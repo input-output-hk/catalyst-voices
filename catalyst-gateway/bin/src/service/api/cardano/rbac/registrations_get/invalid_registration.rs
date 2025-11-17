@@ -1,14 +1,20 @@
 //! An invalid RBAC registration.
 
-use cardano_chain_follower::{hashes::TransactionId, Slot};
+use cardano_chain_follower::{Slot, hashes::TransactionId};
 use catalyst_types::uuid::UuidV4;
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{
+    Object,
+    types::{Example, ParseFromJSON},
+};
 
 use crate::{
     db::index::queries::rbac::get_rbac_invalid_registrations::Query,
-    service::common::types::{
-        cardano::{slot_no::SlotNo, transaction_id::TxnId, txn_index::TxnIndex},
-        generic::{date_time::DateTime, error_msg::ErrorMessage, uuidv4::UUIDv4},
+    service::common::{
+        objects::generic::problem_report::ProblemReport,
+        types::{
+            cardano::{slot_no::SlotNo, transaction_id::TxnId, txn_index::TxnIndex},
+            generic::{date_time::DateTime, uuidv4::UUIDv4},
+        },
     },
     settings::Settings,
 };
@@ -30,7 +36,7 @@ pub struct InvalidRegistration {
     /// A registration purpose.
     purpose: Option<UUIDv4>,
     /// A problem report.
-    report: ErrorMessage,
+    report: ProblemReport,
 }
 
 impl Example for InvalidRegistration {
@@ -42,25 +48,28 @@ impl Example for InvalidRegistration {
             txn_index: TxnIndex::example(),
             previous_txn: Some(TxnId::example()),
             purpose: Some(UUIDv4::example()),
-            report: ErrorMessage::example(),
+            report: ProblemReport::example(),
         }
     }
 }
 
-impl From<Query> for InvalidRegistration {
-    fn from(q: Query) -> Self {
+impl TryFrom<Query> for InvalidRegistration {
+    type Error = anyhow::Error;
+
+    fn try_from(q: Query) -> Result<Self, Self::Error> {
         let time = Settings::cardano_network()
             .slot_to_time(q.slot_no.into())
             .into();
 
-        Self {
+        Ok(Self {
             time,
             txn_id: TransactionId::from(q.txn_id).into(),
             slot: Slot::from(q.slot_no).into(),
             txn_index: q.txn_index.into(),
             previous_txn: q.prv_txn_id.map(|t| TransactionId::from(t).into()),
             purpose: q.purpose.map(|p| UuidV4::from(p).into()),
-            report: q.problem_report.into(),
-        }
+            report: ParseFromJSON::parse_from_json_string(&q.problem_report)
+                .map_err(|e| anyhow::anyhow!("{}", e.message()))?,
+        })
     }
 }

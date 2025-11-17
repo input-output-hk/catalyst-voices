@@ -16,7 +16,8 @@ import 'package:result_type/result_type.dart';
 final _logger = Logger('RegistrationCubit');
 
 /// Manages the registration state.
-final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmitterMixin {
+final class RegistrationCubit extends Cubit<RegistrationState>
+    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<RegistrationSignal, RegistrationState> {
   final BaseProfileCubit _baseProfileCubit;
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
@@ -64,9 +65,17 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     _walletLinkCubit.errorStream.listen(emitError);
     _recoverCubit.errorStream.listen(emitError);
 
+    final getStarted = RegistrationGetStartedState(
+      availableMethods: [
+        if (CatalystPlatform.isWeb) CreateAccountType.createNew,
+        CreateAccountType.recover,
+      ],
+    );
+
     // Emits initialization state
     emit(
       state.copyWith(
+        getStarted: getStarted,
         baseProfileStateData: _baseProfileCubit.state,
         keychainStateData: _keychainCreationCubit.state,
         walletLinkStateData: _walletLinkCubit.state,
@@ -141,7 +150,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       _onRegistrationStateDataChanged(_registrationState.copyWith(isSubmittingTx: true));
 
       final submitData = _buildAccountSubmitData();
-
       switch (submitData) {
         case AccountSubmitFullData():
           final account = await _registrationService.register(data: submitData);
@@ -177,9 +185,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
         ),
       );
     } on EmailAlreadyUsedException {
-      _logger.info('Email already in use');
-
-      emitError(const LocalizedRegistrationEmailAlreadyUsedException());
+      emitSignal(const EmailAlreadyUsedSignal());
 
       _onRegistrationStateDataChanged(_registrationState.copyWith(isSubmittingTx: false));
 
@@ -269,12 +275,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       _transaction = transaction;
 
       final fee = transaction.fee;
-      final formattedFree = CryptocurrencyFormatter.formatAmount(fee);
+      final formattedFee = MoneyFormatter.formatExactAmount(fee.toMoney());
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
           canSubmitTx: Optional.of(Success(true)),
-          transactionFee: Optional.of(formattedFree),
+          transactionFee: Optional.of(formattedFee),
         ),
       );
     } on RegistrationException catch (error, stackTrace) {

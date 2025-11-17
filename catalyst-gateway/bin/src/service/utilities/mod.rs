@@ -1,12 +1,12 @@
 //! `API` Utility operations
 pub(crate) mod cache;
-pub(crate) mod catch_panic;
 pub(crate) mod convert;
 pub(crate) mod health;
 pub(crate) mod middleware;
 pub(crate) mod net;
+pub(crate) mod panic;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 // use pallas::ledger::addresses::Network as PallasNetwork;
 // use poem_openapi::types::ToJSON;
 

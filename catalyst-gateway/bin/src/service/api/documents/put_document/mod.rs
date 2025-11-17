@@ -3,7 +3,7 @@
 use std::{collections::HashSet, str::FromStr};
 
 use catalyst_signed_doc::CatalystSignedDocument;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{ApiResponse, payload::Json};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use super::common::{DocProvider, VerifyingKeyProvider};
@@ -15,9 +15,12 @@ use crate::{
         },
         index::session::CassandraSessionError,
     },
-    service::common::{
-        auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
-        types::headers::retry_after::RetryAfterOption,
+    service::{
+        api::documents::common::ValidationProvider,
+        common::{
+            auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
+            types::headers::retry_after::RetryAfterOption,
+        },
     },
 };
 
@@ -71,6 +74,21 @@ pub(crate) async fn endpoint(
         .into();
     };
 
+    // validate document signatures
+    let verifying_key_provider =
+        match VerifyingKeyProvider::try_from_kids(&mut token, &doc.authors()).await {
+            Ok(value) => value,
+            Err(err) if err.is::<CassandraSessionError>() => {
+                return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
+            },
+            Err(err) => {
+                return Responses::UnprocessableContent(Json(
+                    PutDocumentUnprocessableContent::new(&err, None),
+                ))
+                .into();
+            },
+        };
+
     match doc.is_deprecated() {
         // apply older validation rule
         Ok(true) => {
@@ -85,7 +103,7 @@ pub(crate) async fn endpoint(
                     return Responses::UnprocessableContent(Json(
                         PutDocumentUnprocessableContent::new(
                             "Failed validating document integrity",
-                            serde_json::to_value(doc.problem_report()).ok(),
+                            None,
                         ),
                     ))
                     .into();
@@ -95,13 +113,15 @@ pub(crate) async fn endpoint(
         },
         // apply newest validation rules
         Ok(false) => {
-            match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+            let validation_provider = ValidationProvider::new(DocProvider, verifying_key_provider);
+
+            match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
                 Ok(true) => (),
                 Ok(false) => {
                     return Responses::UnprocessableContent(Json(
                         PutDocumentUnprocessableContent::new(
                             "Failed validating document integrity",
-                            serde_json::to_value(doc.problem_report()).ok(),
+                            Some(doc.problem_report()),
                         ),
                     ))
                     .into();
@@ -115,38 +135,10 @@ pub(crate) async fn endpoint(
         Err(err) => return AllResponses::handle_error(&err),
     }
 
-    // validate document signatures
-    let verifying_key_provider =
-        match VerifyingKeyProvider::try_from_kids(&mut token, &doc.kids()).await {
-            Ok(value) => value,
-            Err(err) if err.is::<CassandraSessionError>() => {
-                return AllResponses::service_unavailable(&err, RetryAfterOption::Default)
-            },
-            Err(err) => {
-                return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                    &err, None,
-                )))
-                .into()
-            },
-        };
-    match catalyst_signed_doc::validator::validate_signatures(&doc, &verifying_key_provider).await {
-        Ok(true) => (),
-        Ok(false) => {
-            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Failed validating document signatures",
-                serde_json::to_value(doc.problem_report()).ok(),
-            )))
-            .into();
-        },
-        Err(err) => {
-            return AllResponses::handle_error(&err);
-        },
-    }
-
     if doc.problem_report().is_problematic() {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "Invalid Catalyst Signed Document",
-            serde_json::to_value(doc.problem_report()).ok(),
+            Some(doc.problem_report()),
         )))
         .into();
     }
@@ -169,7 +161,7 @@ pub(crate) async fn endpoint(
         Err(err) if err.is::<StoreError>() => {
             Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Document with the same `id` and `ver` already exists",
-                serde_json::to_value(doc.problem_report()).ok(),
+                Some(doc.problem_report()),
             )))
             .into()
         },
@@ -182,7 +174,7 @@ async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::
     let original_doc = match FullSignedDoc::retrieve(&doc.doc_id()?.uuid(), None).await {
         Ok(doc) => doc,
         Err(e) if e.is::<error::NotFoundError>() => return Ok(true),
-        Err(e) => anyhow::bail!("Database error: {e}"),
+        Err(e) => return Err(e),
     };
 
     let original_authors = original_doc
@@ -202,13 +194,17 @@ async fn store_document_in_db(
     doc: &catalyst_signed_doc::CatalystSignedDocument,
     doc_bytes: Vec<u8>,
 ) -> anyhow::Result<bool> {
-    let authors = doc.authors().iter().map(ToString::to_string).collect();
+    let authors = doc
+        .authors()
+        .iter()
+        .map(|v| v.as_short_id().to_string())
+        .collect();
 
     let doc_meta_json = doc.doc_meta().to_json()?;
 
     let payload = if matches!(
-        doc.doc_content_type()?,
-        catalyst_signed_doc::ContentType::Json
+        doc.doc_content_type(),
+        Some(catalyst_signed_doc::ContentType::Json)
     ) {
         match serde_json::from_slice(doc.decoded_content()?.as_slice()) {
             Ok(payload) => Some(payload),

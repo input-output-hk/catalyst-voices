@@ -40,6 +40,10 @@ class _EnvironmentCard extends StatelessWidget {
           name: const Text('reviews'),
           value: Text(env?.type.reviews.toString() ?? '-'),
         ),
+        ValueText(
+          name: const Text('status'),
+          value: Text(env?.type.status.toString() ?? '-'),
+        ),
       ],
     );
   }

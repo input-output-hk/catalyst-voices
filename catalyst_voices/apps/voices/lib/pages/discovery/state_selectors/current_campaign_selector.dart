@@ -1,9 +1,11 @@
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/typedefs.dart';
 import 'package:catalyst_voices/pages/discovery/sections/current_campaign.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -76,7 +78,7 @@ class CurrentCampaignLoading extends StatelessWidget {
         return Offstage(
           offstage: !state,
           child: CurrentCampaign(
-            currentCampaignInfo: const NullCurrentCampaignInfoViewModel(),
+            currentCampaignInfo: NullCurrentCampaignInfoViewModel(),
             isLoading: state,
           ),
         );
@@ -90,16 +92,18 @@ class CurrentCampaignSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      key: Key('CurrentCampaignRoot'),
+    return Column(
+      key: const Key('CurrentCampaignRoot'),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.only(left: 120, top: 64, right: 120),
-          child: _Header(),
+        ResponsivePadding(
+          xs: const EdgeInsets.only(left: 20, top: 64, right: 20),
+          sm: const EdgeInsets.only(left: 42, top: 64, right: 42),
+          md: const EdgeInsets.only(left: 120, top: 64, right: 120),
+          child: const _Header(),
         ),
-        Stack(
+        const Stack(
           children: [
             CurrentCampaignLoading(),
             CurrentCampaignData(),
@@ -130,7 +134,7 @@ class _Header extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             key: const Key('Subtitle'),
-            context.l10n.catalystFundNo(14),
+            context.l10n.catalystFundNo(context.activeCampaignFundNumber),
             style: context.textTheme.displayMedium?.copyWith(
               color: context.colorScheme.primary,
             ),

@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/permissions/permission_handler_factory.dart';
 import 'package:catalyst_voices/share/resource_url_resolver.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -11,8 +13,10 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:path_provider/path_provider.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final class Dependencies extends DependencyProvider {
@@ -78,6 +82,9 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerLazySingleton<AdminTools>(
         () => get<AdminToolsCubit>(),
+      )
+      ..registerLazySingleton<SystemStatusCubit>(
+        () => SystemStatusCubit(get<SystemStatusRepository>()),
       )
       ..registerLazySingleton<SessionCubit>(
         () {
@@ -181,11 +188,6 @@ final class Dependencies extends DependencyProvider {
           get<DocumentsService>(),
         );
       })
-      ..registerFactory<PublicProfileEmailStatusCubit>(() {
-        return PublicProfileEmailStatusCubit(
-          get<UserService>(),
-        );
-      })
       ..registerFactory<DocumentLookupBloc>(() {
         return DocumentLookupBloc(
           get<DocumentsService>(),
@@ -235,7 +237,10 @@ final class Dependencies extends DependencyProvider {
         return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
-        return const SignedDocumentManager();
+        return const SignedDocumentManager(
+          brotli: CatalystBrotliCompressor(),
+          zstd: CatalystZstdCompressor(),
+        );
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
         return DatabaseDraftsDataSource(
@@ -292,6 +297,11 @@ final class Dependencies extends DependencyProvider {
         () => VotingRepository(
           get<CastedVotesObserver>(),
         ),
+      )
+      ..registerLazySingleton<SystemStatusRepository>(
+        () => SystemStatusRepository(
+          get<ApiServices>(),
+        ),
       );
   }
 
@@ -325,6 +335,7 @@ final class Dependencies extends DependencyProvider {
     });
     registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
     registerLazySingleton<DownloaderService>(DownloaderService.new);
+    registerLazySingleton<UploaderService>(UploaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,
@@ -345,6 +356,7 @@ final class Dependencies extends DependencyProvider {
         return UserService(
           get<UserRepository>(),
           get<UserObserver>(),
+          get<RegistrationStatusPoller>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
@@ -444,6 +456,10 @@ final class Dependencies extends DependencyProvider {
               sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
               driftWorker: Uri.parse(config.webDriftWorker),
             ),
+            native: CatalystDriftDatabaseNativeConfig(
+              dbDir: () => path.getApplicationDocumentsDirectory().then((dir) => dir.path),
+              dbTempDir: () => path.getTemporaryDirectory().then((dir) => dir.path),
+            ),
           ),
           interceptor: reporting.buildDbInterceptor(databaseName: config.name),
         );
@@ -468,14 +484,23 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (storage) async => storage.dispose(),
     );
+    registerLazySingleton<AppMetaStorage>(
+      () {
+        return AppMetaStorageLocalStorage(
+          sharedPreferences: get<SharedPreferencesAsync>(),
+        );
+      },
+    );
   }
 
   void _registerUtils() {
     registerLazySingleton<SyncManager>(
       () {
         return SyncManager(
+          get<AppMetaStorage>(),
           get<SyncStatsStorage>(),
           get<DocumentsService>(),
+          get<CampaignService>(),
         );
       },
       dispose: (manager) async => manager.dispose(),
@@ -499,5 +524,16 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
     registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+
+    // Not a singleton
+    registerFactory<RegistrationStatusPoller>(
+      () => RegistrationStatusPoller(get<UserRepository>()),
+    );
+    registerLazySingleton<DeviceInfoPlugin>(DeviceInfoPlugin.new);
+    registerLazySingleton<PermissionHandler>(
+      () => PermissionHandlerImpl(
+        get<DeviceInfoPlugin>(),
+      ),
+    );
   }
 }

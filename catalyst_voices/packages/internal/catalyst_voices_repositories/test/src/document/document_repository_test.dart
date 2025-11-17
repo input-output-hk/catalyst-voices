@@ -305,7 +305,7 @@ void main() {
           );
           final remoteRefs = [...refs, ...refs];
           final expectedRefs = <TypedDocumentRef>[
-            ...constantDocumentsRefs.expand(
+            ...activeConstantDocumentRefs.expand(
               (e) {
                 return e.allTyped.where((element) => element.type != categoryType);
               },
@@ -313,10 +313,12 @@ void main() {
             ...refs,
           ];
 
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(remoteRefs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(remoteRefs));
 
           // When
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           expect(
@@ -338,9 +340,11 @@ void main() {
           );
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
 
-          await repository.getAllDocumentsRefs();
+          await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           verifyNever(() => remoteDocuments.getLatestVersion(any()));
@@ -365,12 +369,14 @@ void main() {
           final refs = [...exactRefs, ...looseRefs];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
           when(
             () => remoteDocuments.getLatestVersion(any()),
           ).thenAnswer((_) => Future(DocumentRefFactory.randomUuidV7));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           verify(() => remoteDocuments.getLatestVersion(any())).called(looseRefs.length);
@@ -384,7 +390,7 @@ void main() {
         'remote loose refs to const documents are removed',
         () async {
           // Given
-          final constTemplatesRefs = constantDocumentsRefs
+          final constTemplatesRefs = activeConstantDocumentRefs
               .expand(
                 (element) => [
                   element.proposal.toTyped(DocumentType.proposalTemplate),
@@ -396,22 +402,26 @@ void main() {
             10,
             (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
-          final looseTemplatesRefs = constTemplatesRefs.map(
-            (e) => e.copyWith(ref: e.ref.toLoose()),
-          );
+          final looseTemplatesRefs = constTemplatesRefs
+              .map((e) => e.copyWith(ref: e.ref.toLoose()))
+              .toList();
           final refs = [
             ...docsRefs,
             ...looseTemplatesRefs,
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
-          expect(allRefs, isNot(containsAll(looseTemplatesRefs)));
-          expect(allRefs, containsAll(constTemplatesRefs));
+          if (constTemplatesRefs.isNotEmpty) {
+            expect(allRefs, isNot(containsAll(looseTemplatesRefs)));
+            expect(allRefs, containsAll(constTemplatesRefs));
+          }
 
           verifyNever(() => remoteDocuments.getLatestVersion(any()));
         },
@@ -422,7 +432,7 @@ void main() {
         'categories refs are filtered out',
         () async {
           // Given
-          final categoriesRefs = constantDocumentsRefs
+          final categoriesRefs = allConstantDocumentRefs
               .expand(
                 (element) => [
                   element.category.toTyped(DocumentType.categoryParametersDocument),
@@ -442,9 +452,11 @@ void main() {
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           expect(allRefs, isNot(containsAll(categoriesRefs)));
@@ -467,16 +479,18 @@ void main() {
             TypedDocumentRef(ref: ref, type: DocumentType.unknown),
           ];
           final expectedRefs = <TypedDocumentRef>[
-            ...constantDocumentsRefs.expand(
+            ...activeConstantDocumentRefs.expand(
               (refs) => refs.allTyped.where((e) => e.type != categoryType),
             ),
             TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(docsRefs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(docsRefs));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           expect(allRefs, containsAll(expectedRefs));
@@ -547,11 +561,13 @@ void main() {
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
         );
+
         const publicDraftContent = DocumentDataContent({'title': 'My proposal'});
-        final publicDraftRef = DocumentRefFactory.draftRef();
+        final publicDraftRef = DocumentRefFactory.signedDocumentRef();
         final publicDraftData = DocumentDataFactory.build(
           selfRef: publicDraftRef,
           template: templateRef,
+          categoryId: DocumentRefFactory.signedDocumentRef(),
           content: publicDraftContent,
         );
 

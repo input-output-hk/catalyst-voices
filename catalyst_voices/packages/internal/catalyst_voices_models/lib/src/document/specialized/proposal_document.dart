@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/document/document_metadata.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -8,7 +7,7 @@ final class ProposalDocument extends Equatable {
   /// The maximum amount of proposal submitted for review per user.
   ///
   /// The limit does not have any effect on drafts or published proposals.
-  static const int maxSubmittedProposalsPerUser = 6;
+  static const int maxSubmittedProposalsPerUser = 2;
 
   /// A hardcoded [NodeId] of the title property.
   ///
@@ -22,7 +21,6 @@ final class ProposalDocument extends Equatable {
   static final requestedFundsNodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
   static final durationNodeId = DocumentNodeId.fromString('summary.time.duration');
   static final authorNameNodeId = DocumentNodeId.fromString('setup.proposer.applicant');
-  static final categoryNodeId = DocumentNodeId.fromString('campaign_category');
   static final categoryDetailsNodeId = DocumentNodeId.fromString(
     'campaign_category.category_details',
   );
@@ -51,7 +49,6 @@ final class ProposalDocument extends Equatable {
     requestedFundsNodeId,
     durationNodeId,
     authorNameNodeId,
-    categoryNodeId,
     categoryDetailsNodeId,
     categoryDetailsNameNodeId,
     milestonesNodeId,
@@ -93,7 +90,7 @@ final class ProposalDocument extends Equatable {
     return property.value;
   }
 
-  Coin? get fundsRequested {
+  Money? get fundsRequested {
     final property = document.getProperty(requestedFundsNodeId);
 
     if (property is! DocumentValueProperty<int>) {
@@ -101,8 +98,16 @@ final class ProposalDocument extends Equatable {
     }
 
     final value = property.value;
-    if (value == null) return null;
-    return Coin.fromWholeAda(value);
+    if (value == null) {
+      return null;
+    }
+
+    final schema = property.schema;
+    if (schema is! DocumentCurrencySchema) {
+      return null;
+    }
+
+    return schema.valueToMoney(value);
   }
 
   int? get milestoneCount {
@@ -114,7 +119,7 @@ final class ProposalDocument extends Equatable {
 
     return DocumentNodeTraverser.findSectionsAndSubsections(
       property,
-    ).where((element) => element.nodeId.isChildOf(milestoneListNodeId)).length;
+    ).where((element) => element.nodeId.isSameOrChildOf(milestoneListNodeId)).length;
   }
 
   @override

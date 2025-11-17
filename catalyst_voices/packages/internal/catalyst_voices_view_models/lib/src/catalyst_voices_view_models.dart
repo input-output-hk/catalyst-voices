@@ -1,7 +1,6 @@
 export 'account/exception/localized_active_account_not_found_exception.dart';
 export 'account/exception/localized_email_already_use_exception.dart';
 export 'account/my_account_role_item.dart';
-export 'account/my_account_status_notification.dart';
 export 'api/exception/localized_api_exception.dart';
 export 'authentication/authentication.dart';
 export 'campaign/campaign_category_section.dart';
@@ -28,6 +27,8 @@ export 'document/validation/localized_document_validation_result.dart';
 export 'exception/localized_document_import_invalid_data_exception.dart';
 export 'exception/localized_exception.dart';
 export 'exception/localized_not_found_exception.dart';
+export 'exception/localized_permission_need_explanation_exception.dart';
+export 'exception/localized_permission_need_rationale_exception.dart';
 export 'exception/localized_unknown_exception.dart';
 export 'managers/video_manager_assets.dart';
 export 'menu/menu_item.dart';

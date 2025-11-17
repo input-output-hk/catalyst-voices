@@ -1,10 +1,297 @@
 name: catalyst_voices_workspace
 
 environment:
-  sdk: ">=3.3.3 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
+
+workspace:
+  - apps/voices
+  - packages/internal/catalyst_voices_assets
+  - packages/internal/catalyst_voices_assets/example
+  - packages/internal/catalyst_voices_blocs
+  - packages/internal/catalyst_voices_brands
+  - packages/internal/catalyst_voices_driver
+  - packages/internal/catalyst_voices_localization
+  - packages/internal/catalyst_voices_models
+  - packages/internal/catalyst_voices_repositories
+  - packages/internal/catalyst_voices_services
+  - packages/internal/catalyst_voices_shared
+  - packages/internal/catalyst_voices_view_models
+  - packages/libs/catalyst_analysis
+  - packages/libs/catalyst_analysis/example
+  - packages/libs/catalyst_cardano/catalyst_cardano
+  - packages/libs/catalyst_cardano/catalyst_cardano/example
+  - packages/libs/catalyst_cardano/catalyst_cardano_platform_interface
+  - packages/libs/catalyst_cardano/catalyst_cardano_web
+  - packages/libs/catalyst_cardano_serialization
+  - packages/libs/catalyst_compression
+  - packages/libs/catalyst_compression/example
+  - packages/libs/catalyst_cose
+  - packages/libs/catalyst_key_derivation
+  - packages/libs/catalyst_key_derivation/example
+  - utilities/poc_local_storage
+  - utilities/remote_widgets
+  - utilities/remote_widgets/example
+  - utilities/uikit_example
 
 dependencies:
-  dart_pubspec_licenses: ^3.0.4
+  dart_pubspec_licenses: ^3.0.9
 
 dev_dependencies:
-  melos: ^6.3.3
+  melos: ^7.1.1
+
+melos:
+  repository: https://github.com/input-output-hk/catalyst-voices
+
+  command:
+    version:
+      linkToCommits: true
+      workspaceChangelog: true
+    bootstrap:
+      runPubGetInParallel: true
+      environment:
+        sdk: ">=3.9.0 <4.0.0"
+        flutter: ">=3.35.1"
+
+  scripts:
+    install:
+      run: |
+        dart pub global activate junitreport
+        dart pub global activate dartdoc
+        dart pub global activate coverage
+        dart pub global activate combine_coverage
+        dart pub global activate license_checker
+        dart pub global activate pubviz
+        dart pub global activate dhttpd
+      description: |
+        Installs plugins needed by scripts in this file.
+
+    analyze:
+      run: |
+        melos exec -- dart analyze --fatal-infos --fatal-warnings
+      description: |
+        Run `dart analyze` in every package.
+
+    l10n:
+      run: |
+        melos exec --scope="catalyst_voices_localization" -- flutter gen-l10n
+      description: |
+        Run `flutter gen-l10n` in catalyst_voices_localization package to generate l10n bindings.
+
+    l10n-check:
+      run: |
+        cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --check
+      description: |
+        Check for unused translation keys in .arb files without modifying them, and check if translation keys are sorted.
+
+    l10n-clean:
+      run: |
+        cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --clean --sort
+      description: |
+        Clean up unused translation keys and sort them alphabetically in .arb files.
+
+    build-runner:
+      run: |
+        melos exec --depends-on="build_runner" --ignore="catalyst_voices_repositories" --order-dependents -- \
+            dart run build_runner build --delete-conflicting-outputs
+      description: |
+        Run `build_runner` in every package which contains the build_runner dependency.
+        The catalyst_voices_repositories is skipped because to run a build_runner there you
+        must generate first swagger docs (see related Earthfile).
+
+    build-runner-repository:
+      run: |
+        melos exec --scope="catalyst_voices_repositories" -- dart run build_runner clean && \
+        melos exec --scope="catalyst_voices_repositories" -- dart run process_openapi.dart && \
+        melos exec --scope="catalyst_voices_repositories" -- dart run build_runner build --delete-conflicting-outputs
+      description: |
+        Run `build_runner` in catalyst_voices_repositories package
+
+    db-make-migration:
+      run: |
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
+      description: |
+        Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
+        classes
+
+    metrics:
+      run: |
+        melos exec -- flutter pub run dart_code_metrics:metrics analyze
+      description: |
+        Run `dart_code_metrics` in all packages.
+        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
+
+    format-apply:
+      run: |
+        melos exec --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
+        melos exec --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
+        melos exec --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +"
+      description: Run `dart format` for all packages.
+
+    format-check:
+      run: |
+        melos exec --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
+        melos exec --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
+        melos exec --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +"
+      description: Run `dart format` checks for all packages.
+
+    license-check:
+      run: |
+        cd $MELOS_ROOT_PATH && lic_ck check-licenses -c $MELOS_ROOT_PATH/licenses.yaml -i
+      description: Run `lic_ck` checks for all packages.
+
+    license-list:
+      run: |
+        melos exec --ignore="catalyst_analysis" --ignore="*example*" -- \
+          'dart run $MELOS_ROOT_PATH/scripts/generate_licenses.dart $MELOS_PACKAGE_PATH $MELOS_ROOT_PATH/docs/licenses/$MELOS_PACKAGE_NAME.csv'
+        dart run $MELOS_ROOT_PATH/scripts/merge_csv_files.dart $MELOS_ROOT_PATH/docs/licenses/ $MELOS_ROOT_PATH/docs/licenses/licenses.csv
+        echo "✅ Output file: $MELOS_ROOT_PATH/docs/licenses/licenses.csv"
+      description: Generate license list for all packages in docs/licenses/licenses.csv file.
+
+    dependency-graph:
+      run: |
+        melos exec --scope "catalyst_voices" -- \
+          'pubviz print --direct-dependencies --production-dependencies --format dot > $MELOS_ROOT_PATH/docs/dependency_graph.dot'
+        echo "✅ Output file: $MELOS_ROOT_PATH/docs/dependency_graph.dot"
+      description: |
+        Generate license list for all packages in docs/dependency_graph.dot file.
+        The .dot file can be viewed using software available online such as graphviz.
+
+    test-native-sync:
+      run: |
+        melos exec -c 1 --dir-exists="test" -- \
+          flutter test --reporter github --no-pub
+      description: |
+        Run `flutter test` for all packages one by one.
+
+    test-native:
+      run: |
+        melos exec --dir-exists="test" -- \
+          flutter test --reporter github --no-pub 2>&1 \
+          | grep -v "Waiting for another flutter command to release the startup lock"
+      description: |
+        Run `flutter test` for all packages
+        Filters out irrelevant warning messages related to the startup lock.
+
+    # catalyst_voices: this package should contain only widget tests
+    test-web:
+      run: |
+        melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
+          flutter test --reporter github --platform chrome --no-pub 2>&1 \
+          | grep -v "Waiting for another flutter command to release the startup lock"
+      description: |
+        Run `flutter test --platform chrome` for all packages.
+        Filters out irrelevant warning messages related to the startup lock.
+
+    test-report-native:
+      run: |
+        # cleanup from previous build and create empty folder where test reports will be stored
+        rm -fR $MELOS_ROOT_PATH/test_reports
+        mkdir $MELOS_ROOT_PATH/test_reports
+
+        # cleanup old coverage files and create empty folder where coverage files will be stored
+        find . -type d -name coverage -prune -exec rm -rf {} \;
+        mkdir $MELOS_ROOT_PATH/coverage
+
+        # run tests, generate junit reports in /test_reports/ & code coverage report
+        melos exec --dir-exists="test" -- \
+        ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
+          JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
+          flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2>&1 \
+            | grep -v "Waiting for another flutter command to release the startup lock" ; \
+          EXIT_CODE=$? ; \
+          cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
+          exit $EXIT_CODE'
+
+        # store the exit code after running the tests,
+        # this is the exit code for the whole script
+        EXIT_CODE=$?
+
+        # removes code coverage for generated code
+        find . -name "*.lcov.info" -exec \
+          lcov --remove {} -o {} --ignore-errors unused,unused \
+          '*.g.dart' \
+          '*.freezed.dart' \
+          '*.chopper.dart' \
+          '*.swagger.dart' \
+          '*.openapi.dart' \
+          '*.gen.dart' \
+          '*.swagger.*.dart' \
+          '*.drift.dart' \
+          'lib/generated/**' \;
+
+        # merges all coverage reports into a single one and puts it in /coverage/lcov.info
+        dart pub global run combine_coverage --repo-path=.
+        mv ./coverage/lcov.info ./coverage/lcov.coverage.info
+
+        exit $EXIT_CODE
+
+      description: |
+        Run `flutter test` for all packages and generate junit and coverage reports.
+        The test reports are saved in /test_reports folder.
+        The coverages are saved in coverage/lcov.info file for each tested package.
+        The combined coverage is saved in the /coverage/lcov.coverage.info file.
+        Filters out irrelevant warning messages related to the startup lock.
+
+    test-report-web:
+      run: |
+        # cleanup from previous build and create empty folder where test reports will be stored
+        rm -fR $MELOS_ROOT_PATH/test_reports
+        mkdir $MELOS_ROOT_PATH/test_reports
+
+        # cleanup old coverage files and create empty folder where coverage files will be stored
+        find . -type d -name coverage -prune -exec rm -rf {} \;
+        mkdir $MELOS_ROOT_PATH/coverage
+
+        # run tests, generate junit reports in /test_reports/ & code coverage report
+        melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
+        ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
+          JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
+          flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2>&1 \
+            | grep -v "Waiting for another flutter command to release the startup lock" ; \
+          EXIT_CODE=$? ; \
+          cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
+          exit $EXIT_CODE'
+
+        # store the exit code after running the tests,
+        # this is the exit code for the whole script
+        EXIT_CODE=$?
+
+        # removes code coverage for generated code
+        find . -name "*.lcov.info" -exec \
+          lcov --remove {} -o {} --ignore-errors unused,unused \
+          '*.g.dart' \
+          '*.freezed.dart' \
+          '*.chopper.dart' \
+          '*.swagger.dart' \
+          '*.openapi.dart' \
+          '*.gen.dart' \
+          '*.swagger.*.dart' \
+          '*.drift.dart' \
+          'lib/generated/**' \;
+
+        # merges all coverage reports into a single one and puts it in /coverage/lcov.info
+        dart pub global run combine_coverage --repo-path=.
+        mv ./coverage/lcov.info ./coverage/lcov.coverage.info
+
+        exit $EXIT_CODE
+
+      description: |
+        Run `flutter test --platform chrome` for all packages and generate junit and coverage reports.
+        The test reports are saved in /test_reports folder.
+        The coverages are saved in coverage/lcov.info file for each tested package.
+        The combined coverage is saved in the /coverage/lcov.coverage.info file.
+        Filters out irrelevant warning messages related to the startup lock.
+
+    docs-generate:
+      run: |
+        melos exec --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
+        melos exec --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
+      description: |
+        Generate internal documentation and saves it to docs/dartdoc directory
+
+    docs-view:
+      run: |
+        dart pub global run dhttpd --path docs/dartdoc/
+      description: |
+        Documentation will be served at localhost:8080/<packageName>
+        For example catalyst_voices_repository is served at localhost:8080/catalyst_voices_repository

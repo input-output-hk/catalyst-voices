@@ -10,17 +10,17 @@ The file structure is subject to change as the project evolves.
 ## Table of Contents
 
 * [Catalyst Voices Integration Tests](#catalyst-voices-integration-tests)
-  * [Table of Contents](#table-of-contents)
-  * [Introduction](#introduction)
-  * [Prerequisites](#prerequisites)
-  * [Directory Structure](#directory-structure)
-  * [Running Tests](#running-tests)
-    * [Via CLI](#via-cli)
-    * [Via Visual Studio Code](#via-visual-studio-code)
-    * [Via earthly](#via-earthly)
-  * [Test Approach](#test-approach)
-  * [Troubleshooting](#troubleshooting)
-  * [Contributing](#contributing)
+    * [Table of Contents](#table-of-contents)
+    * [Introduction](#introduction)
+    * [Prerequisites](#prerequisites)
+    * [Directory Structure](#directory-structure)
+    * [Running Tests](#running-tests)
+        * [Via CLI](#via-cli)
+        * [Via Visual Studio Code](#via-visual-studio-code)
+        * [Via earthly](#via-earthly)
+    * [Test Approach](#test-approach)
+    * [Troubleshooting](#troubleshooting)
+    * [Contributing](#contributing)
 
 ---
 
@@ -141,12 +141,12 @@ ensure that you have same versions of chromedriver and chrome.
 * **Web Headers**: If you encounter cross-origin issues, ensure the web headers are set correctly.
 * **Other issues**: If you encounter other issues, try the following:
 
-  * From the root of the project run `melos clean`
-  * Run `just bootstrap` to ensure all dependencies are installed correctly
-  * NOTE: `just bootstrap` takes a white to run, so you can first try with `melos clean` and then run:
+    * From the root of the project run `melos clean`
+    * Run `just bootstrap` to ensure all dependencies are installed correctly
+    * NOTE: `just bootstrap` takes a white to run, so you can first try with `melos clean` and then run:
 
 ```bash
-  melos l10n && melos build_runner && melos build_runner_repository
+  melos l10n && melos build-runner && melos build-runner-repository
 ```
 
 ---

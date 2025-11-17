@@ -1,27 +1,27 @@
 # Flutter Integration Tests
 
 * [Flutter Integration Tests](#flutter-integration-tests)
-  * [Requirements](#requirements)
-  * [Run Integration Tests](#run-integration-tests)
-    * [CI](#ci)
-      * [View Integration Test Results](#view-integration-test-results)
-    * [Local](#local)
-      * [Web](#web)
-      * [iOS](#ios)
-        * [Run integration test in Xcode](#run-integration-test-in-xcode)
-        * [Run integration test from command line](#run-integration-test-from-command-line)
-      * [Android](#android)
-        * [Run integration test in Android Studio](#run-integration-test-in-android-studio)
-        * [Run integration test from command line](#run-integration-test-from-command-line-1)
-    * [Run integration test in Firebase Test Lab](#run-integration-test-in-firebase-test-lab)
-  * [Gcloud CLI](#gcloud-cli)
-  * [Links](#links)
+    * [Requirements](#requirements)
+    * [Run Integration Tests](#run-integration-tests)
+        * [CI](#ci)
+            * [View Integration Test Results](#view-integration-test-results)
+        * [Local](#local)
+            * [Web](#web)
+            * [iOS](#ios)
+                * [Run integration test in Xcode](#run-integration-test-in-xcode)
+                * [Run integration test from command line](#run-integration-test-from-command-line)
+            * [Android](#android)
+                * [Run integration test in Android Studio](#run-integration-test-in-android-studio)
+                * [Run integration test from command line](#run-integration-test-from-command-line-1)
+        * [Run integration test in Firebase Test Lab](#run-integration-test-in-firebase-test-lab)
+    * [Gcloud CLI](#gcloud-cli)
+    * [Links](#links)
 
 ## Requirements
 
 * macOS 14.0 + (if you want to run iOS tests locally)
-* Xcode: 14.2+ (required for iOS tests)
-* Android Studio: Android Studio Electric Eel | 2022.1.1 +
+* Xcode: latest
+* Android Studio: latest
 * [gcloud CLI](https://cloud.google.com/sdk/gcloud)
 
 ## Run Integration Tests

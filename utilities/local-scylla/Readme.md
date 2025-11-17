@@ -88,11 +88,11 @@ just stop-cluster
 These services are not deployed by default.
 
 * [Catalyst Voices Frontend](http://voices.cluster.test/)
-  * [HTTPS](https://voices.cluster.test/)
+    * [HTTPS](https://voices.cluster.test/)
 * [Catalyst Voices Backend](http://voices.cluster.test/api/)
-  * [HTTPS](https://voices.cluster.test/api/)
+    * [HTTPS](https://voices.cluster.test/api/)
 * [Catalyst Voices Documentation](http://docs.voices.cluster.test/)
-  * [HTTPS](https://docs.voices.cluster.test/)
+    * [HTTPS](https://docs.voices.cluster.test/)
 
 ### Deploying Catalyst Voices Frontend and Backend Services
 

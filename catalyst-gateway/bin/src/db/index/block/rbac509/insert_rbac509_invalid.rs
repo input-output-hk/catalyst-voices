@@ -2,9 +2,10 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::{hashes::TransactionId, Slot, TxnIndex};
-use catalyst_types::{catalyst_id::CatalystId, problem_report::ProblemReport, uuid::UuidV4};
-use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
+use cardano_chain_follower::{Slot, TxnIndex, hashes::TransactionId};
+use catalyst_types::{catalyst_id::CatalystId, problem_report, uuid::UuidV4};
+use poem_openapi::types::ToJSON;
+use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
 use crate::{
@@ -12,6 +13,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
+    service::common::objects::generic::problem_report::ProblemReport,
     settings::cassandra_db::EnvVars,
 };
 
@@ -46,14 +48,11 @@ impl Params {
         txn_index: TxnIndex,
         purpose: Option<UuidV4>,
         prv_txn_id: Option<TransactionId>,
-        report: &ProblemReport,
+        report: problem_report::ProblemReport,
     ) -> Self {
         let purpose = purpose.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
-        let problem_report = serde_json::to_string(&report).unwrap_or_else(|e| {
-            error!("Failed to serialize problem report: {e:?}. Report = {report:?}");
-            String::new()
-        });
+        let problem_report = ProblemReport::from(report).to_json_string();
 
         Self {
             catalyst_id: catalyst_id.into(),

@@ -2,8 +2,8 @@
 
 use derive_more::{From, Into};
 use poem_openapi::{
-    types::{Example, ToJSON},
     NewType, Object,
+    types::{Example, ToJSON},
 };
 
 use crate::service::common::types::{
@@ -86,7 +86,7 @@ impl Example for StakeInfo {
     to_header = false,
     example = true
 )]
-pub(crate) struct VolatileStakeInfo(StakeInfo);
+pub(crate) struct VolatileStakeInfo(pub(crate) StakeInfo);
 
 impl Example for VolatileStakeInfo {
     fn example() -> Self {
@@ -102,7 +102,7 @@ impl Example for VolatileStakeInfo {
     to_header = false,
     example = true
 )]
-pub(crate) struct PersistentStakeInfo(StakeInfo);
+pub(crate) struct PersistentStakeInfo(pub(crate) StakeInfo);
 
 impl Example for PersistentStakeInfo {
     fn example() -> Self {

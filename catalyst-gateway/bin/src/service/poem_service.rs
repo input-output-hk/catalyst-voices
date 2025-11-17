@@ -4,10 +4,10 @@
 
 use cardano_chain_follower::Network;
 use poem::{
-    listener::TcpListener,
-    middleware::{CatchPanic, Compression, Cors, SensitiveHeader},
-    web::CompressionLevel,
     Endpoint, EndpointExt, Route,
+    listener::TcpListener,
+    middleware::{Compression, Cors, SensitiveHeader},
+    web::CompressionLevel,
 };
 
 use super::{
@@ -19,8 +19,12 @@ use crate::{
         api::mk_api,
         docs::{docs, favicon},
         utilities::{
-            catch_panic::{panic_endpoint, set_panic_hook, ServicePanicHandler},
-            middleware::{metrics_updater::MetricsUpdaterMiddleware, tracing_mw::Tracing},
+            middleware::{
+                catch_panic::{CatchPanicMiddleware, set_panic_hook},
+                metrics_updater::MetricsUpdaterMiddleware,
+                tracing_mw::Tracing,
+            },
+            panic::panic_endpoint,
         },
     },
     settings::Settings,
@@ -37,7 +41,7 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
     let api_service = mk_api();
     let docs = docs(&api_service);
 
-    if Settings::cardano_network() != Network::Mainnet && Settings::is_panic_endpoint_enabled() {
+    if Settings::cardano_network() != &Network::Mainnet && Settings::is_panic_endpoint_enabled() {
         base_route = base_route.nest("/panic", panic_endpoint);
     }
 
@@ -48,7 +52,7 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
         .nest("/favicon.ico", favicon())
         .with(Cors::new())
         .with(Compression::new().with_quality(CompressionLevel::Fastest))
-        .with(CatchPanic::new().with_handler(ServicePanicHandler))
+        .with(CatchPanicMiddleware::new())
         .with(Tracing)
         .with(DatabaseConnectionCheck)
         .with(CatGatewayInfo)

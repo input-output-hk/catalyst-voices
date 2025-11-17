@@ -15,9 +15,9 @@ class NoWalletFoundDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const VoicesTwoPaneDialog(
-      left: _LeftSide(),
-      right: _RightSide(),
+    return VoicesPanelsDialog(
+      secondary: const _LeftSide(),
+      primary: const _RightSide(),
     );
   }
 
@@ -75,11 +75,14 @@ class _GoodToKnow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final money = CardanoWalletDetails.minAdaForRegistration.toMoney();
+
     return TipCard(
       headerText: context.l10n.goodToKnow,
       tips: [
         context.l10n.registrationTransactionFeeDescription(
-          CardanoWalletDetails.minAdaForRegistration.ada,
+          MoneyFormatter.formatCompactRounded(money),
+          money.currency.code.value,
         ),
       ],
     );

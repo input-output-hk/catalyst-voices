@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -24,7 +24,9 @@ class LanguageCodeWidget extends StatefulWidget {
 
 class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
   bool get _isRequired => widget.schema.isRequired;
+
   String get _title => widget.schema.title;
+
   String? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override

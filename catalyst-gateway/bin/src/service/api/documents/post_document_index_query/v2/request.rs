@@ -1,8 +1,8 @@
 //! Document Index Query V1 endpoint request objects.
 
 use poem_openapi::{
-    types::{Example, ToJSON},
     NewType, Object,
+    types::{Example, ToJSON},
 };
 
 use crate::{
@@ -10,8 +10,8 @@ use crate::{
     service::common::types::{
         array_types::impl_array_types,
         document::{
-            doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
-            ver::EqOrRangedVerDocumented,
+            doc_type::DocumentType, id::IdSelectorDocumented,
+            id_and_ver_ref::IdAndVerRefDocumented, ver::VerSelectorDocumented,
         },
     },
 };
@@ -38,13 +38,13 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// Either an absolute single Document ID or a range of
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     #[oai(skip_serializing_if_is_none)]
-    id: Option<EqOrRangedIdDocumentedList>,
+    id: Option<IdSelectorDocumented>,
     /// ## Document Version
     ///
     /// Either an absolute single Document Version or a range of
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     #[oai(skip_serializing_if_is_none)]
-    ver: Option<EqOrRangedVerDocumentedList>,
+    ver: Option<VerSelectorDocumented>,
     /// ## Document Reference
     ///
     /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
@@ -147,23 +147,6 @@ impl Example for DocumentIndexQueryFilterV2 {
 }
 
 impl_array_types!(
-    EqOrRangedIdDocumentedList,
-    EqOrRangedIdDocumented,
-    Some(poem_openapi::registry::MetaSchema {
-        example: Self::example().to_json(),
-        max_items: Some(10),
-        items: Some(Box::new(EqOrRangedIdDocumented::schema_ref())),
-        ..poem_openapi::registry::MetaSchema::ANY
-    })
-);
-
-impl Example for EqOrRangedIdDocumentedList {
-    fn example() -> Self {
-        Self(vec![EqOrRangedIdDocumented::example()])
-    }
-}
-
-impl_array_types!(
     DocumentTypeList,
     DocumentType,
     Some(poem_openapi::registry::MetaSchema {
@@ -177,23 +160,6 @@ impl_array_types!(
 impl Example for DocumentTypeList {
     fn example() -> Self {
         Self(vec![DocumentType::example()])
-    }
-}
-
-impl_array_types!(
-    EqOrRangedVerDocumentedList,
-    EqOrRangedVerDocumented,
-    Some(poem_openapi::registry::MetaSchema {
-        example: Self::example().to_json(),
-        max_items: Some(10),
-        items: Some(Box::new(EqOrRangedVerDocumented::schema_ref())),
-        ..poem_openapi::registry::MetaSchema::ANY
-    })
-);
-
-impl Example for EqOrRangedVerDocumentedList {
-    fn example() -> Self {
-        Self(vec![EqOrRangedVerDocumented::example()])
     }
 }
 
@@ -247,27 +213,15 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
                     .collect::<Result<Vec<_>, _>>()?,
             );
         }
-        if let Some(ids) = value.id {
-            let ids = ids
-                .0
-                .into_iter()
-                .map(TryInto::try_into)
-                .collect::<Result<Vec<_>, _>>()?;
-
-            for id in ids {
-                db_filter = db_filter.with_id(id);
-            }
+        if let Some(id) = value.id
+            && let Some(id) = id.try_into()?
+        {
+            db_filter = db_filter.with_id(id);
         }
-        if let Some(versions) = value.ver {
-            let versions = versions
-                .0
-                .into_iter()
-                .map(TryInto::try_into)
-                .collect::<Result<Vec<_>, _>>()?;
-
-            for ver in versions {
-                db_filter = db_filter.with_ver(ver);
-            }
+        if let Some(version) = value.ver
+            && let Some(version) = version.try_into()?
+        {
+            db_filter = db_filter.with_ver(version);
         }
         if let Some(doc_refs) = value.doc_ref {
             let doc_refs = doc_refs

@@ -16,7 +16,6 @@ final class AccountRolesState extends Equatable {
 }
 
 final class AccountState extends Equatable {
-  final MyAccountStatusNotification status;
   final CatalystId? catalystId;
   final Username username;
   final Email email;
@@ -25,7 +24,6 @@ final class AccountState extends Equatable {
   final AccountPublicStatus accountPublicStatus;
 
   const AccountState({
-    this.status = const None(),
     this.catalystId,
     this.username = const Username.pure(),
     this.email = const Email.pure(),
@@ -36,7 +34,6 @@ final class AccountState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
     catalystId,
     username,
     email,
@@ -46,7 +43,6 @@ final class AccountState extends Equatable {
   ];
 
   AccountState copyWith({
-    MyAccountStatusNotification? status,
     Optional<CatalystId>? catalystId,
     Username? username,
     Email? email,
@@ -55,7 +51,6 @@ final class AccountState extends Equatable {
     AccountPublicStatus? accountPublicStatus,
   }) {
     return AccountState(
-      status: status ?? this.status,
       catalystId: catalystId.dataOr(this.catalystId),
       username: username ?? this.username,
       email: email ?? this.email,

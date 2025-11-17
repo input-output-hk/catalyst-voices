@@ -1,29 +1,26 @@
 //! Signed Documents API endpoints
 
 use anyhow::anyhow;
-use poem::{error::ReadBodyError, Body};
+use poem::{Body, error::ReadBodyError};
 use poem_openapi::{
+    OpenApi,
     param::{Path, Query},
     payload::Json,
-    OpenApi,
 };
 use put_document::{
-    unprocessable_content_request::PutDocumentUnprocessableContent, MAXIMUM_DOCUMENT_SIZE,
+    MAXIMUM_DOCUMENT_SIZE, unprocessable_content_request::PutDocumentUnprocessableContent,
 };
 
-use crate::service::{
-    common::{
-        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
-        tags::ApiTags,
-        types::{
-            generic::{
-                query::pagination::{Limit, Page},
-                uuidv7::UUIDv7,
-            },
-            payload::cbor::Cbor,
+use crate::service::common::{
+    auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
+    tags::ApiTags,
+    types::{
+        generic::{
+            query::pagination::{Limit, Page},
+            uuidv7::UUIDv7,
         },
+        payload::cbor::Cbor,
     },
-    utilities::middleware::schema_validation::schema_version_validation,
 };
 
 mod common;
@@ -43,8 +40,7 @@ impl DocumentApi {
     #[oai(
         path = "/v1/document/:document_id",
         method = "get",
-        operation_id = "getDocument",
-        transform = "schema_version_validation"
+        operation_id = "getDocument"
     )]
     async fn get_document(
         &self,
@@ -71,12 +67,7 @@ impl DocumentApi {
     ///
     /// This endpoint returns OK if the document is valid, able to be put by the
     /// submitter, and if it already exists, is identical to the existing document.
-    #[oai(
-        path = "/v1/document",
-        method = "put",
-        operation_id = "putDocument",
-        transform = "schema_version_validation"
-    )]
+    #[oai(path = "/v1/document", method = "put", operation_id = "putDocument")]
     async fn put_document(
         &self,
         /// The document to PUT
@@ -99,31 +90,6 @@ impl DocumentApi {
         }
     }
 
-    /// Post A Signed Document Index Query.
-    ///
-    /// This endpoint produces a summary of signed documents that meet the criteria
-    /// defined in the request body.
-    ///
-    /// It does not return the actual documents, just an index of the document identifiers
-    /// which allows the documents to be retrieved by the `GET document` endpoint.
-    #[oai(
-        path = "/v1/document/index",
-        method = "post",
-        operation_id = "postDocument",
-        transform = "schema_version_validation"
-    )]
-    async fn post_document_v1(
-        &self,
-        /// The Query Filter Specification
-        query: Json<post_document_index_query::v1::request::DocumentIndexQueryFilterBody>,
-        page: Query<Option<Page>>,
-        limit: Query<Option<Limit>>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> post_document_index_query::v1::AllResponses {
-        post_document_index_query::v1::endpoint(query.0 .0, page.0, limit.0).await
-    }
-
     /// Post A Signed Document Index Query for Newer Versions of v0.04.
     ///
     /// Produces a summary of signed documents that meet the criteria
@@ -134,8 +100,7 @@ impl DocumentApi {
     #[oai(
         path = "/v2/document/index",
         method = "post",
-        operation_id = "postDocumentV2",
-        transform = "schema_version_validation"
+        operation_id = "postDocumentV2"
     )]
     async fn post_document_v2(
         &self,
@@ -146,6 +111,6 @@ impl DocumentApi {
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> post_document_index_query::v2::AllResponses {
-        post_document_index_query::v2::endpoint(query.0 .0, page.0, limit.0).await
+        post_document_index_query::v2::endpoint(query.0.0, page.0, limit.0).await
     }
 }

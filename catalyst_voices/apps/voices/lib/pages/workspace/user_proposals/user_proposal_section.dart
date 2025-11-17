@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/cards/proposal/workspace_proposal_card.dart';
+import 'package:catalyst_voices/pages/workspace/user_proposals/proposal_card/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/headers/section_learn_more_header.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
@@ -8,7 +8,7 @@ class UserProposalSection extends StatefulWidget {
   final List<UsersProposalOverview> items;
   final String title;
   final String info;
-  final String learnMoreUrl;
+  final String? learnMoreUrl;
   final String emptyTextMessage;
 
   const UserProposalSection({
@@ -17,7 +17,7 @@ class UserProposalSection extends StatefulWidget {
     required this.emptyTextMessage,
     required this.title,
     required this.info,
-    required this.learnMoreUrl,
+    this.learnMoreUrl,
   });
 
   @override

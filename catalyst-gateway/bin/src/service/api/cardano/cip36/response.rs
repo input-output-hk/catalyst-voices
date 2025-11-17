@@ -3,9 +3,9 @@
 use catalyst_types::problem_report::ProblemReport;
 use derive_more::{From, Into};
 use poem_openapi::{
+    ApiResponse, NewType, Object,
     payload::Json,
     types::{Example, ToJSON},
-    ApiResponse, NewType, Object,
 };
 
 use crate::service::common::{self, types::array_types::impl_array_types};
@@ -144,7 +144,7 @@ pub(crate) struct Cip36Details {
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
     #[oai(skip_serializing_if_is_none)]
-    pub errors: Option<common::types::generic::error_msg::ErrorMessage>,
+    pub errors: Option<common::objects::generic::problem_report::ProblemReport>,
 }
 
 impl Example for Cip36Details {
@@ -175,7 +175,6 @@ impl Cip36Details {
     fn invalid_example() -> Self {
         let problem_report = ProblemReport::new("Cip36");
         problem_report.other("Error occurred", "Cip36 decoding error");
-        let errors = serde_json::to_string(&problem_report).unwrap_or_default();
 
         Self {
             slot_no: (common::types::cardano::slot_no::EXAMPLE + 135)
@@ -191,7 +190,7 @@ impl Cip36Details {
             is_payable: false.into(),
             cip15: true.into(),
             errors: Some(
-                crate::service::common::types::generic::error_msg::ErrorMessage::from(errors),
+                common::objects::generic::problem_report::ProblemReport::from(problem_report),
             ),
         }
     }

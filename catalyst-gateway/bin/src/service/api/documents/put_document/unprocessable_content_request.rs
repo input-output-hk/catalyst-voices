@@ -1,6 +1,6 @@
 //! Bad Document PUT request.
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 
 use crate::service::common;
 
@@ -12,14 +12,14 @@ pub(crate) struct PutDocumentUnprocessableContent {
     error: common::types::generic::error_msg::ErrorMessage,
     /// Error report JSON object.
     #[oai(skip_serializing_if_is_none)]
-    report: Option<common::objects::generic::json_object::JSONObject>,
+    report: Option<common::objects::generic::problem_report::ProblemReport>,
 }
 
 impl PutDocumentUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
     pub(crate) fn new(
         error: &(impl ToString + ?Sized),
-        report: Option<serde_json::Value>,
+        report: Option<catalyst_signed_doc::ProblemReport>,
     ) -> Self {
         Self {
             error: error.to_string().into(),
@@ -32,7 +32,9 @@ impl Example for PutDocumentUnprocessableContent {
     fn example() -> Self {
         Self::new(
             "Missing Document in request body",
-            serde_json::json!({}).into(),
+            Some(catalyst_signed_doc::ProblemReport::new(
+                "Missing Document in request body",
+            )),
         )
     }
 }

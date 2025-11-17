@@ -5,9 +5,9 @@ use std::{
     sync::Arc,
 };
 
-use cardano_chain_follower::{hashes::TransactionId, Slot, StakeAddress, TxnIndex};
+use cardano_chain_follower::{Slot, StakeAddress, TxnIndex, hashes::TransactionId};
 use futures::TryStreamExt;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{ApiResponse, payload::Json};
 
 use crate::{
     db::index::{
@@ -85,15 +85,15 @@ struct TxoInfo {
 }
 
 /// Building a full stake info response from the provided arguments.
-async fn build_full_stake_info_response(
+pub(crate) async fn build_full_stake_info_response(
     stake_address: Cip19StakeAddress,
     provided_network: Option<Network>,
     slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<FullStakeInfo>> {
-    if let Some(provided_network) = provided_network {
-        if cardano_chain_follower::Network::from(provided_network) != Settings::cardano_network() {
-            return Ok(None);
-        }
+    if let Some(provided_network) = provided_network
+        && &cardano_chain_follower::Network::from(provided_network) != Settings::cardano_network()
+    {
+        return Ok(None);
     }
     let persistent_session =
         CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
@@ -316,10 +316,10 @@ fn build_stake_info(
             continue;
         }
         // Filter out spent TXOs.
-        if let Some(spent_slot) = txo_info.spent_slot_no {
-            if spent_slot <= slot_num {
-                continue;
-            }
+        if let Some(spent_slot) = txo_info.spent_slot_no
+            && spent_slot <= slot_num
+        {
+            continue;
         }
 
         let value = AdaValue::try_from(txo_info.value)?;
