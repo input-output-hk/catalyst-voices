@@ -177,7 +177,14 @@ jobs:
 #      - name: Setup upterm session
 #        uses: owenthereal/action-upterm@v1
 
-      - run: echo "${{ secrets.PRIVATE_SSH_KEY }}" | wc -c
+      - name: Check if secret is set
+        run: |
+          if [ -z "${{ secrets.PRIVATE_SSH_KEY }}" ]; then
+            echo "Secret is empty or not set"
+            exit 1
+          else
+            echo "Secret is set"
+          fi
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
