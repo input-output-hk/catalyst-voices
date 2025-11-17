@@ -177,6 +177,8 @@ jobs:
 #      - name: Setup upterm session
 #        uses: owenthereal/action-upterm@v1
 
+      - run: echo "${{ secrets.PRIVATE_SSH_KEY }}" | wc -c
+
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
