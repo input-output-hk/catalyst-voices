@@ -45,14 +45,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check if secret is set
-        run: |
-          if [ -z "${{ secrets.PRIVATE_SSH_KEY }}" ]; then
-            echo "Secret is empty or not set"
-            exit 1
-          else
-            echo "Secret is set"
-          fi
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
         with:
@@ -86,6 +78,8 @@ jobs:
     needs: [paths-filter]
     if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.base_ref == 'main'}}
     uses: ./.github/workflows/gateway-tests.yml
+    secrets:
+      PRIVATE_SSH_KEY: ${{ secrets.PRIVATE_SSH_KEY }}
 
  # voices-integration-tests:
  #   needs: [ci, paths-filter]
