@@ -10,7 +10,10 @@ use tracing::error;
 
 use crate::{
     db::{
-        index::queries::{PreparedQueries, SizedBatch},
+        index::{
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
         types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
     service::common::objects::generic::problem_report::ProblemReport,
@@ -63,6 +66,16 @@ impl Params {
             prv_txn_id,
             problem_report,
         }
+    }
+
+    /// Executes prepared queries as a batch.
+    pub(crate) async fn execute_batch(
+        session: &Arc<CassandraSession>,
+        queries: Vec<Self>,
+    ) -> FallibleQueryResults {
+        session
+            .execute_batch(PreparedQuery::Rbac509InvalidInsertQuery, queries)
+            .await
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries

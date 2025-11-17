@@ -16,10 +16,7 @@ use rbac_registration::{
 };
 
 use crate::{
-    db::index::{
-        queries::rbac::get_catalyst_id_from_stake_address::cache_stake_address,
-        session::CassandraSession,
-    },
+    db::index::session::CassandraSession,
     rbac::{
         RbacBlockIndexingContext, RbacValidationError, RbacValidationResult, RbacValidationSuccess,
         chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
@@ -121,8 +118,6 @@ async fn update_chain(
         origin.point().slot_or_default(),
         origin.txn_index(),
         Some(previous_txn),
-        // Only a new chain can remove stake addresses from an existing one.
-        HashSet::new(),
     );
 
     if is_persistent {
@@ -233,16 +228,7 @@ async fn start_new_chain(
         new_chain.current_txn_index(),
         // No previous transaction for the root registration.
         None,
-        // This chain has just been created, so no addresses have been removed from it.
-        HashSet::new(),
     );
-
-    // This cache must be updated because these addresses previously belonged to other chains.
-    for (catalyst_id, addresses) in &updated_chains {
-        for address in addresses {
-            cache_stake_address(is_persistent, address.clone(), catalyst_id.clone());
-        }
-    }
 
     Ok(RbacValidationSuccess {
         catalyst_id,
