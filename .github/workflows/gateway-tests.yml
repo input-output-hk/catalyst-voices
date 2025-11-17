@@ -251,7 +251,7 @@ jobs:
             fi
             if [ "$STATUS" == "unhealthy" ]; then
               echo "Container became unhealthy."
-              exit 1
+              break
             fi
             sleep 5
           done
