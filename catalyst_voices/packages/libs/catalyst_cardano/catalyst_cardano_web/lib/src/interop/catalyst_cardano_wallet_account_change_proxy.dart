@@ -4,16 +4,16 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 typedef _GetWalletApiCallback = Future<CardanoWalletApi> Function();
 typedef _GetWalletCip95ApiCallback = Future<CardanoWalletCip95Api> Function();
 
-/// A decorator of the [CardanoWallet] delegate which handles
+/// A proxy to the [CardanoWallet] delegate which handles
 /// the [WalletApiErrorCode.accountChange] error.
 ///
 /// The implementation will catch the error once, re-enable the api and retry the request.
 /// If that fails the error from the second request is returned.
-final class CardanoWalletAccountChangeDecorator implements CardanoWallet {
+final class CardanoWalletAccountChangeProxy implements CardanoWallet {
   final CardanoWallet _delegate;
 
-  /// The default constructor for the [CardanoWalletAccountChangeDecorator].
-  const CardanoWalletAccountChangeDecorator(this._delegate);
+  /// The default constructor for the [CardanoWalletAccountChangeProxy].
+  const CardanoWalletAccountChangeProxy(this._delegate);
 
   @override
   String? get apiVersion => _delegate.apiVersion;
