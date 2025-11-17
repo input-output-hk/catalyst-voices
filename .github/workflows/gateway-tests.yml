@@ -22,8 +22,8 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           touch ~/.ssh/id_rsa
-          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/id_rsa_tmp
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/id_rsa1
+          chmod 600 ~/.ssh/id_rsa1
 
       - name: Setup upterm session
         uses: lhotari/action-upterm@v1
