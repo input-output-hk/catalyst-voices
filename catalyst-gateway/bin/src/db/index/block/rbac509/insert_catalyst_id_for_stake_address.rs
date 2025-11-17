@@ -69,12 +69,12 @@ impl Params {
         session: &Arc<CassandraSession>,
         queries: Vec<Self>,
     ) -> FallibleQueryResults {
-        queries.iter().for_each(|q| {
+        for q in &queries {
             session
                 .caches()
                 .rbac_stake_address()
                 .insert(q.stake_address.clone().into(), q.catalyst_id.clone().into());
-        });
+        }
 
         session
             .execute_batch(PreparedQuery::CatalystIdForStakeAddressInsertQuery, queries)

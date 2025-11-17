@@ -4,9 +4,7 @@
 
 // cSpell:ignoreRegExp cardano/Fftx
 
-use std::collections::HashSet;
-
-use cardano_chain_follower::{Network, StakeAddress, VotingPubKey, hashes::TransactionId};
+use cardano_chain_follower::{VotingPubKey, hashes::TransactionId};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -258,7 +256,6 @@ async fn rbac509_registration() {
             0.into(),
             0.into(),
             None,
-            HashSet::new(),
             None,
         ),
         rbac509::insert_rbac509::Params::new(
@@ -269,15 +266,6 @@ async fn rbac509_registration() {
             1.into(),
             1.into(),
             Some(TransactionId::new(&[3])),
-            [StakeAddress::new(
-                Network::Mainnet,
-                false,
-                "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
-                    .parse()
-                    .unwrap(),
-            )]
-            .into_iter()
-            .collect(),
             Some(UuidV4::new()),
         ),
     ];
