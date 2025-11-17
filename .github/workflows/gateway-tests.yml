@@ -26,9 +26,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
       - name: Setup upterm session
-        uses: owenthereal/action-upterm@v1
-        env:
-          MY_SECRET: ${{ secrets.PRIVATE_SSH_KEY }}
+        uses: lhotari/action-upterm@v1
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
