@@ -1,6 +1,6 @@
 import { test } from "../fixtures";
 import { expect } from "@playwright/test";
-import { getOneOfEachExtensions, getWalletConfigByExtensionName } from "../data/walletConfigs";
+import { getOneOfEachExtensions, getWalletConfigByExtensionName, walletConfigs } from "../data/walletConfigs";
 import { WalletListPanel } from "../page-objects/onboarding/create-flow/step-15-wallet-list";
 import { createWalletActions } from "../utils/wallets/wallet-actions-factory";
 import { WalletConnectedPanel } from "../page-objects/onboarding/create-flow/step-16-wallet-connected";
@@ -8,7 +8,7 @@ import { TestModel } from "../models/testModel";
 import { getAccountModel } from "../data/accountConfigs";
 import { BrowserExtensionName } from "../models/browserExtensionModel";
 
-for (const walletConfig of [getWalletConfigByExtensionName(BrowserExtensionName.Lace)]) {
+for (const walletConfig of walletConfigs) {
   test.describe(`Onboarding ${walletConfig.extension.Name}`, () => {
     test.use({
       testModel: new TestModel(getAccountModel("DummyForTesting"), walletConfig),
