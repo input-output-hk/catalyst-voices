@@ -12,8 +12,8 @@ class WebAssetVersioner {
   static const manuallyVersionedFiles = [
     'sqlite3.wasm',
     'drift_worker.js',
-    'assets/packages/catalyst_key_derivation/assets/js/catalyst_key_derivation_bg.wasm',
-    'assets/packages/catalyst_key_derivation/assets/js/catalyst_key_derivation.js',
+    'assets/packages/catalyst_key_derivation/assets/js/*/catalyst_key_derivation_bg.wasm',
+    'assets/packages/catalyst_key_derivation/assets/js/*/catalyst_key_derivation.js',
     'assets/packages/catalyst_compression/assets/js/catalyst_compression_bg.wasm',
     'assets/packages/catalyst_compression/assets/js/catalyst_compression.js',
   ];
@@ -118,41 +118,112 @@ class WebAssetVersioner {
     return dir == '.' ? versioned : path.join(dir, versioned);
   }
 
+  void _findManuallyVersionFile(String file) {
+    final fullPath = path.join(buildDir, path.dirname(file));
+    final basename = path.basenameWithoutExtension(file);
+    final ext = path.extension(file);
+
+    final directory = Directory(fullPath);
+    if (!directory.existsSync()) {
+      return;
+    }
+
+    final versionedPattern = RegExp(
+      '^${RegExp.escape(basename)}(?:\\.v(\\d+))?${RegExp.escape(ext)}\$',
+    );
+
+    final versionedFiles = directory
+        .listSync()
+        .whereType<File>()
+        .where((file) => versionedPattern.hasMatch(path.basename(file.path)))
+        .toList();
+
+    if (versionedFiles.isEmpty) {
+      return;
+    }
+
+    //Find out what version is assigned to this file
+    final versionedFile = versionedFiles.first;
+    final versionedFileName = path.basename(versionedFile.path);
+
+    final hashMatch = versionedPattern.firstMatch(versionedFileName);
+    final hash = hashMatch?.group(1) ?? '';
+
+    final relativePath = path.relative(versionedFile.path, from: buildDir);
+    _versionMap[file] = relativePath;
+    _hashMap[file] = hash;
+  }
+
   void _findManuallyVersionFiles() {
     for (final file in manuallyVersionedFiles) {
-      final fullPath = path.join(buildDir, path.dirname(file));
-      final basename = path.basenameWithoutExtension(file);
-      final ext = path.extension(file);
+      if (file.contains('*')) {
+        _findManuallyVersionFilesWithWildcard(file);
+      } else {
+        _findManuallyVersionFile(file);
+      }
+    }
+  }
 
-      final directory = Directory(fullPath);
-      if (!directory.existsSync()) {
+  void _findManuallyVersionFilesWithWildcard(String pattern) {
+    final parts = pattern.split('/');
+    final wildcardIndex = parts.indexWhere((part) => part.contains('*'));
+
+    if (wildcardIndex == -1) {
+      return;
+    }
+
+    final basePath = path.joinAll(parts.sublist(0, wildcardIndex));
+
+    final fullBasePath = path.join(buildDir, basePath);
+
+    final baseDirectory = Directory(fullBasePath);
+    if (!baseDirectory.existsSync()) {
+      return;
+    }
+
+    final wildcardPart = parts[wildcardIndex];
+    final wildcardRegex = RegExp('^${wildcardPart.replaceAll('*', '.*')}\$');
+
+    // Find all directories matching the wildcard
+    final matchingDirs = baseDirectory
+        .listSync()
+        .whereType<Directory>()
+        .where((dir) => wildcardRegex.hasMatch(path.basename(dir.path)))
+        .toList();
+
+    for (final dir in matchingDirs) {
+      final actualDirName = path.basename(dir.path);
+      final remainingParts = parts.sublist(wildcardIndex + 1);
+
+      final filePath = path.joinAll([dir.path, ...remainingParts]);
+      final file = File(filePath);
+
+      if (!file.existsSync()) {
         continue;
       }
 
-      final versionedPattern = RegExp(
-        '^${RegExp.escape(basename)}(?:\\.v(\\d+))?${RegExp.escape(ext)}\$',
-      );
+      // Extract version from directory name (e.g., v1, v2, v3)
+      final versionMatch = RegExp(r'v(\d+)').firstMatch(actualDirName);
+      final hash = versionMatch?.group(1) ?? '';
 
-      final versionedFiles = directory
-          .listSync()
-          .whereType<File>()
-          .where((file) => versionedPattern.hasMatch(path.basename(file.path)))
-          .toList();
+      final relativePath = path.relative(file.path, from: buildDir);
 
-      if (versionedFiles.isEmpty) {
-        continue;
-      }
+      // Build the actual pattern (original pattern with * replaced)
+      final actualPattern = parts
+          .asMap()
+          .entries
+          .map(
+            (entry) => entry.key == wildcardIndex ? actualDirName : entry.value,
+          )
+          .join('/');
 
-      //Find out what version is assigned to this file
-      final versionedFile = versionedFiles.first;
-      final versionedFileName = path.basename(versionedFile.path);
+      _versionMap[actualPattern] = relativePath;
+      _hashMap[actualPattern] = hash;
 
-      final hashMatch = versionedPattern.firstMatch(versionedFileName);
-      final hash = hashMatch?.group(1) ?? '';
+      _log('✓ Found $pattern -> $relativePath (matched: $actualDirName)');
 
-      final relativePath = path.relative(versionedFile.path, from: buildDir);
-      _versionMap[file] = relativePath;
-      _hashMap[file] = hash;
+      // Only map the first match
+      break;
     }
   }
 

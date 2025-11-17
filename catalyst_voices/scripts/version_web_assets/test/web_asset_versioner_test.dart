@@ -38,11 +38,11 @@ void main() {
       assetVersionData = jsonDecode(fileData) as Map<String, dynamic>;
     });
 
-    tearDownAll(() async {
-      if (await dst.exists()) {
-        await dst.delete(recursive: true);
-      }
-    });
+    // tearDownAll(() async {
+    //   if (await dst.exists()) {
+    //     await dst.delete(recursive: true);
+    //   }
+    // });
 
     test("WebAssetVersioner find manually version files", () async {
       expect(assetVersionData['asset_hashes']['sqlite3.wasm'], '1');

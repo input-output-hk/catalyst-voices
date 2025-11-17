@@ -7,9 +7,9 @@
     "url": "https://github.com/input-output-hk/catalyst-voices"
   },
   "files": [
-    "catalyst_compression_bg.wasm",
-    "catalyst_compression.js"
+    "catalyst_compression_bg.v1.wasm",
+    "catalyst_compression.v1.js"
   ],
-  "browser": "catalyst_compression.js",
+  "browser": "catalyst_compression.v1.js",
   "homepage": "https://input-output-hk.github.io/catalyst-voices"
 }
