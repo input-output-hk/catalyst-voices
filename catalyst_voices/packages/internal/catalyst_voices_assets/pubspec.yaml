@@ -26,21 +26,11 @@ dev_dependencies:
 flutter:
   generate: true
   assets:
-    # --no-optimize-overdraw - https://github.com/flutter/flutter/issues/174619
     - assets/images/
-    - path: assets/images/category/
-      transformers:
-        - package: vector_graphics_compiler
-          args: ['--no-optimize-overdraw']
+    - assets/images/category/
     - assets/images/opportunities/
-    - path: assets/images/svg/
-      transformers:
-        - package: vector_graphics_compiler
-          args: ['--no-optimize-overdraw']
-    - path: assets/icons/
-      transformers:
-        - package: vector_graphics_compiler
-          args: ['--no-optimize-overdraw']
+    - assets/images/svg/
+    - assets/icons/
     - assets/lottie/
     - assets/videos/
   fonts:
@@ -53,6 +43,8 @@ flutter_gen:
   output: lib/generated/
   assets:
     enabled: true
+    exclude:
+      - assets_svg_copy/**
     outputs:
       class_name: VoicesAssets
       package_parameter_enabled: false
