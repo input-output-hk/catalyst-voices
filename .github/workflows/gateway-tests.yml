@@ -158,7 +158,7 @@ jobs:
       #    swap-storage: true
 
       - name: Setup upterm session
-        uses: owenthereal/action-upterm@v1
+        uses: lhotari/action-upterm@v1
 
 #      - name: Setup SSH Agent
 #        uses: webfactory/ssh-agent@v0.9.0
