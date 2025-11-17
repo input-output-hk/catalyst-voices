@@ -106,18 +106,6 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
-# Skip for now as it adds ~10mins to CI execution time, will try to incorporate this in nightly instead
-      - name: Integration health thru proxy tests
-        if: false
-        env:
-          API_TEST_MARKS: "health_with_proxy_endpoint"
-          EVENT_DB_URL: "haproxy:18080"
-          INDEX_DB_URL: "haproxy:18090"
-        run: |
-          docker stop cat-gateway || true
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy --detach
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
-
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
         if: success() || failure()
