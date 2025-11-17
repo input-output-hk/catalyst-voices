@@ -34,7 +34,7 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
 
    ```bash
    cd catalyst_voices/apps/voices &&
-   flutter run --dart-define=ENV_NAME=preprod --web-port 5555 \
+   flutter run --dart-define=ENV_NAME=dev --web-port 5555 \
    --web-header "Cross-Origin-Opener-Policy=same-origin" \
    --web-header "Cross-Origin-Embedder-Policy=require-corp" \
    -d web-server --target lib/configs/main.dart
