@@ -2,6 +2,9 @@ name: Catalyst Gateway integration tests
 
 on:
   workflow_call:
+    secrets:
+      PRIVATE_SSH_KEY:
+        required: true
 
 concurrency:
   group: gateway-tests-${{ github.head_ref || github.ref }}
