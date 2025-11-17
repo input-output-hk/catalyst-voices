@@ -18,6 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Save SSH key to file
+        run: |
+          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Setup upterm session
         uses: owenthereal/action-upterm@v1
         env:
