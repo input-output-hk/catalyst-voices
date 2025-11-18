@@ -25,12 +25,11 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@",
+    password: "Test12345678@!!",
     cipBridge: ["cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
-    stakeAddress:
-      "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
+    stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
   },
   {
     name: "Eternl",
@@ -54,12 +53,11 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@!!",
+    password: "Test12345678@!!",
     cipBridge: ["cip-30", "cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
-    stakeAddress:
-      "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
+    stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
   },
   {
     name: "Yoroi",
@@ -83,12 +81,11 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@!!",
+    password: "Test12345678@!!",
     cipBridge: ["cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
-    stakeAddress:
-      "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
+    stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
   },
   {
     name: "Nufi",
@@ -112,12 +109,39 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@!!",
+    password: "Test12345678@!!",
     cipBridge: ["cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
-    stakeAddress:
-      "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
+    stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
+  },
+  {
+    name: "Vespr",
+    extension: getBrowserExtension(BrowserExtensionName.Vespr),
+    seed: [
+      "stomach",
+      "horn",
+      "rail",
+      "afraid",
+      "flip",
+      "also",
+      "abandon",
+      "speed",
+      "chaos",
+      "daring",
+      "soon",
+      "soft",
+      "okay",
+      "online",
+      "benefit",
+    ],
+    network: "preprod",
+    username: "test123",
+    password: "Test12345678@!!",
+    cipBridge: ["cip-95"],
+    mainAddress:
+      "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
+    stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
   },
 ];
 // cspell: enable
@@ -128,9 +152,7 @@ export const walletConfigs: WalletConfigModel[] = [
  * @returns The wallet config
  */
 export const getWalletConfigByName = (name: string): WalletConfigModel => {
-  const walletConfig = walletConfigs.find(
-    (walletConfig) => walletConfig.name === name
-  );
+  const walletConfig = walletConfigs.find((walletConfig) => walletConfig.name === name);
   if (!walletConfig) {
     throw new Error(`Wallet config with name ${name} not found`);
   }
@@ -142,12 +164,8 @@ export const getWalletConfigByName = (name: string): WalletConfigModel => {
  * @param name - The name of the extension
  * @returns The wallet config
  */
-export const getWalletConfigByExtensionName = (
-  name: BrowserExtensionName
-): WalletConfigModel => {
-  const walletConfig = walletConfigs.find(
-    (walletConfig) => walletConfig.extension.Name === name
-  );
+export const getWalletConfigByExtensionName = (name: BrowserExtensionName): WalletConfigModel => {
+  const walletConfig = walletConfigs.find((walletConfig) => walletConfig.extension.Name === name);
   if (!walletConfig) {
     throw new Error(`Wallet config with extension name ${name} not found`);
   }
