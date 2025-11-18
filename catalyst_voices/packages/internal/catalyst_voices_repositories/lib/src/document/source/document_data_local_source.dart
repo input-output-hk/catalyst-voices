@@ -44,7 +44,10 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
 
 /// See [DatabaseDocumentsDataSource].
 abstract interface class SignedDocumentDataSource implements DocumentDataLocalSource {
-  Future<int> deleteAllRespectingLocalDrafts();
+  @override
+  Future<int> deleteAll({
+    List<DocumentType>? notInType,
+  });
 
   Future<int> getRefCount({
     required DocumentRef ref,

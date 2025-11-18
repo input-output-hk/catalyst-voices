@@ -24,13 +24,10 @@ final class DatabaseDocumentsDataSource
   );
 
   @override
-  Future<int> deleteAll() {
-    return _database.documentsDao.deleteAll();
-  }
-
-  @override
-  Future<int> deleteAllRespectingLocalDrafts() {
-    return _database.documentsDao.deleteAll(keepTemplatesForLocalDrafts: true);
+  Future<int> deleteAll({
+    List<DocumentType>? notInType,
+  }) {
+    return _database.documentsV2Dao.deleteWhere(notInType: notInType);
   }
 
   @override

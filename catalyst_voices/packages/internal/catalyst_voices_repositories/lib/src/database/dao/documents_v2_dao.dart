@@ -12,6 +12,16 @@ abstract interface class DocumentsV2Dao {
   /// Returns the total number of documents in the table.
   Future<int> count();
 
+  /// Deletes documents that meet a specific condition and returns the number of
+  /// documents deleted.
+  ///
+  /// This method is intended to be implemented by a concrete class that defines
+  /// the deletion criteria. For example, it could delete all documents that are
+  /// older than a certain date.
+  Future<int> deleteWhere({
+    List<DocumentType>? notInType,
+  });
+
   /// Checks if a document exists by its reference.
   ///
   /// If [ref] is exact (has version), checks for the specific version.
@@ -84,6 +94,19 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<int> count() {
     return documentsV2.count().getSingleOrNull().then((value) => value ?? 0);
+  }
+
+  @override
+  Future<int> deleteWhere({
+    List<DocumentType>? notInType,
+  }) {
+    final query = delete(documentsV2);
+
+    if (notInType != null) {
+      query.where((tbl) => tbl.type.isNotInValues(notInType));
+    }
+
+    return query.go();
   }
 
   @override

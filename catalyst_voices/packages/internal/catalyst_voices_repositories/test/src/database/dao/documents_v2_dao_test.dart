@@ -1007,6 +1007,283 @@ void main() {
         expect(result!.version, versions[3]);
       });
     });
+
+    group('deleteWhere', () {
+      test('returns zero when database is empty', () async {
+        // Given: An empty database
+
+        // When
+        final result = await dao.deleteWhere();
+
+        // Then
+        expect(result, 0);
+      });
+
+      test('deletes all documents when no filter is provided', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.commentDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-3',
+            ver: 'ver-3',
+            type: DocumentType.proposalTemplate,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere();
+
+        // Then
+        expect(result, 3);
+        expect(await dao.count(), 0);
+      });
+
+      test('deletes documents not in notInType list', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        final template = _createTestDocumentEntity(
+          id: 'template-id',
+          ver: 'template-ver',
+          type: DocumentType.proposalTemplate,
+        );
+        await dao.saveAll([proposal, comment, template]);
+
+        // When
+        final result = await dao.deleteWhere(
+          notInType: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 1);
+
+        final remaining = await dao.getDocument(
+          const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+        );
+        expect(remaining, isNotNull);
+        expect(remaining!.type, DocumentType.proposalDocument);
+      });
+
+      test('keeps multiple document types when specified in notInType', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        final template = _createTestDocumentEntity(
+          id: 'template-id',
+          ver: 'template-ver',
+          type: DocumentType.proposalTemplate,
+        );
+        final action = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'action-ver',
+          type: DocumentType.proposalActionDocument,
+        );
+        await dao.saveAll([proposal, comment, template, action]);
+
+        // When
+        final result = await dao.deleteWhere(
+          notInType: [
+            DocumentType.proposalDocument,
+            DocumentType.proposalTemplate,
+          ],
+        );
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 2);
+
+        final remainingProposal = await dao.getDocument(
+          const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+        );
+        final remainingTemplate = await dao.getDocument(
+          const SignedDocumentRef.exact(id: 'template-id', version: 'template-ver'),
+        );
+        final deletedComment = await dao.getDocument(
+          const SignedDocumentRef.exact(id: 'comment-id', version: 'comment-ver'),
+        );
+        final deletedAction = await dao.getDocument(
+          const SignedDocumentRef.exact(id: 'action-id', version: 'action-ver'),
+        );
+
+        expect(remainingProposal, isNotNull);
+        expect(remainingTemplate, isNotNull);
+        expect(deletedComment, isNull);
+        expect(deletedAction, isNull);
+      });
+
+      test('deletes all documents when notInType is empty list', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.commentDocument,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(notInType: []);
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 0);
+      });
+
+      test('returns zero when all documents match notInType filter', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.proposalDocument,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(
+          notInType: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 0);
+        expect(await dao.count(), 2);
+      });
+
+      test('handles multiple versions of same document id', () async {
+        // Given
+        final v1 = _createTestDocumentEntity(
+          id: 'multi-id',
+          ver: 'ver-1',
+          type: DocumentType.proposalDocument,
+        );
+        final v2 = _createTestDocumentEntity(
+          id: 'multi-id',
+          ver: 'ver-2',
+          type: DocumentType.proposalDocument,
+        );
+        final other = _createTestDocumentEntity(
+          id: 'other-id',
+          ver: 'other-ver',
+          type: DocumentType.commentDocument,
+        );
+        await dao.saveAll([v1, v2, other]);
+
+        // When
+        final result = await dao.deleteWhere(
+          notInType: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 1);
+        expect(await dao.count(), 2);
+      });
+
+      test('deletes documents with all different types correctly', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.commentDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-3',
+            ver: 'ver-3',
+            type: DocumentType.reviewDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-4',
+            ver: 'ver-4',
+            type: DocumentType.proposalActionDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-5',
+            ver: 'ver-5',
+            type: DocumentType.proposalTemplate,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(
+          notInType: [
+            DocumentType.proposalDocument,
+            DocumentType.proposalTemplate,
+            DocumentType.proposalActionDocument,
+          ],
+        );
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 3);
+      });
+
+      test('performs efficiently with large dataset', () async {
+        // Given
+        final entities = List.generate(
+          1000,
+          (i) => _createTestDocumentEntity(
+            id: 'id-$i',
+            ver: 'ver-$i',
+            type: i.isEven ? DocumentType.proposalDocument : DocumentType.commentDocument,
+          ),
+        );
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(
+          notInType: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 500);
+        expect(await dao.count(), 500);
+      });
+    });
   });
 }
 
