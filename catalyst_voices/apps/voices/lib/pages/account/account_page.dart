@@ -128,9 +128,9 @@ class _AccountPageState extends State<AccountPage>
             Features.voting,
           );
           if (isVotingEnabled) {
-            const VotingRoute($extra: true).go(context);
+            const VotingRoute.keychainDeleted().go(context);
           } else {
-            const DiscoveryRoute($extra: true).go(context);
+            const DiscoveryRoute.keychainDeleted().go(context);
           }
         case null:
         case CampaignPhaseType.proposalSubmission:
@@ -138,7 +138,7 @@ class _AccountPageState extends State<AccountPage>
         case CampaignPhaseType.reviewRegistration:
         case CampaignPhaseType.votingResults:
         case CampaignPhaseType.projectOnboarding:
-          const DiscoveryRoute($extra: true).go(context);
+          const DiscoveryRoute.keychainDeleted().go(context);
       }
     }
   }

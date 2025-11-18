@@ -94,14 +94,14 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
       switch (phaseType) {
         case CampaignPhaseType.communityReview:
         case CampaignPhaseType.communityVoting:
-          const VotingRoute($extra: true).go(context);
+          const VotingRoute.keychainDeleted().go(context);
         case null:
         case CampaignPhaseType.proposalSubmission:
         case CampaignPhaseType.votingRegistration:
         case CampaignPhaseType.reviewRegistration:
         case CampaignPhaseType.votingResults:
         case CampaignPhaseType.projectOnboarding:
-          const DiscoveryRoute($extra: true).go(context);
+          const DiscoveryRoute.keychainDeleted().go(context);
       }
     }
   }

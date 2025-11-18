@@ -46,6 +46,8 @@ final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
 
   const DiscoveryRoute({this.$extra});
 
+  const DiscoveryRoute.keychainDeleted() : this($extra: true);
+
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return SentryDisplayWidget(child: DiscoveryPage(keychainDeleted: $extra ?? false));
@@ -193,6 +195,15 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin, Compos
     this.tab,
     this.$extra,
   });
+
+  const VotingRoute.keychainDeleted({
+    String? categoryId,
+    String? tab,
+  }) : this(
+         categoryId: categoryId,
+         tab: tab,
+         $extra: true,
+       );
 
   @override
   List<RouteGuard> get routeGuards => [const VotingFeatureFlagGuard()];
