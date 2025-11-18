@@ -54,7 +54,10 @@ final class _CardanoWalletApi implements CardanoWalletApi {
   @override
   CardanoWalletCip95Api get cip95 => _CardanoWalletCip95Api(
     delegate: _delegate.cip95,
-    onAccountChange: () => _onAccountChange().then((api) => api.cip95),
+    onAccountChange: () async {
+      _delegate = await _onAccountChange();
+      return _delegate.cip95;
+    },
   );
 
   @override
