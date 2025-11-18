@@ -39,6 +39,9 @@ dependencies:
 dev_dependencies:
   melos: ^7.1.1
 
+dependency_overrides:
+  test_api: 0.7.8
+
 melos:
   repository: https://github.com/input-output-hk/catalyst-voices
 
@@ -91,7 +94,7 @@ melos:
 
     build-runner:
       run: |
-        melos exec --depends-on="build_runner" --order-dependents -- dart run build_runner build --delete-conflicting-outputs
+        melos exec --depends-on="build_runner" --order-dependents -- dart run build_runner build --delete-conflicting-outputs --force-aot --log-performance=test
       description: |
         Run `build_runner` in every package which contains the build_runner dependency.
 
