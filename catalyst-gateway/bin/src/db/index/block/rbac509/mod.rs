@@ -6,10 +6,7 @@ pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
 
-use std::{
-    collections::{BTreeSet, HashSet},
-    sync::Arc,
-};
+use std::{collections::BTreeSet, sync::Arc};
 
 use anyhow::{Context, Result};
 use cardano_chain_follower::{MultiEraBlock, Slot, TxnIndex, hashes::TransactionId};
@@ -20,7 +17,7 @@ use tracing::{debug, error};
 
 use crate::{
     db::index::{
-        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
+        queries::{FallibleQueryTasks, SizedBatch},
         session::CassandraSession,
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
@@ -176,14 +173,11 @@ impl Rbac509InsertQuery {
                     slot,
                     index,
                     previous_transaction,
-                    // Addresses can only be removed from other chains, so this list is always
-                    // empty for the chain that is being updated.
-                    HashSet::new(),
                     purpose,
                 ));
 
                 // Update other chains that were affected by this registration.
-                for (catalyst_id, removed_addresses) in modified_chains {
+                for (catalyst_id, _) in modified_chains {
                     self.registrations.push(insert_rbac509::Params::new(
                         catalyst_id.clone(),
                         txn_hash,
@@ -193,7 +187,6 @@ impl Rbac509InsertQuery {
                         // make sense to include a previous transaction ID unrelated to the chain
                         // that is being updated.
                         None,
-                        removed_addresses,
                         None,
                     ));
                 }
@@ -254,54 +247,47 @@ impl Rbac509InsertQuery {
         if !self.registrations.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(PreparedQuery::Rbac509InsertQuery, self.registrations)
-                    .await
+                insert_rbac509::Params::execute_batch(&inner_session, self.registrations).await
             }));
         }
 
         if !self.invalid.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(PreparedQuery::Rbac509InvalidInsertQuery, self.invalid)
-                    .await
+                insert_rbac509_invalid::Params::execute_batch(&inner_session, self.invalid).await
             }));
         }
 
         if !self.catalyst_id_for_txn_id.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(
-                        PreparedQuery::CatalystIdForTxnIdInsertQuery,
-                        self.catalyst_id_for_txn_id,
-                    )
-                    .await
+                insert_catalyst_id_for_txn_id::Params::execute_batch(
+                    &inner_session,
+                    self.catalyst_id_for_txn_id,
+                )
+                .await
             }));
         }
 
         if !self.catalyst_id_for_stake_address.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(
-                        PreparedQuery::CatalystIdForStakeAddressInsertQuery,
-                        self.catalyst_id_for_stake_address,
-                    )
-                    .await
+                insert_catalyst_id_for_stake_address::Params::execute_batch(
+                    &inner_session,
+                    self.catalyst_id_for_stake_address,
+                )
+                .await
             }));
         }
 
         if !self.catalyst_id_for_public_key.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(
-                        PreparedQuery::CatalystIdForPublicKeyInsertQuery,
-                        self.catalyst_id_for_public_key,
-                    )
-                    .await
+                insert_catalyst_id_for_public_key::Params::execute_batch(
+                    &inner_session,
+                    self.catalyst_id_for_public_key,
+                )
+                .await
             }));
         }
 
