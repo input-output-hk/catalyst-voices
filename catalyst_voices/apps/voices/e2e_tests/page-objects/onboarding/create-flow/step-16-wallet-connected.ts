@@ -1,6 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 import { OnboardingBasePage } from "../onboarding-base-page";
 import { WalletListPanel } from "./step-15-wallet-list";
+import { TestModel } from "../../../models/testModel";
 
 export class WalletConnectedPanel extends OnboardingBasePage {
   page: Page;
@@ -9,8 +10,8 @@ export class WalletConnectedPanel extends OnboardingBasePage {
   readonly walletAddressValue: Locator;
   readonly walletAddressClipboardIcon: Locator;
 
-  constructor(page: Page) {
-    super(page);
+  constructor(page: Page, testModel: TestModel) {
+    super(page, testModel);
     this.page = page;
     this.walletNameValue = page.getByTestId("NameOfWalletValue");
     this.walletBalanceValue = page.getByTestId("WalletBalanceValue");
@@ -21,8 +22,8 @@ export class WalletConnectedPanel extends OnboardingBasePage {
   }
 
   async goto() {
-    await new WalletListPanel(this.page).goto();
-    await new WalletListPanel(this.page).clickConnectWallet("Lace");
+    await new WalletListPanel(this.page, this.testModel).goto();
+    await new WalletListPanel(this.page, this.testModel).clickConnectWallet(this.testModel.walletConfig.name);
   }
 
   async getWalletNameValue() {
