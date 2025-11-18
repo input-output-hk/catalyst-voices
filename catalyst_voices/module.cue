@@ -65,8 +65,11 @@
 						localhost:8080 {
 							root * /app
 
+							encode
+
 							file_server {
-							try_files {path} {path}/ /index.html
+							    precompressed
+							    try_files {path} {path}/ /index.html
 							}
 
 							header {
