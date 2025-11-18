@@ -18,11 +18,11 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   );
 
   @override
-  Future<DocumentData> get({required DocumentRef ref}) async {
+  Future<DocumentData> get({DocumentRef? ref}) async {
     final bytes = await _api.gateway
         .apiV1DocumentDocumentIdGet(
-          documentId: ref.id,
-          version: ref.version,
+          documentId: ref?.id,
+          version: ref?.version,
         )
         .successBodyBytesOrThrow();
 

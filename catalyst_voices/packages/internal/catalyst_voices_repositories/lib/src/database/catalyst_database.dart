@@ -2,8 +2,8 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.drif
 import 'package:catalyst_voices_repositories/src/database/catalyst_database_config.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_local_metadata_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/local_draft_documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
-import 'package:catalyst_voices_repositories/src/database/dao/workspace_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
@@ -28,6 +28,8 @@ abstract interface class CatalystDatabase {
 
   DocumentsV2Dao get documentsV2Dao;
 
+  LocalDraftDocumentsV2Dao get localDocumentsV2Dao;
+
   DocumentsV2LocalMetadataDao get localMetadataDao;
 
   /// Allows to await completion of pending operations.
@@ -37,8 +39,6 @@ abstract interface class CatalystDatabase {
   Future<void> get pendingOperations;
 
   ProposalsV2Dao get proposalsV2Dao;
-
-  WorkspaceDao get workspaceDao;
 
   Future<void> analyze();
 
@@ -62,7 +62,7 @@ abstract interface class CatalystDatabase {
     DriftDocumentsV2Dao,
     DriftProposalsV2Dao,
     DriftDocumentsV2LocalMetadataDao,
-    DriftWorkspaceDao,
+    DriftLocalDraftDocumentsV2Dao,
   ],
   queries: {},
   views: [],
@@ -101,6 +101,9 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
   DocumentsV2Dao get documentsV2Dao => driftDocumentsV2Dao;
 
   @override
+  LocalDraftDocumentsV2Dao get localDocumentsV2Dao => driftLocalDraftDocumentsV2Dao;
+
+  @override
   DocumentsV2LocalMetadataDao get localMetadataDao => driftDocumentsV2LocalMetadataDao;
 
   @override
@@ -122,9 +125,6 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
 
   @override
   int get schemaVersion => 4;
-
-  @override
-  WorkspaceDao get workspaceDao => driftWorkspaceDao;
 
   @override
   Future<void> analyze() async {

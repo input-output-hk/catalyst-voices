@@ -130,7 +130,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) async {
     final documentData = await _documentRepository.getDocumentData(ref: ref);
     final commentsCount = await _documentRepository.getRefCount(
-      ref: ref,
+      refTo: ref,
       type: DocumentType.commentDocument,
     );
     final proposalPublish = await getProposalPublishForRef(ref: ref);

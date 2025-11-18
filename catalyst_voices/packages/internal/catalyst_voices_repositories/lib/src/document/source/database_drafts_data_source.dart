@@ -1,5 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 
 /// Encryption will be added later here as drafts are not public
 final class DatabaseDraftsDataSource implements DraftDataSource {
@@ -10,56 +13,67 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   );
 
   @override
-  Future<void> delete({required DraftRef ref}) async {
-    await _database.draftsDao.deleteWhere(ref: ref);
+  Future<int> count({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _database.localDocumentsV2Dao.count(type: type, ref: ref, refTo: refTo);
   }
 
   @override
-  Future<int> deleteAll() => _database.draftsDao.deleteAll();
+  Future<int> delete({
+    DocumentRef? ref,
+    List<DocumentType>? notInType,
+  }) {
+    return _database.localDocumentsV2Dao.deleteWhere(ref: ref, notInType: notInType);
+  }
 
   @override
   Future<bool> exists({required DocumentRef ref}) {
-    return _database.draftsDao.count(ref: ref).then((count) => count > 0);
+    return _database.localDocumentsV2Dao.exists(ref);
   }
 
   @override
   Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) {
-    // TODO(damian-molinski): not implemented
-    return Future(() => []);
+    return _database.localDocumentsV2Dao.filterExisting(refs);
   }
 
   @override
-  Future<DocumentData> get({required DocumentRef ref}) async {
-    final entity = await _database.draftsDao.query(ref: ref);
-    if (entity == null) {
-      throw DraftNotFoundException(ref: ref);
-    }
-
-    return entity.toModel();
+  Future<DocumentData?> get({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _database.localDocumentsV2Dao
+        .getDocument(type: type, ref: ref, refTo: refTo)
+        .then((value) => value?.toModel());
   }
 
   @override
-  Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) {
-    return _database.draftsDao
-        .queryAll(ref: ref)
+  Future<List<DocumentData>> getAll({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    bool latestOnly = false,
+    int limit = 100,
+    int offset = 0,
+  }) {
+    return _database.localDocumentsV2Dao
+        .getDocuments(
+          type: type,
+          ref: ref,
+          refTo: refTo,
+          latestOnly: latestOnly,
+          limit: limit,
+          offset: offset,
+        )
         .then((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override
-  Future<DocumentData?> getLatest({CatalystId? authorId}) {
-    return _database.draftsDao.queryLatest(authorId: authorId).then((value) => value?.toModel());
-  }
-
-  @override
   Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
-    // TODO(damian-molinski): not implemented
-    return null;
-  }
-
-  @override
-  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
-    final documentEntities = await _database.draftsDao.queryVersionsOfId(id: id);
-    return documentEntities.map((e) => e.toModel()).toList();
+    return _database.localDocumentsV2Dao.getLatestOf(ref);
   }
 
   @override
@@ -67,10 +81,9 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
 
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
-    // TODO(damian-molinski): migrate to V2
-    /*final entries = data.map((e) => e.toEntity()).toList();
+    final entries = data.map((e) => e.toEntity()).toList();
 
-    await _database.localDraftsV2Dao.saveAll(entries);*/
+    await _database.localDocumentsV2Dao.saveAll(entries);
   }
 
   @override
@@ -78,35 +91,90 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {
-    await _database.draftsDao.updateContent(ref: ref, content: content);
+    await _database.localDocumentsV2Dao.updateContent(ref: ref, content: content);
   }
 
   @override
-  Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.draftsDao.watch(ref: ref).map((entity) => entity?.toModel());
+  Stream<DocumentData?> watch({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _database.localDocumentsV2Dao
+        .watchDocument(type: type, ref: ref, refTo: refTo)
+        .distinct()
+        .map((value) => value?.toModel());
   }
 
   @override
   Stream<List<DocumentData>> watchAll({
-    int? limit,
     DocumentType? type,
-    CatalystId? authorId,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    bool latestOnly = false,
+    int limit = 100,
+    int offset = 0,
   }) {
-    return _database.draftsDao
-        .watchAll(
-          limit: limit,
+    return _database.localDocumentsV2Dao
+        .watchDocuments(
           type: type,
-          authorId: authorId,
+          ref: ref,
+          refTo: refTo,
+          latestOnly: latestOnly,
+          limit: limit,
+          offset: offset,
         )
-        .map((event) {
-          final list = List<DocumentData>.from(event.map((e) => e.toModel()));
-          return list;
-        });
+        .distinct(listEquals)
+        .map((value) => value.map((e) => e.toModel()).toList());
+  }
+
+  @override
+  Stream<int> watchCount({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _database.localDocumentsV2Dao
+        .watchCount(
+          type: type,
+          ref: ref,
+          refTo: refTo,
+        )
+        .distinct();
+  }
+}
+
+extension on LocalDocumentDraftEntity {
+  DocumentData toModel() {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: type,
+        selfRef: DraftRef(id: id, version: ver),
+        ref: refId.toRef(refVer),
+        template: templateId.toRef(templateVer),
+        reply: replyId.toRef(replyVer),
+        section: section,
+        categoryId: categoryId.toRef(categoryVer),
+        authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
+      ),
+      content: content,
+    );
+  }
+}
+
+extension on String? {
+  SignedDocumentRef? toRef([String? ver]) {
+    final id = this;
+    if (id == null) {
+      return null;
+    }
+
+    return SignedDocumentRef(id: id, version: ver);
   }
 }
 
 extension on DocumentData {
-  /*LocalDocumentDraftEntity toEntity() {
+  LocalDocumentDraftEntity toEntity() {
     return LocalDocumentDraftEntity(
       content: content,
       id: metadata.id,
@@ -124,5 +192,5 @@ extension on DocumentData {
       authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       createdAt: metadata.version.dateTime,
     );
-  }*/
+  }
 }

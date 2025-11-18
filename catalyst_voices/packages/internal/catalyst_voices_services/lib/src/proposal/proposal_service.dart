@@ -403,8 +403,8 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<bool> watchMaxProposalsLimitReached() {
-    // TODO(damian-molinski): watch active account id + active campain
-    const filters = const ProposalsFiltersV2(
+    // TODO(damian-molinski): watch active account id + active campaign
+    const filters = ProposalsFiltersV2(
       status: ProposalStatusFilter.aFinal,
       author: null,
       campaign: null,

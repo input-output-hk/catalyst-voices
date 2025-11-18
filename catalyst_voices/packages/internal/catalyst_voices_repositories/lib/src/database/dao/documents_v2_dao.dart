@@ -9,94 +9,128 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 abstract interface class DocumentsV2Dao {
-  /// Returns the total number of documents in the table.
-  Future<int> count();
-
-  /// Deletes documents that meet a specific condition and returns the number of
-  /// documents deleted.
+  /// Counts the number of documents matching the provided filters.
   ///
-  /// This method is intended to be implemented by a concrete class that defines
-  /// the deletion criteria. For example, it could delete all documents that are
-  /// older than a certain date.
+  /// [type] filters by the document type (e.g., proposal, comment).
+  /// [ref] filters by the document's own identity.
+  ///   - If [DocumentRef.isExact], counts matches for that specific version.
+  ///   - If [DocumentRef.isLoose], counts all versions of that document ID.
+  /// [refTo] filters documents that *reference* the given target.
+  ///   - Example: Count all comments ([type]=comment) that point to proposal X ([refTo]=X).
+  Future<int> count({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  });
+
+  /// Deletes documents from the database, preserving those with types in [notInType].
+  ///
+  /// If [notInType] is null or empty, this may delete *all* documents (implementation dependent).
+  /// Typically used for cache invalidation or cleaning up old data while keeping
+  /// certain important types (e.g. keeping local drafts or templates).
+  ///
+  /// Returns the number of deleted rows.
   Future<int> deleteWhere({
     List<DocumentType>? notInType,
   });
 
-  /// Checks if a document exists by its reference.
+  /// Checks if a document exists in the database.
   ///
-  /// If [ref] is exact (has version), checks for the specific version.
-  /// If loose (no version), checks if any version with the id exists.
-  /// Returns true if the document exists, false otherwise.
+  /// [ref] determines the scope of the check:
+  /// - [SignedDocumentRef.exact]: Returns true only if that specific version exists.
+  /// - [SignedDocumentRef.loose]: Returns true if *any* version of that ID exists.
   Future<bool> exists(DocumentRef ref);
 
-  /// Filters and returns only the DocumentRefs from [refs] that exist in the database.
+  /// Filters a list of references, returning only those that exist in the database.
   ///
-  /// Optimized for performance: Uses a single query to fetch all relevant (id, ver) pairs
-  /// for unique ids in [refs], then checks existence in memory.
-  /// - For exact refs: Matches specific id and ver.
-  /// - For loose refs: Checks if any version for the id exists.
-  /// Suitable for synchronizing many documents with minimal database round-trips.
+  /// This is useful for bulk validation.
+  /// - For exact refs, it checks for exact matches.
+  /// - For loose refs, it checks if any version of the ID exists.
   Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
 
-  /// Retrieves a document.
+  /// Retrieves a single document matching the criteria.
   ///
-  /// If [ref] is provided and is exact (has version), returns the specific version.
-  /// If [ref] is loose (no version), returns the latest version by createdAt.
-  /// If [author] is non null tries to find matching document
-  /// Returns null if no matching document is found.
+  /// If multiple documents match (e.g. querying by loose ref or type only),
+  /// the one with the latest [DocumentEntityV2.createdAt] timestamp is returned.
+  ///
+  /// Returns `null` if no matching document is found.
   Future<DocumentEntityV2?> getDocument({
+    DocumentType? type,
     DocumentRef? ref,
+    DocumentRef? refTo,
     CatalystId? author,
   });
 
-  /// Retrieves a list of documents that match the given criteria.
+  /// Retrieves a list of documents matching the criteria with pagination.
   ///
-  /// This method returns a list of documents that match the given criteria.
-  /// - [id]: optional filter to only include documents with matching id.
-  /// - [type]: Optional filter to only include documents of a specific [DocumentType].
-  /// - [filters]: Optional campaign filter.
-  /// - [latestOnly] is true only newest version per id is returned.
-  /// - [limit]: The maximum number of documents to return.
-  /// - [offset]: The number of documents to skip for pagination.
+  /// [latestOnly] - If `true`, only the most recent version (by [DocumentEntityV2.createdAt])
+  /// of each unique document ID is returned. If `false`, all versions are returned.
+  /// [limit] - The maximum number of documents to return (clamped to 999).
+  /// [offset] - The number of documents to skip.
+  ///
+  /// Note: Ensure the implementation applies a deterministic `orderBy` clause
+  /// (usually `createdAt` DESC) to ensure stable pagination.
   Future<List<DocumentEntityV2>> getDocuments({
-    String? id,
     DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
     CampaignFilters? filters,
     bool latestOnly,
     int limit,
     int offset,
   });
 
-  /// Finds the latest version of a document.
+  /// Finds the latest version of a document given a reference.
   ///
-  /// Takes a [ref] (which can be loose or exact) and returns a [DocumentRef]
-  /// pointing to the latest known version of that document.
+  /// Even if [ref] points to an older version (exact), this method will find
+  /// the version with the newest [DocumentEntityV2.createdAt] timestamp for that [DocumentRef.id].
+  ///
+  /// Returns `null` if the document ID does not exist in the database.
   Future<DocumentRef?> getLatestOf(DocumentRef ref);
 
-  /// Saves a single document, ignoring if it conflicts on {id, ver}.
+  /// Saves a single document and its associated authors.
   ///
-  /// Delegates to [saveAll] for consistent conflict handling and reuse.
+  /// This is a convenience wrapper around [saveAll].
   Future<void> save(DocumentWithAuthorsEntity entity);
 
-  /// Saves multiple documents in a batch operation, ignoring conflicts.
+  /// Saves multiple documents and their authors in a single transaction.
   ///
-  /// [entries] is a list of DocumentEntity instances.
-  /// Uses insertOrIgnore to skip on primary key conflicts ({id, ver}).
+  /// Uses `INSERT OR IGNORE` conflict resolution. If a document with the same
+  /// `id` and `ver` already exists, the new record is ignored.
   Future<void> saveAll(List<DocumentWithAuthorsEntity> entries);
 
-  /// Watches for a list of documents that match the given criteria.
+  /// Watches for changes and emits the count of documents matching the filters.
   ///
-  /// This method returns a stream that emits a new list of documents whenever
-  /// the underlying data changes.
-  /// - [id]: optional filter to only include documents with matching id.
-  /// - [type]: Optional filter to only include documents of a specific [DocumentType].
-  /// - [filters]: Optional campaign filter.
-  /// - [latestOnly] is true only newest version per id is returned.
-  /// - [limit]: The maximum number of documents to return.
-  /// - [offset]: The number of documents to skip for pagination.
-  Stream<List<DocumentEntityV2>> watchDocuments({
-    String? id,
+  /// Emits a new value whenever the underlying tables change in a way that
+  /// affects the count.
+  Stream<int> watchCount({
     DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  });
+
+  /// Watches for changes to a specific document query.
+  ///
+  /// Emits the updated document (or null) whenever a matching record is
+  /// inserted, updated, or deleted.
+  Stream<DocumentEntityV2?> watchDocument({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    CatalystId? author,
+  });
+
+  /// Watches for changes and emits a list of documents.
+  ///
+  /// This stream automatically updates when new documents are synced or
+  /// existing ones are modified.
+  ///
+  /// Note: Large limits or complex filters in a watch stream can impact performance
+  /// as the query is re-run on every write to the `documents_v2` table.
+  Stream<List<DocumentEntityV2>> watchDocuments({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
     CampaignFilters? filters,
     bool latestOnly,
     int limit,
@@ -116,8 +150,12 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDocumentsV2Dao(super.attachedDatabase);
 
   @override
-  Future<int> count() {
-    return documentsV2.count().getSingleOrNull().then((value) => value ?? 0);
+  Future<int> count({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _queryCount(type: type, ref: ref, refTo: refTo).getSingle().then((value) => value ?? 0);
   }
 
   @override
@@ -186,52 +224,28 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<DocumentEntityV2?> getDocument({
+    DocumentType? type,
     DocumentRef? ref,
+    DocumentRef? refTo,
     CatalystId? author,
   }) {
-    final query = select(documentsV2);
-
-    if (ref != null) {
-      query.where((tbl) => tbl.id.equals(ref.id));
-
-      if (ref.isExact) {
-        query.where((tbl) => tbl.ver.equals(ref.version!));
-      }
-    }
-
-    // TODO(damian-molinski): test it
-    if (author != null) {
-      final significant = author.toSignificant().toUri().toString();
-      query.where((tbl) {
-        final authorDocs = subqueryExpression<String>(
-          selectOnly(documentAuthors)
-            ..addColumns([documentAuthors.documentId])
-            ..where(documentAuthors.authorIdSignificant.equals(significant))
-            ..where(documentAuthors.documentId.equalsExp(documentsV2.id)),
-        );
-        return tbl.id.equalsExp(authorDocs);
-      });
-    }
-
-    query
-      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
-      ..limit(1);
-
-    return query.getSingleOrNull();
+    return _queryDocument(type: type, ref: ref, refTo: refTo, author: author).getSingleOrNull();
   }
 
   @override
   Future<List<DocumentEntityV2>> getDocuments({
-    String? id,
     DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
     CampaignFilters? filters,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
   }) {
     return _queryDocuments(
-      id: id,
       type: type,
+      ref: ref,
+      refTo: refTo,
       filters: filters,
       latestOnly: latestOnly,
       limit: limit,
@@ -285,17 +299,38 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<List<DocumentEntityV2>> watchDocuments({
-    String? id,
+  Stream<int> watchCount({
     DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _queryCount(type: type, ref: ref, refTo: refTo).watchSingle().map((value) => value ?? 0);
+  }
+
+  @override
+  Stream<DocumentEntityV2?> watchDocument({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    CatalystId? author,
+  }) {
+    return _queryDocument(type: type, ref: ref, refTo: refTo, author: author).watchSingleOrNull();
+  }
+
+  @override
+  Stream<List<DocumentEntityV2>> watchDocuments({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
     CampaignFilters? filters,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
   }) {
     return _queryDocuments(
-      id: id,
       type: type,
+      ref: ref,
+      refTo: refTo,
       filters: filters,
       latestOnly: latestOnly,
       limit: limit,
@@ -303,31 +338,123 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     ).watch();
   }
 
-  SimpleSelectStatement<$DocumentsV2Table, DocumentEntityV2> _queryDocuments({
-    String? id,
+  Selectable<int?> _queryCount({
     DocumentType? type,
-    CampaignFilters? filters,
-    required bool latestOnly,
-    required int limit,
-    required int offset,
+    DocumentRef? ref,
+    DocumentRef? refTo,
   }) {
-    final effectiveLimit = limit.clamp(0, 999);
+    final count = countAll();
+    final query = selectOnly(documentsV2)..addColumns([count]);
 
-    final query = select(documentsV2);
-
-    if (id != null) {
-      query.where((tbl) => tbl.id.equals(id));
+    if (type != null) {
+      query.where(documentsV2.type.equalsValue(type));
     }
 
-    if (filters != null) {
-      query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
+    if (ref != null) {
+      query.where(documentsV2.id.equals(ref.id));
+
+      if (ref.isExact) {
+        query.where(documentsV2.ver.equals(ref.version!));
+      }
+    }
+
+    if (refTo != null) {
+      query.where(documentsV2.refId.equals(refTo.id));
+
+      if (refTo.isExact) {
+        query.where(documentsV2.refVer.equals(refTo.version!));
+      }
+    }
+
+    return query.map((row) => row.read(count));
+  }
+
+  Selectable<DocumentEntityV2> _queryDocument({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    CatalystId? author,
+  }) {
+    final query = select(documentsV2);
+
+    if (ref != null) {
+      query.where((tbl) => tbl.id.equals(ref.id));
+
+      if (ref.isExact) {
+        query.where((tbl) => tbl.ver.equals(ref.version!));
+      }
+    }
+
+    if (refTo != null) {
+      query.where((tbl) => tbl.refId.equals(refTo.id));
+
+      if (refTo.isExact) {
+        query.where((tbl) => tbl.refVer.equals(refTo.version!));
+      }
     }
 
     if (type != null) {
       query.where((tbl) => tbl.type.equalsValue(type));
     }
 
-    if (latestOnly) {
+    if (author != null) {
+      final significant = author.toSignificant();
+      query.where((tbl) {
+        final authorQuery = selectOnly(documentAuthors)
+          ..addColumns([const Constant(1)])
+          ..where(documentAuthors.documentId.equalsExp(tbl.id))
+          ..where(documentAuthors.documentVer.equalsExp(tbl.ver))
+          ..where(documentAuthors.authorIdSignificant.equals(significant.toUri().toString()));
+        return existsQuery(authorQuery);
+      });
+    }
+
+    query
+      ..orderBy([
+        (tbl) => OrderingTerm.desc(tbl.createdAt),
+      ])
+      ..limit(1);
+
+    return query;
+  }
+
+  SimpleSelectStatement<$DocumentsV2Table, DocumentEntityV2> _queryDocuments({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    CampaignFilters? filters,
+    required bool latestOnly,
+    required int limit,
+    required int offset,
+  }) {
+    final effectiveLimit = limit.clamp(0, 999);
+    final query = select(documentsV2);
+
+    if (type != null) {
+      query.where((tbl) => tbl.type.equalsValue(type));
+    }
+
+    if (ref != null) {
+      query.where((tbl) => tbl.id.equals(ref.id));
+
+      if (ref.isExact) {
+        query.where((tbl) => tbl.ver.equals(ref.version!));
+      }
+    }
+
+    if (refTo != null) {
+      query.where((tbl) => tbl.refId.equals(refTo.id));
+
+      if (refTo.isExact) {
+        query.where((tbl) => tbl.refVer.equals(refTo.version!));
+      }
+    }
+
+    if (filters != null) {
+      query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
+    }
+
+    if (latestOnly && ref?.version == null) {
       final inner = alias(documentsV2, 'inner');
 
       query.where((tbl) {
@@ -340,7 +467,9 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       });
     }
 
-    query.limit(effectiveLimit, offset: offset);
+    query
+      ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+      ..limit(effectiveLimit, offset: offset);
 
     return query;
   }

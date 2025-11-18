@@ -3,77 +3,58 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 /// Base interface to interact with locally document data.
 abstract interface class DocumentDataLocalSource implements DocumentDataSource {
-  Future<int> deleteAll();
+  Future<int> count({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  });
+
+  Future<int> delete({
+    List<DocumentType>? notInType,
+  });
 
   Future<bool> exists({required DocumentRef ref});
 
   Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
 
-  Future<List<DocumentData>> findAllVersions({required DocumentRef ref});
-
-  Future<DocumentData?> getLatest({
-    CatalystId? authorId,
+  @override
+  Future<DocumentData?> get({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
   });
 
-  Future<List<DocumentData>> queryVersionsOfId({required String id});
+  Future<List<DocumentData>> getAll({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    bool latestOnly,
+    int limit,
+    int offset,
+  });
 
   Future<void> save({required DocumentData data});
 
   Future<void> saveAll(Iterable<DocumentData> data);
 
-  Stream<DocumentData?> watch({required DocumentRef ref});
-}
-
-/// See [DatabaseDraftsDataSource].
-abstract interface class DraftDataSource implements DocumentDataLocalSource {
-  Future<void> delete({
-    required DraftRef ref,
-  });
-
-  Future<void> update({
-    required DraftRef ref,
-    required DocumentDataContent content,
-  });
-
-  Stream<List<DocumentData>> watchAll({
-    int? limit,
+  Stream<DocumentData?> watch({
     DocumentType? type,
-    CatalystId? authorId,
-  });
-}
-
-/// See [DatabaseDocumentsDataSource].
-abstract interface class SignedDocumentDataSource implements DocumentDataLocalSource {
-  @override
-  Future<int> deleteAll({
-    List<DocumentType>? notInType,
-  });
-
-  Future<int> getRefCount({
-    required DocumentRef ref,
-    required DocumentType type,
-  });
-
-  Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
-    required DocumentType type,
-  });
-
-  Stream<List<DocumentData>> watchAll({
-    int? limit,
-    required bool unique,
-    DocumentType? type,
-    CatalystId? authorId,
+    DocumentRef? ref,
     DocumentRef? refTo,
+  });
+
+  Stream<List<DocumentData>> watchAll({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    bool latestOnly,
+    int limit,
+    int offset,
   });
 
   Stream<int> watchCount({
-    DocumentRef? refTo,
     DocumentType? type,
-  });
-
-  Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
-    required DocumentType type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
   });
 }

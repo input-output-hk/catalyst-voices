@@ -182,7 +182,7 @@ Future<void> cleanUpStorages({
 Future<void> cleanUpUserDataFromDatabase() async {
   final db = Dependencies.instance.get<CatalystDatabase>();
 
-  await db.workspaceDao.deleteLocalDrafts();
+  await db.localDocumentsV2Dao.deleteWhere();
   await db.localMetadataDao.deleteWhere();
 }
 

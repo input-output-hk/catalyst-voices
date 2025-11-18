@@ -39,6 +39,7 @@ void main() {
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
+    registerFallbackValue(const ProposalsFiltersV2());
 
     when(
       () => mockDocumentRepository.watchCount(

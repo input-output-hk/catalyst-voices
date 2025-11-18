@@ -24,7 +24,16 @@ final class DatabaseDocumentsDataSource
   );
 
   @override
-  Future<int> deleteAll({
+  Future<int> count({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _database.documentsV2Dao.count(type: type, ref: ref, refTo: refTo);
+  }
+
+  @override
+  Future<int> delete({
     List<DocumentType>? notInType,
   }) {
     return _database.documentsV2Dao.deleteWhere(notInType: notInType);
@@ -41,27 +50,36 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) {
-    return _database.documentsV2Dao
-        .getDocuments(id: ref.id)
-        .then((value) => value.map((e) => e.toModel()).toList());
-  }
-
-  @override
-  Future<DocumentData> get({required DocumentRef ref}) async {
-    final entity = await _database.documentsV2Dao.getDocument(ref: ref);
-    if (entity == null) {
-      throw DocumentNotFoundException(ref: ref);
-    }
-
-    return entity.toModel();
-  }
-
-  @override
-  Future<DocumentData?> getLatest({
+  Future<DocumentData?> get({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
     CatalystId? authorId,
   }) {
-    return _database.documentsV2Dao.getDocument(author: authorId).then((value) => value?.toModel());
+    return _database.documentsV2Dao
+        .getDocument(type: type, ref: ref, refTo: refTo, author: authorId)
+        .then((value) => value?.toModel());
+  }
+
+  @override
+  Future<List<DocumentData>> getAll({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    bool latestOnly = false,
+    int limit = 200,
+    int offset = 0,
+  }) {
+    return _database.documentsV2Dao
+        .getDocuments(
+          type: type,
+          ref: ref,
+          refTo: refTo,
+          latestOnly: latestOnly,
+          limit: limit,
+          offset: offset,
+        )
+        .then((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override
@@ -75,30 +93,6 @@ final class DatabaseDocumentsDataSource
     required ProposalsTotalAskFilters filters,
   }) {
     return _database.proposalsV2Dao.getProposalsTotalTask(filters: filters, nodeId: nodeId);
-  }
-
-  @override
-  Future<int> getRefCount({
-    required DocumentRef ref,
-    required DocumentType type,
-  }) {
-    return _database.documentsDao.countRefDocumentByType(ref: ref, type: type);
-  }
-
-  @override
-  Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
-    DocumentType? type,
-  }) {
-    return _database.documentsDao
-        .queryRefToDocumentData(refTo: refTo, type: type)
-        .then((e) => e?.toModel());
-  }
-
-  @override
-  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
-    final documentEntities = await _database.documentsDao.queryVersionsOfId(id: id);
-    return documentEntities.map((e) => e.toModel()).toList();
   }
 
   @override
@@ -122,40 +116,53 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.documentsDao.watch(ref: ref).map((entity) => entity?.toModel());
+  Stream<DocumentData?> watch({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+  }) {
+    return _database.documentsV2Dao
+        .watchDocument(type: type, ref: ref, refTo: refTo)
+        .distinct()
+        .map((value) => value?.toModel());
   }
 
   @override
   Stream<List<DocumentData>> watchAll({
-    int? limit,
-    required bool unique,
     DocumentType? type,
-    CatalystId? authorId,
+    DocumentRef? ref,
     DocumentRef? refTo,
+    CatalystId? authorId,
+    bool latestOnly = false,
+    int limit = 200,
+    int offset = 0,
   }) {
-    return _database.documentsDao
-        .watchAll(
-          limit: limit,
-          unique: unique,
+    return _database.documentsV2Dao
+        .watchDocuments(
           type: type,
-          authorId: authorId,
+          ref: ref,
           refTo: refTo,
+          latestOnly: latestOnly,
+          limit: limit,
+          offset: offset,
         )
-        .map((entities) {
-          return List<DocumentData>.from(entities.map((e) => e.toModel()));
-        });
+        .distinct(listEquals)
+        .map((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override
   Stream<int> watchCount({
-    DocumentRef? refTo,
     DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
   }) {
-    return _database.documentsDao.watchCount(
-      refTo: refTo,
-      type: type,
-    );
+    return _database.documentsV2Dao
+        .watchCount(
+          type: type,
+          ref: ref,
+          refTo: refTo,
+        )
+        .distinct();
   }
 
   @override
@@ -173,6 +180,7 @@ final class DatabaseDocumentsDataSource
             if (!tr.finished) unawaited(tr.finish());
           },
         )
+        .distinct()
         .map((page) => page.map((data) => data.toModel()));
   }
 
@@ -186,7 +194,7 @@ final class DatabaseDocumentsDataSource
       (_) {
         if (!tr.finished) unawaited(tr.finish());
       },
-    );
+    ).distinct();
   }
 
   @override
@@ -208,16 +216,6 @@ final class DatabaseDocumentsDataSource
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
   }
-
-  @override
-  Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
-    required DocumentType type,
-  }) {
-    return _database.documentsDao
-        .watchRefToDocumentData(refTo: refTo, type: type)
-        .map((e) => e?.toModel());
-  }
 }
 
 extension on DocumentEntityV2 {
@@ -231,7 +229,6 @@ extension on DocumentEntityV2 {
         reply: replyId.toRef(replyVer),
         section: section,
         categoryId: categoryId.toRef(categoryVer),
-        // TODO(damian-molinski): Make sure to add unit tests
         authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
       ),
       content: content,
