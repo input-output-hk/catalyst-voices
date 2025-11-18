@@ -1,7 +1,4 @@
-import {
-  BrowserExtensionModel,
-  BrowserExtensionName,
-} from "../models/browserExtensionModel";
+import { BrowserExtensionModel, BrowserExtensionName } from "../models/browserExtensionModel";
 
 /* cspell: disable */
 export const browserExtensions: BrowserExtensionModel[] = [
@@ -17,7 +14,7 @@ export const browserExtensions: BrowserExtensionModel[] = [
   },
   {
     Name: BrowserExtensionName.Yoroi,
-    Id: "poonlenmfdfbjfeeballhiibknlknepo",
+    Id: "ffnbelfdoeiohenkjibnmadjiehjhajb",
     HomeUrl: "/main_window.html#",
   },
   {
@@ -25,15 +22,16 @@ export const browserExtensions: BrowserExtensionModel[] = [
     Id: "hbklpdnlgiadjhdadfnfmemmklbopbcm",
     HomeUrl: "/index.html#",
   },
+  {
+    Name: BrowserExtensionName.Vespr,
+    Id: "bedogdpgdnifilpgeianmmdabklhfkcn",
+    HomeUrl: "/index.html#",
+  },
 ];
 /* cspell: enable */
 
-export const getBrowserExtension = (
-  name: BrowserExtensionName
-): BrowserExtensionModel => {
-  const extension = browserExtensions.find(
-    (extension) => extension.Name === name
-  );
+export const getBrowserExtension = (name: BrowserExtensionName): BrowserExtensionModel => {
+  const extension = browserExtensions.find((extension) => extension.Name === name);
   if (!extension) {
     throw new Error(`Browser extension with name ${name} not found`);
   }
