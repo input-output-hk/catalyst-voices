@@ -17,6 +17,8 @@ class CatalystIdText extends StatefulWidget {
   final bool isCompact;
   final bool showCopy;
   final bool showLabel;
+  final bool showUsername;
+  final bool includeUsername;
   final TextStyle? style;
   final TextStyle? labelStyle;
   final double labelGap;
@@ -28,6 +30,8 @@ class CatalystIdText extends StatefulWidget {
     required this.isCompact,
     this.showCopy = true,
     this.showLabel = false,
+    this.showUsername = false,
+    this.includeUsername = true,
     this.style,
     this.labelStyle,
     this.labelGap = 6,
@@ -93,8 +97,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.data != oldWidget.data || widget.isCompact != oldWidget.isCompact) {
-      final id = widget.data;
-      _fullDataAsString = id.withoutUsername().toUri().toString();
+      _fullDataAsString = _buildFullData();
       _effectiveData = _buildTextData();
       _tooltipVisible = _isTooltipVisible();
     }
@@ -112,10 +115,15 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   void initState() {
     super.initState();
 
-    final id = widget.data;
-    _fullDataAsString = id.withoutUsername().toString();
+    _fullDataAsString = _buildFullData();
     _effectiveData = _buildTextData();
     _tooltipVisible = _isTooltipVisible();
+  }
+
+  String _buildFullData() {
+    final catalystId = widget.showUsername ? widget.data : widget.data.withoutUsername();
+
+    return catalystId.toUri().toString();
   }
 
   String _buildTextData() {
@@ -132,7 +140,10 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   Future<void> _copyDataToClipboard() async {
-    final data = ClipboardData(text: _fullDataAsString);
+    final catalystId = widget.includeUsername
+        ? widget.data.toUri().toString()
+        : widget.data.withoutUsername().toUri().toString();
+    final data = ClipboardData(text: catalystId);
     await Clipboard.setData(data);
 
     if (mounted) {
