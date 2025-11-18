@@ -87,7 +87,6 @@ class NewProposalCubit extends Cubit<NewProposalState>
   }
 
   Future<void> load({SignedDocumentRef? categoryRef}) async {
-    print('load.categoryRef -> $categoryRef');
     _cache = _cache.copyWith(categoryRef: Optional(categoryRef));
 
     emit(NewProposalState.loading());

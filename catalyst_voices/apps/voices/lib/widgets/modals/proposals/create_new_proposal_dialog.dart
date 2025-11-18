@@ -14,6 +14,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// TODO(damian-molinski): this widget have to be refactored into smaller files.
 class CreateNewProposalDialog extends StatefulWidget {
   final SignedDocumentRef? categoryRef;
 
