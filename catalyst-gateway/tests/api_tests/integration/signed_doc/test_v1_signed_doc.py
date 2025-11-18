@@ -272,7 +272,7 @@ def deprecated_proposal(rbac_chain):
             "ver": "0194d490-30bf-7473-81c8-a0eaef369619",
         },
     }
-    with open("./test_data/signed_docs/proposal.json", "r") as json_file:
+    with open("./test_data/signed_docs/proposal.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
     doc = SignedDocumentV1(proposal_metadata_json, content)

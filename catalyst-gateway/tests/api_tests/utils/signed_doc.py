@@ -85,14 +85,10 @@ class SignedDocument(SignedDocumentBase):
         )
 
 
-BRAND_ID = "0199e71b-401e-7160-9139-a398c4d7b8fa"
-PROPOSAL_FORM_TEMPLATE_ID = "0199e71b-4025-7323-bc4a-d39e35762521"
-
-
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture
 def proposal_doc_factory(rbac_chain_factory):
-    def __factory__() -> tuple[SignedDocument, RoleID]:
+    def __factory__(template_id: str) -> tuple[SignedDocument, RoleID]:
         role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
         doc_id = uuid_v7.uuid_v7()
@@ -104,14 +100,11 @@ def proposal_doc_factory(rbac_chain_factory):
             "content-type": "application/json",
             "content-encoding": "br",
             "parameters": [
-                # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
-                {"id": PROPOSAL_FORM_TEMPLATE_ID, "ver": PROPOSAL_FORM_TEMPLATE_ID, "cid": "0x"},
-                # referenced to the defined category id, comes from the 'templates/data.rs' file
-                {"id": BRAND_ID, "ver": BRAND_ID, "cid": "0x"},
+                {"id": template_id, "ver": template_id, "cid": "0x"},
             ],
         }
-        with open("./test_data/signed_docs/proposal.json", "r") as json_file:
-            body = json.load(json_file)
+        # TODO: auto generate body from the given schema
+        body = {}
 
         doc_builder = SignedDocument(metadata, body)
         (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
