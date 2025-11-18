@@ -35,6 +35,12 @@ abstract interface class DocumentsV2Dao {
   /// Returns null if no matching document is found.
   Future<DocumentEntityV2?> getDocument(DocumentRef ref);
 
+  /// Finds the latest version of a document.
+  ///
+  /// Takes a [ref] (which can be loose or exact) and returns a [DocumentRef]
+  /// pointing to the latest known version of that document.
+  Future<DocumentRef?> getLatestOf(DocumentRef ref);
+
   /// Saves a single document, ignoring if it conflicts on {id, ver}.
   ///
   /// Delegates to [saveAll] for consistent conflict handling and reuse.
@@ -144,6 +150,24 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     return query.getSingleOrNull();
+  }
+
+  @override
+  Future<DocumentRef?> getLatestOf(DocumentRef ref) {
+    final query = selectOnly(documentsV2)
+      ..addColumns([documentsV2.id, documentsV2.ver])
+      ..where(documentsV2.id.equals(ref.id))
+      ..orderBy([OrderingTerm.desc(documentsV2.createdAt)])
+      ..limit(1);
+
+    return query
+        .map(
+          (row) => SignedDocumentRef.exact(
+            id: row.read(documentsV2.id)!,
+            version: row.read(documentsV2.ver)!,
+          ),
+        )
+        .getSingleOrNull();
   }
 
   @override

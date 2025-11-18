@@ -892,6 +892,124 @@ void main() {
         await expectation;
       });
     });
+
+    group('getLatestOf', () {
+      test('returns null for non-existing id in empty database', () async {
+        // Given
+        const ref = SignedDocumentRef.exact(id: 'non-existent-id', version: 'non-existent-ver');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('returns the document ref when only one version exists', () async {
+        // Given
+        final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
+        await dao.save(entity);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'test-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'test-id');
+        expect(result.version, 'test-ver');
+        expect(result.isExact, isTrue);
+      });
+
+      test('returns latest version when multiple versions exist (loose ref input)', () async {
+        // Given
+        final oldCreatedAt = DateTime.utc(2023, 1, 1);
+        final newerCreatedAt = DateTime.utc(2024, 6, 15);
+
+        final oldVer = _buildUuidV7At(oldCreatedAt);
+        final newerVer = _buildUuidV7At(newerCreatedAt);
+        final entityOld = _createTestDocumentEntity(id: 'test-id', ver: oldVer);
+        final entityNew = _createTestDocumentEntity(id: 'test-id', ver: newerVer);
+        await dao.saveAll([entityOld, entityNew]);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'test-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'test-id');
+        expect(result.version, newerVer);
+      });
+
+      test('returns latest version even when exact ref points to older version', () async {
+        // Given
+        final oldCreatedAt = DateTime.utc(2023, 1, 1);
+        final newerCreatedAt = DateTime.utc(2024, 6, 15);
+
+        final oldVer = _buildUuidV7At(oldCreatedAt);
+        final newerVer = _buildUuidV7At(newerCreatedAt);
+        final entityOld = _createTestDocumentEntity(id: 'test-id', ver: oldVer);
+        final entityNew = _createTestDocumentEntity(id: 'test-id', ver: newerVer);
+        await dao.saveAll([entityOld, entityNew]);
+
+        // And: exact ref pointing to older version
+        final ref = SignedDocumentRef.exact(id: 'test-id', version: oldVer);
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then: still returns the latest version
+        expect(result, isNotNull);
+        expect(result!.id, 'test-id');
+        expect(result.version, newerVer);
+      });
+
+      test('returns null for non-existing id when other documents exist', () async {
+        // Given
+        final entity = _createTestDocumentEntity(id: 'other-id', ver: 'other-ver');
+        await dao.save(entity);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'non-existent-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('returns latest among many versions', () async {
+        // Given
+        final dates = [
+          DateTime.utc(2023, 1, 1),
+          DateTime.utc(2023, 6, 15),
+          DateTime.utc(2024, 3, 10),
+          DateTime.utc(2024, 12, 25),
+          DateTime.utc(2024, 8, 1),
+        ];
+        final versions = dates.map(_buildUuidV7At).toList();
+        final entities = versions
+            .map((ver) => _createTestDocumentEntity(id: 'multi-ver-id', ver: ver))
+            .toList();
+        await dao.saveAll(entities);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'multi-ver-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then: returns the version with latest createdAt (2024-12-25)
+        expect(result, isNotNull);
+        expect(result!.version, versions[3]);
+      });
+    });
   });
 }
 

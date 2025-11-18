@@ -70,6 +70,11 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<DocumentRef?> getLatestOf({required DocumentRef ref}) {
+    return _database.documentsV2Dao.getLatestOf(ref);
+  }
+
+  @override
   Future<List<ProposalDocumentData>> getProposals({
     SignedDocumentRef? categoryRef,
     required ProposalsFilterType type,
