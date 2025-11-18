@@ -74,6 +74,12 @@ melos:
       description: |
         Run `dart analyze` in every package.
 
+    flutter-clean:
+      run: |
+        melos exec -c 1 -- flutter clean
+      description: |
+        Run `flutter clean` sequentially in every Flutter package.
+
     l10n:
       run: |
         melos exec --scope="catalyst_voices_localization" -- flutter gen-l10n
