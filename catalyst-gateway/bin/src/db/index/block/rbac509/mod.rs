@@ -21,10 +21,7 @@ use crate::{
         session::CassandraSession,
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
-    rbac::{
-        RbacBlockIndexingContext, RbacValidationError, RbacValidationSuccess,
-        validate_rbac_registration,
-    },
+    rbac::{RbacBlockIndexingContext, RbacValidationSuccess, validate_rbac_registration},
     settings::cassandra_db::EnvVars,
 };
 
@@ -121,17 +118,21 @@ impl Rbac509InsertQuery {
 
         let previous_transaction = cip509.previous_transaction();
         // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
-        match Box::pin(validate_rbac_registration(
-            cip509,
-            block.is_immutable(),
-            context,
-        ))
-        .await
-        {
+        match validate_rbac_registration(&cip509, block.is_immutable(), context)
+            .await
+            .inspect_err(|e| {
+                error!(
+                   slot = ?slot,
+                   index = ?index,
+                   txn_hash = ?txn_hash,
+                   err = ?e,
+                   "Error indexing RBAC registration"
+                )
+            })? {
             // Write updates to the database. There can be multiple updates in one registration
             // because a new chain can take ownership of stake addresses of the existing chains and
             // in that case we want to record changes to all those chains as well as the new one.
-            Ok(RbacValidationSuccess {
+            Some(RbacValidationSuccess {
                 catalyst_id,
                 stake_addresses,
                 public_keys,
@@ -191,44 +192,30 @@ impl Rbac509InsertQuery {
                     ));
                 }
             },
-            // Invalid registrations are being recorded in order to report failure.
-            Err(RbacValidationError::InvalidRegistration {
-                catalyst_id,
-                purpose,
-                report,
-            }) => {
+            None => {
                 inc_invalid_rbac_reg_count();
-                self.invalid.push(insert_rbac509_invalid::Params::new(
-                    catalyst_id,
-                    txn_hash,
-                    slot,
-                    index,
-                    purpose,
-                    previous_transaction,
-                    report,
-                ));
-            },
-            // This isn't a hard error because user input can contain invalid information. If there
-            // is no Catalyst ID, then we cannot record this registration as invalid and can only
-            // ignore (and log) it.
-            Err(RbacValidationError::UnknownCatalystId) => {
-                debug!(
-                    slot = ?slot,
-                    index = ?index,
-                    txn_hash = ?txn_hash,
-                    "Unable to determine Catalyst id for registration"
-                );
-            },
-            Err(RbacValidationError::Fatal(e)) => {
-                error!(
-                   slot = ?slot,
-                   index = ?index,
-                   txn_hash = ?txn_hash,
-                   err = ?e,
-                   "Error indexing RBAC registration"
-                );
-                // Propagate an error.
-                return Err(e);
+                if let Some(catalyst_id) = cip509.catalyst_id() {
+                    // Invalid registrations are being recorded in order to report failure.
+                    self.invalid.push(insert_rbac509_invalid::Params::new(
+                        catalyst_id.clone(),
+                        txn_hash,
+                        slot,
+                        index,
+                        cip509.purpose(),
+                        previous_transaction,
+                        cip509.report().clone(),
+                    ));
+                } else {
+                    // This isn't a hard error because user input can contain invalid information.
+                    // If there is no Catalyst ID, then we cannot record this
+                    // registration as invalid and can only ignore (and log) it.
+                    debug!(
+                        slot = ?slot,
+                        index = ?index,
+                        txn_hash = ?txn_hash,
+                        "Unable to determine Catalyst id for registration"
+                    );
+                }
             },
         }
 
