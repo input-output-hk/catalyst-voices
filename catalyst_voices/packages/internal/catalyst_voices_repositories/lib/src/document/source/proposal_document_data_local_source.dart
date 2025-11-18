@@ -20,6 +20,11 @@ abstract interface class ProposalDocumentDataLocalSource {
     required ProposalsOrder order,
   });
 
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  });
+
   Future<void> updateProposalFavorite({
     required String id,
     required bool isFavorite,
@@ -45,12 +50,12 @@ abstract interface class ProposalDocumentDataLocalSource {
     required ProposalsOrder order,
   });
 
-  Stream<List<DocumentData>> watchProposalTemplates({
-    required CampaignFilters filters,
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   });
 
-  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
+  Stream<List<DocumentData>> watchProposalTemplates({
     required CampaignFilters filters,
-    required NodeId nodeId,
   });
 }

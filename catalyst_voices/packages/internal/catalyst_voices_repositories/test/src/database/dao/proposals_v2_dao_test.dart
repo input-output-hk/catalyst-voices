@@ -4188,7 +4188,7 @@ void main() {
       });
     });
 
-    group('getProposalTemplatesTotalTask', () {
+    group('getProposalsTotalTask', () {
       final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
       final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
       final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
@@ -4196,14 +4196,14 @@ void main() {
       final nodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
 
       test('returns empty map when categories list is empty', () async {
-        const filters = CampaignFilters(categoriesIds: []);
+        const filters = ProposalsTotalAskFilters();
 
-        final result = await dao.getProposalTemplatesTotalTask(
-          filters: filters,
+        final result = await dao.getProposalsTotalTask(
           nodeId: nodeId,
+          filters: filters,
         );
 
-        expect(result, <DocumentRef, ProposalTemplateTotalAsk>{});
+        expect(result, const ProposalsTotalAsk({}));
       });
 
       test('returns empty map when no final proposals exist', () async {
@@ -4222,14 +4222,16 @@ void main() {
 
         await db.documentsV2Dao.saveAll([draftProposal]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
 
-        expect(result, <DocumentRef, ProposalTemplateTotalAsk>{});
+        expect(result, const ProposalsTotalAsk({}));
       });
 
       test('aggregates budget from single template with final proposals', () async {
@@ -4281,9 +4283,11 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
@@ -4292,9 +4296,9 @@ void main() {
           id: 'template-1',
           version: 'template-1-ver',
         );
-        final templateResult = result[templateRef];
+        final templateResult = result.data[templateRef];
 
-        expect(result.length, 1);
+        expect(result.data.length, 1);
         expect(templateResult, isNotNull);
         expect(templateResult!.totalAsk, 35000);
         expect(templateResult.finalProposalsCount, 2);
@@ -4349,9 +4353,11 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
@@ -4365,11 +4371,11 @@ void main() {
           version: 'template-1-v2',
         );
 
-        expect(result.length, 2);
-        expect(result[templateRef1]!.totalAsk, 10000);
-        expect(result[templateRef1]!.finalProposalsCount, 1);
-        expect(result[templateRef2]!.totalAsk, 20000);
-        expect(result[templateRef2]!.finalProposalsCount, 1);
+        expect(result.data.length, 2);
+        expect(result.data[templateRef1]!.totalAsk, 10000);
+        expect(result.data[templateRef1]!.finalProposalsCount, 1);
+        expect(result.data[templateRef2]!.totalAsk, 20000);
+        expect(result.data[templateRef2]!.finalProposalsCount, 1);
       });
 
       test('groups by different templates separately', () async {
@@ -4421,9 +4427,11 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
@@ -4437,11 +4445,11 @@ void main() {
           version: 'template-2-ver',
         );
 
-        expect(result.length, 2);
-        expect(result[templateRef1]!.totalAsk, 10000);
-        expect(result[templateRef1]!.finalProposalsCount, 1);
-        expect(result[templateRef2]!.totalAsk, 30000);
-        expect(result[templateRef2]!.finalProposalsCount, 1);
+        expect(result.data.length, 2);
+        expect(result.data[templateRef1]!.totalAsk, 10000);
+        expect(result.data[templateRef1]!.finalProposalsCount, 1);
+        expect(result.data[templateRef2]!.totalAsk, 30000);
+        expect(result.data[templateRef2]!.finalProposalsCount, 1);
       });
 
       test('treats non-integer budget values as 0', () async {
@@ -4493,9 +4501,11 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
@@ -4505,8 +4515,8 @@ void main() {
           version: 'template-1-ver',
         );
 
-        expect(result[templateRef]!.totalAsk, 15000);
-        expect(result[templateRef]!.finalProposalsCount, 2);
+        expect(result.data[templateRef]!.totalAsk, 15000);
+        expect(result.data[templateRef]!.finalProposalsCount, 2);
       });
 
       test('respects category filter', () async {
@@ -4558,9 +4568,11 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
@@ -4570,9 +4582,9 @@ void main() {
           version: 'template-1-ver',
         );
 
-        expect(result.length, 1);
-        expect(result[templateRef]!.totalAsk, 10000);
-        expect(result[templateRef]!.finalProposalsCount, 1);
+        expect(result.data.length, 1);
+        expect(result.data[templateRef]!.totalAsk, 10000);
+        expect(result.data[templateRef]!.finalProposalsCount, 1);
       });
 
       test('handles multiple categories in filter', () async {
@@ -4654,9 +4666,11 @@ void main() {
           finalAction3,
         ]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1', 'cat-2']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1', 'cat-2']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
@@ -4666,9 +4680,9 @@ void main() {
           version: 'template-1-ver',
         );
 
-        expect(result.length, 1);
-        expect(result[templateRef]!.totalAsk, 30000);
-        expect(result[templateRef]!.finalProposalsCount, 2);
+        expect(result.data.length, 1);
+        expect(result.data[templateRef]!.totalAsk, 30000);
+        expect(result.data[templateRef]!.finalProposalsCount, 2);
       });
 
       test('uses correct version when final action points to specific version', () async {
@@ -4723,9 +4737,11 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposalV1, proposalV2, proposalV3, finalAction]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
@@ -4735,8 +4751,8 @@ void main() {
           version: 'template-1-ver',
         );
 
-        expect(result[templateRef]!.totalAsk, 25000);
-        expect(result[templateRef]!.finalProposalsCount, 1);
+        expect(result.data[templateRef]!.totalAsk, 25000);
+        expect(result.data[templateRef]!.finalProposalsCount, 1);
       });
 
       test('excludes final actions without valid ref_ver', () async {
@@ -4778,14 +4794,16 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposalV1, proposalV2, finalActionWithoutRefVer]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
 
-        expect(result, <DocumentRef, ProposalTemplateTotalAsk>{});
+        expect(result, const ProposalsTotalAsk({}));
       });
 
       test('extracts value from custom nodeId path', () async {
@@ -4839,9 +4857,11 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
-        final result = await dao.getProposalTemplatesTotalTask(
+        final result = await dao.getProposalsTotalTask(
           filters: filters,
           nodeId: customNodeId,
         );
@@ -4851,8 +4871,8 @@ void main() {
           version: 'template-1-ver',
         );
 
-        expect(result[templateRef]!.totalAsk, 12500);
-        expect(result[templateRef]!.finalProposalsCount, 2);
+        expect(result.data[templateRef]!.totalAsk, 12500);
+        expect(result.data[templateRef]!.finalProposalsCount, 2);
       });
     });
 
@@ -4865,16 +4885,18 @@ void main() {
       final nodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
 
       test('returns empty map when categories list is empty', () async {
-        const filters = CampaignFilters(categoriesIds: []);
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: []),
+        );
 
-        final stream = dao.watchProposalTemplatesTotalTask(
+        final stream = dao.watchProposalsTotalTask(
           filters: filters,
           nodeId: nodeId,
         );
 
         await expectLater(
           stream,
-          emits({}),
+          emits(const ProposalsTotalAsk({})),
         );
       });
 
@@ -4909,12 +4931,14 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, finalAction1]);
 
-        final emissions = <Map<DocumentRef, ProposalTemplateTotalAsk>>[];
-        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+        final emissions = <Map<DocumentRef, ProposalsTotalAskPerTemplate>>[];
+        const filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        );
 
         final subscription = dao
-            .watchProposalTemplatesTotalTask(filters: filters, nodeId: nodeId)
-            .listen(emissions.add);
+            .watchProposalsTotalTask(filters: filters, nodeId: nodeId)
+            .listen((event) => emissions.add(event.data));
 
         await pumpEventQueue();
         expect(emissions.length, 1);

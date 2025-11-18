@@ -12,9 +12,14 @@ abstract interface class CampaignRepository {
 
   Future<CampaignCategory?> getCategory(SignedDocumentRef ref);
 
-  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
-    required CampaignFilters filters,
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  });
+
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   });
 }
 
@@ -44,10 +49,18 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   }
 
   @override
-  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
-    required CampaignFilters filters,
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   }) {
-    return _source.watchProposalTemplatesTotalTask(filters: filters, nodeId: nodeId);
+    return _source.getProposalsTotalTask(nodeId: nodeId, filters: filters);
+  }
+
+  @override
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) {
+    return _source.watchProposalsTotalTask(nodeId: nodeId, filters: filters);
   }
 }

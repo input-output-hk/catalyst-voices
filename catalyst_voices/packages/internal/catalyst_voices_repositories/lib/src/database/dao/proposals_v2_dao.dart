@@ -118,20 +118,18 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<Map<DocumentRef, ProposalTemplateTotalAsk>> getProposalTemplatesTotalTask({
-    required CampaignFilters filters,
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   }) async {
-    if (filters.categoriesIds.isEmpty) {
-      return {};
+    if (_totalAskShouldReturnEarlyFor(filters: filters)) {
+      return const ProposalsTotalAsk({});
     }
 
-    final entries = await _queryProposalTemplatesTotalTask(
+    return _queryProposalsTotalTask(
       filters: filters,
       nodeId: nodeId,
-    ).get();
-
-    return Map.fromEntries(entries);
+    ).get().then(Map.fromEntries).then(ProposalsTotalAsk.new);
   }
 
   @override
@@ -200,18 +198,18 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
-    required CampaignFilters filters,
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
     required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   }) {
-    if (filters.categoriesIds.isEmpty) {
-      return Stream.value({});
+    if (_totalAskShouldReturnEarlyFor(filters: filters)) {
+      return Stream.value(const ProposalsTotalAsk({}));
     }
 
-    return _queryProposalTemplatesTotalTask(
-      filters: filters,
+    return _queryProposalsTotalTask(
       nodeId: nodeId,
-    ).watch().map(Map.fromEntries);
+      filters: filters,
+    ).watch().map(Map.fromEntries).map(ProposalsTotalAsk.new);
   }
 
   @override
@@ -308,6 +306,22 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     if (filters.ids != null) {
       final escapedIds = filters.ids!.map((id) => "'${_escapeSqlString(id)}'").join(', ');
       clauses.add('p.id IN ($escapedIds)');
+    }
+
+    return clauses;
+  }
+
+  List<String> _buildFilterTotalAskClauses(ProposalsTotalAskFilters filters) {
+    final clauses = <String>[];
+
+    if (filters.categoryId != null) {
+      final escapedCategory = _escapeSqlString(filters.categoryId!);
+      clauses.add("p.category_id = '$escapedCategory'");
+    } else if (filters.campaign != null) {
+      final escapedIds = filters.campaign!.categoriesIds
+          .map((id) => "'${_escapeSqlString(id)}'")
+          .join(', ');
+      clauses.add('p.category_id IN ($escapedIds)');
     }
 
     return clauses;
@@ -472,13 +486,12 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return input.replaceAll("'", "''");
   }
 
-  Selectable<MapEntry<DocumentRef, ProposalTemplateTotalAsk>> _queryProposalTemplatesTotalTask({
-    required CampaignFilters filters,
+  Selectable<MapEntry<DocumentRef, ProposalsTotalAskPerTemplate>> _queryProposalsTotalTask({
     required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   }) {
-    final escapedCategories = filters.categoriesIds
-        .map((id) => "'${_escapeSqlString(id)}'")
-        .join(', ');
+    final filterClauses = _buildFilterTotalAskClauses(filters);
+    final filterWhereClause = filterClauses.isEmpty ? '' : 'AND ${filterClauses.join(' AND ')}';
 
     final query =
         '''
@@ -514,7 +527,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     FROM documents_v2 p
     INNER JOIN effective_final_proposals efp ON p.id = efp.id AND p.ver = efp.ver
     WHERE p.type = ?
-      AND p.category_id IN ($escapedCategories)
+      $filterWhereClause
       AND p.template_id IS NOT NULL
       AND p.template_ver IS NOT NULL
     GROUP BY p.template_id, p.template_ver
@@ -539,7 +552,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         version: templateVer,
       );
 
-      final value = ProposalTemplateTotalAsk(
+      final value = ProposalsTotalAskPerTemplate(
         totalAsk: totalAsk,
         finalProposalsCount: finalProposalsCount,
       );
@@ -778,6 +791,29 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     return false;
   }
+
+  bool _totalAskShouldReturnEarlyFor({
+    required ProposalsTotalAskFilters filters,
+  }) {
+    final campaign = filters.campaign;
+    if (campaign != null) {
+      assert(
+        campaign.categoriesIds.length <= 100,
+        'Campaign filter with more than 100 categories may impact performance. '
+        'Consider pagination or alternative filtering strategy.',
+      );
+
+      if (campaign.categoriesIds.isEmpty) {
+        return true;
+      }
+
+      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }
 
 /// Public interface for proposal queries.
@@ -831,9 +867,9 @@ abstract interface class ProposalsV2Dao {
     ProposalsFiltersV2 filters,
   });
 
-  Future<Map<DocumentRef, ProposalTemplateTotalAsk>> getProposalTemplatesTotalTask({
-    required CampaignFilters filters,
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   });
 
   /// Counts the total number of visible proposals that match the given filters.
@@ -887,9 +923,9 @@ abstract interface class ProposalsV2Dao {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
-    required CampaignFilters filters,
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
     required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   });
 
   /// Watches for changes and emits the total count of visible proposals.

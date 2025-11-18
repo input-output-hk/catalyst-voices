@@ -236,8 +236,9 @@ class NewProposalCubit extends Cubit<NewProposalState>
   }
 
   void _watchCampaignTotalAsk(Campaign campaign) {
+    final filters = ProposalsTotalAskFilters(campaign: CampaignFilters.from(campaign));
     _activeCampaignTotalAskSub = _campaignService
-        .watchCampaignTotalAsk(filters: CampaignFilters.from(campaign))
+        .watchCampaignTotalAsk(filters: filters)
         .distinct()
         .listen(_handleCampaignTotalAskChange);
   }

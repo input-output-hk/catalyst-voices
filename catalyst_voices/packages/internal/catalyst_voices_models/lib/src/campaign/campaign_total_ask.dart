@@ -16,4 +16,12 @@ final class CampaignTotalAsk extends Equatable {
     final categoriesMoney = categoriesAsks.values.map((e) => e.money).flattened.toList();
     return MultiCurrencyAmount.list(categoriesMoney);
   }
+
+  CampaignCategoryTotalAsk? category(SignedDocumentRef ref) {
+    return categoriesAsks.entries.firstWhereOrNull((entry) => entry.key.id == ref.id)?.value;
+  }
+
+  CampaignCategoryTotalAsk categoryOrZero(SignedDocumentRef ref) {
+    return category(ref) ?? CampaignCategoryTotalAsk.zero(ref);
+  }
 }
