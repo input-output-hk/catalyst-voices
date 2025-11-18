@@ -104,7 +104,6 @@ def proposal_doc_factory(rbac_chain_factory):
                 {"id": template_id, "ver": template_id, "cid": "0x"},
             ],
         }
-        # TODO: auto generate body from the given schema
         body = JSF(template_schema).generate()
 
         doc_builder = SignedDocument(metadata, body)
