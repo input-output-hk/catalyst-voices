@@ -295,7 +295,7 @@ void main() {
         const ref = SignedDocumentRef.exact(id: 'non-existent-id', version: 'non-existent-ver');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNull);
@@ -310,7 +310,7 @@ void main() {
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'test-ver');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNotNull);
@@ -327,7 +327,7 @@ void main() {
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'wrong-ver');
 
         // When: getDocument is called
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then: Returns null
         expect(result, isNull);
@@ -348,7 +348,7 @@ void main() {
         const ref = SignedDocumentRef.loose(id: 'test-id');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNotNull);
@@ -365,7 +365,7 @@ void main() {
         const ref = SignedDocumentRef.loose(id: 'non-existent-id');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNull);
@@ -1077,7 +1077,7 @@ void main() {
         expect(await dao.count(), 1);
 
         final remaining = await dao.getDocument(
-          const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+          ref: const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
         );
         expect(remaining, isNotNull);
         expect(remaining!.type, DocumentType.proposalDocument);
@@ -1120,16 +1120,16 @@ void main() {
         expect(await dao.count(), 2);
 
         final remainingProposal = await dao.getDocument(
-          const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+          ref: const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
         );
         final remainingTemplate = await dao.getDocument(
-          const SignedDocumentRef.exact(id: 'template-id', version: 'template-ver'),
+          ref: const SignedDocumentRef.exact(id: 'template-id', version: 'template-ver'),
         );
         final deletedComment = await dao.getDocument(
-          const SignedDocumentRef.exact(id: 'comment-id', version: 'comment-ver'),
+          ref: const SignedDocumentRef.exact(id: 'comment-id', version: 'comment-ver'),
         );
         final deletedAction = await dao.getDocument(
-          const SignedDocumentRef.exact(id: 'action-id', version: 'action-ver'),
+          ref: const SignedDocumentRef.exact(id: 'action-id', version: 'action-ver'),
         );
 
         expect(remainingProposal, isNotNull);

@@ -39,7 +39,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
+  Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) {
     return _database.draftsDao
         .queryAll(ref: ref)
         .then((value) => value.map((e) => e.toModel()).toList());
@@ -102,15 +102,6 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
           final list = List<DocumentData>.from(event.map((e) => e.toModel()));
           return list;
         });
-  }
-}
-
-extension on DocumentDraftEntity {
-  DocumentData toModel() {
-    return DocumentData(
-      metadata: metadata,
-      content: content,
-    );
   }
 }
 

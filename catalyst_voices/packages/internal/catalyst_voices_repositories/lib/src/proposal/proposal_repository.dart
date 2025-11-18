@@ -31,19 +31,6 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
-  Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
-  });
-
-  /// Fetches all proposals for page matching [request] as well as
-  /// [filters].
-  Future<Page<ProposalData>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  });
-
   /// Returns [ProposalTemplate] for matching [ref].
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
@@ -99,18 +86,8 @@ abstract interface class ProposalRepository {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  });
-
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters,
-  });
-
-  Stream<Page<ProposalData>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
   });
 
   Stream<List<ProposalTemplate>> watchProposalTemplates({
@@ -185,27 +162,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final action = _buildProposalActionData(data);
     return _getProposalPublish(ref: ref, action: action);
-  }
-
-  @override
-  Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
-  }) async {
-    return _proposalsLocalSource
-        .getProposals(type: type, categoryRef: categoryRef)
-        .then((value) => value.map(_buildProposalData).toList());
-  }
-
-  @override
-  Future<Page<ProposalData>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) {
-    return _proposalsLocalSource
-        .getProposalsPage(request: request, filters: filters, order: order)
-        .then((value) => value.map(_buildProposalData));
   }
 
   @override
@@ -358,28 +314,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  }) {
-    return _proposalsLocalSource.watchProposalsCount(filters: filters);
-  }
-
-  @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
     return _proposalsLocalSource.watchProposalsCountV2(filters: filters);
-  }
-
-  @override
-  Stream<Page<ProposalData>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) {
-    return _proposalsLocalSource
-        .watchProposalsPage(request: request, filters: filters, order: order)
-        .map((value) => value.map(_buildProposalData));
   }
 
   @override
@@ -426,31 +364,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
     final dto = ProposalSubmissionActionDocumentDto.fromJson(action.content.data);
     return dto.action.toModel();
-  }
-
-  ProposalData _buildProposalData(ProposalDocumentData data) {
-    final action = _buildProposalActionData(data.action);
-
-    final publish = switch (action) {
-      ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
-      ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
-      ProposalSubmissionAction.hide => throw ArgumentError(
-        'Proposal(${data.proposal.metadata.selfRef}) is '
-        'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
-        'out hidden proposals before this code is reached.',
-      ),
-    };
-
-    final document = _buildProposalDocument(
-      documentData: data.proposal,
-      templateData: data.template,
-    );
-
-    return ProposalData(
-      document: document,
-      publish: publish,
-      commentsCount: data.commentsCount,
-    );
   }
 
   ProposalDocument _buildProposalDocument({

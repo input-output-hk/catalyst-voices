@@ -41,8 +41,15 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) {
+    return _database.documentsV2Dao
+        .getDocuments(id: ref.id)
+        .then((value) => value.map((e) => e.toModel()).toList());
+  }
+
+  @override
   Future<DocumentData> get({required DocumentRef ref}) async {
-    final entity = await _database.documentsV2Dao.getDocument(ref);
+    final entity = await _database.documentsV2Dao.getDocument(ref: ref);
     if (entity == null) {
       throw DocumentNotFoundException(ref: ref);
     }
@@ -51,48 +58,15 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
-    return _database.documentsDao
-        .queryAll(ref: ref)
-        .then((value) => value.map((e) => e.toModel()).toList());
-  }
-
-  @override
   Future<DocumentData?> getLatest({
     CatalystId? authorId,
   }) {
-    return _database.documentsDao
-        .queryLatestDocumentData(authorId: authorId)
-        .then((value) => value?.toModel());
+    return _database.documentsV2Dao.getDocument(author: authorId).then((value) => value?.toModel());
   }
 
   @override
   Future<DocumentRef?> getLatestOf({required DocumentRef ref}) {
     return _database.documentsV2Dao.getLatestOf(ref);
-  }
-
-  @override
-  Future<List<ProposalDocumentData>> getProposals({
-    SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
-  }) {
-    return _database.proposalsDao
-        .queryProposals(
-          categoryRef: categoryRef,
-          filters: ProposalsFilters.forActiveCampaign(type: type),
-        )
-        .then((value) => value.map((e) => e.toModel()).toList());
-  }
-
-  @override
-  Future<Page<ProposalDocumentData>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) {
-    return _database.proposalsDao
-        .queryProposalsPage(request: request, filters: filters, order: order)
-        .then((page) => page.map((e) => e.toModel()));
   }
 
   @override
@@ -203,13 +177,6 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  }) {
-    return _database.proposalsDao.watchCount(filters: filters);
-  }
-
-  @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
@@ -220,17 +187,6 @@ final class DatabaseDocumentsDataSource
         if (!tr.finished) unawaited(tr.finish());
       },
     );
-  }
-
-  @override
-  Stream<Page<ProposalDocumentData>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) {
-    return _database.proposalsDao
-        .watchProposalsPage(request: request, filters: filters, order: order)
-        .map((page) => page.map((e) => e.toModel()));
   }
 
   @override
@@ -261,15 +217,6 @@ final class DatabaseDocumentsDataSource
     return _database.documentsDao
         .watchRefToDocumentData(refTo: refTo, type: type)
         .map((e) => e?.toModel());
-  }
-}
-
-extension on DocumentEntity {
-  DocumentData toModel() {
-    return DocumentData(
-      metadata: metadata,
-      content: content,
-    );
   }
 }
 
@@ -333,18 +280,6 @@ extension on DocumentData {
       templateVer: metadata.template?.version,
       authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
       createdAt: metadata.version.dateTime,
-    );
-  }
-}
-
-extension on JoinedProposalEntity {
-  ProposalDocumentData toModel() {
-    return ProposalDocumentData(
-      proposal: proposal.toModel(),
-      template: template.toModel(),
-      action: action?.toModel(),
-      commentsCount: commentsCount,
-      versions: versions,
     );
   }
 }

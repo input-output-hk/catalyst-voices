@@ -944,12 +944,22 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       emit(state.copyWith(isChanging: true));
       if (state.isMaxProposalsLimitReached) {
         final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
-        final count = await _proposalService.watchUserProposalsCount().first;
+        final activeAccountId = _userService.user.activeAccount?.catalystId;
+        final count = activeAccountId == null
+            ? 0
+            : await _proposalService
+                  .watchProposalsCountV2(
+                    filters: ProposalsFiltersV2(
+                      status: ProposalStatusFilter.aFinal,
+                      author: activeAccountId,
+                    ),
+                  )
+                  .first;
 
         if (proposalSubmissionCloseDate != null) {
           final signal = MaxProposalsLimitReachedSignal(
             proposalSubmissionCloseDate: proposalSubmissionCloseDate,
-            currentSubmissions: count.finals,
+            currentSubmissions: count,
             maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
           );
 

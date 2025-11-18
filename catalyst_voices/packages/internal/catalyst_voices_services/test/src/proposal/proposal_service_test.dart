@@ -39,7 +39,6 @@ void main() {
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
-    registerFallbackValue(const ProposalsCountFilters());
 
     when(
       () => mockDocumentRepository.watchCount(
@@ -61,14 +60,12 @@ void main() {
         isActive: true,
       );
       final user = User.optional(accounts: [account]);
-      const proposalsCount = ProposalsCount(
-        finals: ProposalDocument.maxSubmittedProposalsPerUser + 1,
-      );
+      const proposalsCount = ProposalDocument.maxSubmittedProposalsPerUser + 1;
 
       when(() => mockUserService.watchUser).thenAnswer((_) => Stream.value(user));
 
       when(
-        () => mockProposalRepository.watchProposalsCount(
+        () => mockProposalRepository.watchProposalsCountV2(
           filters: any(named: 'filters'),
         ),
       ).thenAnswer((_) => Stream.value(proposalsCount));

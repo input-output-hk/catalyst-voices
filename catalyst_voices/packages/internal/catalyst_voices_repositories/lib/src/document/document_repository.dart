@@ -49,7 +49,7 @@ abstract interface class DocumentRepository {
   });
 
   /// Returns all matching [DocumentData] to given [ref].
-  Future<List<DocumentData>> getAllDocumentsData({
+  Future<List<DocumentData>> findAllVersions({
     required DocumentRef ref,
   });
 
@@ -254,10 +254,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<DocumentData>> getAllDocumentsData({required DocumentRef ref}) async {
+  Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) async {
     final all = switch (ref) {
-      DraftRef() => await _drafts.getAll(ref: ref),
-      SignedDocumentRef() => await _localDocuments.getAll(ref: ref),
+      DraftRef() => await _drafts.findAllVersions(ref: ref),
+      SignedDocumentRef() => await _localDocuments.findAllVersions(ref: ref),
     }..sort();
 
     return all;

@@ -38,12 +38,34 @@ abstract interface class DocumentsV2Dao {
   /// Suitable for synchronizing many documents with minimal database round-trips.
   Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
 
-  /// Retrieves a document by its reference.
+  /// Retrieves a document.
   ///
-  /// If [ref] is exact (has version), returns the specific version.
-  /// If loose (no version), returns the latest version by createdAt.
+  /// If [ref] is provided and is exact (has version), returns the specific version.
+  /// If [ref] is loose (no version), returns the latest version by createdAt.
+  /// If [author] is non null tries to find matching document
   /// Returns null if no matching document is found.
-  Future<DocumentEntityV2?> getDocument(DocumentRef ref);
+  Future<DocumentEntityV2?> getDocument({
+    DocumentRef? ref,
+    CatalystId? author,
+  });
+
+  /// Retrieves a list of documents that match the given criteria.
+  ///
+  /// This method returns a list of documents that match the given criteria.
+  /// - [id]: optional filter to only include documents with matching id.
+  /// - [type]: Optional filter to only include documents of a specific [DocumentType].
+  /// - [filters]: Optional campaign filter.
+  /// - [latestOnly] is true only newest version per id is returned.
+  /// - [limit]: The maximum number of documents to return.
+  /// - [offset]: The number of documents to skip for pagination.
+  Future<List<DocumentEntityV2>> getDocuments({
+    String? id,
+    DocumentType? type,
+    CampaignFilters? filters,
+    bool latestOnly,
+    int limit,
+    int offset,
+  });
 
   /// Finds the latest version of a document.
   ///
@@ -66,12 +88,14 @@ abstract interface class DocumentsV2Dao {
   ///
   /// This method returns a stream that emits a new list of documents whenever
   /// the underlying data changes.
+  /// - [id]: optional filter to only include documents with matching id.
   /// - [type]: Optional filter to only include documents of a specific [DocumentType].
   /// - [filters]: Optional campaign filter.
   /// - [latestOnly] is true only newest version per id is returned.
   /// - [limit]: The maximum number of documents to return.
   /// - [offset]: The number of documents to skip for pagination.
   Stream<List<DocumentEntityV2>> watchDocuments({
+    String? id,
     DocumentType? type,
     CampaignFilters? filters,
     bool latestOnly,
@@ -161,18 +185,58 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<DocumentEntityV2?> getDocument(DocumentRef ref) {
-    final query = select(documentsV2)..where((tbl) => tbl.id.equals(ref.id));
+  Future<DocumentEntityV2?> getDocument({
+    DocumentRef? ref,
+    CatalystId? author,
+  }) {
+    final query = select(documentsV2);
 
-    if (ref.isExact) {
-      query.where((tbl) => tbl.ver.equals(ref.version!));
-    } else {
-      query
-        ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
-        ..limit(1);
+    if (ref != null) {
+      query.where((tbl) => tbl.id.equals(ref.id));
+
+      if (ref.isExact) {
+        query.where((tbl) => tbl.ver.equals(ref.version!));
+      }
     }
 
+    // TODO(damian-molinski): test it
+    if (author != null) {
+      final significant = author.toSignificant().toUri().toString();
+      query.where((tbl) {
+        final authorDocs = subqueryExpression<String>(
+          selectOnly(documentAuthors)
+            ..addColumns([documentAuthors.documentId])
+            ..where(documentAuthors.authorIdSignificant.equals(significant))
+            ..where(documentAuthors.documentId.equalsExp(documentsV2.id)),
+        );
+        return tbl.id.equalsExp(authorDocs);
+      });
+    }
+
+    query
+      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
+      ..limit(1);
+
     return query.getSingleOrNull();
+  }
+
+  @override
+  Future<List<DocumentEntityV2>> getDocuments({
+    String? id,
+    DocumentType? type,
+    CampaignFilters? filters,
+    bool latestOnly = false,
+    int limit = 200,
+    int offset = 0,
+  }) {
+    return _queryDocuments(
+      id: id,
+      type: type,
+      filters: filters,
+      latestOnly: latestOnly,
+      limit: limit,
+      offset: offset,
+    ).get();
   }
 
   @override
@@ -222,15 +286,38 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Stream<List<DocumentEntityV2>> watchDocuments({
+    String? id,
     DocumentType? type,
     CampaignFilters? filters,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
   }) {
+    return _queryDocuments(
+      id: id,
+      type: type,
+      filters: filters,
+      latestOnly: latestOnly,
+      limit: limit,
+      offset: offset,
+    ).watch();
+  }
+
+  SimpleSelectStatement<$DocumentsV2Table, DocumentEntityV2> _queryDocuments({
+    String? id,
+    DocumentType? type,
+    CampaignFilters? filters,
+    required bool latestOnly,
+    required int limit,
+    required int offset,
+  }) {
     final effectiveLimit = limit.clamp(0, 999);
 
     final query = select(documentsV2);
+
+    if (id != null) {
+      query.where((tbl) => tbl.id.equals(id));
+    }
 
     if (filters != null) {
       query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
@@ -255,6 +342,6 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     query.limit(effectiveLimit, offset: offset);
 
-    return query.watch();
+    return query;
   }
 }

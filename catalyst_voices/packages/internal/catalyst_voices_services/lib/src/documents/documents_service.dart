@@ -65,7 +65,7 @@ final class DocumentsServiceImpl implements DocumentsService {
 
   @override
   Future<List<DocumentData>> lookup(DocumentRef ref) {
-    return _documentRepository.getAllDocumentsData(ref: ref);
+    return _documentRepository.findAllVersions(ref: ref);
   }
 
   @override

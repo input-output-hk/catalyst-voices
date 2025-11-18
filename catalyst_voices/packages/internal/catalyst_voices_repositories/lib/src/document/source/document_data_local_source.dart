@@ -9,7 +9,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
 
   Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
 
-  Future<List<DocumentData>> getAll({required DocumentRef ref});
+  Future<List<DocumentData>> findAllVersions({required DocumentRef ref});
 
   Future<DocumentData?> getLatest({
     CatalystId? authorId,

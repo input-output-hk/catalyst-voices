@@ -60,12 +60,6 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Future<Page<ProposalWithContext>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  });
-
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
@@ -127,23 +121,11 @@ abstract interface class ProposalService {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  });
-
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters,
   });
 
-  Stream<Page<Proposal>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  });
-
   Stream<List<DetailProposal>> watchUserProposals();
-
-  Stream<ProposalsCount> watchUserProposalsCount();
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -262,61 +244,6 @@ final class ProposalServiceImpl implements ProposalService {
       commentsCount: proposalData.commentsCount,
       versions: version,
     );
-  }
-
-  @override
-  Future<Page<ProposalWithContext>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) async {
-    // TODO(LynxxLynx): Only for mocking! Remove this when we start supporting writing votes to the database
-    final originalFilters = filters;
-    if (filters.type == ProposalsFilterType.voted) {
-      filters = filters.copyWith(type: ProposalsFilterType.total);
-    }
-
-    final proposalsPage = await _proposalRepository
-        .getProposalsPage(request: request, filters: filters, order: order)
-        .then(_mapProposalDataPage);
-    var proposals = proposalsPage.items;
-
-    // TODO(LynxxLynx): Only for mocking! Remove this when we start supporting writing votes to the database
-    if (originalFilters.type == ProposalsFilterType.voted) {
-      final votedProposals = _castedVotesObserver.votes;
-      final votedProposalIds = votedProposals.map((vote) => vote.proposal).toSet();
-      proposals = proposals
-          .where((proposal) => votedProposalIds.contains(proposal.selfRef))
-          .toList();
-    }
-
-    final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
-
-    // If we are getting proposals then campaign needs to be active
-    // Getting whole campaign with list of categories saves time then calling to get each category separately
-    // for each proposal
-    final activeCampaign = _activeCampaignObserver.campaign;
-
-    final categories = Map<String, CampaignCategory>.fromEntries(
-      categoriesRefs.map((ref) {
-        final category = activeCampaign!.categories.firstWhere(
-          (category) => category.selfRef == ref,
-        );
-        return MapEntry(ref.id, category);
-      }),
-    );
-
-    final proposalsWithContext = proposals
-        .map(
-          (proposal) => ProposalWithContext(
-            proposal: proposal,
-            category: categories[proposal.categoryRef.id]!,
-            user: const ProposalUserContext(),
-          ),
-        )
-        .toList();
-
-    return proposalsPage.copyWithItems(proposalsWithContext);
   }
 
   @override
@@ -476,9 +403,16 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<bool> watchMaxProposalsLimitReached() {
-    return watchUserProposalsCount().map((count) {
-      return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
-    });
+    // TODO(damian-molinski): watch active account id + active campain
+    const filters = const ProposalsFiltersV2(
+      status: ProposalStatusFilter.aFinal,
+      author: null,
+      campaign: null,
+    );
+
+    return _proposalRepository
+        .watchProposalsCountV2(filters: filters)
+        .map((event) => event >= ProposalDocument.maxSubmittedProposalsPerUser);
   }
 
   @override
@@ -513,22 +447,6 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  }) {
-    final proposalsCount = _proposalRepository.watchProposalsCount(filters: filters);
-
-    // TODO(LynxxLynx): Remove this when we start supporting writing votes to the database
-    return proposalsCount.switchMap((count) {
-      return _castedVotesObserver.watchCastedVotes.map((votedProposals) {
-        return count.copyWith(
-          voted: votedProposals.length,
-        );
-      });
-    });
-  }
-
-  @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
@@ -537,17 +455,6 @@ final class ProposalServiceImpl implements ProposalService {
         return _proposalRepository.watchProposalsCountV2(filters: effectiveFilters);
       },
     );
-  }
-
-  @override
-  Stream<Page<Proposal>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) {
-    return _proposalRepository
-        .watchProposalsPage(request: request, filters: filters, order: order)
-        .asyncMap(_mapProposalDataPage);
   }
 
   @override
@@ -605,28 +512,6 @@ final class ProposalServiceImpl implements ProposalService {
               },
             ).switchMap(Stream.fromFuture);
           });
-    });
-  }
-
-  @override
-  Stream<ProposalsCount> watchUserProposalsCount() {
-    return _userService.watchUser.distinct().switchMap((user) {
-      final authorId = user.activeAccount?.catalystId;
-      if (!_isProposer(user) || authorId == null) {
-        // user is not eligible for creating proposals
-        return const Stream.empty();
-      }
-
-      final activeCampaign = _activeCampaignObserver.campaign;
-      final categoriesIds = activeCampaign?.categories.map((e) => e.selfRef.id).toList();
-
-      final filters = ProposalsCountFilters(
-        author: authorId,
-        onlyAuthor: true,
-        campaign: categoriesIds != null ? CampaignFilters(categoriesIds: categoriesIds) : null,
-      );
-
-      return watchProposalsCount(filters: filters);
     });
   }
 
@@ -738,24 +623,5 @@ final class ProposalServiceImpl implements ProposalService {
       isFavorite: data.isFavorite,
       votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
     );
-  }
-
-  Future<Page<Proposal>> _mapProposalDataPage(Page<ProposalData> page) async {
-    final proposals = await page.items.map(
-      (item) async {
-        final versions = await _proposalRepository
-            .queryVersionsOfId(
-              id: item.document.metadata.selfRef.id,
-              includeLocalDrafts: true,
-            )
-            .then(
-              (value) => value.map((e) => e.metadata.selfRef.version!).whereType<String>().toList(),
-            );
-
-        return Proposal.fromData(item, versions);
-      },
-    ).wait;
-
-    return page.copyWithItems(proposals);
   }
 }
