@@ -10,7 +10,7 @@ use crate::service::common::types::{
 };
 
 impl_array_types!(
-    CatalystIdList,
+    CollaboratorsList,
     CatalystId,
     Some(MetaSchema {
         example: Self::example().to_json(),
@@ -20,7 +20,7 @@ impl_array_types!(
     })
 );
 
-impl Example for CatalystIdList {
+impl Example for CollaboratorsList {
     fn example() -> Self {
         Self(vec![Example::example()])
     }

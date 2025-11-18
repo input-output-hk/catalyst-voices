@@ -12,7 +12,7 @@ use crate::{
         self,
         types::{
             array_types::impl_array_types,
-            cardano::catalyst_id_list::CatalystIdList,
+            cardano::collaborators_list::CollaboratorsList,
             document::{
                 doc_chain::DocumentChainDocumented, doc_ref_v2::DocumentReferenceListV2,
                 doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
@@ -171,7 +171,7 @@ pub(crate) struct IndexedDocumentVersionV2 {
     /// A list of collaborators who can participate in drafting and submitting a document
     /// that matches the filter.
     #[oai(skip_serializing_if_is_none)]
-    pub collaborators: Option<CatalystIdList>,
+    pub collaborators: Option<CollaboratorsList>,
     /// A link to a previous document in a chained sequence that matches the filter.
     #[oai(skip_serializing_if_is_none)]
     pub chain: Option<DocumentChainDocumented>,
