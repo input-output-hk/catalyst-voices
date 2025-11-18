@@ -9,6 +9,7 @@ from api.v1 import document
 from utils import signed_doc, uuid_v7
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from tempfile import NamedTemporaryFile
+from jsf import JSF
 
 
 DOC_TYPE = {
@@ -88,7 +89,7 @@ class SignedDocument(SignedDocumentBase):
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture
 def proposal_doc_factory(rbac_chain_factory):
-    def __factory__(template_id: str) -> tuple[SignedDocument, RoleID]:
+    def __factory__(template_id: str, template_schema: Any) -> tuple[SignedDocument, RoleID]:
         role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
         doc_id = uuid_v7.uuid_v7()
@@ -104,7 +105,7 @@ def proposal_doc_factory(rbac_chain_factory):
             ],
         }
         # TODO: auto generate body from the given schema
-        body = {}
+        body = JSF(template_schema).generate()
 
         doc_builder = SignedDocument(metadata, body)
         (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
