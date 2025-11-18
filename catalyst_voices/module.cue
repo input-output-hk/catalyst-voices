@@ -65,7 +65,7 @@
 						localhost:8080 {
 							root * /app
 
-              encode
+						encode
 
 							file_server {
 							    precompressed
