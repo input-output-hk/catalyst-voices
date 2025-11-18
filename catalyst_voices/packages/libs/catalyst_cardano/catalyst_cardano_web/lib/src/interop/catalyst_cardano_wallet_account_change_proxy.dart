@@ -42,12 +42,12 @@ final class CardanoWalletAccountChangeProxy implements CardanoWallet {
 }
 
 final class _CardanoWalletApi implements CardanoWalletApi {
-  final CardanoWalletApi _delegate;
   final _GetWalletApiCallback _onAccountChange;
+  CardanoWalletApi _delegate;
 
-  const _CardanoWalletApi({
-    required CardanoWalletApi delegate,
+  _CardanoWalletApi({
     required _GetWalletApiCallback onAccountChange,
+    required CardanoWalletApi delegate,
   }) : _onAccountChange = onAccountChange,
        _delegate = delegate;
 
@@ -139,8 +139,8 @@ final class _CardanoWalletApi implements CardanoWalletApi {
       return await callback(_delegate);
     } on WalletApiException catch (e) {
       if (e.code == WalletApiErrorCode.accountChange) {
-        final newDelegate = await _onAccountChange();
-        return callback(newDelegate);
+        _delegate = await _onAccountChange();
+        return callback(_delegate);
       }
 
       rethrow;
@@ -149,12 +149,12 @@ final class _CardanoWalletApi implements CardanoWalletApi {
 }
 
 final class _CardanoWalletCip95Api implements CardanoWalletCip95Api {
-  final CardanoWalletCip95Api _delegate;
   final _GetWalletCip95ApiCallback _onAccountChange;
+  CardanoWalletCip95Api _delegate;
 
-  const _CardanoWalletCip95Api({
-    required CardanoWalletCip95Api delegate,
+  _CardanoWalletCip95Api({
     required _GetWalletCip95ApiCallback onAccountChange,
+    required CardanoWalletCip95Api delegate,
   }) : _onAccountChange = onAccountChange,
        _delegate = delegate;
 
@@ -204,8 +204,8 @@ final class _CardanoWalletCip95Api implements CardanoWalletCip95Api {
       return await callback(_delegate);
     } on WalletApiException catch (e) {
       if (e.code == WalletApiErrorCode.accountChange) {
-        final newDelegate = await _onAccountChange();
-        return callback(newDelegate);
+        _delegate = await _onAccountChange();
+        return callback(_delegate);
       }
 
       rethrow;
