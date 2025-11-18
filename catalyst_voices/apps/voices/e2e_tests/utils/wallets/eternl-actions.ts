@@ -12,47 +12,41 @@ export class EternlActions implements WalletActions {
   }
 
   async restoreWallet(): Promise<void> {
-    await this.page.locator('//button[aria-label="Start setup"]').click();
-    await this.page.locator('#modalSetupSettingsFooter button').click();
-    
-    await this.page.locator('button:has-text("Add Wallet")').click();
+    /* cspell: disable */
+    await this.page.locator('//button[@aria-label="Start setup"]').click();
+    await this.page.locator("#modalSetupSettingsFooter button").click();
+    await this.selectNetwork(this.walletConfig.network);
+
+    await this.page
+      .locator("//div[@id='eternl-modal']//button[@id='modelSetupSettingsBtnNext']")
+      .click();
+    await this.page.locator("#passwordInput").fill(this.walletConfig.password);
+    await this.page.locator("#btnNext").click();
+    await this.page.locator("#passwordInput").fill(this.walletConfig.password);
+    await this.page.locator("#modelSetupSettingsBtnNext").click();
 
     // Click Restore wallet
-    await this.page.locator('button:has-text("Restore wallet")').click();
+    await this.page.locator('button:has-text("Enter a Seed-phrase")').click();
 
-    // Select 15 words
-    await this.page.locator('button:has-text("15 words")').click();
-
-    // Click next
-    await this.page.locator('button.cc-btn-primary:has-text("next")').click();
-
-    // Enter seed phrase
     await this.page
-      .locator("#wordInput")
-      .fill(this.walletConfig.seed.join(" "));
+      .locator(`button:has-text("${this.walletConfig.seed.length}-word phrase")`)
+      .click();
+
+    await this.writeDownSeedPhraseWords();
+    await this.page.locator('button#modelRestoreWalletBtnNext:has-text("Next")').click();
+    await this.page.locator('button#modelRestoreWalletBtnNext:has-text("Next")').click();
+
+    await this.page.locator("#walletName").fill(this.walletConfig.name);
+    await this.page.locator('button#modelRestoreWalletBtnNext:has-text("Next")').click();
 
     // Continue
-    await this.page.locator('button:has-text("continue")').click();
-
-    // Set wallet name
-    await this.page
-      .locator("#inputWalletName")
-      .fill(this.walletConfig.username);
-
-    // Set password
     await this.page.locator("#password").fill(this.walletConfig.password);
-    await this.page.locator("#repeatPassword").fill(this.walletConfig.password);
-
-    // Save wallet
-    await this.page.locator('button:has-text("save")').click();
-    await this.page.locator('button:has-text("save")').click();
-
-    // Click on the light theme area to complete setup
+    await this.page.locator("#passwordConfirm").pressSequentially(this.walletConfig.password);
+    await this.page.locator("span:has-text('Set your spending password')").click();
+    await this.page.locator('button:has-text("Next")').click();
     await this.page
-      .locator(
-        "div.flex.flex-row.justify-center.items-center.cursor-pointer.cc-area-light-1"
-      )
-      .click();
+      .locator('.p-card-footer-compact:has-text("Up to date")')
+      .waitFor({ state: "visible" });
   }
 
   async connectWallet(): Promise<void> {
@@ -66,5 +60,40 @@ export class EternlActions implements WalletActions {
 
     // Sign the transaction
     await this.page.locator('//button[.//span[text()="sign"]]').click();
+  }
+
+  private async writeDownSeedPhraseWords(): Promise<void> {
+    for (let i = 0; i < this.walletConfig.seed.length; i++) {
+      await this.page
+        .locator(`//div[@class='p-inputgroup' and .//span[text()='${i + 1}']]//input`)
+        .fill(this.walletConfig.seed[i]);
+      await this.page
+        .locator(
+          `//div[@class='p-autocomplete-overlay p-component']//li[text()='${this.walletConfig.seed[i]}']`
+        )
+        .click();
+    }
+  }
+
+  private async selectNetwork(network: string): Promise<void> {
+    switch (network) {
+      case "preprod":
+        await this.page
+          .locator(
+            "//div[@id='modal-network-select']//button[.//div[contains(text(), 'Pre-Production')]]"
+          )
+          .click();
+        break;
+      case "mainnet":
+        await this.page
+          .locator(
+            "//div[@id='modal-network-select']//button[.//div[contains(text(), 'Cardano mainnet')]]"
+          )
+          .click();
+        break;
+      default:
+        throw new Error(`Invalid network: ${network}`);
+    }
+    /* cspell: enable */
   }
 }
