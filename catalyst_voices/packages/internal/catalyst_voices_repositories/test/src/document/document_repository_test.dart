@@ -23,7 +23,6 @@ void main() {
   late DraftDataSource draftsSource;
   late SignedDocumentDataSource localDocuments;
   late DocumentDataRemoteSource remoteDocuments;
-  late DocumentFavoriteSource favoriteDocuments;
 
   setUp(() async {
     final connection = await buildTestConnection();
@@ -32,14 +31,12 @@ void main() {
     draftsSource = DatabaseDraftsDataSource(database);
     localDocuments = DatabaseDocumentsDataSource(database, const CatalystProfiler.noop());
     remoteDocuments = _MockDocumentDataRemoteSource();
-    favoriteDocuments = DatabaseDocumentFavoriteSource(database);
 
     repository = DocumentRepositoryImpl(
       database,
       draftsSource,
       localDocuments,
       remoteDocuments,
-      favoriteDocuments,
     );
   });
 

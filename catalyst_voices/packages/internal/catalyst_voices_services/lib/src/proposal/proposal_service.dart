@@ -50,9 +50,6 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
-  /// Similar to [watchFavoritesProposalsIds] stops after first emit.
-  Future<List<String>> getFavoritesProposalsIds();
-
   Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref});
 
   Future<DetailProposal> getProposal({
@@ -119,14 +116,6 @@ abstract interface class ProposalService {
     required DocumentDataContent content,
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
-  });
-
-  /// Fetches favorites proposals ids of the user
-  Stream<List<String>> watchFavoritesProposalsIds();
-
-  /// Emits when proposal fav status changes.
-  Stream<bool> watchIsFavoritesProposal({
-    required DocumentRef ref,
   });
 
   /// Streams changes to [isMaxProposalsLimitReached].
@@ -240,13 +229,6 @@ final class ProposalServiceImpl implements ProposalService {
         return actionRef;
       },
     );
-  }
-
-  @override
-  Future<List<String>> getFavoritesProposalsIds() {
-    return _documentRepository
-        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
-        .first;
   }
 
   @override
@@ -490,18 +472,6 @@ final class ProposalServiceImpl implements ProposalService {
         content: content,
       ),
     );
-  }
-
-  @override
-  Stream<List<String>> watchFavoritesProposalsIds() {
-    return _documentRepository.watchAllDocumentsFavoriteIds(
-      type: DocumentType.proposalDocument,
-    );
-  }
-
-  @override
-  Stream<bool> watchIsFavoritesProposal({required DocumentRef ref}) {
-    return _documentRepository.watchIsDocumentFavorite(ref: ref.toLoose());
   }
 
   @override

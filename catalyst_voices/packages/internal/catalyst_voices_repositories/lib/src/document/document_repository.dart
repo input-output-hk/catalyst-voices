@@ -25,7 +25,6 @@ abstract interface class DocumentRepository {
     DraftDataSource drafts,
     SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
-    DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
 
   /// Analyzes the database to gather statistics and potentially optimize it.
@@ -113,10 +112,7 @@ abstract interface class DocumentRepository {
     required List<DocumentRef> refs,
   });
 
-  /// Similar to [watchIsDocumentFavorite] but stops after first emit.
-  Future<bool> isDocumentFavorite({
-    required DocumentRef ref,
-  });
+  Future<bool> isFavorite(DocumentRef ref);
 
   /// Parses a document [data] previously encoded by [encodeDocumentForExport].
   ///
@@ -169,13 +165,6 @@ abstract interface class DocumentRepository {
     required CatalystId authorId,
   });
 
-  /// Updates fav status matching [ref].
-  Future<void> updateDocumentFavorite({
-    required DocumentRef ref,
-    required DocumentType type,
-    required bool isFavorite,
-  });
-
   /// In context of [document] selfRef:
   ///
   /// - [DraftRef] -> Creates/updates a local document draft.
@@ -186,13 +175,6 @@ abstract interface class DocumentRepository {
   /// change.
   Future<void> upsertDocument({
     required DocumentData document,
-  });
-
-  /// Emits list of all favorite ids.
-  ///
-  /// All returned ids are loose and won't specify version.
-  Stream<List<String>> watchAllDocumentsFavoriteIds({
-    DocumentType? type,
   });
 
   /// Emits number of matching documents
@@ -225,11 +207,6 @@ abstract interface class DocumentRepository {
     DocumentRef? refTo,
   });
 
-  /// Emits changes to fav status of [ref].
-  Stream<bool> watchIsDocumentFavorite({
-    required DocumentRef ref,
-  });
-
   /// Looking for document with matching refTo and type.
   /// It return documents data that have a reference that matches [refTo]
   ///
@@ -249,7 +226,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
-  final DocumentFavoriteSource _favoriteDocuments;
 
   final _documentDataLock = Lock();
 
@@ -258,7 +234,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._drafts,
     this._localDocuments,
     this._remoteDocuments,
-    this._favoriteDocuments,
   );
 
   @override
@@ -378,10 +353,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<bool> isDocumentFavorite({required DocumentRef ref}) {
-    assert(!ref.isExact, 'Favorite ref have to be loose!');
-
-    return _favoriteDocuments.watchIsDocumentFavorite(ref.id).first;
+  Future<bool> isFavorite(DocumentRef ref) {
+    // TODO: implement isFavorite
+    throw UnimplementedError();
   }
 
   @override
@@ -471,21 +445,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateDocumentFavorite({
-    required DocumentRef ref,
-    required DocumentType type,
-    required bool isFavorite,
-  }) {
-    assert(!ref.isExact, 'Favorite ref have to be loose!');
-
-    return _favoriteDocuments.updateDocumentFavorite(
-      ref.id,
-      type: type,
-      isFavorite: isFavorite,
-    );
-  }
-
-  @override
   Future<void> upsertDocument({
     required DocumentData document,
   }) async {
@@ -553,13 +512,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           },
         )
         .distinct(listEquals);
-  }
-
-  @override
-  Stream<List<String>> watchAllDocumentsFavoriteIds({
-    DocumentType? type,
-  }) {
-    return _favoriteDocuments.watchAllFavoriteIds(type: type);
   }
 
   @override
@@ -645,13 +597,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         },
       );
     });
-  }
-
-  @override
-  Stream<bool> watchIsDocumentFavorite({required DocumentRef ref}) {
-    assert(!ref.isExact, 'Favorite ref have to be loose!');
-
-    return _favoriteDocuments.watchIsDocumentFavorite(ref.id);
   }
 
   @override

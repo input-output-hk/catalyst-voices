@@ -18,7 +18,6 @@ export 'document/source/database_drafts_data_source.dart';
 export 'document/source/document_data_local_source.dart';
 export 'document/source/document_data_remote_source.dart';
 export 'document/source/document_data_source.dart';
-export 'document/source/document_favorites_source.dart';
 export 'dto/document/document_dto.dart' show DocumentExt;
 export 'logging/logging_settings_storage.dart';
 export 'proposal/proposal_repository.dart' show ProposalRepository;

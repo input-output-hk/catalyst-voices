@@ -5,13 +5,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
-import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
+import '../../utils/document_with_authors_factory.dart';
 import '../connection/test_connection.dart';
 
 void main() {
@@ -1013,11 +1010,7 @@ void main() {
   });
 }
 
-String _buildUuidV7At(DateTime dateTime) {
-  final ts = dateTime.millisecondsSinceEpoch;
-  final rand = Uint8List.fromList([42, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  return const UuidV7().generate(options: V7Options(ts, rand));
-}
+String _buildUuidV7At(DateTime dateTime) => DocumentRefFactory.uuidV7At(dateTime);
 
 DocumentWithAuthorsEntity _createTestDocumentEntity({
   String? id,
@@ -1035,15 +1028,10 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
   String? templateId,
   String? templateVer,
 }) {
-  id ??= DocumentRefFactory.randomUuidV7();
-  ver ??= id;
-  authors ??= '';
-
-  final docEntity = DocumentEntityV2(
+  return DocumentWithAuthorsFactory.create(
     id: id,
     ver: ver,
-    content: DocumentDataContent(contentData),
-    createdAt: ver.tryDateTime ?? DateTime.timestamp(),
+    contentData: contentData,
     type: type,
     authors: authors,
     categoryId: categoryId,
@@ -1056,22 +1044,4 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
     templateId: templateId,
     templateVer: templateVer,
   );
-
-  final authorsEntities = authors
-      .split(',')
-      .where((element) => element.trim().isNotEmpty)
-      .map(CatalystId.tryParse)
-      .nonNulls
-      .map(
-        (e) => DocumentAuthorEntity(
-          documentId: docEntity.id,
-          documentVer: docEntity.ver,
-          authorId: e.toUri().toString(),
-          authorIdSignificant: e.toSignificant().toUri().toString(),
-          authorUsername: e.username,
-        ),
-      )
-      .toList();
-
-  return DocumentWithAuthorsEntity(docEntity, authorsEntities);
 }
