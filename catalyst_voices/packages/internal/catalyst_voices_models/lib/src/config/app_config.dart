@@ -232,6 +232,15 @@ final class CacheConfig extends Equatable {
   }
 }
 
+/// Database configuration for the application.
+///
+/// IMPORTANT: Web asset versioning notes:
+/// - [webSqlite3Wasm] and [webDriftWorker] files require manual versioning
+/// - These filenames are hardcoded here and compiled into the app during build
+/// - The automatic versioning script runs AFTER `flutter build web`, so it cannot
+///   update these hardcoded references
+/// - When these files change, manually rename them with a version suffix
+///   (e.g., 'sqlite3.v2.wasm') and update the filenames here BEFORE building
 final class DatabaseConfig extends Equatable {
   final String name;
   final String webSqlite3Wasm;

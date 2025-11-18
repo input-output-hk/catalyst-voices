@@ -5,4 +5,6 @@ class MockCatGateway extends Mock implements CatGateway {}
 
 class MockCatReviews extends Mock implements CatReviews {}
 
+class MockedAppMetaService extends Mock implements AppMetaService {}
+
 class MockedCatStatus extends Mock implements CatStatus {}

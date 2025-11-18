@@ -4,8 +4,8 @@
 //! metrics to the latest before sending to the service.
 
 use poem::{
-    http::{Method, StatusCode},
     Endpoint, Request, Response, Result,
+    http::{Method, StatusCode},
 };
 use prometheus::{Encoder, Registry, TextEncoder};
 

@@ -19,27 +19,19 @@ export class LaceActions implements WalletActions {
     await this.handleNextPage();
 
     // Select 15-word recovery phrase
-    await this.page
-      .locator('//span[@data-testid="recovery-phrase-15"]')
-      .click();
+    await this.page.locator('//span[@data-testid="recovery-phrase-15"]').click();
 
     // Enter seed phrase
     for (let i = 0; i < this.walletConfig.seed.length; i++) {
       const seedPhraseSelector = `//*[@id="mnemonic-word-${i + 1}"]`;
-      await this.page
-        .locator(seedPhraseSelector)
-        .fill(this.walletConfig.seed[i]);
+      await this.page.locator(seedPhraseSelector).fill(this.walletConfig.seed[i]);
     }
 
     // Continue to next step
-    await this.page
-      .locator('[data-testid="wallet-setup-step-btn-next"]')
-      .click();
+    await this.page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
 
     // Set wallet name and password
-    await this.page
-      .locator('[data-testid="wallet-name-input"]')
-      .fill(this.walletConfig.username);
+    await this.page.locator('[data-testid="wallet-name-input"]').fill(this.walletConfig.username);
     await this.page
       .locator('[data-testid="wallet-password-verification-input"]')
       .fill(this.walletConfig.password);
@@ -48,12 +40,10 @@ export class LaceActions implements WalletActions {
       .fill(this.walletConfig.password);
 
     // Continue through the setup
-    await this.page
-      .locator('[data-testid="wallet-setup-step-btn-next"]')
-      .click();
-    await this.page
-      .locator('[data-testid="wallet-setup-step-btn-next"]')
-      .click();
+    await this.page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
+    // await this.page
+    // .locator('[data-testid="wallet-setup-step-btn-next"]')
+    //.click();
 
     // Switch to preprod network
     await this.page
@@ -68,18 +58,15 @@ export class LaceActions implements WalletActions {
       .locator('//*[@data-testid="network-preprod-radio-button"]')
       .click();
     await this.page.waitForSelector('[data-testid="portfolio-balance-label"]', {
-      timeout: 10000, state: "visible",
+      timeout: 10000,
+      state: "visible",
     });
   }
 
   async connectWallet(): Promise<void> {
     // Authorize the connection
-    await this.page
-      .locator("//button[@data-testid='connect-authorize-button']")
-      .click();
-    await this.page
-      .locator("//button[@data-testid='connect-modal-accept-always']")
-      .click();
+    await this.page.locator("//button[@data-testid='connect-authorize-button']").click();
+    await this.page.locator("//button[@data-testid='connect-modal-accept-always']").click();
   }
 
   async approveTransaction(): Promise<void> {
@@ -92,9 +79,7 @@ export class LaceActions implements WalletActions {
       .fill(this.walletConfig.password);
 
     // Sign transaction
-    await this.page
-      .locator("//button[@data-testid='sign-transaction-confirm']")
-      .click();
+    await this.page.locator("//button[@data-testid='sign-transaction-confirm']").click();
 
     // Wait for transaction to complete
     await this.page.waitForTimeout(2000);
@@ -111,9 +96,7 @@ export class LaceActions implements WalletActions {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         // Wait for the restore wallet button to be visible and enabled
-        const restoreWalletButton = this.page.locator(
-          restoreWalletButtonSelector
-        );
+        const restoreWalletButton = this.page.locator(restoreWalletButtonSelector);
         await restoreWalletButton.waitFor({ state: "visible", timeout: 5000 });
         await expect(restoreWalletButton).toBeEnabled();
 
@@ -136,9 +119,7 @@ export class LaceActions implements WalletActions {
           );
         } else {
           // Log the attempt and retry
-          console.warn(
-            `Attempt ${attempt} to click 'restore-wallet-button' failed. Retrying...`
-          );
+          console.warn(`Attempt ${attempt} to click 'restore-wallet-button' failed. Retrying...`);
           // Optionally, you can add a short delay before retrying
           await this.page.waitForTimeout(1000);
         }
@@ -151,9 +132,7 @@ export class LaceActions implements WalletActions {
       .locator('//*[@data-testid="wallet-setup-step-title"]')
       .textContent();
     if (title === "Choose recovery method") {
-      await this.page
-        .locator('[data-testid="wallet-setup-step-btn-next"]')
-        .click();
+      await this.page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
     }
   }
 }

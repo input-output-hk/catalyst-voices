@@ -1,6 +1,6 @@
 //! Define `Unauthorized` response type.
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 use uuid::Uuid;
 
 use crate::service::common;

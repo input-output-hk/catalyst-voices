@@ -4,18 +4,18 @@ use std::time::Instant;
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use poem::{
-    http::{header, HeaderMap, StatusCode},
-    web::RealIp,
     Endpoint, Error, FromRequest, IntoResponse, Middleware, PathPattern, Request, Response, Result,
+    http::{HeaderMap, StatusCode, header},
+    web::RealIp,
 };
 use poem_openapi::OperationId;
-use tracing::{error, field, warn, Instrument, Level, Span};
+use tracing::{Instrument, Level, Span, error, field, warn};
 use ulid::Ulid;
 use uuid::Uuid;
 
 use crate::{
     metrics::endpoint::{
-        CLIENT_REQUEST_COUNT, HTTP_REQUEST_COUNT, HTTP_REQ_CPU_TIME_MS, HTTP_REQ_DURATION_MS,
+        CLIENT_REQUEST_COUNT, HTTP_REQ_CPU_TIME_MS, HTTP_REQ_DURATION_MS, HTTP_REQUEST_COUNT,
         NOT_FOUND_COUNT,
     },
     settings::Settings,
@@ -166,24 +166,24 @@ fn add_interesting_headers_to_span(
     let encoding_field = prefix.to_string() + "_encoding";
 
     // Record request size if its specified.
-    if let Some(size) = headers.get(header::CONTENT_LENGTH) {
-        if let Ok(size) = size.to_str() {
-            span.record(size_field.as_str(), size);
-        }
+    if let Some(size) = headers.get(header::CONTENT_LENGTH)
+        && let Ok(size) = size.to_str()
+    {
+        span.record(size_field.as_str(), size);
     }
 
     // Record request content type if its specified.
-    if let Some(content_type) = headers.get(header::CONTENT_TYPE) {
-        if let Ok(content_type) = content_type.to_str() {
-            span.record(content_type_field.as_str(), content_type);
-        }
+    if let Some(content_type) = headers.get(header::CONTENT_TYPE)
+        && let Ok(content_type) = content_type.to_str()
+    {
+        span.record(content_type_field.as_str(), content_type);
     }
 
     // Record request encoding if its specified.
-    if let Some(encoding) = headers.get(header::CONTENT_ENCODING) {
-        if let Ok(encoding) = encoding.to_str() {
-            span.record(encoding_field.as_str(), encoding);
-        }
+    if let Some(encoding) = headers.get(header::CONTENT_ENCODING)
+        && let Ok(encoding) = encoding.to_str()
+    {
+        span.record(encoding_field.as_str(), encoding);
     }
 }
 

@@ -171,16 +171,14 @@ impl StringEnvVar {
             (default.to_string().as_str(), redacted, choices.as_str()).into(),
         );
 
-        let value = match T::from_str(choice.as_str()) {
+        match T::from_str(choice.as_str()) {
             Ok(var) => var,
             Err(error) => {
                 error!(error=%error, default=%default, choices=choices, choice=%choice,
                     "Invalid choice. Using Default.");
                 default
             },
-        };
-
-        value
+        }
     }
 
     /// Convert an Envvar into the required Duration type.
@@ -232,10 +230,14 @@ impl StringEnvVar {
         match raw_value.parse::<T>() {
             Ok(value) => {
                 if value < min {
-                    error!("{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {min}");
+                    error!(
+                        "{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {min}"
+                    );
                     min
                 } else if value > max {
-                    error!("{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {max}");
+                    error!(
+                        "{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {max}"
+                    );
                     max
                 } else {
                     value

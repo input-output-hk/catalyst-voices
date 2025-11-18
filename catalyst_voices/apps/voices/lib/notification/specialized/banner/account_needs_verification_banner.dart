@@ -39,7 +39,7 @@ final class AccountProposerNeedsVerificationBanner extends AccountNeedsVerificat
   @override
   BannerNotificationMessage message(BuildContext context) {
     return BannerNotificationMessage(
-      text: context.l10n.emailNotVerifiedBannerProposerMessage,
+      text: context.l10n.emailNotVerifiedBannerProposerMessage('{destination}'),
       placeholders: {
         'destination': CatalystNotificationTextPart(
           text: context.l10n.myAccount,
