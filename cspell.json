@@ -172,6 +172,7 @@
         "**/historic_data/**/*.yaml",
         "**/historic_data/**/*.json",
         "**/test_data/**/*.sql",
+        "**/test_data/rbac_regs/*.jsonc",
         "styles.min.css",
         "web-components.min.js",
         "**/generated/**",
@@ -185,7 +186,7 @@
         "**/*.svg",
         "catalyst_voices/docs/licenses/**",
         "catalyst_voices/docs/dependency_graph.dot",
-        "catalyst-gateway/tests/api_tests/test_data/**",
+        "catalyst_voices/scripts/version_web_assets/test/helper"
     ],
     "enableFiletypes": [
         "earthfile",
