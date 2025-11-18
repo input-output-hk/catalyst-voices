@@ -14,8 +14,8 @@ class WebAssetVersioner {
     'drift_worker.js',
     'assets/packages/catalyst_key_derivation/assets/js/*/catalyst_key_derivation_bg.wasm',
     'assets/packages/catalyst_key_derivation/assets/js/*/catalyst_key_derivation.js',
-    'assets/packages/catalyst_compression/assets/js/catalyst_compression_bg.wasm',
-    'assets/packages/catalyst_compression/assets/js/catalyst_compression.js',
+    'assets/packages/catalyst_compression/assets/js/*/catalyst_compression_bg.wasm',
+    'assets/packages/catalyst_compression/assets/js/*/catalyst_compression.js',
   ];
 
   final String buildDir;
