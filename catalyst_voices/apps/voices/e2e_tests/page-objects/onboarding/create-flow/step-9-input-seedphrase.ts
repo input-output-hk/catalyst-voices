@@ -27,7 +27,7 @@ export class InputSeedPhrasePanel extends OnboardingBasePage {
 
   async inputSeedPhraseWords() {
     for (const word of this.testModel.accountModel.seedPhrase) {
-      await this.page.getByRole("button", { name: word, exact: true }).click();
+      await this.page.getByRole("button", { name: word, exact: true }).first().click();
       await this.page.waitForTimeout(100);
     }
   }
