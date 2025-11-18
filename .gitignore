@@ -134,3 +134,5 @@ browser_extensions/
 
 # Playwright
 /browser-profiles/
+
+/target
