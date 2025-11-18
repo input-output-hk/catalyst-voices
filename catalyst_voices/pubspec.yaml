@@ -39,6 +39,9 @@ dependencies:
 dev_dependencies:
   melos: ^7.1.1
 
+dependency_overrides:
+  test_api: 0.7.8
+
 melos:
   repository: https://github.com/input-output-hk/catalyst-voices
 
@@ -71,6 +74,12 @@ melos:
       description: |
         Run `dart analyze` in every package.
 
+    flutter-clean:
+      run: |
+        melos exec -c 1 -- flutter clean
+      description: |
+        Run `flutter clean` sequentially in every Flutter package.
+
     l10n:
       run: |
         melos exec --scope="catalyst_voices_localization" -- flutter gen-l10n
@@ -91,7 +100,7 @@ melos:
 
     build-runner:
       run: |
-        melos exec --depends-on="build_runner" --order-dependents -- dart run build_runner build --delete-conflicting-outputs
+        melos exec --depends-on="build_runner" --order-dependents -- dart run build_runner build --delete-conflicting-outputs --force-aot
       description: |
         Run `build_runner` in every package which contains the build_runner dependency.
 
