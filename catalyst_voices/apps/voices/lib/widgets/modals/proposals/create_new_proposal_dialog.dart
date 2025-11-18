@@ -14,11 +14,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-typedef _SelectedCategoryData = ({
-  List<CampaignCategoryDetailsViewModel> categories,
-  SignedDocumentRef? value,
-});
-
 class CreateNewProposalDialog extends StatefulWidget {
   final SignedDocumentRef? categoryRef;
 
@@ -165,17 +160,11 @@ class _ProposalCategory extends StatelessWidget {
           text: context.l10n.selectCategory,
           description: context.l10n.categorySelectionDescription,
         ),
-        BlocSelector<NewProposalCubit, NewProposalState, _SelectedCategoryData>(
-          selector: (state) {
-            return (
-              categories: state.categories,
-              value: state.categoryRef,
-            );
-          },
+        BlocSelector<NewProposalCubit, NewProposalState, NewProposalStateCategories>(
+          selector: (state) => state.categories,
           builder: (context, state) {
             return CreateNewProposalCategorySelection(
-              categories: state.categories,
-              selectedCategory: state.value,
+              categories: state,
               onCategorySelected: (value) =>
                   context.read<NewProposalCubit>().updateSelectedCategory(value),
             );

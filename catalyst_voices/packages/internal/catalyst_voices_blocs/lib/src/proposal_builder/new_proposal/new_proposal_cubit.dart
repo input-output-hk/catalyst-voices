@@ -87,6 +87,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   }
 
   Future<void> load({SignedDocumentRef? categoryRef}) async {
+    print('load.categoryRef -> $categoryRef');
     _cache = _cache.copyWith(categoryRef: Optional(categoryRef));
 
     emit(NewProposalState.loading());
@@ -118,11 +119,14 @@ class NewProposalCubit extends Cubit<NewProposalState>
   }
 
   void updateSelectedCategory(SignedDocumentRef? categoryRef) {
+    _cache = _cache.copyWith(categoryRef: Optional(categoryRef));
+
     emit(
       state.copyWith(
-        categoryRef: Optional(categoryRef),
         isAgreeToCategoryCriteria: false,
         isAgreeToNoFurtherCategoryChange: false,
+        categoryRef: Optional(categoryRef),
+        categories: state.categories.copyWith(selectedRef: Optional(categoryRef)),
       ),
     );
   }
@@ -183,12 +187,12 @@ class NewProposalCubit extends Cubit<NewProposalState>
     // right now user can start creating proposal without selecting category.
     // Right now every category have the same requirements for title so we can do a fallback for
     // first category from the list.
-    final categories = campaign?.categories ?? [];
-    final templateRef = categories
+    final campaignCategories = campaign?.categories ?? [];
+    final templateRef = campaignCategories
         .cast<CampaignCategory?>()
         .firstWhere(
           (e) => e?.selfRef == preselectedCategory,
-          orElse: () => categories.firstOrNull,
+          orElse: () => campaignCategories.firstOrNull,
         )
         ?.proposalTemplateRef;
 
@@ -197,7 +201,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
         : null;
     final titleRange = template?.title?.strLengthRange;
 
-    final stateCategories = categories.map(
+    final mappedCategories = campaignCategories.map(
       (category) {
         final categoryTotalAsk =
             campaignTotalAsk.categoriesAsks[category.selfRef] ??
@@ -211,6 +215,11 @@ class NewProposalCubit extends Cubit<NewProposalState>
       },
     ).toList();
 
+    final categoriesState = NewProposalStateCategories(
+      categories: mappedCategories,
+      selectedRef: _cache.categoryRef,
+    );
+
     final step = _cache.categoryRef == null
         ? const CreateProposalWithoutPreselectedCategoryStep()
         : const CreateProposalWithPreselectedCategoryStep();
@@ -220,7 +229,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       step: step,
       categoryRef: Optional(_cache.categoryRef),
       titleLengthRange: Optional(titleRange),
-      categories: stateCategories,
+      categories: categoriesState,
     );
 
     if (!isClosed) {
