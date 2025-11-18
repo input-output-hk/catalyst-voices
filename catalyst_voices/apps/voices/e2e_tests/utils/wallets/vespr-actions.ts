@@ -12,11 +12,48 @@ export class VesprActions implements WalletActions {
   }
 
   async restoreWallet(): Promise<void> {
-    throw new Error("Vespr wallet is not supported yet");
+    await this.page
+      .locator("//*[@aria-label='Enable accessibility']")
+      .evaluate((element: HTMLElement) => element.click());
+
+    await this.page.locator("//flt-semantics[text()='Restore wallet']").click();
+    await this.page.locator("(//flt-semantics[@role='checkbox'])[1]").click();
+    await this.page.locator("(//flt-semantics[@role='checkbox'])[2]").click();
+    await this.page.locator("//flt-semantics[@role='button' and text()='Continue']").click();
+    await this.page
+      .locator("//textarea[@aria-label='Seed Phrase']")
+      .pressSequentially(this.walletConfig.seed.join(" "));
+    await this.page.locator("//flt-semantics[@role='button' and text()='Submit']").click();
+    await this.page
+      .locator("//input[@aria-label='Enter a password']")
+      .pressSequentially(this.walletConfig.password);
+    await this.page.locator("//flt-semantics[@role='button' and text()='Continue']").click();
+    await this.page.locator("//span[text()='Confirm your password']").waitFor({ state: "visible" });
+    await this.page.locator("//input[@aria-label='Enter password']").focus();
+    await this.page
+      .locator("//input[@aria-label='Enter password']")
+      .pressSequentially(this.walletConfig.password, { delay: 100 });
+    await this.page.locator("(//flt-semantics[@role='checkbox'])[1]").click();
+    await this.page.locator("(//flt-semantics[@role='checkbox'])[2]").click();
+    await this.page.locator("//flt-semantics[@role='button' and text()='Continue']").click();
+    await this.page.locator("//flt-semantics[@role='button' and text()='Continue']").click();
+    await this.page
+      .locator("//flt-semantics[@role='button' and text()='View your wallet']")
+      .click();
+    await this.page.locator("(//flt-semantics[@role='button'])[9]").click();
+    await this.page
+      .locator("//flt-semantics[@role='button' and contains(text(), 'Active Network')]")
+      .click();
+    await this.page
+      .locator("//flt-semantics[@role='button' and contains(text(), 'PreProd')]")
+      .click();
   }
 
   async connectWallet(): Promise<void> {
-    throw new Error("Vespr wallet is not supported yet");
+    await this.page
+      .locator("//*[@aria-label='Enable accessibility']")
+      .evaluate((element: HTMLElement) => element.click());
+    await this.page.locator("//flt-semantics[@role='button' and text()='Connect']").click();
   }
 
   async approveTransaction(): Promise<void> {
