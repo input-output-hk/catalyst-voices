@@ -586,82 +586,94 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<DetailProposal>> watchUserProposals() async* {
-    yield* _userService.watchUser.distinct().switchMap((user) {
-      final authorId = user.activeAccount?.catalystId;
-      if (!_isProposer(user) || authorId == null) {
-        return const Stream.empty();
-      }
+    yield* _userService //
+        .watchUser
+        .distinct()
+        .switchMap(_userWhenUnlockedStream)
+        .switchMap((user) {
+          if (user == null) return const Stream.empty();
 
-      return _proposalRepository
-          .watchUserProposals(authorId: authorId)
-          .distinct()
-          .switchMap<List<DetailProposal>>((documents) async* {
-            if (documents.isEmpty) {
-              yield [];
-              return;
-            }
-            final proposalsDataStreams = await Future.wait(
-              documents.map(_createProposalDataStream).toList(),
-            );
+          final authorId = user.activeAccount?.catalystId;
+          if (!_isProposer(user) || authorId == null) {
+            return const Stream.empty();
+          }
 
-            yield* Rx.combineLatest(
-              proposalsDataStreams,
-              (List<ProposalData?> proposalsData) async {
-                // Note. one is null and two versions of same id.
-                final validProposalsData = proposalsData.whereType<ProposalData>().toList();
-
-                final groupedProposals = groupBy(
-                  validProposalsData,
-                  (data) => data.document.metadata.selfRef.id,
+          return _proposalRepository
+              .watchUserProposals(authorId: authorId)
+              .distinct()
+              .switchMap<List<DetailProposal>>((documents) async* {
+                if (documents.isEmpty) {
+                  yield [];
+                  return;
+                }
+                final proposalsDataStreams = await Future.wait(
+                  documents.map(_createProposalDataStream).toList(),
                 );
 
-                final filteredProposalsData = groupedProposals.values
-                    .map((group) {
-                      if (group.any(
-                        (p) => p.publish != ProposalPublish.localDraft,
-                      )) {
-                        return group.where(
-                          (p) => p.publish != ProposalPublish.localDraft,
-                        );
-                      }
-                      return group;
-                    })
-                    .expand((group) => group)
-                    .toList();
+                yield* Rx.combineLatest(
+                  proposalsDataStreams,
+                  (List<ProposalData?> proposalsData) async {
+                    // Note. one is null and two versions of same id.
+                    final validProposalsData = proposalsData.whereType<ProposalData>().toList();
 
-                final proposalsWithVersions = await Future.wait(
-                  filteredProposalsData.map((proposalData) async {
-                    final versions = await _getDetailVersionsOfProposal(proposalData);
-                    return DetailProposal.fromData(proposalData, versions);
-                  }),
-                );
-                return proposalsWithVersions;
-              },
-            ).switchMap(Stream.fromFuture);
-          });
-    });
+                    final groupedProposals = groupBy(
+                      validProposalsData,
+                      (data) => data.document.metadata.selfRef.id,
+                    );
+
+                    final filteredProposalsData = groupedProposals.values
+                        .map((group) {
+                          if (group.any(
+                            (p) => p.publish != ProposalPublish.localDraft,
+                          )) {
+                            return group.where(
+                              (p) => p.publish != ProposalPublish.localDraft,
+                            );
+                          }
+                          return group;
+                        })
+                        .expand((group) => group)
+                        .toList();
+
+                    final proposalsWithVersions = await Future.wait(
+                      filteredProposalsData.map((proposalData) async {
+                        final versions = await _getDetailVersionsOfProposal(proposalData);
+                        return DetailProposal.fromData(proposalData, versions);
+                      }),
+                    );
+                    return proposalsWithVersions;
+                  },
+                ).switchMap(Stream.fromFuture);
+              });
+        });
   }
 
   @override
   Stream<ProposalsCount> watchUserProposalsCount() {
-    return _userService.watchUser.distinct().switchMap((user) {
-      final authorId = user.activeAccount?.catalystId;
-      if (!_isProposer(user) || authorId == null) {
-        // user is not eligible for creating proposals
-        return const Stream.empty();
-      }
+    return _userService //
+        .watchUser
+        .distinct()
+        .switchMap(_userWhenUnlockedStream)
+        .switchMap((user) {
+          if (user == null) return const Stream.empty();
 
-      final activeCampaign = _activeCampaignObserver.campaign;
-      final categoriesIds = activeCampaign?.categories.map((e) => e.selfRef.id).toList();
+          final authorId = user.activeAccount?.catalystId;
+          if (!_isProposer(user) || authorId == null) {
+            // user is not eligible for creating proposals
+            return const Stream.empty();
+          }
 
-      final filters = ProposalsCountFilters(
-        author: authorId,
-        onlyAuthor: true,
-        campaign: categoriesIds != null ? CampaignFilters(categoriesIds: categoriesIds) : null,
-      );
+          final activeCampaign = _activeCampaignObserver.campaign;
+          final categoriesIds = activeCampaign?.categories.map((e) => e.selfRef.id).toList();
 
-      return watchProposalsCount(filters: filters);
-    });
+          final filters = ProposalsCountFilters(
+            author: authorId,
+            onlyAuthor: true,
+            campaign: categoriesIds != null ? CampaignFilters(categoriesIds: categoriesIds) : null,
+          );
+
+          return watchProposalsCount(filters: filters);
+        });
   }
 
   // TODO(damian-molinski): Remove this when voteBy is implemented.
@@ -791,5 +803,14 @@ final class ProposalServiceImpl implements ProposalService {
     ).wait;
 
     return page.copyWithItems(proposals);
+  }
+
+  Stream<User?> _userWhenUnlockedStream(User user) {
+    final activeAccount = user.activeAccount;
+
+    if (activeAccount == null) return Stream.value(null);
+
+    final isUnlockedStream = activeAccount.keychain.watchIsUnlocked;
+    return isUnlockedStream.map((isUnlocked) => isUnlocked ? user : null);
   }
 }
