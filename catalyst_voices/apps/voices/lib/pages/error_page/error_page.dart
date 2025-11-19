@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 /// A fullscreen error page. Meant to be used as a template for other error pages.
 class ErrorPage extends StatelessWidget {
   final AssetGenImage image;
+  final double maxImageWidth;
   final String title;
   final String message;
   final Widget button;
@@ -14,6 +15,7 @@ class ErrorPage extends StatelessWidget {
   const ErrorPage({
     super.key,
     required this.image,
+    this.maxImageWidth = 500,
     required this.title,
     required this.message,
     required this.button,
@@ -32,7 +34,10 @@ class ErrorPage extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 3),
-              _Image(image: image),
+              _Image(
+                image: image,
+                maxImageWidth: maxImageWidth,
+              ),
               const SizedBox(height: 56),
               _Title(text: title),
               const SizedBox(height: 12),
@@ -62,14 +67,17 @@ class _Background extends StatelessWidget {
 
 class _Image extends StatelessWidget {
   final AssetGenImage image;
+  final double maxImageWidth;
 
-  const _Image({required this.image});
+  const _Image({
+    required this.image,
+    required this.maxImageWidth,
+  });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final minImageWidth = min(300, screenWidth * 0.9);
-    const maxImageWidth = 500;
     final preferredImageWidth = screenWidth * 0.6;
 
     final imageWidth = preferredImageWidth.clamp(

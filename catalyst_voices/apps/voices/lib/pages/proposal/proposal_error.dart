@@ -56,22 +56,23 @@ class _ProposalError extends StatelessWidget {
       LocalizedNotFoundException() => const _NotFoundError(),
       LocalizedDocumentReferenceException() => _NotFoundError(message: exception?.message(context)),
       LocalizedDocumentHiddenException() => _NotFoundError(message: exception?.message(context)),
-      _ => _RecoverableError(message: exception?.message(context)),
+      _ => _RecoverableError(title: exception?.message(context)),
     };
   }
 }
 
 class _RecoverableError extends StatelessWidget {
-  final String? message;
+  final String? title;
 
-  const _RecoverableError({this.message});
+  const _RecoverableError({this.title});
 
   @override
   Widget build(BuildContext context) {
     return ErrorPage(
       image: VoicesAssets.images.magGlass,
-      title: context.l10n.somethingWentWrong,
-      message: message ?? context.l10n.proposalViewNotFoundMessage,
+      maxImageWidth: 300,
+      title: title ?? context.l10n.somethingWentWrong,
+      message: context.l10n.proposalViewLoadErrorMessage,
       button: VoicesTextButton(
         leading: VoicesAssets.icons.refresh.buildIcon(),
         child: Text(context.l10n.refresh),

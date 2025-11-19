@@ -933,6 +933,10 @@
   "@doWord": {
     "description": "Label for a list of things to do"
   },
+  "documentHiddenException": "The proposal is no longer available.",
+  "@documentHiddenException": {
+    "description": "Message when the document (proposal) is no longer available due to being hidden."
+  },
   "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
   "@documentImportInvalidDataError": {
     "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
@@ -940,10 +944,6 @@
   "documentReferenceError": "Invalid proposal reference.",
   "@documentReferenceError": {
     "description": "Message when the resource reference such as proposal is invalid."
-  },
-  "documentHiddenException": "The proposal is no longer available.",
-  "@documentHiddenException": {
-    "description": "Message when the document (proposal) is no longer available due to being hidden."
   },
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
@@ -2410,6 +2410,10 @@
   "proposalViewFundingRequested": "Funding Requested",
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
+  },
+  "proposalViewLoadErrorMessage": "We weren't able to load that proposal.",
+  "@proposalViewLoadErrorMessage": {
+    "description": "Error message shown when proposal cannot be loaded (i.e. due to connection error)."
   },
   "proposalViewMetadataOverviewSegment": "Overview",
   "@proposalViewMetadataOverviewSegment": {
