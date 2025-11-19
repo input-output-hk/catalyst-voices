@@ -3,6 +3,7 @@ import 'dart:js_interop';
 
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
 import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_interop.dart' as interop;
+import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_wallet_account_change_proxy.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart' show Registrar;
 
 /// The web implementation of [CatalystCardanoPlatform].
@@ -17,7 +18,7 @@ final class CatalystCardanoWeb extends CatalystCardanoPlatform {
   @override
   Future<List<CardanoWallet>> getWallets() async {
     final wallets = interop.getWallets().toDart;
-    return wallets.map((e) => e.toDart).toList();
+    return wallets.map((e) => CardanoWalletAccountChangeProxy(e.toDart)).toList();
   }
 
   /// Registers this class as the default instance of
