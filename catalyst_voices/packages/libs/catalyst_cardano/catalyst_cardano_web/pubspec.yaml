@@ -36,3 +36,4 @@ dev_dependencies:
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter
+  mocktail: ^1.0.4
