@@ -84,7 +84,7 @@ final class Dependencies extends DependencyProvider {
         () => get<AdminToolsCubit>(),
       )
       ..registerLazySingleton<SystemStatusCubit>(
-        () => SystemStatusCubit(get<SystemStatusRepository>()),
+        () => SystemStatusCubit(get<SystemStatusService>()),
       )
       ..registerLazySingleton<SessionCubit>(
         () {
@@ -455,6 +455,12 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (mediator) => mediator.dispose(),
     );
+    registerLazySingleton<SystemStatusService>(() {
+      return SystemStatusService(
+        get<SystemStatusRepository>(),
+        get<AppMetaStorage>(),
+      );
+    });
   }
 
   void _registerStorages() {

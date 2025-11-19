@@ -3,9 +3,9 @@
 use catalyst_types::problem_report::ProblemReport;
 use derive_more::{From, Into};
 use poem_openapi::{
+    ApiResponse, NewType, Object,
     payload::Json,
     types::{Example, ToJSON},
-    ApiResponse, NewType, Object,
 };
 
 use crate::service::common::{self, types::array_types::impl_array_types};

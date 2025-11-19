@@ -6,7 +6,7 @@
 
 use std::collections::HashSet;
 
-use cardano_chain_follower::{hashes::TransactionId, Network, StakeAddress, VotingPubKey};
+use cardano_chain_follower::{Network, StakeAddress, VotingPubKey, hashes::TransactionId};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -14,7 +14,7 @@ use futures::StreamExt;
 use super::*;
 use crate::db::index::{
     block::*,
-    queries::{purge::*, PreparedQuery},
+    queries::{PreparedQuery, purge::*},
     tests::{
         test_utils,
         test_utils::{stake_address_1, stake_address_2},

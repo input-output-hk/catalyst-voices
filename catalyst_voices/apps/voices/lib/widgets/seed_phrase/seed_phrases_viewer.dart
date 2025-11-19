@@ -19,12 +19,17 @@ class SeedPhrasesViewer extends StatelessWidget {
   /// The list of seed phrases to be displayed.
   final List<SeedPhraseWord> words;
 
+  /// Optional semantics identifier for accessibility and testing.
+  /// Individual word cells will use this as a prefix.
+  final String? semanticsIdentifier;
+
   const SeedPhrasesViewer({
     super.key,
     this.columnsCount = 2,
     this.mainAxisSpacing = 24,
     this.crossAxisSpacing = 12,
     required this.words,
+    this.semanticsIdentifier,
   });
 
   @override
@@ -35,8 +40,12 @@ class SeedPhrasesViewer extends StatelessWidget {
         mainAxisSpacing: mainAxisSpacing,
         crossAxisSpacing: crossAxisSpacing,
         children: words.mapIndexed((index, word) {
+          final identifier = semanticsIdentifier != null
+              ? '${semanticsIdentifier}_word_$index'
+              : 'SeedPhrase${index}CellKey';
           return _WordCell(
             word.data,
+            semanticsIdentifier: identifier,
             key: ValueKey('SeedPhrase${index}CellKey'),
             number: word.nr,
           );
@@ -55,17 +64,21 @@ class _WordCell extends StatelessWidget {
   /// The sequential number associated with the seed phrase.
   final int number;
 
+  /// Optional semantics identifier for accessibility and testing.
+  final String? semanticsIdentifier;
+
   const _WordCell(
     this.data, {
     super.key,
     required this.number,
+    this.semanticsIdentifier,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
+    final container = Container(
       constraints: const BoxConstraints(minHeight: 56),
       decoration: BoxDecoration(
         color: theme.colors.onSurfaceNeutralOpaqueLv1,
@@ -96,5 +109,14 @@ class _WordCell extends StatelessWidget {
         ),
       ),
     );
+
+    if (semanticsIdentifier != null) {
+      return Semantics(
+        identifier: semanticsIdentifier,
+        child: container,
+      );
+    }
+
+    return container;
   }
 }

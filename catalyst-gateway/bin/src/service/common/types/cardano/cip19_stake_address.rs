@@ -5,7 +5,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
-use cardano_chain_follower::{pallas_addresses::Address, StakeAddress};
+use cardano_chain_follower::{StakeAddress, pallas_addresses::Address};
 use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
@@ -76,11 +76,11 @@ fn is_valid(stake_addr: &str) -> bool {
     #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
     static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
 
-    if RE.is_match(stake_addr) {
-        if let Ok((hrp, addr)) = bech32::decode(stake_addr) {
-            let hrp = hrp.as_str();
-            return addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE);
-        }
+    if RE.is_match(stake_addr)
+        && let Ok((hrp, addr)) = bech32::decode(stake_addr)
+    {
+        let hrp = hrp.as_str();
+        return addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE);
     }
     false
 }

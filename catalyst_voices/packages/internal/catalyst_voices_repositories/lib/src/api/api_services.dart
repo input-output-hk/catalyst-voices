@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
+import 'package:catalyst_voices_repositories/src/api/dio_app_meta_service.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/path_trim_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/local/local_cat_gateway.dart';
@@ -30,6 +31,7 @@ final class ApiServices {
   final CatGateway gateway;
   final CatReviews reviews;
   final CatStatus status;
+  final AppMetaService appMeta;
 
   factory ApiServices({
     required ApiConfig config,
@@ -73,6 +75,7 @@ final class ApiServices {
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
       ),
+      appMeta: AppMetaService(),
     );
   }
 
@@ -81,11 +84,13 @@ final class ApiServices {
     required this.gateway,
     required this.reviews,
     required this.status,
+    required this.appMeta,
   });
 
   Future<void> dispose() async {
     gateway.client.dispose();
     reviews.client.dispose();
     status.client.dispose();
+    appMeta.close();
   }
 }

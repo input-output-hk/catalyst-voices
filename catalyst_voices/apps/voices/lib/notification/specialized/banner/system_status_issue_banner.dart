@@ -13,14 +13,9 @@ final class SystemStatusIssueBanner extends BannerNotification with LaunchUrlMix
       );
 
   @override
-  String title(BuildContext context) {
-    return context.l10n.systemStatusIssueBannerTitle;
-  }
-
-  @override
   BannerNotificationMessage message(BuildContext context) {
     return BannerNotificationMessage(
-      text: context.l10n.systemStatusIssueBannerMessage,
+      text: context.l10n.systemStatusIssueBannerMessage('{readMoreLink}'),
       placeholders: {
         'readMoreLink': CatalystNotificationTextPart(
           text: context.l10n.readMore,
@@ -31,5 +26,10 @@ final class SystemStatusIssueBanner extends BannerNotification with LaunchUrlMix
         ),
       },
     );
+  }
+
+  @override
+  String title(BuildContext context) {
+    return context.l10n.systemStatusIssueBannerTitle;
   }
 }

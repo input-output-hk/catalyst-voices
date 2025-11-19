@@ -150,6 +150,7 @@ headful
 headlessui
 healthz
 HIDPI
+hotfixes
 hotspots
 httpx
 icudtl
@@ -308,8 +309,8 @@ ripgrep
 ristretto
 rlib
 rngs
-rolname
 rollouts
+rolname
 RPATH
 ruleset
 rustc
