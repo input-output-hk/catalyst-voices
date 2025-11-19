@@ -5,8 +5,8 @@ use std::{any::Any, backtrace::Backtrace, cell::RefCell, panic::AssertUnwindSafe
 use futures::FutureExt;
 use panic_message::panic_message;
 use poem::{
-    http::{HeaderMap, Method, StatusCode, Uri},
     Endpoint, IntoResponse, Middleware, Request, Response,
+    http::{HeaderMap, Method, StatusCode, Uri},
 };
 use poem_openapi::payload::Json;
 use tracing::{debug, error};

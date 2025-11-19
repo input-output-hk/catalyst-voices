@@ -4,8 +4,8 @@ use futures::{Stream, StreamExt};
 
 use super::DocsQueryFilter;
 use crate::{
-    db::event::{common::query_limits::QueryLimits, error::NotFoundError, EventDB},
-    jinja::{get_template, JinjaTemplateSource},
+    db::event::{EventDB, common::query_limits::QueryLimits, error::NotFoundError},
+    jinja::{JinjaTemplateSource, get_template},
 };
 
 /// Filtered select sql query jinja template

@@ -94,6 +94,13 @@ melos:
       description: |
         Clean up unused translation keys and sort them alphabetically in .arb files.
 
+    version-web-assets:
+      run: |
+        dart run scripts/version_web_assets/version_web_assets.dart --build-dir=apps/voices/build/web
+      description: |
+        Version web assets with content-based MD5 hashes for cache busting.
+        Run this after 'flutter build web' to add version query parameters to assets.
+
     build-runner:
       run: |
         melos exec --depends-on="build_runner" --ignore="catalyst_voices_repositories" --order-dependents -- \

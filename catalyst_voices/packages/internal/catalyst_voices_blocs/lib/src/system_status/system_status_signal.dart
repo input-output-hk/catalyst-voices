@@ -1,11 +1,15 @@
 import 'package:equatable/equatable.dart';
 
-final class SystemStatusIssueSignal extends SystemStatusSignal {
-  const SystemStatusIssueSignal();
-}
-
 final class CancelSystemStatusIssueSignal extends SystemStatusSignal {
   const CancelSystemStatusIssueSignal();
+}
+
+final class NewVersionAvailable extends SystemStatusSignal {
+  const NewVersionAvailable();
+}
+
+final class SystemStatusIssueSignal extends SystemStatusSignal {
+  const SystemStatusIssueSignal();
 }
 
 sealed class SystemStatusSignal extends Equatable {

@@ -31,6 +31,7 @@ class _EmailTextField extends StatelessWidget {
     return VoicesEmailTextField(
       key: const Key('EmailTextField'),
       initialText: data.value,
+      semanticsIdentifier: 'EmailTextFieldInput',
       onChanged: (value) {
         RegistrationCubit.of(context).baseProfile.updateEmail(Email.dirty(value ?? ''));
       },

@@ -30,6 +30,7 @@ class _DisplayNameTextField extends StatelessWidget {
 
     return VoicesUsernameTextField(
       key: const Key('DisplayNameTextField'),
+      semanticsIdentifier: 'UsernameTextField',
       initialText: data.value,
       onChanged: (value) {
         RegistrationCubit.of(context).baseProfile.updateUsername(Username.dirty(value ?? ''));

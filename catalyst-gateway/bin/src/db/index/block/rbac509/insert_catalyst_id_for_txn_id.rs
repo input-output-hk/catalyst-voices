@@ -2,9 +2,9 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::{hashes::TransactionId, Slot};
+use cardano_chain_follower::{Slot, hashes::TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
-use scylla::{client::session::Session, SerializeRow};
+use scylla::{SerializeRow, client::session::Session};
 use tracing::error;
 
 use crate::{

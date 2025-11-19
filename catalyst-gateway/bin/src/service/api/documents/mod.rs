@@ -1,14 +1,14 @@
 //! Signed Documents API endpoints
 
 use anyhow::anyhow;
-use poem::{error::ReadBodyError, Body};
+use poem::{Body, error::ReadBodyError};
 use poem_openapi::{
+    OpenApi,
     param::{Path, Query},
     payload::Json,
-    OpenApi,
 };
 use put_document::{
-    unprocessable_content_request::PutDocumentUnprocessableContent, MAXIMUM_DOCUMENT_SIZE,
+    MAXIMUM_DOCUMENT_SIZE, unprocessable_content_request::PutDocumentUnprocessableContent,
 };
 
 use crate::service::common::{
@@ -90,7 +90,7 @@ impl DocumentApi {
         }
     }
 
-    /// Post A Signed Document Index Query for Newer Versions of v0.04.
+    /// Post A Signed Document Index Query (v2).
     ///
     /// Produces a summary of signed documents that meet the criteria
     /// defined in the request body for new signed document versions of v0.04.
@@ -111,6 +111,6 @@ impl DocumentApi {
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> post_document_index_query::v2::AllResponses {
-        post_document_index_query::v2::endpoint(query.0 .0, page.0, limit.0).await
+        post_document_index_query::v2::endpoint(query.0.0, page.0, limit.0).await
     }
 }
