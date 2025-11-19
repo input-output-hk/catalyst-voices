@@ -42,6 +42,13 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// Whether the ref specifies the document [version].
   bool get isExact => version != null;
 
+  bool get isValid {
+    final isIdValid = Uuid.isValidUUID(fromString: id);
+    final isVersionValid = version == null || Uuid.isValidUUID(fromString: version!);
+
+    return isIdValid && isVersionValid;
+  }
+
   @override
   List<Object?> get props => [id, version];
 
@@ -93,20 +100,6 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   ///
   /// Useful when a draft becomes a signed document after publishing.
   SignedDocumentRef toSignedDocumentRef();
-
-  /// Returns true when the reference is structurally valid.
-  bool validate() {
-    try {
-      UuidParsing.parse(id);
-
-      if (version != null) {
-        UuidParsing.parse(version!);
-      }
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
 }
 
 /// Ref to local draft document.
@@ -195,13 +188,6 @@ final class SignedDocumentRef extends DocumentRef {
   }
 
   const SignedDocumentRef.loose({required super.id});
-
-  bool get isValid {
-    final isIdValid = Uuid.isValidUUID(fromString: id);
-    final isVersionValid = version == null || Uuid.isValidUUID(fromString: version!);
-
-    return isIdValid && isVersionValid;
-  }
 
   @override
   SignedDocumentRef copyWith({

@@ -76,7 +76,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     try {
       _logger.info('Loading $ref');
 
-      if (!ref.validate()) {
+      if (!ref.isValid) {
         emit(state.copyWith(error: const Optional(LocalizedDocumentReferenceException())));
         return;
       }
