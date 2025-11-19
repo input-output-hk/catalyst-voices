@@ -1,6 +1,6 @@
 //! RBAC registration V2 chain.
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 
 use crate::{
     rbac::ChainInfo,

@@ -1,6 +1,6 @@
 //! Pagination response object to be included in every paged response.
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 
 use crate::service::common;
 

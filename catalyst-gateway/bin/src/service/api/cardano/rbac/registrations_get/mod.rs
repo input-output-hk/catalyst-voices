@@ -1,8 +1,8 @@
 //! A shared implementation for V1 and V2 endpoints.
 
 pub use self::{
-    v1::{endpoint_v1, AllResponsesV1},
-    v2::{endpoint_v2, AllResponsesV2},
+    v1::{AllResponsesV1, endpoint_v1},
+    v2::{AllResponsesV2, endpoint_v2},
 };
 
 mod invalid_registration;
