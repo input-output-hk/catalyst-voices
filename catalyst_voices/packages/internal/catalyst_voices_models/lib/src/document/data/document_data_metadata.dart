@@ -27,10 +27,16 @@ final class DocumentDataMetadata extends Equatable {
   /// A reference to a section of a document.
   final String? section;
 
+  /// A list of allowed Collaborators on the next subsequent version of a document.
+  final List<CatalystId>? collaborators;
+
   /// A list of referenced parameters like brand, category or campaign.
   final DocumentParameters parameters;
 
-  /// List of authors represented by CatalystId
+  /// List of authors represented by CatalystId.
+  ///
+  /// Note. This list just represents who signed this version
+  /// Note. Can change from version to version when [collaborators] are non empty.
   final List<CatalystId>? authors;
 
   /// The default constructor for the [DocumentDataMetadata].
@@ -42,6 +48,7 @@ final class DocumentDataMetadata extends Equatable {
     this.template,
     this.reply,
     this.section,
+    this.collaborators,
     this.parameters = const DocumentParameters(),
     this.authors,
   }) : assert(
@@ -134,9 +141,13 @@ final class DocumentDataMetadata extends Equatable {
     template,
     reply,
     section,
+    collaborators,
     parameters,
     authors,
   ];
+
+  /// Who signed this document version. Can change from version to version.
+  List<CatalystId>? get signers => authors;
 
   String get version => selfRef.version!;
 
@@ -148,6 +159,7 @@ final class DocumentDataMetadata extends Equatable {
     Optional<SignedDocumentRef>? template,
     Optional<SignedDocumentRef>? reply,
     Optional<String>? section,
+    Optional<List<CatalystId>>? collaborators,
     DocumentParameters? parameters,
     Optional<List<CatalystId>>? authors,
   }) {
@@ -159,6 +171,7 @@ final class DocumentDataMetadata extends Equatable {
       template: template.dataOr(this.template),
       reply: reply.dataOr(this.reply),
       section: section.dataOr(this.section),
+      collaborators: collaborators.dataOr(this.collaborators),
       parameters: parameters ?? this.parameters,
       authors: authors.dataOr(this.authors),
     );
