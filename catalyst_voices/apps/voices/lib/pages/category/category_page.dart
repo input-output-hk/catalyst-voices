@@ -141,9 +141,9 @@ class _CategoryDetailContent extends StatelessWidget {
 }
 
 class _CategoryDetailError extends StatelessWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
 
-  const _CategoryDetailError({required this.categoryId});
+  const _CategoryDetailError({required this.categoryRef});
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +167,7 @@ class _CategoryDetailError extends StatelessWidget {
                     ? null
                     : () {
                         unawaited(
-                          context.read<CategoryDetailCubit>().getCategoryDetail(categoryId),
+                          context.read<CategoryDetailCubit>().getCategoryDetail(categoryRef),
                         );
                       },
               ),
@@ -189,7 +189,7 @@ class _CategoryPageState extends State<CategoryPage> {
         children: [
           const _CategoryDetailContent(),
           _CategoryDetailError(
-            categoryId: widget.categoryRef,
+            categoryRef: widget.categoryRef,
           ),
         ].constrainedDelegate(),
       ),
