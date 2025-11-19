@@ -941,6 +941,10 @@
   "@documentReferenceError": {
     "description": "Message when the resource reference such as proposal is invalid."
   },
+  "documentHiddenException": "The proposal is no longer available.",
+  "@documentHiddenException": {
+    "description": "Message when the document (proposal) is no longer available due to being hidden."
+  },
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
     "description": "Action to not show again"
