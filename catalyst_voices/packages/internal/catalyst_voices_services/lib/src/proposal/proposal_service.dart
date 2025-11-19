@@ -403,16 +403,36 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<bool> watchMaxProposalsLimitReached() {
-    // TODO(damian-molinski): watch active account id + active campaign
-    const filters = ProposalsFiltersV2(
-      status: ProposalStatusFilter.aFinal,
-      author: null,
-      campaign: null,
-    );
+    final activeAccountId = _userService.watchUnlockedActiveAccount
+        .map((account) => account?.catalystId)
+        .distinct();
+    final activeCampaign = _activeCampaignObserver.watchCampaign.distinct();
 
-    return _proposalRepository
-        .watchProposalsCountV2(filters: filters)
-        .map((event) => event >= ProposalDocument.maxSubmittedProposalsPerUser);
+    return Rx.combineLatest2<CatalystId?, Campaign?, ProposalsFiltersV2?>(
+      activeAccountId,
+      activeCampaign,
+      (author, campaign) {
+        if (author == null || campaign == null) {
+          return null;
+        }
+
+        return ProposalsFiltersV2(
+          status: ProposalStatusFilter.aFinal,
+          author: author,
+          campaign: ProposalsCampaignFilters.from(campaign),
+        );
+      },
+    ).distinct().switchMap(
+      (filters) {
+        if (filters == null) {
+          return Stream.value(true);
+        }
+
+        return _proposalRepository
+            .watchProposalsCountV2(filters: filters)
+            .map((event) => event >= ProposalDocument.maxSubmittedProposalsPerUser);
+      },
+    );
   }
 
   @override
@@ -458,10 +478,12 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<List<DetailProposal>> watchUserProposals() async* {
-    yield* _userService.watchUser.distinct().switchMap((user) {
-      final authorId = user.activeAccount?.catalystId;
-      if (!_isProposer(user) || authorId == null) {
+  Stream<List<DetailProposal>> watchUserProposals() {
+    return _userService.watchUnlockedActiveAccount.distinct().switchMap((account) {
+      if (account == null) return const Stream.empty();
+
+      final authorId = account.catalystId;
+      if (!account.hasRole(AccountRole.proposer)) {
         return const Stream.empty();
       }
 
@@ -587,10 +609,6 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
-  }
-
-  bool _isProposer(User user) {
-    return user.activeAccount?.roles.contains(AccountRole.proposer) ?? false;
   }
 
   ProposalBriefData _mapJoinedProposalBriefData(

@@ -49,8 +49,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     _cache = _cache.copyWith(
       activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
     );
-    _activeAccountIdSub = _userService.watchUser
-        .map((event) => event.activeAccount?.catalystId)
+    _activeAccountIdSub = _userService.watchUnlockedActiveAccount
+        .map((activeAccount) => activeAccount?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChanged);
   }

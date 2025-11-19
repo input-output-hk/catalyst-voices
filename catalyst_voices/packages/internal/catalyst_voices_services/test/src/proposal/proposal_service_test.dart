@@ -60,10 +60,15 @@ void main() {
         keychain: MockKeychain(),
         isActive: true,
       );
-      final user = User.optional(accounts: [account]);
+      final campaign = Campaign.f15();
       const proposalsCount = ProposalDocument.maxSubmittedProposalsPerUser + 1;
 
-      when(() => mockUserService.watchUser).thenAnswer((_) => Stream.value(user));
+      when(
+        () => mockUserService.watchUnlockedActiveAccount,
+      ).thenAnswer((_) => Stream.value(account));
+      when(
+        () => mockActiveCampaignObserver.watchCampaign,
+      ).thenAnswer((_) => Stream.value(campaign));
 
       when(
         () => mockProposalRepository.watchProposalsCountV2(
