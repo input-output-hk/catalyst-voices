@@ -1,7 +1,9 @@
+//! An implementation of the `rbac_registration::cardano::state::RbacChainsState` trait
+
 use std::collections::{HashMap, HashSet};
 
 use anyhow::Context;
-use cardano_chain_follower::StakeAddress;
+use cardano_chain_follower::{StakeAddress, hashes::TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -16,16 +18,25 @@ use crate::{
     },
 };
 
+/// A helper struct to handle RBAC related state from the DB and caches.
+/// Implements `rbac_registration::cardano::state::RbacChainsState` trait.
 pub(crate) struct RbacChainsState<'a> {
+    /// `index-db` corresponding flag
     is_persistent: bool,
-    context: Option<&'a RbacBlockIndexingContext>,
+    /// `RbacBlockIndexingContext` reference
+    context: &'a RbacBlockIndexingContext,
+    /// Recorded modified registration chains by the `take_stake_address_from_chains`
+    /// method. During the `take_stake_address_from_chains` execution nothing is
+    /// written into the `index-db`, all these data would be written to the DB in a
+    /// batch. To consume this field call `consume` method
     modified_chains: HashMap<CatalystId, HashSet<StakeAddress>>,
 }
 
 impl<'a> RbacChainsState<'a> {
+    /// Creates a new instance of `RbacChainsState`
     pub fn new(
         is_persistent: bool,
-        context: Option<&'a RbacBlockIndexingContext>,
+        context: &'a RbacBlockIndexingContext,
     ) -> Self {
         Self {
             is_persistent,
@@ -34,8 +45,38 @@ impl<'a> RbacChainsState<'a> {
         }
     }
 
+    /// Consumes `RbacChainsState` instance and returns recorded `modified_chains` field.
     pub fn consume(self) -> HashMap<CatalystId, HashSet<StakeAddress>> {
         self.modified_chains
+    }
+
+    /// Returns a Catalyst ID corresponding to the given transaction hash.
+    pub async fn catalyst_id_from_txn_id(
+        &self,
+        txn_id: TransactionId,
+    ) -> anyhow::Result<Option<CatalystId>> {
+        use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
+
+        // Check the context first.
+        if let Some(catalyst_id) = self.context.find_transaction(&txn_id) {
+            return Ok(Some(catalyst_id.to_owned()));
+        }
+
+        // Then try to find in the persistent database.
+        let session =
+            CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+        if let Some(id) = Query::get(&session, txn_id).await? {
+            return Ok(Some(id));
+        }
+
+        // Conditionally check the volatile database.
+        if !self.is_persistent {
+            let session =
+                CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+            return Query::get(&session, txn_id).await;
+        }
+
+        Ok(None)
     }
 }
 
@@ -51,15 +92,14 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
         };
 
         // Apply additional registrations from context if any.
-        if let Some(context) = self.context {
-            if let Some(regs) = context.find_registrations(id) {
-                let regs = regs.iter().cloned();
-                match chain {
-                    Some(c) => return apply_regs(c, regs).await.map(Some),
-                    None => return build_rbac_chain(regs).await,
-                }
+        if let Some(regs) = self.context.find_registrations(id) {
+            let regs = regs.iter().cloned();
+            match chain {
+                Some(c) => return apply_regs(c, regs).await.map(Some),
+                None => return build_rbac_chain(regs).await,
             }
         }
+
         Ok(chain)
     }
 
@@ -67,10 +107,8 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
         &self,
         id: &CatalystId,
     ) -> anyhow::Result<bool> {
-        if let Some(context) = self.context {
-            if context.find_registrations(id).is_some() {
-                return Ok(true);
-            }
+        if self.context.find_registrations(id).is_some() {
+            return Ok(true);
         }
 
         let session =
@@ -114,10 +152,8 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
         use crate::db::index::queries::rbac::get_catalyst_id_from_public_key::Query;
 
         // Check the context first.
-        if let Some(context) = self.context {
-            if let Some(catalyst_id) = context.find_public_key(&key) {
-                return Ok(Some(catalyst_id.to_owned()));
-            }
+        if let Some(catalyst_id) = self.context.find_public_key(key) {
+            return Ok(Some(catalyst_id.to_owned()));
         }
 
         // Then try to find in the persistent database.
@@ -158,18 +194,17 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
     }
 }
 
+/// Returns a Catalyst ID corresponding to the given stake address.
 async fn catalyst_id_from_stake_address(
     address: &StakeAddress,
     is_persistent: bool,
-    context: Option<&RbacBlockIndexingContext>,
+    context: &RbacBlockIndexingContext,
 ) -> anyhow::Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
 
     // Check the context first.
-    if let Some(context) = context {
-        if let Some(catalyst_id) = context.find_address(address) {
-            return Ok(Some(catalyst_id.to_owned()));
-        }
+    if let Some(catalyst_id) = context.find_address(address) {
+        return Ok(Some(catalyst_id.to_owned()));
     }
 
     // Then try to find in the persistent database.
