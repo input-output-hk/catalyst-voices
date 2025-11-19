@@ -15,7 +15,7 @@ Future<QueryExecutor> buildExecutor() async {
   // see https://github.com/simolus3/drift/issues/1592
   throw UnsupportedError(
     'Drift does is not testable in unit tests for web, because it requires '
-    'sqlite3.wasm to be served with specific headers and this is '
+    'sqlite3.v1.wasm to be served with specific headers and this is '
     'not possible in flutter test. '
     'Its possible to test drift on web but we would need to convert existing '
     'unit tests to integration tests with widgets',

@@ -1,4 +1,4 @@
-let key_derivation_wasm_bindgen;
+let compression_wasm_bindgen;
 (function() {
     const __exports = {};
     let script_src;
@@ -211,68 +211,6 @@ let key_derivation_wasm_bindgen;
     }
     /**
      * @param {number} func_id
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     * @returns {any}
-     */
-    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
-        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
-        return ret;
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
-    };
-
-    /**
-     * @returns {number}
-     */
-    __exports.frb_get_rust_content_hash = function() {
-        const ret = wasm.frb_get_rust_content_hash();
-        return ret;
-    };
-
-    /**
-     * @param {number} func_id
      * @param {any} port_
      * @param {any} ptr_
      * @param {number} rust_vec_len_
@@ -290,6 +228,26 @@ let key_derivation_wasm_bindgen;
      */
     __exports.frb_dart_fn_deliver_output = function(call_id, ptr_, rust_vec_len_, data_len_) {
         wasm.frb_dart_fn_deliver_output(call_id, ptr_, rust_vec_len_, data_len_);
+    };
+
+    /**
+     * @param {number} func_id
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
+     * @returns {any}
+     */
+    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
+        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
+        return ret;
+    };
+
+    /**
+     * @returns {number}
+     */
+    __exports.frb_get_rust_content_hash = function() {
+        const ret = wasm.frb_get_rust_content_hash();
+        return ret;
     };
 
     function takeFromExternrefTable0(idx) {
@@ -311,10 +269,6 @@ let key_derivation_wasm_bindgen;
     __exports.frb_dart_opaque_rust2dart_decode = function(ptr) {
         const ret = wasm.frb_dart_opaque_rust2dart_decode(ptr);
         return ret;
-    };
-
-    __exports.wasm_start_callback = function() {
-        wasm.wasm_start_callback();
     };
 
     function passArrayJsValueToWasm0(array, malloc) {
@@ -344,6 +298,10 @@ let key_derivation_wasm_bindgen;
         }
     };
 
+    __exports.wasm_start_callback = function() {
+        wasm.wasm_start_callback();
+    };
+
     /**
      * # Safety
      *
@@ -358,15 +316,15 @@ let key_derivation_wasm_bindgen;
     };
 
     function __wbg_adapter_36(arg0, arg1, arg2) {
-        wasm.closure143_externref_shim(arg0, arg1, arg2);
+        wasm.closure178_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_39(arg0, arg1, arg2) {
-        wasm.closure177_externref_shim(arg0, arg1, arg2);
+        wasm.closure203_externref_shim(arg0, arg1, arg2);
     }
 
-    function __wbg_adapter_141(arg0, arg1, arg2, arg3) {
-        wasm.closure230_externref_shim(arg0, arg1, arg2, arg3);
+    function __wbg_adapter_113(arg0, arg1, arg2, arg3) {
+        wasm.closure251_externref_shim(arg0, arg1, arg2, arg3);
     }
 
     const WorkerPoolFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -614,7 +572,7 @@ let key_derivation_wasm_bindgen;
                     const a = state0.a;
                     state0.a = 0;
                     try {
-                        return __wbg_adapter_141(a, state0.b, arg0, arg1);
+                        return __wbg_adapter_113(a, state0.b, arg0, arg1);
                     } finally {
                         state0.a = a;
                     }
@@ -740,16 +698,16 @@ let key_derivation_wasm_bindgen;
             const ret = false;
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper438 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 142, __wbg_adapter_36);
+        imports.wbg.__wbindgen_closure_wrapper1008 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 177, __wbg_adapter_36);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper539 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 176, __wbg_adapter_39);
+        imports.wbg.__wbindgen_closure_wrapper1071 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 202, __wbg_adapter_39);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper540 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 176, __wbg_adapter_39);
+        imports.wbg.__wbindgen_closure_wrapper1073 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 202, __wbg_adapter_39);
             return ret;
         };
         imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {
@@ -840,7 +798,7 @@ let key_derivation_wasm_bindgen;
     }
 
     function __wbg_init_memory(imports, memory) {
-        imports.wbg.memory = memory || new WebAssembly.Memory({initial:20,maximum:16384,shared:true});
+        imports.wbg.memory = memory || new WebAssembly.Memory({initial:29,maximum:16384,shared:true});
     }
 
     function __wbg_finalize_init(instance, module, thread_stack_size) {
@@ -907,6 +865,6 @@ let key_derivation_wasm_bindgen;
         return __wbg_finalize_init(instance, module, thread_stack_size);
     }
 
-    key_derivation_wasm_bindgen = Object.assign(__wbg_init, { initSync }, __exports);
+    compression_wasm_bindgen = Object.assign(__wbg_init, { initSync }, __exports);
 
 })();
