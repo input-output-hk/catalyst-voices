@@ -755,6 +755,195 @@ void main() {
         expect(didUpdateAccount, expectedResult);
       });
     });
+
+    group('watchUnlockedActiveAccount', () {
+      tearDown(() async {
+        userObserver.user = const User.empty();
+        await service.dispose();
+      });
+
+      test('emits null when no active account', () async {
+        // Given
+        const emptyUser = User.empty();
+
+        // When
+        userObserver.user = emptyUser;
+        final accountStream = service.watchUnlockedActiveAccount;
+
+        // Then
+        expect(
+          accountStream,
+          emitsInOrder([
+            isNull,
+          ]),
+        );
+      });
+
+      test('emits null when active account keychain is locked', () async {
+        // Given
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        );
+
+        // When
+        await keychain.lock();
+        userObserver.user = User.optional(accounts: [account]);
+
+        final accountStream = service.watchUnlockedActiveAccount;
+
+        // Then
+        expect(
+          accountStream,
+          emitsInOrder([
+            isNull,
+          ]),
+        );
+      });
+
+      test('emits account when active account keychain is unlocked', () async {
+        // Given
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        const lock = PasswordLockFactor('Test1234');
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        );
+
+        // When
+        await keychain.setLock(lock);
+        await keychain.unlock(lock);
+        userObserver.user = User.optional(accounts: [account]);
+
+        final accountStream = service.watchUnlockedActiveAccount;
+
+        // Then
+        expect(
+          accountStream,
+          emitsInOrder([
+            predicate<Account?>((e) => e?.catalystId == account.catalystId),
+          ]),
+        );
+      });
+
+      test('emits null then account when keychain unlocks', () async {
+        // Given
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        const lock = PasswordLockFactor('Test1234');
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        );
+
+        // When
+        await keychain.setLock(lock);
+        await keychain.lock();
+        userObserver.user = User.optional(accounts: [account]);
+
+        final accountStream = service.watchUnlockedActiveAccount;
+
+        // Then
+        final expectation = expectLater(
+          accountStream,
+          emitsInOrder([
+            isNull,
+            predicate<Account?>((e) => e?.catalystId == account.catalystId),
+          ]),
+        );
+
+        await keychain.unlock(lock);
+
+        await expectation;
+      });
+
+      test('emits account then null when keychain locks', () async {
+        // Given
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        const lock = PasswordLockFactor('Test1234');
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        );
+
+        // When
+        await keychain.setLock(lock);
+        await keychain.unlock(lock);
+        userObserver.user = User.optional(accounts: [account]);
+
+        final accountStream = service.watchUnlockedActiveAccount;
+
+        // Then
+        final expectation = expectLater(
+          accountStream,
+          emitsInOrder([
+            predicate<Account?>((e) => e?.catalystId == account.catalystId),
+            isNull,
+          ]),
+        );
+
+        await Future<void>.delayed(Duration.zero);
+        await keychain.lock();
+
+        await expectation;
+      });
+
+      test('does not emit duplicate values when account state does not change', () async {
+        // Given
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        const lock = PasswordLockFactor('Test1234');
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        );
+
+        // When
+        await keychain.setLock(lock);
+        await keychain.unlock(lock);
+        userObserver.user = User.optional(accounts: [account]);
+
+        final accountStream = service.watchUnlockedActiveAccount;
+        final emittedValues = <Account?>[];
+
+        final subscription = accountStream.listen(emittedValues.add);
+
+        // Then
+        // Trigger multiple updates that don't change the unlocked state
+        userObserver.user = User.optional(accounts: [account]);
+        await Future<void>.delayed(Duration.zero);
+        userObserver.user = User.optional(accounts: [account]);
+        await Future<void>.delayed(Duration.zero);
+
+        // Modify account to trigger a new emission
+        final modifiedAccount = account.copyWith(
+          roles: {AccountRole.voter},
+        );
+        userObserver.user = User.optional(accounts: [modifiedAccount]);
+        await Future<void>.delayed(Duration.zero);
+
+        await subscription.cancel();
+
+        expect(emittedValues.length, 2);
+        expect(emittedValues.first?.catalystId, account.catalystId);
+        expect(emittedValues.last?.catalystId, modifiedAccount.catalystId);
+        expect(emittedValues.last?.roles, modifiedAccount.roles);
+      });
+    });
   });
 }
 
