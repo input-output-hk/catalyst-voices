@@ -4,7 +4,8 @@ import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/account/edit_roles_dialog.dart';
 import 'package:catalyst_voices/pages/account/verification_required_dialog.dart';
-import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_dialog.dart'
+    deferred as registration_dialog;
 import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -71,7 +72,11 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
       return;
     }
 
-    await RegistrationDialog.show(
+    await registration_dialog.loadLibrary();
+
+    if (!mounted) return;
+
+    await registration_dialog.RegistrationDialog.show(
       context,
       type: UpdateAccount(id: accountId),
     );

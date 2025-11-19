@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/indicators/voices_password_strength_indicator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';

@@ -54,7 +54,6 @@ export 'indicators/voices_error_indicator.dart';
 export 'indicators/voices_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
 export 'indicators/voices_no_internet_connection_banner.dart';
-export 'indicators/voices_password_strength_indicator.dart';
 export 'indicators/voices_status_indicator.dart';
 export 'list/bullet_list.dart';
 export 'menu/voices_menu.dart';

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/registration/pictures/unlock_keychain_picture.dart';
-import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_dialog.dart'
+    deferred as registration_dialog;
 import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
@@ -111,11 +112,15 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
     });
   }
 
-  void _onRecover() {
+  Future<void> _onRecover() async {
     Navigator.of(context).pop();
 
+    await registration_dialog.loadLibrary();
+
+    if (!mounted) return;
+
     unawaited(
-      RegistrationDialog.show(
+      registration_dialog.RegistrationDialog.show(
         context,
         type: const RecoverRegistration(),
       ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_dialog.dart'
+    deferred as registration_dialog;
 import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_lock_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_unlock_button.dart';
@@ -38,13 +39,19 @@ class _FinishRegistrationButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       key: const Key('FinishRegistrationButton'),
-      onTap: () => unawaited(
-        RegistrationDialog.show(
-          context,
-          type: const ContinueRegistration(),
-        ),
-      ),
+      onTap: () async => _onFinishRegistrationTap(context),
       child: Text(context.l10n.finishAccountCreation),
+    );
+  }
+
+  Future<void> _onFinishRegistrationTap(BuildContext context) async {
+    await registration_dialog.loadLibrary();
+
+    if (!context.mounted) return;
+
+    await registration_dialog.RegistrationDialog.show(
+      context,
+      type: const ContinueRegistration(),
     );
   }
 }
@@ -56,11 +63,19 @@ class _GetStartedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       key: const Key('GetStartedButton'),
-      onTap: () async => RegistrationDialog.show(
-        context,
-        type: const FreshRegistration(),
-      ),
+      onTap: () async => _onGetStartedTap(context),
       child: Text(context.l10n.getStarted, semanticsIdentifier: 'GetStartedButton'),
+    );
+  }
+
+  Future<void> _onGetStartedTap(BuildContext context) async {
+    await registration_dialog.loadLibrary();
+
+    if (!context.mounted) return;
+
+    await registration_dialog.RegistrationDialog.show(
+      context,
+      type: const FreshRegistration(),
     );
   }
 }
