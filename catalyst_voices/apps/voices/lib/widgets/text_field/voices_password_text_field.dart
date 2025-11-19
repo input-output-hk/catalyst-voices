@@ -39,6 +39,7 @@ final class VoicesPasswordTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesTextField(
       key: const Key('PasswordTextField'),
+      semanticsIdentifier: semanticsIdentifier,
       controller: controller,
       keyboardType: TextInputType.visiblePassword,
       autofocus: autofocus,

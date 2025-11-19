@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -104,6 +105,9 @@ class VoicesTextField extends VoicesFormField<String> {
 
   final bool showValidationStatusIcon;
 
+  /// Optional semantics identifier used for accessibility and testing.
+  final String? semanticsIdentifier;
+
   VoicesTextField({
     super.key,
     super.enabled = true,
@@ -137,6 +141,7 @@ class VoicesTextField extends VoicesFormField<String> {
     this.maxLengthEnforcement,
     this.mouseCursor,
     this.showValidationStatusIcon = true,
+    this.semanticsIdentifier,
   }) : super(
          value: controller?.text ?? initialText,
          validator: (value) {
@@ -180,32 +185,36 @@ class VoicesTextField extends VoicesFormField<String> {
                  resizableVertically: resizableVertically,
                  minHeight: maxLines == null ? 65 : 48,
                  iconBottomSpacing: maxLines == null ? 18 : 0,
-                 child: TextField(
-                   key: const Key('VoicesTextField'),
-                   textAlignVertical: TextAlignVertical.top,
-                   autofocus: autofocus,
-                   expands: resizableVertically,
-                   controller: state._obtainController(),
-                   statesController: statesController,
-                   focusNode: focusNode,
-                   onSubmitted: onFieldSubmitted,
-                   onEditingComplete: onEditingComplete,
-                   inputFormatters: inputFormatters,
-                   decoration: state._buildDecoration(),
-                   keyboardType: keyboardType,
-                   textInputAction: textInputAction,
-                   textCapitalization: textCapitalization,
-                   style: style,
-                   obscureText: obscureText,
-                   maxLines: maxLines,
-                   minLines: minLines,
-                   maxLength: maxLength,
-                   maxLengthEnforcement: maxLengthEnforcement,
-                   enabled: enabled,
-                   readOnly: readOnly,
-                   ignorePointers: ignorePointers,
-                   onChanged: onChangedHandler,
-                   mouseCursor: mouseCursor,
+                 child: CombineSemantics(
+                   identifier: semanticsIdentifier,
+                   textField: true,
+                   child: TextField(
+                     key: const Key('VoicesTextField'),
+                     textAlignVertical: TextAlignVertical.top,
+                     autofocus: autofocus,
+                     expands: resizableVertically,
+                     controller: state._obtainController(),
+                     statesController: statesController,
+                     focusNode: focusNode,
+                     onSubmitted: onFieldSubmitted,
+                     onEditingComplete: onEditingComplete,
+                     inputFormatters: inputFormatters,
+                     decoration: state._buildDecoration(),
+                     keyboardType: keyboardType,
+                     textInputAction: textInputAction,
+                     textCapitalization: textCapitalization,
+                     style: style,
+                     obscureText: obscureText,
+                     maxLines: maxLines,
+                     minLines: minLines,
+                     maxLength: maxLength,
+                     maxLengthEnforcement: maxLengthEnforcement,
+                     enabled: enabled,
+                     readOnly: readOnly,
+                     ignorePointers: ignorePointers,
+                     onChanged: onChangedHandler,
+                     mouseCursor: mouseCursor,
+                   ),
                  ),
                ),
              ],

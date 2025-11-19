@@ -13,7 +13,9 @@ export class NufiActions implements WalletActions {
 
   async restoreWallet(): Promise<void> {
     // Click restore page icon
-    await this.page.locator("//*[@data-testid='RestorePageIcon']").click();
+    await this.page
+      .locator("//div[contains(@class,'MuiPaper-root') and .//p[text()='Restore Wallet']]")
+      .click();
 
     // Enter seed phrase
     const seedPhrase = this.walletConfig.seed;
@@ -24,9 +26,7 @@ export class NufiActions implements WalletActions {
     }
 
     // Accept terms and conditions
-    await this.page
-      .locator("//span[@data-test-id='terms-and-conditions-checkbox']/input")
-      .check();
+    await this.page.locator("//span[@data-test-id='terms-and-conditions-checkbox']/input").check();
 
     // Continue
     await this.page.locator("button:has-text('Continue')").click();
@@ -38,31 +38,27 @@ export class NufiActions implements WalletActions {
 
     // Set password (using specific field IDs)
     await this.page
-      .locator("//input[@id=':rg:']")
+      .locator("//div[@data-test-id='wallet-password-field']//input")
       .fill(this.walletConfig.password);
     await this.page
-      .locator("//input[@id=':rh:']")
+      .locator("//div[@data-test-id='wallet-password-confirm-field']//input")
       .fill(this.walletConfig.password);
 
-    // Continue
-    await this.page.locator("button:has-text('Continue')").click();
-
     // Recover wallet
-    await this.page.locator("button:has-text('Recover')").click();
+    await this.page.locator("//button[text()='Recover']").click();
 
     // Go to wallet
     await this.page.locator("button:has-text('Go to Wallet')").click();
+    await this.page.locator("//*[@data-test-id='close-news-button']").click();
+    await this.page
+      .locator(
+        "(//div[contains(@class, 'MuiPaper-root')]//div[contains(@class, 'MuiBox-root') and text()='Send'])[1]"
+      )
+      .waitFor({ state: "visible" });
   }
 
   async connectWallet(): Promise<void> {
-    // First, enter password if required
-    await this.page
-      .locator("//input[@type='password']")
-      .fill(this.walletConfig.password);
-
-    // Click connect button (there are typically two)
-    await this.page.locator("button:has-text('Connect')").click();
-    await this.page.locator("button:has-text('Connect')").click();
+    await this.page.locator("//button[text()='Connect']").click();
   }
 
   async approveTransaction(): Promise<void> {
