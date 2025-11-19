@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -37,10 +39,8 @@ class __AddCollaboratorTextFieldState extends State<_AddCollaboratorTextField> {
     return VoicesTextField(
       focusNode: _focusNode,
       initialText: widget.collaboratorId.value,
-      onChanged: (value) {
-        context.read<AddCollaboratorCubit>().updateCollaboratorId(value ?? '');
-      },
-      onFieldSubmitted: (_) {},
+      onChanged: _onTextFiledChange,
+      onFieldSubmitted: _onTextFiledSubmitted,
       decoration: VoicesTextFieldDecoration(
         labelText: context.l10n.catalystId,
         labelStyle: context.textTheme.labelLarge,
@@ -59,6 +59,17 @@ class __AddCollaboratorTextFieldState extends State<_AddCollaboratorTextField> {
   void initState() {
     super.initState();
     _focusNode = FocusNode()..requestFocus();
+  }
+
+  void _onTextFiledChange(String? value) {
+    context.read<AddCollaboratorCubit>().updateCollaboratorId(value ?? '');
+  }
+
+  void _onTextFiledSubmitted(String? value) {
+    final isLoading = context.read<AddCollaboratorCubit>().state.collaboratorIdState.isLoading;
+    if (isLoading) return;
+
+    unawaited(context.read<AddCollaboratorCubit>().validateCollaboratorId());
   }
 }
 

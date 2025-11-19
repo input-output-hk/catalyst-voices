@@ -33,13 +33,7 @@ class _AddCollaboratorAddButton extends StatelessWidget {
         collaboratorIdState.collaboratorId.isValid && !collaboratorIdState.collaboratorId.isPure;
 
     return VoicesFilledButton(
-      onTap: isValid
-          ? () {
-              if (collaboratorIdState.isLoading) return;
-
-              unawaited(context.read<AddCollaboratorCubit>().validateCollaboratorId());
-            }
-          : null,
+      onTap: isValid ? () => _validateCollaboratorId(context) : null,
       trailing: collaboratorIdState.isLoading
           ? const SizedBox(
               width: 16,
@@ -49,5 +43,11 @@ class _AddCollaboratorAddButton extends StatelessWidget {
           : null,
       child: Text(context.l10n.addCollaborator),
     );
+  }
+
+  void _validateCollaboratorId(BuildContext context) {
+    if (collaboratorIdState.isLoading) return;
+
+    unawaited(context.read<AddCollaboratorCubit>().validateCollaboratorId());
   }
 }

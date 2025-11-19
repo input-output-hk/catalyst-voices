@@ -30,7 +30,7 @@ class AddCollaboratorDialog extends StatefulWidget {
         authorId: authorId,
         collaborators: collaborators ?? const Collaborators(),
       ),
-      routeSettings: const RouteSettings(name: '/add-collaborator'),
+      routeSettings: const RouteSettings(name: '/add-collaborator-dialog'),
     );
   }
 }
