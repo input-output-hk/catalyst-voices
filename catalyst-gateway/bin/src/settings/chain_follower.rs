@@ -5,7 +5,7 @@ use std::{cmp::min, time::Duration};
 use cardano_chain_follower::{ChainSyncConfig, Network, turbo_downloader::DlConfig};
 use tracing::info;
 
-use super::str_env_var::{StringEnvVar, StringEnvVarParams};
+use super::str_env_var::StringEnvVar;
 
 /// Default chain to follow.
 const DEFAULT_NETWORK: NetworkFromStr = NetworkFromStr::Mainnet;
@@ -120,10 +120,7 @@ impl From<NetworkFromStr> for Network {
             NetworkFromStr::Devnet => {
                 let genesis_key = StringEnvVar::new(
                     "CHAIN_FOLLOWER_DEVNET_GENESIS_KEY",
-                    StringEnvVarParams::Plain(
-                        "DEFAULT_DEVNET_GENESIS_KEY".into(),
-                        DEFAULT_DEVNET_GENESIS_KEY.to_string().into(),
-                    ),
+                    DEFAULT_DEVNET_GENESIS_KEY.into(),
                 );
                 let magic = StringEnvVar::new_as_int(
                     "CHAIN_FOLLOWER_DEVNET_MAGIC",
@@ -157,10 +154,7 @@ impl From<NetworkFromStr> for Network {
                 );
                 let byron_known_hash = StringEnvVar::new(
                     "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_HASH",
-                    StringEnvVarParams::Plain(
-                        "DEFAULT_DEVNET_BYRON_KNOWN_HASH".into(),
-                        DEFAULT_DEVNET_BYRON_KNOWN_HASH.to_string().into(),
-                    ),
+                    DEFAULT_DEVNET_BYRON_KNOWN_HASH.into(),
                 );
                 let byron_known_time = StringEnvVar::new_as_int(
                     "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_TIME",
@@ -188,10 +182,7 @@ impl From<NetworkFromStr> for Network {
                 );
                 let shelley_known_hash = StringEnvVar::new(
                     "CHAIN_FOLLOWER_DEVNET_SHELLEY_KNOWN_HASH",
-                    StringEnvVarParams::Plain(
-                        "DEFAULT_DEVNET_SHELLEY_KNOWN_HASH".into(),
-                        DEFAULT_DEVNET_SHELLEY_KNOWN_HASH.to_string().into(),
-                    ),
+                    DEFAULT_DEVNET_SHELLEY_KNOWN_HASH.into(),
                 );
                 let shelley_known_time = StringEnvVar::new_as_int(
                     "CHAIN_FOLLOWER_DEVNET_SHELLEY_KNOWN_TIME",
@@ -199,7 +190,6 @@ impl From<NetworkFromStr> for Network {
                     0,
                     u64::MAX,
                 );
-
                 Self::Devnet {
                     genesis_key: genesis_key.as_string(),
                     magic,
