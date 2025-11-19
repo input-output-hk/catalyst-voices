@@ -93,6 +93,20 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   ///
   /// Useful when a draft becomes a signed document after publishing.
   SignedDocumentRef toSignedDocumentRef();
+
+  /// Returns true when the reference is structurally valid.
+  bool validate() {
+    try {
+      UuidParsing.parse(id);
+
+      if (version != null) {
+        UuidParsing.parse(version!);
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 /// Ref to local draft document.

@@ -1,9 +1,11 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/common/typedefs.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/pages/error_page/error_page.dart';
+import 'package:catalyst_voices/routes/routing/root_route.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalError extends StatelessWidget {
@@ -14,34 +16,71 @@ class ProposalError extends StatelessWidget {
     return BlocSelector<ProposalCubit, ProposalState, ErrorVisibilityState>(
       selector: (state) => (show: state.showError, data: state.error),
       builder: (context, state) {
-        final errorMessage = state.data?.message(context);
-
         return Offstage(
           offstage: !state.show,
-          child: _ProposalError(
-            message: errorMessage ?? context.l10n.somethingWentWrong,
-          ),
+          child: _ProposalError(exception: state.data),
         );
       },
     );
   }
 }
 
+class _NotFoundError extends StatelessWidget {
+  final String? message;
+
+  const _NotFoundError({this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return ErrorPage(
+      image: VoicesAssets.images.notFound404,
+      title: context.l10n.proposalViewNotFoundTitle,
+      message: message ?? context.l10n.proposalViewNotFoundMessage,
+      button: VoicesTextButton(
+        leading: VoicesAssets.icons.arrowNarrowRight.buildIcon(),
+        child: Text(context.l10n.proposalViewNotFoundButton),
+        onTap: () => const RootRoute().go(context),
+      ),
+    );
+  }
+}
+
 class _ProposalError extends StatelessWidget {
-  final String message;
+  final LocalizedException? exception;
 
   const _ProposalError({
-    required this.message,
+    required this.exception,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: VoicesErrorIndicator(
-        message: message,
-        onRetry: () {
-          unawaited(context.read<ProposalCubit>().retryLastRef());
-        },
+    return switch (exception) {
+      LocalizedNotFoundException() => const _NotFoundError(),
+      LocalizedDocumentReferenceException() => _NotFoundError(
+        message: exception?.message(context),
+      ),
+      _ => _RecoverableError(
+        message: exception?.message(context),
+      ),
+    };
+  }
+}
+
+class _RecoverableError extends StatelessWidget {
+  final String? message;
+
+  const _RecoverableError({this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return ErrorPage(
+      image: VoicesAssets.images.magGlass,
+      title: context.l10n.proposalViewNotFoundTitle,
+      message: message ?? context.l10n.proposalViewNotFoundMessage,
+      button: VoicesTextButton(
+        leading: VoicesAssets.icons.refresh.buildIcon(),
+        child: Text(context.l10n.refresh),
+        onTap: () => context.read<ProposalCubit>().retryLastRef(),
       ),
     );
   }

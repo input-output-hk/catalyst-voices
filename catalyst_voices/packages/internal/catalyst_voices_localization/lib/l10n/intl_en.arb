@@ -937,6 +937,10 @@
   "@documentImportInvalidDataError": {
     "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
   },
+  "documentReferenceError": "Invalid proposal reference.",
+  "@documentReferenceError": {
+    "description": "Message when the resource reference such as proposal is invalid."
+  },
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
     "description": "Action to not show again"
@@ -2410,6 +2414,18 @@
   "proposalViewMetadataSection": "Metadata",
   "@proposalViewMetadataSection": {
     "description": "Viewing proposal navigation section"
+  },
+  "proposalViewNotFoundButton": "Go to Catalyst Home.",
+  "@proposalViewNotFoundButton": {
+    "description": "Error button shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundMessage": "It looks like we can't find the proposal you're looking for.\nMaybe a good time for a coffee break?",
+  "@proposalViewNotFoundMessage": {
+    "description": "Error message shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundTitle": "We can't find that proposal.",
+  "@proposalViewNotFoundTitle": {
+    "description": "Error title shown when proposal cannot be found."
   },
   "proposalViewProjectDelivery": "Project Delivery",
   "@proposalViewProjectDelivery": {

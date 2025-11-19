@@ -26,6 +26,7 @@ export 'document/document_version.dart';
 export 'document/uuid.dart';
 export 'document/validation/localized_document_validation_result.dart';
 export 'exception/localized_document_import_invalid_data_exception.dart';
+export 'exception/localized_document_reference_exception.dart';
 export 'exception/localized_exception.dart';
 export 'exception/localized_not_found_exception.dart';
 export 'exception/localized_permission_need_explanation_exception.dart';
