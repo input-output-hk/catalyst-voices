@@ -20,14 +20,7 @@ export class YoroiActions implements WalletActions {
     // Accept analytics
     await this.page.locator("#startupAnalytics-accept-button").click();
 
-    // Select location
-    await this.page.locator("#somewhere-checkbox").check();
-    await this.page.locator('button:has-text("Continue")').click();
-
-    // Skip URI prompt
-    await this.page
-      .locator(".UriPromptForm_buttonsWrapper button.MuiButton-secondary")
-      .click();
+    await this.page.locator('#uriPrompt-skip-button').click();
 
     // Start restore process
     await this.page.locator("#restoreWalletButton").click();
@@ -62,14 +55,12 @@ export class YoroiActions implements WalletActions {
 
     // Create wallet
     await this.page.locator("#primaryButton").click();
+    await this.page.locator('#wallet-sendSubTab-button').waitFor({ state: "visible" });
 
     // Go to wallet
-    await this.page.locator("#dialog-gotothewallet-button").click();
-
-    // Switch to preprod network
-    await this.page.locator('xpath=//*[@id="sidebar.settings"]').click();
-    await this.page.locator('button:has-text("I Understand")').click();
-    await this.page.locator('button:has-text("SWITCH NETWORK")').click();
+    await this.page.locator("//div[@id='sidebar.settings']").click();
+    await this.page.locator('#testNetworkInfoModal-understand-button').click();
+    await this.page.locator("//button[@id='settings:general-switchNetwork-button']").click();
     await this.page
       .locator("#switchNetworkDialog-selectNetwork-dropdown")
       .click();
@@ -77,10 +68,7 @@ export class YoroiActions implements WalletActions {
       .locator("#switchNetworkDialog-selectNetwork_250-menuItem")
       .click();
     await this.page.locator("#switchNetworkDialog-apply-button").click();
-
-    // Complete location setup
-    await this.page.locator("#somewhere-checkbox").click();
-    await this.page.locator('button:has-text("Continue")').click();
+    await this.page.locator('#topBar-pageTitle-text').waitFor({ state: "visible" });
     /* cspell: enable */
   }
 
