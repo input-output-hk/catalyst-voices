@@ -7,6 +7,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 /// [UserService] allows to manage user accounts.
 /// [watchUser] returns a stream of user changes which allows to react to user changes.
@@ -18,6 +19,9 @@ abstract interface class UserService implements ActiveAware {
   ) = UserServiceImpl;
 
   User get user;
+
+  /// Returns [Account] when keychain is unlocked, otherwise returns `null`.
+  Stream<Account?> get watchUnlockedActiveAccount;
 
   Stream<User> get watchUser;
 
@@ -114,6 +118,15 @@ final class UserServiceImpl implements UserService {
 
   @override
   User get user => _userObserver.user;
+
+  @override
+  Stream<Account?> get watchUnlockedActiveAccount =>
+      watchUser.map((e) => e.activeAccount).switchMap((account) {
+        if (account == null) return Stream.value(null);
+
+        final isUnlockedStream = account.keychain.watchIsUnlocked;
+        return isUnlockedStream.map((isUnlocked) => isUnlocked ? account : null);
+      }).distinct();
 
   @override
   Stream<User> get watchUser => _userObserver.watchUser;
