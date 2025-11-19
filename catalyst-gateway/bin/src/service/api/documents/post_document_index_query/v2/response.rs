@@ -12,11 +12,10 @@ use crate::{
         self,
         types::{
             array_types::impl_array_types,
+            cardano::collaborators_list::CollaboratorsList,
             document::{
-                doc_ref_v2::{DocumentReferenceListV2, DocumentReferenceV2},
-                doc_type::DocumentType,
-                id::DocumentId,
-                ver::DocumentVer,
+                doc_chain::DocumentChainDocumented, doc_ref_v2::DocumentReferenceListV2,
+                doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
             },
         },
     },
@@ -155,6 +154,8 @@ pub(crate) struct IndexedDocumentVersionV2 {
     /// Document Type that matches the filter
     #[oai(rename = "type")]
     pub doc_type: DocumentType,
+    /// A unique document identifier that matches the filter.
+    pub id: DocumentId,
     /// Document Reference that matches the filter
     #[oai(rename = "ref", skip_serializing_if_is_none)]
     pub doc_ref: Option<DocumentReferenceListV2>,
@@ -167,6 +168,13 @@ pub(crate) struct IndexedDocumentVersionV2 {
     /// Document Parameter Reference that matches the filter
     #[oai(rename = "doc_parameters", skip_serializing_if_is_none)]
     pub parameters: Option<DocumentReferenceListV2>,
+    /// A list of collaborators who can participate in drafting and submitting a document
+    /// that matches the filter.
+    #[oai(skip_serializing_if_is_none)]
+    pub collaborators: Option<CollaboratorsList>,
+    /// A link to a previous document in a chained sequence that matches the filter.
+    #[oai(skip_serializing_if_is_none)]
+    pub chain: Option<DocumentChainDocumented>,
 }
 
 impl Example for IndexedDocumentVersionV2 {
@@ -174,33 +182,14 @@ impl Example for IndexedDocumentVersionV2 {
         Self {
             ver: Example::example(),
             doc_type: Example::example(),
+            id: Example::example(),
             doc_ref: Some(Example::example()),
             reply: None,
             template: None,
             parameters: None,
+            collaborators: Some(Example::example()),
+            chain: Some(Example::example()),
         }
-    }
-}
-
-/// Document Reference for filtered Documents.
-#[derive(NewType, Debug, Clone, From, Into)]
-#[oai(
-    from_multipart = false,
-    from_parameter = false,
-    to_header = false,
-    example = true
-)]
-pub(crate) struct FilteredDocumentReferenceV2(DocumentReferenceV2);
-
-impl From<catalyst_signed_doc::DocumentRef> for FilteredDocumentReferenceV2 {
-    fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
-        Self(value.into())
-    }
-}
-
-impl Example for FilteredDocumentReferenceV2 {
-    fn example() -> Self {
-        Self(Example::example())
     }
 }
 
@@ -256,6 +245,8 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
         let mut reply = None;
         let mut template = None;
         let mut parameters = None;
+        let mut collaborators = None;
+        let mut chain = None;
         if let Some(json_meta) = doc.metadata() {
             let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
 
@@ -264,6 +255,17 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
             reply = meta.reply().cloned().map(Into::into);
             template = meta.template().cloned().map(Into::into);
             parameters = meta.parameters().cloned().map(Into::into);
+            if !meta.collaborators().is_empty() {
+                collaborators = Some(
+                    meta.collaborators()
+                        .iter()
+                        .cloned()
+                        .map(Into::into)
+                        .collect::<Vec<_>>()
+                        .into(),
+                );
+            }
+            chain = meta.chain().map(Into::into);
         }
 
         if let Some(doc_type) = doc_type {
@@ -271,10 +273,13 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
                 IndexedDocumentVersionV2 {
                     ver: DocumentVer::new_unchecked(doc.ver().to_string()),
                     doc_type: DocumentType::new_unchecked(doc_type.to_string()),
+                    id: DocumentId::new_unchecked(doc.id().to_string()),
                     doc_ref,
                     reply,
                     template,
                     parameters,
+                    collaborators,
+                    chain,
                 },
             ))
         } else {
