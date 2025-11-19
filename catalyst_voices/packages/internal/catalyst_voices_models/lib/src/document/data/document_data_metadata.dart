@@ -87,6 +87,7 @@ final class DocumentDataMetadata extends Equatable {
     required SignedDocumentRef template,
     required DocumentParameters parameters,
     required List<CatalystId> authors,
+    List<CatalystId>? collaborators,
   }) {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
@@ -95,6 +96,7 @@ final class DocumentDataMetadata extends Equatable {
       template: template,
       parameters: parameters,
       authors: authors,
+      collaborators: collaborators,
     );
   }
 

@@ -92,6 +92,7 @@ final class DocumentDataMetadataDto {
   final DocumentRefDto? template;
   final DocumentRefDto? reply;
   final String? section;
+  final List<String>? collaborators;
   final List<DocumentRefDto> parameters;
   final List<String>? authors;
 
@@ -103,6 +104,7 @@ final class DocumentDataMetadataDto {
     this.template,
     this.reply,
     this.section,
+    this.collaborators,
     this.parameters = const [],
     this.authors,
   });
@@ -125,6 +127,7 @@ final class DocumentDataMetadataDto {
         template: data.template?.toDto(),
         reply: data.reply?.toDto(),
         section: data.section,
+        collaborators: data.collaborators?.map((e) => e.toString()).toList(),
         parameters: data.parameters.set.map((e) => e.toDto()).toList(),
         authors: data.authors?.map((e) => e.toString()).toList(),
       );
@@ -140,6 +143,7 @@ final class DocumentDataMetadataDto {
       template: template?.toModel().toSignedDocumentRef(),
       reply: reply?.toModel().toSignedDocumentRef(),
       section: section,
+      collaborators: collaborators?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
       parameters: DocumentParameters(
         parameters.map((e) => e.toModel().toSignedDocumentRef()).toSet(),
       ),
