@@ -55,7 +55,7 @@ async fn update_chain(
     ))?;
 
     // Try to add a new registration to the chain.
-    let Some(new_chain) = chain.update(reg, &mut state).await? else {
+    let Some(new_chain) = chain.update(reg, &state).await? else {
         return Ok(None);
     };
 
