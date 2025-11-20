@@ -205,6 +205,19 @@ abstract interface class CardanoWalletCip95Api {
     required (ShelleyAddress?, DRepID?) address,
     required List<int> payload,
   });
+
+  /// This endpoint requests the wallet to inspect and provide appropriate witnesses
+  /// for a supplied transaction. The wallet should articulate this request from client
+  /// application in a explicit and highly informative way.
+  ///
+  /// Here we extend the capabilities of CIP-30's .signTx().
+  ///
+  /// To allow signatures with drep_credential and recognition
+  /// of Conway ledger era transaction fields and certificates.
+  Future<TransactionWitnessSet> signTx({
+    required BaseTransaction transaction,
+    bool partialSign = false,
+  });
 }
 
 /// Defines the [cip] extension version.

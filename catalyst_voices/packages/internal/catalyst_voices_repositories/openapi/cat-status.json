@@ -59,33 +59,9 @@
             "type": "string",
             "example": "Catalyst App"
           },
-          "xname": {
-            "type": "object",
-            "properties": {
-              "default": {
-                "type": "string",
-                "example": "Catalyst App"
-              }
-            },
-            "required": [
-              "default"
-            ]
-          },
           "description": {
             "type": "string",
             "example": ""
-          },
-          "xdescription": {
-            "type": "object",
-            "properties": {
-              "default": {
-                "type": "string",
-                "example": ""
-              }
-            },
-            "required": [
-              "default"
-            ]
           },
           "status": {
             "type": "string",
@@ -107,9 +83,7 @@
         "required": [
           "id",
           "name",
-          "xname",
           "description",
-          "xdescription",
           "status"
         ]
       }
