@@ -11,13 +11,6 @@ import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_wallet_js_to_d
 @JS()
 external JSArray<JSCardanoWallet> getWallets();
 
-/// Returns a JS undefined object.
-///
-/// Use this function to obtain an instance of `undefined`
-/// when you need to distinguish between `null` and `undefined`.
-@JS()
-external JSAny? makeUndefined();
-
 /// The JS representation of the [CardanoWallet].
 extension type JSCardanoWallet(JSObject _) implements JSObject {
   /// See [CardanoWallet.apiVersion].

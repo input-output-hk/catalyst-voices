@@ -51,4 +51,4 @@ flutter:
       macos:
         ffiPlugin: true
   assets:
-    - assets/js/
+    - assets/js/v1/
