@@ -97,6 +97,10 @@
   "@actor": {
     "description": "Refers to user that created keychain and is unlocked."
   },
+  "addCollaborator": "Add Co-proposer",
+  "@addCollaborator": {
+    "description": "Informs user that he is adding collaborator to his proposal"
+  },
   "addCommentSection": "Add comment",
   "@addCommentSection": {
     "description": "Viewing proposal navigation section"
@@ -388,6 +392,18 @@
   "@catalystId": {
     "description": "Label of chip with account catalyst ID clearly describing content"
   },
+  "catalystIdAlreadyAddedAsCollaboratorMessage": "This Catalyst ID is already added as Co-Proposer",
+  "@catalystIdAlreadyAddedAsCollaboratorMessage": {
+    "description": "Error message shown to user when he tries to add Catalyst ID which already exists as collaborator in proposal"
+  },
+  "catalystIdBelongsToMainProposer": "This Catalyst ID belongs to the Author and can't be added as Co-Proposer",
+  "@catalystIdBelongsToMainProposer": {
+    "description": "Error message shown to user when he tries to add Catalyst ID which belongs to himself"
+  },
+  "catalystIdFormatInvalidMessage": "This Catalyst ID has invalid format",
+  "@catalystIdFormatInvalidMessage": {
+    "description": "Error message shown to user when Catalyst ID has not valid format"
+  },
   "catalystKeychain": "Catalyst Keychain",
   "@catalystKeychain": {
     "description": "Name for Catalyst Keychain"
@@ -464,6 +480,10 @@
   "close": "Close",
   "@close": {
     "description": "CTA To close something"
+  },
+  "collaboratorCatalystIdIsMissingProposerRole": "This Catalyst ID is missing Proposer role. Only Proposers can be added as Co-Proposers",
+  "@collaboratorCatalystIdIsMissingProposerRole": {
+    "description": "Error message shown to user when he tries to add Catalyst ID of a user that don't have Proposer role"
   },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
@@ -1568,6 +1588,10 @@
   "howItWorksVoteDescription": "Use a voting app to choose ideas with impact worth funding. Get rewarded in ada for taking part.",
   "@howItWorksVoteDescription": {
     "description": "Description of voting process and rewards"
+  },
+  "howToAddCollaboratorDescription": "Enter the full catalyst ID of the co-proposer you wish to add to your proposal:",
+  "@howToAddCollaboratorDescription": {
+    "description": "Description on how to add collaborator"
   },
   "ideaJourney": "Idea Journey",
   "@ideaJourney": {
