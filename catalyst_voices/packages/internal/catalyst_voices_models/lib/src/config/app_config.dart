@@ -248,8 +248,8 @@ final class DatabaseConfig extends Equatable {
 
   const DatabaseConfig({
     this.name = 'catalyst_db',
-    this.webSqlite3Wasm = 'sqlite3.wasm',
-    this.webDriftWorker = 'drift_worker.js',
+    this.webSqlite3Wasm = 'sqlite3.v1.wasm',
+    this.webDriftWorker = 'drift_worker.v1.js',
   });
 
   @override

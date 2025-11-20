@@ -70,7 +70,7 @@ void main() {
   });
   group('Test brand_assets', () {
     final catalystLogo = CatalystSvgPicture.asset(
-      VoicesAssets.images.catalystLogo.path,
+      VoicesAssets.images.svg.catalystLogo.path,
     );
     testWidgets('Logo from Default theme is applied', (tester) async {
       await tester.pumpWidget(

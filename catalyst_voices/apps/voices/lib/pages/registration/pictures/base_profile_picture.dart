@@ -15,7 +15,7 @@ class BaseProfilePicture extends StatelessWidget {
     return TaskPicture(
       child: TaskPictureIconBox(
         type: type,
-        child: VoicesAssets.images.createBaseProfile.buildIcon(
+        child: VoicesAssets.images.svg.createBaseProfile.buildIcon(
           allowSize: false,
         ),
       ),

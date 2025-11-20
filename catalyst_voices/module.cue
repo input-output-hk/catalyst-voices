@@ -69,13 +69,17 @@
 						http://:8080 {
 							root * /app
 
+							encode
+
 							handle /healthz {
 							  respond `{"status":"ok"}` 200
 							}
 
 							handle {
-							  try_files {path} /index.html
-							  file_server
+								try_files {path} /index.html
+							  file_server {
+							  	precompressed
+							  }
 							}
 
 							header {
