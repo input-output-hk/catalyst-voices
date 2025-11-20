@@ -118,6 +118,14 @@ melos:
       description: |
         Run `build_runner` in catalyst_voices_repositories package
 
+    compile_svg:
+      run: |
+        cd packages/internal/catalyst_voices_assets && \
+        dart run compile_svg.dart
+      description: |
+        Compile copied SVGs into vector_graphics binary format assets via packages/internal/catalyst_voices_assets/compile_svg.dart.
+        Temporary workaround see packages/internal/catalyst_voices_assets/README.md for context.
+
     db-make-migration:
       run: |
         melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
