@@ -2,7 +2,7 @@
 
 use std::{collections::BTreeSet, fmt::Display, sync::Arc, time::Duration};
 
-use cardano_chain_follower::{ChainFollower, ChainSyncConfig, MultiEraBlock, Network, Point, Slot};
+use cardano_chain_follower::{ChainFollower, MultiEraBlock, Network, Point, Slot};
 use duration_string::DurationString;
 use futures::{StreamExt, stream::FuturesUnordered};
 use rand::{Rng, SeedableRng};
@@ -33,15 +33,10 @@ pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs
 
 /// Start syncing a particular network
 async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
-    let chain = &cfg.chain;
-    let dl_config = cfg.dl_config.clone();
+    info!(chain = %cfg.chain(), "Starting Chain Sync Task");
 
-    let mut cfg = ChainSyncConfig::default_for(chain.clone());
-    cfg.mithril_cfg = cfg.mithril_cfg.with_dl_config(dl_config);
-    info!(chain = %chain, "Starting Chain Sync Task");
-
-    if let Err(error) = cfg.run().await {
-        error!(chain=%chain, error=%error, "Failed to start Chain Sync Task");
+    if let Err(error) = cfg.cfg.clone().run().await {
+        error!(chain=%cfg.chain(), error=%error, "Failed to start Chain Sync Task");
         Err(error)?;
     }
 
@@ -495,10 +490,10 @@ impl SyncTask {
     async fn run(&mut self) {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
-        let tips = ChainFollower::get_tips(&self.cfg.chain).await;
+        let tips = ChainFollower::get_tips(self.cfg.chain()).await;
         self.immutable_tip_slot = tips.0.slot_or_default();
         self.live_tip_slot = tips.1.slot_or_default();
-        info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Running the primary blockchain follower task.");
+        info!(chain=%self.cfg.chain(), immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Running the primary blockchain follower task.");
 
         metrics_updater::current_tip_slot(self.live_tip_slot, self.immutable_tip_slot);
 
@@ -509,14 +504,14 @@ impl SyncTask {
         // After waiting, we set the liveness flag to true if it is not already set.
         CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
 
-        info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state for indexing");
+        info!(chain=%self.cfg.chain(), "Indexing DB is ready - Getting recovery state for indexing");
         self.sync_status = get_sync_status().await;
-        debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
+        debug!(chain=%self.cfg.chain(), "Sync Status: {:?}", self.sync_status);
 
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
         self.add_sync_task(SyncParams::new(
-            self.cfg.chain.clone(),
+            self.cfg.chain().clone(),
             Point::fuzzy(self.immutable_tip_slot),
             Point::TIP,
         ));
@@ -542,7 +537,7 @@ impl SyncTask {
 
             match completed {
                 Ok(finished) => {
-                    let tips = ChainFollower::get_tips(&self.cfg.chain).await;
+                    let tips = ChainFollower::get_tips(self.cfg.chain()).await;
                     let immutable_tip_slot = tips.0.slot_or_default();
                     let live_tip_slot = tips.1.slot_or_default();
                     info!(immutable_tip_slot=?immutable_tip_slot, live_tip_slot=?live_tip_slot, "Chain Indexer task finished");
@@ -564,12 +559,12 @@ impl SyncTask {
                                 self.immutable_tip_slot,
                             );
 
-                            info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
+                            info!(chain=%self.cfg.chain(), report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
                             metrics_updater::reached_immutable_tip(false);
                         } else {
-                            error!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished without to reach TIP.");
+                            error!(chain=%self.cfg.chain(), report=%finished, "Chain Indexer finished without to reach TIP.");
                         }
 
                         // Start the Live Chain sync task again from where it left off.
@@ -577,7 +572,7 @@ impl SyncTask {
                     } else if let Some(result) = finished.result.as_ref() {
                         match result {
                             Ok(()) => {
-                                info!(chain=%self.cfg.chain, report=%finished,
+                                info!(chain=%self.cfg.chain(), report=%finished,
                                     "The Immutable follower completed successfully.");
 
                                 finished.last_indexed_block.as_ref().inspect(|block| {
@@ -588,7 +583,7 @@ impl SyncTask {
 
                                 self.pending_blocks.send_modify(|blocks| {
                                     if !blocks.remove(&finished.end.slot_or_default()) {
-                                        error!(chain=%self.cfg.chain, end=?finished.end,
+                                        error!(chain=%self.cfg.chain(), end=?finished.end,
                                             "The immutable follower completed successfully, but its end point isn't present in index_sync_channel"
                                         );
                                     }
@@ -599,7 +594,7 @@ impl SyncTask {
                                 self.start_immutable_followers();
                             },
                             Err(error) => {
-                                error!(chain=%self.cfg.chain, report=%finished, error=%error,
+                                error!(chain=%self.cfg.chain(), report=%finished, error=%error,
                                         "An Immutable follower failed, restarting it.");
                                 // Restart the Immutable Chain sync task again from where it left
                                 // off.
@@ -607,12 +602,12 @@ impl SyncTask {
                             },
                         }
                     } else {
-                        error!(chain=%self.cfg.chain, report=%finished,
+                        error!(chain=%self.cfg.chain(), report=%finished,
                         "BUG: The Immutable follower completed, but without a proper result.");
                     }
                 },
                 Err(error) => {
-                    error!(chain=%self.cfg.chain, error=%error, "BUG: Sync task failed. Can not restart it, not enough information.  Sync is probably failed at this point.");
+                    error!(chain=%self.cfg.chain(), error=%error, "BUG: Sync task failed. Can not restart it, not enough information.  Sync is probably failed at this point.");
                 },
             }
 
@@ -641,16 +636,16 @@ impl SyncTask {
                 let purge_to_slot =
                     self.immutable_tip_slot - Settings::purge_backward_slot_buffer();
                 let purge_condition = PurgeCondition::PurgeBackwards(purge_to_slot);
-                info!(chain=%self.cfg.chain, purge_to_slot=?purge_to_slot, "Backwards purging volatile data.");
+                info!(chain=%self.cfg.chain(), purge_to_slot=?purge_to_slot, "Backwards purging volatile data.");
                 if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
-                    error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
+                    error!(chain=%self.cfg.chain(), error=%error, "BUG: Purging volatile data task failed.");
                 } else {
                     metrics_updater::backward_data_purge();
                 }
             }
         }
 
-        error!(chain=%self.cfg.chain,"BUG: Sync tasks have all stopped.  This is an unexpected error!");
+        error!(chain=%self.cfg.chain(),"BUG: Sync tasks have all stopped.  This is an unexpected error!");
     }
 
     /// Start immutable followers, if we can
@@ -672,7 +667,7 @@ impl SyncTask {
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
                     self.add_sync_task(SyncParams::new(
-                        self.cfg.chain.clone(),
+                        self.cfg.chain().clone(),
                         first_point,
                         last_point.clone(),
                     ));
