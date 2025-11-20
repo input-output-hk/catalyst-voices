@@ -44,10 +44,12 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<DocumentData?> getLatest({
+    DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? category,
   }) {
     return _database.documentsDao
-        .queryLatestDocumentData(authorId: authorId)
+        .queryLatestDocumentData(type: type, authorId: authorId, category: category)
         .then((value) => value?.toModel());
   }
 
@@ -81,6 +83,19 @@ final class DatabaseDocumentsDataSource
     required DocumentType type,
   }) {
     return _database.documentsDao.countRefDocumentByType(ref: ref, type: type);
+  }
+
+  @override
+  Future<List<DocumentRef>> getRefs({
+    DocumentType? type,
+    CampaignFilters? campaign,
+    int limit = 100,
+    int offset = 0,
+  }) {
+    // TODO(damian-molinski): This implementation will be replaced at performance branch
+    return _database.documentsDao
+        .queryAll(type: type, campaign: campaign)
+        .then((value) => value.map((e) => e.metadata.selfRef.toSignedDocumentRef()).toList());
   }
 
   @override
