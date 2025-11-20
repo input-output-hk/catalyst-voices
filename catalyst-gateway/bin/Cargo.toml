@@ -14,16 +14,6 @@ repository.workspace = true
 [lints]
 workspace = true
 
-[features]
-default = []
-distributed-tracing = [
-    "tracing-opentelemetry",
-    "opentelemetry",
-    "opentelemetry_sdk",
-    "opentelemetry-otlp",
-    "opentelemetry-semantic-conventions",
-]
-
 [dependencies]
 cardano-chain-follower = { version = "0.0.19", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.19" }
 rbac-registration = { version = "0.0.15", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.15" }
@@ -119,11 +109,11 @@ poem-openapi-derive = { version = "=5.1.4" }
 darling = { version = "=0.20.10" }
 
 # Optional dependencies for distributed tracing
-tracing-opentelemetry = { version = "0.32", optional = true }
-opentelemetry = { version = "0.31", optional = true }
-opentelemetry_sdk = { version = "0.31", optional = true, features = ["rt-tokio"] }
-opentelemetry-otlp = { version = "0.31", optional = true, features = ["grpc-tonic"] }
-opentelemetry-semantic-conventions = { version = "0.31", optional = true }
+tracing-opentelemetry = { version = "0.32" }
+opentelemetry = { version = "0.31" }
+opentelemetry_sdk = { version = "0.31", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.31", features = ["grpc-tonic"] }
+opentelemetry-semantic-conventions = { version = "0.31" }
 
 [dev-dependencies]
 test-case = "3.3.1"
