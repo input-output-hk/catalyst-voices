@@ -114,8 +114,13 @@ final class _InfoCodeError {
           return null;
         }
 
-      case _:
+      case null:
         return null;
+      case _:
+        // The JS error is converted into `JSValue` which we can't catch directly because
+        // it's wasm internal type, instead convert it to a String which should be the json
+        // and try to parse it.
+        return tryFrom(object.toString());
     }
   }
 }
@@ -146,8 +151,13 @@ final class _PaginateError {
           return null;
         }
 
-      case _:
+      case null:
         return null;
+      case _:
+        // The JS error is converted into `JSValue` which we can't catch directly because
+        // it's wasm internal type, instead convert it to a String which should be the json
+        // and try to parse it.
+        return tryFrom(object.toString());
     }
   }
 }
