@@ -89,7 +89,14 @@ class SignedDocument(SignedDocumentBase):
 
 
 class DocBuilderReturns:
-    def __init__(self, doc_builder: SignedDocument, signed_doc: str, auth_token: str, cat_id: str, role_id: RoleID):
+    def __init__(
+        self,
+        doc_builder: SignedDocument,
+        signed_doc: str,
+        auth_token: str,
+        cat_id: str,
+        role_id: RoleID,
+    ):
         self.doc_builder = doc_builder
         self.signed_doc = signed_doc
         self.auth_token = auth_token
@@ -97,7 +104,9 @@ class DocBuilderReturns:
         self.role_id = role_id
 
 
-def generic_doc_builder(rbac_chain: RBACChain, doc_type: str, parameters: list[dict], content: Any) -> DocBuilderReturns:
+def generic_doc_builder(
+    rbac_chain: RBACChain, doc_type: str, parameters: list[dict], content: Any
+) -> DocBuilderReturns:
     role_id = RoleID.PROPOSER
     doc_id = uuid_v7.uuid_v7()
     metadata = {
@@ -129,8 +138,11 @@ def build_signed_doc(
     cat_id: str,
     mk_signed_doc_path,
 ) -> str:
-    with NamedTemporaryFile() as metadata_file, NamedTemporaryFile() as doc_content_file, NamedTemporaryFile() as signed_doc_file:
-
+    with (
+        NamedTemporaryFile() as metadata_file,
+        NamedTemporaryFile() as doc_content_file,
+        NamedTemporaryFile() as signed_doc_file,
+    ):
         json_str = json.dumps(metadata_json)
         metadata_file.write(json_str.encode(encoding="utf-8"))
         metadata_file.flush()
@@ -163,7 +175,7 @@ def build_signed_doc(
 
         signed_doc_hex = signed_doc_file.read().hex()
         return signed_doc_hex
-    
+
 
 # ------------------- #
 # Signed Docs Factory #
@@ -178,8 +190,16 @@ class ProposalParameterType(IntEnum):
 
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture
-def proposal_doc_factory(rbac_chain_factory, proposal_form_template_doc_factory, category_parameters_doc_factory, campaign_parameters_doc_factory, brand_parameters_doc_factory):
-    def __factory__(parameter_type: ProposalParameterType) -> tuple[SignedDocument, RoleID]:
+def proposal_doc_factory(
+    rbac_chain_factory,
+    proposal_form_template_doc_factory,
+    category_parameters_doc_factory,
+    campaign_parameters_doc_factory,
+    brand_parameters_doc_factory,
+):
+    def __factory__(
+        parameter_type: ProposalParameterType,
+    ) -> tuple[SignedDocument, RoleID]:
         param: SignedDocumentBase
         if parameter_type == ProposalParameterType.CATEGORY:
             param = category_parameters_doc_factory()
@@ -196,19 +216,23 @@ def proposal_doc_factory(rbac_chain_factory, proposal_form_template_doc_factory,
             rbac_chain_factory(),
             DOC_TYPE["proposal"],
             [
-                { "id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x" },
-                { "id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x" }
+                {
+                    "id": template.metadata["id"],
+                    "ver": template.metadata["ver"],
+                    "cid": "0x",
+                },
+                {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
-            JSF(template.content).generate()
+            JSF(template.content).generate(),
         )
-        
+
         resp = document.put(
             data=result.signed_doc,
             token=result.auth_token,
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
         return result.doc_builder, result.role_id
 
@@ -219,20 +243,22 @@ def proposal_doc_factory(rbac_chain_factory, proposal_form_template_doc_factory,
 def proposal_form_template_doc_factory(rbac_chain_factory):
     def __factory__() -> SignedDocumentBase:
         role_id = RoleID.PROPOSER
-        with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
+        with open(
+            "./test_data/signed_docs/proposal_form_template.json", "r"
+        ) as json_file:
             metadata, content = json.load(json_file)
 
         doc_builder = SignedDocument(metadata, content)
         rbac_chain = rbac_chain_factory()
         (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-        
+
         resp = document.put(
             data=doc_builder.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
         return SignedDocumentBase(metadata, content)
 
@@ -240,7 +266,11 @@ def proposal_form_template_doc_factory(rbac_chain_factory):
 
 
 @pytest.fixture
-def category_parameters_doc_factory(rbac_chain_factory, category_parameters_form_template_doc_factory, campaign_parameters_doc_factory):
+def category_parameters_doc_factory(
+    rbac_chain_factory,
+    category_parameters_form_template_doc_factory,
+    campaign_parameters_doc_factory,
+):
     def __factory__() -> SignedDocumentBase:
         template: SignedDocumentBase = category_parameters_form_template_doc_factory()
         param: SignedDocumentBase = campaign_parameters_doc_factory()
@@ -249,54 +279,66 @@ def category_parameters_doc_factory(rbac_chain_factory, category_parameters_form
             rbac_chain_factory(),
             DOC_TYPE["category_parameters"],
             [
-                { "id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x" },
-                { "id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x" }
+                {
+                    "id": template.metadata["id"],
+                    "ver": template.metadata["ver"],
+                    "cid": "0x",
+                },
+                {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
-            JSF(template.content).generate()
+            JSF(template.content).generate(),
         )
-        
+
         resp = document.put(
             data=result.signed_doc,
             token=result.auth_token,
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
-        return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+        return SignedDocumentBase(
+            result.doc_builder.metadata, result.doc_builder.content
+        )
 
     return __factory__
 
 
 @pytest.fixture
-def category_parameters_form_template_doc_factory(rbac_chain_factory, campaign_parameters_doc_factory):
+def category_parameters_form_template_doc_factory(
+    rbac_chain_factory, campaign_parameters_doc_factory
+):
     def __factory__() -> SignedDocumentBase:
         param: SignedDocumentBase = campaign_parameters_doc_factory()
 
         result = generic_doc_builder(
             rbac_chain_factory(),
             DOC_TYPE["category_parameters_form_template"],
-            [
-                { "id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x" }
-            ],
-            { "type": "object" }
+            [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+            {"type": "object"},
         )
-        
+
         resp = document.put(
             data=result.signed_doc,
             token=result.auth_token,
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
-        return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+        return SignedDocumentBase(
+            result.doc_builder.metadata, result.doc_builder.content
+        )
 
     return __factory__
 
 
 @pytest.fixture
-def campaign_parameters_doc_factory(rbac_chain_factory, campaign_parameters_form_template_doc_factory, brand_parameters_doc_factory):
+def campaign_parameters_doc_factory(
+    rbac_chain_factory,
+    campaign_parameters_form_template_doc_factory,
+    brand_parameters_doc_factory,
+):
     def __factory__() -> SignedDocumentBase:
         template: SignedDocumentBase = campaign_parameters_form_template_doc_factory()
         param: SignedDocumentBase = brand_parameters_doc_factory()
@@ -305,54 +347,64 @@ def campaign_parameters_doc_factory(rbac_chain_factory, campaign_parameters_form
             rbac_chain_factory(),
             DOC_TYPE["campaign_parameters"],
             [
-                { "id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x" },
-                { "id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x" }
+                {
+                    "id": template.metadata["id"],
+                    "ver": template.metadata["ver"],
+                    "cid": "0x",
+                },
+                {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
-            JSF(template.content).generate()
+            JSF(template.content).generate(),
         )
-        
+
         resp = document.put(
             data=result.signed_doc,
             token=result.auth_token,
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
-        return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+        return SignedDocumentBase(
+            result.doc_builder.metadata, result.doc_builder.content
+        )
 
     return __factory__
 
 
 @pytest.fixture
-def campaign_parameters_form_template_doc_factory(rbac_chain_factory, brand_parameters_doc_factory):
+def campaign_parameters_form_template_doc_factory(
+    rbac_chain_factory, brand_parameters_doc_factory
+):
     def __factory__() -> SignedDocumentBase:
         param: SignedDocumentBase = brand_parameters_doc_factory()
 
         result = generic_doc_builder(
             rbac_chain_factory(),
             DOC_TYPE["campaign_parameters_form_template"],
-            [
-                { "id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x" }
-            ],
-            { "type": "object" }
+            [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+            {"type": "object"},
         )
-        
+
         resp = document.put(
             data=result.signed_doc,
             token=result.auth_token,
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
-        return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+        return SignedDocumentBase(
+            result.doc_builder.metadata, result.doc_builder.content
+        )
 
     return __factory__
 
 
 @pytest.fixture
-def brand_parameters_doc_factory(rbac_chain_factory, brand_parameters_form_template_doc_factory):
+def brand_parameters_doc_factory(
+    rbac_chain_factory, brand_parameters_form_template_doc_factory
+):
     def __factory__() -> SignedDocumentBase:
         template: SignedDocumentBase = brand_parameters_form_template_doc_factory()
 
@@ -360,20 +412,26 @@ def brand_parameters_doc_factory(rbac_chain_factory, brand_parameters_form_templ
             rbac_chain_factory(),
             DOC_TYPE["brand_parameters"],
             [
-                { "id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x" }
+                {
+                    "id": template.metadata["id"],
+                    "ver": template.metadata["ver"],
+                    "cid": "0x",
+                }
             ],
-            JSF(template.content).generate()
+            JSF(template.content).generate(),
         )
-        
+
         resp = document.put(
             data=result.signed_doc,
             token=result.auth_token,
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
-        return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+        return SignedDocumentBase(
+            result.doc_builder.metadata, result.doc_builder.content
+        )
 
     return __factory__
 
@@ -385,17 +443,19 @@ def brand_parameters_form_template_doc_factory(rbac_chain_factory):
             rbac_chain_factory(),
             DOC_TYPE["brand_parameters_form_template"],
             [],
-            { "type": "object" }
+            {"type": "object"},
         )
-        
+
         resp = document.put(
             data=result.signed_doc,
             token=result.auth_token,
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
-        return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+        return SignedDocumentBase(
+            result.doc_builder.metadata, result.doc_builder.content
+        )
 
     return __factory__
