@@ -202,15 +202,15 @@ def proposal_doc_factory(
     ) -> tuple[SignedDocument, RoleID]:
         param: SignedDocumentBase
         if parameter_type == ProposalParameterType.CATEGORY:
-            param = category_parameters_doc_factory()
+            param = category_parameters_doc_factory
         elif parameter_type == ProposalParameterType.CAMPAIGN:
-            param = campaign_parameters_doc_factory()
+            param = campaign_parameters_doc_factory
         elif parameter_type == ProposalParameterType.BRAND:
-            param = brand_parameters_doc_factory()
+            param = brand_parameters_doc_factory
         else:
             raise Exception("Invalid parameter type for proposal document")
 
-        template: SignedDocumentBase = proposal_form_template_doc_factory()
+        template: SignedDocumentBase = proposal_form_template_doc_factory
 
         result = generic_doc_builder(
             rbac_chain_factory(),
@@ -266,8 +266,8 @@ def category_parameters_doc_factory(
     category_parameters_form_template_doc_factory,
     campaign_parameters_doc_factory,
 ) -> SignedDocumentBase:
-    template: SignedDocumentBase = category_parameters_form_template_doc_factory()
-    param: SignedDocumentBase = campaign_parameters_doc_factory()
+    template: SignedDocumentBase = category_parameters_form_template_doc_factory
+    param: SignedDocumentBase = campaign_parameters_doc_factory
 
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -298,7 +298,7 @@ def category_parameters_doc_factory(
 def category_parameters_form_template_doc_factory(
     rbac_chain_factory, campaign_parameters_doc_factory
 ) -> SignedDocumentBase:
-    param: SignedDocumentBase = campaign_parameters_doc_factory()
+    param: SignedDocumentBase = campaign_parameters_doc_factory
 
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -324,8 +324,8 @@ def campaign_parameters_doc_factory(
     campaign_parameters_form_template_doc_factory,
     brand_parameters_doc_factory,
 ) -> SignedDocumentBase:
-    template: SignedDocumentBase = campaign_parameters_form_template_doc_factory()
-    param: SignedDocumentBase = brand_parameters_doc_factory()
+    template: SignedDocumentBase = campaign_parameters_form_template_doc_factory
+    param: SignedDocumentBase = brand_parameters_doc_factory
 
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -356,7 +356,7 @@ def campaign_parameters_doc_factory(
 def campaign_parameters_form_template_doc_factory(
     rbac_chain_factory, brand_parameters_doc_factory
 ) -> SignedDocumentBase:
-    param: SignedDocumentBase = brand_parameters_doc_factory()
+    param: SignedDocumentBase = brand_parameters_doc_factory
 
     result = generic_doc_builder(
         rbac_chain_factory(),
