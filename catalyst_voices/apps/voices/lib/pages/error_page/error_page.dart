@@ -34,9 +34,11 @@ class ErrorPage extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 3),
-              _Image(
-                image: image,
-                maxImageWidth: maxImageWidth,
+              Center(
+                child: _Image(
+                  image: image,
+                  maxImageWidth: maxImageWidth,
+                ),
               ),
               const SizedBox(height: 56),
               _Title(text: title),
@@ -85,12 +87,10 @@ class _Image extends StatelessWidget {
       maxImageWidth,
     );
 
-    return Center(
-      child: CatalystImage.asset(
-        image.path,
-        width: imageWidth.toDouble(),
-        fit: BoxFit.cover,
-      ),
+    return CatalystImage.asset(
+      image.path,
+      width: imageWidth.toDouble(),
+      fit: BoxFit.cover,
     );
   }
 }
