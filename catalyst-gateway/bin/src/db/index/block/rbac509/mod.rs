@@ -283,7 +283,7 @@ impl Rbac509InsertQuery {
         Ok(())
     }
 
-    /// Making coresponding records according to the valid registration
+    /// Making corresponding records according to the valid registration
     #[allow(clippy::too_many_arguments)]
     fn record_valid_registration(
         &mut self,
@@ -362,7 +362,7 @@ impl Rbac509InsertQuery {
         }
     }
 
-    /// Making coresponding records according to the valid registration
+    /// Making corresponding records according to the valid registration
     #[allow(clippy::too_many_arguments)]
     fn record_invalid_registration(
         &mut self,
