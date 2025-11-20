@@ -84,30 +84,30 @@ class _ProposalPageState extends State<ProposalPage>
   Widget build(BuildContext context) {
     return SegmentsControllerScope(
       controller: _segmentsController,
-      child: Scaffold(
-        appBar: const _AppBar(),
-        endDrawer: const OpportunitiesDrawer(),
-        floatingActionButton: _ScrollToTopButton(
-          segmentsScrollController: _segmentsScrollController,
-        ),
-        body: Stack(
-          children: [
-            ProposalHeaderWrapper(
-              child: ProposalSidebars(
-                navPanel: const ProposalNavigationPanel(),
-                body: Stack(
-                  children: [
-                    ProposalContent(
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: const _AppBar(),
+            endDrawer: const OpportunitiesDrawer(),
+            floatingActionButton: _ScrollToTopButton(
+              segmentsScrollController: _segmentsScrollController,
+            ),
+            body: Stack(
+              children: [
+                ProposalHeaderWrapper(
+                  child: ProposalSidebars(
+                    navPanel: const ProposalNavigationPanel(),
+                    body: ProposalContent(
                       scrollController: _segmentsScrollController,
                     ),
-                    const ProposalError(),
-                  ],
+                  ),
                 ),
-              ),
+                const ProposalLoading(),
+              ],
             ),
-            const ProposalLoading(),
-          ],
-        ),
+          ),
+          const ProposalError(),
+        ],
       ),
     );
   }

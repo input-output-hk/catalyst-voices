@@ -953,9 +953,17 @@
   "@doWord": {
     "description": "Label for a list of things to do"
   },
+  "documentHiddenException": "The proposal is no longer available.",
+  "@documentHiddenException": {
+    "description": "Message when the document (proposal) is no longer available due to being hidden."
+  },
   "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
   "@documentImportInvalidDataError": {
     "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
+  },
+  "documentReferenceError": "Invalid proposal reference.",
+  "@documentReferenceError": {
+    "description": "Message when the resource reference such as proposal is invalid."
   },
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
@@ -2427,6 +2435,10 @@
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
   },
+  "proposalViewLoadErrorMessage": "We weren't able to load that proposal.",
+  "@proposalViewLoadErrorMessage": {
+    "description": "Error message shown when proposal cannot be loaded (i.e. due to connection error)."
+  },
   "proposalViewMetadataOverviewSegment": "Overview",
   "@proposalViewMetadataOverviewSegment": {
     "description": "Viewing proposal navigation segment"
@@ -2434,6 +2446,18 @@
   "proposalViewMetadataSection": "Metadata",
   "@proposalViewMetadataSection": {
     "description": "Viewing proposal navigation section"
+  },
+  "proposalViewNotFoundButton": "Go to Catalyst Home.",
+  "@proposalViewNotFoundButton": {
+    "description": "Error button shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundMessage": "It looks like we can't find the proposal you're looking for.\nMaybe a good time for a coffee break?",
+  "@proposalViewNotFoundMessage": {
+    "description": "Error message shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundTitle": "We can't find that proposal.",
+  "@proposalViewNotFoundTitle": {
+    "description": "Error title shown when proposal cannot be found."
   },
   "proposalViewProjectDelivery": "Project Delivery",
   "@proposalViewProjectDelivery": {

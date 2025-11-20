@@ -140,7 +140,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
     final proposalPublish = await getProposalPublishForRef(ref: ref);
     if (proposalPublish == null) {
-      throw const NotFoundException(message: 'Proposal is hidden');
+      throw DocumentHiddenException(ref: ref);
     }
     final templateRef = documentData.metadata.template!;
     final documentTemplate = await _documentRepository.getDocumentData(ref: templateRef);
