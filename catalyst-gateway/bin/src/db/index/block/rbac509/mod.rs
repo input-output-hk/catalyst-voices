@@ -29,7 +29,7 @@ use crate::{
         session::CassandraSession,
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
-    rbac::{RbacBlockIndexingContext, state::RbacChainsState},
+    rbac::{RbacBlockIndexingContext, cache_persistent_rbac_chain, state::RbacChainsState},
     settings::cassandra_db::EnvVars,
 };
 
@@ -195,6 +195,10 @@ impl Rbac509InsertQuery {
             .collect::<HashSet<_>>();
         let modified_chains = state.consume();
         let purpose = reg.purpose();
+
+        if is_persistent {
+            cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
+        }
 
         self.record_valid_registration(
             txn_hash,
