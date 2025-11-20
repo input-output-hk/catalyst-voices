@@ -31,7 +31,7 @@ final class VotingMockService implements VotingService {
 
     final category = _cacheCampaign!.categories.firstWhere(
       (category) => category.selfRef == proposal.categoryRef,
-      orElse: () => throw StateError('Category not found'),
+      orElse: () => throw const NotFoundException(message: 'Category not found'),
     );
 
     return VoteProposal.fromData(

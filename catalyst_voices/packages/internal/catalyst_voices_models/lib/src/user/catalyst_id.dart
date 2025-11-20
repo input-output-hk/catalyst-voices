@@ -157,6 +157,18 @@ final class CatalystId extends Equatable {
     return userInfo.isNotEmpty ? userInfo : null;
   }
 
+  /// Tries to parse a [CatalystId] from a [String].
+  ///
+  /// Returns `null` if the [value] cannot be parsed as a valid [CatalystId].
+  static CatalystId? tryParse(String value) {
+    try {
+      final uri = Uri.parse(value);
+      return CatalystId.fromUri(uri);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Parses the data from [Uri.path].
   ///
   /// Format: role0Key[/roleNumber][/rotation]

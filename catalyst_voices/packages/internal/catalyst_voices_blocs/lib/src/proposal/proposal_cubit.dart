@@ -74,22 +74,28 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> load({required DocumentRef ref}) async {
     try {
-      final isReadOnlyMode = await _isReadOnlyMode();
-      final campaign = await _campaignService.getActiveCampaign();
-      final isVotingStage = _isVotingStage(campaign);
-      final showComments = campaign?.supportsComments ?? false;
       _logger.info('Loading $ref');
 
-      _cache = _cache.copyWith(ref: Optional.of(ref));
+      if (!ref.isValid) {
+        emit(state.copyWith(error: const Optional(LocalizedDocumentReferenceException())));
+        return;
+      }
 
       emit(state.copyWith(isLoading: true));
+      _cache = _cache.copyWith(ref: Optional.of(ref));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
-      final category = await _campaignService.getCategory(proposal.document.metadata.categoryId);
-      final commentTemplate = await _commentService.getCommentTemplateFor(
-        category: proposal.document.metadata.categoryId,
-      );
-      final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
+
+      final (isReadOnlyMode, campaign, category, commentTemplate, isFavorite) = await (
+        _isReadOnlyMode(),
+        _campaignService.getActiveCampaign(),
+        _campaignService.getCategory(proposal.document.metadata.categoryId),
+        _commentService.getCommentTemplateFor(category: proposal.document.metadata.categoryId),
+        _proposalService.watchIsFavoritesProposal(ref: ref).first,
+      ).wait;
+
+      final isVotingStage = _isVotingStage(campaign);
+      final showComments = campaign?.supportsComments ?? false;
 
       _cache = _cache.copyWith(
         proposal: Optional(proposal),
