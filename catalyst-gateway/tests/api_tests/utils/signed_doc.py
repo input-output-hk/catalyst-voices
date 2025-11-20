@@ -86,149 +86,6 @@ class SignedDocument(SignedDocumentBase):
         )
 
 
-# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
-@pytest.fixture
-def proposal_doc_factory(rbac_chain_factory, proposal_form_template_doc_factory):
-    def __factory__() -> tuple[SignedDocument, RoleID]:
-        role_id = RoleID.PROPOSER
-        template = proposal_form_template_doc_factory()
-        rbac_chain = rbac_chain_factory()
-        doc_id = uuid_v7.uuid_v7()
-
-        metadata = {
-            "id": doc_id,
-            "ver": doc_id,
-            "type": DOC_TYPE["proposal"],
-            "content-type": "application/json",
-            "content-encoding": "br",
-            "parameters": [
-                # TODO:
-            ],
-        }
-        body = JSF(template).generate()
-
-        doc_builder = SignedDocument(metadata, body)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-        
-        resp = document.put(
-            data=doc_builder.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
-        return doc_builder, role_id
-
-    return __factory__
-
-
-@pytest.fixture
-def campaign_parameters_doc_factory(rbac_chain_factory):
-    def __factory__() -> tuple[SignedDocument, RoleID]:
-        role_id = RoleID.PROPOSER
-        template = proposal_form_template_doc_factory()
-        rbac_chain = rbac_chain_factory()
-        doc_id = uuid_v7.uuid_v7()
-
-        metadata = {
-            "id": doc_id,
-            "ver": doc_id,
-            "type": DOC_TYPE["campaign_parameters"],
-            "content-type": "application/json",
-            "content-encoding": "br",
-            "parameters": [],
-        }
-        body = JSF(template).generate()
-
-        doc_builder = SignedDocument(metadata, body)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-        
-        resp = document.put(
-            data=doc_builder.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
-        return doc_builder, role_id
-
-    return __factory__
-
-@pytest.fixture
-def campaign_parameters_form_template_doc_factory(rbac_chain_factory):
-    None
-
-@pytest.fixture
-def proposal_form_template_doc_factory(rbac_chain_factory):
-    def __factory__() -> tuple[SignedDocument, RoleID]:
-        role_id = RoleID.PROPOSER
-        with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
-            metadata, content = json.load(json_file)
-
-        doc_builder = SignedDocument(metadata, content)
-        rbac_chain = rbac_chain_factory()
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-        
-        resp = document.put(
-            data=doc_builder.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
-        return doc_builder, role_id
-
-    return __factory__
-
-
-@pytest.fixture
-def category_parameters_doc_factory(rbac_chain_factory):
-    def __factory__() -> tuple[SignedDocument, RoleID]:
-        with open("./test_data/signed_docs/category_parameters.json", "r") as json_file:
-            metadata, content = json.load(json_file)
-
-        doc_builder = SignedDocument(metadata, content)
-        rbac_chain = rbac_chain_factory()
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
-        
-        resp = document.put(
-            data=doc_builder.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
-        return doc_builder, RoleID.PROPOSER
-
-    return __factory__
-
-
-@pytest.fixture
-def category_parameters_form_template_doc_factory(rbac_chain_factory):
-    def __factory__() -> tuple[SignedDocument, RoleID]:
-        builder = generic_doc_builder(
-            rbac_chain_factory(),
-            DOC_TYPE["category_parameters_form_template"],
-            [],
-            {}
-        )
-        
-        resp = document.put(
-            data=builder["signed_doc"],
-            token=builder["auth_token"],
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
-        return builder["doc_builder"], builder["role_id"]
-
-    return __factory__
-
 def generic_doc_builder(rbac_chain, doc_type: str, parameters: list[dict], content: Any):
     role_id = RoleID.PROPOSER
     doc_id = uuid_v7.uuid_v7()
@@ -297,3 +154,154 @@ def build_signed_doc(
 
         signed_doc_hex = signed_doc_file.read().hex()
         return signed_doc_hex
+    
+
+# ------------------- #
+# Signed Docs Factory #
+# ------------------- #
+
+# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
+@pytest.fixture
+def proposal_doc_factory(rbac_chain_factory, proposal_form_template_doc_factory):
+    def __factory__(parameter: SignedDocumentBase) -> tuple[str, Any, Any]:
+        role_id = RoleID.PROPOSER
+        template: SignedDocumentBase = proposal_form_template_doc_factory()
+        rbac_chain = rbac_chain_factory()
+        doc_id = uuid_v7.uuid_v7()
+
+        metadata = {
+            "id": doc_id,
+            "ver": doc_id,
+            "type": DOC_TYPE["proposal"],
+            "content-type": "application/json",
+            "content-encoding": "br",
+            "parameters": [
+                { "id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x" },
+                { "id": parameter.metadata["id"], "ver": parameter.metadata["ver"], "cid": "0x" },
+            ],
+        }
+        content = JSF(template.content).generate()
+
+        doc_builder = SignedDocument(metadata, content)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        
+        resp = document.put(
+            data=doc_builder.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        return doc_id, metadata, content
+
+    return __factory__
+
+
+@pytest.fixture
+def proposal_form_template_doc_factory(rbac_chain_factory):
+    def __factory__() -> SignedDocumentBase:
+        role_id = RoleID.PROPOSER
+        with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
+            metadata, content = json.load(json_file)
+
+        doc_builder = SignedDocument(metadata, content)
+        rbac_chain = rbac_chain_factory()
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        
+        resp = document.put(
+            data=doc_builder.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        return SignedDocumentBase(metadata, content)
+
+    return __factory__
+
+
+@pytest.fixture
+def category_parameters_doc_factory(rbac_chain_factory):
+    def __factory__() -> tuple[SignedDocument, RoleID]:
+        with open("./test_data/signed_docs/category_parameters.json", "r") as json_file:
+            metadata, content = json.load(json_file)
+
+        doc_builder = SignedDocument(metadata, content)
+        rbac_chain = rbac_chain_factory()
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+        
+        resp = document.put(
+            data=doc_builder.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        return doc_builder, RoleID.PROPOSER
+
+    return __factory__
+
+
+@pytest.fixture
+def category_parameters_form_template_doc_factory(rbac_chain_factory):
+    def __factory__() -> tuple[SignedDocument, RoleID]:
+        builder = generic_doc_builder(
+            rbac_chain_factory(),
+            DOC_TYPE["category_parameters_form_template"],
+            [],
+            {}
+        )
+        
+        resp = document.put(
+            data=builder["signed_doc"],
+            token=builder["auth_token"],
+        )
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        return builder["doc_builder"], builder["role_id"]
+
+    return __factory__
+
+
+@pytest.fixture
+def campaign_parameters_doc_factory(rbac_chain_factory):
+    def __factory__() -> tuple[SignedDocument, RoleID]:
+        role_id = RoleID.PROPOSER
+        template = proposal_form_template_doc_factory()
+        rbac_chain = rbac_chain_factory()
+        doc_id = uuid_v7.uuid_v7()
+
+        metadata = {
+            "id": doc_id,
+            "ver": doc_id,
+            "type": DOC_TYPE["campaign_parameters"],
+            "content-type": "application/json",
+            "content-encoding": "br",
+            "parameters": [],
+        }
+        body = JSF(template).generate()
+
+        doc_builder = SignedDocument(metadata, body)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        
+        resp = document.put(
+            data=doc_builder.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        return doc_builder, role_id
+
+    return __factory__
+
+
+@pytest.fixture
+def campaign_parameters_form_template_doc_factory(rbac_chain_factory):
+    None
