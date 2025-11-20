@@ -16,9 +16,11 @@ void main() {
     const uuidV7Str = '019273a8-3339-7604-b12e-86625513f0f0';
 
     // Catalyst IDs
+    /* cSpell:disable */
     const catalystIdStr = 'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE';
     final catalystId = CatalystId.fromUri(Uri.parse(catalystIdStr));
     final catalystIdKid = CatalystIdKid(Uint8List.fromList(utf8.encode(catalystIdStr)));
+    /* cSpell:enable */
 
     // Common Objects
     const signedDocRef = SignedDocumentRef(id: uuidV7Str, version: uuidV7Str);
