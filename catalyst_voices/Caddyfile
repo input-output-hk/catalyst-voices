@@ -5,14 +5,20 @@
 http://:8080 {
 	root * /app
 
-	handle /healthz {
-		respond `{"status":"ok"}` 200
-	}
+    # Compress on-the-fly if not precompressed
+    encode
 
-	handle {
-		try_files {path} /index.html
-		file_server
-	}
+    handle /healthz {
+        respond `{"status":"ok"}` 200
+    }
+
+    handle {
+        try_files {path} /index.html
+        file_server {
+            # default order br zstd gzip
+            precompressed
+        }
+    }
 
 	header {
 		Cross-Origin-Opener-Policy "same-origin"

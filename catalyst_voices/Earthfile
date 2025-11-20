@@ -128,10 +128,12 @@ build-web:
         --SENTRY_ORG='iohk-j4' \
         --SENTRY_PROJECT='catalyst-voices' \
         --WASM=true
-    
+
     # Version web assets with content-based MD5 hashes for cache busting
     RUN dart run /frontend/scripts/version_web_assets/version_web_assets.dart --build-dir=$WORKDIR/build/web --wasm=true
-    
+
+    DO flutter-ci+COMPRESS_WEB_FILES
+
     SAVE ARTIFACT --keep-ts web
 
 package:
