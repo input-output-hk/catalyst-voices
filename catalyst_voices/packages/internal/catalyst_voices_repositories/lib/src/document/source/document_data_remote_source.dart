@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/api/models/document_index_query
 import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
 import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
 import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:collection/collection.dart';
@@ -49,7 +50,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     try {
       final index = await _api.gateway
           .documentIndex(
-            filter: DocumentIndexQueryFilter(id: [EqOrRangedId.eq(id)]),
+            filter: DocumentIndexQueryFilter(id: IdSelector.eq(id)),
             limit: 1,
           )
           .successBodyOrThrow();
