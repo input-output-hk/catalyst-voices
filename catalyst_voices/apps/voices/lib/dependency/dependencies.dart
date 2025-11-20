@@ -211,6 +211,11 @@ final class Dependencies extends DependencyProvider {
           get<VotingBallotBuilder>(),
           get<VotingService>(),
         );
+      })
+      ..registerFactory<AddCollaboratorCubit>(() {
+        return AddCollaboratorCubit(
+          get<ProposalService>(),
+        );
       });
   }
 

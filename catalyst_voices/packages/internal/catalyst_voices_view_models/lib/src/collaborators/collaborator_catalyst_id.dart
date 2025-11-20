@@ -43,8 +43,6 @@ final class CollaboratorCatalystId
 
   @override
   CollaboratorCatalystIdValidationException? validator(String value) {
-    if (isPure) return null;
-
     final catalystId = CatalystId.tryParse(value);
     if (catalystId == null) {
       return const InvalidCatalystIdFormatValidationException();

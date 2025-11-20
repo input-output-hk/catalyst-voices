@@ -5,7 +5,6 @@ import 'package:catalyst_voices/pages/co_proposers/widgets/add_collaborator/add_
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -63,11 +62,8 @@ class _AddCollaboratorDialogState extends State<AddCollaboratorDialog> {
   @override
   void initState() {
     super.initState();
-    final proposalService = Dependencies.instance.get<ProposalService>();
-    _cubit = AddCollaboratorCubit(
-      proposalService,
-      collaborators: widget.collaborators,
-      authorCatalystId: widget.authorId,
-    );
+    _cubit = Dependencies.instance.get<AddCollaboratorCubit>();
+
+    _cubit.init(collaborators: widget.collaborators, authorCatalystId: widget.authorId);
   }
 }

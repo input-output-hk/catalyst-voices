@@ -496,7 +496,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<bool> validateForCollaborator(CatalystId id) async {
-    return Random().nextBool();
+    // TODO(LynxLynxx): Add implementation
+    return Future.delayed(const Duration(seconds: 1), () {
+      return Random().nextBool();
+    });
   }
 
   @override

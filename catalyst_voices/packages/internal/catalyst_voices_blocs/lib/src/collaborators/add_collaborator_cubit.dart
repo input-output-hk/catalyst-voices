@@ -10,18 +10,19 @@ final class AddCollaboratorCubit extends Cubit<AddCollaboratorState>
   final ProposalService _proposalService;
 
   AddCollaboratorCubit(
-    this._proposalService, {
-    required CatalystId authorCatalystId,
-    required Collaborators collaborators,
-  }) : super(
-         AddCollaboratorState(
-           authorCatalystId: authorCatalystId,
-           collaborators: collaborators,
-           collaboratorIdState: const CollaboratorIdState(
-             collaboratorId: CollaboratorCatalystId.pure(),
-           ),
-         ),
-       );
+    this._proposalService,
+  ) : super(
+        const AddCollaboratorState(),
+      );
+
+  void init({required Collaborators collaborators, required CatalystId authorCatalystId}) {
+    emit(
+      AddCollaboratorState(
+        collaborators: collaborators,
+        authorCatalystId: authorCatalystId,
+      ),
+    );
+  }
 
   void updateCollaboratorId(String value) {
     final result = CollaboratorCatalystId.dirty(
@@ -39,6 +40,8 @@ final class AddCollaboratorCubit extends Cubit<AddCollaboratorState>
   }
 
   Future<void> validateCollaboratorId() async {
+    if (state.collaboratorIdState.isLoading) return;
+
     final id = state.collaboratorIdState.collaboratorId.value;
     final catalystId = CatalystId.tryParse(id);
 
@@ -47,11 +50,10 @@ final class AddCollaboratorCubit extends Cubit<AddCollaboratorState>
     emit(state.copyWith(collaboratorIdState: newCollaboratorIdState.copyWith(isLoading: true)));
     final result = await _proposalService.validateForCollaborator(catalystId);
 
-    await Future.delayed(const Duration(seconds: 1), () {});
     emit(state.copyWith(collaboratorIdState: newCollaboratorIdState.copyWith(isLoading: false)));
 
     if (result) {
-      emitSignal(const ValidCollaboratorIdSignal());
+      emitSignal(ValidCollaboratorIdSignal(catalystId));
     } else {
       emitError(const LocalizedCollaboratorIsNotAProposerException());
     }

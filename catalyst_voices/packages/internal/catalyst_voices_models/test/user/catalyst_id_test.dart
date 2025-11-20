@@ -230,8 +230,8 @@ void main() {
       final invalidCatalystId = CatalystId.tryParse(invalidUri);
       final invalidCatalystId2 = CatalystId.tryParse(invalidUri2);
 
-      expect(invalidCatalystId, null);
-      expect(invalidCatalystId2, null);
+      expect(invalidCatalystId, isNull);
+      expect(invalidCatalystId2, isNull);
     });
   });
 }

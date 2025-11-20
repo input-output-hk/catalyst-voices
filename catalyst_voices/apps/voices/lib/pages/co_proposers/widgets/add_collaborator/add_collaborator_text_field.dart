@@ -27,7 +27,7 @@ class __AddCollaboratorTextFieldState extends State<_AddCollaboratorTextField> {
   late final FocusNode _focusNode;
 
   String? get errorMessage {
-    final error = widget.collaboratorId.error;
+    final error = widget.collaboratorId.displayError;
     if (error is InvalidCatalystIdFormatValidationException) {
       return error.message(context);
     }
@@ -39,8 +39,8 @@ class __AddCollaboratorTextFieldState extends State<_AddCollaboratorTextField> {
     return VoicesTextField(
       focusNode: _focusNode,
       initialText: widget.collaboratorId.value,
-      onChanged: _onTextFiledChange,
-      onFieldSubmitted: _onTextFiledSubmitted,
+      onChanged: _onTextFieldChange,
+      onFieldSubmitted: _onTextFieldSubmitted,
       decoration: VoicesTextFieldDecoration(
         labelText: context.l10n.catalystId,
         labelStyle: context.textTheme.labelLarge,
@@ -61,14 +61,11 @@ class __AddCollaboratorTextFieldState extends State<_AddCollaboratorTextField> {
     _focusNode = FocusNode()..requestFocus();
   }
 
-  void _onTextFiledChange(String? value) {
+  void _onTextFieldChange(String? value) {
     context.read<AddCollaboratorCubit>().updateCollaboratorId(value ?? '');
   }
 
-  void _onTextFiledSubmitted(String? value) {
-    final isLoading = context.read<AddCollaboratorCubit>().state.collaboratorIdState.isLoading;
-    if (isLoading) return;
-
+  void _onTextFieldSubmitted(String? value) {
     unawaited(context.read<AddCollaboratorCubit>().validateCollaboratorId());
   }
 }

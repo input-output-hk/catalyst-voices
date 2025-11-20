@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/co_proposers/widgets/add_collaborator/add_collaborator_add_button.dart';
+import 'package:catalyst_voices/pages/co_proposers/widgets/add_collaborator/add_collaborator_button.dart';
 import 'package:catalyst_voices/pages/co_proposers/widgets/add_collaborator/add_collaborator_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -35,7 +35,7 @@ class _AddCollaboratorViewState extends State<AddCollaboratorView>
             SizedBox(height: 28),
             AddCollaboratorTextField(),
             SizedBox(height: 24),
-            AddCollaboratorAddButton(),
+            AddCollaboratorButton(),
           ],
         ),
       ),
@@ -45,14 +45,11 @@ class _AddCollaboratorViewState extends State<AddCollaboratorView>
   @override
   void handleSignal(AddCollaboratorSignal signal) {
     return switch (signal) {
-      ValidCollaboratorIdSignal() => _returnResult(),
+      ValidCollaboratorIdSignal(:final catalystId) => _popWithResult(catalystId),
     };
   }
 
-  void _returnResult() {
-    final id = context.read<AddCollaboratorCubit>().state.collaboratorIdState.collaboratorId.value;
-    final catalystId = CatalystId.tryParse(id);
-
+  void _popWithResult(CatalystId catalystId) {
     Navigator.pop(context, catalystId);
   }
 }

@@ -6,8 +6,8 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class AddCollaboratorAddButton extends StatelessWidget {
-  const AddCollaboratorAddButton({super.key});
+class AddCollaboratorButton extends StatelessWidget {
+  const AddCollaboratorButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,24 +16,21 @@ class AddCollaboratorAddButton extends StatelessWidget {
         return state.collaboratorIdState;
       },
       builder: (context, collaboratorIdState) {
-        return _AddCollaboratorAddButton(collaboratorIdState);
+        return _AddCollaboratorButton(collaboratorIdState);
       },
     );
   }
 }
 
-class _AddCollaboratorAddButton extends StatelessWidget {
+class _AddCollaboratorButton extends StatelessWidget {
   final CollaboratorIdState collaboratorIdState;
 
-  const _AddCollaboratorAddButton(this.collaboratorIdState);
+  const _AddCollaboratorButton(this.collaboratorIdState);
 
   @override
   Widget build(BuildContext context) {
-    final isValid =
-        collaboratorIdState.collaboratorId.isValid && !collaboratorIdState.collaboratorId.isPure;
-
     return VoicesFilledButton(
-      onTap: isValid ? () => _validateCollaboratorId(context) : null,
+      onTap: collaboratorIdState.isValid ? () => _validateCollaboratorId(context) : null,
       trailing: collaboratorIdState.isLoading
           ? const SizedBox(
               width: 16,

@@ -3,21 +3,18 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 class AddCollaboratorState extends Equatable {
-  final bool isLoading;
-  final CatalystId authorCatalystId;
+  final CatalystId? authorCatalystId;
   final Collaborators collaborators;
   final CollaboratorIdState collaboratorIdState;
 
   const AddCollaboratorState({
-    this.isLoading = false,
-    required this.authorCatalystId,
-    required this.collaborators,
-    required this.collaboratorIdState,
+    this.authorCatalystId,
+    this.collaborators = const Collaborators(),
+    this.collaboratorIdState = const CollaboratorIdState(),
   });
 
   @override
   List<Object?> get props => [
-    isLoading,
     authorCatalystId,
     collaborators,
     collaboratorIdState,
@@ -27,7 +24,6 @@ class AddCollaboratorState extends Equatable {
     CollaboratorIdState? collaboratorIdState,
   }) {
     return AddCollaboratorState(
-      isLoading: isLoading,
       authorCatalystId: authorCatalystId,
       collaborators: collaborators,
       collaboratorIdState: collaboratorIdState ?? this.collaboratorIdState,
@@ -39,7 +35,12 @@ class CollaboratorIdState extends Equatable {
   final bool isLoading;
   final CollaboratorCatalystId collaboratorId;
 
-  const CollaboratorIdState({this.isLoading = false, required this.collaboratorId});
+  const CollaboratorIdState({
+    this.isLoading = false,
+    this.collaboratorId = const CollaboratorCatalystId.pure(),
+  });
+
+  bool get isValid => collaboratorId.isValid && !collaboratorId.isPure;
 
   @override
   List<Object?> get props => [isLoading, collaboratorId];
