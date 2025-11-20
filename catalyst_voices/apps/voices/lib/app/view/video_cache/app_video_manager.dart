@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:video_player/video_player.dart';
 
+final _logger = Logger('AppVideoManager');
+
 /// Caches [VideoPlayerController] so it can be initialized and reused in different parts
 /// of app.
 class VideoManager extends ValueNotifier<VideoManagerState> {
@@ -21,8 +23,9 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   Future<bool> get isInitialized => _isInitialized.future;
 
   Future<VideoPlayerController> createOrReinitializeController(
-    VideoCacheKey asset,
-  ) async {
+    VideoCacheKey asset, {
+    VideoPlaybackConfig config = const VideoPlaybackConfig(),
+  }) async {
     final key = _createKey(asset.name, asset.package);
     if (value.controllers.containsKey(key)) {
       final controller = value.controllers[key]!;
@@ -31,13 +34,16 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
       // to a new VideoPlayer widget instance, even though controller state remains unchanged
       // it has to do with internal logic of VideoPlayer widget that is not exposed to us
       await controller.initialize();
-      await controller.play();
+      await controller.applyConfig(config);
       return controller;
     }
-    final controller = await _initializeController(asset.name, package: asset.package);
+    final controller = await _initializeController(
+      asset.name,
+      package: asset.package,
+      config: config,
+    );
 
     final newControllers = Map.of(value.controllers)..[key] = controller;
-
     value = value.copyWith(controllers: newControllers);
 
     return controller;
@@ -91,20 +97,22 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   Future<VideoPlayerController> _initializeController(
     String asset, {
     String? package,
+    VideoPlaybackConfig config = const VideoPlaybackConfig(),
   }) async {
     final controller = VideoPlayerController.asset(
       asset,
       package: package,
     );
 
-    await controller.initialize();
-    // TODO(LynxLynxx): extract this to public method so interested widget can
-    // control video playback
-    await controller.setLooping(true);
-    await controller.setVolume(0);
-    await controller.play();
-
-    return controller;
+    try {
+      await controller.initialize();
+      await controller.applyConfig(config);
+      return controller;
+    } catch (e) {
+      _logger.severe('Failed to initialize video controller for $asset: $e');
+      await controller.dispose();
+      rethrow;
+    }
   }
 
   Future<void> _precacheVideos(
@@ -121,8 +129,12 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
           final key = _createKey(asset, videoAssets.package);
           if (value.controllers.containsKey(key)) return;
 
-          final controller = await _initializeController(asset, package: videoAssets.package);
-          newControllers[key] = controller;
+          try {
+            final controller = await _initializeController(asset, package: videoAssets.package);
+            newControllers[key] = controller;
+          } catch (e) {
+            _logger.info('Skipping video asset $asset due to error: $e');
+          }
         }),
       );
 
@@ -174,5 +186,20 @@ class VideoManagerState extends Equatable {
       controllers: controllers ?? this.controllers,
       brightness: brightness.dataOr(this.brightness),
     );
+  }
+}
+
+/// Extension methods for [VideoPlayerController] to apply playback configuration.
+extension on VideoPlayerController {
+  /// Applies the given [VideoPlaybackConfig] to this controller.
+  ///
+  /// This sets the looping behavior, volume, and optionally starts playback
+  /// based on the configuration.
+  Future<void> applyConfig(VideoPlaybackConfig config) async {
+    await setLooping(config.looping);
+    await setVolume(config.volume);
+    if (config.autoPlay) {
+      await play();
+    }
   }
 }

@@ -27,11 +27,6 @@ abstract interface class DocumentRepository {
     DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
 
-  /// Making sure document from [ref] is available locally.
-  Future<void> cacheDocument({
-    required SignedDocumentRef ref,
-  });
-
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef ref,
@@ -51,21 +46,11 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
-  /// Returns list of refs to all published and any refs it may hold.
-  ///
-  /// Its using documents index api.
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs({
-    required Campaign campaign,
-  });
-
   /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   });
-
-  /// Returns list of locally saved signed documents refs.
-  Future<List<TypedDocumentRef>> getCachedDocumentsRefs();
 
   /// If version is not specified in [ref] method will try to return latest
   /// version of document matching [ref].
@@ -77,8 +62,12 @@ abstract interface class DocumentRepository {
   ///
   /// If [DocumentRef] is [DraftRef] it will look for this document in local
   /// storage.
+  ///
+  /// When [useCache] is false [ref] will be looped up only remotely. If [ref] is referees to
+  /// local draft it will throw [DocumentNotFoundException].
   Future<DocumentData> getDocumentData({
     required DocumentRef ref,
+    bool useCache,
   });
 
   /// Useful when recovering account and we want to lookup
@@ -97,6 +86,20 @@ abstract interface class DocumentRepository {
   Future<DocumentData?> getRefToDocumentData({
     required DocumentRef refTo,
     required DocumentType type,
+  });
+
+  /// Looks up all signed document refs according to [filters].
+  ///
+  /// Response is paginated using [page] and [limit].
+  Future<DocumentIndex> index({
+    required int page,
+    required int limit,
+    required DocumentIndexFilters filters,
+  });
+
+  /// Looks up local source if matching document exists.
+  Future<bool> isCached({
+    required DocumentRef ref,
   });
 
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
@@ -135,6 +138,14 @@ abstract interface class DocumentRepository {
   Future<int> removeAll({
     bool keepLocalDrafts,
   });
+
+  /// Saves a list of documents to the appropriate local storage.
+  ///
+  /// This method iterates through the provided list of [documents] and saves
+  /// each one based on its reference type.
+  /// - [DraftRef] documents are saved as drafts.
+  /// - [SignedDocumentRef] documents are saved as local signed documents.
+  Future<void> saveDocumentBulk(List<DocumentData> documents);
 
   /// Saves a pre-parsed and validated document to storage.
   ///
@@ -238,13 +249,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   );
 
   @override
-  Future<void> cacheDocument({required SignedDocumentRef ref}) async {
-    final documentData = await _remoteDocuments.get(ref: ref);
-
-    await _localDocuments.save(data: documentData);
-  }
-
-  @override
   Future<void> deleteDocumentDraft({required DraftRef ref}) {
     return _drafts.delete(ref: ref);
   }
@@ -269,41 +273,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs({
-    required Campaign campaign,
-  }) async {
-    final allRefs = await _remoteDocuments.index(campaign: campaign).then(_uniqueTypedRefs);
-    final allConstRefs = allConstantDocumentRefs.expand((element) => element.all);
-
-    final nonConstRefs = allRefs
-        .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
-        .toList();
-
-    final exactRefs = nonConstRefs.where((ref) => ref.ref.isExact).toList();
-    final looseRefs = nonConstRefs.where((ref) => !ref.ref.isExact).toList();
-
-    final latestLooseRefs = await looseRefs.map((ref) async {
-      final latestVer = await _remoteDocuments.getLatestVersion(ref.ref.id);
-      return latestVer != null ? ref.copyWithVersion(latestVer) : ref;
-    }).wait;
-
-    final allLatestRefs = [
-      ...exactRefs,
-      ...latestLooseRefs,
-    ];
-
-    final uniqueRefs = {
-      // Note. categories are mocked on backend so we can't not fetch them.
-      ...activeConstantDocumentRefs.expand(
-        (element) => element.allTyped.where((e) => !e.type.isCategory),
-      ),
-      ...allLatestRefs,
-    };
-
-    return uniqueRefs.toList();
-  }
-
-  @override
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   }) async {
@@ -314,16 +283,16 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<TypedDocumentRef>> getCachedDocumentsRefs() {
-    return _localDocuments.index();
-  }
-
-  @override
   Future<DocumentData> getDocumentData({
     required DocumentRef ref,
+    bool useCache = true,
   }) async {
     return switch (ref) {
-      SignedDocumentRef() => _getSignedDocumentData(ref: ref),
+      SignedDocumentRef() => _getSignedDocumentData(ref: ref, useCache: useCache),
+      DraftRef() when !useCache => throw DocumentNotFoundException(
+        ref: ref,
+        message: '$ref can not be resolved while not using cache',
+      ),
       DraftRef() => _getDraftDocumentData(ref: ref),
     };
   }
@@ -352,6 +321,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
   }) {
     return _localDocuments.getRefToDocumentData(refTo: refTo, type: type);
+  }
+
+  @override
+  Future<DocumentIndex> index({
+    required int page,
+    required int limit,
+    required DocumentIndexFilters filters,
+  }) {
+    return _remoteDocuments.index(
+      page: page,
+      limit: limit,
+      filters: filters,
+    );
+  }
+
+  @override
+  Future<bool> isCached({required DocumentRef ref}) {
+    return switch (ref) {
+      DraftRef() => _drafts.exists(ref: ref),
+      SignedDocumentRef() => _localDocuments.exists(ref: ref),
+    };
   }
 
   @override
@@ -413,6 +403,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         : await _localDocuments.deleteAll();
 
     return deletedDrafts + deletedDocuments;
+  }
+
+  @override
+  Future<void> saveDocumentBulk(List<DocumentData> documents) async {
+    final signedDocs = documents.where((element) => element.ref is SignedDocumentRef);
+    final draftDocs = documents.where((element) => element.ref is DraftRef);
+
+    final signedDocsSave = signedDocs.isNotEmpty
+        ? _localDocuments.saveAll(signedDocs)
+        : Future(() {});
+    final draftsDocsSave = draftDocs.isNotEmpty ? _drafts.saveAll(draftDocs) : Future(() {});
+
+    await [signedDocsSave, draftsDocsSave].wait;
   }
 
   @override
@@ -635,6 +638,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   Future<DocumentData> _getSignedDocumentData({
     required SignedDocumentRef ref,
+    bool useCache = true,
   }) async {
     // if version is not specified we're asking remote for latest version
     // if remote does not know about this id its probably draft so
@@ -644,16 +648,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       ref = ref.copyWith(version: Optional(latestVersion));
     }
 
-    final isCached = await _localDocuments.exists(ref: ref);
+    final isCached = useCache && await _localDocuments.exists(ref: ref);
     if (isCached) {
       return _localDocuments.get(ref: ref);
     }
 
-    final remoteData = await _remoteDocuments.get(ref: ref);
+    final document = await _remoteDocuments.get(ref: ref);
 
-    await _localDocuments.save(data: remoteData);
+    if (useCache) {
+      await _localDocuments.save(data: document);
+    }
 
-    return remoteData;
+    return document;
   }
 
   bool _isDocumentMetadataValid(DocumentData document) {
@@ -718,22 +724,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return results;
   }
 
-  List<TypedDocumentRef> _uniqueTypedRefs(List<TypedDocumentRef> refs) {
-    final uniqueRefs = <DocumentRef, TypedDocumentRef>{};
-
-    for (final ref in refs) {
-      uniqueRefs.update(
-        ref.ref,
-        // While indexing we don't know what is type of "ref" or "reply".
-        // Here we're trying to eliminate duplicates with unknown type.
-        (value) => value.type != DocumentType.unknown ? value : ref,
-        ifAbsent: () => ref,
-      );
-    }
-
-    return uniqueRefs.values.toList();
-  }
-
   void _validateDocumentMetadata(DocumentData document) {
     if (!_isDocumentMetadataValid(document)) {
       throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformed);
@@ -775,8 +765,4 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     return StreamGroup.merge([updateStream, localStream]);
   }
-}
-
-extension on DocumentType {
-  bool get isCategory => this == DocumentType.categoryParametersDocument;
 }

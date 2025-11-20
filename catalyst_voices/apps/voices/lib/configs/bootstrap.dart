@@ -19,14 +19,11 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-const CatalystProfiler _profiler = _shouldUseSentry
-    ? CatalystSentryProfiler()
-    : CatalystNoopProfiler();
 const ReportingService _reportingService = _shouldUseSentry
     ? SentryReportingService()
     : NoopReportingService();
 
-const _shouldUseSentry = kReleaseMode || kProfileMode;
+const _shouldUseSentry = kReleaseMode;
 
 var _bootstrapInitState = const _BootstrapState();
 
@@ -71,9 +68,14 @@ Future<BootstrapArgs> bootstrap({
   final config = await _getAppConfig(env: environment.type);
   _bootstrapInitState = _bootstrapInitState.copyWith(appConfig: Optional(config));
 
+  if (config.stressTest.isEnabled) {
+    _debugPrintStressTest();
+  }
+
   final endConfigTimestamp = DateTimeExt.now(utc: true);
 
-  await _reportingService.init(config: config.sentry);
+  await _initReportingService(config.sentry);
+
   await cleanUpStorages(onlyOld: true);
   if (!_bootstrapInitState.didInitializeCryptoUtils) {
     await _initCryptoUtils();
@@ -81,19 +83,24 @@ Future<BootstrapArgs> bootstrap({
   }
 
   // profilers
-  final startupProfiler = CatalystStartupProfiler(_profiler)
+  final profiler = _createProfiler(config);
+
+  final startupProfiler = CatalystStartupProfiler(profiler)
     ..start(at: bootstrapStartTimestamp)
     ..appConfig(
       fromTo: DateRange(from: startConfigTimestamp, to: endConfigTimestamp),
     );
+
+  final runtimeProfiler = CatalystRuntimeProfiler(profiler)..start(at: bootstrapStartTimestamp);
 
   await Dependencies.instance.init(
     config: config,
     environment: environment,
     loggingService: _loggingService,
     reportingService: _reportingService,
-    profiler: _profiler,
+    profiler: profiler,
     startupProfiler: startupProfiler,
+    runtimeProfiler: runtimeProfiler,
   );
 
   final router = buildAppRouter(initialLocation: initialLocation);
@@ -101,6 +108,10 @@ Future<BootstrapArgs> bootstrap({
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
   Bloc.observer = AppBlocObserver(logOnChange: false);
+
+  if (config.stressTest.isEnabled && config.stressTest.clearDatabase) {
+    await Dependencies.instance.get<CatalystDatabase>().clear();
+  }
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
   unawaited(
@@ -197,6 +208,32 @@ Future<void> registerDependencies({
   );
 }
 
+/// Creates the appropriate profiler based on the current build mode.
+///
+/// Returns:
+/// - [CatalystDeveloperProfiler] when running in profile mode
+/// - [CatalystSentryProfiler] when running in release mode
+/// - [CatalystNoopProfiler] for debug mode (no overhead)
+CatalystProfiler _createProfiler(AppConfig config) {
+  if (kProfileMode) {
+    return CatalystDeveloperProfiler.fromConfig(config.developerProfiler);
+  }
+
+  if (_shouldUseSentry) {
+    return const CatalystSentryProfiler();
+  }
+
+  return const CatalystNoopProfiler();
+}
+
+void _debugPrintStressTest() {
+  if (!kProfileMode) {
+    debugPrint('Warning. StressTest is enabled for non profile mode');
+  } else {
+    debugPrint('Running in StressTest environment');
+  }
+}
+
 Widget _defaultBuilder(BootstrapArgs args) {
   return App(
     routerConfig: args.routerConfig,
@@ -225,7 +262,8 @@ Future<void> _doBootstrapAndRun(
 Future<AppConfig> _getAppConfig({
   required AppEnvironmentType env,
 }) async {
-  final api = ApiServices(env: env);
+  final config = ApiConfig(env: env);
+  final api = ApiServices(config: config);
   final source = ApiConfigSource(api);
   final service = ConfigService(ConfigRepository(source));
   return service.getAppConfig(env: env);
@@ -238,6 +276,18 @@ Future<void> _initCryptoUtils() async {
   CatalystPrivateKey.factory = const Bip32Ed25519XCatalystPrivateKeyFactory();
   CatalystPublicKey.factory = const Bip32Ed25519XCatalystPublicKeyFactory();
   CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
+}
+
+Future<void> _initReportingService(SentryConfig sentryConfig) async {
+  await _reportingService.init(config: sentryConfig).onError(
+    (error, stackTrace) {
+      _loggerBootstrap.info(
+        'Failed to initialize ReportingService. App will continue without error reporting.',
+        error,
+        stackTrace,
+      );
+    },
+  );
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {

@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_header.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_nav_tile.dart';
-import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_selectors/user_proposal_selectors.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/discovery_overview_proposal.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space_overview_container.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -26,7 +26,7 @@ class DiscoveryOverview extends StatelessWidget {
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           Expanded(
             child: SingleChildScrollView(
-              child: _PublishedProposalSelector(),
+              child: _PublishedProposal(),
             ),
           ),
         ],
@@ -67,8 +67,8 @@ class _FeedbackTile extends StatelessWidget {
   }
 }
 
-class _PublishedProposalSelector extends StatelessWidget {
-  const _PublishedProposalSelector();
+class _PublishedProposal extends StatelessWidget {
+  const _PublishedProposal();
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,7 @@ class _PublishedProposalSelector extends StatelessWidget {
       builder: (context, state) {
         return Offstage(
           offstage: state,
-          child: const DiscoveryOverviewProposalSelector(),
+          child: const DiscoveryOverviewProposal(),
         );
       },
     );

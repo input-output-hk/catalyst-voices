@@ -29,6 +29,7 @@ packageLicenseOverride:
   remote_widgets_example: Apache-2.0
   catalyst_voices_view_models: Apache-2.0
   catalyst_voices_blocs: Apache-2.0
+  catalyst_voices_dev: Apache-2.0
   catalyst_voices_driver: Apache-2.0
   catalyst_voices_shared: Apache-2.0
   catalyst_voices_brands: Apache-2.0

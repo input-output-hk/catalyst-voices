@@ -45,33 +45,35 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<List<TypedDocumentRef>> index() {
-    return _database.draftsDao.queryAllTypedRefs();
-  }
-
-  @override
   Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
     final documentEntities = await _database.draftsDao.queryVersionsOfId(id: id);
     return documentEntities.map((e) => e.toModel()).toList();
   }
 
   @override
-  Future<void> save({required DocumentData data}) async {
-    final idHiLo = UuidHiLo.from(data.metadata.id);
-    final verHiLo = UuidHiLo.from(data.metadata.version);
+  Future<void> save({required DocumentData data}) => saveAll([data]);
 
-    final draft = DocumentDraftEntity(
-      idHi: idHiLo.high,
-      idLo: idHiLo.low,
-      verHi: verHiLo.high,
-      verLo: verHiLo.low,
-      type: data.metadata.type,
-      content: data.content,
-      metadata: data.metadata,
-      title: data.content.title ?? '',
+  @override
+  Future<void> saveAll(Iterable<DocumentData> data) async {
+    final entities = data.map(
+      (data) {
+        final idHiLo = UuidHiLo.from(data.metadata.id);
+        final verHiLo = UuidHiLo.from(data.metadata.version);
+
+        return DocumentDraftEntity(
+          idHi: idHiLo.high,
+          idLo: idHiLo.low,
+          verHi: verHiLo.high,
+          verLo: verHiLo.low,
+          type: data.metadata.type,
+          content: data.content,
+          metadata: data.metadata,
+          title: data.content.title ?? '',
+        );
+      },
     );
 
-    await _database.draftsDao.save(draft);
+    await _database.draftsDao.saveAll(entities);
   }
 
   @override

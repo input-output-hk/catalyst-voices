@@ -1,9 +1,12 @@
 {
-    admin :8081
-    metrics
+	admin :8081
+	metrics
 }
 http://:8080 {
-    root * /app
+	root * /app
+
+    # Compress on-the-fly if not precompressed
+    encode
 
     handle /healthz {
         respond `{"status":"ok"}` 200
@@ -11,20 +14,29 @@ http://:8080 {
 
     handle {
         try_files {path} /index.html
-        file_server
+        file_server {
+            # default order br zstd gzip
+            precompressed
+        }
     }
 
-    header {
-        Cross-Origin-Opener-Policy "same-origin"
-        Cross-Origin-Embedder-Policy "require-corp"
+	header {
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Embedder-Policy "require-corp"
+		Cross-Origin-Resource-Policy "same-origin"
 
-        / Cache-Control "public, max-age=3600, must-revalidate"
-    }
+		?Cache-Control "public, max-age=3600, must-revalidate"
+	}
 
-    handle_errors {
-        rewrite * /50x.html
-        file_server
-    }
+	@index_html path /index.html
+	header @index_html Cache-Control "no-cache, must-revalidate"
 
-    log
+	import /app/versioned_assets.caddy
+
+	handle_errors {
+		rewrite * /50x.html
+		file_server
+	}
+
+	log
 }

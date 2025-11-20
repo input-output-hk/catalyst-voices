@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_assets/src/catalyst_svg_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:vector_graphics/vector_graphics.dart';
 
 /// Builds an svg icon using [SvgPicture] via [CatalystSvgPicture] but on
 /// top of that extracts configuration from [IconTheme] like
@@ -79,7 +80,6 @@ class CatalystSvgIcon extends StatelessWidget {
     super.key,
     AssetBundle? bundle,
     String? package = 'catalyst_voices_assets',
-    SvgTheme? theme,
     this.size,
     this.allowSize = true,
     this.fit = BoxFit.contain,
@@ -97,11 +97,10 @@ class CatalystSvgIcon extends StatelessWidget {
          color == null || colorFilter == null,
          'Either color or colorFilter is supported but not both',
        ),
-       bytesLoader = SvgAssetLoader(
+       bytesLoader = AssetBytesLoader(
          assetName,
          packageName: package,
          assetBundle: bundle,
-         theme: theme,
        );
 
   ColorFilter? get _colorFilter {

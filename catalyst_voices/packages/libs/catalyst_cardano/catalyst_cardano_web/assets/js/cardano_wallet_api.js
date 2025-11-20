@@ -1,7 +1,4 @@
-import {
-  CardanoWalletInfoCodeError,
-  CardanoWalletPaginateError,
-} from "./cardano_wallet_error.js";
+import { CardanoWalletInfoCodeError, CardanoWalletPaginateError } from "./cardano_wallet_error.js";
 
 /**
  * The initial API of the CIP-30 wallet interface: https://cips.cardano.org/cip/CIP-30#initial-api.
@@ -30,7 +27,7 @@ export class CardanoWalletInitialApi {
    */
   async enable(...args) {
     try {
-      const fullApi = await this.delegate.enable(...args);
+      const fullApi = await this.delegate.enable(..._normalizeArgs(args));
       return new CardanoWalletFullApi(fullApi);
     } catch (err) {
       throw _mapError(err);
@@ -169,7 +166,7 @@ export class CardanoWalletFullApi {
    */
   async getUtxos(...args) {
     try {
-      return await this.delegate.getUtxos(...args);
+      return await this.delegate.getUtxos(..._normalizeArgs(args));
     } catch (err) {
       throw _mapError(err);
     }
@@ -195,7 +192,7 @@ export class CardanoWalletFullApi {
    */
   async getUsedAddresses(...args) {
     try {
-      return await this.delegate.getUsedAddresses(...args);
+      return await this.delegate.getUsedAddresses(..._normalizeArgs(args));
     } catch (err) {
       throw _mapError(err);
     }
@@ -247,7 +244,7 @@ export class CardanoWalletFullApi {
    */
   async signTx(...args) {
     try {
-      return await this.delegate.signTx(...args);
+      return await this.delegate.signTx(..._normalizeArgs(args));
     } catch (err) {
       throw _mapError(err);
     }
@@ -260,7 +257,7 @@ export class CardanoWalletFullApi {
    */
   async signData(...args) {
     try {
-      return await this.delegate.signData(...args);
+      return await this.delegate.signData(..._normalizeArgs(args));
     } catch (err) {
       throw _mapError(err);
     }
@@ -273,7 +270,7 @@ export class CardanoWalletFullApi {
    */
   async submitTx(...args) {
     try {
-      return await this.delegate.submitTx(...args);
+      return await this.delegate.submitTx(..._normalizeArgs(args));
     } catch (err) {
       throw _mapError(err);
     }
@@ -346,7 +343,7 @@ export class CardanoWalletCip95Api {
    */
   async signTx(...args) {
     try {
-      return await this.delegate.signTx(...args);
+      return await this.delegate.signTx(..._normalizeArgs(args));
     } catch (err) {
       throw _mapError(err);
     }
@@ -359,11 +356,24 @@ export class CardanoWalletCip95Api {
    */
   async signData(...args) {
     try {
-      return await this.delegate.signData(...args);
+      return await this.delegate.signData(..._normalizeArgs(args));
     } catch (err) {
       throw _mapError(err);
     }
   }
+}
+
+/**
+ * Normalizes the args by replacing `null` values by `undefined`.
+ *
+ * CIP-30 specification makes implicit use of undefined values to detect that argument has not been passed.
+ * However from the dart side the wasm is not able to represent undefined values and is translating them to nulls.
+ * Therefore here we need to translate these nulls back into undefined values to be compatible with the specification.
+ * 
+ * See: https://api.flutter.dev/flutter/dart-js_interop/NullableUndefineableJSAnyExtension.html
+ */
+function _normalizeArgs(args) {
+  return args.map((arg) => (arg === null ? undefined : arg));
 }
 
 /**

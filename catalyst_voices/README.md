@@ -6,19 +6,22 @@ This repository contains the Catalyst Voices app and packages.
 
 * [Catalyst Voices](#catalyst-voices)
     * [Requirements](#requirements)
+    * [Recommended VS code plugins](#recommended-vs-code-plugins)
     * [Platforms](#platforms)
     * [Getting Started](#getting-started)
         * [Bootstrapping](#bootstrapping)
         * [Packages](#packages)
         * [Environment Type vs Flavor](#environment-type-vs-flavor)
         * [Environment types](#environment-types)
+            * [Stress Test](#stress-test)
+            * [Debug Performance Flags](#debug-performance-flags)
         * [Flavor types](#flavor-types)
         * [Environment variables](#environment-variables)
             * [Environment config](#environment-config)
-        * [Code Generation](#code-generation)
-            * [Running Code Generation](#running-code-generation)
+    * [Code Generation](#code-generation)
+            *[Running Code Generation](#running-code-generation)
                 * [Basic Generation](#basic-generation)
-                * [Local Saving](#local-saving)
+                *[Local Saving](#local-saving)
             * [GitHub Token / PAT Setup](#github-token--pat-setup)
             * [Security Notes](#security-notes)
     * [Running Tests](#running-tests)
@@ -76,6 +79,7 @@ just bootstrap
 | [catalyst_voices_services](./packages/internal/catalyst_voices_services/)         | Services |[example](./packages/internal/catalyst_voices_services/)|
 | [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
 | [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
+| [catalyst_voices_dev](./packages/internal/catalyst_voices_dev/)                   | Dev | [example](./packages/internal/catalyst_voices_dev/)|
 
 ### Environment Type vs Flavor
 
@@ -121,6 +125,39 @@ flutter run --target lib/configs/main.dart --dart-define=ENV_NAME=prod -d chrome
 
 > Catalyst Voices works on the Web only.
 > We plan to add support for other targets later.
+
+#### Stress Test
+
+Each environment can be launched in stress test.
+It will use local version of Gateway and produce as many proposals as configured (defaults to 100).
+Use following `--dart-define` variables to configure your setup:
+
+* `--dart-define=STRESS_TEST=true` to enable
+* `--dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=100` says how many proposals will be produced
+* `--dart-define=STRESS_TEST_DECOMPRESSED=false` if signed documents should be compressed or not
+
+#### Debug Performance Flags
+
+Each environment can be launched with additional debug performance flags on web in `Profile` mode
+There is four performance flags to choose from:
+
+* **debugProfileBuildsEnabled:** Adds Timeline events for every Widget built.
+* **debugProfileBuildsEnabledUserWidgets:** Adds Timeline events for every user-created Widget built.
+* **debugProfileLayoutsEnabled:** Adds Timeline events for every RenderObject layout.
+* **debugProfilePaintsEnabled:** Adds Timeline events for every RenderObject painted.
+
+To use following `--dart-define` variables to configure your setup:
+
+* `--dart-define=DEBUG_PROFILE_BUILDS_ENABLED` to enable debugProfileBuildsEnabled
+* `--dart-define=DEBUG_PROFILE_BUILDS_ENABLED_USER_WIDGETS` to enable debugProfileBuildsEnabledUserWidgets
+* `--dart-define=DEBUG_PROFILE_LAYOUTS_ENABLED` to enable debugProfileLayoutsEnabled
+* `--dart-define=DEBUG_PROFILE_PAINTS_ENABLED` to enable debugProfilePaintsEnabled
+
+There is `--dart-define` variable to enable all four performance flags at once:
+
+* `--dart-define=DEBUG_PROFILE_DEVELOPER_PROFILER_ENABLE_ALL`
+
+Remember to also use `--profile` mode when running the app.
 
 ### Flavor types
 

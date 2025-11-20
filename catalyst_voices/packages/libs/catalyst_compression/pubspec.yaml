@@ -44,4 +44,4 @@ flutter:
       windows:
         ffiPlugin: true
   assets:
-    - assets/js/
+    - assets/js/v1/

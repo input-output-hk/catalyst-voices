@@ -19,7 +19,7 @@ class InsertImageError extends StatelessWidget {
             SizedBox(
               width: 32,
               height: 32,
-              child: VoicesAssets.images.insertImageError.buildIcon(),
+              child: VoicesAssets.images.svg.insertImageError.buildIcon(),
             ),
             const SizedBox(height: 12),
             Text(

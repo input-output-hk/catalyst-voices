@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -83,12 +84,6 @@ void main() {
 class MockActiveCampaignObserver extends Mock implements ActiveCampaignObserver {}
 
 class MockCastedVotesObserver extends Mock implements CastedVotesObserver {}
-
-class MockDocumentRepository extends Mock implements DocumentRepository {}
-
-class MockKeychain extends Mock implements Keychain {}
-
-class MockProposalRepository extends Mock implements ProposalRepository {}
 
 class MockSignerService extends Mock implements SignerService {}
 

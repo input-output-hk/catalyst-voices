@@ -5,6 +5,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 const _maxRecentProposalsCount = 7;
@@ -20,7 +21,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   StreamSubscription<List<Proposal>>? _proposalsSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
 
-  DiscoveryCubit(this._campaignService, this._proposalService) : super(DiscoveryState());
+  DiscoveryCubit(this._campaignService, this._proposalService) : super(const DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
@@ -53,8 +54,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     try {
       emit(
         state.copyWith(
-          campaign: DiscoveryCurrentCampaignState(),
-          categories: const DiscoveryCampaignCategoriesState(),
+          campaign: const DiscoveryCampaignState(),
         ),
       );
       final campaign = (await _campaignService.getActiveCampaign())!;
@@ -63,18 +63,17 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       final categoriesModel = campaign.categories
           .map(CampaignCategoryDetailsViewModel.fromModel)
           .toList();
+      final datesEvents = _buildCampaignDatesEvents(timeline);
 
       if (!isClosed) {
         emit(
           state.copyWith(
-            campaign: DiscoveryCurrentCampaignState(
+            campaign: DiscoveryCampaignState(
               currentCampaign: currentCampaign,
               campaignTimeline: timeline,
-              isLoading: false,
-            ),
-            categories: DiscoveryCampaignCategoriesState(
-              isLoading: false,
               categories: categoriesModel,
+              datesEvents: datesEvents,
+              isLoading: false,
             ),
           ),
         );
@@ -85,8 +84,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       if (!isClosed) {
         emit(
           state.copyWith(
-            categories: DiscoveryCampaignCategoriesState(error: LocalizedException.create(e)),
-            campaign: DiscoveryCurrentCampaignState(error: LocalizedException.create(e)),
+            campaign: DiscoveryCampaignState(error: LocalizedException.create(e)),
           ),
         );
       }
@@ -133,6 +131,51 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       _logger.severe('Error adding favorite', e, st);
       emitError(LocalizedException.create(e));
     }
+  }
+
+  CampaignDatesEventsState _buildCampaignDatesEvents(
+    List<CampaignTimelineViewModel> campaignTimeline,
+  ) {
+    final reviewItems =
+        [
+              campaignTimeline.firstWhereOrNull(
+                (e) => e.type == CampaignPhaseType.reviewRegistration,
+              ),
+              campaignTimeline.firstWhereOrNull(
+                (e) => e.type == CampaignPhaseType.communityReview,
+              ),
+            ]
+            .whereType<CampaignTimelineViewModel>()
+            .map(
+              (e) => CampaignTimelineEventWithTitle(
+                dateRange: e.timeline,
+                type: e.type,
+              ),
+            )
+            .toList();
+
+    final votingItems =
+        [
+              campaignTimeline.firstWhereOrNull(
+                (e) => e.type == CampaignPhaseType.votingRegistration,
+              ),
+              campaignTimeline.firstWhereOrNull(
+                (e) => e.type == CampaignPhaseType.communityVoting,
+              ),
+            ]
+            .whereType<CampaignTimelineViewModel>()
+            .map(
+              (e) => CampaignTimelineEventWithTitle(
+                dateRange: e.timeline,
+                type: e.type,
+              ),
+            )
+            .toList();
+
+    return CampaignDatesEventsState(
+      reviewTimelineItems: reviewItems,
+      votingTimelineItems: votingItems,
+    );
   }
 
   StreamSubscription<List<String>> _buildFavoritesProposalsIdsSub() {
@@ -193,7 +236,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     emit(
       state.copyWith(
         proposals: state.proposals.copyWith(
-          isLoading: false,
           proposals: proposalList,
         ),
       ),

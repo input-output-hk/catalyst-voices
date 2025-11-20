@@ -1,16 +1,14 @@
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/src/catalyst_voices_models.dart';
 import 'package:test/test.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   group(DetailProposal, () {
     test('check if versions are sorted from latest to oldest', () async {
-      final proposalId = const Uuid().v7();
-      final versionId1 = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 1), () {});
-      final versionId2 = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 1), () {});
-      final versionId3 = const Uuid().v7();
+      final proposalId = DocumentRefFactory.randomUuidV7();
+      final versionId1 = DocumentRefFactory.randomUuidV7();
+      final versionId2 = DocumentRefFactory.randomUuidV7();
+      final versionId3 = DocumentRefFactory.randomUuidV7();
 
       final proposalWithVersions = DetailProposal(
         selfRef: DocumentRef.build(
@@ -74,10 +72,9 @@ void main() {
     });
 
     test('check if proposal without version is the oldest', () async {
-      final proposalId = const Uuid().v7();
-      final versionId1 = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 1), () {});
-      final versionId2 = const Uuid().v7();
+      final proposalId = DocumentRefFactory.randomUuidV7();
+      final versionId1 = DocumentRefFactory.randomUuidV7();
+      final versionId2 = DocumentRefFactory.randomUuidV7();
 
       final proposalWithVersions = DetailProposal(
         selfRef: DocumentRef.build(
