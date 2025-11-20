@@ -100,9 +100,7 @@ def proposal_doc_factory(rbac_chain_factory):
             "type": DOC_TYPE["proposal"],
             "content-type": "application/json",
             "content-encoding": "br",
-            "parameters": [
-                {"id": template_id, "ver": template_id, "cid": "0x"},
-            ],
+            "parameters": [],
         }
         body = JSF(template_schema).generate()
 
@@ -172,33 +170,49 @@ def category_parameters_doc_factory(rbac_chain_factory):
 @pytest.fixture
 def category_parameters_form_template_doc_factory(rbac_chain_factory):
     def __factory__() -> tuple[SignedDocument, RoleID]:
-        role_id = RoleID.PROPOSER
-        rbac_chain = rbac_chain_factory()
-        doc_id = uuid_v7.uuid_v7()
-        metadata = {
-            "id": doc_id,
-            "ver": doc_id,
-            "type": DOC_TYPE["category_parameters_form_template"],
-            "content-type": "application/json",
-            "content-encoding": "br",
-        }
-        with open("./test_data/signed_docs/category_parameters_form_template.json", "r") as json_file:
-            content = json.load(json_file)
-
-        doc_builder = SignedDocument(metadata, content)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        builder = generic_doc_builder(
+            rbac_chain_factory(),
+            DOC_TYPE["category_parameters_form_template"],
+            [],
+            {}
+        )
         
         resp = document.put(
-            data=doc_builder.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
+            data=builder["signed_doc"],
+            token=builder["auth_token"],
         )
         assert (
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        return doc_builder, role_id
+        return builder["doc_builder"], builder["role_id"]
 
     return __factory__
+
+def generic_doc_builder(rbac_chain, doc_type: str, parameters: list[dict], content: Any):
+    role_id = RoleID.PROPOSER
+    doc_id = uuid_v7.uuid_v7()
+    metadata = {
+        "content-encoding": "br",
+        "content-type": "application/json",
+        "id": doc_id,
+        "ver": doc_id,
+        "type": doc_type,
+        "parameters": parameters,
+    }
+
+    doc_builder = SignedDocument(metadata, content)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+
+    return {
+        "metadata": metadata,
+        "content": content,
+        "doc_builder": doc_builder,
+        "signed_doc": doc_builder.build_and_sign(cat_id, sk_hex),
+        "auth_token": rbac_chain.auth_token(),
+        "cat_id": cat_id,
+        "role_id": role_id
+    }
 
 
 def build_signed_doc(
