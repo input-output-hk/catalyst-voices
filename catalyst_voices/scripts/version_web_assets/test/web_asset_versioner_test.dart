@@ -46,7 +46,7 @@ void main() {
 
     test("WebAssetVersioner find manually version files", () async {
       expect(assetVersionData['asset_hashes']['sqlite3.wasm'], '1');
-      expect(assetVersionData['asset_hashes']['drift_worker.js'], '');
+      expect(assetVersionData['asset_hashes']['drift_worker.js'], '1');
     });
 
     test(
