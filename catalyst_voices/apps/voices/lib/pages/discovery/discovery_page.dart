@@ -2,16 +2,13 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
-import 'package:catalyst_voices/pages/co_proposers/widgets/add_collaborator/add_collaborator_dialog.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_details/campaign_details.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals/most_recent_proposals.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/stay_involved.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -32,27 +29,6 @@ class _Body extends StatelessWidget {
         SliverList(
           delegate: SliverChildListDelegate(
             [
-              BlocSelector<SessionCubit, SessionState, CatalystId?>(
-                selector: (state) => state.account?.catalystId,
-                builder: (context, catalystId) {
-                  if (catalystId != null) {
-                    return VoicesOutlinedButton(
-                      child: const Text('Dialog'),
-                      onTap: () async {
-                        final collaborator = await AddCollaboratorDialog.show(
-                          context,
-                          authorId: catalystId,
-                        );
-                        if (context.mounted) {
-                          print(collaborator);
-                        }
-                      },
-                    );
-                  }
-                  return const SizedBox();
-                },
-              ),
-
               const CampaignHeroSection(),
               const HowItWorks(),
               const CampaignDetails(),
