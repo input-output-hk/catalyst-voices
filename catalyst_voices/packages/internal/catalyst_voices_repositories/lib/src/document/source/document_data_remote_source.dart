@@ -3,7 +3,6 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
-import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
 import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
 import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
@@ -103,13 +102,9 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
     required Campaign campaign,
   }) async {
-    assert(campaign.categories.length <= 10, 'Max 10 categories are allowed in the filter.');
-
-    final categoryFilter = campaign.categories
-        .take(10)
-        .map((e) => IdAndVerRef.idOnly(EqOrRangedId.eq(e.selfRef.id)))
-        .toList();
-    final documentFilter = DocumentIndexQueryFilter(category: categoryFilter);
+    final categoryIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    final categoryFilter = IdAndVerRef.idOnly(IdSelector.inside(categoryIds));
+    final documentFilter = DocumentIndexQueryFilter(category: [categoryFilter]);
 
     return _api.gateway
         .documentIndex(
