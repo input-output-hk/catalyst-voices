@@ -163,7 +163,7 @@ async fn checker_api_catalyst_auth(
 
     // Step 8: Get the latest stable signing certificate registered for Role 0.
     let (latest_pk, _) = reg_chain
-        .get_latest_signing_pk_for_role(RoleId::Role0)
+        .get_latest_signing_public_key_for_role(RoleId::Role0)
         .ok_or_else(|| {
             debug!(
                 "Unable to get last signing key for {} Catalyst ID",

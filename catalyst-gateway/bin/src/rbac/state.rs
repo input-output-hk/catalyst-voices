@@ -145,7 +145,7 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
             .map(|v| v.is_some())
     }
 
-    async fn chain_catalyst_id_from_signing_pk(
+    async fn chain_catalyst_id_from_signing_public_key(
         &self,
         key: &VerifyingKey,
     ) -> anyhow::Result<Option<CatalystId>> {
@@ -173,11 +173,15 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
         Ok(None)
     }
 
-    async fn take_stake_address_from_chains(
+    async fn take_stake_address_from_chains<I>(
         &mut self,
-        addresses: impl Iterator<Item = cardano_chain_follower::StakeAddress> + Send,
-    ) -> anyhow::Result<()> {
-        for addr in addresses {
+        addresses: I,
+    ) -> anyhow::Result<()>
+    where
+        I: IntoIterator<Item = StakeAddress> + Send,
+        <I as IntoIterator>::IntoIter: Send,
+    {
+        for addr in addresses.into_iter() {
             if let Some(cat_id) =
                 catalyst_id_from_stake_address(&addr, self.is_persistent, self.context).await?
             {

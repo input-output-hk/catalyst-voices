@@ -191,7 +191,7 @@ impl Rbac509InsertQuery {
         let public_keys = reg
             .all_roles()
             .iter()
-            .filter_map(|v| reg.signing_pk_for_role(*v))
+            .filter_map(|v| reg.signing_public_key_for_role(*v))
             .collect::<HashSet<_>>();
         let modified_chains = state.consume();
         let purpose = reg.purpose();
@@ -262,7 +262,7 @@ impl Rbac509InsertQuery {
         let public_keys = reg
             .all_roles()
             .iter()
-            .filter_map(|v| reg.signing_pk_for_role(*v))
+            .filter_map(|v| reg.signing_public_key_for_role(*v))
             .collect::<HashSet<_>>();
         let modified_chains = state.consume();
         let purpose = reg.purpose();
