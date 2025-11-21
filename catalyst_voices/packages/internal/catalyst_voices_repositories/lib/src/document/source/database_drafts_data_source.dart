@@ -24,9 +24,9 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   @override
   Future<int> delete({
     DocumentRef? ref,
-    List<DocumentType>? typeNotIn,
+    List<DocumentType>? excludeTypes,
   }) {
-    return _database.localDocumentsV2Dao.deleteWhere(ref: ref, typeNotIn: typeNotIn);
+    return _database.localDocumentsV2Dao.deleteWhere(ref: ref, excludeTypes: excludeTypes);
   }
 
   @override

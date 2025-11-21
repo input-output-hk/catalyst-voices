@@ -20,12 +20,12 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
 
   /// Deletes documents matching the provided filters.
   ///
-  /// * [typeNotIn]: If provided, deletes all documents *except* those
+  /// * [excludeTypes]: If provided, deletes all documents *except* those
   ///   matching the types in this list.
   ///
   /// Returns the number of records deleted.
   Future<int> delete({
-    List<DocumentType>? typeNotIn,
+    List<DocumentType>? excludeTypes,
   });
 
   /// Checks if a specific document exists in local storage.

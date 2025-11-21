@@ -9,11 +9,11 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
   /// Deletes drafts matching the criteria.
   ///
   /// * [ref]: If provided, deletes the specific draft.
-  /// * [typeNotIn]: Deletes all drafts NOT matching these types (often used for cleanup).
+  /// * [excludeTypes]: Deletes all drafts NOT matching these types (often used for cleanup).
   @override
   Future<int> delete({
     DocumentRef? ref,
-    List<DocumentType>? typeNotIn,
+    List<DocumentType>? excludeTypes,
   });
 
   /// Updates the content of an existing draft identified by [ref].

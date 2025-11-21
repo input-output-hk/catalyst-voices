@@ -410,8 +410,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool keepLocalDrafts = false,
   }) async {
     final deletedDrafts = keepLocalDrafts ? 0 : await _drafts.delete();
-    final typeNotIn = keepLocalDrafts ? [DocumentType.proposalTemplate] : null;
-    final deletedDocuments = await _localDocuments.delete(typeNotIn: typeNotIn);
+    final excludeTypes = keepLocalDrafts ? [DocumentType.proposalTemplate] : null;
+    final deletedDocuments = await _localDocuments.delete(excludeTypes: excludeTypes);
 
     return deletedDrafts + deletedDocuments;
   }
