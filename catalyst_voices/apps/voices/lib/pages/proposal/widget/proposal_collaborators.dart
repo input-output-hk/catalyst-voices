@@ -105,9 +105,9 @@ class _Status extends StatelessWidget {
     return switch (status) {
       CollaboratorInviteStatus.pending => const Color(0xFFB5B5B5),
       CollaboratorInviteStatus.accepted => Theme.of(context).colors.iconsSuccess,
-      CollaboratorInviteStatus.rejected => Theme.of(context).colors.iconsError,
-      CollaboratorInviteStatus.left ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.iconsDisabled,
+      CollaboratorInviteStatus.rejected ||
+      CollaboratorInviteStatus.removed => Theme.of(context).colors.iconsError,
+      CollaboratorInviteStatus.left => Theme.of(context).colors.iconsDisabled,
     };
   }
 
@@ -125,9 +125,9 @@ class _Status extends StatelessWidget {
     return switch (status) {
       CollaboratorInviteStatus.pending ||
       CollaboratorInviteStatus.accepted ||
-      CollaboratorInviteStatus.rejected => Theme.of(context).colors.textOnPrimaryLevel1,
-      CollaboratorInviteStatus.left ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.textDisabled,
+      CollaboratorInviteStatus.rejected ||
+      CollaboratorInviteStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
+      CollaboratorInviteStatus.left => Theme.of(context).colors.textDisabled,
     };
   }
 }
@@ -166,9 +166,9 @@ class _Username extends StatelessWidget {
     return switch (status) {
       CollaboratorInviteStatus.pending ||
       CollaboratorInviteStatus.accepted ||
-      CollaboratorInviteStatus.rejected => Theme.of(context).colors.textOnPrimaryLevel1,
-      CollaboratorInviteStatus.left ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.textDisabled,
+      CollaboratorInviteStatus.rejected ||
+      CollaboratorInviteStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
+      CollaboratorInviteStatus.left => Theme.of(context).colors.textDisabled,
     };
   }
 }
