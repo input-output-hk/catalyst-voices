@@ -28,7 +28,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// ## Signed Document Type.  
     ///
     /// The document type must match one of the
-    /// [Registered Document Types](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+    /// [Registered Document Types](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/)
     ///
     /// UUIDv4 Formatted 128bit value.
     #[oai(rename = "type", skip_serializing_if_is_none)]
@@ -36,99 +36,69 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// ## Document ID
     ///
     /// Either an absolute single Document ID or a range of
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+    /// [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
     #[oai(skip_serializing_if_is_none)]
     id: Option<IdSelectorDocumented>,
     /// ## Document Version
     ///
     /// Either an absolute single Document Version or a range of
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+    /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
     #[oai(skip_serializing_if_is_none)]
     ver: Option<VerSelectorDocumented>,
     /// ## Document Reference
     ///
-    /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
+    /// A [reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ref)
     /// to another signed document.  This fields can match any reference that matches the
-    /// defined [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+    /// defined [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
     /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+    /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
     ///
     /// The kind of document that the reference refers to is defined by the
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+    /// [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/)
     #[oai(rename = "ref", skip_serializing_if_is_none)]
-    doc_ref: Option<IdAndVerRefDocumentedList>,
+    doc_ref: Option<IdAndVerRefDocumented>,
     /// ## Document Template
     ///
     /// Documents that are created based on a template include the
-    /// [template reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#template-template-reference)
+    /// [template reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#template)
     /// to another signed document.  This fields can match any template reference that
-    /// matches the defined [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+    /// matches the defined [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
     /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+    /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
     ///
     /// The kind of document that the reference refers to is defined by the
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+    /// [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/)
     /// however, it will always be a template type document that matches the document
     /// itself.
     #[oai(skip_serializing_if_is_none)]
-    template: Option<IdAndVerRefDocumentedList>,
+    template: Option<IdAndVerRefDocumented>,
     /// ## Document Reply
     ///
     /// This is a
-    /// [reply reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#reply-reply-reference)
+    /// [reply reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#reply)
     /// which links one document to another, when acting as a reply to it.
     /// Replies typically reference the same kind of document.
     /// This fields can match any reply reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+    /// [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
     /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+    /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
     ///
     /// The kind of document that the reference refers to is defined by the
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
+    /// [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    reply: Option<IdAndVerRefDocumentedList>,
-    /// ## Brand
+    reply: Option<IdAndVerRefDocumented>,
+    /// ## Parameters
     ///
-    /// This is a
-    /// [brand reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#brand_id)
-    /// to a brand document which defines the brand the document falls under.
-    /// This fields can match any brand reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+    /// This is a reference to a configuration document.
+    /// This fields can match any reference that matches the defined
+    /// [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
     /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+    /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
     ///
-    /// Whether a Document Type has a brand reference is defined by its
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
+    /// Whether a Document Type has a brand, campaign, category etc. reference is defined
+    /// by its [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    brand: Option<IdAndVerRefDocumentedList>,
-    /// ## Campaign
-    ///
-    /// This is a
-    /// [campaign reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#campaign_id)
-    /// to a campaign document which defines the campaign the document falls under.
-    /// This fields can match any campaign reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-    /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-    ///
-    /// Whether a Document Type has a campaign reference is defined by its
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-    #[oai(skip_serializing_if_is_none)]
-    campaign: Option<IdAndVerRefDocumentedList>,
-    /// ## Category
-    ///
-    /// This is a
-    /// [category reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#category_id)
-    /// to a category document which defines the category the document falls under.
-    /// This fields can match any category reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-    /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-    ///
-    /// Whether a Document Type has a category reference is defined by its
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-    #[oai(skip_serializing_if_is_none)]
-    category: Option<IdAndVerRefDocumentedList>,
+    parameters: Option<IdAndVerRefDocumented>,
 }
 
 impl Example for DocumentIndexQueryFilterV2 {
@@ -140,8 +110,7 @@ impl Example for DocumentIndexQueryFilterV2 {
             doc_ref: Some(Example::example()),
             template: Some(Example::example()),
             reply: Some(Example::example()),
-            brand: Some(Example::example()),
-            ..Default::default()
+            parameters: Some(Example::example()),
         }
     }
 }
@@ -223,53 +192,20 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         {
             db_filter = db_filter.with_ver(version);
         }
-        if let Some(doc_refs) = value.doc_ref {
-            let doc_refs = doc_refs
-                .0
-                .into_iter()
-                .map(TryInto::try_into)
-                .collect::<Result<Vec<_>, _>>()?;
-
-            for doc_ref in doc_refs {
-                db_filter = db_filter.with_ref(doc_ref);
-            }
+        if let Some(doc_ref) = value.doc_ref {
+            db_filter = db_filter.with_ref(doc_ref.try_into()?);
         }
-        if let Some(templates) = value.template {
-            let templates = templates
-                .0
-                .into_iter()
-                .map(TryInto::try_into)
-                .collect::<Result<Vec<_>, _>>()?;
-
-            for template in templates {
-                db_filter = db_filter.with_template(template);
-            }
+        if let Some(template) = value.template {
+            db_filter = db_filter.with_template(template.try_into()?);
         }
-        if let Some(replies) = value.reply {
-            let replies = replies
-                .0
-                .into_iter()
-                .map(TryInto::try_into)
-                .collect::<Result<Vec<_>, _>>()?;
-
-            for reply in replies {
-                db_filter = db_filter.with_reply(reply);
-            }
+        if let Some(reply) = value.reply {
+            db_filter = db_filter.with_reply(reply.try_into()?);
+            
         }
-        for params in [value.brand, value.campaign, value.category]
-            .into_iter()
-            .flatten()
-        {
-            let params = params
-                .0
-                .into_iter()
-                .map(TryInto::try_into)
-                .collect::<Result<Vec<_>, _>>()?;
-
-            for param in params {
-                db_filter = db_filter.with_parameters(param);
-            }
+        if let Some(parameters) = value.parameters {
+            db_filter = db_filter.with_parameters(parameters.try_into()?);
         }
+        
         Ok(db_filter)
     }
 }
