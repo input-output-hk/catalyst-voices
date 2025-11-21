@@ -138,6 +138,6 @@ final class Account extends Equatable {
 extension CatalystIdExt on CatalystId {
   /// Compares accounts against significant parts of [Account] catalystId.
   bool isReferringTo(Account account) {
-    return toSignificant() == account.catalystId.toSignificant();
+    return isSame(account.catalystId);
   }
 }

@@ -288,14 +288,14 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   ProposalViewData _buildProposalViewData({
-    required bool hasActiveAccount,
     required bool hasAccountUsername,
+    required CatalystId? activeAccountId,
     required ProposalDetailData? proposal,
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
-    required CollaboratorInvites collaborators,
+    required List<CollaboratorInvite> collaborators,
     required bool isFavorite,
     required bool isVotingStage,
     required bool showComments,
@@ -322,6 +322,12 @@ final class ProposalCubit extends Cubit<ProposalState>
         ? comments.fold(0, (prev, next) => prev + 1 + next.repliesCount)
         : null;
 
+    final collaboratorsState = CollaboratorInvites.filterByActiveAccount(
+      activeAccountId: activeAccountId,
+      authorId: proposal?.document.authorId,
+      collaborators: collaborators,
+    );
+
     final segments = proposal != null
         ? _buildSegments(
             proposal: proposal,
@@ -330,8 +336,8 @@ final class ProposalCubit extends Cubit<ProposalState>
             comments: comments,
             commentSchema: commentSchema,
             commentsSort: commentsSort,
-            collaborators: collaborators,
-            hasActiveAccount: hasActiveAccount,
+            collaborators: collaboratorsState,
+            hasActiveAccount: activeAccountId != null,
             hasAccountUsername: hasAccountUsername,
             commentsCount: commentsCount,
             isVotingStage: isVotingStage,
@@ -472,20 +478,20 @@ final class ProposalCubit extends Cubit<ProposalState>
     ];
   }
 
-  Future<CollaboratorInvites> _getCollaborators() async {
+  Future<List<CollaboratorInvite>> _getCollaborators() async {
     final uri = Uri.parse(
       'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
     );
 
     final catalystId = CatalystId.fromUri(uri);
 
-    return CollaboratorInvites([
+    return [
       for (final status in CollaboratorInviteStatus.values)
         CollaboratorInvite(
           catalystId: catalystId,
           status: status,
         ),
-    ]);
+    ];
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {
@@ -534,7 +540,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? const [];
     final commentsSort = state.comments.commentsSort;
-    final collaborators = _cache.collaborators ?? const CollaboratorInvites();
+    final collaborators = _cache.collaborators ?? const [];
     final isFavorite = _cache.isFavorite ?? false;
     final isVotingStage = _cache.isVotingStage ?? false;
     final showComments = _cache.showComments ?? false;
@@ -547,7 +553,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final username = activeAccountId?.username;
 
     return _buildProposalViewData(
-      hasActiveAccount: activeAccountId != null,
+      activeAccountId: activeAccountId,
       hasAccountUsername: username != null && !username.isBlank,
       proposal: proposal,
       category: category,

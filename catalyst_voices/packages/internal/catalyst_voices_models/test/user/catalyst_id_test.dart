@@ -160,6 +160,7 @@ void main() {
 
       // Then
       expect(significantSame, isTrue);
+      expect(idOne.isSame(idTwo), isTrue);
     });
 
     test('different host makes id significant different', () {
@@ -176,6 +177,7 @@ void main() {
 
       // Then
       expect(significantSame, isFalse);
+      expect(idOne.isSame(idTwo), isFalse);
     });
 
     test('username with spaces is decoded correctly', () {
