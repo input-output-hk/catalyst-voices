@@ -1,5 +1,7 @@
 //! `EqOrRangedUuid` query conditional stmt object.
 
+use crate::db::event::common::{ConditionalStmt, uuid_list::UuidList};
+
 /// Search either by a singe UUID, a range of UUIDs or a list of UUIDs.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum UuidSelector {
@@ -13,27 +15,21 @@ pub(crate) enum UuidSelector {
         max: uuid::Uuid,
     },
     /// Search UUIDs in the given list.
-    In(Vec<uuid::Uuid>),
+    In(UuidList),
 }
 
-impl UuidSelector {
-    /// Return a sql conditional statement by the provided `table_field`
-    pub(crate) fn conditional_stmt(
+impl ConditionalStmt for UuidSelector {
+    fn conditional_stmt(
         &self,
+        f: &mut std::fmt::Formatter<'_>,
         table_field: &str,
-    ) -> String {
+    ) -> std::fmt::Result {
         match self {
-            Self::Eq(id) => format!("{table_field} = '{id}'"),
+            Self::Eq(id) => write!(f, "{table_field} = '{id}'"),
             Self::Range { min, max } => {
-                format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
+                write!(f, "{table_field} >= '{min}' AND {table_field} <= '{max}'")
             },
-            Self::In(ids) => {
-                itertools::intersperse(
-                    ids.iter().map(|id| format!("{table_field} = '{id}'")),
-                    " OR ".to_string(),
-                )
-                .collect()
-            },
+            Self::In(ids) => ids.conditional_stmt(f, table_field),
         }
     }
 }

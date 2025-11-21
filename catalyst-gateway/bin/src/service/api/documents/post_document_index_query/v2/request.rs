@@ -200,12 +200,11 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         }
         if let Some(reply) = value.reply {
             db_filter = db_filter.with_reply(reply.try_into()?);
-            
         }
         if let Some(parameters) = value.parameters {
             db_filter = db_filter.with_parameters(parameters.try_into()?);
         }
-        
+
         Ok(db_filter)
     }
 }

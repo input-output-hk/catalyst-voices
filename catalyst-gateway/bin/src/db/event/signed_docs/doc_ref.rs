@@ -1,8 +1,6 @@
 //! Document Reference filtering object.
 
-use std::fmt::Write;
-
-use crate::db::event::common::eq_or_ranged_uuid::UuidSelector;
+use crate::db::event::common::{ConditionalStmt, uuid_selector::UuidSelector};
 
 /// Document Reference filtering struct.
 #[derive(Clone, Debug)]
@@ -13,30 +11,26 @@ pub(crate) struct DocumentRef {
     pub(crate) ver: Option<UuidSelector>,
 }
 
-impl DocumentRef {
-    /// Return a sql conditional statement by the provided `table_field`
-    pub(crate) fn conditional_stmt(
+impl ConditionalStmt for DocumentRef {
+    fn conditional_stmt(
         &self,
+        f: &mut std::fmt::Formatter<'_>,
         table_field: &str,
-    ) -> String {
-        let mut stmt = "TRUE".to_string();
+    ) -> std::fmt::Result {
+        write!(
+            f,
+            "EXISTS (SELECT 1 FROM JSONB_ARRAY_ELEMENTS({table_field}) AS doc_ref WHERE TRUE"
+        )?;
+
         if let Some(id) = &self.id {
-            let _ = write!(
-                stmt,
-                " AND {}",
-                id.conditional_stmt("(doc_ref->>'id')::uuid")
-            );
+            write!(f, " AND ")?;
+            id.conditional_stmt(f, "(doc_ref->>'id')::uuid")?;
         }
         if let Some(ver) = &self.ver {
-            let _ = write!(
-                stmt,
-                " AND {}",
-                ver.conditional_stmt("(doc_ref->>'ver')::uuid")
-            );
+            write!(f, " AND ")?;
+            ver.conditional_stmt(f, "(doc_ref->>'id')::uuid")?;
         }
 
-        format!(
-            "EXISTS (SELECT 1 FROM JSONB_ARRAY_ELEMENTS({table_field}) AS doc_ref WHERE {stmt})"
-        )
+        write!(f, ")")
     }
 }
