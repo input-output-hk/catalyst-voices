@@ -16,6 +16,7 @@ export 'campaign/exception/active_campaign_not_found_exception.dart';
 export 'category/category_description_view_model.dart';
 export 'category/dropdown_menu_view_model.dart';
 export 'collaborators/collaborator_catalyst_id.dart';
+export 'collaborators/collaborator_invite.dart';
 export 'collaborators/collaborators.dart';
 export 'collaborators/exception/localized_collaborator_is_not_a_proposer_exception.dart';
 export 'common/formatters/date_formatter.dart';

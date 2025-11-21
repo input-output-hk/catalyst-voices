@@ -167,13 +167,12 @@ final class UserRepositoryImpl implements UserRepository {
   Future<String?> _lookupUsernameFromDocuments({
     required CatalystId catalystId,
   }) {
-    final significantId = catalystId.toSignificant();
     return _documentRepository
-        .getLatestDocument(authorId: significantId)
+        .getLatestDocument(authorId: catalystId.toSignificant())
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {
-            return authors.firstWhereOrNull((id) => id.toSignificant() == significantId);
+            return authors.firstWhereOrNull((id) => id.isSameAs(catalystId));
           },
         )
         .then((value) => value?.username);
