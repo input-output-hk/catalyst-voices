@@ -50,16 +50,7 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<DocumentData?> get({
-    DocumentType? type,
-    DocumentRef? ref,
-    DocumentRef? refTo,
-    CatalystId? authorId,
-  }) {
-    return _database.documentsV2Dao
-        .getDocument(type: type, ref: ref, refTo: refTo, author: authorId)
-        .then((value) => value?.toModel());
-  }
+  Future<DocumentData?> get(DocumentRef ref) => getWhere(ref: ref);
 
   @override
   Future<List<DocumentData>> getAll({
@@ -83,7 +74,7 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<DocumentRef?> getLatestOf({required DocumentRef ref}) {
+  Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
     return _database.documentsV2Dao.getLatestOf(ref);
   }
 
@@ -93,6 +84,18 @@ final class DatabaseDocumentsDataSource
     required ProposalsTotalAskFilters filters,
   }) {
     return _database.proposalsV2Dao.getProposalsTotalTask(filters: filters, nodeId: nodeId);
+  }
+
+  @override
+  Future<DocumentData?> getWhere({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
+    CatalystId? authorId,
+  }) {
+    return _database.documentsV2Dao
+        .getDocument(type: type, ref: ref, refTo: refTo, author: authorId)
+        .then((value) => value?.toModel());
   }
 
   @override

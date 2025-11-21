@@ -298,8 +298,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentData?> getLatestDocument({
     CatalystId? authorId,
   }) async {
-    final latestDocument = await _localDocuments.get(authorId: authorId);
-    final latestDraft = await _drafts.get();
+    final latestDocument = await _localDocuments.getWhere(authorId: authorId);
+    final latestDraft = await _drafts.getWhere();
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
@@ -307,12 +307,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   // TODO(damian-molinski): consider also checking with remote source.
   @override
   Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
-    final draft = await _drafts.getLatestOf(ref: ref);
+    final draft = await _drafts.getLatestRefOf(ref);
     if (draft != null) {
       return draft;
     }
 
-    return _localDocuments.getLatestOf(ref: ref);
+    return _localDocuments.getLatestRefOf(ref);
   }
 
   @override
@@ -328,7 +328,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef refTo,
     required DocumentType type,
   }) {
-    return _localDocuments.get(refTo: refTo, type: type);
+    return _localDocuments.getWhere(refTo: refTo, type: type);
   }
 
   @override
@@ -614,7 +614,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentData?> _getDraftDocumentData({
     required DraftRef ref,
   }) async {
-    return _drafts.get(ref: ref);
+    return _drafts.get(ref);
   }
 
   Future<DocumentData?> _getSignedDocumentData({
@@ -631,10 +631,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final isCached = useCache && await _localDocuments.exists(ref: ref);
     if (isCached) {
-      return _localDocuments.get(ref: ref);
+      return _localDocuments.get(ref);
     }
 
-    final document = await _remoteDocuments.get(ref: ref);
+    final document = await _remoteDocuments.get(ref);
 
     if (useCache && document != null) {
       await _localDocuments.save(data: document);

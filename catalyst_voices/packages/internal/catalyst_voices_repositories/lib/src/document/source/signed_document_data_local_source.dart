@@ -4,7 +4,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 /// See [DatabaseDocumentsDataSource].
 abstract interface class SignedDocumentDataSource implements DocumentDataLocalSource {
   @override
-  Future<DocumentData?> get({
+  Future<DocumentData?> getWhere({
     DocumentType? type,
     DocumentRef? ref,
     DocumentRef? refTo,

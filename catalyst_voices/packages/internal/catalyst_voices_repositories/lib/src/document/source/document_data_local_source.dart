@@ -17,13 +17,6 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
 
   Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
 
-  @override
-  Future<DocumentData?> get({
-    DocumentType? type,
-    DocumentRef? ref,
-    DocumentRef? refTo,
-  });
-
   Future<List<DocumentData>> getAll({
     DocumentType? type,
     DocumentRef? ref,
@@ -31,6 +24,12 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
     bool latestOnly,
     int limit,
     int offset,
+  });
+
+  Future<DocumentData?> getWhere({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? refTo,
   });
 
   Future<void> save({required DocumentData data});
