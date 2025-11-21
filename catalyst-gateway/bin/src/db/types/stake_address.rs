@@ -26,6 +26,12 @@ impl From<StakeAddress> for DbStakeAddress {
     }
 }
 
+impl From<DbStakeAddress> for StakeAddress {
+    fn from(value: DbStakeAddress) -> Self {
+        value.0
+    }
+}
+
 impl Display for DbStakeAddress {
     fn fmt(
         &self,

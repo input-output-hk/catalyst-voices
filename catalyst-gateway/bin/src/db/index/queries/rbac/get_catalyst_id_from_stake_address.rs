@@ -120,20 +120,6 @@ impl Query {
     }
 }
 
-/// Adds the given value to the cache.
-pub fn cache_stake_address(
-    is_persistent: bool,
-    stake_address: StakeAddress,
-    catalyst_id: CatalystId,
-) {
-    CassandraSession::get(is_persistent).inspect(|session| {
-        session
-            .caches()
-            .rbac_stake_address()
-            .insert(stake_address, catalyst_id);
-    });
-}
-
 /// Removes all cached values.
 pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
     CassandraSession::get(is_persistent).inspect(|session| {

@@ -1,16 +1,19 @@
 //! Insert RBAC 509 Registration Query.
 
-use std::{collections::HashSet, fmt::Debug, sync::Arc};
+use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::{Slot, StakeAddress, TxnIndex, hashes::TransactionId};
+use cardano_chain_follower::{Slot, TxnIndex, hashes::TransactionId};
 use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV4};
 use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
 use crate::{
     db::{
-        index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbUuidV4},
+        index::{
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -31,8 +34,6 @@ pub(crate) struct Params {
     txn_id: DbTransactionId,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<DbTransactionId>,
-    /// A set of removed stake addresses.
-    removed_stake_addresses: HashSet<DbStakeAddress>,
     /// A registration purpose.
     ///
     /// The value of purpose is `None` if the chain is modified by the registration
@@ -55,7 +56,6 @@ impl Debug for Params {
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("prv_txn_id", &prv_txn_id)
-            .field("removed_stake_addresses", &self.removed_stake_addresses)
             .field("purpose", &self.purpose)
             .finish()
     }
@@ -69,14 +69,9 @@ impl Params {
         slot_no: Slot,
         txn_index: TxnIndex,
         prv_txn_id: Option<TransactionId>,
-        removed_stake_addresses: HashSet<StakeAddress>,
         purpose: Option<UuidV4>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
-        let removed_stake_addresses = removed_stake_addresses
-            .into_iter()
-            .map(Into::into)
-            .collect();
         let purpose = purpose.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
 
         Self {
@@ -85,9 +80,18 @@ impl Params {
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             prv_txn_id,
-            removed_stake_addresses,
             purpose,
         }
+    }
+
+    /// Executes prepared queries as a batch.
+    pub(crate) async fn execute_batch(
+        session: &Arc<CassandraSession>,
+        queries: Vec<Self>,
+    ) -> FallibleQueryResults {
+        session
+            .execute_batch(PreparedQuery::Rbac509InsertQuery, queries)
+            .await
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries

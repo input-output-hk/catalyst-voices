@@ -10,7 +10,10 @@ use tracing::error;
 
 use crate::{
     db::{
-        index::queries::{PreparedQueries, SizedBatch},
+        index::{
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
         types::{DbCatalystId, DbPublicKey, DbSlot},
     },
     settings::cassandra_db::EnvVars,
@@ -55,6 +58,16 @@ impl Params {
             slot_no: slot_no.into(),
             catalyst_id: catalyst_id.into(),
         }
+    }
+
+    /// Executes prepared queries as a batch.
+    pub(crate) async fn execute_batch(
+        session: &Arc<CassandraSession>,
+        queries: Vec<Self>,
+    ) -> FallibleQueryResults {
+        session
+            .execute_batch(PreparedQuery::CatalystIdForPublicKeyInsertQuery, queries)
+            .await
     }
 
     /// Prepares a batch of queries.
