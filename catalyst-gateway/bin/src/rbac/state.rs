@@ -1,0 +1,245 @@
+//! An implementation of the `rbac_registration::cardano::state::RbacChainsState` trait
+
+use std::collections::{HashMap, HashSet};
+
+use anyhow::Context;
+use cardano_chain_follower::{StakeAddress, hashes::TransactionId};
+use catalyst_types::catalyst_id::CatalystId;
+use ed25519_dalek::VerifyingKey;
+use futures::StreamExt;
+
+use crate::{
+    db::index::session::CassandraSession,
+    rbac::{
+        RbacBlockIndexingContext,
+        chains_cache::cached_persistent_rbac_chain,
+        get_chain::{apply_regs, build_rbac_chain, persistent_rbac_chain},
+        latest_rbac_chain,
+    },
+};
+
+/// A helper struct to handle RBAC related state from the DB and caches.
+/// Implements `rbac_registration::cardano::state::RbacChainsState` trait.
+pub(crate) struct RbacChainsState<'a> {
+    /// `index-db` corresponding flag
+    is_persistent: bool,
+    /// `RbacBlockIndexingContext` reference
+    context: &'a RbacBlockIndexingContext,
+    /// Recorded modified registration chains by the `take_stake_address_from_chains`
+    /// method. During the `take_stake_address_from_chains` execution nothing is
+    /// written into the `index-db`, all these data would be written to the DB in a
+    /// batch. To consume this field call `consume` method
+    modified_chains: HashMap<CatalystId, HashSet<StakeAddress>>,
+}
+
+impl<'a> RbacChainsState<'a> {
+    /// Creates a new instance of `RbacChainsState`
+    pub fn new(
+        is_persistent: bool,
+        context: &'a RbacBlockIndexingContext,
+    ) -> Self {
+        Self {
+            is_persistent,
+            context,
+            modified_chains: HashMap::new(),
+        }
+    }
+
+    /// Consumes `RbacChainsState` instance and returns recorded `modified_chains` field.
+    pub fn consume(self) -> HashMap<CatalystId, HashSet<StakeAddress>> {
+        self.modified_chains
+    }
+
+    /// Returns a Catalyst ID corresponding to the given transaction hash.
+    pub async fn catalyst_id_from_txn_id(
+        &self,
+        txn_id: TransactionId,
+    ) -> anyhow::Result<Option<CatalystId>> {
+        use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
+
+        // Check the context first.
+        if let Some(catalyst_id) = self.context.find_transaction(&txn_id) {
+            return Ok(Some(catalyst_id.to_owned()));
+        }
+
+        // Then try to find in the persistent database.
+        let session =
+            CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+        if let Some(id) = Query::get(&session, txn_id).await? {
+            return Ok(Some(id));
+        }
+
+        // Conditionally check the volatile database.
+        if !self.is_persistent {
+            let session =
+                CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+            return Query::get(&session, txn_id).await;
+        }
+
+        Ok(None)
+    }
+}
+
+impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> {
+    async fn chain(
+        &self,
+        id: &CatalystId,
+    ) -> anyhow::Result<Option<rbac_registration::registration::cardano::RegistrationChain>> {
+        let chain = if self.is_persistent {
+            persistent_rbac_chain(id).await?
+        } else {
+            latest_rbac_chain(id).await?.map(|i| i.chain)
+        };
+
+        // Apply additional registrations from context if any.
+        if let Some(regs) = self.context.find_registrations(id) {
+            let regs = regs.iter().cloned();
+            match chain {
+                Some(c) => return apply_regs(c, regs).await.map(Some),
+                None => return build_rbac_chain(regs).await,
+            }
+        }
+
+        Ok(chain)
+    }
+
+    async fn is_chain_known(
+        &self,
+        id: &CatalystId,
+    ) -> anyhow::Result<bool> {
+        if self.context.find_registrations(id).is_some() {
+            return Ok(true);
+        }
+
+        let session =
+            CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+
+        // We only cache persistent chains, so it is ok to check the cache regardless of the
+        // `is_persistent` parameter value.
+        if cached_persistent_rbac_chain(&session, id).is_some() {
+            return Ok(true);
+        }
+
+        if is_cat_id_known(&session, id).await? {
+            return Ok(true);
+        }
+
+        // Conditionally check the volatile database.
+        if !self.is_persistent {
+            let session =
+                CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+            if is_cat_id_known(&session, id).await? {
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
+    }
+
+    async fn is_stake_address_used(
+        &self,
+        address: &StakeAddress,
+    ) -> anyhow::Result<bool> {
+        catalyst_id_from_stake_address(address, self.is_persistent, self.context)
+            .await
+            .map(|v| v.is_some())
+    }
+
+    async fn chain_catalyst_id_from_signing_public_key(
+        &self,
+        key: &VerifyingKey,
+    ) -> anyhow::Result<Option<CatalystId>> {
+        use crate::db::index::queries::rbac::get_catalyst_id_from_public_key::Query;
+
+        // Check the context first.
+        if let Some(catalyst_id) = self.context.find_public_key(key) {
+            return Ok(Some(catalyst_id.to_owned()));
+        }
+
+        // Then try to find in the persistent database.
+        let session =
+            CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+        if let Some(id) = Query::get(&session, *key).await? {
+            return Ok(Some(id));
+        }
+
+        // Conditionally check the volatile database.
+        if !self.is_persistent {
+            let session =
+                CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+            return Query::get(&session, *key).await;
+        }
+
+        Ok(None)
+    }
+
+    async fn take_stake_address_from_chains<I>(
+        &mut self,
+        addresses: I,
+    ) -> anyhow::Result<()>
+    where
+        I: IntoIterator<Item = StakeAddress> + Send,
+        <I as IntoIterator>::IntoIter: Send,
+    {
+        for addr in addresses {
+            if let Some(cat_id) =
+                catalyst_id_from_stake_address(&addr, self.is_persistent, self.context).await?
+            {
+                self.modified_chains
+                    .entry(cat_id)
+                    .and_modify(|e| {
+                        e.insert(addr.clone());
+                    })
+                    .or_insert([addr].into_iter().collect());
+            }
+        }
+
+        Ok(())
+    }
+}
+
+/// Returns a Catalyst ID corresponding to the given stake address.
+async fn catalyst_id_from_stake_address(
+    address: &StakeAddress,
+    is_persistent: bool,
+    context: &RbacBlockIndexingContext,
+) -> anyhow::Result<Option<CatalystId>> {
+    use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
+
+    // Check the context first.
+    if let Some(catalyst_id) = context.find_address(address) {
+        return Ok(Some(catalyst_id.to_owned()));
+    }
+
+    // Then try to find in the persistent database.
+    let session =
+        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+    if let Some(id) = Query::latest(&session, address).await? {
+        return Ok(Some(id));
+    }
+
+    // Conditionally check the volatile database.
+    if !is_persistent {
+        let session =
+            CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+        return Query::latest(&session, address).await;
+    }
+
+    Ok(None)
+}
+
+/// Returns `true` if there is at least one registration with the given Catalyst ID.
+async fn is_cat_id_known(
+    session: &CassandraSession,
+    id: &CatalystId,
+) -> anyhow::Result<bool> {
+    use crate::db::index::queries::rbac::get_rbac_registrations::{Query, QueryParams};
+
+    Ok(Query::execute(session, QueryParams {
+        catalyst_id: id.clone().into(),
+    })
+    .await?
+    .next()
+    .await
+    .is_some())
+}
