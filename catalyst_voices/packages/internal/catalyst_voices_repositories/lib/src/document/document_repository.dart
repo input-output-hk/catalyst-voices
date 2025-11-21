@@ -25,7 +25,6 @@ abstract interface class DocumentRepository {
     DraftDataSource drafts,
     SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
-    DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
 
   /// Analyzes the database to gather statistics and potentially optimize it.
@@ -50,7 +49,7 @@ abstract interface class DocumentRepository {
   });
 
   /// Returns all matching [DocumentData] to given [ref].
-  Future<List<DocumentData>> getAllDocumentsData({
+  Future<List<DocumentData>> findAllVersions({
     required DocumentRef ref,
   });
 
@@ -88,14 +87,14 @@ abstract interface class DocumentRepository {
   /// Returns latest matching [DocumentRef] version with same id as [ref].
   Future<DocumentRef?> getLatestOf({required DocumentRef ref});
 
-  /// Returns count of documents matching [ref] id and [type].
+  /// Returns count of documents matching [referencing] id and [type].
   Future<int> getRefCount({
-    required DocumentRef ref,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 
   Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 
@@ -113,10 +112,7 @@ abstract interface class DocumentRepository {
     required List<DocumentRef> refs,
   });
 
-  /// Similar to [watchIsDocumentFavorite] but stops after first emit.
-  Future<bool> isDocumentFavorite({
-    required DocumentRef ref,
-  });
+  Future<bool> isFavorite(DocumentRef ref);
 
   /// Parses a document [data] previously encoded by [encodeDocumentForExport].
   ///
@@ -169,13 +165,6 @@ abstract interface class DocumentRepository {
     required CatalystId authorId,
   });
 
-  /// Updates fav status matching [ref].
-  Future<void> updateDocumentFavorite({
-    required DocumentRef ref,
-    required DocumentType type,
-    required bool isFavorite,
-  });
-
   /// In context of [document] selfRef:
   ///
   /// - [DraftRef] -> Creates/updates a local document draft.
@@ -188,16 +177,9 @@ abstract interface class DocumentRepository {
     required DocumentData document,
   });
 
-  /// Emits list of all favorite ids.
-  ///
-  /// All returned ids are loose and won't specify version.
-  Stream<List<String>> watchAllDocumentsFavoriteIds({
-    DocumentType? type,
-  });
-
   /// Emits number of matching documents
   Stream<int> watchCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     DocumentType? type,
   });
 
@@ -222,24 +204,19 @@ abstract interface class DocumentRepository {
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
-    DocumentRef? refTo,
-  });
-
-  /// Emits changes to fav status of [ref].
-  Stream<bool> watchIsDocumentFavorite({
-    required DocumentRef ref,
+    DocumentRef? referencing,
   });
 
   /// Looking for document with matching refTo and type.
-  /// It return documents data that have a reference that matches [refTo]
+  /// It return documents data that have a reference that matches [referencing]
   ///
   /// This method is used when we want to find a document that has a reference
   /// to a document that we are looking for.
   ///
   /// For example, we want to find latest document action that were made
-  /// on a [refTo] document.
+  /// on a [referencing] document.
   Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 }
@@ -249,7 +226,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
-  final DocumentFavoriteSource _favoriteDocuments;
 
   final _documentDataLock = Lock();
 
@@ -258,7 +234,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._drafts,
     this._localDocuments,
     this._remoteDocuments,
-    this._favoriteDocuments,
   );
 
   @override
@@ -279,10 +254,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<DocumentData>> getAllDocumentsData({required DocumentRef ref}) async {
+  Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) async {
     final all = switch (ref) {
-      DraftRef() => await _drafts.getAll(ref: ref),
-      SignedDocumentRef() => await _localDocuments.getAll(ref: ref),
+      DraftRef() => await _drafts.findAll(ref: ref),
+      SignedDocumentRef() => await _localDocuments.findAll(ref: ref),
     }..sort();
 
     return all;
@@ -292,8 +267,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   }) async {
-    final localRefs = await _localDocuments.queryVersionsOfId(id: id);
-    final drafts = await _drafts.queryVersionsOfId(id: id);
+    final localRefs = await _localDocuments.findAll(ref: SignedDocumentRef(id: id));
+    final drafts = await _drafts.findAll(ref: DraftRef(id: id));
 
     return [...drafts, ...localRefs];
   }
@@ -303,22 +278,28 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
     bool useCache = true,
   }) async {
-    return switch (ref) {
-      SignedDocumentRef() => _getSignedDocumentData(ref: ref, useCache: useCache),
+    final documentData = switch (ref) {
+      SignedDocumentRef() => await _getSignedDocumentData(ref: ref, useCache: useCache),
       DraftRef() when !useCache => throw DocumentNotFoundException(
         ref: ref,
         message: '$ref can not be resolved while not using cache',
       ),
-      DraftRef() => _getDraftDocumentData(ref: ref),
+      DraftRef() => await _getDraftDocumentData(ref: ref),
     };
+
+    if (documentData == null) {
+      throw DocumentNotFoundException(ref: ref);
+    }
+
+    return documentData;
   }
 
   @override
   Future<DocumentData?> getLatestDocument({
     CatalystId? authorId,
   }) async {
-    final latestDocument = await _localDocuments.getLatest(authorId: authorId);
-    final latestDraft = await _drafts.getLatest(authorId: authorId);
+    final latestDocument = await _localDocuments.findFirst(authorId: authorId);
+    final latestDraft = await _drafts.findFirst();
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
@@ -326,28 +307,28 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   // TODO(damian-molinski): consider also checking with remote source.
   @override
   Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
-    final draft = await _drafts.getLatestOf(ref: ref);
+    final draft = await _drafts.getLatestRefOf(ref);
     if (draft != null) {
       return draft;
     }
 
-    return _localDocuments.getLatestOf(ref: ref);
+    return _localDocuments.getLatestRefOf(ref);
   }
 
   @override
   Future<int> getRefCount({
-    required DocumentRef ref,
+    required DocumentRef referencing,
     required DocumentType type,
   }) {
-    return _localDocuments.getRefCount(ref: ref, type: type);
+    return _localDocuments.count(referencing: referencing, type: type);
   }
 
   @override
   Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   }) {
-    return _localDocuments.getRefToDocumentData(refTo: refTo, type: type);
+    return _localDocuments.findFirst(referencing: referencing, type: type);
   }
 
   @override
@@ -378,10 +359,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<bool> isDocumentFavorite({required DocumentRef ref}) {
-    assert(!ref.isExact, 'Favorite ref have to be loose!');
-
-    return _favoriteDocuments.watchIsDocumentFavorite(ref.id).first;
+  Future<bool> isFavorite(DocumentRef ref) {
+    return _db.localMetadataDao.isFavorite(ref.id);
   }
 
   @override
@@ -405,9 +384,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool includeLocalDrafts = false,
   }) async {
     List<DocumentData> documents;
-    final localDocuments = await _localDocuments.queryVersionsOfId(id: id);
+    final localDocuments = await _localDocuments.findAll(ref: SignedDocumentRef(id: id));
     if (includeLocalDrafts) {
-      final localDrafts = await _drafts.queryVersionsOfId(id: id);
+      final localDrafts = await _drafts.findAll(ref: DraftRef(id: id));
       documents = [...localDocuments, ...localDrafts];
     } else {
       documents = localDocuments;
@@ -430,10 +409,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<int> removeAll({
     bool keepLocalDrafts = false,
   }) async {
-    final deletedDrafts = keepLocalDrafts ? 0 : await _drafts.deleteAll();
-    final deletedDocuments = keepLocalDrafts
-        ? await _localDocuments.deleteAllRespectingLocalDrafts()
-        : await _localDocuments.deleteAll();
+    final deletedDrafts = keepLocalDrafts ? 0 : await _drafts.delete();
+    final excludeTypes = keepLocalDrafts ? [DocumentType.proposalTemplate] : null;
+    final deletedDocuments = await _localDocuments.delete(excludeTypes: excludeTypes);
 
     return deletedDrafts + deletedDocuments;
   }
@@ -471,21 +449,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateDocumentFavorite({
-    required DocumentRef ref,
-    required DocumentType type,
-    required bool isFavorite,
-  }) {
-    assert(!ref.isExact, 'Favorite ref have to be loose!');
-
-    return _favoriteDocuments.updateDocumentFavorite(
-      ref.id,
-      type: type,
-      isFavorite: isFavorite,
-    );
-  }
-
-  @override
   Future<void> upsertDocument({
     required DocumentData document,
   }) async {
@@ -505,15 +468,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool getLocalDrafts = false,
     DocumentType? type,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     final localDocs = _localDocuments
         .watchAll(
-          limit: limit,
-          unique: unique,
+          latestOnly: unique,
           type: type,
           authorId: authorId,
-          refTo: refTo,
+          referencing: referencing,
+          limit: limit ?? 200,
         )
         .asyncMap(
           (documents) async => _processDocuments(
@@ -528,9 +491,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final localDrafts = _drafts
         .watchAll(
-          limit: limit,
           type: type,
-          authorId: authorId,
+          limit: limit ?? 100,
         )
         .asyncMap(
           (documents) async => _processDocuments(
@@ -556,19 +518,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Stream<List<String>> watchAllDocumentsFavoriteIds({
-    DocumentType? type,
-  }) {
-    return _favoriteDocuments.watchAllFavoriteIds(type: type);
-  }
-
-  @override
   Stream<int> watchCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     DocumentType? type,
   }) {
     return _localDocuments.watchCount(
-      refTo: refTo,
+      referencing: referencing,
       type: type,
     );
   }
@@ -602,7 +557,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return watchAllDocuments(
       refGetter: refGetter,
@@ -611,7 +566,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       unique: unique,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
-      refTo: refTo,
+      referencing: referencing,
     );
   }
 
@@ -648,28 +603,21 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Stream<bool> watchIsDocumentFavorite({required DocumentRef ref}) {
-    assert(!ref.isExact, 'Favorite ref have to be loose!');
-
-    return _favoriteDocuments.watchIsDocumentFavorite(ref.id);
-  }
-
-  @override
   Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
     ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {
-    return _localDocuments.watchRefToDocumentData(refTo: refTo, type: type).distinct();
+    return _localDocuments.watch(referencing: referencing, type: type).distinct();
   }
 
-  Future<DocumentData> _getDraftDocumentData({
+  Future<DocumentData?> _getDraftDocumentData({
     required DraftRef ref,
   }) async {
-    return _drafts.get(ref: ref);
+    return _drafts.get(ref);
   }
 
-  Future<DocumentData> _getSignedDocumentData({
+  Future<DocumentData?> _getSignedDocumentData({
     required SignedDocumentRef ref,
     bool useCache = true,
   }) async {
@@ -683,12 +631,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final isCached = useCache && await _localDocuments.exists(ref: ref);
     if (isCached) {
-      return _localDocuments.get(ref: ref);
+      return _localDocuments.get(ref);
     }
 
-    final document = await _remoteDocuments.get(ref: ref);
+    final document = await _remoteDocuments.get(ref);
 
-    if (useCache) {
+    if (useCache && document != null) {
       await _localDocuments.save(data: document);
     }
 

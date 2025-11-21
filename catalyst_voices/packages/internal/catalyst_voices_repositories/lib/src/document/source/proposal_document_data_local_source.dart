@@ -5,21 +5,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 /// implement those queries in abstract way without know all logic related
 /// just to proposals.
 abstract interface class ProposalDocumentDataLocalSource {
-  /// Used to retrieve all proposals. Offers way to filter proposals by passing
-  /// category ref and proposal filter type.
-  ///
-  /// If [categoryRef] is null then all proposals are returned.
-  Future<List<ProposalDocumentData>> getProposals({
-    SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
-  });
-
-  Future<Page<ProposalDocumentData>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  });
-
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
@@ -36,18 +21,8 @@ abstract interface class ProposalDocumentDataLocalSource {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  });
-
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters,
-  });
-
-  Stream<Page<ProposalDocumentData>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
   });
 
   Stream<ProposalsTotalAsk> watchProposalsTotalTask({

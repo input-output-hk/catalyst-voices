@@ -35,3 +35,12 @@ docs_count  ,filer              ,avg_duration    ,PR     ,note
 14008       ,categories         ,0:00:02.108506  ,#3622  ,-
 14008       ,categories:drafts  ,0:00:01.585000  ,#3622  ,-
 14008       ,categories:finals  ,0:00:05.024950  ,#3622  ,-
+712         ,categories         ,0:00:00.139314  ,#3747  ,-
+712         ,categories:drafts  ,0:00:00.138364  ,#3747  ,-
+712         ,categories:finals  ,0:00:00.148680  ,#3747  ,-
+7008        ,categories         ,0:00:00.168405  ,#3747  ,-
+7008        ,categories:drafts  ,0:00:00.190470  ,#3747  ,-
+7008        ,categories:finals  ,0:00:00.167145  ,#3747  ,-
+14008       ,categories         ,0:00:00.253610  ,#3747  ,-
+14008       ,categories:drafts  ,0:00:00.266390  ,#3747  ,-
+14008       ,categories:finals  ,0:00:00.247054  ,#3747  ,-

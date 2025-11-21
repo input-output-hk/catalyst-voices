@@ -1,17 +1,16 @@
 // ignore_for_file: avoid_redundant_argument_values
+import 'dart:typed_data';
 
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
-import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
+import '../../utils/document_with_authors_factory.dart';
 import '../connection/test_connection.dart';
 
 void main() {
@@ -68,6 +67,275 @@ void main() {
 
         // When
         final result = await dao.count();
+
+        // Then
+        expect(result, 2);
+      });
+
+      test('filters by type and returns matching count', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        final template = _createTestDocumentEntity(
+          id: 'template-id',
+          ver: 'template-ver',
+          type: DocumentType.proposalTemplate,
+        );
+        await dao.saveAll([proposal, comment, template]);
+
+        // When
+        final result = await dao.count(type: DocumentType.proposalDocument);
+
+        // Then
+        expect(result, 1);
+      });
+
+      test('returns zero when no documents match type filter', () async {
+        // Given
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        await dao.save(comment);
+
+        // When
+        final result = await dao.count(type: DocumentType.proposalDocument);
+
+        // Then
+        expect(result, 0);
+      });
+
+      test('filters by loose ref and returns all versions count', () async {
+        // Given
+        final v1 = _createTestDocumentEntity(id: 'multi-id', ver: 'ver-1');
+        final v2 = _createTestDocumentEntity(id: 'multi-id', ver: 'ver-2');
+        final other = _createTestDocumentEntity(id: 'other-id', ver: 'other-ver');
+        await dao.saveAll([v1, v2, other]);
+
+        // When
+        final result = await dao.count(
+          ref: const SignedDocumentRef.loose(id: 'multi-id'),
+        );
+
+        // Then
+        expect(result, 2);
+      });
+
+      test('filters by exact ref and returns single match', () async {
+        // Given
+        final v1 = _createTestDocumentEntity(id: 'multi-id', ver: 'ver-1');
+        final v2 = _createTestDocumentEntity(id: 'multi-id', ver: 'ver-2');
+        await dao.saveAll([v1, v2]);
+
+        // When
+        final result = await dao.count(
+          ref: const SignedDocumentRef.exact(id: 'multi-id', version: 'ver-1'),
+        );
+
+        // Then
+        expect(result, 1);
+      });
+
+      test('returns zero for non-existing ref', () async {
+        // Given
+        final entity = _createTestDocumentEntity(id: 'existing-id', ver: 'existing-ver');
+        await dao.save(entity);
+
+        // When
+        final result = await dao.count(
+          ref: const SignedDocumentRef.exact(id: 'non-existent', version: 'non-ver'),
+        );
+
+        // Then
+        expect(result, 0);
+      });
+
+      test('filters by loose refTo and returns documents referencing id', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        final action1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: 'action-ver-1',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final action2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: 'action-ver-2',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver-2',
+        );
+        final unrelated = _createTestDocumentEntity(
+          id: 'unrelated',
+          ver: 'unrelated-ver',
+          type: DocumentType.proposalActionDocument,
+          refId: 'other-proposal',
+          refVer: 'other-ver',
+        );
+        await dao.saveAll([proposal, action1, action2, unrelated]);
+
+        // When
+        final result = await dao.count(
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, 2);
+      });
+
+      test('filters by exact refTo and returns documents referencing exact version', () async {
+        // Given
+        final action1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: 'action-ver-1',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver-1',
+        );
+        final action2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: 'action-ver-2',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver-2',
+        );
+        await dao.saveAll([action1, action2]);
+
+        // When
+        final result = await dao.count(
+          referencing: const SignedDocumentRef.exact(
+            id: 'proposal-id',
+            version: 'proposal-ver-1',
+          ),
+        );
+
+        // Then
+        expect(result, 1);
+      });
+
+      test('returns zero when no documents match refTo filter', () async {
+        // Given
+        final action = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'action-ver',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        await dao.save(action);
+
+        // When
+        final result = await dao.count(
+          referencing: const SignedDocumentRef.loose(id: 'non-existent-proposal'),
+        );
+
+        // Then
+        expect(result, 0);
+      });
+
+      test('combines type and ref filters', () async {
+        // Given
+        final proposal1 = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'ver-1',
+          type: DocumentType.proposalDocument,
+        );
+        final proposal2 = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'ver-2',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'ver-3',
+          type: DocumentType.commentDocument,
+        );
+        await dao.saveAll([proposal1, proposal2, comment]);
+
+        // When
+        final result = await dao.count(
+          type: DocumentType.proposalDocument,
+          ref: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, 2);
+      });
+
+      test('combines type and refTo filters', () async {
+        // Given
+        final action = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'action-ver',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        await dao.saveAll([action, comment]);
+
+        // When
+        final result = await dao.count(
+          type: DocumentType.proposalActionDocument,
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, 1);
+      });
+
+      test('combines all three filters', () async {
+        // Given
+        final action1 = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'ver-1',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final action2 = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'ver-2',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final action3 = _createTestDocumentEntity(
+          id: 'other-action',
+          ver: 'ver-3',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        await dao.saveAll([action1, action2, action3]);
+
+        // When
+        final result = await dao.count(
+          type: DocumentType.proposalActionDocument,
+          ref: const SignedDocumentRef.loose(id: 'action-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
 
         // Then
         expect(result, 2);
@@ -298,7 +566,7 @@ void main() {
         const ref = SignedDocumentRef.exact(id: 'non-existent-id', version: 'non-existent-ver');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNull);
@@ -313,7 +581,7 @@ void main() {
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'test-ver');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNotNull);
@@ -329,10 +597,10 @@ void main() {
         // And
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'wrong-ver');
 
-        // When: getDocument is called
-        final result = await dao.getDocument(ref);
+        // When
+        final result = await dao.getDocument(ref: ref);
 
-        // Then: Returns null
+        // Then
         expect(result, isNull);
       });
 
@@ -351,7 +619,7 @@ void main() {
         const ref = SignedDocumentRef.loose(id: 'test-id');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNotNull);
@@ -368,10 +636,369 @@ void main() {
         const ref = SignedDocumentRef.loose(id: 'non-existent-id');
 
         // When
-        final result = await dao.getDocument(ref);
+        final result = await dao.getDocument(ref: ref);
 
         // Then
         expect(result, isNull);
+      });
+
+      test('filters by type and returns matching document', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        await dao.saveAll([proposal, comment]);
+
+        // When
+        final result = await dao.getDocument(type: DocumentType.proposalDocument);
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'proposal-id');
+        expect(result.type, DocumentType.proposalDocument);
+      });
+
+      test('returns null when no documents match type filter', () async {
+        // Given
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        await dao.save(comment);
+
+        // When
+        final result = await dao.getDocument(type: DocumentType.proposalDocument);
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('returns latest document when filtering by type only', () async {
+        // Given
+        final oldCreatedAt = DateTime.utc(2023, 1, 1);
+        final newerCreatedAt = DateTime.utc(2024, 1, 1);
+
+        final oldVer = _buildUuidV7At(oldCreatedAt);
+        final newerVer = _buildUuidV7At(newerCreatedAt);
+
+        final oldProposal = _createTestDocumentEntity(
+          id: 'proposal-1',
+          ver: oldVer,
+          type: DocumentType.proposalDocument,
+        );
+        final newProposal = _createTestDocumentEntity(
+          id: 'proposal-2',
+          ver: newerVer,
+          type: DocumentType.proposalDocument,
+        );
+        await dao.saveAll([oldProposal, newProposal]);
+
+        // When
+        final result = await dao.getDocument(type: DocumentType.proposalDocument);
+
+        // Then
+        expect(result, isNotNull);
+      });
+
+      test('filters by loose refTo and returns latest referencing document', () async {
+        // Given
+        final oldCreatedAt = DateTime.utc(2023, 1, 1);
+        final newerCreatedAt = DateTime.utc(2024, 1, 1);
+
+        final oldVer = _buildUuidV7At(oldCreatedAt);
+        final newerVer = _buildUuidV7At(newerCreatedAt);
+
+        final action1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: oldVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final action2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: newerVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver-2',
+        );
+        final unrelated = _createTestDocumentEntity(
+          id: 'unrelated',
+          ver: 'unrelated-ver',
+          type: DocumentType.proposalActionDocument,
+          refId: 'other-proposal',
+          refVer: 'other-ver',
+        );
+        await dao.saveAll([action1, action2, unrelated]);
+
+        // When
+        final result = await dao.getDocument(
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.refId, 'proposal-id');
+      });
+
+      test('filters by exact refTo and returns matching document', () async {
+        // Given
+        final action1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: 'action-ver-1',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver-1',
+        );
+        final action2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: 'action-ver-2',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver-2',
+        );
+        await dao.saveAll([action1, action2]);
+
+        // When
+        final result = await dao.getDocument(
+          referencing: const SignedDocumentRef.exact(
+            id: 'proposal-id',
+            version: 'proposal-ver-1',
+          ),
+        );
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'action-1');
+        expect(result.refVer, 'proposal-ver-1');
+      });
+
+      test('returns null when no documents match refTo filter', () async {
+        // Given
+        final action = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'action-ver',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        await dao.save(action);
+
+        // When
+        final result = await dao.getDocument(
+          referencing: const SignedDocumentRef.loose(id: 'non-existent-proposal'),
+        );
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('combines type and ref filters', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'doc-id',
+          ver: 'ver-1',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'doc-id',
+          ver: 'ver-2',
+          type: DocumentType.commentDocument,
+        );
+        await dao.saveAll([proposal, comment]);
+
+        // When
+        final result = await dao.getDocument(
+          type: DocumentType.proposalDocument,
+          ref: const SignedDocumentRef.loose(id: 'doc-id'),
+        );
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'doc-id');
+        expect(result.ver, 'ver-1');
+        expect(result.type, DocumentType.proposalDocument);
+      });
+
+      test('returns null when type and ref filters have no intersection', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        await dao.save(proposal);
+
+        // When
+        final result = await dao.getDocument(
+          type: DocumentType.commentDocument,
+          ref: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('combines type and refTo filters', () async {
+        // Given
+        final action = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'action-ver',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        await dao.saveAll([action, comment]);
+
+        // When
+        final result = await dao.getDocument(
+          type: DocumentType.proposalActionDocument,
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'action-id');
+        expect(result.type, DocumentType.proposalActionDocument);
+      });
+
+      test('combines ref and refTo filters', () async {
+        // Given
+        final action1 = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'ver-1',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-1',
+          refVer: 'proposal-ver',
+        );
+        final action2 = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'ver-2',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-2',
+          refVer: 'proposal-ver',
+        );
+        await dao.saveAll([action1, action2]);
+
+        // When
+        final result = await dao.getDocument(
+          ref: const SignedDocumentRef.loose(id: 'action-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-1'),
+        );
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'action-id');
+        expect(result.refId, 'proposal-1');
+      });
+
+      test('combines all three filters', () async {
+        // Given
+        final oldCreatedAt = DateTime.utc(2023, 1, 1);
+        final newerCreatedAt = DateTime.utc(2024, 1, 1);
+
+        final oldVer = _buildUuidV7At(oldCreatedAt);
+        final newerVer = _buildUuidV7At(newerCreatedAt);
+
+        final action1 = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: oldVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final action2 = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: newerVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        await dao.saveAll([action1, action2, comment]);
+
+        // When
+        final result = await dao.getDocument(
+          type: DocumentType.proposalActionDocument,
+          ref: const SignedDocumentRef.loose(id: 'action-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'action-id');
+        expect(result.ver, newerVer);
+        expect(result.type, DocumentType.proposalActionDocument);
+        expect(result.refId, 'proposal-id');
+      });
+
+      test('returns null when all three filters have no intersection', () async {
+        // Given
+        final action = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'action-ver',
+          type: DocumentType.proposalActionDocument,
+          refId: 'proposal-id',
+          refVer: 'proposal-ver',
+        );
+        await dao.save(action);
+
+        // When
+        final result = await dao.getDocument(
+          type: DocumentType.commentDocument,
+          ref: const SignedDocumentRef.loose(id: 'action-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
+        );
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('returns newest document by author', () async {
+        // Given
+        final author = _createTestAuthor(name: 'Damian');
+        final proposal1 = _createTestDocumentEntity(
+          id: 'proposal1-id',
+          ver: _buildUuidV7At(DateTime(2023)),
+          type: DocumentType.proposalDocument,
+          authors: author.toUri().toString(),
+        );
+        final newerVer = _buildUuidV7At(DateTime(2024));
+        final proposal2 = _createTestDocumentEntity(
+          id: 'proposal2-id',
+          ver: newerVer,
+          type: DocumentType.proposalDocument,
+          authors: author.toUri().toString(),
+        );
+        await dao.saveAll([proposal1, proposal2]);
+
+        // When
+        final result = await dao.getDocument(author: author);
+
+        // Then
+        expect(result, isNotNull);
+        expect(result?.ver, newerVer);
       });
     });
 
@@ -1010,13 +1637,664 @@ void main() {
         expect(result!.version, versions[3]);
       });
     });
+
+    group('deleteWhere', () {
+      test('returns zero when database is empty', () async {
+        // Given: An empty database
+
+        // When
+        final result = await dao.deleteWhere();
+
+        // Then
+        expect(result, 0);
+      });
+
+      test('deletes all documents when no filter is provided', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.commentDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-3',
+            ver: 'ver-3',
+            type: DocumentType.proposalTemplate,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere();
+
+        // Then
+        expect(result, 3);
+        expect(await dao.count(), 0);
+      });
+
+      test('deletes documents not in notInType list', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        final template = _createTestDocumentEntity(
+          id: 'template-id',
+          ver: 'template-ver',
+          type: DocumentType.proposalTemplate,
+        );
+        await dao.saveAll([proposal, comment, template]);
+
+        // When
+        final result = await dao.deleteWhere(
+          excludeTypes: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 1);
+
+        final remaining = await dao.getDocument(
+          ref: const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+        );
+        expect(remaining, isNotNull);
+        expect(remaining!.type, DocumentType.proposalDocument);
+      });
+
+      test('keeps multiple document types when specified in notInType', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'proposal-id',
+          ver: 'proposal-ver',
+          type: DocumentType.proposalDocument,
+        );
+        final comment = _createTestDocumentEntity(
+          id: 'comment-id',
+          ver: 'comment-ver',
+          type: DocumentType.commentDocument,
+        );
+        final template = _createTestDocumentEntity(
+          id: 'template-id',
+          ver: 'template-ver',
+          type: DocumentType.proposalTemplate,
+        );
+        final action = _createTestDocumentEntity(
+          id: 'action-id',
+          ver: 'action-ver',
+          type: DocumentType.proposalActionDocument,
+        );
+        await dao.saveAll([proposal, comment, template, action]);
+
+        // When
+        final result = await dao.deleteWhere(
+          excludeTypes: [
+            DocumentType.proposalDocument,
+            DocumentType.proposalTemplate,
+          ],
+        );
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 2);
+
+        final remainingProposal = await dao.getDocument(
+          ref: const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+        );
+        final remainingTemplate = await dao.getDocument(
+          ref: const SignedDocumentRef.exact(id: 'template-id', version: 'template-ver'),
+        );
+        final deletedComment = await dao.getDocument(
+          ref: const SignedDocumentRef.exact(id: 'comment-id', version: 'comment-ver'),
+        );
+        final deletedAction = await dao.getDocument(
+          ref: const SignedDocumentRef.exact(id: 'action-id', version: 'action-ver'),
+        );
+
+        expect(remainingProposal, isNotNull);
+        expect(remainingTemplate, isNotNull);
+        expect(deletedComment, isNull);
+        expect(deletedAction, isNull);
+      });
+
+      test('deletes all documents when notInType is empty list', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.commentDocument,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(excludeTypes: []);
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 0);
+      });
+
+      test('returns zero when all documents match notInType filter', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.proposalDocument,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(
+          excludeTypes: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 0);
+        expect(await dao.count(), 2);
+      });
+
+      test('handles multiple versions of same document id', () async {
+        // Given
+        final v1 = _createTestDocumentEntity(
+          id: 'multi-id',
+          ver: 'ver-1',
+          type: DocumentType.proposalDocument,
+        );
+        final v2 = _createTestDocumentEntity(
+          id: 'multi-id',
+          ver: 'ver-2',
+          type: DocumentType.proposalDocument,
+        );
+        final other = _createTestDocumentEntity(
+          id: 'other-id',
+          ver: 'other-ver',
+          type: DocumentType.commentDocument,
+        );
+        await dao.saveAll([v1, v2, other]);
+
+        // When
+        final result = await dao.deleteWhere(
+          excludeTypes: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 1);
+        expect(await dao.count(), 2);
+      });
+
+      test('deletes documents with all different types correctly', () async {
+        // Given
+        final entities = [
+          _createTestDocumentEntity(
+            id: 'id-1',
+            ver: 'ver-1',
+            type: DocumentType.proposalDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-2',
+            ver: 'ver-2',
+            type: DocumentType.commentDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-3',
+            ver: 'ver-3',
+            type: DocumentType.reviewDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-4',
+            ver: 'ver-4',
+            type: DocumentType.proposalActionDocument,
+          ),
+          _createTestDocumentEntity(
+            id: 'id-5',
+            ver: 'ver-5',
+            type: DocumentType.proposalTemplate,
+          ),
+        ];
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(
+          excludeTypes: [
+            DocumentType.proposalDocument,
+            DocumentType.proposalTemplate,
+            DocumentType.proposalActionDocument,
+          ],
+        );
+
+        // Then
+        expect(result, 2);
+        expect(await dao.count(), 3);
+      });
+
+      test('performs efficiently with large dataset', () async {
+        // Given
+        final entities = List.generate(
+          1000,
+          (i) => _createTestDocumentEntity(
+            id: 'id-$i',
+            ver: 'ver-$i',
+            type: i.isEven ? DocumentType.proposalDocument : DocumentType.commentDocument,
+          ),
+        );
+        await dao.saveAll(entities);
+
+        // When
+        final result = await dao.deleteWhere(
+          excludeTypes: [DocumentType.proposalDocument],
+        );
+
+        // Then
+        expect(result, 500);
+        expect(await dao.count(), 500);
+      });
+    });
+
+    group('getDocuments', () {
+      test('returns empty list for empty database', () async {
+        // Given: An empty database
+
+        // When
+        final result = await dao.getDocuments(
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result, isEmpty);
+      });
+
+      test('returns all documents when no filters applied', () async {
+        // Given
+        final doc1 = _createTestDocumentEntity(id: 'id-1', ver: 'ver-1');
+        final doc2 = _createTestDocumentEntity(id: 'id-2', ver: 'ver-1');
+        await dao.saveAll([doc1, doc2]);
+
+        // When
+        final result = await dao.getDocuments(
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 2);
+        expect(result.map((e) => e.id), containsAll(['id-1', 'id-2']));
+      });
+
+      test('filters by type', () async {
+        // Given
+        final proposal = _createTestDocumentEntity(
+          id: 'p-1',
+          type: DocumentType.proposalDocument,
+        );
+        final template = _createTestDocumentEntity(
+          id: 't-1',
+          type: DocumentType.proposalTemplate,
+        );
+        await dao.saveAll([proposal, template]);
+
+        // When
+        final result = await dao.getDocuments(
+          type: DocumentType.proposalDocument,
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 1);
+        expect(result.first.id, 'p-1');
+        expect(result.first.type, DocumentType.proposalDocument);
+      });
+
+      test('filters by loose ref (returns all versions)', () async {
+        // Given
+        final v1 = _createTestDocumentEntity(id: 'doc-1', ver: 'v1');
+        final v2 = _createTestDocumentEntity(id: 'doc-1', ver: 'v2');
+        final other = _createTestDocumentEntity(id: 'doc-2', ver: 'v1');
+        await dao.saveAll([v1, v2, other]);
+
+        // When
+        final result = await dao.getDocuments(
+          ref: const SignedDocumentRef.loose(id: 'doc-1'),
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 2);
+        expect(result.map((e) => e.ver), containsAll(['v1', 'v2']));
+      });
+
+      test('filters by exact ref', () async {
+        // Given
+        final v1 = _createTestDocumentEntity(id: 'doc-1', ver: 'v1');
+        final v2 = _createTestDocumentEntity(id: 'doc-1', ver: 'v2');
+        await dao.saveAll([v1, v2]);
+
+        // When
+        final result = await dao.getDocuments(
+          ref: const SignedDocumentRef.exact(id: 'doc-1', version: 'v1'),
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 1);
+        expect(result.first.ver, 'v1');
+      });
+
+      test('filters by refTo (loose)', () async {
+        // Given
+        final target = _createTestDocumentEntity(id: 'target-1');
+        final ref1 = _createTestDocumentEntity(
+          id: 'ref-1',
+          refId: 'target-1',
+          refVer: 'any',
+        );
+        final ref2 = _createTestDocumentEntity(
+          id: 'ref-2',
+          refId: 'target-1',
+          refVer: 'other',
+        );
+        final other = _createTestDocumentEntity(id: 'other', refId: 'other-target');
+        await dao.saveAll([target, ref1, ref2, other]);
+
+        // When
+        final result = await dao.getDocuments(
+          referencing: const SignedDocumentRef.loose(id: 'target-1'),
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 2);
+        expect(result.map((e) => e.id), containsAll(['ref-1', 'ref-2']));
+      });
+
+      test('filters by refTo (exact)', () async {
+        // Given
+        final v1 = _createTestDocumentEntity(
+          id: 'ref-1',
+          refId: 'target',
+          refVer: 'v1',
+        );
+        final v2 = _createTestDocumentEntity(
+          id: 'ref-2',
+          refId: 'target',
+          refVer: 'v2',
+        );
+        await dao.saveAll([v1, v2]);
+
+        // When
+        final result = await dao.getDocuments(
+          referencing: const SignedDocumentRef.exact(id: 'target', version: 'v1'),
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 1);
+        expect(result.first.id, 'ref-1');
+      });
+
+      test('returns only latest versions when latestOnly is true', () async {
+        // Given
+        final oldTime = DateTime.utc(2024, 1, 1);
+        final newTime = DateTime.utc(2024, 1, 2);
+
+        final doc1V1 = _createTestDocumentEntity(
+          id: 'doc-1',
+          ver: _buildUuidV7At(oldTime),
+        );
+        final doc1V2 = _createTestDocumentEntity(
+          id: 'doc-1',
+          ver: _buildUuidV7At(newTime),
+        );
+        final doc2 = _createTestDocumentEntity(
+          id: 'doc-2',
+          ver: _buildUuidV7At(oldTime),
+        );
+
+        await dao.saveAll([doc1V1, doc1V2, doc2]);
+
+        // When
+        final result = await dao.getDocuments(
+          latestOnly: true,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 2);
+        expect(result.map((e) => e.id), containsAll(['doc-1', 'doc-2']));
+
+        final resultDoc1 = result.firstWhere((e) => e.id == 'doc-1');
+        expect(resultDoc1.ver, doc1V2.doc.ver);
+      });
+
+      test('pagination works with limit and offset', () async {
+        // Given: 5 documents
+        final docs = List.generate(
+          5,
+          (i) => _createTestDocumentEntity(
+            id: 'doc-$i',
+            ver: _buildUuidV7At(DateTime.utc(2024, 1, 1).add(Duration(minutes: i))),
+          ),
+        );
+
+        await dao.saveAll(docs);
+
+        // When
+        final result = await dao.getDocuments(
+          latestOnly: false,
+          limit: 2,
+          offset: 1,
+        );
+
+        // Then
+        expect(result.length, 2);
+      });
+
+      test('respects campaign filters (categories)', () async {
+        // Given
+        final doc1 = _createTestDocumentEntity(id: 'd1', categoryId: 'cat-1');
+        final doc2 = _createTestDocumentEntity(id: 'd2', categoryId: 'cat-2');
+        final doc3 = _createTestDocumentEntity(id: 'd3', categoryId: 'cat-1');
+        await dao.saveAll([doc1, doc2, doc3]);
+
+        // When
+        final result = await dao.getDocuments(
+          filters: const CampaignFilters(categoriesIds: ['cat-1']),
+          latestOnly: false,
+          limit: 100,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 2);
+        expect(result.map((e) => e.id), containsAll(['d1', 'd3']));
+      });
+
+      test('combines type, latestOnly and campaign filters', () async {
+        // Given
+        final oldProposal = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(DateTime(2023)),
+          type: DocumentType.proposalDocument,
+          categoryId: 'cat-A',
+        );
+        final newProposal = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(DateTime(2024)),
+          type: DocumentType.proposalDocument,
+          categoryId: 'cat-A',
+        );
+        final otherCatProposal = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(DateTime(2024)),
+          type: DocumentType.proposalDocument,
+          categoryId: 'cat-B',
+        );
+        final wrongType = _createTestDocumentEntity(
+          id: 't1',
+          type: DocumentType.proposalTemplate,
+          categoryId: 'cat-A',
+        );
+
+        await dao.saveAll([oldProposal, newProposal, otherCatProposal, wrongType]);
+
+        // When
+        final result = await dao.getDocuments(
+          type: DocumentType.proposalDocument,
+          filters: const CampaignFilters(categoriesIds: ['cat-A']),
+          latestOnly: true,
+          limit: 10,
+          offset: 0,
+        );
+
+        // Then
+        expect(result.length, 1);
+        expect(result.first.id, 'p1');
+        expect(result.first.ver, newProposal.doc.ver);
+      });
+
+      test('results should be ordered by createdAt DESC (Newest First)', () async {
+        // Given: Three documents with distinct creation times
+        final oldestDate = DateTime.utc(2023, 1, 1);
+        final middleDate = DateTime.utc(2023, 6, 1);
+        final newestDate = DateTime.utc(2024, 1, 1);
+
+        final oldestDoc = _createTestDocumentEntity(
+          id: 'doc-old',
+          ver: _buildUuidV7At(oldestDate),
+        );
+        final middleDoc = _createTestDocumentEntity(
+          id: 'doc-mid',
+          ver: _buildUuidV7At(middleDate),
+        );
+        final newestDoc = _createTestDocumentEntity(
+          id: 'doc-new',
+          ver: _buildUuidV7At(newestDate),
+        );
+
+        // When: Saved in SCRAMBLED order (Old -> New -> Middle)
+        await dao.save(oldestDoc);
+        await dao.save(newestDoc);
+        await dao.save(middleDoc);
+
+        // And: We query with pagination
+        final result = await dao.getDocuments(
+          latestOnly: false,
+          limit: 10,
+          offset: 0,
+        );
+
+        // Then: We EXPECT them sorted by time (New -> Mid -> Old)
+        expect(result.length, 3);
+
+        expect(
+          result[0].id,
+          'doc-new',
+          reason: 'First item should be the newest document',
+        );
+
+        expect(
+          result[1].id,
+          'doc-mid',
+          reason: 'Second item should be the middle document',
+        );
+
+        expect(
+          result[2].id,
+          'doc-old',
+          reason: 'Last item should be the oldest document',
+        );
+      });
+
+      test('pagination stays consistent across updates', () async {
+        // Given
+        final docs = List.generate(
+          5,
+          (i) => _createTestDocumentEntity(
+            id: 'doc-$i',
+            ver: _buildUuidV7At(DateTime.utc(2024, 1, 1).add(Duration(minutes: i))),
+          ),
+        );
+
+        await dao.saveAll(docs);
+
+        // When: We fetch Page 1 (size 2)
+        final page1 = await dao.getDocuments(latestOnly: false, limit: 2, offset: 0);
+
+        // And: We insert a VERY OLD document (simulating a sync of historical data)
+        final ancientDoc = _createTestDocumentEntity(
+          id: 'doc-ancient',
+          ver: _buildUuidV7At(DateTime.utc(2020, 1, 1)),
+        );
+        await dao.save(ancientDoc);
+
+        // And
+        final page1Again = await dao.getDocuments(latestOnly: false, limit: 2, offset: 0);
+
+        // Then
+        expect(page1Again[0].id, page1[0].id);
+      });
+    });
   });
 }
 
-String _buildUuidV7At(DateTime dateTime) {
-  final ts = dateTime.millisecondsSinceEpoch;
-  final rand = Uint8List.fromList([42, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  return const UuidV7().generate(options: V7Options(ts, rand));
+String _buildUuidV7At(DateTime dateTime) => DocumentRefFactory.uuidV7At(dateTime);
+
+CatalystId _createTestAuthor({
+  String? name,
+  int role0KeySeed = 0,
+}) {
+  final buffer = StringBuffer('id.catalyst://');
+  final role0Key = Uint8List.fromList(List.filled(32, role0KeySeed));
+
+  if (name != null) {
+    buffer
+      ..write(name)
+      ..write('@');
+  }
+
+  buffer
+    ..write('preprod.cardano/')
+    ..write(base64UrlNoPadEncode(role0Key));
+
+  return CatalystId.parse(buffer.toString());
 }
 
 DocumentWithAuthorsEntity _createTestDocumentEntity({
@@ -1035,15 +2313,10 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
   String? templateId,
   String? templateVer,
 }) {
-  id ??= DocumentRefFactory.randomUuidV7();
-  ver ??= id;
-  authors ??= '';
-
-  final docEntity = DocumentEntityV2(
+  return DocumentWithAuthorsFactory.create(
     id: id,
     ver: ver,
-    content: DocumentDataContent(contentData),
-    createdAt: ver.tryDateTime ?? DateTime.timestamp(),
+    contentData: contentData,
     type: type,
     authors: authors,
     categoryId: categoryId,
@@ -1056,22 +2329,4 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
     templateId: templateId,
     templateVer: templateVer,
   );
-
-  final authorsEntities = authors
-      .split(',')
-      .where((element) => element.trim().isNotEmpty)
-      .map(CatalystId.tryParse)
-      .nonNulls
-      .map(
-        (e) => DocumentAuthorEntity(
-          documentId: docEntity.id,
-          documentVer: docEntity.ver,
-          authorId: e.toUri().toString(),
-          authorIdSignificant: e.toSignificant().toUri().toString(),
-          authorUsername: e.username,
-        ),
-      )
-      .toList();
-
-  return DocumentWithAuthorsEntity(docEntity, authorsEntities);
 }

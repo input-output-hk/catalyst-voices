@@ -21,6 +21,8 @@ abstract interface class DocumentsService {
   /// if [keepLocalDrafts] is true local drafts and their templates will be kept.
   Future<int> clear({bool keepLocalDrafts});
 
+  Future<bool> isFavorite(DocumentRef ref);
+
   /// Returns all matching [DocumentData] for given [ref].
   Future<List<DocumentData>> lookup(DocumentRef ref);
 
@@ -57,8 +59,13 @@ final class DocumentsServiceImpl implements DocumentsService {
   }
 
   @override
+  Future<bool> isFavorite(DocumentRef ref) {
+    return _documentRepository.isFavorite(ref);
+  }
+
+  @override
   Future<List<DocumentData>> lookup(DocumentRef ref) {
-    return _documentRepository.getAllDocumentsData(ref: ref);
+    return _documentRepository.findAllVersions(ref: ref);
   }
 
   @override

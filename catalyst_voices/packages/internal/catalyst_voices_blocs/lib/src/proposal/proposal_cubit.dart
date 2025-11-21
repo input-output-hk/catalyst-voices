@@ -25,6 +25,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   final ProposalService _proposalService;
   final CommentService _commentService;
   final CampaignService _campaignService;
+  final DocumentsService _documentsService;
   final DocumentMapper _documentMapper;
   final VotingBallotBuilder _ballotBuilder;
   final VotingService _votingService;
@@ -40,6 +41,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     this._proposalService,
     this._commentService,
     this._campaignService,
+    this._documentsService,
     this._documentMapper,
     this._ballotBuilder,
     this._votingService,
@@ -89,7 +91,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: proposal.document.metadata.categoryId,
       );
-      final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
+      final isFavorite = await _documentsService.isFavorite(ref);
 
       _cache = _cache.copyWith(
         proposal: Optional(proposal),
