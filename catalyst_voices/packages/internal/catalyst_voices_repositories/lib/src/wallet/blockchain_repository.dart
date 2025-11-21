@@ -1,9 +1,9 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
-import 'package:catalyst_voices_repositories/src/dto/blockchain/network_id_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/blockchain/network_id_ext.dart';
 
 // TODO(dt-iohk): move wallet related repository code here
 // ignore: one_member_abstracts
@@ -29,9 +29,9 @@ final class BlockchainRepositoryImpl implements BlockchainRepository {
     RbacToken? rbacToken,
   }) {
     return _apiServices.gateway
-        .apiV1CardanoAssetsStakeAddressGet(
+        .stakeAssets(
           stakeAddress: stakeAddress.toBech32(),
-          network: networkId.toDto(),
+          network: networkId.toApiValue(),
           authorization: rbacToken?.authHeader(),
         )
         .successBodyOrThrow()

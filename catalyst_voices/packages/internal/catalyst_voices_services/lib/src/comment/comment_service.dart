@@ -51,7 +51,9 @@ final class CommentServiceImpl implements CommentService {
         ?.comment;
 
     if (commentTemplateRef == null) {
-      throw const ApiErrorResponseException.notFound();
+      throw ApiBadResponseException.notFound(
+        message: 'No comment template for category id ${category.id}',
+      );
     }
 
     return _commentRepository.getCommentTemplate(ref: commentTemplateRef);

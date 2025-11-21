@@ -11,6 +11,7 @@ void main() {
       // When
       DocumentDataMetadata buildFun() {
         return DocumentDataMetadata(
+          contentType: DocumentContentType.json,
           type: DocumentType.proposalDocument,
           selfRef: selfRef,
         );
@@ -30,6 +31,7 @@ void main() {
       // When
       DocumentDataMetadata buildFun() {
         return DocumentDataMetadata(
+          contentType: DocumentContentType.json,
           type: DocumentType.proposalDocument,
           selfRef: selfRef,
         );

@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_reviews.enums.swagger.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_status.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_rbac_registration_status.dart';
 
 String? _tryDecodeUsername(dynamic source) {
   if (source is! String) {
@@ -16,39 +17,30 @@ String? _tryDecodeUsername(dynamic source) {
   }
 }
 
-extension on CatalystIDStatus? {
-  // inactive = 0
-  // email_verified = 1
-  // active = 2
-  // banned = 3
+extension on CatalystIdStatus? {
   AccountPublicStatus toModel() {
     return switch (this) {
-      null || CatalystIDStatus.swaggerGeneratedUnknown => AccountPublicStatus.unknown,
-      CatalystIDStatus.value_0 => AccountPublicStatus.verifying,
-      CatalystIDStatus.value_1 || CatalystIDStatus.value_2 => AccountPublicStatus.verified,
-      CatalystIDStatus.value_3 => AccountPublicStatus.banned,
+      null => AccountPublicStatus.unknown,
+      CatalystIdStatus.inactive => AccountPublicStatus.verifying,
+      CatalystIdStatus.emailVerified || CatalystIdStatus.active => AccountPublicStatus.verified,
+      CatalystIdStatus.banned => AccountPublicStatus.banned,
     };
   }
 }
 
-extension on CatalystRBACRegistrationStatus? {
-  // initialized = 0
-  // not_found = 1
-  // volatile = 2
-  // persistent = 3
+extension on CatalystRbacRegistrationStatus? {
   AccountPublicRbacStatus toModel() {
     return switch (this) {
-      null ||
-      CatalystRBACRegistrationStatus.swaggerGeneratedUnknown => AccountPublicRbacStatus.unknown,
-      CatalystRBACRegistrationStatus.value_0 => AccountPublicRbacStatus.initialized,
-      CatalystRBACRegistrationStatus.value_1 => AccountPublicRbacStatus.notFound,
-      CatalystRBACRegistrationStatus.value_2 => AccountPublicRbacStatus.volatile,
-      CatalystRBACRegistrationStatus.value_3 => AccountPublicRbacStatus.persistent,
+      null => AccountPublicRbacStatus.unknown,
+      CatalystRbacRegistrationStatus.initialized => AccountPublicRbacStatus.initialized,
+      CatalystRbacRegistrationStatus.notFound => AccountPublicRbacStatus.notFound,
+      CatalystRbacRegistrationStatus.volatile => AccountPublicRbacStatus.volatile,
+      CatalystRbacRegistrationStatus.persistent => AccountPublicRbacStatus.persistent,
     };
   }
 }
 
-extension CatalystIdPublicExt on CatalystIDPublic {
+extension CatalystIdPublicExt on CatalystIdPublic {
   AccountPublicProfile toModel() {
     final email = this.email;
     final decodedEmail = email is String ? email : '';

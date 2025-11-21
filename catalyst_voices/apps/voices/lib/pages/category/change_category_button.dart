@@ -20,13 +20,13 @@ class ChangeCategoryButton extends StatelessWidget {
       List<DropdownMenuViewModel<ProposalsCategoryFilter>>
     >(
       selector: (state) {
-        final selectedCategory = state.category?.id ?? '';
+        final selectedCategory = state.category?.ref ?? '';
         return state.categories
             .map(
               (e) => DropdownMenuViewModel(
-                value: ProposalsRefCategoryFilter(ref: e.id),
+                value: ProposalsRefCategoryFilter(ref: e.ref),
                 name: e.formattedName,
-                isSelected: e.id == selectedCategory,
+                isSelected: e.ref == selectedCategory,
               ),
             )
             .toList();
