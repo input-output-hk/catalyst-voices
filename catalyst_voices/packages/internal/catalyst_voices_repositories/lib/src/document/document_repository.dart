@@ -87,14 +87,14 @@ abstract interface class DocumentRepository {
   /// Returns latest matching [DocumentRef] version with same id as [ref].
   Future<DocumentRef?> getLatestOf({required DocumentRef ref});
 
-  /// Returns count of documents matching [refTo] id and [type].
+  /// Returns count of documents matching [referencing] id and [type].
   Future<int> getRefCount({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 
   Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 
@@ -179,7 +179,7 @@ abstract interface class DocumentRepository {
 
   /// Emits number of matching documents
   Stream<int> watchCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     DocumentType? type,
   });
 
@@ -204,19 +204,19 @@ abstract interface class DocumentRepository {
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   /// Looking for document with matching refTo and type.
-  /// It return documents data that have a reference that matches [refTo]
+  /// It return documents data that have a reference that matches [referencing]
   ///
   /// This method is used when we want to find a document that has a reference
   /// to a document that we are looking for.
   ///
   /// For example, we want to find latest document action that were made
-  /// on a [refTo] document.
+  /// on a [referencing] document.
   Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 }
@@ -256,8 +256,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) async {
     final all = switch (ref) {
-      DraftRef() => await _drafts.getAll(ref: ref),
-      SignedDocumentRef() => await _localDocuments.getAll(ref: ref),
+      DraftRef() => await _drafts.findAll(ref: ref),
+      SignedDocumentRef() => await _localDocuments.findAll(ref: ref),
     }..sort();
 
     return all;
@@ -267,8 +267,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   }) async {
-    final localRefs = await _localDocuments.getAll(ref: SignedDocumentRef(id: id));
-    final drafts = await _drafts.getAll(ref: DraftRef(id: id));
+    final localRefs = await _localDocuments.findAll(ref: SignedDocumentRef(id: id));
+    final drafts = await _drafts.findAll(ref: DraftRef(id: id));
 
     return [...drafts, ...localRefs];
   }
@@ -298,8 +298,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentData?> getLatestDocument({
     CatalystId? authorId,
   }) async {
-    final latestDocument = await _localDocuments.get(authorId: authorId);
-    final latestDraft = await _drafts.get();
+    final latestDocument = await _localDocuments.findFirst(authorId: authorId);
+    final latestDraft = await _drafts.findFirst();
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
@@ -307,28 +307,28 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   // TODO(damian-molinski): consider also checking with remote source.
   @override
   Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
-    final draft = await _drafts.getLatestOf(ref: ref);
+    final draft = await _drafts.getLatestRefOf(ref);
     if (draft != null) {
       return draft;
     }
 
-    return _localDocuments.getLatestOf(ref: ref);
+    return _localDocuments.getLatestRefOf(ref);
   }
 
   @override
   Future<int> getRefCount({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   }) {
-    return _localDocuments.count(refTo: refTo, type: type);
+    return _localDocuments.count(referencing: referencing, type: type);
   }
 
   @override
   Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   }) {
-    return _localDocuments.get(refTo: refTo, type: type);
+    return _localDocuments.findFirst(referencing: referencing, type: type);
   }
 
   @override
@@ -384,9 +384,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool includeLocalDrafts = false,
   }) async {
     List<DocumentData> documents;
-    final localDocuments = await _localDocuments.getAll(ref: SignedDocumentRef(id: id));
+    final localDocuments = await _localDocuments.findAll(ref: SignedDocumentRef(id: id));
     if (includeLocalDrafts) {
-      final localDrafts = await _drafts.getAll(ref: DraftRef(id: id));
+      final localDrafts = await _drafts.findAll(ref: DraftRef(id: id));
       documents = [...localDocuments, ...localDrafts];
     } else {
       documents = localDocuments;
@@ -410,8 +410,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool keepLocalDrafts = false,
   }) async {
     final deletedDrafts = keepLocalDrafts ? 0 : await _drafts.delete();
-    final notInType = keepLocalDrafts ? [DocumentType.proposalTemplate] : null;
-    final deletedDocuments = await _localDocuments.delete(notInType: notInType);
+    final excludeTypes = keepLocalDrafts ? [DocumentType.proposalTemplate] : null;
+    final deletedDocuments = await _localDocuments.delete(excludeTypes: excludeTypes);
 
     return deletedDrafts + deletedDocuments;
   }
@@ -468,14 +468,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool getLocalDrafts = false,
     DocumentType? type,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     final localDocs = _localDocuments
         .watchAll(
           latestOnly: unique,
           type: type,
           authorId: authorId,
-          refTo: refTo,
+          referencing: referencing,
           limit: limit ?? 200,
         )
         .asyncMap(
@@ -519,11 +519,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Stream<int> watchCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     DocumentType? type,
   }) {
     return _localDocuments.watchCount(
-      refTo: refTo,
+      referencing: referencing,
       type: type,
     );
   }
@@ -557,7 +557,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return watchAllDocuments(
       refGetter: refGetter,
@@ -566,7 +566,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       unique: unique,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
-      refTo: refTo,
+      referencing: referencing,
     );
   }
 
@@ -604,17 +604,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
     ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {
-    return _localDocuments.watch(refTo: refTo, type: type).distinct();
+    return _localDocuments.watch(referencing: referencing, type: type).distinct();
   }
 
   Future<DocumentData?> _getDraftDocumentData({
     required DraftRef ref,
   }) async {
-    return _drafts.get(ref: ref);
+    return _drafts.get(ref);
   }
 
   Future<DocumentData?> _getSignedDocumentData({
@@ -631,10 +631,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final isCached = useCache && await _localDocuments.exists(ref: ref);
     if (isCached) {
-      return _localDocuments.get(ref: ref);
+      return _localDocuments.get(ref);
     }
 
-    final document = await _remoteDocuments.get(ref: ref);
+    final document = await _remoteDocuments.get(ref);
 
     if (useCache && document != null) {
       await _localDocuments.save(data: document);

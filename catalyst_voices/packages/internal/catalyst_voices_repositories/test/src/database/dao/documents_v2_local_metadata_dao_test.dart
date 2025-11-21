@@ -6,20 +6,20 @@ import 'package:flutter_test/flutter_test.dart';
 import '../connection/test_connection.dart';
 
 void main() {
-  late DriftCatalystDatabase db;
-  late DocumentsV2LocalMetadataDao dao;
-
-  setUp(() async {
-    final connection = await buildTestConnection();
-    db = DriftCatalystDatabase(connection);
-    dao = db.driftDocumentsV2LocalMetadataDao;
-  });
-
-  tearDown(() async {
-    await db.close();
-  });
-
   group(DriftDocumentsV2LocalMetadataDao, () {
+    late DriftCatalystDatabase db;
+    late DocumentsV2LocalMetadataDao dao;
+
+    setUp(() async {
+      final connection = await buildTestConnection();
+      db = DriftCatalystDatabase(connection);
+      dao = db.driftDocumentsV2LocalMetadataDao;
+    });
+
+    tearDown(() async {
+      await db.close();
+    });
+
     group('deleteWhere', () {
       test('returns zero when database is empty', () async {
         // Given: An empty database

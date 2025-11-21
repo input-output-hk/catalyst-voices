@@ -66,10 +66,10 @@ void main() {
         );
 
         when(
-          () => remoteDocuments.get(ref: template.ref),
+          () => remoteDocuments.get(template.ref),
         ).thenAnswer((_) => Future.value(template));
         when(
-          () => remoteDocuments.get(ref: proposal.ref),
+          () => remoteDocuments.get(proposal.ref),
         ).thenAnswer((_) => Future.value(proposal));
 
         // When
@@ -97,10 +97,10 @@ void main() {
           template: templateRef,
         );
 
-        when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
+        when(() => remoteDocuments.get(templateRef)).thenAnswer(
           (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
         );
-        when(() => remoteDocuments.get(ref: proposal.ref)).thenAnswer(
+        when(() => remoteDocuments.get(proposal.ref)).thenAnswer(
           (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
         );
 
@@ -133,14 +133,14 @@ void main() {
 
           final ref = documentData.ref;
 
-          when(() => remoteDocuments.get(ref: ref)).thenAnswer((_) => Future.value(documentData));
+          when(() => remoteDocuments.get(ref)).thenAnswer((_) => Future.value(documentData));
 
           // When
           await repository.getDocumentData(ref: ref);
           await repository.getDocumentData(ref: ref);
 
           // Then
-          verify(() => remoteDocuments.get(ref: ref)).called(1);
+          verify(() => remoteDocuments.get(ref)).called(1);
         },
         onPlatform: driftOnPlatforms,
       );
@@ -162,7 +162,7 @@ void main() {
           when(() => remoteDocuments.getLatestVersion(id)).thenAnswer((_) => Future.value(version));
 
           when(
-            () => remoteDocuments.get(ref: exactRef),
+            () => remoteDocuments.get(exactRef),
           ).thenAnswer((_) => Future.value(documentData));
 
           // When
@@ -170,7 +170,7 @@ void main() {
 
           // Then
           verify(() => remoteDocuments.getLatestVersion(id)).called(1);
-          verify(() => remoteDocuments.get(ref: exactRef)).called(1);
+          verify(() => remoteDocuments.get(exactRef)).called(1);
         },
         onPlatform: driftOnPlatforms,
       );
@@ -189,10 +189,10 @@ void main() {
           final proposal = DocumentDataFactory.build(template: templateRef);
 
           when(
-            () => remoteDocuments.get(ref: template.ref),
+            () => remoteDocuments.get(template.ref),
           ).thenAnswer((_) => Future.value(template));
           when(
-            () => remoteDocuments.get(ref: proposal.ref),
+            () => remoteDocuments.get(proposal.ref),
           ).thenAnswer((_) => Future.value(proposal));
 
           // When
@@ -233,13 +233,13 @@ void main() {
           final proposal2 = DocumentDataFactory.build(template: templateRef);
 
           when(
-            () => remoteDocuments.get(ref: template.ref),
+            () => remoteDocuments.get(template.ref),
           ).thenAnswer((_) => Future.value(template));
           when(
-            () => remoteDocuments.get(ref: proposal1.ref),
+            () => remoteDocuments.get(proposal1.ref),
           ).thenAnswer((_) => Future.value(proposal1));
           when(
-            () => remoteDocuments.get(ref: proposal2.ref),
+            () => remoteDocuments.get(proposal2.ref),
           ).thenAnswer((_) => Future.value(proposal2));
 
           // When
@@ -262,7 +262,7 @@ void main() {
           expect(proposals[0]!.data.ref, proposal1.ref);
           expect(proposals[1]!.data.ref, proposal2.ref);
 
-          verify(() => remoteDocuments.get(ref: template.ref)).called(1);
+          verify(() => remoteDocuments.get(template.ref)).called(1);
         },
         onPlatform: driftOnPlatforms,
       );

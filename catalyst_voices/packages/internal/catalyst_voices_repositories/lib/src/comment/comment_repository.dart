@@ -105,7 +105,7 @@ final class DocumentsCommentRepository implements CommentRepository {
         .watchDocuments(
           type: DocumentType.commentDocument,
           refGetter: (data) => data.metadata.template!,
-          refTo: ref,
+          referencing: ref,
         )
         .map(
           (documents) {

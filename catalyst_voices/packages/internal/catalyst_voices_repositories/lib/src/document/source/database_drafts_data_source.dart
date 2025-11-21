@@ -16,17 +16,17 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Future<int> count({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
-    return _database.localDocumentsV2Dao.count(type: type, ref: ref, refTo: refTo);
+    return _database.localDocumentsV2Dao.count(type: type, ref: ref, referencing: referencing);
   }
 
   @override
   Future<int> delete({
     DocumentRef? ref,
-    List<DocumentType>? notInType,
+    List<DocumentType>? excludeTypes,
   }) {
-    return _database.localDocumentsV2Dao.deleteWhere(ref: ref, notInType: notInType);
+    return _database.localDocumentsV2Dao.deleteWhere(ref: ref, excludeTypes: excludeTypes);
   }
 
   @override
@@ -40,21 +40,10 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<DocumentData?> get({
+  Future<List<DocumentData>> findAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
-  }) {
-    return _database.localDocumentsV2Dao
-        .getDocument(type: type, ref: ref, refTo: refTo)
-        .then((value) => value?.toModel());
-  }
-
-  @override
-  Future<List<DocumentData>> getAll({
-    DocumentType? type,
-    DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 100,
     int offset = 0,
@@ -63,7 +52,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
         .getDocuments(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -72,7 +61,21 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
+  Future<DocumentData?> findFirst({
+    DocumentType? type,
+    DocumentRef? ref,
+    DocumentRef? referencing,
+  }) {
+    return _database.localDocumentsV2Dao
+        .getDocument(type: type, ref: ref, referencing: referencing)
+        .then((value) => value?.toModel());
+  }
+
+  @override
+  Future<DocumentData?> get(DocumentRef ref) => findFirst(ref: ref);
+
+  @override
+  Future<DocumentRef?> getLatestRefOf(DocumentRef ref) async {
     return _database.localDocumentsV2Dao.getLatestOf(ref);
   }
 
@@ -87,7 +90,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<void> update({
+  Future<void> updateContent({
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {
@@ -98,10 +101,10 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Stream<DocumentData?> watch({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
-        .watchDocument(type: type, ref: ref, refTo: refTo)
+        .watchDocument(type: type, ref: ref, referencing: referencing)
         .distinct()
         .map((value) => value?.toModel());
   }
@@ -110,7 +113,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 100,
     int offset = 0,
@@ -119,7 +122,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
         .watchDocuments(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -132,13 +135,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Stream<int> watchCount({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
         .watchCount(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
         )
         .distinct();
   }

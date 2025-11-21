@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_redundant_argument_values
-
 import 'dart:typed_data';
 
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
@@ -192,7 +191,7 @@ void main() {
 
         // When
         final result = await dao.count(
-          refTo: const SignedDocumentRef.loose(id: 'proposal-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
         );
 
         // Then
@@ -219,7 +218,7 @@ void main() {
 
         // When
         final result = await dao.count(
-          refTo: const SignedDocumentRef.exact(
+          referencing: const SignedDocumentRef.exact(
             id: 'proposal-id',
             version: 'proposal-ver-1',
           ),
@@ -242,7 +241,7 @@ void main() {
 
         // When
         final result = await dao.count(
-          refTo: const SignedDocumentRef.loose(id: 'non-existent-proposal'),
+          referencing: const SignedDocumentRef.loose(id: 'non-existent-proposal'),
         );
 
         // Then
@@ -299,7 +298,7 @@ void main() {
         // When
         final result = await dao.count(
           type: DocumentType.proposalActionDocument,
-          refTo: const SignedDocumentRef.loose(id: 'proposal-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
         );
 
         // Then
@@ -335,7 +334,7 @@ void main() {
         final result = await dao.count(
           type: DocumentType.proposalActionDocument,
           ref: const SignedDocumentRef.loose(id: 'action-id'),
-          refTo: const SignedDocumentRef.loose(id: 'proposal-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
         );
 
         // Then
@@ -742,7 +741,7 @@ void main() {
 
         // When
         final result = await dao.getDocument(
-          refTo: const SignedDocumentRef.loose(id: 'proposal-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
         );
 
         // Then
@@ -770,7 +769,7 @@ void main() {
 
         // When
         final result = await dao.getDocument(
-          refTo: const SignedDocumentRef.exact(
+          referencing: const SignedDocumentRef.exact(
             id: 'proposal-id',
             version: 'proposal-ver-1',
           ),
@@ -795,7 +794,7 @@ void main() {
 
         // When
         final result = await dao.getDocument(
-          refTo: const SignedDocumentRef.loose(id: 'non-existent-proposal'),
+          referencing: const SignedDocumentRef.loose(id: 'non-existent-proposal'),
         );
 
         // Then
@@ -869,7 +868,7 @@ void main() {
         // When
         final result = await dao.getDocument(
           type: DocumentType.proposalActionDocument,
-          refTo: const SignedDocumentRef.loose(id: 'proposal-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
         );
 
         // Then
@@ -899,7 +898,7 @@ void main() {
         // When
         final result = await dao.getDocument(
           ref: const SignedDocumentRef.loose(id: 'action-id'),
-          refTo: const SignedDocumentRef.loose(id: 'proposal-1'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-1'),
         );
 
         // Then
@@ -943,7 +942,7 @@ void main() {
         final result = await dao.getDocument(
           type: DocumentType.proposalActionDocument,
           ref: const SignedDocumentRef.loose(id: 'action-id'),
-          refTo: const SignedDocumentRef.loose(id: 'proposal-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
         );
 
         // Then
@@ -969,7 +968,7 @@ void main() {
         final result = await dao.getDocument(
           type: DocumentType.commentDocument,
           ref: const SignedDocumentRef.loose(id: 'action-id'),
-          refTo: const SignedDocumentRef.loose(id: 'proposal-id'),
+          referencing: const SignedDocumentRef.loose(id: 'proposal-id'),
         );
 
         // Then
@@ -1700,7 +1699,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          excludeTypes: [DocumentType.proposalDocument],
         );
 
         // Then
@@ -1740,7 +1739,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [
+          excludeTypes: [
             DocumentType.proposalDocument,
             DocumentType.proposalTemplate,
           ],
@@ -1786,7 +1785,7 @@ void main() {
         await dao.saveAll(entities);
 
         // When
-        final result = await dao.deleteWhere(notInType: []);
+        final result = await dao.deleteWhere(excludeTypes: []);
 
         // Then
         expect(result, 2);
@@ -1811,7 +1810,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          excludeTypes: [DocumentType.proposalDocument],
         );
 
         // Then
@@ -1840,7 +1839,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          excludeTypes: [DocumentType.proposalDocument],
         );
 
         // Then
@@ -1881,7 +1880,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [
+          excludeTypes: [
             DocumentType.proposalDocument,
             DocumentType.proposalTemplate,
             DocumentType.proposalActionDocument,
@@ -1907,7 +1906,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          excludeTypes: [DocumentType.proposalDocument],
         );
 
         // Then
@@ -2032,7 +2031,7 @@ void main() {
 
         // When
         final result = await dao.getDocuments(
-          refTo: const SignedDocumentRef.loose(id: 'target-1'),
+          referencing: const SignedDocumentRef.loose(id: 'target-1'),
           latestOnly: false,
           limit: 100,
           offset: 0,
@@ -2059,7 +2058,7 @@ void main() {
 
         // When
         final result = await dao.getDocuments(
-          refTo: const SignedDocumentRef.exact(id: 'target', version: 'v1'),
+          referencing: const SignedDocumentRef.exact(id: 'target', version: 'v1'),
           latestOnly: false,
           limit: 100,
           offset: 0,
