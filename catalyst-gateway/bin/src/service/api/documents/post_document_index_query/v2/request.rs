@@ -87,9 +87,11 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
     reply: Option<IdAndVerRefDocumented>,
-    /// ## Parameters
-    ///
-    /// This is a reference to a configuration document.
+    /// ## Document Parameters
+    /// 
+    /// This is a
+    /// [parameters reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#parameters).
+    /// Reference to a configuration document.
     /// This fields can match any reference that matches the defined
     /// [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
     /// and/or
@@ -97,7 +99,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     ///
     /// Whether a Document Type has a brand, campaign, category etc. reference is defined
     /// by its [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
-    #[oai(skip_serializing_if_is_none)]
+    #[oai(skip_serializing_if_is_none, rename="params")]
     parameters: Option<IdAndVerRefDocumented>,
 }
 
