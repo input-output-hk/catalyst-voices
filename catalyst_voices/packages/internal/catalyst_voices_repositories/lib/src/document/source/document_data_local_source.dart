@@ -40,7 +40,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   /// * [latestOnly]: If `true`, only the most recent version of each
   ///   document ID is returned.
   /// * [limit] and [offset]: Used for pagination.
-  Future<List<DocumentData>> getAll({
+  Future<List<DocumentData>> findAll({
     DocumentType? type,
     DocumentRef? ref,
     DocumentRef? refTo,
@@ -53,7 +53,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   ///
   /// Returns `null` if no document matches or if multiple match (depending on impl).
   /// Generally used when the filter is expected to yield a unique result.
-  Future<DocumentData?> getWhere({
+  Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? ref,
     DocumentRef? refTo,

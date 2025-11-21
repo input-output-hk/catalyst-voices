@@ -40,10 +40,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<DocumentData?> get(DocumentRef ref) => getWhere(ref: ref);
-
-  @override
-  Future<List<DocumentData>> getAll({
+  Future<List<DocumentData>> findAll({
     DocumentType? type,
     DocumentRef? ref,
     DocumentRef? refTo,
@@ -64,12 +61,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<DocumentRef?> getLatestRefOf(DocumentRef ref) async {
-    return _database.localDocumentsV2Dao.getLatestOf(ref);
-  }
-
-  @override
-  Future<DocumentData?> getWhere({
+  Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? ref,
     DocumentRef? refTo,
@@ -77,6 +69,14 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     return _database.localDocumentsV2Dao
         .getDocument(type: type, ref: ref, refTo: refTo)
         .then((value) => value?.toModel());
+  }
+
+  @override
+  Future<DocumentData?> get(DocumentRef ref) => findFirst(ref: ref);
+
+  @override
+  Future<DocumentRef?> getLatestRefOf(DocumentRef ref) async {
+    return _database.localDocumentsV2Dao.getLatestOf(ref);
   }
 
   @override

@@ -256,8 +256,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<List<DocumentData>> findAllVersions({required DocumentRef ref}) async {
     final all = switch (ref) {
-      DraftRef() => await _drafts.getAll(ref: ref),
-      SignedDocumentRef() => await _localDocuments.getAll(ref: ref),
+      DraftRef() => await _drafts.findAll(ref: ref),
+      SignedDocumentRef() => await _localDocuments.findAll(ref: ref),
     }..sort();
 
     return all;
@@ -267,8 +267,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   }) async {
-    final localRefs = await _localDocuments.getAll(ref: SignedDocumentRef(id: id));
-    final drafts = await _drafts.getAll(ref: DraftRef(id: id));
+    final localRefs = await _localDocuments.findAll(ref: SignedDocumentRef(id: id));
+    final drafts = await _drafts.findAll(ref: DraftRef(id: id));
 
     return [...drafts, ...localRefs];
   }
@@ -298,8 +298,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentData?> getLatestDocument({
     CatalystId? authorId,
   }) async {
-    final latestDocument = await _localDocuments.getWhere(authorId: authorId);
-    final latestDraft = await _drafts.getWhere();
+    final latestDocument = await _localDocuments.findFirst(authorId: authorId);
+    final latestDraft = await _drafts.findFirst();
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
@@ -328,7 +328,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef refTo,
     required DocumentType type,
   }) {
-    return _localDocuments.getWhere(refTo: refTo, type: type);
+    return _localDocuments.findFirst(refTo: refTo, type: type);
   }
 
   @override
@@ -384,9 +384,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool includeLocalDrafts = false,
   }) async {
     List<DocumentData> documents;
-    final localDocuments = await _localDocuments.getAll(ref: SignedDocumentRef(id: id));
+    final localDocuments = await _localDocuments.findAll(ref: SignedDocumentRef(id: id));
     if (includeLocalDrafts) {
-      final localDrafts = await _drafts.getAll(ref: DraftRef(id: id));
+      final localDrafts = await _drafts.findAll(ref: DraftRef(id: id));
       documents = [...localDocuments, ...localDrafts];
     } else {
       documents = localDocuments;

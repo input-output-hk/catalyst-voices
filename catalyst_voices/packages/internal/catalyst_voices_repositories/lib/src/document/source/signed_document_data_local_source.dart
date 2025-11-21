@@ -11,7 +11,7 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
   ///
   /// * [authorId]: Filters documents authored by a specific [CatalystId].
   @override
-  Future<DocumentData?> getWhere({
+  Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? ref,
     DocumentRef? refTo,
