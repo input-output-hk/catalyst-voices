@@ -38,9 +38,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
         throw StateError('Cannot create draft, category not selected');
       }
 
-      final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
-      final templateRef = category.proposalTemplateRef;
-      final template = await _proposalService.getProposalTemplate(ref: templateRef);
+      final template = await _proposalService.getProposalTemplate(category: categoryRef);
       final parameters = template.metadata.parameters;
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
@@ -56,7 +54,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       return await _proposalService.createDraftProposal(
         content: documentContent,
-        templateRef: templateRef,
+        templateRef: template.metadata.selfRef.toSignedDocumentRef(),
         parameters: parameters,
       );
     } catch (error, stackTrace) {
@@ -83,16 +81,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
       // right now user can start creating proposal without selecting category.
       // Right now every category have the same requirements for title so we can do a fallback for
       // first category from the list.
-      final templateRef = campaign.categories
-          .cast<CampaignCategory?>()
-          .firstWhere(
-            (e) => e?.selfRef == categoryRef,
-            orElse: () => campaign.categories.firstOrNull,
-          )
-          ?.proposalTemplateRef;
+      categoryRef ??= campaign.categories.firstOrNull?.selfRef;
 
-      final template = templateRef != null
-          ? await _proposalService.getProposalTemplate(ref: templateRef)
+      final template = categoryRef != null
+          ? await _proposalService.getProposalTemplate(category: categoryRef)
           : null;
       final titleRange = template?.title?.strLengthRange;
 

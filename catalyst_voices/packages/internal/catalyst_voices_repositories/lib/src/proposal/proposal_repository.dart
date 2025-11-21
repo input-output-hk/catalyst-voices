@@ -45,11 +45,11 @@ abstract interface class ProposalRepository {
     required ProposalsOrder order,
   });
 
-  /// Returns [ProposalTemplate] for matching [ref].
+  /// Returns [ProposalTemplate] which belongs to [category].
   ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+  /// Returns null if no matching template is found.
+  Future<ProposalTemplate?> getProposalTemplate({
+    required DocumentRef category,
   });
 
   Future<void> publishProposal({
@@ -189,12 +189,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+  Future<ProposalTemplate?> getProposalTemplate({
+    required DocumentRef category,
   }) async {
-    final proposalDocument = await _documentRepository.getDocumentData(ref: ref);
+    final document = await _documentRepository.getLatestDocument(
+      type: DocumentType.proposalTemplate,
+      category: category,
+    );
 
-    return _buildProposalTemplate(documentData: proposalDocument);
+    if (document == null) {
+      return null;
+    }
+
+    return _buildProposalTemplate(documentData: document);
   }
 
   @override

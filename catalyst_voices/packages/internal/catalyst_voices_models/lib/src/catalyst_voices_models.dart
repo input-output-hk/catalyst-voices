@@ -12,6 +12,7 @@ export 'campaign/campaign_category.dart';
 export 'campaign/campaign_filters.dart';
 export 'campaign/campaign_phase.dart';
 export 'campaign/campaign_timeline.dart';
+export 'campaign/exception/active_campaign_not_found_exception.dart';
 export 'common/hi_lo/hi_lo.dart';
 export 'common/hi_lo/uuid_hi_lo.dart';
 export 'common/markdown_data.dart';

@@ -408,9 +408,10 @@ void main() {
           final constTemplatesRefs = activeConstantDocumentRefs
               .expand(
                 (element) => [
-                  element.proposal.toTyped(DocumentType.proposalTemplate),
+                  element.proposal?.toTyped(DocumentType.proposalTemplate),
                 ],
               )
+              .nonNulls
               .toList();
 
           final docsRefs = List.generate(
