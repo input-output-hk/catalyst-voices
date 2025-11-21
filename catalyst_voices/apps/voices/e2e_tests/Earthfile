@@ -1,0 +1,70 @@
+VERSION 0.8
+
+# Import catalyst-ci playwright module for base setup
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter/installer:v3.6.4 AS flutter-installer
+
+# Base setup for E2E test runner
+builder:
+    FROM mcr.microsoft.com/playwright:v1.56.1-noble
+    WORKDIR /workspace
+    RUN apt-get update --fix-missing && apt-get install -y apt-utils unzip
+
+    DO flutter-installer+INSTALL_CHROME_FOR_TESTING --version=142.0.7444.175
+
+    RUN apt-get update && apt-get install -y \
+        libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*
+
+    # Copy test files
+    COPY package.json package-lock.json ./
+    RUN npm ci
+
+    # Copy all test-related files
+    COPY . .
+
+# Build the E2E test runner image
+docker:
+    FROM +builder
+
+    ARG container="e2e-test-runner"
+    ARG tag="latest"
+    
+    # Set working directory
+    WORKDIR /workspace
+
+    # Default command to run tests
+    CMD ["npx", "playwright", "test"]
+
+    SAVE IMAGE ${container}:${tag}
+
+# Build all required images for E2E testing
+all-images:
+    FROM scratch
+    
+    # Build gateway and its dependencies
+    BUILD ../../../../catalyst-gateway+docker
+    BUILD ../../../../catalyst-gateway/event-db+docker
+    
+    # Build voices frontend
+    BUILD ../../../+docker
+    
+    # Build E2E test runner
+    # BUILD +docker
+
+# Run E2E tests locally with docker-compose
+test:
+    FROM docker:24-cli
+    
+    RUN apk add --no-cache docker-compose
+
+    # Copy compose file and configs
+    COPY docker-compose.yml ./
+    COPY Caddyfile ./
+    
+    # Build all required images first
+    BUILD +all-images
+    
+    # Run tests
+    RUN --privileged \
+        docker-compose up --abort-on-container-exit --exit-code-from e2e-test-runner e2e-test-runner

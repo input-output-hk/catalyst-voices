@@ -13,7 +13,6 @@ services:
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=catalyst-event-dev
       - DB_USER_PASSWORD=CHANGE_ME
-
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=false
     ports:
