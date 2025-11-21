@@ -186,7 +186,8 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
+final class VotingRoute extends GoRouteData
+    with $VotingRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
   final String? tab;
   final bool? $extra;
