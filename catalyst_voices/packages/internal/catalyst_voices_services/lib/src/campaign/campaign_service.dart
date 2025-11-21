@@ -5,7 +5,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
-final logger = Logger('CampaignService');
+final _logger = Logger('CampaignService');
 
 Campaign? _mockedActiveCampaign;
 
@@ -178,8 +178,8 @@ final class CampaignServiceImpl implements CampaignService {
       final moneyFormat = templatesMoneyFormat[templateRef]?.moneyFormat;
 
       if (categoryRef == null || moneyFormat == null) {
-        if (categoryRef == null) logger.info('Template[$templateRef] do not have category');
-        if (moneyFormat == null) logger.info('Template[$templateRef] do not have moneyFormat');
+        if (categoryRef == null) _logger.info('Template[$templateRef] do not have category');
+        if (moneyFormat == null) _logger.info('Template[$templateRef] do not have moneyFormat');
         continue;
       }
 
