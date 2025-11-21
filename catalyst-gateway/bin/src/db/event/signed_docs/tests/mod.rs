@@ -6,7 +6,7 @@ use futures::TryStreamExt;
 
 use super::*;
 use crate::db::event::{
-    common::{eq_or_ranged_uuid::UuidSelector, query_limits::QueryLimits},
+    common::{query_limits::QueryLimits, uuid_selector::UuidSelector},
     establish_connection_pool,
 };
 
