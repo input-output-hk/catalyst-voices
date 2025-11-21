@@ -309,7 +309,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     if (category != null) {
-      query.where((tbl) => tbl.metadata.jsonExtract<String>(r'$.parameters').like(category.id));
+      query.where((tbl) => tbl.metadata.isInCategoryList([category.id]));
     }
 
     return query.getSingleOrNull();
