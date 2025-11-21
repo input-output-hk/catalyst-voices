@@ -90,7 +90,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<void> update({
+  Future<void> updateContent({
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {

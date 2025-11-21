@@ -20,7 +20,7 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
   ///
   /// This is distinct from [save] as it implies modifying the payload
   /// of an existing entity without necessarily creating a new version/ID.
-  Future<void> update({
+  Future<void> updateContent({
     required DraftRef ref,
     required DocumentDataContent content,
   });
