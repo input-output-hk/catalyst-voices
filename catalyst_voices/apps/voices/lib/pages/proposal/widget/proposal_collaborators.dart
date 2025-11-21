@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/widgets/user/catalyst_id_text.dart';
 import 'package:catalyst_voices/widgets/user/profile_avatar.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -89,46 +88,16 @@ class _Status extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 4.5,
-          backgroundColor: _getCircleColor(context),
+          backgroundColor: status.statusColor(context),
         ),
         Text(
-          _getStatusText(context),
+          status.labelText(context),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: _getTextColor(context),
+            color: status.labelColor(context),
           ),
         ),
       ],
     );
-  }
-
-  Color _getCircleColor(BuildContext context) {
-    return switch (status) {
-      CollaboratorInviteStatus.pending => const Color(0xFFB5B5B5),
-      CollaboratorInviteStatus.accepted => Theme.of(context).colors.iconsSuccess,
-      CollaboratorInviteStatus.rejected ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.iconsError,
-      CollaboratorInviteStatus.left => Theme.of(context).colors.iconsDisabled,
-    };
-  }
-
-  String _getStatusText(BuildContext context) {
-    return switch (status) {
-      CollaboratorInviteStatus.pending => context.l10n.collaboratorInvitationStatusPending,
-      CollaboratorInviteStatus.accepted => context.l10n.collaboratorInvitationStatusAccepted,
-      CollaboratorInviteStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
-      CollaboratorInviteStatus.left => context.l10n.collaboratorInvitationStatusLeft,
-      CollaboratorInviteStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
-    };
-  }
-
-  Color _getTextColor(BuildContext context) {
-    return switch (status) {
-      CollaboratorInviteStatus.pending ||
-      CollaboratorInviteStatus.accepted ||
-      CollaboratorInviteStatus.rejected ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
-      CollaboratorInviteStatus.left => Theme.of(context).colors.textDisabled,
-    };
   }
 }
 
@@ -150,7 +119,7 @@ class _Username extends StatelessWidget {
         Text(
           catalystId.username ?? context.l10n.anonymousUsername,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: _getTextColor(context),
+            color: status.labelColor(context),
           ),
         ),
         CatalystIdText(
@@ -160,15 +129,5 @@ class _Username extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Color _getTextColor(BuildContext context) {
-    return switch (status) {
-      CollaboratorInviteStatus.pending ||
-      CollaboratorInviteStatus.accepted ||
-      CollaboratorInviteStatus.rejected ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
-      CollaboratorInviteStatus.left => Theme.of(context).colors.textDisabled,
-    };
   }
 }

@@ -1,5 +1,8 @@
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 final class AcceptedCollaboratorInvites extends CollaboratorInvitesState {
   const AcceptedCollaboratorInvites(super.invites);
@@ -67,5 +70,35 @@ enum CollaboratorInviteStatus {
   left,
 
   /// The collaborator has been removed.
-  removed,
+  removed;
+
+  Color labelColor(BuildContext context) {
+    return switch (this) {
+      CollaboratorInviteStatus.pending ||
+      CollaboratorInviteStatus.accepted ||
+      CollaboratorInviteStatus.rejected ||
+      CollaboratorInviteStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
+      CollaboratorInviteStatus.left => Theme.of(context).colors.textDisabled,
+    };
+  }
+
+  String labelText(BuildContext context) {
+    return switch (this) {
+      CollaboratorInviteStatus.pending => context.l10n.collaboratorInvitationStatusPending,
+      CollaboratorInviteStatus.accepted => context.l10n.collaboratorInvitationStatusAccepted,
+      CollaboratorInviteStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
+      CollaboratorInviteStatus.left => context.l10n.collaboratorInvitationStatusLeft,
+      CollaboratorInviteStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
+    };
+  }
+
+  Color statusColor(BuildContext context) {
+    return switch (this) {
+      CollaboratorInviteStatus.pending => Theme.of(context).colors.iconsDisabled,
+      CollaboratorInviteStatus.accepted => Theme.of(context).colors.iconsSuccess,
+      CollaboratorInviteStatus.rejected ||
+      CollaboratorInviteStatus.removed => Theme.of(context).colors.iconsError,
+      CollaboratorInviteStatus.left => Theme.of(context).colors.iconsDisabled,
+    };
+  }
 }
