@@ -110,7 +110,7 @@ impl Example for DocumentIndexQueryFilterV2 {
             doc_ref: Some(Example::example()),
             template: Some(Example::example()),
             reply: Some(Example::example()),
-            ..Default::default()
+            parameters: Some(Example::example()),
         }
     }
 }
