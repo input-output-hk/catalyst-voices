@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// Cache for [ProposalCubit].
@@ -10,6 +11,7 @@ final class ProposalCubitCache extends Equatable {
   final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
+  final CollaboratorInvites? collaborators;
   final bool? isFavorite;
   final bool? isVotingStage;
   final bool? showComments;
@@ -23,6 +25,7 @@ final class ProposalCubitCache extends Equatable {
     this.category,
     this.commentTemplate,
     this.comments,
+    this.collaborators,
     this.isFavorite,
     this.isVotingStage,
     this.showComments,
@@ -38,6 +41,7 @@ final class ProposalCubitCache extends Equatable {
     category,
     commentTemplate,
     comments,
+    collaborators,
     isFavorite,
     isVotingStage,
     showComments,
@@ -52,6 +56,7 @@ final class ProposalCubitCache extends Equatable {
     Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
+    Optional<CollaboratorInvites>? collaborators,
     Optional<bool>? isFavorite,
     Optional<bool>? isVotingStage,
     Optional<bool>? showComments,
@@ -65,6 +70,7 @@ final class ProposalCubitCache extends Equatable {
       category: category.dataOr(this.category),
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
+      collaborators: collaborators.dataOr(this.collaborators),
       isFavorite: isFavorite.dataOr(this.isFavorite),
       isVotingStage: isVotingStage.dataOr(this.isVotingStage),
       showComments: showComments.dataOr(this.showComments),

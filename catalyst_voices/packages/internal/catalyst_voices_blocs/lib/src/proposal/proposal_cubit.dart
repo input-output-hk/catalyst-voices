@@ -85,6 +85,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       _cache = _cache.copyWith(ref: Optional.of(ref));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
+      final proposalCollaborators = await _getCollaborators();
 
       final (isReadOnlyMode, campaign, category, commentTemplate, isFavorite) = await (
         _isReadOnlyMode(),
@@ -102,6 +103,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         category: Optional(category),
         commentTemplate: Optional(commentTemplate),
         comments: const Optional([]),
+        collaborators: Optional(proposalCollaborators),
         isFavorite: Optional(isFavorite),
         isVotingStage: Optional(isVotingStage),
         showComments: Optional(showComments),
@@ -293,6 +295,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
+    required CollaboratorInvites collaborators,
     required bool isFavorite,
     required bool isVotingStage,
     required bool showComments,
@@ -327,6 +330,7 @@ final class ProposalCubit extends Cubit<ProposalState>
             comments: comments,
             commentSchema: commentSchema,
             commentsSort: commentsSort,
+            collaborators: collaborators,
             hasActiveAccount: hasActiveAccount,
             hasAccountUsername: hasAccountUsername,
             commentsCount: commentsCount,
@@ -392,6 +396,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
+    required CollaboratorInvites collaborators,
     required bool hasActiveAccount,
     required bool hasAccountUsername,
     required int? commentsCount,
@@ -421,6 +426,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       isVotingStage: (isVotingStage && isLatestVersion),
       data: ProposalViewMetadata(
         author: Profile(catalystId: document.authorId!),
+        collaborators: collaborators,
         description: document.description,
         status: proposal.publish,
         createdAt: version?.id.tryDateTime ?? DateTimeExt.now(),
@@ -464,6 +470,22 @@ final class ProposalCubit extends Cubit<ProposalState>
       ...proposalSegments,
       if ((canComment || comments.isNotEmpty) && showComments) commentsSegment,
     ];
+  }
+
+  Future<CollaboratorInvites> _getCollaborators() async {
+    final uri = Uri.parse(
+      'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+    );
+
+    final catalystId = CatalystId.fromUri(uri);
+
+    return CollaboratorInvites([
+      for (final status in CollaboratorInviteStatus.values)
+        CollaboratorInvite(
+          catalystId: catalystId,
+          status: status,
+        ),
+    ]);
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {
@@ -512,6 +534,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? const [];
     final commentsSort = state.comments.commentsSort;
+    final collaborators = _cache.collaborators ?? const CollaboratorInvites();
     final isFavorite = _cache.isFavorite ?? false;
     final isVotingStage = _cache.isVotingStage ?? false;
     final showComments = _cache.showComments ?? false;
@@ -531,6 +554,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       comments: comments,
       commentSchema: commentTemplate?.schema,
       commentsSort: commentsSort,
+      collaborators: collaborators,
       isFavorite: isFavorite,
       readOnlyMode: readOnlyMode,
       isVotingStage: isVotingStage,
