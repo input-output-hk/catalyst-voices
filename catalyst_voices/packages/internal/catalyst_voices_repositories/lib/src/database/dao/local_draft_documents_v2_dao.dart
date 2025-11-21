@@ -28,12 +28,12 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   @override
   Future<int> deleteWhere({
     DocumentRef? ref,
-    List<DocumentType>? notInType,
+    List<DocumentType>? typeNotIn,
   }) {
     final query = delete(localDocumentsDrafts);
 
-    if (notInType != null) {
-      query.where((tbl) => tbl.type.isNotInValues(notInType));
+    if (typeNotIn != null) {
+      query.where((tbl) => tbl.type.isNotInValues(typeNotIn));
     }
 
     return query.go();
@@ -338,7 +338,7 @@ abstract interface class LocalDraftDocumentsV2Dao {
 
   Future<int> deleteWhere({
     DocumentRef? ref,
-    List<DocumentType>? notInType,
+    List<DocumentType>? typeNotIn,
   });
 
   Future<bool> exists(DocumentRef ref);

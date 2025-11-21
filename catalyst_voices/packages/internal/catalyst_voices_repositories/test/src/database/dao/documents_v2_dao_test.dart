@@ -1699,7 +1699,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          typeNotIn: [DocumentType.proposalDocument],
         );
 
         // Then
@@ -1739,7 +1739,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [
+          typeNotIn: [
             DocumentType.proposalDocument,
             DocumentType.proposalTemplate,
           ],
@@ -1785,7 +1785,7 @@ void main() {
         await dao.saveAll(entities);
 
         // When
-        final result = await dao.deleteWhere(notInType: []);
+        final result = await dao.deleteWhere(typeNotIn: []);
 
         // Then
         expect(result, 2);
@@ -1810,7 +1810,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          typeNotIn: [DocumentType.proposalDocument],
         );
 
         // Then
@@ -1839,7 +1839,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          typeNotIn: [DocumentType.proposalDocument],
         );
 
         // Then
@@ -1880,7 +1880,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [
+          typeNotIn: [
             DocumentType.proposalDocument,
             DocumentType.proposalTemplate,
             DocumentType.proposalActionDocument,
@@ -1906,7 +1906,7 @@ void main() {
 
         // When
         final result = await dao.deleteWhere(
-          notInType: [DocumentType.proposalDocument],
+          typeNotIn: [DocumentType.proposalDocument],
         );
 
         // Then

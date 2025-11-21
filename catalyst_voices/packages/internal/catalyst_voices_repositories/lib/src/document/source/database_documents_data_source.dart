@@ -34,9 +34,9 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<int> delete({
-    List<DocumentType>? notInType,
+    List<DocumentType>? typeNotIn,
   }) {
-    return _database.documentsV2Dao.deleteWhere(notInType: notInType);
+    return _database.documentsV2Dao.deleteWhere(typeNotIn: typeNotIn);
   }
 
   @override

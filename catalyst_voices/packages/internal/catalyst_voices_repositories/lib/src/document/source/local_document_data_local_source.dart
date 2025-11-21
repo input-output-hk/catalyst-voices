@@ -6,7 +6,7 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
   @override
   Future<int> delete({
     DocumentRef? ref,
-    List<DocumentType>? notInType,
+    List<DocumentType>? typeNotIn,
   });
 
   Future<void> update({

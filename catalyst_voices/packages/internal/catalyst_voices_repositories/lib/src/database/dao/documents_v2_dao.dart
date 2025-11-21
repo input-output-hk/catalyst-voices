@@ -23,15 +23,15 @@ abstract interface class DocumentsV2Dao {
     DocumentRef? refTo,
   });
 
-  /// Deletes documents from the database, preserving those with types in [notInType].
+  /// Deletes documents from the database, preserving those with types in [typeNotIn].
   ///
-  /// If [notInType] is null or empty, this may delete *all* documents (implementation dependent).
+  /// If [typeNotIn] is null or empty, this may delete *all* documents (implementation dependent).
   /// Typically used for cache invalidation or cleaning up old data while keeping
   /// certain important types (e.g. keeping local drafts or templates).
   ///
   /// Returns the number of deleted rows.
   Future<int> deleteWhere({
-    List<DocumentType>? notInType,
+    List<DocumentType>? typeNotIn,
   });
 
   /// Checks if a document exists in the database.
@@ -160,12 +160,12 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<int> deleteWhere({
-    List<DocumentType>? notInType,
+    List<DocumentType>? typeNotIn,
   }) {
     final query = delete(documentsV2);
 
-    if (notInType != null) {
-      query.where((tbl) => tbl.type.isNotInValues(notInType));
+    if (typeNotIn != null) {
+      query.where((tbl) => tbl.type.isNotInValues(typeNotIn));
     }
 
     return query.go();

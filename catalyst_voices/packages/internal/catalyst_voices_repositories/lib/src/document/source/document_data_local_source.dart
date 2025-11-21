@@ -10,7 +10,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   });
 
   Future<int> delete({
-    List<DocumentType>? notInType,
+    List<DocumentType>? typeNotIn,
   });
 
   Future<bool> exists({required DocumentRef ref});
