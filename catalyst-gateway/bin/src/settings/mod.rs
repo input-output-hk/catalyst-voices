@@ -318,7 +318,7 @@ impl Settings {
     /// Chain Follower network (The Blockchain network we are configured to use).
     /// Note: Catalyst Gateway can ONLY follow one network at a time.
     pub(crate) fn cardano_network() -> &'static Network {
-        &ENV_VARS.chain_follower.chain
+        ENV_VARS.chain_follower.chain()
     }
 
     /// The API Url prefix
