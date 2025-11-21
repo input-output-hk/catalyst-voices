@@ -110,7 +110,7 @@ impl Example for DocumentIndexQueryFilterV2 {
             doc_ref: Some(Example::example()),
             template: Some(Example::example()),
             reply: Some(Example::example()),
-            parameters: Some(Example::example()),
+            ..Default::default()
         }
     }
 }
@@ -129,23 +129,6 @@ impl_array_types!(
 impl Example for DocumentTypeList {
     fn example() -> Self {
         Self(vec![DocumentType::example()])
-    }
-}
-
-impl_array_types!(
-    IdAndVerRefDocumentedList,
-    IdAndVerRefDocumented,
-    Some(poem_openapi::registry::MetaSchema {
-        example: Self::example().to_json(),
-        max_items: Some(10),
-        items: Some(Box::new(IdAndVerRefDocumented::schema_ref())),
-        ..poem_openapi::registry::MetaSchema::ANY
-    })
-);
-
-impl Example for IdAndVerRefDocumentedList {
-    fn example() -> Self {
-        Self(vec![IdAndVerRefDocumented::example()])
     }
 }
 
