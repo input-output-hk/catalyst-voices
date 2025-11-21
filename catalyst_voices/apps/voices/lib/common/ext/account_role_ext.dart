@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 extension AccountRoleExt on AccountRole {
   SvgGenImage get icon {
     return switch (this) {
-      AccountRole.voter => VoicesAssets.images.roleVoter,
-      AccountRole.drep => VoicesAssets.images.roleDrep,
-      AccountRole.proposer => VoicesAssets.images.roleProposer,
+      AccountRole.voter => VoicesAssets.images.svg.roleVoter,
+      AccountRole.drep => VoicesAssets.images.svg.roleDrep,
+      AccountRole.proposer => VoicesAssets.images.svg.roleProposer,
     };
   }
 
