@@ -10,12 +10,12 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   ///
   /// * [type]: Filter by the [DocumentType] (e.g., Proposal, Comment).
   /// * [ref]: Filter by the specific identity of the document (ID/Version).
-  /// * [refTo]: Filter for documents that reference *this* target [refTo].
+  /// * [referencing]: Filter for documents that reference *this* target [referencing].
   ///   (e.g., Find all comments pointing to Proposal X).
   Future<int> count({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   /// Deletes documents matching the provided filters.
@@ -43,7 +43,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   Future<List<DocumentData>> findAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     bool latestOnly,
     int limit,
     int offset,
@@ -56,7 +56,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   /// Persists a single [DocumentData] object to local storage.
@@ -73,7 +73,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   Stream<DocumentData?> watch({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   /// Watches for changes to a list of documents matching the filters.
@@ -82,7 +82,7 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     bool latestOnly,
     int limit,
     int offset,
@@ -92,6 +92,6 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   Stream<int> watchCount({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 }

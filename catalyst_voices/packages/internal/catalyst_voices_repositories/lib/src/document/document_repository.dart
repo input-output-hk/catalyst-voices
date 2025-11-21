@@ -87,14 +87,14 @@ abstract interface class DocumentRepository {
   /// Returns latest matching [DocumentRef] version with same id as [ref].
   Future<DocumentRef?> getLatestOf({required DocumentRef ref});
 
-  /// Returns count of documents matching [refTo] id and [type].
+  /// Returns count of documents matching [referencing] id and [type].
   Future<int> getRefCount({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 
   Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 
@@ -179,7 +179,7 @@ abstract interface class DocumentRepository {
 
   /// Emits number of matching documents
   Stream<int> watchCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     DocumentType? type,
   });
 
@@ -204,19 +204,19 @@ abstract interface class DocumentRepository {
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   /// Looking for document with matching refTo and type.
-  /// It return documents data that have a reference that matches [refTo]
+  /// It return documents data that have a reference that matches [referencing]
   ///
   /// This method is used when we want to find a document that has a reference
   /// to a document that we are looking for.
   ///
   /// For example, we want to find latest document action that were made
-  /// on a [refTo] document.
+  /// on a [referencing] document.
   Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   });
 }
@@ -317,18 +317,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<int> getRefCount({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   }) {
-    return _localDocuments.count(refTo: refTo, type: type);
+    return _localDocuments.count(referencing: referencing, type: type);
   }
 
   @override
   Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
   }) {
-    return _localDocuments.findFirst(refTo: refTo, type: type);
+    return _localDocuments.findFirst(referencing: referencing, type: type);
   }
 
   @override
@@ -468,14 +468,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool getLocalDrafts = false,
     DocumentType? type,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     final localDocs = _localDocuments
         .watchAll(
           latestOnly: unique,
           type: type,
           authorId: authorId,
-          refTo: refTo,
+          referencing: referencing,
           limit: limit ?? 200,
         )
         .asyncMap(
@@ -519,11 +519,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Stream<int> watchCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     DocumentType? type,
   }) {
     return _localDocuments.watchCount(
-      refTo: refTo,
+      referencing: referencing,
       type: type,
     );
   }
@@ -557,7 +557,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return watchAllDocuments(
       refGetter: refGetter,
@@ -566,7 +566,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       unique: unique,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
-      refTo: refTo,
+      referencing: referencing,
     );
   }
 
@@ -604,11 +604,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
     required DocumentType type,
     ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {
-    return _localDocuments.watch(refTo: refTo, type: type).distinct();
+    return _localDocuments.watch(referencing: referencing, type: type).distinct();
   }
 
   Future<DocumentData?> _getDraftDocumentData({

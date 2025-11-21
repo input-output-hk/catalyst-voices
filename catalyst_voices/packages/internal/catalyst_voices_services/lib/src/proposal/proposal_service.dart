@@ -554,11 +554,11 @@ final class ProposalServiceImpl implements ProposalService {
     final selfRef = doc.metadata.selfRef;
 
     final commentsCountStream = _proposalRepository.watchCommentsCount(
-      refTo: selfRef,
+      referencing: selfRef,
     );
 
     return Rx.combineLatest2(
-      _proposalRepository.watchProposalPublish(refTo: selfRef),
+      _proposalRepository.watchProposalPublish(referencing: selfRef),
       commentsCountStream,
       (ProposalPublish? publishState, int commentsCount) {
         if (publishState == null) return null;

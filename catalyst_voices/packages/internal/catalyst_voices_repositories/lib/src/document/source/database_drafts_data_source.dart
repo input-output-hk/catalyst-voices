@@ -16,9 +16,9 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Future<int> count({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
-    return _database.localDocumentsV2Dao.count(type: type, ref: ref, refTo: refTo);
+    return _database.localDocumentsV2Dao.count(type: type, ref: ref, referencing: referencing);
   }
 
   @override
@@ -43,7 +43,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Future<List<DocumentData>> findAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 100,
     int offset = 0,
@@ -52,7 +52,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
         .getDocuments(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -64,10 +64,10 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
-        .getDocument(type: type, ref: ref, refTo: refTo)
+        .getDocument(type: type, ref: ref, referencing: referencing)
         .then((value) => value?.toModel());
   }
 
@@ -101,10 +101,10 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Stream<DocumentData?> watch({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
-        .watchDocument(type: type, ref: ref, refTo: refTo)
+        .watchDocument(type: type, ref: ref, referencing: referencing)
         .distinct()
         .map((value) => value?.toModel());
   }
@@ -113,7 +113,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 100,
     int offset = 0,
@@ -122,7 +122,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
         .watchDocuments(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -135,13 +135,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Stream<int> watchCount({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
         .watchCount(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
         )
         .distinct();
   }

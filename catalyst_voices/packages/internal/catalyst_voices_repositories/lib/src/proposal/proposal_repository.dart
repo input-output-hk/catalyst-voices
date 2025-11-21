@@ -66,18 +66,18 @@ abstract interface class ProposalRepository {
   Future<void> upsertDraftProposal({required DocumentData document});
 
   Stream<int> watchCommentsCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
 
-  /// Watches for [ProposalSubmissionAction] that were made on [refTo] document.
+  /// Watches for [ProposalSubmissionAction] that were made on [referencing] document.
   ///
   /// As making action on document not always creates a new document ref
   /// we need to watch for actions on a document that has a reference to
-  /// [refTo] document.
+  /// [referencing] document.
   Stream<ProposalPublish?> watchProposalPublish({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
   });
 
   Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
@@ -130,7 +130,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) async {
     final documentData = await _documentRepository.getDocumentData(ref: ref);
     final commentsCount = await _documentRepository.getRefCount(
-      refTo: ref,
+      referencing: ref,
       type: DocumentType.commentDocument,
     );
     final proposalPublish = await getProposalPublishForRef(ref: ref);
@@ -156,7 +156,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required DocumentRef ref,
   }) async {
     final data = await _documentRepository.getRefToDocumentData(
-      refTo: ref,
+      referencing: ref,
       type: DocumentType.proposalActionDocument,
     );
 
@@ -253,10 +253,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Stream<int> watchCommentsCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _documentRepository.watchCount(
-      refTo: refTo,
+      referencing: referencing,
       type: DocumentType.commentDocument,
     );
   }
@@ -286,17 +286,17 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Stream<ProposalPublish?> watchProposalPublish({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
   }) {
     return _documentRepository
         .watchRefToDocumentData(
-          refTo: refTo,
+          referencing: referencing,
           type: DocumentType.proposalActionDocument,
         )
         .map((data) {
           final action = _buildProposalActionData(data);
 
-          return _getProposalPublish(ref: refTo, action: action);
+          return _getProposalPublish(ref: referencing, action: action);
         });
   }
 

@@ -14,7 +14,7 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
   Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CatalystId? authorId,
   });
 
@@ -25,7 +25,7 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CatalystId? authorId,
     bool latestOnly,
     int limit,

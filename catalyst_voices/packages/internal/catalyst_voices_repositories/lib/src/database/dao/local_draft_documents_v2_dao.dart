@@ -20,9 +20,13 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   Future<int> count({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
-    return _queryCount(type: type, ref: ref, refTo: refTo).getSingle().then((value) => value ?? 0);
+    return _queryCount(
+      type: type,
+      ref: ref,
+      referencing: referencing,
+    ).getSingle().then((value) => value ?? 0);
   }
 
   @override
@@ -94,16 +98,16 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   Future<LocalDocumentDraftEntity?> getDocument({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
-    return _queryDocument(type: type, ref: ref, refTo: refTo).getSingleOrNull();
+    return _queryDocument(type: type, ref: ref, referencing: referencing).getSingleOrNull();
   }
 
   @override
   Future<List<LocalDocumentDraftEntity>> getDocuments({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly = false,
     int limit = 200,
@@ -112,7 +116,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
     return _queryDocuments(
       type: type,
       ref: ref,
-      refTo: refTo,
+      referencing: referencing,
       filters: filters,
       latestOnly: latestOnly,
       limit: limit,
@@ -169,25 +173,29 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   Stream<int> watchCount({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
-    return _queryCount(type: type, ref: ref, refTo: refTo).watchSingle().map((value) => value ?? 0);
+    return _queryCount(
+      type: type,
+      ref: ref,
+      referencing: referencing,
+    ).watchSingle().map((value) => value ?? 0);
   }
 
   @override
   Stream<LocalDocumentDraftEntity?> watchDocument({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
-    return _queryDocument(type: type, ref: ref, refTo: refTo).watchSingleOrNull();
+    return _queryDocument(type: type, ref: ref, referencing: referencing).watchSingleOrNull();
   }
 
   @override
   Stream<List<LocalDocumentDraftEntity>> watchDocuments({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly = false,
     int limit = 200,
@@ -196,7 +204,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
     return _queryDocuments(
       type: type,
       ref: ref,
-      refTo: refTo,
+      referencing: referencing,
       filters: filters,
       latestOnly: latestOnly,
       limit: limit,
@@ -207,7 +215,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   Selectable<int?> _queryCount({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     final count = countAll();
     final query = selectOnly(localDocumentsDrafts)..addColumns([count]);
@@ -224,11 +232,11 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       }
     }
 
-    if (refTo != null) {
-      query.where(localDocumentsDrafts.refId.equals(refTo.id));
+    if (referencing != null) {
+      query.where(localDocumentsDrafts.refId.equals(referencing.id));
 
-      if (refTo.isExact) {
-        query.where(localDocumentsDrafts.refVer.equals(refTo.version!));
+      if (referencing.isExact) {
+        query.where(localDocumentsDrafts.refVer.equals(referencing.version!));
       }
     }
 
@@ -238,7 +246,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   Selectable<LocalDocumentDraftEntity> _queryDocument({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     final query = select(localDocumentsDrafts);
 
@@ -250,11 +258,11 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       }
     }
 
-    if (refTo != null) {
-      query.where((tbl) => tbl.refId.equals(refTo.id));
+    if (referencing != null) {
+      query.where((tbl) => tbl.refId.equals(referencing.id));
 
-      if (refTo.isExact) {
-        query.where((tbl) => tbl.refVer.equals(refTo.version!));
+      if (referencing.isExact) {
+        query.where((tbl) => tbl.refVer.equals(referencing.version!));
       }
     }
 
@@ -274,7 +282,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   SimpleSelectStatement<$LocalDocumentsDraftsTable, LocalDocumentDraftEntity> _queryDocuments({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CampaignFilters? filters,
     required bool latestOnly,
     required int limit,
@@ -295,11 +303,11 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       }
     }
 
-    if (refTo != null) {
-      query.where((tbl) => tbl.refId.equals(refTo.id));
+    if (referencing != null) {
+      query.where((tbl) => tbl.refId.equals(referencing.id));
 
-      if (refTo.isExact) {
-        query.where((tbl) => tbl.refVer.equals(refTo.version!));
+      if (referencing.isExact) {
+        query.where((tbl) => tbl.refVer.equals(referencing.version!));
       }
     }
 
@@ -333,7 +341,7 @@ abstract interface class LocalDraftDocumentsV2Dao {
   Future<int> count({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   Future<int> deleteWhere({
@@ -348,13 +356,13 @@ abstract interface class LocalDraftDocumentsV2Dao {
   Future<LocalDocumentDraftEntity?> getDocument({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   Future<List<LocalDocumentDraftEntity>> getDocuments({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly,
     int limit,
@@ -373,19 +381,19 @@ abstract interface class LocalDraftDocumentsV2Dao {
   Stream<int> watchCount({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   Stream<LocalDocumentDraftEntity?> watchDocument({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   Stream<List<LocalDocumentDraftEntity>> watchDocuments({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly,
     int limit,

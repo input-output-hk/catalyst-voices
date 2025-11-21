@@ -27,9 +27,9 @@ final class DatabaseDocumentsDataSource
   Future<int> count({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
-    return _database.documentsV2Dao.count(type: type, ref: ref, refTo: refTo);
+    return _database.documentsV2Dao.count(type: type, ref: ref, referencing: referencing);
   }
 
   @override
@@ -53,7 +53,7 @@ final class DatabaseDocumentsDataSource
   Future<List<DocumentData>> findAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -62,7 +62,7 @@ final class DatabaseDocumentsDataSource
         .getDocuments(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -74,11 +74,11 @@ final class DatabaseDocumentsDataSource
   Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CatalystId? authorId,
   }) {
     return _database.documentsV2Dao
-        .getDocument(type: type, ref: ref, refTo: refTo, author: authorId)
+        .getDocument(type: type, ref: ref, referencing: referencing, author: authorId)
         .then((value) => value?.toModel());
   }
 
@@ -122,10 +122,10 @@ final class DatabaseDocumentsDataSource
   Stream<DocumentData?> watch({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _database.documentsV2Dao
-        .watchDocument(type: type, ref: ref, refTo: refTo)
+        .watchDocument(type: type, ref: ref, referencing: referencing)
         .distinct()
         .map((value) => value?.toModel());
   }
@@ -134,7 +134,7 @@ final class DatabaseDocumentsDataSource
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
     CatalystId? authorId,
     bool latestOnly = false,
     int limit = 200,
@@ -144,7 +144,7 @@ final class DatabaseDocumentsDataSource
         .watchDocuments(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -157,13 +157,13 @@ final class DatabaseDocumentsDataSource
   Stream<int> watchCount({
     DocumentType? type,
     DocumentRef? ref,
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _database.documentsV2Dao
         .watchCount(
           type: type,
           ref: ref,
-          refTo: refTo,
+          referencing: referencing,
         )
         .distinct();
   }

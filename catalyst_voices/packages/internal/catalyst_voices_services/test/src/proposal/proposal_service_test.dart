@@ -43,7 +43,7 @@ void main() {
 
     when(
       () => mockDocumentRepository.watchCount(
-        refTo: any(named: 'refTo'),
+        referencing: any(named: 'referencing'),
         type: DocumentType.commentDocument,
       ),
     ).thenAnswer((_) => Stream.fromIterable([5]));
