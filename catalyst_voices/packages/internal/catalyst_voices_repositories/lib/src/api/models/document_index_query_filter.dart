@@ -1,6 +1,6 @@
-import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
-import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_ver.dart';
 import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
+import 'package:catalyst_voices_repositories/src/api/models/ver_selector.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_query_filter.g.dart';
@@ -24,21 +24,15 @@ final class DocumentIndexQueryFilter {
   /// Max items 10
   final List<String>? type;
 
-  /// ## Document ID
+  /// Document ID Selector
   ///
-  /// Either an absolute single Document ID or a range of
-  /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-  ///
-  /// Max items 10
-  final List<EqOrRangedId>? id;
+  /// Either a absolute single Document ID or a range of Document IDs
+  final IdSelector? id;
 
-  /// ## Document Version
+  /// Document Version Selector
   ///
-  /// Either an absolute single Document Version or a range of
-  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-  ///
-  /// Max items 10
-  final List<EqOrRangedVer>? ver;
+  /// Either a absolute single Document Version or a range of Document Versions
+  final VerSelector? ver;
 
   /// ## Document Reference
   ///

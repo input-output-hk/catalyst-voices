@@ -105,6 +105,7 @@ void main() {
                 return IndexedDocumentVersion(
                   ver: e.version!,
                   type: DocumentType.proposalDocument.uuid,
+                  id: '01944e87-e68c-7f22-9df1-816863cfa5ff',
                   template: [
                     DocumentReference(
                       id: templateRef.id,
@@ -155,6 +156,7 @@ IndexedDocument _buildDocumentIndexList({
         return IndexedDocumentVersion(
           ver: DocumentRefFactory.randomUuidV7(),
           type: DocumentRefFactory.randomUuidV7(),
+          id: DocumentRefFactory.randomUuidV7(),
           template: template,
           ref: ref,
         );
