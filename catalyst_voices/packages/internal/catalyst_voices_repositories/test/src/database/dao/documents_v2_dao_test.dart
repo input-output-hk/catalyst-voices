@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_redundant_argument_values
-
 import 'dart:typed_data';
 
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
