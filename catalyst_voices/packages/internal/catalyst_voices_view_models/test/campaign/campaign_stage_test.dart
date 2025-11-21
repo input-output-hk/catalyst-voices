@@ -12,9 +12,6 @@ void main() {
       allFunds: MultiCurrencyAmount.single(
         Money.zero(currency: Currencies.ada),
       ),
-      totalAsk: MultiCurrencyAmount.single(
-        Money.zero(currency: Currencies.ada),
-      ),
       fundNumber: 1,
       timeline: const CampaignTimeline(phases: []),
       categories: const [],

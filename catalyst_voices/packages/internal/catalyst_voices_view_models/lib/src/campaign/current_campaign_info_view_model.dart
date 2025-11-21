@@ -36,15 +36,6 @@ class CurrentCampaignInfoViewModel extends Equatable {
     );
   }
 
-  factory CurrentCampaignInfoViewModel.fromModel(Campaign model) {
-    return CurrentCampaignInfoViewModel(
-      title: model.name,
-      allFunds: model.allFunds,
-      totalAsk: model.totalAsk,
-      timeline: model.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList(),
-    );
-  }
-
   @override
   List<Object?> get props => [
     allFunds,

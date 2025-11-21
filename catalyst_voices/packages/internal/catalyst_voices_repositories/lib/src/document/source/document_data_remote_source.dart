@@ -31,6 +31,16 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
+  Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
+    final ver = await getLatestVersion(ref.id);
+    if (ver == null) {
+      return null;
+    }
+
+    return SignedDocumentRef(id: ref.id, version: ver);
+  }
+
+  @override
   Future<String?> getLatestVersion(String id) {
     final ver = allConstantDocumentRefs
         .firstWhereOrNull((element) => element.hasId(id))

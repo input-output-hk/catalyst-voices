@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
@@ -5,6 +7,8 @@ import 'package:flutter/foundation.dart';
 final class VotingBallotLocalBuilder with ChangeNotifier implements VotingBallotBuilder {
   /// A map of votes casted on ref.
   final Map<DocumentRef, Vote> _votes;
+
+  final _streamController = StreamController<List<Vote>>.broadcast();
 
   factory VotingBallotLocalBuilder({
     List<Vote> votes = const [],
@@ -23,6 +27,12 @@ final class VotingBallotLocalBuilder with ChangeNotifier implements VotingBallot
 
   @override
   List<Vote> get votes => List.unmodifiable(_votes.values);
+
+  @override
+  Stream<List<Vote>> get watchVotes async* {
+    yield votes;
+    yield* _streamController.stream;
+  }
 
   @override
   void addVote(Vote vote) {
@@ -51,10 +61,22 @@ final class VotingBallotLocalBuilder with ChangeNotifier implements VotingBallot
   }
 
   @override
+  void dispose() {
+    unawaited(_streamController.close());
+    super.dispose();
+  }
+
+  @override
   Vote? getVoteOn(DocumentRef proposal) => _votes[proposal];
 
   @override
   bool hasVotedOn(DocumentRef proposal) => _votes.containsKey(proposal);
+
+  @override
+  void notifyListeners() {
+    _streamController.add(votes);
+    super.notifyListeners();
+  }
 
   @override
   Vote? removeVoteOn(DocumentRef proposal) {

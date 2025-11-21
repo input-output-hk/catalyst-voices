@@ -24,7 +24,6 @@ final class Campaign extends Equatable {
   final String name;
   final String description;
   final MultiCurrencyAmount allFunds;
-  final MultiCurrencyAmount totalAsk;
   final int fundNumber;
   final CampaignTimeline timeline;
   final List<CampaignCategory> categories;
@@ -35,7 +34,6 @@ final class Campaign extends Equatable {
     required this.name,
     required this.description,
     required this.allFunds,
-    required this.totalAsk,
     required this.fundNumber,
     required this.timeline,
     required this.categories,
@@ -49,7 +47,6 @@ final class Campaign extends Equatable {
       description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
       allFunds: MultiCurrencyAmount.single(Currencies.ada.amount(20000000)),
-      totalAsk: MultiCurrencyAmount.single(Money.zero(currency: Currencies.ada)),
       fundNumber: 14,
       timeline: f14StaticCampaignTimeline,
       publish: CampaignPublish.published,
@@ -65,10 +62,6 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       allFunds: MultiCurrencyAmount.list([
         Currencies.ada.amount(20000000),
         Currencies.usdm.amount(250000),
-      ]),
-      totalAsk: MultiCurrencyAmount.list([
-        Money.zero(currency: Currencies.ada),
-        Money.zero(currency: Currencies.usdm),
       ]),
       fundNumber: 15,
       timeline: f15StaticCampaignTimeline,
@@ -112,7 +105,6 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     name,
     description,
     allFunds,
-    totalAsk,
     fundNumber,
     timeline,
     publish,
@@ -165,7 +157,6 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     String? name,
     String? description,
     MultiCurrencyAmount? allFunds,
-    MultiCurrencyAmount? totalAsk,
     int? fundNumber,
     CampaignTimeline? timeline,
     CampaignPublish? publish,
@@ -176,7 +167,6 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       name: name ?? this.name,
       description: description ?? this.description,
       allFunds: allFunds ?? this.allFunds,
-      totalAsk: totalAsk ?? this.totalAsk,
       fundNumber: fundNumber ?? this.fundNumber,
       timeline: timeline ?? this.timeline,
       publish: publish ?? this.publish,

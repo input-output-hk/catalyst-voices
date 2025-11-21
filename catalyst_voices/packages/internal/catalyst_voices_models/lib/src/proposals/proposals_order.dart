@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-/// Orders base on [Proposal.title].
+/// Orders proposals based on their [Proposal.title] in alphabetical order.
 final class Alphabetical extends ProposalsOrder {
   const Alphabetical();
 
@@ -9,12 +9,14 @@ final class Alphabetical extends ProposalsOrder {
   String toString() => 'Alphabetical';
 }
 
-/// Order base on [Proposal.fundsRequested].
+/// Orders proposals based on their [Proposal.fundsRequested].
 ///
-/// The [isAscending] parameter determines the direction of the sort:
-/// - true: Lowest budget to highest budget.
-/// - false: Highest budget to lowest budget.
+/// The sorting direction can be specified as ascending or descending.
 final class Budget extends ProposalsOrder {
+  /// Determines the sorting direction.
+  ///
+  /// If `true`, proposals are sorted from the lowest budget to the highest.
+  /// If `false`, they are sorted from the highest budget to the lowest.
   final bool isAscending;
 
   const Budget({
@@ -28,10 +30,11 @@ final class Budget extends ProposalsOrder {
   String toString() => 'Budget(${isAscending ? 'asc' : 'desc'})';
 }
 
-/// A base sealed class representing different ways to order [Proposal].
+/// A base sealed class that defines different strategies for ordering a list of [Proposal] objects.
 ///
-/// This allows us to define a fixed set of ordering types,
-/// where each type can potentially hold its own specific data or logic.
+/// Subclasses of [ProposalsOrder] represent specific ordering methods,
+/// such as by title, budget, or update date. This sealed class ensures that only a
+/// predefined set of ordering types can be created, providing type safety.
 sealed class ProposalsOrder extends Equatable {
   const ProposalsOrder();
 
@@ -39,17 +42,29 @@ sealed class ProposalsOrder extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Orders base on [Proposal] version.
+/// Orders proposals based on their last update date, which corresponds to the [Proposal] version.
 ///
-/// The [isAscending] parameter determines the direction of the sort:
-/// - true: Oldest to newest.
-/// - false: Newest to oldest.
+/// The sorting direction can be specified as ascending (oldest to newest)
+/// or descending (newest to oldest).
 final class UpdateDate extends ProposalsOrder {
+  /// Determines the sorting direction.
+  ///
+  /// If `true`, proposals are sorted from oldest to newest.
+  /// If `false`, they are sorted from newest to oldest.
   final bool isAscending;
 
+  /// Creates an instance of [UpdateDate] order.
+  ///
+  /// The [isAscending] parameter is required to specify the sorting direction.
   const UpdateDate({
     required this.isAscending,
   });
+
+  /// Creates an instance that sorts proposals in ascending order (oldest to newest).
+  const UpdateDate.asc() : this(isAscending: true);
+
+  /// Creates an instance that sorts proposals in descending order (newest to oldest).
+  const UpdateDate.desc() : this(isAscending: false);
 
   @override
   List<Object?> get props => [isAscending];

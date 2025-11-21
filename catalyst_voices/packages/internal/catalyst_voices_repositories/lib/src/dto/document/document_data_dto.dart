@@ -146,7 +146,7 @@ final class DocumentDataMetadataDto {
       campaignId: campaignId?.toModel().toSignedDocumentRef(),
       electionId: electionId,
       categoryId: categoryId?.toModel().toSignedDocumentRef(),
-      authors: authors?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
+      authors: authors?.map(CatalystId.parse).toList(),
     );
   }
 

@@ -68,7 +68,6 @@ void main() {
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
             fundNumber: 14,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
@@ -81,10 +80,8 @@ void main() {
                 categorySubname: 'Test Subname',
                 description: 'Test description',
                 shortDescription: 'Test short description',
-                proposalsCount: 0,
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
@@ -123,7 +120,6 @@ void main() {
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
             // TODO(LynxLynxx): refactor it when _mapProposalToViewModel will be refactored
             fundNumber: 0,
             timeline: const CampaignTimeline(phases: []),
@@ -137,10 +133,8 @@ void main() {
                 categorySubname: 'Test Subname',
                 description: 'Test description',
                 shortDescription: 'Test short description',
-                proposalsCount: 0,
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),

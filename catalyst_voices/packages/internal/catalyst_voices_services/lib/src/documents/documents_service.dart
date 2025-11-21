@@ -140,6 +140,11 @@ final class DocumentsServiceImpl implements DocumentsService {
       onProgress?.call(1);
     }
 
+    // Analyze is kind of expensive so run it when significant amount of docs were added
+    if (syncResult.newDocumentsCount > 100) {
+      await _documentRepository.analyzeDatabase();
+    }
+
     return syncResult;
   }
 
@@ -254,20 +259,19 @@ final class DocumentsServiceImpl implements DocumentsService {
     DocumentIndex index,
     Set<DocumentBaseType> exclude,
     Set<String> excludeIds,
-  ) {
-    return index.docs
+  ) async {
+    final refs = index.docs
         .map((e) => e.refs(exclude: exclude))
         .expand((refs) => refs)
         .where((ref) => !excludeIds.contains(ref.id))
         .toSet()
-        .map((ref) {
-          return _documentRepository
-              .isCached(ref: ref)
-              .onError((_, _) => false)
-              .then((value) => value ? null : ref);
-        })
-        .wait
-        .then((refs) => refs.nonNulls.toList());
+        .toList();
+
+    final cachedRefs = await _documentRepository.isCachedBulk(refs: refs);
+
+    refs.removeWhere(cachedRefs.contains);
+
+    return refs.toList();
   }
 
   /// Fetches the [DocumentData] for a list of [SignedDocumentRef]s concurrently.

@@ -35,7 +35,9 @@ final class DocumentData extends Equatable implements Comparable<DocumentData> {
   }
 
   /// Update document data with a new [ref].
-  DocumentData copyWithSelfRef({required DocumentRef selfRef}) {
+  DocumentData copyWith({
+    required DocumentRef selfRef,
+  }) {
     return DocumentData(
       metadata: metadata.copyWith(selfRef: selfRef),
       content: content,

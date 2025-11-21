@@ -3,10 +3,9 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
@@ -72,6 +71,11 @@ abstract interface class ProposalRepository {
     bool includeLocalDrafts = false,
   });
 
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  });
+
   Future<void> upsertDraftProposal({required DocumentData document});
 
   Stream<int> watchCommentsCount({
@@ -89,14 +93,28 @@ abstract interface class ProposalRepository {
     required DocumentRef refTo,
   });
 
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order,
+    ProposalsFiltersV2 filters,
+  });
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
+  });
+
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
   });
 
   Stream<Page<ProposalData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
+  });
+
+  Stream<List<ProposalTemplate>> watchProposalTemplates({
+    required CampaignFilters filters,
   });
 
   Stream<List<ProposalDocument>> watchUserProposals({
@@ -194,9 +212,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final proposalDocument = await _documentRepository.getDocumentData(ref: ref);
+    final documentData = await _documentRepository.getDocumentData(ref: ref);
 
-    return _buildProposalTemplate(documentData: proposalDocument);
+    return ProposalTemplateFactory.create(documentData);
   }
 
   @override
@@ -265,6 +283,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) {
+    return _proposalsLocalSource.updateProposalFavorite(id: id, isFavorite: isFavorite);
+  }
+
+  @override
   Future<void> upsertDraftProposal({required DocumentData document}) {
     return _documentRepository.upsertDocument(document: document);
   }
@@ -319,10 +345,30 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return _proposalsLocalSource.watchProposalsBriefPage(
+      request: request,
+      order: order,
+      filters: filters,
+    );
+  }
+
+  @override
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   }) {
     return _proposalsLocalSource.watchProposalsCount(filters: filters);
+  }
+
+  @override
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return _proposalsLocalSource.watchProposalsCountV2(filters: filters);
   }
 
   @override
@@ -334,6 +380,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return _proposalsLocalSource
         .watchProposalsPage(request: request, filters: filters, order: order)
         .map((value) => value.map(_buildProposalData));
+  }
+
+  @override
+  Stream<List<ProposalTemplate>> watchProposalTemplates({
+    required CampaignFilters filters,
+  }) {
+    return _proposalsLocalSource
+        .watchProposalTemplates(filters: filters)
+        .map((event) => event.map(ProposalTemplateFactory.create).toList());
   }
 
   @override
@@ -402,48 +457,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required DocumentData documentData,
     required DocumentData templateData,
   }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalDocument,
-      'Not a proposalDocument document data type',
-    );
-
-    final metadata = ProposalMetadata(
-      selfRef: documentData.metadata.selfRef,
-      templateRef: documentData.metadata.template!,
-      categoryId: documentData.metadata.categoryId!,
-      authors: documentData.metadata.authors ?? [],
-    );
-
-    final template = _buildProposalTemplate(documentData: templateData);
-    final schema = template.schema;
-    final content = DocumentDataContentDto.fromModel(documentData.content);
-    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
-
-    return ProposalDocument(
-      metadata: metadata,
-      document: document,
-    );
-  }
-
-  ProposalTemplate _buildProposalTemplate({
-    required DocumentData documentData,
-  }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalTemplate,
-      'Not a proposalTemplate document data type',
-    );
-
-    final metadata = ProposalTemplateMetadata(
-      selfRef: documentData.metadata.selfRef,
-    );
-
-    final contentData = documentData.content.data;
-    final schema = DocumentSchemaDto.fromJson(contentData).toModel();
-
-    return ProposalTemplate(
-      metadata: metadata,
-      schema: schema,
-    );
+    final template = ProposalTemplateFactory.create(templateData);
+    final proposal = ProposalDocumentFactory.create(documentData, template: template);
+    return proposal;
   }
 
   SignedDocumentMetadata _createProposalMetadata(

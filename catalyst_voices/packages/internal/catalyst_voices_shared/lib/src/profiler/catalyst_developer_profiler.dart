@@ -99,6 +99,7 @@ final class CatalystDeveloperProfiler implements CatalystProfiler {
     String name,
     AsyncOrValueGetter<T> body, {
     CatalystProfilerTimelineArguments? arguments,
+    bool debounce = false,
   }) async {
     final transaction = startTransaction(name, arguments: arguments);
     final finishArgs = CatalystProfilerTimelineFinishArguments();

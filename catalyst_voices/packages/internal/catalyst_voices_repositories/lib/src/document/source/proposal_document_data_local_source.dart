@@ -20,13 +20,42 @@ abstract interface class ProposalDocumentDataLocalSource {
     required ProposalsOrder order,
   });
 
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  });
+
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  });
+
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order,
+    ProposalsFiltersV2 filters,
+  });
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
+  });
+
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
   });
 
   Stream<Page<ProposalDocumentData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
+  });
+
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  });
+
+  Stream<List<DocumentData>> watchProposalTemplates({
+    required CampaignFilters filters,
   });
 }

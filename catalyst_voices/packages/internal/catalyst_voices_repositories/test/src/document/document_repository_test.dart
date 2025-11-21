@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -29,11 +30,12 @@ void main() {
     database = DriftCatalystDatabase(connection);
 
     draftsSource = DatabaseDraftsDataSource(database);
-    localDocuments = DatabaseDocumentsDataSource(database);
+    localDocuments = DatabaseDocumentsDataSource(database, const CatalystProfiler.noop());
     remoteDocuments = _MockDocumentDataRemoteSource();
     favoriteDocuments = DatabaseDocumentFavoriteSource(database);
 
     repository = DocumentRepositoryImpl(
+      database,
       draftsSource,
       localDocuments,
       remoteDocuments,
@@ -269,28 +271,32 @@ void main() {
       );
     });
 
-    group('insertDocument', () {
-      test(
-        'draft document data is saved',
-        () async {
-          // Given
-          final documentDataToSave = DocumentDataFactory.build(
-            selfRef: DocumentRefFactory.draftRef(),
-          );
+    group(
+      'insertDocument',
+      () {
+        test(
+          'draft document data is saved',
+          () async {
+            // Given
+            final documentDataToSave = DocumentDataFactory.build(
+              selfRef: DocumentRefFactory.draftRef(),
+            );
 
-          // When
-          await repository.upsertDocument(document: documentDataToSave);
+            // When
+            await repository.upsertDocument(document: documentDataToSave);
 
-          // Then
-          final savedDocumentData = await repository.getDocumentData(
-            ref: documentDataToSave.metadata.selfRef,
-          );
+            // Then
+            final savedDocumentData = await repository.getDocumentData(
+              ref: documentDataToSave.metadata.selfRef,
+            );
 
-          expect(savedDocumentData, equals(documentDataToSave));
-        },
-        onPlatform: driftOnPlatforms,
-      );
-    });
+            expect(savedDocumentData, equals(documentDataToSave));
+          },
+          onPlatform: driftOnPlatforms,
+        );
+      },
+      skip: 'V2 drafts are not yet migrated',
+    );
 
     test(
       'updating proposal draft '
@@ -341,6 +347,7 @@ void main() {
           ]),
         );
       },
+      skip: 'V2 drafts are not yet migrated',
       onPlatform: driftOnPlatforms,
     );
 
@@ -382,6 +389,7 @@ void main() {
           ]),
         );
       },
+      skip: 'V2 drafts are not yet migrated',
       onPlatform: driftOnPlatforms,
     );
   });

@@ -21,11 +21,19 @@ DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 /// document type.
 abstract interface class DocumentRepository {
   factory DocumentRepository(
+    CatalystDatabase db,
     DraftDataSource drafts,
     SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
     DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
+
+  /// Analyzes the database to gather statistics and potentially optimize it.
+  ///
+  /// This can be a long-running operation, so it should be used judiciously,
+  /// for example, during application startup or in a background process
+  /// for maintenance.
+  Future<void> analyzeDatabase();
 
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
@@ -77,6 +85,9 @@ abstract interface class DocumentRepository {
     CatalystId? authorId,
   });
 
+  /// Returns latest matching [DocumentRef] version with same id as [ref].
+  Future<DocumentRef?> getLatestOf({required DocumentRef ref});
+
   /// Returns count of documents matching [ref] id and [type].
   Future<int> getRefCount({
     required DocumentRef ref,
@@ -97,9 +108,9 @@ abstract interface class DocumentRepository {
     required DocumentIndexFilters filters,
   });
 
-  /// Looks up local source if matching document exists.
-  Future<bool> isCached({
-    required DocumentRef ref,
+  /// Filters and returns only the DocumentRefs from [refs] which are cached.
+  Future<List<DocumentRef>> isCachedBulk({
+    required List<DocumentRef> refs,
   });
 
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
@@ -234,6 +245,7 @@ abstract interface class DocumentRepository {
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
+  final CatalystDatabase _db;
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
@@ -242,11 +254,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   final _documentDataLock = Lock();
 
   DocumentRepositoryImpl(
+    this._db,
     this._drafts,
     this._localDocuments,
     this._remoteDocuments,
     this._favoriteDocuments,
   );
+
+  @override
+  Future<void> analyzeDatabase() => _db.analyze();
 
   @override
   Future<void> deleteDocumentDraft({required DraftRef ref}) {
@@ -307,6 +323,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
 
+  // TODO(damian-molinski): consider also checking with remote source.
+  @override
+  Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
+    final draft = await _drafts.getLatestOf(ref: ref);
+    if (draft != null) {
+      return draft;
+    }
+
+    return _localDocuments.getLatestOf(ref: ref);
+  }
+
   @override
   Future<int> getRefCount({
     required DocumentRef ref,
@@ -337,11 +364,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<bool> isCached({required DocumentRef ref}) {
-    return switch (ref) {
-      DraftRef() => _drafts.exists(ref: ref),
-      SignedDocumentRef() => _localDocuments.exists(ref: ref),
-    };
+  Future<List<DocumentRef>> isCachedBulk({required List<DocumentRef> refs}) {
+    final signedRefs = refs.whereType<SignedDocumentRef>().toList();
+    final localDraftsRefs = refs.whereType<DraftRef>().toList();
+
+    final signedDocsSave = _localDocuments.filterExisting(signedRefs);
+    final draftsDocsSave = _drafts.filterExisting(localDraftsRefs);
+
+    return [
+      signedDocsSave,
+      draftsDocsSave,
+    ].wait.then((value) => value.expand((refs) => refs).toList());
   }
 
   @override

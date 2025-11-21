@@ -56,7 +56,7 @@ melos build-runner-repository
 Build migration test files with
 
 ```bash
-melos db-make-migration
+melos build-db-schema
 ```
 
 #### Web

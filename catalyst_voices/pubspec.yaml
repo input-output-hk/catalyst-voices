@@ -118,6 +118,22 @@ melos:
       description: |
         Run `build_runner` in catalyst_voices_repositories package
 
+    build-db-schema:
+      run: |
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
+      description: |
+        Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
+        classes
+
+    build-db-migration:
+      run: |
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema steps drift_schemas/catalyst_database lib/src/database/migration/schema_versions.g.dart
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate drift_schemas/catalyst_database test/src/database/migration/catalyst_database/generated/
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate --data-classes --companions drift_schemas/catalyst_database/ test/src/database/migration/catalyst_database/generated/
+      description: |
+        Run `drift_dev schema steps` in catalyst_voices_repositories package and generates schema migration steps
+        classes
+
     compile_svg:
       run: |
         cd packages/internal/catalyst_voices_assets && \
@@ -125,13 +141,6 @@ melos:
       description: |
         Compile copied SVGs into vector_graphics binary format assets via packages/internal/catalyst_voices_assets/compile_svg.dart.
         Temporary workaround see packages/internal/catalyst_voices_assets/README.md for context.
-
-    db-make-migration:
-      run: |
-        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
-      description: |
-        Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
-        classes
 
     metrics:
       run: |
