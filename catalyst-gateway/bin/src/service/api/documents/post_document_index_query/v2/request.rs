@@ -99,7 +99,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     ///
     /// Whether a Document Type has a brand, campaign, category etc. reference is defined
     /// by its [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
-    #[oai(skip_serializing_if_is_none, rename="params")]
+    #[oai(skip_serializing_if_is_none, rename = "doc_parameters")]
     parameters: Option<IdAndVerRefDocumented>,
 }
 
