@@ -480,9 +480,11 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<List<CollaboratorInvite>> _getCollaborators() async {
     // TODO(dt-iohk): connect to real data source and remove hardcoded collaborators.
+    /* cSpell:disable */
     final uri = Uri.parse(
       'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
     );
+    /* cSpell:enable */
 
     final catalystId = CatalystId.fromUri(uri);
 
