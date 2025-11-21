@@ -111,7 +111,6 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
-        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -156,7 +155,6 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
-        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -224,7 +222,6 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
-        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -285,7 +282,6 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
-        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -346,7 +342,6 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
-        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -421,7 +416,6 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
-        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(

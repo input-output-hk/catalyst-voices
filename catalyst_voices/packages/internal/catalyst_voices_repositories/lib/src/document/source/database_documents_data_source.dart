@@ -10,6 +10,7 @@ import 'package:catalyst_voices_repositories/src/document/source/proposal_docume
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 final class DatabaseDocumentsDataSource
@@ -69,6 +70,11 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<DocumentRef?> getLatestOf({required DocumentRef ref}) {
+    return _database.documentsV2Dao.getLatestOf(ref);
+  }
+
+  @override
   Future<List<ProposalDocumentData>> getProposals({
     SignedDocumentRef? categoryRef,
     required ProposalsFilterType type,
@@ -90,6 +96,14 @@ final class DatabaseDocumentsDataSource
     return _database.proposalsDao
         .queryProposalsPage(request: request, filters: filters, order: order)
         .then((page) => page.map((e) => e.toModel()));
+  }
+
+  @override
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) {
+    return _database.proposalsV2Dao.getProposalsTotalTask(filters: filters, nodeId: nodeId);
   }
 
   @override
@@ -220,6 +234,26 @@ final class DatabaseDocumentsDataSource
     return _database.proposalsDao
         .watchProposalsPage(request: request, filters: filters, order: order)
         .map((page) => page.map((e) => e.toModel()));
+  }
+
+  @override
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) {
+    return _database.proposalsV2Dao
+        .watchProposalsTotalTask(filters: filters, nodeId: nodeId)
+        .distinct();
+  }
+
+  @override
+  Stream<List<DocumentData>> watchProposalTemplates({
+    required CampaignFilters filters,
+  }) {
+    return _database.documentsV2Dao
+        .watchDocuments(type: DocumentType.proposalTemplate, filters: filters)
+        .distinct(listEquals)
+        .map((event) => event.map((e) => e.toModel()).toList());
   }
 
   @override

@@ -316,9 +316,7 @@ final class VotingCubit extends Cubit<VotingState>
     final selectedCategory = campaign?.categories.firstWhereOrNull(
       (e) => e.selfRef.id == selectedCategoryId,
     );
-    final selectedCategoryViewModel = selectedCategory != null
-        ? CampaignCategoryDetailsViewModel.fromModel(selectedCategory)
-        : null;
+
     final fundNumber = campaign?.fundNumber;
     final votingPowerViewModel = votingPower != null
         ? VotingPowerViewModel.fromModel(votingPower)
@@ -327,8 +325,15 @@ final class VotingCubit extends Cubit<VotingState>
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
 
+    final header = VotingHeaderData(
+      showCategoryPicker: votingPhaseViewModel?.status.isActive ?? false,
+      category: selectedCategory != null
+          ? VotingHeaderCategoryData.fromModel(selectedCategory)
+          : null,
+    );
+
     return state.copyWith(
-      selectedCategory: Optional(selectedCategoryViewModel),
+      header: header,
       fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
       votingPhase: Optional(votingPhaseViewModel),

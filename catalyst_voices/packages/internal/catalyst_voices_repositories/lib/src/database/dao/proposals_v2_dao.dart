@@ -118,6 +118,21 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) async {
+    if (_totalAskShouldReturnEarlyFor(filters: filters)) {
+      return const ProposalsTotalAsk({});
+    }
+
+    return _queryProposalsTotalTask(
+      filters: filters,
+      nodeId: nodeId,
+    ).get().then(Map.fromEntries).then(ProposalsTotalAsk.new);
+  }
+
+  @override
   Future<int> getVisibleProposalsCount({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
@@ -180,6 +195,21 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         maxPerPage: effectiveSize,
       ),
     );
+  }
+
+  @override
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) {
+    if (_totalAskShouldReturnEarlyFor(filters: filters)) {
+      return Stream.value(const ProposalsTotalAsk({}));
+    }
+
+    return _queryProposalsTotalTask(
+      nodeId: nodeId,
+      filters: filters,
+    ).watch().map(Map.fromEntries).map(ProposalsTotalAsk.new);
   }
 
   @override
@@ -276,6 +306,22 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     if (filters.ids != null) {
       final escapedIds = filters.ids!.map((id) => "'${_escapeSqlString(id)}'").join(', ');
       clauses.add('p.id IN ($escapedIds)');
+    }
+
+    return clauses;
+  }
+
+  List<String> _buildFilterTotalAskClauses(ProposalsTotalAskFilters filters) {
+    final clauses = <String>[];
+
+    if (filters.categoryId != null) {
+      final escapedCategory = _escapeSqlString(filters.categoryId!);
+      clauses.add("p.category_id = '$escapedCategory'");
+    } else if (filters.campaign != null) {
+      final escapedIds = filters.campaign!.categoriesIds
+          .map((id) => "'${_escapeSqlString(id)}'")
+          .join(', ');
+      clauses.add('p.category_id IN ($escapedIds)');
     }
 
     return clauses;
@@ -438,6 +484,81 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// Returns: The escaped string.
   String _escapeSqlString(String input) {
     return input.replaceAll("'", "''");
+  }
+
+  Selectable<MapEntry<DocumentRef, ProposalsTotalAskPerTemplate>> _queryProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) {
+    final filterClauses = _buildFilterTotalAskClauses(filters);
+    final filterWhereClause = filterClauses.isEmpty ? '' : 'AND ${filterClauses.join(' AND ')}';
+
+    final query =
+        '''
+    WITH latest_actions AS (
+      SELECT ref_id, MAX(ver) as max_action_ver
+      FROM documents_v2
+      WHERE type = ?
+      GROUP BY ref_id
+    ),
+    action_status AS (
+      SELECT 
+        a.ref_id,
+        a.ref_ver,
+        COALESCE(json_extract(a.content, '\$.action'), 'draft') as action_type
+      FROM documents_v2 a
+      INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
+      WHERE a.type = ?
+    ),
+    effective_final_proposals AS (
+      SELECT 
+        ast.ref_id as id,
+        ast.ref_ver as ver
+      FROM action_status ast
+      WHERE ast.action_type = 'final'
+        AND ast.ref_ver IS NOT NULL
+        AND ast.ref_ver != ''
+    )
+    SELECT 
+      p.template_id,
+      p.template_ver,
+      SUM(COALESCE(CAST(json_extract(p.content, '\$.${nodeId.value}') AS INTEGER), 0)) as total_ask,
+      COUNT(*) as final_proposals_count
+    FROM documents_v2 p
+    INNER JOIN effective_final_proposals efp ON p.id = efp.id AND p.ver = efp.ver
+    WHERE p.type = ?
+      $filterWhereClause
+      AND p.template_id IS NOT NULL
+      AND p.template_ver IS NOT NULL
+    GROUP BY p.template_id, p.template_ver
+  ''';
+
+    return customSelect(
+      query,
+      variables: [
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.proposalDocument.uuid),
+      ],
+      readsFrom: {documentsV2},
+    ).map((row) {
+      final templateId = row.read<String>('template_id');
+      final templateVer = row.read<String>('template_ver');
+      final totalAsk = row.read<int>('total_ask');
+      final finalProposalsCount = row.read<int>('final_proposals_count');
+
+      final ref = SignedDocumentRef(
+        id: templateId,
+        version: templateVer,
+      );
+
+      final value = ProposalsTotalAskPerTemplate(
+        totalAsk: totalAsk,
+        finalProposalsCount: finalProposalsCount,
+      );
+
+      return MapEntry(ref, value);
+    });
   }
 
   /// Fetches a page of visible proposals using multi-stage CTE logic.
@@ -670,6 +791,29 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     return false;
   }
+
+  bool _totalAskShouldReturnEarlyFor({
+    required ProposalsTotalAskFilters filters,
+  }) {
+    final campaign = filters.campaign;
+    if (campaign != null) {
+      assert(
+        campaign.categoriesIds.length <= 100,
+        'Campaign filter with more than 100 categories may impact performance. '
+        'Consider pagination or alternative filtering strategy.',
+      );
+
+      if (campaign.categoriesIds.isEmpty) {
+        return true;
+      }
+
+      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }
 
 /// Public interface for proposal queries.
@@ -723,6 +867,11 @@ abstract interface class ProposalsV2Dao {
     ProposalsFiltersV2 filters,
   });
 
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  });
+
   /// Counts the total number of visible proposals that match the given filters.
   ///
   /// This method respects the same status handling logic as [getProposalsBriefPage],
@@ -772,6 +921,11 @@ abstract interface class ProposalsV2Dao {
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
+  });
+
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
   });
 
   /// Watches for changes and emits the total count of visible proposals.

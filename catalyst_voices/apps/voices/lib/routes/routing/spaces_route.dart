@@ -33,7 +33,7 @@ final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return CategoryPage(
-      categoryId: SignedDocumentRef(id: categoryId),
+      categoryRef: SignedDocumentRef(id: categoryId),
     );
   }
 }

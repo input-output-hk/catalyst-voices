@@ -85,6 +85,9 @@ abstract interface class DocumentRepository {
     CatalystId? authorId,
   });
 
+  /// Returns latest matching [DocumentRef] version with same id as [ref].
+  Future<DocumentRef?> getLatestOf({required DocumentRef ref});
+
   /// Returns count of documents matching [ref] id and [type].
   Future<int> getRefCount({
     required DocumentRef ref,
@@ -318,6 +321,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final latestDraft = await _drafts.getLatest(authorId: authorId);
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
+  }
+
+  // TODO(damian-molinski): consider also checking with remote source.
+  @override
+  Future<DocumentRef?> getLatestOf({required DocumentRef ref}) async {
+    final draft = await _drafts.getLatestOf(ref: ref);
+    if (draft != null) {
+      return draft;
+    }
+
+    return _localDocuments.getLatestOf(ref: ref);
   }
 
   @override

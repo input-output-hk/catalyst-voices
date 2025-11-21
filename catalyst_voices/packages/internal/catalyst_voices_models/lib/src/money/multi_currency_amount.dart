@@ -1,5 +1,5 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
-import 'package:catalyst_voices_models/src/money/money.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents a collection of monetary amounts in multiple currencies.
@@ -14,7 +14,7 @@ final class MultiCurrencyAmount extends Equatable {
   /// Creates an empty [MultiCurrencyAmount] or initializes with an optional map.
   MultiCurrencyAmount({
     Map<CurrencyCode, Money>? map,
-  }) : _map = map ?? {};
+  }) : _map = Map.unmodifiable(map ?? {});
 
   /// Creates a [MultiCurrencyAmount] from a list of [Money] values.
   ///
@@ -23,11 +23,21 @@ final class MultiCurrencyAmount extends Equatable {
   /// final amounts = MultiCurrencyAmount.list([usdmMoney, adaMoney]);
   /// ```
   factory MultiCurrencyAmount.list(List<Money> money) {
-    final group = MultiCurrencyAmount();
+    final map = <CurrencyCode, Money>{};
+
     for (final item in money) {
-      group.add(item);
+      final currency = item.currency;
+
+      map.update(
+        currency.code,
+        (value) => value + item,
+        ifAbsent: () => item,
+      );
     }
-    return group;
+
+    map.removeWhere((key, value) => value.isZero);
+
+    return MultiCurrencyAmount(map: map);
   }
 
   /// Creates a [MultiCurrencyAmount] with a single [Money] value.
@@ -36,13 +46,19 @@ final class MultiCurrencyAmount extends Equatable {
   /// ```dart
   /// final amount = MultiCurrencyAmount.single(usdmMoney);
   /// ```
-  factory MultiCurrencyAmount.single(Money money) {
-    final group = MultiCurrencyAmount()..add(money);
-    return group;
+  factory MultiCurrencyAmount.single(Money money) => MultiCurrencyAmount.list([money]);
+
+  /// Creates a [MultiCurrencyAmount] with a single zero [Money] value.
+  ///
+  /// The currency defaults to [Currencies.fallback] if not specified.
+  factory MultiCurrencyAmount.zero({
+    Currency currency = Currencies.fallback,
+  }) {
+    return MultiCurrencyAmount.single(Money.zero(currency: currency));
   }
 
   /// Returns all [Money] values in this collection as a list.
-  List<Money> get list => _map.values.toList();
+  List<Money> get list => List.unmodifiable(_map.values);
 
   @override
   List<Object?> get props => [_map];
@@ -52,17 +68,6 @@ final class MultiCurrencyAmount extends Equatable {
     return _map[isoCode];
   }
 
-  /// Adds [money] to the collection.
-  ///
-  /// If an amount for the same currency already exists, it sums them.
-  /// Zero amounts are automatically removed from the collection.
-  void add(Money money) {
-    final currency = money.currency;
-    final current = _map[currency.code];
-    final updated = (current ?? Money.zero(currency: currency)) + money;
-    _updateMap(updated);
-  }
-
   /// Creates a deep copy of this [MultiCurrencyAmount].
   ///
   /// Modifications to the copy will not affect the original.
@@ -70,26 +75,6 @@ final class MultiCurrencyAmount extends Equatable {
     return MultiCurrencyAmount(map: Map.of(_map));
   }
 
-  /// Subtracts [money] from the collection.
-  ///
-  /// If an amount for the same currency exists, it subtracts it.
-  /// Zero amounts are automatically removed from the collection.
-  void subtract(Money money) {
-    final currency = money.currency;
-    final current = _map[currency.code];
-    final updated = (current ?? Money.zero(currency: currency)) - money;
-    _updateMap(updated);
-  }
-
-  /// Updates the internal map with [money].
-  ///
-  /// If the amount is zero, the entry is removed. Otherwise, it is added/updated.
-  void _updateMap(Money money) {
-    final isoCode = money.currency.code;
-    if (money.isZero) {
-      _map.remove(isoCode);
-    } else {
-      _map[isoCode] = money;
-    }
-  }
+  @override
+  String toString() => 'MultiCurrencyAmount(${_map.values.join(', ')})';
 }

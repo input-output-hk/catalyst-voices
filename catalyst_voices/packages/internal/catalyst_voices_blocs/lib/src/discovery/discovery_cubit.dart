@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/discovery/discovery_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -9,6 +10,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 const _maxRecentProposalsCount = 7;
+const List<CampaignPhaseType> _offstagePhases = [CampaignPhaseType.reviewRegistration];
+
 final _logger = Logger('DiscoveryCubit');
 
 /// Manages all data for the discovery screen.
@@ -18,9 +21,16 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
 
-  StreamSubscription<List<ProposalBrief>>? _proposalsV2Sub;
+  DiscoveryCubitCache _cache = const DiscoveryCubitCache();
 
-  DiscoveryCubit(this._campaignService, this._proposalService) : super(const DiscoveryState());
+  StreamSubscription<List<ProposalBrief>>? _proposalsV2Sub;
+  StreamSubscription<Campaign?>? _activeCampaignSub;
+  StreamSubscription<CampaignTotalAsk>? _activeCampaignTotalAskSub;
+
+  DiscoveryCubit(
+    this._campaignService,
+    this._proposalService,
+  ) : super(const DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
@@ -36,6 +46,12 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     await _proposalsV2Sub?.cancel();
     _proposalsV2Sub = null;
 
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
+
+    await _activeCampaignTotalAskSub?.cancel();
+    _activeCampaignTotalAskSub = null;
+
     return super.close();
   }
 
@@ -46,40 +62,20 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   Future<void> getCurrentCampaign() async {
     try {
-      emit(state.copyWith(campaign: const DiscoveryCampaignState()));
+      emit(state.copyWith(campaign: const DiscoveryCampaignState(isLoading: true)));
 
-      final campaign = (await _campaignService.getActiveCampaign())!;
-      final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
-      final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
-      final categoriesModel = campaign.categories
-          .map(CampaignCategoryDetailsViewModel.fromModel)
-          .toList();
-      final datesEvents = _buildCampaignDatesEvents(timeline);
+      final campaign = await _campaignService.getActiveCampaign();
 
-      if (isClosed) {
-        return;
+      if (!isClosed) {
+        _handleActiveCampaignChange(campaign);
+        _watchActiveCampaign();
       }
-
-      emit(
-        state.copyWith(
-          campaign: DiscoveryCampaignState(
-            currentCampaign: currentCampaign,
-            campaignTimeline: timeline,
-            categories: categoriesModel,
-            datesEvents: datesEvents,
-            isLoading: false,
-          ),
-        ),
-      );
     } catch (e, st) {
       _logger.severe('Error getting current campaign', e, st);
 
       if (!isClosed) {
-        emit(
-          state.copyWith(
-            campaign: DiscoveryCampaignState(error: LocalizedException.create(e)),
-          ),
-        );
+        final campaignState = DiscoveryCampaignState(error: LocalizedException.create(e));
+        emit(state.copyWith(campaign: campaignState));
       }
     }
   }
@@ -99,49 +95,51 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     }
   }
 
-  CampaignDatesEventsState _buildCampaignDatesEvents(
-    List<CampaignTimelineViewModel> campaignTimeline,
-  ) {
-    final reviewItems =
-        [
-              campaignTimeline.firstWhereOrNull(
-                (e) => e.type == CampaignPhaseType.reviewRegistration,
-              ),
-              campaignTimeline.firstWhereOrNull(
-                (e) => e.type == CampaignPhaseType.communityReview,
-              ),
-            ]
-            .whereType<CampaignTimelineViewModel>()
-            .map(
-              (e) => CampaignTimelineEventWithTitle(
-                dateRange: e.timeline,
-                type: e.type,
-              ),
-            )
-            .toList();
+  CampaignDatesEventsState _buildCampaignDatesEventsState(List<CampaignTimelineViewModel> data) {
+    final reviewReg = data.firstWhereOrNull((e) => e.type.isReviewRegistration);
+    final communityRev = data.firstWhereOrNull((e) => e.type.isCommunityReview);
+    final reviewPhases = [?reviewReg, ?communityRev];
 
-    final votingItems =
-        [
-              campaignTimeline.firstWhereOrNull(
-                (e) => e.type == CampaignPhaseType.votingRegistration,
-              ),
-              campaignTimeline.firstWhereOrNull(
-                (e) => e.type == CampaignPhaseType.communityVoting,
-              ),
-            ]
-            .whereType<CampaignTimelineViewModel>()
-            .map(
-              (e) => CampaignTimelineEventWithTitle(
-                dateRange: e.timeline,
-                type: e.type,
-              ),
-            )
-            .toList();
+    final reviewItems = reviewPhases
+        .map((e) => CampaignTimelineEventWithTitle(dateRange: e.timeline, type: e.type))
+        .toList();
+
+    final votingReg = data.firstWhereOrNull((e) => e.type.isVotingRegistration);
+    final communityVoting = data.firstWhereOrNull((e) => e.type.isCommunityVoting);
+    final votingPhases = [?votingReg, ?communityVoting];
+
+    final votingItems = votingPhases
+        .map((e) => CampaignTimelineEventWithTitle(dateRange: e.timeline, type: e.type))
+        .toList();
 
     return CampaignDatesEventsState(
       reviewTimelineItems: reviewItems,
       votingTimelineItems: votingItems,
     );
+  }
+
+  void _handleActiveCampaignChange(Campaign? campaign) {
+    if (_cache.activeCampaign?.selfRef == campaign?.selfRef) {
+      return;
+    }
+
+    _cache = _cache.copyWith(
+      activeCampaign: Optional(campaign),
+      campaignTotalAsk: const Optional.empty(),
+    );
+
+    _updateCampaignState();
+
+    unawaited(_activeCampaignTotalAskSub?.cancel());
+    _activeCampaignTotalAskSub = null;
+
+    if (campaign != null) _watchCampaignTotalAsk(campaign);
+  }
+
+  void _handleCampaignTotalAskChange(CampaignTotalAsk data) {
+    _logger.finest('Campaign total ask changed: $data');
+    _cache = _cache.copyWith(campaignTotalAsk: Optional(data));
+    _updateCampaignState();
   }
 
   void _handleProposalsChange(List<ProposalBrief> proposals) {
@@ -153,6 +151,65 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     );
 
     emit(state.copyWith(proposals: updatedProposalsState));
+  }
+
+  void _updateCampaignState() {
+    final campaign = _cache.activeCampaign;
+    final campaignTotalAsk = _cache.campaignTotalAsk ?? const CampaignTotalAsk(categoriesAsks: {});
+
+    final phases = campaign?.timeline.phases ?? [];
+    final timeline = phases
+        .where((phase) => !_offstagePhases.contains(phase.type))
+        .map(CampaignTimelineViewModel.fromModel)
+        .toList();
+    final datesEvents = _buildCampaignDatesEventsState(timeline);
+
+    final currentCampaign = CurrentCampaignInfoViewModel(
+      title: campaign?.name ?? '',
+      allFunds: campaign?.allFunds ?? MultiCurrencyAmount.zero(),
+      totalAsk: campaignTotalAsk.totalAsk,
+      timeline: timeline,
+    );
+
+    final categories = campaign?.categories ?? [];
+    final categoriesModel = categories.map(
+      (category) {
+        final categoryTotalAsk =
+            campaignTotalAsk.categoriesAsks[category.selfRef] ??
+            CampaignCategoryTotalAsk.zero(category.selfRef);
+
+        return CampaignCategoryDetailsViewModel.fromModel(
+          category,
+          finalProposalsCount: categoryTotalAsk.finalProposalsCount,
+          totalAsk: categoryTotalAsk.totalAsk,
+        );
+      },
+    ).toList();
+
+    final campaignState = DiscoveryCampaignState(
+      currentCampaign: currentCampaign,
+      campaignTimeline: timeline,
+      categories: categoriesModel,
+      datesEvents: datesEvents,
+    );
+
+    emit(state.copyWith(campaign: campaignState));
+  }
+
+  void _watchActiveCampaign() {
+    unawaited(_activeCampaignSub?.cancel());
+
+    _activeCampaignSub = _campaignService.watchActiveCampaign
+        .distinct((previous, next) => previous?.selfRef != next?.selfRef)
+        .listen(_handleActiveCampaignChange);
+  }
+
+  void _watchCampaignTotalAsk(Campaign campaign) {
+    final filters = ProposalsTotalAskFilters(campaign: CampaignFilters.from(campaign));
+    _activeCampaignTotalAskSub = _campaignService
+        .watchCampaignTotalAsk(filters: filters)
+        .distinct()
+        .listen(_handleCampaignTotalAskChange);
   }
 
   void _watchMostRecentProposals() {

@@ -250,17 +250,13 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> getLatestProposalVersion({
-    required DocumentRef ref,
-  }) async {
-    final proposalVersions = await _documentRepository.getAllVersionsOfId(
-      id: ref.id,
-    );
-    final refList = List<DocumentRef>.from(
-      proposalVersions.map((e) => e.metadata.selfRef).toList(),
-    )..sort();
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref}) async {
+    final latest = await _documentRepository.getLatestOf(ref: ref);
+    if (latest == null) {
+      throw DocumentNotFoundException(ref: ref);
+    }
 
-    return refList.last;
+    return latest;
   }
 
   @override

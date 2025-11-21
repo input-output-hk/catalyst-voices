@@ -35,6 +35,12 @@ abstract interface class DocumentsV2Dao {
   /// Returns null if no matching document is found.
   Future<DocumentEntityV2?> getDocument(DocumentRef ref);
 
+  /// Finds the latest version of a document.
+  ///
+  /// Takes a [ref] (which can be loose or exact) and returns a [DocumentRef]
+  /// pointing to the latest known version of that document.
+  Future<DocumentRef?> getLatestOf(DocumentRef ref);
+
   /// Saves a single document, ignoring if it conflicts on {id, ver}.
   ///
   /// Delegates to [saveAll] for consistent conflict handling and reuse.
@@ -45,6 +51,23 @@ abstract interface class DocumentsV2Dao {
   /// [entries] is a list of DocumentEntity instances.
   /// Uses insertOrIgnore to skip on primary key conflicts ({id, ver}).
   Future<void> saveAll(List<DocumentWithAuthorsEntity> entries);
+
+  /// Watches for a list of documents that match the given criteria.
+  ///
+  /// This method returns a stream that emits a new list of documents whenever
+  /// the underlying data changes.
+  /// - [type]: Optional filter to only include documents of a specific [DocumentType].
+  /// - [filters]: Optional campaign filter.
+  /// - [latestOnly] is true only newest version per id is returned.
+  /// - [limit]: The maximum number of documents to return.
+  /// - [offset]: The number of documents to skip for pagination.
+  Stream<List<DocumentEntityV2>> watchDocuments({
+    DocumentType? type,
+    CampaignFilters? filters,
+    bool latestOnly,
+    int limit,
+    int offset,
+  });
 }
 
 @DriftAccessor(
@@ -130,6 +153,24 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<DocumentRef?> getLatestOf(DocumentRef ref) {
+    final query = selectOnly(documentsV2)
+      ..addColumns([documentsV2.id, documentsV2.ver])
+      ..where(documentsV2.id.equals(ref.id))
+      ..orderBy([OrderingTerm.desc(documentsV2.createdAt)])
+      ..limit(1);
+
+    return query
+        .map(
+          (row) => SignedDocumentRef.exact(
+            id: row.read(documentsV2.id)!,
+            version: row.read(documentsV2.ver)!,
+          ),
+        )
+        .getSingleOrNull();
+  }
+
+  @override
   Future<void> save(DocumentWithAuthorsEntity entity) => saveAll([entity]);
 
   @override
@@ -154,5 +195,43 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         );
       }
     });
+  }
+
+  @override
+  Stream<List<DocumentEntityV2>> watchDocuments({
+    DocumentType? type,
+    CampaignFilters? filters,
+    bool latestOnly = false,
+    int limit = 200,
+    int offset = 0,
+  }) {
+    final effectiveLimit = limit.clamp(0, 999);
+
+    final query = select(documentsV2);
+
+    if (filters != null) {
+      query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
+    }
+
+    if (type != null) {
+      query.where((tbl) => tbl.type.equalsValue(type));
+    }
+
+    if (latestOnly) {
+      final inner = alias(documentsV2, 'inner');
+
+      query.where((tbl) {
+        final maxCreatedAt = subqueryExpression<DateTime>(
+          selectOnly(inner)
+            ..addColumns([inner.createdAt.max()])
+            ..where(inner.id.equalsExp(tbl.id)),
+        );
+        return tbl.createdAt.equalsExp(maxCreatedAt);
+      });
+    }
+
+    query.limit(effectiveLimit, offset: offset);
+
+    return query.watch();
   }
 }

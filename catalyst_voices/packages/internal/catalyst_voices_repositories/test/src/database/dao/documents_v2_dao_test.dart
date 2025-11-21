@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
@@ -502,6 +504,512 @@ void main() {
         expect(saved[0].content.data['key'], 'original');
       });
     });
+
+    group('watchDocuments', () {
+      test('emits all documents when no filters applied', () async {
+        final doc1 = _createTestDocumentEntity(id: 'id1', type: DocumentType.proposalDocument);
+        final doc2 = _createTestDocumentEntity(id: 'id2', type: DocumentType.proposalTemplate);
+        final doc3 = _createTestDocumentEntity(
+          id: 'id3',
+          type: DocumentType.proposalActionDocument,
+        );
+
+        await dao.saveAll([doc1, doc2, doc3]);
+
+        final stream = dao.watchDocuments();
+
+        await expectLater(
+          stream,
+          emits(hasLength(3)),
+        );
+      });
+
+      test('filters documents by type', () async {
+        final proposal1 = _createTestDocumentEntity(id: 'id1', type: DocumentType.proposalDocument);
+        final proposal2 = _createTestDocumentEntity(id: 'id2', type: DocumentType.proposalDocument);
+        final template = _createTestDocumentEntity(id: 'id3', type: DocumentType.proposalTemplate);
+
+        await dao.saveAll([proposal1, proposal2, template]);
+
+        final stream = dao.watchDocuments(type: DocumentType.proposalDocument);
+
+        await expectLater(
+          stream,
+          emits(
+            predicate<List<DocumentEntityV2>>((docs) {
+              return docs.length == 2 && docs.every((d) => d.type == DocumentType.proposalDocument);
+            }),
+          ),
+        );
+      });
+
+      test('respects limit parameter', () async {
+        final docs = List.generate(
+          10,
+          (i) => _createTestDocumentEntity(id: 'id$i', type: DocumentType.proposalDocument),
+        );
+
+        await dao.saveAll(docs);
+
+        final stream = dao.watchDocuments(limit: 5);
+
+        await expectLater(
+          stream,
+          emits(hasLength(5)),
+        );
+      });
+
+      test('respects offset parameter', () async {
+        final docs = List.generate(
+          10,
+          (i) => _createTestDocumentEntity(id: 'id$i', type: DocumentType.proposalDocument),
+        );
+
+        await dao.saveAll(docs);
+
+        final streamFirst = dao.watchDocuments(limit: 5, offset: 0);
+        final streamSecond = dao.watchDocuments(limit: 5, offset: 5);
+
+        final firstBatch = await streamFirst.first;
+        final secondBatch = await streamSecond.first;
+
+        expect(firstBatch.length, 5);
+        expect(secondBatch.length, 5);
+        expect(
+          firstBatch
+              .map((d) => d.id)
+              .toSet()
+              .intersection(
+                secondBatch.map((d) => d.id).toSet(),
+              ),
+          isEmpty,
+        );
+      });
+
+      test('clamps limit to 999 when exceeds maximum', () async {
+        final docs = List.generate(
+          1000,
+          (i) => _createTestDocumentEntity(id: 'id$i', type: DocumentType.proposalDocument),
+        );
+
+        await dao.saveAll(docs);
+
+        final stream = dao.watchDocuments(limit: 1500);
+
+        await expectLater(
+          stream,
+          emits(hasLength(999)),
+        );
+      });
+
+      test('handles limit of 0', () async {
+        final doc = _createTestDocumentEntity(id: 'id1', type: DocumentType.proposalDocument);
+
+        await dao.save(doc);
+
+        final stream = dao.watchDocuments(limit: 0);
+
+        await expectLater(
+          stream,
+          emits(isEmpty),
+        );
+      });
+
+      test('emits empty list when no documents exist', () async {
+        final stream = dao.watchDocuments();
+
+        await expectLater(
+          stream,
+          emits(isEmpty),
+        );
+      });
+
+      test('emits empty list when type filter matches nothing', () async {
+        final doc = _createTestDocumentEntity(id: 'id1', type: DocumentType.proposalDocument);
+
+        await dao.save(doc);
+
+        final stream = dao.watchDocuments(type: DocumentType.proposalTemplate);
+
+        await expectLater(
+          stream,
+          emits(isEmpty),
+        );
+      });
+
+      test('emits new values when documents are added', () async {
+        final stream = dao.watchDocuments();
+
+        final doc1 = _createTestDocumentEntity(id: 'id1', type: DocumentType.proposalDocument);
+        final doc2 = _createTestDocumentEntity(id: 'id2', type: DocumentType.proposalDocument);
+
+        final expectation = expectLater(
+          stream,
+          emitsInOrder([
+            isEmpty,
+            hasLength(1),
+            hasLength(2),
+          ]),
+        );
+
+        await pumpEventQueue();
+        await dao.save(doc1);
+        await pumpEventQueue();
+        await dao.save(doc2);
+        await pumpEventQueue();
+
+        await expectation;
+      });
+
+      test('does not emit duplicate when same document saved twice', () async {
+        final doc = _createTestDocumentEntity(id: 'id1', type: DocumentType.proposalDocument);
+
+        await dao.save(doc);
+
+        final stream = dao.watchDocuments();
+
+        final expectation = expectLater(
+          stream,
+          emitsInOrder([
+            hasLength(1),
+            hasLength(1),
+          ]),
+        );
+
+        await pumpEventQueue();
+        await dao.save(doc);
+        await pumpEventQueue();
+
+        await expectation;
+      });
+
+      test('combines type filter with limit and offset', () async {
+        final proposals = List.generate(
+          20,
+          (i) => _createTestDocumentEntity(id: 'proposal$i', type: DocumentType.proposalDocument),
+        );
+
+        final templates = List.generate(
+          10,
+          (i) => _createTestDocumentEntity(id: 'template$i', type: DocumentType.proposalTemplate),
+        );
+
+        await dao.saveAll([...proposals, ...templates]);
+
+        final stream = dao.watchDocuments(
+          type: DocumentType.proposalDocument,
+          limit: 5,
+          offset: 10,
+        );
+
+        await expectLater(
+          stream,
+          emits(
+            predicate<List<DocumentEntityV2>>((docs) {
+              return docs.length == 5 && docs.every((d) => d.type == DocumentType.proposalDocument);
+            }),
+          ),
+        );
+      });
+
+      test('emits updates when filtered documents change', () async {
+        final proposal = _createTestDocumentEntity(id: 'id1', type: DocumentType.proposalDocument);
+        final template = _createTestDocumentEntity(id: 'id2', type: DocumentType.proposalTemplate);
+
+        final stream = dao.watchDocuments(type: DocumentType.proposalDocument);
+
+        final expectation = expectLater(
+          stream,
+          emitsInOrder([
+            isEmpty,
+            hasLength(1),
+            hasLength(1),
+          ]),
+        );
+
+        await pumpEventQueue();
+        await dao.save(proposal);
+        await pumpEventQueue();
+        await dao.save(template);
+        await pumpEventQueue();
+
+        await expectation;
+      });
+
+      test('returns all versions when latestOnly is false', () async {
+        final v1 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 1)),
+        );
+        final v2 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 2)),
+        );
+        final v3 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 3)),
+        );
+
+        await dao.saveAll([v1, v2, v3]);
+
+        final stream = dao.watchDocuments(latestOnly: false);
+
+        await expectLater(
+          stream,
+          emits(hasLength(3)),
+        );
+      });
+
+      test('returns only latest version of each document when latestOnly is true', () async {
+        final doc1v1 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 1)),
+        );
+        final doc1v2 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 2)),
+        );
+        final doc2v1 = _createTestDocumentEntity(
+          id: 'id2',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 1)),
+        );
+
+        await dao.saveAll([doc1v1, doc1v2, doc2v1]);
+
+        final stream = dao.watchDocuments(latestOnly: true);
+
+        final result = await stream.first;
+
+        expect(result.length, 2);
+        expect(result.any((d) => d.id == 'id1' && d.ver == doc1v1.doc.ver), isFalse);
+        expect(result.any((d) => d.id == 'id1' && d.ver == doc1v2.doc.ver), isTrue);
+        expect(result.any((d) => d.id == 'id2' && d.ver == doc2v1.doc.ver), isTrue);
+      });
+
+      test('combines latestOnly with type filter', () async {
+        final proposal1v1 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 1)),
+          type: DocumentType.proposalDocument,
+        );
+        final proposal1v2 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 2)),
+          type: DocumentType.proposalDocument,
+        );
+        final template1v1 = _createTestDocumentEntity(
+          id: 'id2',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 1)),
+          type: DocumentType.proposalTemplate,
+        );
+        final template1v2 = _createTestDocumentEntity(
+          id: 'id2',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 2)),
+          type: DocumentType.proposalTemplate,
+        );
+
+        await dao.saveAll([proposal1v1, proposal1v2, template1v1, template1v2]);
+
+        final stream = dao.watchDocuments(
+          type: DocumentType.proposalDocument,
+          latestOnly: true,
+        );
+
+        final result = await stream.first;
+
+        expect(result.length, 1);
+        expect(result.first.id, 'id1');
+        expect(result.first.ver, proposal1v2.doc.ver);
+        expect(result.first.type, DocumentType.proposalDocument);
+      });
+
+      test('combines latestOnly with limit and offset', () async {
+        final docs = <DocumentWithAuthorsEntity>[];
+        for (var i = 0; i < 10; i++) {
+          docs
+            ..add(
+              _createTestDocumentEntity(
+                id: 'id$i',
+                ver: _buildUuidV7At(DateTime.utc(2024, 1, 1)),
+              ),
+            )
+            ..add(
+              _createTestDocumentEntity(
+                id: 'id$i',
+                ver: _buildUuidV7At(DateTime.utc(2024, 1, 2)),
+              ),
+            );
+        }
+
+        await dao.saveAll(docs);
+
+        final stream = dao.watchDocuments(
+          latestOnly: true,
+          limit: 5,
+          offset: 3,
+        );
+
+        final result = await stream.first;
+
+        expect(result.length, 5);
+        expect(
+          result.every((d) => d.createdAt.isAtSameMomentAs(DateTime.utc(2024, 1, 2))),
+          isTrue,
+        );
+      });
+
+      test('emits updates when new version added with latestOnly', () async {
+        final doc1v1 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 1)),
+        );
+        final doc1v2 = _createTestDocumentEntity(
+          id: 'id1',
+          ver: _buildUuidV7At(DateTime.utc(2024, 1, 2)),
+        );
+
+        final stream = dao.watchDocuments(latestOnly: true);
+
+        final expectation = expectLater(
+          stream,
+          emitsInOrder([
+            isEmpty,
+            predicate<List<DocumentEntityV2>>(
+              (docs) => docs.length == 1 && docs.first.ver == doc1v1.doc.ver,
+            ),
+            predicate<List<DocumentEntityV2>>(
+              (docs) => docs.length == 1 && docs.first.ver == doc1v2.doc.ver,
+            ),
+          ]),
+        );
+
+        await pumpEventQueue();
+        await dao.save(doc1v1);
+        await pumpEventQueue();
+        await dao.save(doc1v2);
+        await pumpEventQueue();
+
+        await expectation;
+      });
+    });
+
+    group('getLatestOf', () {
+      test('returns null for non-existing id in empty database', () async {
+        // Given
+        const ref = SignedDocumentRef.exact(id: 'non-existent-id', version: 'non-existent-ver');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('returns the document ref when only one version exists', () async {
+        // Given
+        final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
+        await dao.save(entity);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'test-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'test-id');
+        expect(result.version, 'test-ver');
+        expect(result.isExact, isTrue);
+      });
+
+      test('returns latest version when multiple versions exist (loose ref input)', () async {
+        // Given
+        final oldCreatedAt = DateTime.utc(2023, 1, 1);
+        final newerCreatedAt = DateTime.utc(2024, 6, 15);
+
+        final oldVer = _buildUuidV7At(oldCreatedAt);
+        final newerVer = _buildUuidV7At(newerCreatedAt);
+        final entityOld = _createTestDocumentEntity(id: 'test-id', ver: oldVer);
+        final entityNew = _createTestDocumentEntity(id: 'test-id', ver: newerVer);
+        await dao.saveAll([entityOld, entityNew]);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'test-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNotNull);
+        expect(result!.id, 'test-id');
+        expect(result.version, newerVer);
+      });
+
+      test('returns latest version even when exact ref points to older version', () async {
+        // Given
+        final oldCreatedAt = DateTime.utc(2023, 1, 1);
+        final newerCreatedAt = DateTime.utc(2024, 6, 15);
+
+        final oldVer = _buildUuidV7At(oldCreatedAt);
+        final newerVer = _buildUuidV7At(newerCreatedAt);
+        final entityOld = _createTestDocumentEntity(id: 'test-id', ver: oldVer);
+        final entityNew = _createTestDocumentEntity(id: 'test-id', ver: newerVer);
+        await dao.saveAll([entityOld, entityNew]);
+
+        // And: exact ref pointing to older version
+        final ref = SignedDocumentRef.exact(id: 'test-id', version: oldVer);
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then: still returns the latest version
+        expect(result, isNotNull);
+        expect(result!.id, 'test-id');
+        expect(result.version, newerVer);
+      });
+
+      test('returns null for non-existing id when other documents exist', () async {
+        // Given
+        final entity = _createTestDocumentEntity(id: 'other-id', ver: 'other-ver');
+        await dao.save(entity);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'non-existent-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then
+        expect(result, isNull);
+      });
+
+      test('returns latest among many versions', () async {
+        // Given
+        final dates = [
+          DateTime.utc(2023, 1, 1),
+          DateTime.utc(2023, 6, 15),
+          DateTime.utc(2024, 3, 10),
+          DateTime.utc(2024, 12, 25),
+          DateTime.utc(2024, 8, 1),
+        ];
+        final versions = dates.map(_buildUuidV7At).toList();
+        final entities = versions
+            .map((ver) => _createTestDocumentEntity(id: 'multi-ver-id', ver: ver))
+            .toList();
+        await dao.saveAll(entities);
+
+        // And
+        const ref = SignedDocumentRef.loose(id: 'multi-ver-id');
+
+        // When
+        final result = await dao.getLatestOf(ref);
+
+        // Then: returns the version with latest createdAt (2024-12-25)
+        expect(result, isNotNull);
+        expect(result!.version, versions[3]);
+      });
+    });
   });
 }
 
@@ -535,7 +1043,7 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
     id: id,
     ver: ver,
     content: DocumentDataContent(contentData),
-    createdAt: ver.tryDateTime ?? DateTime.now(),
+    createdAt: ver.tryDateTime ?? DateTime.timestamp(),
     type: type,
     authors: authors,
     categoryId: categoryId,
