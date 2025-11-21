@@ -181,7 +181,7 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
         I: IntoIterator<Item = StakeAddress> + Send,
         <I as IntoIterator>::IntoIter: Send,
     {
-        for addr in addresses.into_iter() {
+        for addr in addresses {
             if let Some(cat_id) =
                 catalyst_id_from_stake_address(&addr, self.is_persistent, self.context).await?
             {
@@ -190,7 +190,7 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
                     .and_modify(|e| {
                         e.insert(addr.clone());
                     })
-                    .or_insert([addr.clone()].into_iter().collect());
+                    .or_insert([addr].into_iter().collect());
             }
         }
 
