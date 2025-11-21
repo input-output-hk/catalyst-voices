@@ -61,7 +61,6 @@ class _AccountPageState extends State<AccountPage>
                   key: ValueKey('AccountOverviewGrid'),
                   children: [
                     AccountHeaderTile(),
-                    Spacer(),
                   ],
                 ),
                 ResponsiveChild(
@@ -72,8 +71,8 @@ class _AccountPageState extends State<AccountPage>
                   key: const ValueKey('AccountDetailsGrid'),
                   children: [
                     const AccountUsernameTile(),
-                    const AccountRolesTile(),
                     const AccountEmailTile(),
+                    const AccountRolesTile(),
                     AccountKeychainTile(
                       key: const Key('AccountKeychainTile'),
                       onRemoveTap: _removeActiveKeychain,
