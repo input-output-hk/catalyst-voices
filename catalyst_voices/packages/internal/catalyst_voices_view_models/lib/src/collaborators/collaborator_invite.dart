@@ -38,11 +38,12 @@ sealed class CollaboratorInvitesState extends Equatable {
     required CatalystId? authorId,
     required List<CollaboratorInvite> collaborators,
   }) {
-    if (activeAccountId != null && authorId != null && activeAccountId.isSame(authorId)) {
+    if (activeAccountId != null && authorId != null && activeAccountId.isSameAs(authorId)) {
       return AllCollaboratorInvites(collaborators);
     }
 
-    if (activeAccountId != null && collaborators.any((e) => e.catalystId.isSame(activeAccountId))) {
+    if (activeAccountId != null &&
+        collaborators.any((e) => e.catalystId.isSameAs(activeAccountId))) {
       return AllCollaboratorInvites(collaborators);
     }
 
@@ -55,7 +56,7 @@ sealed class CollaboratorInvitesState extends Equatable {
   List<Object?> get props => [invites];
 }
 
-/// A state of the collaborator invited to a document (proposal).
+/// A status of the collaborator invited to a document (proposal).
 enum CollaboratorInviteStatus {
   /// The invitation is pending, the collaborator needs to accept / reject.
   pending,

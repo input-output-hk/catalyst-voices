@@ -172,7 +172,7 @@ final class UserRepositoryImpl implements UserRepository {
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {
-            return authors.firstWhereOrNull((id) => id.isSame(catalystId));
+            return authors.firstWhereOrNull((id) => id.isSameAs(catalystId));
           },
         )
         .then((value) => value?.username);

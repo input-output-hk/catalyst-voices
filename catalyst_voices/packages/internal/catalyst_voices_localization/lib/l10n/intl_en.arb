@@ -481,13 +481,29 @@
   "@close": {
     "description": "CTA To close something"
   },
-  "coproposers": "Co-proposers",
-  "@coproposers": {
-    "description": "Collaborators on the proposal."
-  },
   "collaboratorCatalystIdIsMissingProposerRole": "This Catalyst ID is missing Proposer role. Only Proposers can be added as Co-Proposers",
   "@collaboratorCatalystIdIsMissingProposerRole": {
     "description": "Error message shown to user when he tries to add Catalyst ID of a user that don't have Proposer role"
+  },
+  "collaboratorInvitationStatusAccepted": "Accepted",
+  "@collaboratorInvitationStatusAccepted": {
+    "description": "Collaborator invitation status: accepted."
+  },
+  "collaboratorInvitationStatusLeft": "Left",
+  "@collaboratorInvitationStatusLeft": {
+    "description": "Collaborator invitation status: collaborator left after accepting."
+  },
+  "collaboratorInvitationStatusPending": "Pending",
+  "@collaboratorInvitationStatusPending": {
+    "description": "Collaborator invitation status: pending."
+  },
+  "collaboratorInvitationStatusRejected": "Rejected",
+  "@collaboratorInvitationStatusRejected": {
+    "description": "Collaborator invitation status: rejected."
+  },
+  "collaboratorInvitationStatusRemoved": "Removed",
+  "@collaboratorInvitationStatusRemoved": {
+    "description": "Collaborator invitation status: removed."
   },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
@@ -594,6 +610,10 @@
   "copied": "Copied!",
   "@copied": {
     "description": "Snackbar message shown when user copies a link."
+  },
+  "coproposers": "Co-proposers",
+  "@coproposers": {
+    "description": "Collaborators on the proposal."
   },
   "copyLink": "Copy Link",
   "@copyLink": {
@@ -2152,26 +2172,6 @@
         "type": "int"
       }
     }
-  },
-  "collaboratorInvitationStatusPending": "Pending",
-  "@collaboratorInvitationStatusPending": {
-    "description": "Collaborator invitation status: pending."
-  },
-  "collaboratorInvitationStatusAccepted": "Accepted",
-  "@collaboratorInvitationStatusAccepted": {
-    "description": "Collaborator invitation status: accepted."
-  },
-  "collaboratorInvitationStatusRejected": "Rejected",
-  "@collaboratorInvitationStatusRejected": {
-    "description": "Collaborator invitation status: rejected."
-  },
-  "collaboratorInvitationStatusLeft": "Left",
-  "@collaboratorInvitationStatusLeft": {
-    "description": "Collaborator invitation status: collaborator left after accepting."
-  },
-  "collaboratorInvitationStatusRemoved": "Removed",
-  "@collaboratorInvitationStatusRemoved": {
-    "description": "Collaborator invitation status: removed."
   },
   "passwordDoNotMatch": "Passwords do not match, please correct",
   "@passwordDoNotMatch": {

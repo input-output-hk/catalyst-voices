@@ -111,7 +111,7 @@ final class CatalystId extends Equatable {
   }
 
   /// Whether this and [other] represent the same user.
-  bool isSame(CatalystId other) {
+  bool isSameAs(CatalystId other) {
     return toSignificant() == other.toSignificant();
   }
 
