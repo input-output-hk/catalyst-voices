@@ -22,6 +22,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final FeatureFlagsService _featureFlagsService;
 
   ProposalsCubitCache _cache = const ProposalsCubitCache();
 
@@ -33,6 +34,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     this._userService,
     this._campaignService,
     this._proposalService,
+    this._featureFlagsService,
   ) : super(const ProposalsState(recentProposalsMaxAge: _recentProposalsMaxAge)) {
     _resetCache();
 
@@ -208,7 +210,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   void _emitCachedProposalsPage() {
     final campaign = _cache.campaign;
     final page = _cache.page;
-    final showComments = campaign?.supportsComments ?? false;
+    final showComments = _showComments(campaign);
 
     if (campaign == null || page == null) {
       return;
@@ -312,6 +314,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }
 
     return selectedOrder ?? const Alphabetical();
+  }
+
+  bool _showComments(Campaign? campaign) {
+    if (campaign == null) return false;
+
+    return !(_featureFlagsService.isEnabled(Features.voting) && campaign.isVotingStateActive);
   }
 
   Future<void> _updateFavoriteProposal(
