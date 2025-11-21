@@ -1,11 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class AcceptedCollaboratorInvites extends CollaboratorInvites {
+final class AcceptedCollaboratorInvites extends CollaboratorInvitesState {
   const AcceptedCollaboratorInvites(super.invites);
 }
 
-final class AllCollaboratorInvites extends CollaboratorInvites {
+final class AllCollaboratorInvites extends CollaboratorInvitesState {
   const AllCollaboratorInvites(super.invites);
 }
 
@@ -22,15 +22,15 @@ final class CollaboratorInvite extends Equatable {
   List<Object?> get props => [catalystId, status];
 }
 
-sealed class CollaboratorInvites extends Equatable {
+sealed class CollaboratorInvitesState extends Equatable {
   final List<CollaboratorInvite> invites;
 
-  const CollaboratorInvites([this.invites = const []]);
+  const CollaboratorInvitesState([this.invites = const []]);
 
   /// Filters collaborator invites by [activeAccountId].
   /// - Returns all [collaborators] if [activeAccountId] is [authorId] or one of [collaborators].
   /// - Returns collaborators with [CollaboratorInviteStatus.accepted] status otherwise.
-  factory CollaboratorInvites.filterByActiveAccount({
+  factory CollaboratorInvitesState.filterByActiveAccount({
     required CatalystId? activeAccountId,
     required CatalystId? authorId,
     required List<CollaboratorInvite> collaborators,
@@ -54,9 +54,18 @@ sealed class CollaboratorInvites extends Equatable {
 
 /// A state of the collaborator invited to a document (proposal).
 enum CollaboratorInviteStatus {
+  /// The invitation is pending, the collaborator needs to accept / reject.
   pending,
+
+  /// The invitation is accepted by the collaborator.
   accepted,
+
+  /// The invitation is rejected by the collaborator.
   rejected,
+
+  /// The collaborator has accepted and then left.
   left,
+
+  /// The collaborator has been removed.
   removed,
 }

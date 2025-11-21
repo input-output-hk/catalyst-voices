@@ -322,7 +322,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ? comments.fold(0, (prev, next) => prev + 1 + next.repliesCount)
         : null;
 
-    final collaboratorsState = CollaboratorInvites.filterByActiveAccount(
+    final collaboratorsState = CollaboratorInvitesState.filterByActiveAccount(
       activeAccountId: activeAccountId,
       authorId: proposal?.document.authorId,
       collaborators: collaborators,
@@ -402,7 +402,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
-    required CollaboratorInvites collaborators,
+    required CollaboratorInvitesState collaborators,
     required bool hasActiveAccount,
     required bool hasAccountUsername,
     required int? commentsCount,

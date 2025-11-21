@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 /// View model representing proposal metadata in a view mode
 final class ProposalViewMetadata extends Equatable {
   final Profile author;
-  final CollaboratorInvites collaborators;
+  final CollaboratorInvitesState collaborators;
   final String? description;
   final ProposalPublish status;
   final DateTime? createdAt;
