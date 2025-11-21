@@ -88,7 +88,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     #[oai(skip_serializing_if_is_none)]
     reply: Option<IdAndVerRefDocumented>,
     /// ## Document Parameters
-    /// 
+    ///
     /// This is a
     /// [parameters reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#parameters).
     /// Reference to a configuration document.
@@ -100,6 +100,8 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// Whether a Document Type has a brand, campaign, category etc. reference is defined
     /// by its [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none, rename = "doc_parameters")]
+    // renaming to 'doc_parameters' because of the openapi linter, which cannot process
+    // 'parameters' name for the property of the object
     parameters: Option<IdAndVerRefDocumented>,
 }
 
