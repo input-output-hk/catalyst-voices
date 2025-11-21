@@ -105,18 +105,26 @@ class DocBuilderReturns:
 
 
 def generic_doc_builder(
-    rbac_chain: RBACChain, doc_type: str, parameters: list[dict], content: Any
+    rbac_chain: RBACChain,
+    doc_type: str,
+    templates: list[dict] | None,
+    parameters: list[dict] | None,
+    content: Any,
 ) -> DocBuilderReturns:
     role_id = RoleID.PROPOSER
     doc_id = uuid_v7.uuid_v7()
-    metadata = {
+    metadata: dict[str, Any] = {
         "content-encoding": "br",
         "content-type": "application/json",
         "id": doc_id,
         "ver": doc_id,
         "type": doc_type,
-        "parameters": parameters,
     }
+
+    if templates is not None:
+        metadata["templates"] = templates
+    if parameters is not None:
+        metadata["parameters"] = parameters
 
     doc_builder = SignedDocument(metadata, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
@@ -192,25 +200,25 @@ class ProposalParameterType(IntEnum):
 @pytest.fixture
 def proposal_doc_factory(
     rbac_chain_factory,
-    proposal_form_template_doc_factory,
-    category_parameters_doc_factory,
-    campaign_parameters_doc_factory,
-    brand_parameters_doc_factory,
+    proposal_form_template_doc,
+    category_parameters_doc,
+    campaign_parameters_doc,
+    brand_parameters_doc,
 ):
     def __factory__(
         parameter_type: ProposalParameterType,
     ) -> tuple[SignedDocument, RoleID]:
         param: SignedDocumentBase
         if parameter_type == ProposalParameterType.CATEGORY:
-            param = category_parameters_doc_factory
+            param = category_parameters_doc
         elif parameter_type == ProposalParameterType.CAMPAIGN:
-            param = campaign_parameters_doc_factory
+            param = campaign_parameters_doc
         elif parameter_type == ProposalParameterType.BRAND:
-            param = brand_parameters_doc_factory
+            param = brand_parameters_doc
         else:
             raise Exception("Invalid parameter type for proposal document")
 
-        template: SignedDocumentBase = proposal_form_template_doc_factory
+        template: SignedDocumentBase = proposal_form_template_doc
 
         result = generic_doc_builder(
             rbac_chain_factory(),
@@ -220,7 +228,9 @@ def proposal_doc_factory(
                     "id": template.metadata["id"],
                     "ver": template.metadata["ver"],
                     "cid": "0x",
-                },
+                }
+            ],
+            [
                 {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
             JSF(template.content).generate(),
@@ -240,7 +250,7 @@ def proposal_doc_factory(
 
 
 @pytest.fixture
-def proposal_form_template_doc_factory(rbac_chain_factory) -> SignedDocumentBase:
+def proposal_form_template_doc(rbac_chain_factory) -> SignedDocumentBase:
     role_id = RoleID.PROPOSER
     with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
         metadata, content = json.load(json_file)
@@ -261,13 +271,13 @@ def proposal_form_template_doc_factory(rbac_chain_factory) -> SignedDocumentBase
 
 
 @pytest.fixture
-def category_parameters_doc_factory(
+def category_parameters_doc(
     rbac_chain_factory,
-    category_parameters_form_template_doc_factory,
-    campaign_parameters_doc_factory,
+    category_parameters_form_template_doc,
+    campaign_parameters_doc,
 ) -> SignedDocumentBase:
-    template: SignedDocumentBase = category_parameters_form_template_doc_factory
-    param: SignedDocumentBase = campaign_parameters_doc_factory
+    template: SignedDocumentBase = category_parameters_form_template_doc
+    param: SignedDocumentBase = campaign_parameters_doc
 
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -277,7 +287,9 @@ def category_parameters_doc_factory(
                 "id": template.metadata["id"],
                 "ver": template.metadata["ver"],
                 "cid": "0x",
-            },
+            }
+        ],
+        [
             {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
         ],
         JSF(template.content).generate(),
@@ -295,14 +307,15 @@ def category_parameters_doc_factory(
 
 
 @pytest.fixture
-def category_parameters_form_template_doc_factory(
-    rbac_chain_factory, campaign_parameters_doc_factory
+def category_parameters_form_template_doc(
+    rbac_chain_factory, campaign_parameters_doc
 ) -> SignedDocumentBase:
-    param: SignedDocumentBase = campaign_parameters_doc_factory
+    param: SignedDocumentBase = campaign_parameters_doc
 
     result = generic_doc_builder(
         rbac_chain_factory(),
         DOC_TYPE["category_parameters_form_template"],
+        None,
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
         {"type": "object"},
     )
@@ -319,13 +332,13 @@ def category_parameters_form_template_doc_factory(
 
 
 @pytest.fixture
-def campaign_parameters_doc_factory(
+def campaign_parameters_doc(
     rbac_chain_factory,
-    campaign_parameters_form_template_doc_factory,
-    brand_parameters_doc_factory,
+    campaign_parameters_form_template_doc,
+    brand_parameters_doc,
 ) -> SignedDocumentBase:
-    template: SignedDocumentBase = campaign_parameters_form_template_doc_factory
-    param: SignedDocumentBase = brand_parameters_doc_factory
+    template: SignedDocumentBase = campaign_parameters_form_template_doc
+    param: SignedDocumentBase = brand_parameters_doc
 
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -335,7 +348,9 @@ def campaign_parameters_doc_factory(
                 "id": template.metadata["id"],
                 "ver": template.metadata["ver"],
                 "cid": "0x",
-            },
+            }
+        ],
+        [
             {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
         ],
         JSF(template.content).generate(),
@@ -353,14 +368,15 @@ def campaign_parameters_doc_factory(
 
 
 @pytest.fixture
-def campaign_parameters_form_template_doc_factory(
-    rbac_chain_factory, brand_parameters_doc_factory
+def campaign_parameters_form_template_doc(
+    rbac_chain_factory, brand_parameters_doc
 ) -> SignedDocumentBase:
-    param: SignedDocumentBase = brand_parameters_doc_factory
+    param: SignedDocumentBase = brand_parameters_doc
 
     result = generic_doc_builder(
         rbac_chain_factory(),
         DOC_TYPE["campaign_parameters_form_template"],
+        None,
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
         {"type": "object"},
     )
@@ -377,10 +393,10 @@ def campaign_parameters_form_template_doc_factory(
 
 
 @pytest.fixture
-def brand_parameters_doc_factory(
-    rbac_chain_factory, brand_parameters_form_template_doc_factory
+def brand_parameters_doc(
+    rbac_chain_factory, brand_parameters_form_template_doc
 ) -> SignedDocumentBase:
-    template: SignedDocumentBase = brand_parameters_form_template_doc_factory
+    template: SignedDocumentBase = brand_parameters_form_template_doc
 
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -392,6 +408,7 @@ def brand_parameters_doc_factory(
                 "cid": "0x",
             }
         ],
+        None,
         JSF(template.content).generate(),
     )
 
@@ -407,13 +424,14 @@ def brand_parameters_doc_factory(
 
 
 @pytest.fixture
-def brand_parameters_form_template_doc_factory(
+def brand_parameters_form_template_doc(
     rbac_chain_factory,
 ) -> SignedDocumentBase:
     result = generic_doc_builder(
         rbac_chain_factory(),
         DOC_TYPE["brand_parameters_form_template"],
-        [],
+        None,
+        None,
         {"type": "object"},
     )
 
