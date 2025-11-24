@@ -13,10 +13,10 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
     required this.title,
     required this.createdAt,
     required this.publish,
-  }) : assert(selfRef.version != null, 'SelfRef version cannot be null');
+  }) : assert(selfRef.ver != null, 'SelfRef version cannot be null');
 
   factory ProposalVersion.fromData(ProposalData data) {
-    final createdAt = data.document.metadata.selfRef.version!.dateTime;
+    final createdAt = data.document.metadata.selfRef.ver!.dateTime;
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,
       title: data.document.title ?? '',
@@ -35,8 +35,8 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
 
   @override
   int compareTo(ProposalVersion other) {
-    final versionA = selfRef.version ?? '';
-    final versionB = other.selfRef.version ?? '';
+    final versionA = selfRef.ver ?? '';
+    final versionB = other.selfRef.ver ?? '';
     return versionB.compareTo(versionA);
   }
 }
@@ -45,6 +45,6 @@ extension ProposalVersionsList on List<ProposalVersion> {
   ProposalVersion get latest => first;
 
   int versionNumber(String version) {
-    return length - indexWhere((element) => element.selfRef.version == version);
+    return length - indexWhere((element) => element.selfRef.ver == version);
   }
 }

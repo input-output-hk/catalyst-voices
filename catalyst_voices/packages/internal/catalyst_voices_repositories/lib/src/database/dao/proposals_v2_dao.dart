@@ -49,7 +49,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       ..where((tbl) => tbl.id.equals(ref.id) & tbl.type.equals(DocumentType.proposalDocument.uuid));
 
     if (ref.isExact) {
-      query.where((tbl) => tbl.ver.equals(ref.version!));
+      query.where((tbl) => tbl.ver.equals(ref.ver!));
     } else {
       query
         ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
@@ -549,7 +549,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
       final ref = SignedDocumentRef(
         id: templateId,
-        version: templateVer,
+        ver: templateVer,
       );
 
       final value = ProposalsTotalAskPerTemplate(

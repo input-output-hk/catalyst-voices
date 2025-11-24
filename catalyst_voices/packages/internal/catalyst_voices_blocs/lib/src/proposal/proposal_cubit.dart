@@ -301,12 +301,12 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final proposalVersions = proposal?.versions ?? const [];
     final versions = proposalVersions.reversed.mapIndexed((index, version) {
-      final ver = version.selfRef.version;
+      final ver = version.selfRef.ver;
 
       return DocumentVersion(
         id: ver ?? '',
         number: index + 1,
-        isCurrent: ver == proposalDocumentRef?.version,
+        isCurrent: ver == proposalDocumentRef?.ver,
         isLatest: index == proposalVersions.length - 1,
       );
     }).toList();
@@ -338,7 +338,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       proposalRef: proposalDocumentRef,
       title: proposalDocument?.title ?? '',
       authorName: proposalDocument?.authorName,
-      createdAt: proposalDocumentRef?.version?.tryDateTime,
+      createdAt: proposalDocumentRef?.ver?.tryDateTime,
       commentsCount: commentsCount,
       versions: versions,
       isFavorite: isFavorite,

@@ -40,7 +40,7 @@ class ProposalCommentCard extends StatelessWidget {
               _Header(
                 username: authorId.username,
                 catalystId: authorId,
-                createAt: document.metadata.selfRef.version!.tryDateTime,
+                createAt: document.metadata.selfRef.ver!.tryDateTime,
                 actions: [
                   if (canReply) ReplyButton(onTap: onReplyTap),
                 ],

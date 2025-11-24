@@ -20,7 +20,9 @@ final class DocumentRefDto {
   });
 
   factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
-    return _$DocumentRefDtoFromJson(json);
+    final migrated = _migrateJson1(json);
+
+    return _$DocumentRefDtoFromJson(migrated);
   }
 
   factory DocumentRefDto.fromModel(DocumentRef data) {
@@ -31,7 +33,7 @@ final class DocumentRefDto {
 
     return DocumentRefDto(
       id: data.id,
-      version: data.version,
+      version: data.ver,
       type: type,
     );
   }
@@ -40,9 +42,19 @@ final class DocumentRefDto {
 
   DocumentRef toModel() {
     return switch (type) {
-      DocumentRefDtoType.signed => SignedDocumentRef(id: id, version: version),
-      DocumentRefDtoType.draft => DraftRef(id: id, version: version),
+      DocumentRefDtoType.signed => SignedDocumentRef(id: id, ver: version),
+      DocumentRefDtoType.draft => DraftRef(id: id, ver: version),
     };
+  }
+
+  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+    final modified = Map<String, dynamic>.from(json);
+
+    if (modified.containsKey('version') && !modified.containsKey('ver')) {
+      modified['ver'] = modified.remove('version');
+    }
+
+    return modified;
   }
 }
 

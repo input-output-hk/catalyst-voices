@@ -15,7 +15,7 @@ final class Proposal extends CoreProposal {
     required int commentsCount,
     required SignedDocumentRef categoryRef,
   }) {
-    final versionNumber = versionsIds.versionNumber(selfRef.version!);
+    final versionNumber = versionsIds.versionNumber(selfRef.ver!);
 
     return Proposal._(
       selfRef: selfRef,

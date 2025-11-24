@@ -285,18 +285,20 @@ class DocumentDataMetadataDtoDbV3 {
 @JsonSerializable()
 final class DocumentRefDtoDbV3 {
   final String id;
-  final String? version;
+  final String? ver;
   @JsonKey(unknownEnumValue: DocumentRefDtoTypeDbV3.signed)
   final DocumentRefDtoTypeDbV3 type;
 
   const DocumentRefDtoDbV3({
     required this.id,
-    this.version,
+    this.ver,
     required this.type,
   });
 
   factory DocumentRefDtoDbV3.fromJson(Map<String, dynamic> json) {
-    return _$DocumentRefDtoDbV3FromJson(json);
+    final migrated = _migrateJson1(json);
+
+    return _$DocumentRefDtoDbV3FromJson(migrated);
   }
 
   factory DocumentRefDtoDbV3.fromModel(DocumentRef data) {
@@ -307,12 +309,22 @@ final class DocumentRefDtoDbV3 {
 
     return DocumentRefDtoDbV3(
       id: data.id,
-      version: data.version,
+      ver: data.ver,
       type: type,
     );
   }
 
   Map<String, dynamic> toJson() => _$DocumentRefDtoDbV3ToJson(this);
+
+  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+    final modified = Map<String, dynamic>.from(json);
+
+    if (modified.containsKey('version') && !modified.containsKey('ver')) {
+      modified['ver'] = modified.remove('version');
+    }
+
+    return modified;
+  }
 }
 
 enum DocumentRefDtoTypeDbV3 { signed, draft }
@@ -355,7 +367,7 @@ extension on DocumentDataMetadataDtoDbV3 {
     return (authors ?? const []).map(CatalystId.parse).map((catId) {
       return DocumentAuthorEntity(
         documentId: selfRef.id,
-        documentVer: selfRef.version!,
+        documentVer: selfRef.ver!,
         authorId: catId.toUri().toString(),
         authorIdSignificant: catId.toSignificant().toUri().toString(),
         authorUsername: catId.username,
@@ -368,18 +380,18 @@ extension on DocumentDataMetadataDtoDbV3 {
   }) {
     return DocumentEntityV2(
       id: selfRef.id,
-      ver: selfRef.version!,
+      ver: selfRef.ver!,
       type: DocumentType.fromJson(type),
-      createdAt: selfRef.version!.dateTime,
+      createdAt: selfRef.ver!.dateTime,
       refId: ref?.id,
-      refVer: ref?.version,
+      refVer: ref?.ver,
       replyId: reply?.id,
-      replyVer: reply?.version,
+      replyVer: reply?.ver,
       section: section,
       categoryId: categoryId?.id,
-      categoryVer: categoryId?.version,
+      categoryVer: categoryId?.ver,
       templateId: template?.id,
-      templateVer: template?.version,
+      templateVer: template?.ver,
       authors: authors?.join(',') ?? '',
       content: DocumentDataContent(content),
     );
@@ -390,18 +402,18 @@ extension on DocumentDataMetadataDtoDbV3 {
   }) {
     return LocalDocumentDraftEntity(
       id: selfRef.id,
-      ver: selfRef.version!,
+      ver: selfRef.ver!,
       type: DocumentType.fromJson(type),
-      createdAt: selfRef.version!.dateTime,
+      createdAt: selfRef.ver!.dateTime,
       refId: ref?.id,
-      refVer: ref?.version,
+      refVer: ref?.ver,
       replyId: reply?.id,
-      replyVer: reply?.version,
+      replyVer: reply?.ver,
       section: section,
       categoryId: categoryId?.id,
-      categoryVer: categoryId?.version,
+      categoryVer: categoryId?.ver,
       templateId: template?.id,
-      templateVer: template?.version,
+      templateVer: template?.ver,
       authors: authors?.join(',') ?? '',
       content: DocumentDataContent(content),
     );

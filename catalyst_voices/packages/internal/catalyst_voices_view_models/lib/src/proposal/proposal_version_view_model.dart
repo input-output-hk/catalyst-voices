@@ -80,7 +80,7 @@ extension ProposalVersionViewModelMapper on List<ProposalVersion> {
         version,
         isLatest: first.selfRef == version.selfRef,
         isLatestLocal: first.selfRef == version.selfRef && version.publish.isLocal,
-        versionNumber: versionNumber(version.selfRef.version!),
+        versionNumber: versionNumber(version.selfRef.ver!),
       ),
     ).toList();
   }

@@ -5,7 +5,7 @@ abstract interface class DocumentDataSource {
   /// Retrieves a specific document by its unique reference.
   ///
   /// Returns `null` if the document with the specific [DocumentRef.id] and
-  /// [DocumentRef.version] is not found.
+  /// [DocumentRef.ver] is not found.
   Future<DocumentData?> get(DocumentRef ref);
 
   /// Resolves the reference to the latest available version of a document chain.

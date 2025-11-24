@@ -29,7 +29,7 @@ final class DocumentDataFactory {
 
     final metadata = DocumentDataMetadata(
       type: document.metadata.documentType,
-      selfRef: SignedDocumentRef(id: id!, version: ver),
+      selfRef: SignedDocumentRef(id: id!, ver: ver),
       ref: document.metadata.ref?.toModel(),
       refHash: document.metadata.refHash?.toModel(),
       template: document.metadata.template?.toModel(),
@@ -57,7 +57,7 @@ final class DocumentDataFactory {
 }
 
 extension on SignedDocumentMetadataRef {
-  SignedDocumentRef toModel() => SignedDocumentRef(id: id, version: ver);
+  SignedDocumentRef toModel() => SignedDocumentRef(id: id, ver: ver);
 }
 
 extension on SignedDocumentMetadataRefHash {

@@ -86,7 +86,7 @@ final class DocumentDataMetadata extends Equatable {
     authors,
   ];
 
-  String get version => selfRef.version!;
+  String get version => selfRef.ver!;
 
   DocumentDataMetadata copyWith({
     DocumentType? type,

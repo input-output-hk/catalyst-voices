@@ -152,7 +152,7 @@ extension on LocalDocumentDraftEntity {
     return DocumentData(
       metadata: DocumentDataMetadata(
         type: type,
-        selfRef: DraftRef(id: id, version: ver),
+        selfRef: DraftRef(id: id, ver: ver),
         ref: refId.toRef(refVer),
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
@@ -172,7 +172,7 @@ extension on String? {
       return null;
     }
 
-    return SignedDocumentRef(id: id, version: ver);
+    return SignedDocumentRef(id: id, ver: ver);
   }
 }
 
@@ -184,14 +184,14 @@ extension on DocumentData {
       ver: metadata.version,
       type: metadata.type,
       refId: metadata.ref?.id,
-      refVer: metadata.ref?.version,
+      refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.version,
+      replyVer: metadata.reply?.ver,
       section: metadata.section,
       categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.version,
+      categoryVer: metadata.categoryId?.ver,
       templateId: metadata.template?.id,
-      templateVer: metadata.template?.version,
+      templateVer: metadata.template?.ver,
       authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       createdAt: metadata.version.dateTime,
     );

@@ -626,7 +626,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     // local will return latest version
     if (!ref.isExact) {
       final latestVersion = await _remoteDocuments.getLatestVersion(ref.id);
-      ref = ref.copyWith(version: Optional(latestVersion));
+      ref = ref.copyWith(ver: Optional(latestVersion));
     }
 
     final isCached = useCache && await _localDocuments.exists(ref: ref);

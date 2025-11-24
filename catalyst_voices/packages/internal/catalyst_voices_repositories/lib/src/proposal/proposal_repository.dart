@@ -207,7 +207,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
         id: actionRef.id,
-        ver: actionRef.version,
+        ver: actionRef.ver,
         ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
         categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
       ),

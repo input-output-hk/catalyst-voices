@@ -182,7 +182,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       ..where(documentsV2.id.equals(ref.id));
 
     if (ref.isExact) {
-      query.where(documentsV2.ver.equals(ref.version!));
+      query.where(documentsV2.ver.equals(ref.ver!));
     }
 
     query.limit(1);
@@ -222,7 +222,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final vers = idToVers[ref.id];
       if (vers == null || vers.isEmpty) return false;
 
-      return !ref.isExact || vers.contains(ref.version);
+      return !ref.isExact || vers.contains(ref.ver);
     }).toList();
   }
 
@@ -274,7 +274,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         .map(
           (row) => SignedDocumentRef.exact(
             id: row.read(documentsV2.id)!,
-            version: row.read(documentsV2.ver)!,
+            ver: row.read(documentsV2.ver)!,
           ),
         )
         .getSingleOrNull();
@@ -372,7 +372,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where(documentsV2.id.equals(ref.id));
 
       if (ref.isExact) {
-        query.where(documentsV2.ver.equals(ref.version!));
+        query.where(documentsV2.ver.equals(ref.ver!));
       }
     }
 
@@ -380,7 +380,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where(documentsV2.refId.equals(referencing.id));
 
       if (referencing.isExact) {
-        query.where(documentsV2.refVer.equals(referencing.version!));
+        query.where(documentsV2.refVer.equals(referencing.ver!));
       }
     }
 
@@ -399,7 +399,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.id.equals(ref.id));
 
       if (ref.isExact) {
-        query.where((tbl) => tbl.ver.equals(ref.version!));
+        query.where((tbl) => tbl.ver.equals(ref.ver!));
       }
     }
 
@@ -407,7 +407,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.refId.equals(referencing.id));
 
       if (referencing.isExact) {
-        query.where((tbl) => tbl.refVer.equals(referencing.version!));
+        query.where((tbl) => tbl.refVer.equals(referencing.ver!));
       }
     }
 
@@ -456,7 +456,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.id.equals(ref.id));
 
       if (ref.isExact) {
-        query.where((tbl) => tbl.ver.equals(ref.version!));
+        query.where((tbl) => tbl.ver.equals(ref.ver!));
       }
     }
 
@@ -464,7 +464,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.refId.equals(referencing.id));
 
       if (referencing.isExact) {
-        query.where((tbl) => tbl.refVer.equals(referencing.version!));
+        query.where((tbl) => tbl.refVer.equals(referencing.ver!));
       }
     }
 
@@ -472,7 +472,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
     }
 
-    if (latestOnly && ref?.version == null) {
+    if (latestOnly && ref?.ver == null) {
       final inner = alias(documentsV2, 'inner');
 
       query.where((tbl) {

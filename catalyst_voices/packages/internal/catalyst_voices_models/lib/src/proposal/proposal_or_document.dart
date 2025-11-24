@@ -87,7 +87,7 @@ final class _Document extends ProposalOrDocument {
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
 
   @override
-  String get version => data.metadata.selfRef.version!;
+  String get version => data.metadata.selfRef.ver!;
 
   @override
   SignedDocumentRef? get _category => data.metadata.categoryId;
@@ -120,7 +120,7 @@ final class _Proposal extends ProposalOrDocument {
   String? get title => data.title;
 
   @override
-  String get version => data.metadata.selfRef.version!;
+  String get version => data.metadata.selfRef.ver!;
 
   @override
   SignedDocumentRef? get _category => data.metadata.categoryId;

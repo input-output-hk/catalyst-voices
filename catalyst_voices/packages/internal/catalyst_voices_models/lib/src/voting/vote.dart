@@ -17,7 +17,7 @@ final class Vote extends Equatable {
     required this.selfRef,
     required this.proposal,
     required this.type,
-  }) : assert(selfRef.version != null, 'selfRef have to be exact!');
+  }) : assert(selfRef.ver != null, 'selfRef have to be exact!');
 
   Vote.draft({
     String? id,
@@ -26,7 +26,7 @@ final class Vote extends Equatable {
   }) : selfRef = id != null ? DraftRef.generateNextRefFor(id) : DraftRef.generateFirstRef();
 
   /// Extracts timestamp from [selfRef] version.
-  DateTime get createdAt => selfRef.version!.dateTime;
+  DateTime get createdAt => selfRef.ver!.dateTime;
 
   /// Whether this vote is final and decision was already made.
   bool get isCasted => selfRef is SignedDocumentRef;

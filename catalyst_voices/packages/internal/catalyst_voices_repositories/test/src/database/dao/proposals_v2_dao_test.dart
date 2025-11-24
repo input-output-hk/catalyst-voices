@@ -4292,7 +4292,7 @@ void main() {
 
         const templateRef = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
         final templateResult = result.data[templateRef];
 
@@ -4362,11 +4362,11 @@ void main() {
 
         const templateRef1 = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-v1',
+          ver: 'template-1-v1',
         );
         const templateRef2 = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-v2',
+          ver: 'template-1-v2',
         );
 
         expect(result.data.length, 2);
@@ -4436,11 +4436,11 @@ void main() {
 
         const templateRef1 = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
         const templateRef2 = SignedDocumentRef(
           id: 'template-2',
-          version: 'template-2-ver',
+          ver: 'template-2-ver',
         );
 
         expect(result.data.length, 2);
@@ -4510,7 +4510,7 @@ void main() {
 
         const templateRef = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
 
         expect(result.data[templateRef]!.totalAsk, 15000);
@@ -4577,7 +4577,7 @@ void main() {
 
         const templateRef = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
 
         expect(result.data.length, 1);
@@ -4675,7 +4675,7 @@ void main() {
 
         const templateRef = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
 
         expect(result.data.length, 1);
@@ -4746,7 +4746,7 @@ void main() {
 
         const templateRef = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
 
         expect(result.data[templateRef]!.totalAsk, 25000);
@@ -4866,7 +4866,7 @@ void main() {
 
         const templateRef = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
 
         expect(result.data[templateRef]!.totalAsk, 12500);
@@ -4901,7 +4901,7 @@ void main() {
       test('stream emits updated values when data changes', () async {
         const templateRef = SignedDocumentRef(
           id: 'template-1',
-          version: 'template-1-ver',
+          ver: 'template-1-ver',
         );
 
         final proposal1Ver = _buildUuidV7At(middle);
@@ -4910,7 +4910,7 @@ void main() {
           ver: proposal1Ver,
           categoryId: 'cat-1',
           templateId: templateRef.id,
-          templateVer: templateRef.version,
+          templateVer: templateRef.ver,
           contentData: {
             'summary': {
               'budget': {'requestedFunds': 10000},
@@ -4948,7 +4948,7 @@ void main() {
           ver: proposal2Ver,
           categoryId: 'cat-1',
           templateId: templateRef.id,
-          templateVer: templateRef.version,
+          templateVer: templateRef.ver,
           contentData: {
             'summary': {
               'budget': {'requestedFunds': 20000},

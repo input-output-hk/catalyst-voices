@@ -128,7 +128,7 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-            selfRef: SignedDocumentRef(id: id, version: version),
+            selfRef: SignedDocumentRef(id: id, ver: version),
           );
 
           final ref = documentData.ref;
@@ -153,11 +153,11 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-            selfRef: SignedDocumentRef(id: id, version: version),
+            selfRef: SignedDocumentRef(id: id, ver: version),
           );
 
           final ref = SignedDocumentRef(id: id);
-          final exactRef = ref.copyWith(version: Optional(version));
+          final exactRef = ref.copyWith(ver: Optional(version));
 
           when(() => remoteDocuments.getLatestVersion(id)).thenAnswer((_) => Future.value(version));
 

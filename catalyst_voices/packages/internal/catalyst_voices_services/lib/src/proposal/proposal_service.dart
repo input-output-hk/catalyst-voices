@@ -634,7 +634,7 @@ final class ProposalServiceImpl implements ProposalService {
       categoryName: proposal.categoryName ?? '',
       durationInMonths: proposal.durationInMonths ?? 0,
       fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      createdAt: proposal.selfRef.version!.dateTime,
+      createdAt: proposal.selfRef.ver!.dateTime,
       iteration: data.iteration,
       commentsCount: isFinal ? null : data.commentsCount,
       isFinal: isFinal,

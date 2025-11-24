@@ -82,7 +82,7 @@ class _MostRecentProposalsList extends StatelessWidget {
     unawaited(
       ProposalRoute(
         proposalId: ref.id,
-        version: ref.version,
+        version: ref.ver,
       ).push(context),
     );
   }

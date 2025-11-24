@@ -24,7 +24,7 @@ void main() {
       // Given
       final selfRef = DraftRef(
         id: const Uuid().v7(),
-        version: const Uuid().v7(),
+        ver: const Uuid().v7(),
       );
 
       // When

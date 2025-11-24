@@ -138,7 +138,7 @@ void main() {
 
         // When
         final result = await dao.count(
-          ref: const SignedDocumentRef.exact(id: 'multi-id', version: 'ver-1'),
+          ref: const SignedDocumentRef.exact(id: 'multi-id', ver: 'ver-1'),
         );
 
         // Then
@@ -152,7 +152,7 @@ void main() {
 
         // When
         final result = await dao.count(
-          ref: const SignedDocumentRef.exact(id: 'non-existent', version: 'non-ver'),
+          ref: const SignedDocumentRef.exact(id: 'non-existent', ver: 'non-ver'),
         );
 
         // Then
@@ -220,7 +220,7 @@ void main() {
         final result = await dao.count(
           referencing: const SignedDocumentRef.exact(
             id: 'proposal-id',
-            version: 'proposal-ver-1',
+            ver: 'proposal-ver-1',
           ),
         );
 
@@ -345,7 +345,7 @@ void main() {
     group('exists', () {
       test('returns false for non-existing ref in empty database', () async {
         // Given
-        const ref = SignedDocumentRef.exact(id: 'non-existent-id', version: 'non-existent-ver');
+        const ref = SignedDocumentRef.exact(id: 'non-existent-id', ver: 'non-existent-ver');
 
         // When
         final result = await dao.exists(ref);
@@ -360,7 +360,7 @@ void main() {
         await dao.save(entity);
 
         // And
-        const ref = SignedDocumentRef.exact(id: 'test-id', version: 'test-ver');
+        const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'test-ver');
 
         // When
         final result = await dao.exists(ref);
@@ -375,7 +375,7 @@ void main() {
         await dao.save(entity);
 
         // And
-        const ref = SignedDocumentRef.exact(id: 'test-id', version: 'wrong-ver');
+        const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'wrong-ver');
 
         // When
         final result = await dao.exists(ref);
@@ -472,7 +472,7 @@ void main() {
 
         // And
         final refs = [
-          const SignedDocumentRef.exact(id: 'id-1', version: 'ver-1'),
+          const SignedDocumentRef.exact(id: 'id-1', ver: 'ver-1'),
           const SignedDocumentRef.loose(id: 'id-2'),
         ];
 
@@ -482,9 +482,9 @@ void main() {
         // Then
         expect(result.length, 2);
         expect(result[0].id, 'id-1');
-        expect(result[0].version, 'ver-1');
+        expect(result[0].ver, 'ver-1');
         expect(result[1].id, 'id-2');
-        expect(result[1].version, isNull);
+        expect(result[1].ver, isNull);
       });
 
       test('filters out non-existing refs (mixed exact and loose)', () async {
@@ -494,8 +494,8 @@ void main() {
 
         // And
         final refs = [
-          const SignedDocumentRef.exact(id: 'existing-id', version: 'existing-ver'),
-          const SignedDocumentRef.exact(id: 'non-id', version: 'non-ver'),
+          const SignedDocumentRef.exact(id: 'existing-id', ver: 'existing-ver'),
+          const SignedDocumentRef.exact(id: 'non-id', ver: 'non-ver'),
           const SignedDocumentRef.loose(id: 'existing-id'),
           const SignedDocumentRef.loose(id: 'non-id'),
         ];
@@ -506,9 +506,9 @@ void main() {
         // Then
         expect(result.length, 2);
         expect(result[0].id, 'existing-id');
-        expect(result[0].version, 'existing-ver');
+        expect(result[0].ver, 'existing-ver');
         expect(result[1].id, 'existing-id');
-        expect(result[1].version, isNull);
+        expect(result[1].ver, isNull);
       });
 
       test('handles multiple versions for loose refs', () async {
@@ -520,8 +520,8 @@ void main() {
         // And
         final refs = [
           const SignedDocumentRef.loose(id: 'multi-id'),
-          const SignedDocumentRef.exact(id: 'multi-id', version: 'ver-1'),
-          const SignedDocumentRef.exact(id: 'multi-id', version: 'wrong-ver'),
+          const SignedDocumentRef.exact(id: 'multi-id', ver: 'ver-1'),
+          const SignedDocumentRef.exact(id: 'multi-id', ver: 'wrong-ver'),
         ];
 
         // When
@@ -529,8 +529,8 @@ void main() {
 
         // Then
         expect(result.length, 2);
-        expect(result[0].version, isNull);
-        expect(result[1].version, 'ver-1');
+        expect(result[0].ver, isNull);
+        expect(result[1].ver, 'ver-1');
       });
 
       test('performs efficiently for large lists (single query)', () async {
@@ -545,7 +545,7 @@ void main() {
         final refs = List.generate(
           1000,
           (i) => i.isEven
-              ? SignedDocumentRef.exact(id: 'batch-${i % 500}', version: 'ver-$i')
+              ? SignedDocumentRef.exact(id: 'batch-${i % 500}', ver: 'ver-$i')
               : SignedDocumentRef.loose(id: 'non-$i'),
         );
 
@@ -563,7 +563,7 @@ void main() {
     group('getDocument', () {
       test('returns null for non-existing ref in empty database', () async {
         // Given
-        const ref = SignedDocumentRef.exact(id: 'non-existent-id', version: 'non-existent-ver');
+        const ref = SignedDocumentRef.exact(id: 'non-existent-id', ver: 'non-existent-ver');
 
         // When
         final result = await dao.getDocument(ref: ref);
@@ -578,7 +578,7 @@ void main() {
         await dao.save(entity);
 
         // And
-        const ref = SignedDocumentRef.exact(id: 'test-id', version: 'test-ver');
+        const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'test-ver');
 
         // When
         final result = await dao.getDocument(ref: ref);
@@ -595,7 +595,7 @@ void main() {
         await dao.save(entity);
 
         // And
-        const ref = SignedDocumentRef.exact(id: 'test-id', version: 'wrong-ver');
+        const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'wrong-ver');
 
         // When
         final result = await dao.getDocument(ref: ref);
@@ -771,7 +771,7 @@ void main() {
         final result = await dao.getDocument(
           referencing: const SignedDocumentRef.exact(
             id: 'proposal-id',
-            version: 'proposal-ver-1',
+            ver: 'proposal-ver-1',
           ),
         );
 
@@ -1523,7 +1523,7 @@ void main() {
     group('getLatestOf', () {
       test('returns null for non-existing id in empty database', () async {
         // Given
-        const ref = SignedDocumentRef.exact(id: 'non-existent-id', version: 'non-existent-ver');
+        const ref = SignedDocumentRef.exact(id: 'non-existent-id', ver: 'non-existent-ver');
 
         // When
         final result = await dao.getLatestOf(ref);
@@ -1546,7 +1546,7 @@ void main() {
         // Then
         expect(result, isNotNull);
         expect(result!.id, 'test-id');
-        expect(result.version, 'test-ver');
+        expect(result.ver, 'test-ver');
         expect(result.isExact, isTrue);
       });
 
@@ -1570,7 +1570,7 @@ void main() {
         // Then
         expect(result, isNotNull);
         expect(result!.id, 'test-id');
-        expect(result.version, newerVer);
+        expect(result.ver, newerVer);
       });
 
       test('returns latest version even when exact ref points to older version', () async {
@@ -1585,7 +1585,7 @@ void main() {
         await dao.saveAll([entityOld, entityNew]);
 
         // And: exact ref pointing to older version
-        final ref = SignedDocumentRef.exact(id: 'test-id', version: oldVer);
+        final ref = SignedDocumentRef.exact(id: 'test-id', ver: oldVer);
 
         // When
         final result = await dao.getLatestOf(ref);
@@ -1593,7 +1593,7 @@ void main() {
         // Then: still returns the latest version
         expect(result, isNotNull);
         expect(result!.id, 'test-id');
-        expect(result.version, newerVer);
+        expect(result.ver, newerVer);
       });
 
       test('returns null for non-existing id when other documents exist', () async {
@@ -1634,7 +1634,7 @@ void main() {
 
         // Then: returns the version with latest createdAt (2024-12-25)
         expect(result, isNotNull);
-        expect(result!.version, versions[3]);
+        expect(result!.ver, versions[3]);
       });
     });
 
@@ -1707,7 +1707,7 @@ void main() {
         expect(await dao.count(), 1);
 
         final remaining = await dao.getDocument(
-          ref: const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+          ref: const SignedDocumentRef.exact(id: 'proposal-id', ver: 'proposal-ver'),
         );
         expect(remaining, isNotNull);
         expect(remaining!.type, DocumentType.proposalDocument);
@@ -1750,16 +1750,16 @@ void main() {
         expect(await dao.count(), 2);
 
         final remainingProposal = await dao.getDocument(
-          ref: const SignedDocumentRef.exact(id: 'proposal-id', version: 'proposal-ver'),
+          ref: const SignedDocumentRef.exact(id: 'proposal-id', ver: 'proposal-ver'),
         );
         final remainingTemplate = await dao.getDocument(
-          ref: const SignedDocumentRef.exact(id: 'template-id', version: 'template-ver'),
+          ref: const SignedDocumentRef.exact(id: 'template-id', ver: 'template-ver'),
         );
         final deletedComment = await dao.getDocument(
-          ref: const SignedDocumentRef.exact(id: 'comment-id', version: 'comment-ver'),
+          ref: const SignedDocumentRef.exact(id: 'comment-id', ver: 'comment-ver'),
         );
         final deletedAction = await dao.getDocument(
-          ref: const SignedDocumentRef.exact(id: 'action-id', version: 'action-ver'),
+          ref: const SignedDocumentRef.exact(id: 'action-id', ver: 'action-ver'),
         );
 
         expect(remainingProposal, isNotNull);
@@ -2002,7 +2002,7 @@ void main() {
 
         // When
         final result = await dao.getDocuments(
-          ref: const SignedDocumentRef.exact(id: 'doc-1', version: 'v1'),
+          ref: const SignedDocumentRef.exact(id: 'doc-1', ver: 'v1'),
           latestOnly: false,
           limit: 100,
           offset: 0,
@@ -2058,7 +2058,7 @@ void main() {
 
         // When
         final result = await dao.getDocuments(
-          referencing: const SignedDocumentRef.exact(id: 'target', version: 'v1'),
+          referencing: const SignedDocumentRef.exact(id: 'target', ver: 'v1'),
           latestOnly: false,
           limit: 100,
           offset: 0,

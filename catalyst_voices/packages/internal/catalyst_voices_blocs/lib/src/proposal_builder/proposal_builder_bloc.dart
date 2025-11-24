@@ -268,7 +268,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       emit(state.copyWith(isChanging: true));
 
       // removing all versions of this proposal
-      final unversionedRef = ref.copyWith(version: const Optional.empty());
+      final unversionedRef = ref.toLoose();
 
       await _proposalService.deleteDraftProposal(unversionedRef);
       emitSignal(const DeletedProposalBuilderSignal());
@@ -512,7 +512,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ref: proposalRef,
       );
       final versionsIds = proposalData.versions
-          .map((e) => e.selfRef.version)
+          .map((e) => e.selfRef.ver)
           .whereType<String>()
           .toList();
       final proposal = Proposal.fromData(proposalData, versionsIds);
@@ -528,11 +528,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
       final versions = proposalData.versions.mapIndexed((index, version) {
         final versionRef = version.selfRef;
-        final versionId = versionRef.version ?? versionRef.id;
+        final versionId = versionRef.ver ?? versionRef.id;
         return DocumentVersion(
           id: versionId,
           number: index + 1,
-          isCurrent: versionId == proposalRef.version,
+          isCurrent: versionId == proposalRef.ver,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
@@ -873,8 +873,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     DocumentRef? newRef,
     DocumentRef? removedRef,
   }) {
-    final current = state.metadata.versions.whereNot((e) => e.id == removedRef?.version);
-    final currentId = newRef?.version ?? current.last.id;
+    final current = state.metadata.versions.whereNot((e) => e.id == removedRef?.ver);
+    final currentId = newRef?.ver ?? current.last.id;
 
     return [
       for (final (index, ver) in current.indexed)
@@ -885,10 +885,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ),
       if (newRef != null)
         DocumentVersion(
-          id: newRef.version!,
+          id: newRef.ver!,
           number: current.length + 1,
-          isCurrent: newRef.version == currentId,
-          isLatest: newRef.version == currentId,
+          isCurrent: newRef.ver == currentId,
+          isLatest: newRef.ver == currentId,
         ),
     ];
   }

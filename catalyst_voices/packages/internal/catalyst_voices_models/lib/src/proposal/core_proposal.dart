@@ -38,7 +38,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
     commentsCount,
   ];
 
-  DateTime get updateDate => selfRef.version!.dateTime;
+  DateTime get updateDate => selfRef.ver!.dateTime;
 
   @override
   int compareTo(CoreProposal other) {

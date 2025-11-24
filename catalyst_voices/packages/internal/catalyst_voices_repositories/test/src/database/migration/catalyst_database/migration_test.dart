@@ -179,7 +179,7 @@ DocumentData _buildDoc({
 
   final metadata = DocumentDataMetadata(
     type: type,
-    selfRef: DocumentRef.build(id: id, version: ver, isDraft: isDraft),
+    selfRef: DocumentRef.build(id: id, ver: ver, isDraft: isDraft),
     section: section,
     ref: ref,
     reply: reply,
@@ -306,21 +306,21 @@ extension on DocumentData {
       authors:
           metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       refId: metadata.ref?.id,
-      refVer: metadata.ref?.version,
+      refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.version,
+      replyVer: metadata.reply?.ver,
       section: metadata.section,
       templateId: metadata.template?.id,
-      templateVer: metadata.template?.version,
+      templateVer: metadata.template?.ver,
       categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.version,
+      categoryVer: metadata.categoryId?.ver,
       createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
     );
   }
 
   List<_NewDocumentAuthor> v4Authors() {
     final documentId = metadata.selfRef.id;
-    final documentVer = metadata.selfRef.version!;
+    final documentVer = metadata.selfRef.ver!;
 
     return (metadata.authors ?? []).map(
       (catId) {
@@ -351,14 +351,14 @@ extension on DocumentData {
       authors:
           metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       refId: metadata.ref?.id,
-      refVer: metadata.ref?.version,
+      refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.version,
+      replyVer: metadata.reply?.ver,
       section: metadata.section,
       templateId: metadata.template?.id,
-      templateVer: metadata.template?.version,
+      templateVer: metadata.template?.ver,
       categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.version,
+      categoryVer: metadata.categoryId?.ver,
       createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
     );
   }
