@@ -16,11 +16,16 @@ final _logger = Logger('DiscoveryCubit');
 class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final FeatureFlagsService _featureFlagsService;
 
   StreamSubscription<List<Proposal>>? _proposalsSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
 
-  DiscoveryCubit(this._campaignService, this._proposalService) : super(DiscoveryState());
+  DiscoveryCubit(
+    this._campaignService,
+    this._proposalService,
+    this._featureFlagsService,
+  ) : super(DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
@@ -100,6 +105,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
       emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
       final campaign = await _campaignService.getActiveCampaign();
+      final showComments = _showComments(campaign);
       if (!isClosed) {
         _proposalsSub = _buildProposalsSub();
         _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
@@ -108,7 +114,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           state.copyWith(
             proposals: state.proposals.copyWith(
               isLoading: false,
-              showComments: campaign?.supportsComments ?? false,
+              showComments: showComments,
             ),
           ),
         );
@@ -204,5 +210,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     _logger.info('Got proposals: ${proposals.length}');
 
     _emitMostRecentProposals(proposals);
+  }
+
+  bool _showComments(Campaign? campaign) {
+    if (campaign == null) return false;
+
+    return !(_featureFlagsService.isEnabled(Features.voting) && campaign.isVotingStateActive);
   }
 }

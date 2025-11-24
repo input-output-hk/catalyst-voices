@@ -20,11 +20,13 @@ void main() {
   late final _FakeUserRepository userRepository;
   late final UserObserver userObserver;
   late final RegistrationStatusPoller poller;
+  late final _FakeFeatureFlagsRepository featureFlagsRepository;
 
   late final UserService userService;
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
+  late final FeatureFlagsService featureFlagService;
 
   late AdminToolsCubit adminToolsCubit;
   late SessionCubit sessionCubit;
@@ -63,11 +65,14 @@ void main() {
     );
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
+    featureFlagsRepository = _FakeFeatureFlagsRepository();
+    featureFlagService = FeatureFlagsService(featureFlagsRepository);
   });
 
   tearDownAll(() async {
     await userObserver.dispose();
     await userService.dispose();
+    await featureFlagService.dispose();
 
     notifier.dispose();
   });
@@ -87,6 +92,7 @@ void main() {
       notifier,
       accessControl,
       adminToolsCubit,
+      featureFlagService,
     );
   });
 
@@ -264,6 +270,7 @@ void main() {
           notifier,
           accessControl,
           adminToolsCubit,
+          featureFlagService,
         );
 
         // Gives time for stream to emit.
@@ -295,6 +302,7 @@ void main() {
           notifier,
           accessControl,
           adminToolsCubit,
+          featureFlagService,
         );
 
         // Gives time for stream to emit.
@@ -305,6 +313,11 @@ void main() {
       });
     });
   });
+}
+
+class _FakeFeatureFlagsRepository extends Fake implements FeatureFlagsRepository {
+  @override
+  bool isEnabled(FeatureFlag featureFlag) => true;
 }
 
 class _FakeKeychainSigner extends Fake implements KeychainSigner {}
