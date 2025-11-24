@@ -130,6 +130,12 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPageV2({
+    required PageRequest request,
+    ProposalsOrder order,
+    ProposalsFiltersV2 filters,
+  });
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   });
@@ -507,6 +513,15 @@ final class ProposalServiceImpl implements ProposalService {
     return watchUserProposalsCount().map((count) {
       return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
     });
+  }
+
+  @override
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPageV2({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return const Stream.empty();
   }
 
   @override
