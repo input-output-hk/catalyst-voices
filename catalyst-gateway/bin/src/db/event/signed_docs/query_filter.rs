@@ -3,26 +3,26 @@
 use std::fmt::Display;
 
 use super::DocumentRef;
-use crate::db::event::common::eq_or_ranged_uuid::UuidSelector;
+use crate::db::event::common::{ConditionalStmt, uuid_list::UuidList, uuid_selector::UuidSelector};
 
 /// A `select_signed_docs` query filtering argument.
 /// If all fields would be `None` the query will search for all entries from the db.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct DocsQueryFilter {
     /// `type` field. Empty list if unspecified.
-    doc_type: Vec<uuid::Uuid>,
+    doc_type: UuidList,
     /// `id` field. `None` if unspecified.
     id: Option<UuidSelector>,
     /// `ver` field. `None` if unspecified.
     ver: Option<UuidSelector>,
-    /// `metadata->'ref'` field. Empty list if unspecified.
-    doc_ref: Vec<DocumentRef>,
-    /// `metadata->'template'` field. Empty list if unspecified.
-    template: Vec<DocumentRef>,
-    /// `metadata->'reply'` field. Empty list if unspecified.
-    reply: Vec<DocumentRef>,
-    /// `metadata->'parameters'` field. Empty list if unspecified.
-    parameters: Vec<DocumentRef>,
+    /// `metadata->'ref'` field.
+    doc_ref: Option<DocumentRef>,
+    /// `metadata->'template'` field.
+    template: Option<DocumentRef>,
+    /// `metadata->'reply'` field.
+    reply: Option<DocumentRef>,
+    /// `metadata->'parameters'` field.
+    parameters: Option<DocumentRef>,
 }
 
 impl Display for DocsQueryFilter {
@@ -30,51 +30,51 @@ impl Display for DocsQueryFilter {
         &self,
         f: &mut std::fmt::Formatter<'_>,
     ) -> std::fmt::Result {
-        use std::fmt::Write;
-        let mut query = "TRUE".to_string();
+        write!(f, "TRUE")?;
 
-        if !self.doc_type.is_empty() {
-            write!(
-                &mut query,
-                " AND signed_docs.type IN ({})",
-                self.doc_type
-                    .iter()
-                    .map(|uuid| format!("'{uuid}'"))
-                    .collect::<Vec<_>>()
-                    .join(",")
-            )?;
-        }
-
-        if let Some(id) = &self.id {
-            write!(&mut query, " AND {}", id.conditional_stmt("signed_docs.id"))?;
-        }
-        if let Some(ver) = &self.ver {
-            write!(
-                &mut query,
-                " AND {}",
-                ver.conditional_stmt("signed_docs.ver")
-            )?;
-        }
-        let doc_ref_queries = [
-            ("ref", &self.doc_ref),
-            ("template", &self.template),
-            ("reply", &self.reply),
-            ("parameters", &self.parameters),
+        let stmts: [(_, Option<&dyn ConditionalStmt>); _] = [
+            (
+                "signed_docs.type",
+                (!self.doc_type.is_empty()).then_some(&self.doc_type),
+            ),
+            (
+                "signed_docs.id",
+                self.id.as_ref().map(|v| -> &dyn ConditionalStmt { v }),
+            ),
+            (
+                "signed_docs.ver",
+                self.ver.as_ref().map(|v| -> &dyn ConditionalStmt { v }),
+            ),
+            (
+                "metadata->'ref'",
+                self.doc_ref.as_ref().map(|v| -> &dyn ConditionalStmt { v }),
+            ),
+            (
+                "metadata->'template'",
+                self.template
+                    .as_ref()
+                    .map(|v| -> &dyn ConditionalStmt { v }),
+            ),
+            (
+                "metadata->'reply'",
+                self.reply.as_ref().map(|v| -> &dyn ConditionalStmt { v }),
+            ),
+            (
+                "metadata->'parameters'",
+                self.parameters
+                    .as_ref()
+                    .map(|v| -> &dyn ConditionalStmt { v }),
+            ),
         ];
 
-        for (field_name, doc_refs) in doc_ref_queries {
-            if !doc_refs.is_empty() {
-                let stmt = doc_refs
-                    .iter()
-                    .map(|doc_ref| doc_ref.conditional_stmt(&format!("metadata->'{field_name}'")))
-                    .collect::<Vec<_>>()
-                    .join(" OR ");
-
-                write!(&mut query, " AND ({stmt})")?;
+        for (field_name, stmt) in stmts {
+            if let Some(stmt) = stmt {
+                write!(f, " AND ",)?;
+                stmt.conditional_stmt(f, field_name)?;
             }
         }
 
-        write!(f, "{query}")
+        Ok(())
     }
 }
 
@@ -89,7 +89,10 @@ impl DocsQueryFilter {
         self,
         doc_type: Vec<uuid::Uuid>,
     ) -> Self {
-        DocsQueryFilter { doc_type, ..self }
+        DocsQueryFilter {
+            doc_type: doc_type.into(),
+            ..self
+        }
     }
 
     /// Set the `id` field filter condition
@@ -119,10 +122,10 @@ impl DocsQueryFilter {
         self,
         arg: DocumentRef,
     ) -> Self {
-        let mut doc_ref = self.doc_ref;
-        doc_ref.push(arg);
-
-        DocsQueryFilter { doc_ref, ..self }
+        DocsQueryFilter {
+            doc_ref: Some(arg),
+            ..self
+        }
     }
 
     /// Set the `metadata->'template'` field filter condition
@@ -130,10 +133,10 @@ impl DocsQueryFilter {
         self,
         arg: DocumentRef,
     ) -> Self {
-        let mut template = self.template;
-        template.push(arg);
-
-        DocsQueryFilter { template, ..self }
+        DocsQueryFilter {
+            template: Some(arg),
+            ..self
+        }
     }
 
     /// Set the `metadata->'reply'` field filter condition
@@ -141,10 +144,10 @@ impl DocsQueryFilter {
         self,
         arg: DocumentRef,
     ) -> Self {
-        let mut reply = self.reply;
-        reply.push(arg);
-
-        DocsQueryFilter { reply, ..self }
+        DocsQueryFilter {
+            reply: Some(arg),
+            ..self
+        }
     }
 
     /// Set the `metadata->'parameters'` field filter condition
@@ -152,9 +155,9 @@ impl DocsQueryFilter {
         self,
         arg: DocumentRef,
     ) -> Self {
-        let mut parameters = self.parameters;
-        parameters.push(arg);
-
-        DocsQueryFilter { parameters, ..self }
+        DocsQueryFilter {
+            parameters: Some(arg),
+            ..self
+        }
     }
 }

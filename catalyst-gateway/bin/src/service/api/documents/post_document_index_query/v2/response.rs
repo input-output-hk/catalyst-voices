@@ -167,6 +167,8 @@ pub(crate) struct IndexedDocumentVersionV2 {
     pub template: Option<DocumentReferenceListV2>,
     /// Document Parameter Reference that matches the filter
     #[oai(rename = "doc_parameters", skip_serializing_if_is_none)]
+    // renaming to 'doc_parameters' because of the openapi linter, which cannot process
+    // 'parameters' name for the property of the object
     pub parameters: Option<DocumentReferenceListV2>,
     /// A list of collaborators who can participate in drafting and submitting a document
     /// that matches the filter.
