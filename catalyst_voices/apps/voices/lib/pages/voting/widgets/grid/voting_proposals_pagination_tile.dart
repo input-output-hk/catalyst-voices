@@ -19,20 +19,20 @@ class VotingProposalsPaginationTile extends StatelessWidget {
     return ProposalBriefCard(
       proposal: proposal,
       onTap: () {
-        final route = ProposalRoute.fromRef(ref: proposal.selfRef);
+        final route = ProposalRoute.fromRef(ref: proposal.id);
 
         unawaited(route.push(context));
       },
       onFavoriteChanged: (isFavorite) {
         unawaited(
           context.read<VotingCubit>().onChangeFavoriteProposal(
-            proposal.selfRef,
+            proposal.id,
             isFavorite: isFavorite,
           ),
         );
       },
       onVoteAction: (action) {
-        final proposal = this.proposal.selfRef;
+        final proposal = this.proposal.id;
         final event = switch (action) {
           VoteButtonActionRemoveDraft() => RemoveVoteEvent(proposal: proposal),
           VoteButtonActionVote(:final type) => UpdateVoteEvent(proposal: proposal, type: type),

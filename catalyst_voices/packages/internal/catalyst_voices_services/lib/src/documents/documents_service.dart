@@ -78,7 +78,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     _logger.finer('Indexing documents for f${campaign.fundNumber}');
 
     var syncResult = const DocumentsSyncResult();
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet().toList();
+    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet().toList();
 
     // The sync process is ordered. Templates are synced first as other documents
     // may depend on them.

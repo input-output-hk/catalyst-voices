@@ -3,22 +3,22 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalVersion extends Equatable implements Comparable<ProposalVersion> {
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final String title;
   final DateTime createdAt;
   final ProposalPublish publish;
 
   ProposalVersion({
-    required this.selfRef,
+    required this.id,
     required this.title,
     required this.createdAt,
     required this.publish,
-  }) : assert(selfRef.ver != null, 'SelfRef version cannot be null');
+  }) : assert(id.ver != null, 'id version cannot be null');
 
   factory ProposalVersion.fromData(ProposalData data) {
     final createdAt = data.document.metadata.id.ver!.dateTime;
     return ProposalVersion(
-      selfRef: data.document.metadata.id,
+      id: data.document.metadata.id,
       title: data.document.title ?? '',
       createdAt: createdAt,
       publish: data.publish,
@@ -27,7 +27,7 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     title,
     createdAt,
     publish,
@@ -35,8 +35,8 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
 
   @override
   int compareTo(ProposalVersion other) {
-    final versionA = selfRef.ver ?? '';
-    final versionB = other.selfRef.ver ?? '';
+    final versionA = id.ver ?? '';
+    final versionB = other.id.ver ?? '';
     return versionB.compareTo(versionA);
   }
 }
@@ -45,6 +45,6 @@ extension ProposalVersionsList on List<ProposalVersion> {
   ProposalVersion get latest => first;
 
   int versionNumber(String version) {
-    return length - indexWhere((element) => element.selfRef.ver == version);
+    return length - indexWhere((element) => element.id.ver == version);
   }
 }

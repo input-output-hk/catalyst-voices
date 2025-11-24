@@ -48,14 +48,14 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required MultiCurrencyAmount totalAsk,
   }) {
     return CampaignCategoryDetailsViewModel(
-      ref: model.selfRef,
+      ref: model.id,
       name: model.categoryName,
       subname: model.categorySubname,
       description: model.description,
       shortDescription: model.shortDescription,
       finalProposalsCount: finalProposalsCount,
       availableFunds: model.availableFunds,
-      image: CategoryImageUrl.image(model.selfRef.id),
+      image: CategoryImageUrl.image(model.id.id),
       totalAsk: totalAsk,
       range: model.range,
       descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),

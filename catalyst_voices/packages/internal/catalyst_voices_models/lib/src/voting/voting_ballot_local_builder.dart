@@ -39,8 +39,8 @@ final class VotingBallotLocalBuilder with ChangeNotifier implements VotingBallot
     assert(!vote.isCasted, 'Can not add already casted vote!');
     assert(
       () {
-        final id = vote.selfRef.id;
-        return _votes.values.every((vote) => vote.selfRef.id != id);
+        final id = vote.id.id;
+        return _votes.values.every((vote) => vote.id.id != id);
       }(),
       'Only one vote version is allowed',
     );

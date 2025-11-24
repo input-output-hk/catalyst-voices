@@ -107,7 +107,7 @@ void main() {
     test('state returns correct state for single active phase', () {
       // Arrange
       final campaign = Campaign(
-        selfRef: SignedDocumentRef.generateFirstRef(),
+        id: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
@@ -151,7 +151,7 @@ void main() {
     test('state returns correct state for multiple phases', () {
       // Arrange
       final campaign = Campaign(
-        selfRef: SignedDocumentRef.generateFirstRef(),
+        id: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
@@ -218,7 +218,7 @@ void main() {
     test('state return closest phase when no active phase', () {
       // Arrange
       final campaign = Campaign(
-        selfRef: SignedDocumentRef.generateFirstRef(),
+        id: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
@@ -278,7 +278,7 @@ void main() {
     test('state return closest phase that is post when there is no active phase', () {
       // Arrange
       final campaign = Campaign(
-        selfRef: SignedDocumentRef.generateFirstRef(),
+        id: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
@@ -338,7 +338,7 @@ void main() {
     test('state to return correct state for single phase', () {
       // Arrange
       final campaign = Campaign(
-        selfRef: SignedDocumentRef.generateFirstRef(),
+        id: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),
@@ -412,7 +412,7 @@ void main() {
     test('campaign start date returns earliest phase start date', () {
       // Arrange
       final campaign = Campaign(
-        selfRef: SignedDocumentRef.generateFirstRef(),
+        id: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: _multiCurrency(100),

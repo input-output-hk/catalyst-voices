@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group(CampaignStage, () {
     final campaign = Campaign(
-      selfRef: SignedDocumentRef.generateFirstRef(),
+      id: SignedDocumentRef.generateFirstRef(),
       name: 'name',
       description: 'description',
       publish: CampaignPublish.draft,

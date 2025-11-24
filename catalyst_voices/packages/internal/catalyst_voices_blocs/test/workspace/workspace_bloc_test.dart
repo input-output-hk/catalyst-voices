@@ -64,7 +64,7 @@ void main() {
       setUp: () async {
         when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
           (_) async => Campaign(
-            selfRef: SignedDocumentRef.generateFirstRef(),
+            id: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
@@ -73,7 +73,7 @@ void main() {
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                id: categoryRef,
                 proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
@@ -116,7 +116,7 @@ void main() {
       setUp: () async {
         when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
           (_) async => Campaign(
-            selfRef: SignedDocumentRef.generateFirstRef(),
+            id: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
@@ -126,7 +126,7 @@ void main() {
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                id: categoryRef,
                 proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
@@ -191,11 +191,11 @@ void main() {
         required ProposalPublish publish,
         required int commentsCount,
         bool isLatestLocal = false,
-        DocumentRef? selfRef,
+        DocumentRef? id,
       }) {
-        final ref = selfRef ?? SignedDocumentRef.generateFirstRef();
+        final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
         return UsersProposalOverview(
-          selfRef: ref,
+          id: effectiveId,
           title: title,
           updateDate: DateTime(2025, 10, 15),
           fundsRequested: Money.zero(currency: Currencies.ada),
@@ -203,7 +203,7 @@ void main() {
           versions: [
             ProposalVersionViewModel(
               title: title,
-              selfRef: ref,
+              id: effectiveId,
               createdAt: DateTime(2025, 10, 15),
               publish: publish,
               isLatest: true,
@@ -332,7 +332,7 @@ void main() {
             title: 'Draft',
             publish: ProposalPublish.publishedDraft,
             commentsCount: 5,
-            selfRef: draftRef,
+            id: draftRef,
           );
           final final$ = createProposal(
             title: 'Final',
@@ -405,7 +405,7 @@ void main() {
           // Load initial proposals
           bloc
             ..add(LoadProposalsEvent([local1, local2, draft]))
-            ..add(ForgetProposalEvent(local2.selfRef));
+            ..add(ForgetProposalEvent(local2.id));
         },
         expect: () => [
           // After load

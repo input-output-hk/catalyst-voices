@@ -129,17 +129,17 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return proposalBuilder!.build();
   }
 
-  DocumentData _buildDocumentData([DocumentRef? selfRef]) {
+  DocumentData _buildDocumentData([DocumentRef? id]) {
     return DocumentData(
-      metadata: _buildDocumentMetadata(selfRef),
+      metadata: _buildDocumentMetadata(id),
       content: _documentMapper.toContent(_buildDocument()),
     );
   }
 
-  DocumentDataMetadata _buildDocumentMetadata([DocumentRef? selfRef]) {
+  DocumentDataMetadata _buildDocumentMetadata([DocumentRef? id]) {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      id: selfRef ?? state.metadata.documentRef!,
+      id: id ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
       categoryId: state.metadata.categoryId,
     );
@@ -202,7 +202,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required CampaignCategory category,
     required CampaignCategoryTotalAsk categoryTotalAsk,
   }) async {
-    final commentTemplate = await _commentService.getCommentTemplateFor(category: category.selfRef);
+    final commentTemplate = await _commentService.getCommentTemplateFor(category: category.id);
 
     _cache = _cache.copyWith(
       proposalBuilder: Optional(proposalDocument.toBuilder()),
@@ -471,7 +471,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         throw StateError('Cannot load proposal, active campaign not found');
       }
       final category = campaign.categories.first;
-      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.selfRef);
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
 
       final templateRef = category.proposalTemplateRef;
 
@@ -486,7 +486,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
           templateRef: templateRef,
-          categoryId: category.selfRef,
+          categoryId: category.id,
         ),
         category: category,
         categoryTotalAsk: categoryTotalAsk,
@@ -511,10 +511,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final proposalData = await _proposalService.getProposalDetail(
         ref: proposalRef,
       );
-      final versionsIds = proposalData.versions
-          .map((e) => e.selfRef.ver)
-          .whereType<String>()
-          .toList();
+      final versionsIds = proposalData.versions.map((e) => e.id.ver).whereType<String>().toList();
       final proposal = Proposal.fromData(proposalData, versionsIds);
 
       if (proposalData.publish.isPublished) {
@@ -527,7 +524,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       }
 
       final versions = proposalData.versions.mapIndexed((index, version) {
-        final versionRef = version.selfRef;
+        final versionRef = version.id;
         final versionId = versionRef.ver ?? versionRef.id;
         return DocumentVersion(
           id: versionId,
@@ -555,8 +552,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalBuilder: proposalData.document.document.toBuilder(),
         proposalMetadata: ProposalBuilderMetadata(
           publish: proposal.publish,
-          documentRef: proposal.selfRef,
-          originalDocumentRef: proposal.selfRef,
+          documentRef: proposal.id,
+          originalDocumentRef: proposal.id,
           templateRef: proposalData.document.metadata.templateRef,
           categoryId: categoryRef,
           versions: versions,
@@ -860,7 +857,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       proposalDocument: proposalDocument,
       proposalMetadata: proposalMetadata,
       category: category,
-      categoryTotalAsk: categoryTotalAsk ?? CampaignCategoryTotalAsk.zero(category.selfRef),
+      categoryTotalAsk: categoryTotalAsk ?? CampaignCategoryTotalAsk.zero(category.id),
       commentSchema: commentTemplate.schema,
       comments: comments,
       commentsState: commentsState,
@@ -1252,7 +1249,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     } else {
       nextRef = currentRef.nextVersion();
       await _proposalService.upsertDraftProposal(
-        selfRef: nextRef,
+        id: nextRef,
         content: document,
         template: template,
         categoryId: categoryId,

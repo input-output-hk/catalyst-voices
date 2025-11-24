@@ -4,15 +4,15 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   group(DocumentDataMetadata, () {
-    test('non exact selfRef throw assert exception', () {
+    test('non exact id throw assert exception', () {
       // Given
-      final selfRef = DraftRef(id: const Uuid().v7());
+      final id = DraftRef(id: const Uuid().v7());
 
       // When
       DocumentDataMetadata buildFun() {
         return DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          id: selfRef,
+          id: id,
         );
       }
 
@@ -20,9 +20,9 @@ void main() {
       expect(buildFun, throwsA(isA<AssertionError>()));
     });
 
-    test('exact selfRef returns normally', () {
+    test('exact id returns normally', () {
       // Given
-      final selfRef = DraftRef(
+      final id = DraftRef(
         id: const Uuid().v7(),
         ver: const Uuid().v7(),
       );
@@ -31,7 +31,7 @@ void main() {
       DocumentDataMetadata buildFun() {
         return DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          id: selfRef,
+          id: id,
         );
       }
 

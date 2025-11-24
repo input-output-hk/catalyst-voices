@@ -165,7 +165,7 @@ abstract interface class DocumentRepository {
     required CatalystId authorId,
   });
 
-  /// In context of [document] selfRef:
+  /// In context of [document] id:
   ///
   /// - [DraftRef] -> Creates/updates a local document draft.
   /// - [SignedDocumentRef] -> Creates a local document. If matching ref

@@ -9,7 +9,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 final f15StaticCampaignCategories = <CampaignCategory>[
   //Tier-1 Enterprise Integrations
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[0].category,
+    id: f15ConstDocumentsRefs[0].category,
     proposalTemplateRef: f15ConstDocumentsRefs[0].proposal,
     campaignRef: f15ConstDocumentsRefs[0].comment,
     categoryName: 'Cardano Partners:',
@@ -136,7 +136,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
 
   //Cardano Use Cases: Prototype & Launch
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[1].category,
+    id: f15ConstDocumentsRefs[1].category,
     proposalTemplateRef: f15ConstDocumentsRefs[1].proposal,
     campaignRef: f15ConstDocumentsRefs[1].comment,
     categoryName: 'Cardano Use Cases:',
@@ -242,7 +242,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
   ),
   //   //Cardano Open: Ecosystem
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[2].category,
+    id: f15ConstDocumentsRefs[2].category,
     proposalTemplateRef: f15ConstDocumentsRefs[2].proposal,
     campaignRef: f15ConstDocumentsRefs[2].comment,
     categoryName: 'Cardano Open:',
@@ -347,7 +347,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
   ),
   //Midnight: Compact DApps
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[3].category,
+    id: f15ConstDocumentsRefs[3].category,
     proposalTemplateRef: f15ConstDocumentsRefs[3].proposal,
     campaignRef: f15ConstDocumentsRefs[3].comment,
     categoryName: 'Midnight:',

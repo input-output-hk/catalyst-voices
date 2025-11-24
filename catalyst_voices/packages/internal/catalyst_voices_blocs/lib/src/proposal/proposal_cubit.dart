@@ -301,7 +301,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final proposalVersions = proposal?.versions ?? const [];
     final versions = proposalVersions.reversed.mapIndexed((index, version) {
-      final ver = version.selfRef.ver;
+      final ver = version.id.ver;
 
       return DocumentVersion(
         id: ver ?? '',

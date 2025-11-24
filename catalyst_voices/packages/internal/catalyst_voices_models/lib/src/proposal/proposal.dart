@@ -4,7 +4,7 @@ final class Proposal extends CoreProposal {
   final int versionNumber;
 
   factory Proposal({
-    required DocumentRef selfRef,
+    required DocumentRef id,
     required String title,
     required String description,
     required Money fundsRequested,
@@ -15,10 +15,10 @@ final class Proposal extends CoreProposal {
     required int commentsCount,
     required SignedDocumentRef categoryRef,
   }) {
-    final versionNumber = versionsIds.versionNumber(selfRef.ver!);
+    final versionNumber = versionsIds.versionNumber(id.ver!);
 
     return Proposal._(
-      selfRef: selfRef,
+      id: id,
       title: title,
       fundsRequested: fundsRequested,
       publish: publish,
@@ -35,7 +35,7 @@ final class Proposal extends CoreProposal {
     final document = data.document;
 
     return Proposal(
-      selfRef: document.metadata.id,
+      id: document.metadata.id,
       title: document.title ?? '',
       description: document.description ?? '',
       fundsRequested: document.fundsRequested ?? Money.zero(currency: Currencies.fallback),
@@ -49,7 +49,7 @@ final class Proposal extends CoreProposal {
   }
 
   const Proposal._({
-    required super.selfRef,
+    required super.id,
     required super.categoryRef,
     required super.title,
     required super.description,

@@ -154,7 +154,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   }
 
   void _handleActiveCampaignChange(Campaign? campaign) {
-    if (_cache.activeCampaign?.selfRef == campaign?.selfRef) {
+    if (_cache.activeCampaign?.id == campaign?.id) {
       return;
     }
 
@@ -190,7 +190,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
     final templateRef = campaignCategories
         .cast<CampaignCategory?>()
         .firstWhere(
-          (e) => e?.selfRef == preselectedCategory,
+          (e) => e?.id == preselectedCategory,
           orElse: () => campaignCategories.firstOrNull,
         )
         ?.proposalTemplateRef;
@@ -203,8 +203,8 @@ class NewProposalCubit extends Cubit<NewProposalState>
     final mappedCategories = campaignCategories.map(
       (category) {
         final categoryTotalAsk =
-            campaignTotalAsk.categoriesAsks[category.selfRef] ??
-            CampaignCategoryTotalAsk.zero(category.selfRef);
+            campaignTotalAsk.categoriesAsks[category.id] ??
+            CampaignCategoryTotalAsk.zero(category.id);
 
         return CampaignCategoryDetailsViewModel.fromModel(
           category,
@@ -239,7 +239,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   void _watchActiveCampaign() {
     unawaited(_activeCampaignSub?.cancel());
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.selfRef != next?.selfRef)
+        .distinct((previous, next) => previous?.id != next?.id)
         .listen(_handleActiveCampaignChange);
   }
 

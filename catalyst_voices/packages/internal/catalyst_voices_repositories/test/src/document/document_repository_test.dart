@@ -55,12 +55,12 @@ void main() {
 
         final templateRef = SignedDocumentRef.first(DocumentRefFactory.randomUuidV7());
         final template = DocumentDataFactory.build(
-          selfRef: templateRef,
+          id: templateRef,
           type: DocumentType.proposalTemplate,
           content: DocumentDataContent(templateData),
         );
         final proposal = DocumentDataFactory.build(
-          selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
+          id: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
           template: templateRef,
           content: DocumentDataContent(proposalData),
         );
@@ -93,7 +93,7 @@ void main() {
         // Given
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final proposal = DocumentDataFactory.build(
-          selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
+          id: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
           template: templateRef,
         );
 
@@ -128,7 +128,7 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-            selfRef: SignedDocumentRef(id: id, ver: version),
+            id: SignedDocumentRef(id: id, ver: version),
           );
 
           final ref = documentData.id;
@@ -153,7 +153,7 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-            selfRef: SignedDocumentRef(id: id, ver: version),
+            id: SignedDocumentRef(id: id, ver: version),
           );
 
           final ref = SignedDocumentRef(id: id);
@@ -184,7 +184,7 @@ void main() {
           final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
             type: DocumentType.proposalTemplate,
-            selfRef: templateRef,
+            id: templateRef,
           );
           final proposal = DocumentDataFactory.build(template: templateRef);
 
@@ -227,7 +227,7 @@ void main() {
           final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
             type: DocumentType.proposalTemplate,
-            selfRef: templateRef,
+            id: templateRef,
           );
           final proposal1 = DocumentDataFactory.build(template: templateRef);
           final proposal2 = DocumentDataFactory.build(template: templateRef);
@@ -276,7 +276,7 @@ void main() {
           () async {
             // Given
             final documentDataToSave = DocumentDataFactory.build(
-              selfRef: DocumentRefFactory.draftRef(),
+              id: DocumentRefFactory.draftRef(),
             );
 
             // When
@@ -304,18 +304,18 @@ void main() {
 
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
-          selfRef: templateRef,
+          id: templateRef,
           type: DocumentType.proposalTemplate,
         );
 
         final draftRef = DocumentRefFactory.draftRef();
         final draftData = DocumentDataFactory.build(
-          selfRef: draftRef,
+          id: draftRef,
           template: templateRef,
         );
 
         final updatedData = DocumentDataFactory.build(
-          selfRef: draftRef,
+          id: draftRef,
           template: templateRef,
           content: updatedContent,
         );
@@ -353,14 +353,14 @@ void main() {
       () async {
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
-          selfRef: templateRef,
+          id: templateRef,
           type: DocumentType.proposalTemplate,
         );
 
         const publicDraftContent = DocumentDataContent({'title': 'My proposal'});
         final publicDraftRef = DocumentRefFactory.signedDocumentRef();
         final publicDraftData = DocumentDataFactory.build(
-          selfRef: publicDraftRef,
+          id: publicDraftRef,
           template: templateRef,
           categoryId: DocumentRefFactory.signedDocumentRef(),
           content: publicDraftContent,

@@ -169,7 +169,7 @@ final class SyncManagerImpl implements SyncManager {
     final activeCampaign = await _campaignService.getActiveCampaign();
 
     final previous = appMeta.activeCampaign;
-    final current = activeCampaign?.selfRef;
+    final current = activeCampaign?.id;
 
     if (previous == current) {
       return activeCampaign;

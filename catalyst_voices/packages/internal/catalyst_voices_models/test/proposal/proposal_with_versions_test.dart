@@ -11,7 +11,7 @@ void main() {
       final versionId3 = DocumentRefFactory.randomUuidV7();
 
       final proposalWithVersions = DetailProposal(
-        selfRef: DocumentRef.build(
+        id: DocumentRef.build(
           id: proposalId,
           isDraft: true,
           ver: versionId2,
@@ -27,7 +27,7 @@ void main() {
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
               ver: versionId1,
             ),
@@ -36,7 +36,7 @@ void main() {
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
               ver: versionId2,
             ),
@@ -45,7 +45,7 @@ void main() {
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
               ver: versionId3,
             ),
@@ -56,16 +56,16 @@ void main() {
       );
 
       expect(
-        proposalWithVersions.versions[2].selfRef.ver,
+        proposalWithVersions.versions[2].id.ver,
         equals(versionId1),
       );
       expect(
-        proposalWithVersions.versions[1].selfRef.ver,
+        proposalWithVersions.versions[1].id.ver,
         equals(versionId2),
         reason: 'Should be the second latest version',
       );
       expect(
-        proposalWithVersions.versions[0].selfRef.ver,
+        proposalWithVersions.versions[0].id.ver,
         equals(versionId3),
         reason: 'Should be the latest version',
       );
@@ -77,7 +77,7 @@ void main() {
       final versionId2 = DocumentRefFactory.randomUuidV7();
 
       final proposalWithVersions = DetailProposal(
-        selfRef: DocumentRef.build(
+        id: DocumentRef.build(
           id: proposalId,
           isDraft: true,
           ver: versionId1,
@@ -93,7 +93,7 @@ void main() {
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
               ver: versionId1,
             ),
@@ -102,7 +102,7 @@ void main() {
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
               ver: versionId2,
             ),
@@ -111,7 +111,7 @@ void main() {
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
               ver: proposalId,
             ),
@@ -122,7 +122,7 @@ void main() {
       );
 
       expect(
-        proposalWithVersions.versions.first.selfRef.ver,
+        proposalWithVersions.versions.first.id.ver,
         equals(versionId2),
       );
     });

@@ -294,9 +294,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     final items = categories.map((e) {
       return ProposalsCategorySelectorItem(
-        ref: e.selfRef,
+        ref: e.id,
         name: e.formattedCategoryName,
-        isSelected: e.selfRef.id == selectedCategory,
+        isSelected: e.id.id == selectedCategory,
       );
     }).toList();
 
@@ -380,11 +380,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     if (page != null) {
       var items = List.of(page.items);
       if (_cache.tab != ProposalsPageTab.favorites || isFavorite) {
-        items = items
-            .map((e) => e.selfRef == ref ? e.copyWith(isFavorite: isFavorite) : e)
-            .toList();
+        items = items.map((e) => e.id == ref ? e.copyWith(isFavorite: isFavorite) : e).toList();
       } else {
-        items = items.where((element) => element.selfRef != ref).toList();
+        items = items.where((element) => element.id != ref).toList();
       }
 
       final diff = page.items.length - items.length;

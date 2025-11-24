@@ -21,7 +21,7 @@ class VotingProposalsPagination extends StatelessWidget {
       builderDelegate: PagedWrapChildBuilder<ProposalBrief>(
         builder: (context, item) {
           return VotingProposalsPaginationTile(
-            key: ValueKey(item.selfRef),
+            key: ValueKey(item.id),
             proposal: item,
           );
         },

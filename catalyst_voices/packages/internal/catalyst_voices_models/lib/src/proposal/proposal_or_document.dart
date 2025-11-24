@@ -31,7 +31,7 @@ sealed class ProposalOrDocument extends Equatable {
     return Campaign.all
         .map((e) => e.categories)
         .flattened
-        .firstWhereOrNull((category) => category.selfRef == _category)
+        .firstWhereOrNull((category) => category.id == _category)
         ?.formattedCategoryName;
   }
 
@@ -45,7 +45,7 @@ sealed class ProposalOrDocument extends Equatable {
   Money? get fundsRequested;
 
   /// A reference to the document itself.
-  DocumentRef get selfRef;
+  DocumentRef get id;
 
   /// The title of the proposal.
   String? get title;
@@ -81,7 +81,7 @@ final class _Document extends ProposalOrDocument {
   List<Object?> get props => [data];
 
   @override
-  DocumentRef get selfRef => data.metadata.id;
+  DocumentRef get id => data.metadata.id;
 
   @override
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
@@ -114,7 +114,7 @@ final class _Proposal extends ProposalOrDocument {
   List<Object?> get props => [data];
 
   @override
-  DocumentRef get selfRef => data.metadata.id;
+  DocumentRef get id => data.metadata.id;
 
   @override
   String? get title => data.title;

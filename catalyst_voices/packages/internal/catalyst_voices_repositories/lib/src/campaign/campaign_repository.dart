@@ -45,7 +45,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   Future<CampaignCategory?> getCategory(SignedDocumentRef ref) async {
     return Campaign.all
         .expand((element) => element.categories)
-        .firstWhereOrNull((e) => e.selfRef.id == ref.id);
+        .firstWhereOrNull((e) => e.id.id == ref.id);
   }
 
   @override

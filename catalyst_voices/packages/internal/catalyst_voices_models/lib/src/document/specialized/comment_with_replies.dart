@@ -95,7 +95,7 @@ final class CommentWithReplies extends Equatable {
   CommentWithReplies _addReply(CommentDocument reply) {
     assert(
       comment.metadata.id == reply.metadata.reply,
-      'Reply parent ref does not match with comment selfRef',
+      'Reply parent ref does not match with comment id',
     );
 
     final commentWithReplies = CommentWithReplies(

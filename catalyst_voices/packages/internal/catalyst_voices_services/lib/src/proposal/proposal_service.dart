@@ -106,7 +106,7 @@ abstract interface class ProposalService {
 
   /// Upserts a proposal draft in the local storage.
   Future<void> upsertDraftProposal({
-    required DraftRef selfRef,
+    required DraftRef id,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
@@ -377,7 +377,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> upsertDraftProposal({
-    required DraftRef selfRef,
+    required DraftRef id,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
@@ -391,7 +391,7 @@ final class ProposalServiceImpl implements ProposalService {
       document: DocumentData(
         metadata: DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          id: selfRef,
+          id: id,
           template: template,
           categoryId: categoryId,
           authors: [catalystId],
@@ -551,14 +551,12 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Stream<ProposalData?>> _createProposalDataStream(
     ProposalDocument doc,
   ) async {
-    final selfRef = doc.metadata.id;
+    final proposalId = doc.metadata.id;
 
-    final commentsCountStream = _proposalRepository.watchCommentsCount(
-      referencing: selfRef,
-    );
+    final commentsCountStream = _proposalRepository.watchCommentsCount(referencing: proposalId);
 
     return Rx.combineLatest2(
-      _proposalRepository.watchProposalPublish(referencing: selfRef),
+      _proposalRepository.watchProposalPublish(referencing: proposalId),
       commentsCountStream,
       (ProposalPublish? publishState, int commentsCount) {
         if (publishState == null) return null;
@@ -581,10 +579,8 @@ final class ProposalServiceImpl implements ProposalService {
     final versionsData = (await Future.wait(
       versions.map(
         (e) async {
-          final selfRef = e.metadata.id;
-          final action = await _proposalRepository.getProposalPublishForRef(
-            ref: selfRef,
-          );
+          final proposalId = e.metadata.id;
+          final action = await _proposalRepository.getProposalPublishForRef(ref: proposalId);
           if (action == null) {
             return null;
           }
@@ -620,21 +616,21 @@ final class ProposalServiceImpl implements ProposalService {
     final isFinal = data.isFinal;
 
     final draftVote = isFinal
-        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.selfRef)
+        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
         : null;
     final castedVote = isFinal
-        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.selfRef)
+        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
         : null;
 
     return ProposalBriefData(
-      selfRef: proposal.selfRef,
+      id: proposal.id,
       authorName: proposal.authorName ?? '',
       title: proposal.title ?? '',
       description: proposal.description ?? '',
       categoryName: proposal.categoryName ?? '',
       durationInMonths: proposal.durationInMonths ?? 0,
       fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      createdAt: proposal.selfRef.ver!.dateTime,
+      createdAt: proposal.id.ver!.dateTime,
       iteration: data.iteration,
       commentsCount: isFinal ? null : data.commentsCount,
       isFinal: isFinal,

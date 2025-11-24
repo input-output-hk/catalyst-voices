@@ -12,7 +12,7 @@ abstract base class DocumentMetadata extends Equatable {
 
   DocumentMetadata({
     required this.id,
-  }) : assert(id.isExact, 'SelfRef have to be exact!');
+  }) : assert(id.isExact, 'id have to be exact!');
 
   @override
   @mustCallSuper

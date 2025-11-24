@@ -22,7 +22,7 @@ class ProposalData extends Equatable {
 
   ProposalVersion toProposalVersion() {
     return ProposalVersion(
-      selfRef: document.metadata.id,
+      id: document.metadata.id,
       title: document.title ?? '',
       createdAt: UuidV7.parseDateTime(
         document.metadata.id.ver ?? document.metadata.id.id,

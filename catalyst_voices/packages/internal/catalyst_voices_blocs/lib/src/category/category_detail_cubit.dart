@@ -99,9 +99,9 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     final items = categories.map(
       (category) {
         return CategoryDetailStatePickerItem(
-          ref: category.selfRef,
+          ref: category.id,
           name: category.formattedCategoryName,
-          isSelected: category.selfRef == selectedCategoryRef,
+          isSelected: category.id == selectedCategoryRef,
         );
       },
     ).toList();

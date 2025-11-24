@@ -212,7 +212,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Topbar(
-                    proposalRef: proposal.selfRef,
+                    proposalRef: proposal.id,
                     isFavorite: _isFavorite,
                     onFavoriteChanged: widget.onFavoriteChanged != null ? _onFavoriteChanged : null,
                   ),
