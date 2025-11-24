@@ -20,26 +20,26 @@ final class DocumentData extends Equatable implements Comparable<DocumentData> {
     required this.content,
   });
 
+  /// Syntax sugar. Should use [DocumentDataMetadata.id].
+  DocumentRef get id => metadata.id;
+
   @override
   List<Object?> get props => [
     metadata,
     content,
   ];
 
-  /// Syntax sugar. Should use [DocumentDataMetadata.selfRef].
-  DocumentRef get ref => metadata.selfRef;
-
   @override
   int compareTo(DocumentData other) {
-    return metadata.selfRef.compareTo(other.metadata.selfRef);
+    return metadata.id.compareTo(other.metadata.id);
   }
 
-  /// Update document data with a new [ref].
+  /// Update document data with a new [id].
   DocumentData copyWith({
-    required DocumentRef selfRef,
+    DocumentRef? id,
   }) {
     return DocumentData(
-      metadata: metadata.copyWith(selfRef: selfRef),
+      metadata: metadata.copyWith(id: id),
       content: content,
     );
   }

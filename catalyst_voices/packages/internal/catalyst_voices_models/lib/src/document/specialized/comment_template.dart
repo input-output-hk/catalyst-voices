@@ -17,6 +17,6 @@ final class CommentTemplate extends Equatable {
 
 final class CommentTemplateMetadata extends DocumentMetadata {
   CommentTemplateMetadata({
-    required SignedDocumentRef super.selfRef,
+    required SignedDocumentRef super.id,
   });
 }

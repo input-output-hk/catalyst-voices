@@ -29,7 +29,7 @@ final class DocumentDataFactory {
 
     final metadata = DocumentDataMetadata(
       type: document.metadata.documentType,
-      selfRef: SignedDocumentRef(id: id!, ver: ver),
+      id: SignedDocumentRef(id: id!, ver: ver),
       ref: document.metadata.ref?.toModel(),
       refHash: document.metadata.refHash?.toModel(),
       template: document.metadata.template?.toModel(),

@@ -222,7 +222,7 @@ class _SegmentsListView extends StatelessWidget {
         :final canReply,
       ) =>
         ProposalCommentTile(
-          key: ValueKey(comment.comment.metadata.selfRef),
+          key: ValueKey(comment.comment.metadata.id),
           comment: comment,
           canReply: canReply && !readOnlyModeOrMobile,
         ),

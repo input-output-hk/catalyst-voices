@@ -164,7 +164,7 @@ final class ProposalServiceImpl implements ProposalService {
       document: DocumentData(
         metadata: DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          selfRef: draftRef,
+          id: draftRef,
           template: template,
           categoryId: categoryId,
           authors: [catalystId],
@@ -293,13 +293,13 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
-    final originalRef = document.ref;
+    final originalRef = document.id;
 
     // There is a system requirement to publish fresh documents,
     // where version timestamp is not older than a predefined interval.
     // Because of it we're regenerating a version just before publishing.
     final freshRef = originalRef.freshVersion();
-    final freshDocument = document.copyWith(selfRef: freshRef);
+    final freshDocument = document.copyWith(id: freshRef);
 
     await _signerService.useProposerCredentials(
       (catalystId, privateKey) {
@@ -391,7 +391,7 @@ final class ProposalServiceImpl implements ProposalService {
       document: DocumentData(
         metadata: DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          selfRef: selfRef,
+          id: selfRef,
           template: template,
           categoryId: categoryId,
           authors: [catalystId],
@@ -507,7 +507,7 @@ final class ProposalServiceImpl implements ProposalService {
 
                 final groupedProposals = groupBy(
                   validProposalsData,
-                  (data) => data.document.metadata.selfRef.id,
+                  (data) => data.document.metadata.id.id,
                 );
 
                 final filteredProposalsData = groupedProposals.values
@@ -551,7 +551,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Stream<ProposalData?>> _createProposalDataStream(
     ProposalDocument doc,
   ) async {
-    final selfRef = doc.metadata.selfRef;
+    final selfRef = doc.metadata.id;
 
     final commentsCountStream = _proposalRepository.watchCommentsCount(
       referencing: selfRef,
@@ -575,13 +575,13 @@ final class ProposalServiceImpl implements ProposalService {
   // Helper method to fetch versions for a proposal
   Future<List<ProposalVersion>> _getDetailVersionsOfProposal(ProposalData proposal) async {
     final versions = await _proposalRepository.queryVersionsOfId(
-      id: proposal.document.metadata.selfRef.id,
+      id: proposal.document.metadata.id.id,
       includeLocalDrafts: true,
     );
     final versionsData = (await Future.wait(
       versions.map(
         (e) async {
-          final selfRef = e.metadata.selfRef;
+          final selfRef = e.metadata.id;
           final action = await _proposalRepository.getProposalPublishForRef(
             ref: selfRef,
           );

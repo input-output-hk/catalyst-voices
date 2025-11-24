@@ -35,7 +35,7 @@ final class Proposal extends CoreProposal {
     final document = data.document;
 
     return Proposal(
-      selfRef: document.metadata.selfRef,
+      selfRef: document.metadata.id,
       title: document.title ?? '',
       description: document.description ?? '',
       fundsRequested: document.fundsRequested ?? Money.zero(currency: Currencies.fallback),

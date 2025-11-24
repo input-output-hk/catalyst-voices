@@ -107,7 +107,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       await _commentsSub?.cancel();
       _commentsSub = _commentService
           // Note. watch comments on exact version of proposal.
-          .watchCommentsWith(ref: proposal.document.metadata.selfRef)
+          .watchCommentsWith(ref: proposal.document.metadata.id)
           .distinct(listEquals)
           .listen(_handleCommentsChange);
 
@@ -175,9 +175,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
-        selfRef: commentRef,
+        id: commentRef,
         ref: proposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        template: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: reply,
         categoryId: proposalCategoryId,
         authorId: activeAccountId!,
@@ -297,7 +297,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required Vote? draftVote,
   }) {
     final proposalDocument = proposal?.document;
-    final proposalDocumentRef = proposalDocument?.metadata.selfRef;
+    final proposalDocumentRef = proposalDocument?.metadata.id;
 
     final proposalVersions = proposal?.versions ?? const [];
     final versions = proposalVersions.reversed.mapIndexed((index, version) {
@@ -398,7 +398,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required Vote? draftVote,
   }) {
     final document = proposal.document;
-    final isDraftProposal = document.metadata.selfRef is DraftRef;
+    final isDraftProposal = document.metadata.id is DraftRef;
     final isLatestVersion = version?.isLatest ?? false;
 
     final votingSegment = _buildProposalVotingOverviewSegment(
@@ -406,7 +406,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       hasActiveAccount: hasActiveAccount,
       isLatestVersion: isLatestVersion,
       isFinal: proposal.publish.isPublished,
-      proposalRef: proposal.document.metadata.selfRef,
+      proposalRef: proposal.document.metadata.id,
       lastCastedVote: lastCastedVote,
       draftVote: draftVote,
     );

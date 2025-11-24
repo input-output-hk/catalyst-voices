@@ -81,13 +81,13 @@ final class _Document extends ProposalOrDocument {
   List<Object?> get props => [data];
 
   @override
-  DocumentRef get selfRef => data.metadata.selfRef;
+  DocumentRef get selfRef => data.metadata.id;
 
   @override
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
 
   @override
-  String get version => data.metadata.selfRef.ver!;
+  String get version => data.metadata.id.ver!;
 
   @override
   SignedDocumentRef? get _category => data.metadata.categoryId;
@@ -114,13 +114,13 @@ final class _Proposal extends ProposalOrDocument {
   List<Object?> get props => [data];
 
   @override
-  DocumentRef get selfRef => data.metadata.selfRef;
+  DocumentRef get selfRef => data.metadata.id;
 
   @override
   String? get title => data.title;
 
   @override
-  String get version => data.metadata.selfRef.ver!;
+  String get version => data.metadata.id.ver!;
 
   @override
   SignedDocumentRef? get _category => data.metadata.categoryId;

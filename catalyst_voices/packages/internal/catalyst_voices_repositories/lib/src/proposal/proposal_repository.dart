@@ -384,8 +384,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
       documentType: DocumentType.proposalDocument,
-      id: metadata.selfRef.id,
-      ver: metadata.selfRef.ver,
+      id: metadata.id.id,
+      ver: metadata.id.ver,
       template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
       categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );

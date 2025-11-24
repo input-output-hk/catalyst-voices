@@ -418,8 +418,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> saveDocumentBulk(List<DocumentData> documents) async {
-    final signedDocs = documents.where((element) => element.ref is SignedDocumentRef);
-    final draftDocs = documents.where((element) => element.ref is DraftRef);
+    final signedDocs = documents.where((element) => element.id is SignedDocumentRef);
+    final draftDocs = documents.where((element) => element.id is DraftRef);
 
     final signedDocsSave = signedDocs.isNotEmpty
         ? _localDocuments.saveAll(signedDocs)
@@ -435,7 +435,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required CatalystId authorId,
   }) async {
     final newMetadata = document.metadata.copyWith(
-      selfRef: DraftRef.generateFirstRef(),
+      id: DraftRef.generateFirstRef(),
       authors: Optional([authorId]),
     );
 
@@ -445,14 +445,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     await _drafts.save(data: newDocument);
-    return newDocument.metadata.selfRef;
+    return newDocument.metadata.id;
   }
 
   @override
   Future<void> upsertDocument({
     required DocumentData document,
   }) async {
-    switch (document.metadata.selfRef) {
+    switch (document.metadata.id) {
       case DraftRef():
         await _drafts.save(data: document);
       case SignedDocumentRef():
@@ -675,10 +675,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       try {
         if (!_isDocumentMetadataValid(documentData)) {
           _logger.warning(
-            'Invalid document metadata for document ${documentData.metadata.selfRef}, skipping',
+            'Invalid document metadata for document ${documentData.metadata.id}, skipping',
           );
-          if (documentData.metadata.selfRef is DraftRef) {
-            unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
+          if (documentData.metadata.id is DraftRef) {
+            unawaited(deleteDocumentDraft(ref: documentData.metadata.id as DraftRef));
           }
           continue;
         }
@@ -694,9 +694,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         );
       } catch (e, st) {
-        _logger.warning('Error processing document ${documentData.metadata.selfRef}', e, st);
-        if (documentData.metadata.selfRef is DraftRef) {
-          unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
+        _logger.warning('Error processing document ${documentData.metadata.id}', e, st);
+        if (documentData.metadata.id is DraftRef) {
+          unawaited(deleteDocumentDraft(ref: documentData.metadata.id as DraftRef));
         }
         continue;
       }

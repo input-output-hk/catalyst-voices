@@ -70,8 +70,8 @@ final class DocumentsCommentRepository implements CommentRepository {
     final metadata = SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
       documentType: DocumentType.commentDocument,
-      id: document.metadata.selfRef.id,
-      ver: document.metadata.selfRef.ver,
+      id: document.metadata.id.id,
+      ver: document.metadata.id.ver,
       ref: SignedDocumentMetadataRef.fromDocumentRef(ref!),
       template: SignedDocumentMetadataRef.fromDocumentRef(
         document.metadata.template!,
@@ -131,7 +131,7 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentDocument document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment only supports signed documents',
     );
     assert(
@@ -143,9 +143,9 @@ final class DocumentsCommentRepository implements CommentRepository {
 
     final authors = documentData.metadata.authors;
     final metadata = CommentMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
       ref: documentData.metadata.ref! as SignedDocumentRef,
-      template: templateData.metadata.selfRef as SignedDocumentRef,
+      template: templateData.metadata.id as SignedDocumentRef,
       reply: documentData.metadata.reply,
       categoryId: documentData.metadata.categoryId,
       authorId: authors!.single,
@@ -170,12 +170,12 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentTemplate document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment template only supports signed documents',
     );
 
     final metadata = CommentTemplateMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
     );
 
     final contentData = documentData.content.data;

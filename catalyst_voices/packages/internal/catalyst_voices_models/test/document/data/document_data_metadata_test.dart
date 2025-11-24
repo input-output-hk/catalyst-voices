@@ -12,7 +12,7 @@ void main() {
       DocumentDataMetadata buildFun() {
         return DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          selfRef: selfRef,
+          id: selfRef,
         );
       }
 
@@ -31,7 +31,7 @@ void main() {
       DocumentDataMetadata buildFun() {
         return DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          selfRef: selfRef,
+          id: selfRef,
         );
       }
 

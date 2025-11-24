@@ -139,7 +139,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   DocumentDataMetadata _buildDocumentMetadata([DocumentRef? selfRef]) {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: selfRef ?? state.metadata.documentRef!,
+      id: selfRef ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
       categoryId: state.metadata.categoryId,
     );
@@ -1058,9 +1058,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
-        selfRef: commentRef,
+        id: commentRef,
         ref: originalProposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        template: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: event.reply,
         categoryId: originalProposalCategoryId,
         authorId: activeAccountId!,

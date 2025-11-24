@@ -189,7 +189,7 @@ Future<void> _migrateFavorites(
 @JsonSerializable()
 class DocumentDataMetadataDtoDbV3 {
   final String type;
-  final DocumentRefDtoDbV3 selfRef;
+  final DocumentRefDtoDbV3 id;
   final DocumentRefDtoDbV3? ref;
   final SecuredDocumentRefDtoDbV3? refHash;
   final DocumentRefDtoDbV3? template;
@@ -203,7 +203,7 @@ class DocumentDataMetadataDtoDbV3 {
 
   DocumentDataMetadataDtoDbV3({
     required this.type,
-    required this.selfRef,
+    required this.id,
     this.ref,
     this.refHash,
     this.template,
@@ -219,6 +219,7 @@ class DocumentDataMetadataDtoDbV3 {
   factory DocumentDataMetadataDtoDbV3.fromJson(Map<String, dynamic> json) {
     var migrated = _migrateJson1(json);
     migrated = _migrateJson2(migrated);
+    migrated = _migrateJson3(migrated);
 
     return _$DocumentDataMetadataDtoDbV3FromJson(migrated);
   }
@@ -226,7 +227,7 @@ class DocumentDataMetadataDtoDbV3 {
   DocumentDataMetadataDtoDbV3.fromModel(DocumentDataMetadata data)
     : this(
         type: data.type.uuid,
-        selfRef: data.selfRef.toDto(),
+        id: data.id.toDto(),
         ref: data.ref?.toDto(),
         refHash: data.refHash?.toDto(),
         template: data.template?.toDto(),
@@ -276,6 +277,16 @@ class DocumentDataMetadataDtoDbV3 {
         type: DocumentRefDtoTypeDbV3.signed,
       );
       modified['campaignId'] = dto.toJson();
+    }
+
+    return modified;
+  }
+
+  static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+    final modified = Map<String, dynamic>.from(json);
+
+    if (modified.containsKey('selfRef')) {
+      modified['id'] = modified.remove('selfRef');
     }
 
     return modified;
@@ -366,8 +377,8 @@ extension on DocumentDataMetadataDtoDbV3 {
   List<DocumentAuthorEntity> toAuthorEntity() {
     return (authors ?? const []).map(CatalystId.parse).map((catId) {
       return DocumentAuthorEntity(
-        documentId: selfRef.id,
-        documentVer: selfRef.ver!,
+        documentId: id.id,
+        documentVer: id.ver!,
         authorId: catId.toUri().toString(),
         authorIdSignificant: catId.toSignificant().toUri().toString(),
         authorUsername: catId.username,
@@ -379,10 +390,10 @@ extension on DocumentDataMetadataDtoDbV3 {
     required Map<String, dynamic> content,
   }) {
     return DocumentEntityV2(
-      id: selfRef.id,
-      ver: selfRef.ver!,
+      id: id.id,
+      ver: id.ver!,
       type: DocumentType.fromJson(type),
-      createdAt: selfRef.ver!.dateTime,
+      createdAt: id.ver!.dateTime,
       refId: ref?.id,
       refVer: ref?.ver,
       replyId: reply?.id,
@@ -401,10 +412,10 @@ extension on DocumentDataMetadataDtoDbV3 {
     required Map<String, dynamic> content,
   }) {
     return LocalDocumentDraftEntity(
-      id: selfRef.id,
-      ver: selfRef.ver!,
+      id: id.id,
+      ver: id.ver!,
       type: DocumentType.fromJson(type),
-      createdAt: selfRef.ver!.dateTime,
+      createdAt: id.ver!.dateTime,
       refId: ref?.id,
       refVer: ref?.ver,
       replyId: reply?.id,

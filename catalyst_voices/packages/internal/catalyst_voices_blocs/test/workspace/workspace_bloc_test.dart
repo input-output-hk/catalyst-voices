@@ -24,7 +24,7 @@ void main() {
     final documentData = DocumentData(
       metadata: DocumentDataMetadata(
         type: DocumentType.proposalDocument,
-        selfRef: proposalRef,
+        id: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),
         categoryId: categoryRef,
       ),

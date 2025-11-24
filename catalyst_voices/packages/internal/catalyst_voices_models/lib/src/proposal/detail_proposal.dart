@@ -36,7 +36,7 @@ final class DetailProposal extends CoreProposal {
     List<ProposalVersion> versions,
   ) {
     return DetailProposal(
-      selfRef: data.document.metadata.selfRef,
+      selfRef: data.document.metadata.id,
       categoryRef: data.document.metadata.categoryId,
       title: data.document.title ?? '',
       description: data.document.description ?? '',

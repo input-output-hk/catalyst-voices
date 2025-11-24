@@ -12,7 +12,7 @@ abstract final class DocumentDataFactory {
     return DocumentData(
       metadata: DocumentDataMetadata(
         type: type,
-        selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+        id: selfRef ?? DocumentRefFactory.signedDocumentRef(),
         template: template,
         categoryId: categoryId,
       ),

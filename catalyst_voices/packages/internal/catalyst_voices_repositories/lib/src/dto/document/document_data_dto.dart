@@ -81,7 +81,7 @@ final class DocumentDataMetadataDto {
     fromJson: DocumentType.fromJson,
   )
   final DocumentType type;
-  final DocumentRefDto selfRef;
+  final DocumentRefDto id;
   final DocumentRefDto? ref;
   final SecuredDocumentRefDto? refHash;
   final DocumentRefDto? template;
@@ -95,7 +95,7 @@ final class DocumentDataMetadataDto {
 
   DocumentDataMetadataDto({
     required this.type,
-    required this.selfRef,
+    required this.id,
     this.ref,
     this.refHash,
     this.template,
@@ -111,6 +111,7 @@ final class DocumentDataMetadataDto {
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
     var migrated = _migrateJson1(json);
     migrated = _migrateJson2(migrated);
+    migrated = _migrateJson3(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
@@ -118,7 +119,7 @@ final class DocumentDataMetadataDto {
   DocumentDataMetadataDto.fromModel(DocumentDataMetadata data)
     : this(
         type: data.type,
-        selfRef: data.selfRef.toDto(),
+        id: data.id.toDto(),
         ref: data.ref?.toDto(),
         refHash: data.refHash?.toDto(),
         template: data.template?.toDto(),
@@ -136,7 +137,7 @@ final class DocumentDataMetadataDto {
   DocumentDataMetadata toModel() {
     return DocumentDataMetadata(
       type: type,
-      selfRef: selfRef.toModel(),
+      id: id.toModel(),
       ref: ref?.toModel(),
       refHash: refHash?.toModel(),
       template: template?.toModel().toSignedDocumentRef(),
@@ -185,6 +186,16 @@ final class DocumentDataMetadataDto {
         type: DocumentRefDtoType.signed,
       );
       modified['campaignId'] = dto.toJson();
+    }
+
+    return modified;
+  }
+
+  static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+    final modified = Map<String, dynamic>.from(json);
+
+    if (modified.containsKey('selfRef')) {
+      modified['id'] = modified.remove('selfRef');
     }
 
     return modified;

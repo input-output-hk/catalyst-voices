@@ -206,7 +206,7 @@ final class CampaignServiceImpl implements CampaignService {
 
 extension on ProposalTemplate {
   MapEntry<DocumentRef, _ProposalTemplateCategoryAndMoneyFormat> toMapEntry() {
-    final ref = metadata.selfRef;
+    final ref = metadata.id;
     final category = metadata.categoryId;
 
     final currencySchema = requestedFunds;

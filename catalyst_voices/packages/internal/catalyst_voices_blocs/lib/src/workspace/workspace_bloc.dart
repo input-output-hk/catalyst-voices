@@ -56,13 +56,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
-    final selfRef = document.metadata.selfRef;
+    final selfRef = document.metadata.id;
     final categoryId = document.metadata.categoryId;
     final templateRef = document.metadata.templateRef;
 
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: selfRef,
+      id: selfRef,
       template: templateRef,
       categoryId: categoryId,
     );

@@ -32,7 +32,7 @@ final class ProposalTemplateMetadata extends DocumentMetadata {
   final SignedDocumentRef? categoryId;
 
   ProposalTemplateMetadata({
-    required super.selfRef,
+    required super.id,
     this.categoryId,
   });
 

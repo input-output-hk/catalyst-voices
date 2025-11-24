@@ -66,22 +66,22 @@ void main() {
         );
 
         when(
-          () => remoteDocuments.get(template.ref),
+          () => remoteDocuments.get(template.id),
         ).thenAnswer((_) => Future.value(template));
         when(
-          () => remoteDocuments.get(proposal.ref),
+          () => remoteDocuments.get(proposal.id),
         ).thenAnswer((_) => Future.value(proposal));
 
         // When
-        final ref = proposal.ref;
+        final ref = proposal.id;
         final proposalDocument = await repository.getDocumentData(
           ref: ref,
         );
 
         // Then
         expect(
-          proposalDocument.metadata.selfRef,
-          proposal.metadata.selfRef,
+          proposalDocument.metadata.id,
+          proposal.metadata.id,
         );
       },
       onPlatform: driftOnPlatforms,
@@ -100,12 +100,12 @@ void main() {
         when(() => remoteDocuments.get(templateRef)).thenAnswer(
           (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
         );
-        when(() => remoteDocuments.get(proposal.ref)).thenAnswer(
+        when(() => remoteDocuments.get(proposal.id)).thenAnswer(
           (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
         );
 
         // When
-        final ref = proposal.ref;
+        final ref = proposal.id;
         final proposalDocumentFuture = repository.getDocumentData(
           ref: ref,
         );
@@ -131,7 +131,7 @@ void main() {
             selfRef: SignedDocumentRef(id: id, ver: version),
           );
 
-          final ref = documentData.ref;
+          final ref = documentData.id;
 
           when(() => remoteDocuments.get(ref)).thenAnswer((_) => Future.value(documentData));
 
@@ -189,15 +189,15 @@ void main() {
           final proposal = DocumentDataFactory.build(template: templateRef);
 
           when(
-            () => remoteDocuments.get(template.ref),
+            () => remoteDocuments.get(template.id),
           ).thenAnswer((_) => Future.value(template));
           when(
-            () => remoteDocuments.get(proposal.ref),
+            () => remoteDocuments.get(proposal.id),
           ).thenAnswer((_) => Future.value(proposal));
 
           // When
           final proposalStream = repository.watchDocumentWithRef(
-            ref: proposal.ref,
+            ref: proposal.id,
             refGetter: (data) => data.metadata.template!,
           );
 
@@ -211,7 +211,7 @@ void main() {
               isNull,
               // should have all data ready.
               predicate<DocumentsDataWithRefData?>(
-                (data) => data?.data.ref == proposal.ref && data?.refData.ref == template.ref,
+                (data) => data?.data.id == proposal.id && data?.refData.id == template.id,
                 'data or dataRef ref do not match',
               ),
             ]),
@@ -233,25 +233,25 @@ void main() {
           final proposal2 = DocumentDataFactory.build(template: templateRef);
 
           when(
-            () => remoteDocuments.get(template.ref),
+            () => remoteDocuments.get(template.id),
           ).thenAnswer((_) => Future.value(template));
           when(
-            () => remoteDocuments.get(proposal1.ref),
+            () => remoteDocuments.get(proposal1.id),
           ).thenAnswer((_) => Future.value(proposal1));
           when(
-            () => remoteDocuments.get(proposal2.ref),
+            () => remoteDocuments.get(proposal2.id),
           ).thenAnswer((_) => Future.value(proposal2));
 
           // When
           final proposal1Future = repository
               .watchDocumentWithRef(
-                ref: proposal1.ref,
+                ref: proposal1.id,
                 refGetter: (data) => data.metadata.template!,
               )
               .firstWhere((element) => element != null);
           final proposal2Future = repository
               .watchDocumentWithRef(
-                ref: proposal2.ref,
+                ref: proposal2.id,
                 refGetter: (data) => data.metadata.template!,
               )
               .firstWhere((element) => element != null);
@@ -259,10 +259,10 @@ void main() {
           final proposals = await Future.wait([proposal1Future, proposal2Future]);
 
           // Then
-          expect(proposals[0]!.data.ref, proposal1.ref);
-          expect(proposals[1]!.data.ref, proposal2.ref);
+          expect(proposals[0]!.data.id, proposal1.id);
+          expect(proposals[1]!.data.id, proposal2.id);
 
-          verify(() => remoteDocuments.get(template.ref)).called(1);
+          verify(() => remoteDocuments.get(template.id)).called(1);
         },
         onPlatform: driftOnPlatforms,
       );
@@ -284,7 +284,7 @@ void main() {
 
             // Then
             final savedDocumentData = await repository.getDocumentData(
-              ref: documentDataToSave.metadata.selfRef,
+              ref: documentDataToSave.metadata.id,
             );
 
             expect(savedDocumentData, equals(documentDataToSave));
@@ -337,7 +337,7 @@ void main() {
           draftStream,
           emitsInOrder([
             predicate<DocumentsDataWithRefData?>((data) {
-              final isRef = data?.data.ref == draftRef;
+              final isRef = data?.data.id == draftRef;
               final isContent = data?.data.content == updatedContent;
               return isRef && isContent;
             }),
@@ -379,7 +379,7 @@ void main() {
             predicate<List<DocumentsDataWithRefData>>((dataList) {
               if (dataList.isEmpty) return false;
               final data = dataList.first;
-              final isRef = data.data.ref == publicDraftRef;
+              final isRef = data.data.id == publicDraftRef;
               final isContent = data.data.content == publicDraftContent;
               return isRef && isContent;
             }),
