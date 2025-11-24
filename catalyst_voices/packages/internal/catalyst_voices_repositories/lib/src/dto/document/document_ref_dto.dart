@@ -9,13 +9,13 @@ part 'document_ref_dto.g.dart';
 @JsonSerializable()
 final class DocumentRefDto {
   final String id;
-  final String? version;
+  final String? ver;
   @JsonKey(unknownEnumValue: DocumentRefDtoType.signed)
   final DocumentRefDtoType type;
 
   const DocumentRefDto({
     required this.id,
-    this.version,
+    this.ver,
     required this.type,
   });
 
@@ -33,7 +33,7 @@ final class DocumentRefDto {
 
     return DocumentRefDto(
       id: data.id,
-      version: data.ver,
+      ver: data.ver,
       type: type,
     );
   }
@@ -42,8 +42,8 @@ final class DocumentRefDto {
 
   DocumentRef toModel() {
     return switch (type) {
-      DocumentRefDtoType.signed => SignedDocumentRef(id: id, ver: version),
-      DocumentRefDtoType.draft => DraftRef(id: id, ver: version),
+      DocumentRefDtoType.signed => SignedDocumentRef(id: id, ver: ver),
+      DocumentRefDtoType.draft => DraftRef(id: id, ver: ver),
     };
   }
 

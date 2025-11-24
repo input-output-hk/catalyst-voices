@@ -21,7 +21,7 @@ void main() {
 
         // Then
         expect(dto.selfRef.id, id);
-        expect(dto.selfRef.version, version);
+        expect(dto.selfRef.ver, version);
       });
     });
   });
