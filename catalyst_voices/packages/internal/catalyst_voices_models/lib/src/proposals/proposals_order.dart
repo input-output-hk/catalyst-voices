@@ -39,17 +39,29 @@ sealed class ProposalsOrder extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Orders base on [Proposal] version.
+/// Orders proposals based on their last update date, which corresponds to the [Proposal] version.
 ///
-/// The [isAscending] parameter determines the direction of the sort:
-/// - true: Oldest to newest.
-/// - false: Newest to oldest.
+/// The sorting direction can be specified as ascending (oldest to newest)
+/// or descending (newest to oldest).
 final class UpdateDate extends ProposalsOrder {
+  /// Determines the sorting direction.
+  ///
+  /// If `true`, proposals are sorted from oldest to newest.
+  /// If `false`, they are sorted from newest to oldest.
   final bool isAscending;
 
+  /// Creates an instance of [UpdateDate] order.
+  ///
+  /// The [isAscending] parameter is required to specify the sorting direction.
   const UpdateDate({
     required this.isAscending,
   });
+
+  /// Creates an instance that sorts proposals in ascending order (oldest to newest).
+  const UpdateDate.asc() : this(isAscending: true);
+
+  /// Creates an instance that sorts proposals in descending order (newest to oldest).
+  const UpdateDate.desc() : this(isAscending: false);
 
   @override
   List<Object?> get props => [isAscending];
