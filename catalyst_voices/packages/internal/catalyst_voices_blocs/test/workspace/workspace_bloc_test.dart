@@ -74,7 +74,6 @@ void main() {
             categories: [
               CampaignCategory(
                 selfRef: categoryRef,
-                proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',
@@ -129,7 +128,6 @@ void main() {
             categories: [
               CampaignCategory(
                 selfRef: categoryRef,
-                proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',

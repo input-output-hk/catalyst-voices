@@ -463,9 +463,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         throw StateError('Cannot load proposal, active campaign not found');
       }
       final category = campaign.categories.first;
-      final templateRef = category.proposalTemplateRef;
+      final categoryRef = category.selfRef;
 
-      final proposalTemplate = await _proposalService.getProposalTemplate(ref: templateRef);
+      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryRef);
       final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
@@ -473,7 +473,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalDocument: documentBuilder.build(),
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
-          templateRef: templateRef,
+          templateRef: proposalTemplate.metadata.selfRef.toSignedDocumentRef(),
           parameters: templateParameters,
         ),
         category: category,
@@ -560,8 +560,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     await _loadState(emit, () async {
       final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
-      final templateRef = category.proposalTemplateRef;
-      final proposalTemplate = await _proposalService.getProposalTemplate(ref: templateRef);
+      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryRef);
       final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
@@ -569,7 +568,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalDocument: documentBuilder.build(),
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
-          templateRef: templateRef,
+          templateRef: proposalTemplate.metadata.selfRef.toSignedDocumentRef(),
           parameters: templateParameters,
         ),
         category: category,

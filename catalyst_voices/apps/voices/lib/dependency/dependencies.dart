@@ -94,6 +94,7 @@ final class Dependencies extends DependencyProvider {
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
             get<AdminTools>(),
+            get<FeatureFlagsService>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -114,6 +115,7 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
+          get<FeatureFlagsService>(),
         ),
       )
       ..registerLazySingleton<VotingCubit>(
@@ -151,6 +153,7 @@ final class Dependencies extends DependencyProvider {
         return DiscoveryCubit(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<FeatureFlagsService>(),
         );
       })
       ..registerFactory<CategoryDetailCubit>(() {
@@ -170,6 +173,7 @@ final class Dependencies extends DependencyProvider {
           get<DocumentMapper>(),
           get<VotingBallotBuilder>(),
           get<VotingService>(),
+          get<FeatureFlagsService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -206,6 +210,11 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<VotingBallotBuilder>(),
           get<VotingService>(),
+        );
+      })
+      ..registerFactory<FeatureFlagsCubit>(() {
+        return FeatureFlagsCubit(
+          get<FeatureFlagsService>(),
         );
       });
   }
@@ -301,6 +310,12 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<SystemStatusRepository>(
         () => SystemStatusRepository(
           get<ApiServices>(),
+        ),
+      )
+      ..registerLazySingleton<FeatureFlagsRepository>(
+        () => FeatureFlagsRepository(
+          get<AppEnvironment>().type,
+          get<AppConfig>(),
         ),
       );
   }
@@ -437,6 +452,14 @@ final class Dependencies extends DependencyProvider {
         );
       },
       dispose: (mediator) => mediator.dispose(),
+    );
+    registerLazySingleton<FeatureFlagsService>(
+      () {
+        return FeatureFlagsService(
+          get<FeatureFlagsRepository>(),
+        );
+      },
+      dispose: (service) => unawaited(service.dispose()),
     );
   }
 

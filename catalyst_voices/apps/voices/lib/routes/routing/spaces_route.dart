@@ -10,6 +10,7 @@ import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
+import 'package:catalyst_voices/routes/guards/voting_feature_flag_guard.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -45,6 +46,8 @@ final class DiscoveryRoute extends GoRouteData with $DiscoveryRoute, FadePageTra
   final bool? $extra;
 
   const DiscoveryRoute({this.$extra});
+
+  const DiscoveryRoute.keychainDeleted() : this($extra: true);
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -183,7 +186,8 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with $VotingRoute, FadePageTransitionMixin {
+final class VotingRoute extends GoRouteData
+    with $VotingRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
   final String? tab;
   final bool? $extra;
@@ -193,6 +197,18 @@ final class VotingRoute extends GoRouteData with $VotingRoute, FadePageTransitio
     this.tab,
     this.$extra,
   });
+
+  const VotingRoute.keychainDeleted({
+    String? categoryId,
+    String? tab,
+  }) : this(
+         categoryId: categoryId,
+         tab: tab,
+         $extra: true,
+       );
+
+  @override
+  List<RouteGuard> get routeGuards => [const VotingFeatureFlagGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

@@ -68,7 +68,7 @@ abstract interface class ProposalService {
   });
 
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef category,
   });
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
@@ -322,20 +322,28 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef category,
   }) async {
-    final proposalTemplate = await _proposalRepository.getProposalTemplate(
-      ref: ref,
-    );
+    final template = await _proposalRepository.getProposalTemplate(category: category);
+    if (template == null) {
+      throw ProposalTemplateNotFoundException(category: category);
+    }
 
-    return proposalTemplate;
+    return template;
   }
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) async {
-    final allowTemplateRefs =
-        _activeCampaignObserver.campaign?.categories.map((e) => e.proposalTemplateRef).toList() ??
-        [];
+    final activeCampaign = _activeCampaignObserver.campaign;
+    if (activeCampaign == null) {
+      throw const ActiveCampaignNotFoundException();
+    }
+
+    final campaignFilters = CampaignFilters.from(activeCampaign);
+    final allowTemplateRefs = await _documentRepository.getRefs(
+      type: DocumentType.proposalTemplate,
+      campaign: campaignFilters,
+    );
 
     final parsedDocument = await _documentRepository.parseDocumentForImport(data: data);
 

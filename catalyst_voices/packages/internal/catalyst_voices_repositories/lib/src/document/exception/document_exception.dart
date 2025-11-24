@@ -33,6 +33,15 @@ final class DraftNotFoundException implements DocumentException {
   String toString() => 'Draft matching $ref not found';
 }
 
+final class ProposalTemplateNotFoundException implements DocumentException {
+  final DocumentRef category;
+
+  const ProposalTemplateNotFoundException({required this.category});
+
+  @override
+  String toString() => 'Proposal template for category $category not found';
+}
+
 /// Exception thrown when signed document content type is unknown.
 final class UnknownDocumentContentTypeException implements DocumentException {
   final DocumentContentType type;
