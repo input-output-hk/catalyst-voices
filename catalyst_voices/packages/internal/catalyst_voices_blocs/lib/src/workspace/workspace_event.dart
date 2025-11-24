@@ -4,6 +4,15 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class ChangeWorkspaceFilters extends WorkspaceEvent {
+  final WorkspaceFilters filters;
+
+  const ChangeWorkspaceFilters(this.filters);
+
+  @override
+  List<Object?> get props => [...super.props, filters];
+}
+
 final class DeleteDraftProposalEvent extends WorkspaceEvent {
   final DraftRef ref;
 

@@ -75,6 +75,7 @@ final class WorkspaceStateUserProposals extends Equatable {
   final UserProposalsView published;
   final UserProposalsView notPublished;
   final bool hasComments;
+  final WorkspaceFilters currentFilter;
 
   const WorkspaceStateUserProposals({
     this.localProposals = const UserProposalsView(),
@@ -84,6 +85,7 @@ final class WorkspaceStateUserProposals extends Equatable {
     this.published = const UserProposalsView(),
     this.notPublished = const UserProposalsView(),
     this.hasComments = false,
+    this.currentFilter = WorkspaceFilters.allProposals,
   });
 
   factory WorkspaceStateUserProposals.fromList(List<UsersProposalOverview> proposals) {
@@ -140,6 +142,28 @@ final class WorkspaceStateUserProposals extends Equatable {
     );
   }
 
+  WorkspaceStateUserProposals copyWith({
+    UserProposalsView? localProposals,
+    UserProposalsView? draftProposals,
+    UserProposalsView? finalProposals,
+    UserProposalsView? inactiveProposals,
+    UserProposalsView? published,
+    UserProposalsView? notPublished,
+    bool? hasComments,
+    WorkspaceFilters? currentFilter,
+  }) {
+    return WorkspaceStateUserProposals(
+      localProposals: localProposals ?? this.localProposals,
+      draftProposals: draftProposals ?? this.draftProposals,
+      finalProposals: finalProposals ?? this.finalProposals,
+      inactiveProposals: inactiveProposals ?? this.inactiveProposals,
+      published: published ?? this.published,
+      notPublished: notPublished ?? this.notPublished,
+      hasComments: hasComments ?? this.hasComments,
+      currentFilter: currentFilter ?? this.currentFilter,
+    );
+  }
+
   @override
   List<Object?> get props => [
     localProposals,
@@ -149,5 +173,6 @@ final class WorkspaceStateUserProposals extends Equatable {
     published,
     notPublished,
     hasComments,
+    currentFilter,
   ];
 }

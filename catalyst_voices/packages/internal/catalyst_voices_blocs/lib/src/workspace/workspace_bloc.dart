@@ -43,6 +43,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<UnlockProposalEvent>(_unlockProposal);
     on<ForgetProposalEvent>(_forgetProposal);
     on<GetTimelineItemsEvent>(_getTimelineItems);
+    on<ChangeWorkspaceFilters>(_changeFilters);
   }
 
   @override
@@ -71,6 +72,16 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   Future<void> _cancelProposalSubscriptions() async {
     await _proposalsSub?.cancel();
     _proposalsSub = null;
+  }
+
+  Future<void> _changeFilters(ChangeWorkspaceFilters event, Emitter<WorkspaceState> emit) async {
+    emit(
+      state.copyWith(
+        userProposals: state.userProposals.copyWith(
+          currentFilter: event.filters,
+        ),
+      ),
+    );
   }
 
   Future<void> _deleteProposal(DeleteDraftProposalEvent event, Emitter<WorkspaceState> emit) async {

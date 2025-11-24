@@ -1,0 +1,4 @@
+enum WorkspacePageTab {
+  proposals,
+  proposalInvites,
+}
