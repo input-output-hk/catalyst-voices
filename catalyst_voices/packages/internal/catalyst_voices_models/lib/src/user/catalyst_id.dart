@@ -110,6 +110,11 @@ final class CatalystId extends Equatable {
     );
   }
 
+  /// Whether this and [other] represent the same user.
+  bool isSameAs(CatalystId other) {
+    return toSignificant() == other.toSignificant();
+  }
+
   /// Objects which holds [CatalystId] can be uniquely identified only by
   /// comparing [role0Key] and [host] thus they're significant parts of
   /// [CatalystId].

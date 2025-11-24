@@ -485,6 +485,26 @@
   "@collaboratorCatalystIdIsMissingProposerRole": {
     "description": "Error message shown to user when he tries to add Catalyst ID of a user that don't have Proposer role"
   },
+  "collaboratorInvitationStatusAccepted": "Accepted",
+  "@collaboratorInvitationStatusAccepted": {
+    "description": "Collaborator invitation status: accepted."
+  },
+  "collaboratorInvitationStatusLeft": "Left",
+  "@collaboratorInvitationStatusLeft": {
+    "description": "Collaborator invitation status: collaborator left after accepting."
+  },
+  "collaboratorInvitationStatusPending": "Pending",
+  "@collaboratorInvitationStatusPending": {
+    "description": "Collaborator invitation status: pending."
+  },
+  "collaboratorInvitationStatusRejected": "Rejected",
+  "@collaboratorInvitationStatusRejected": {
+    "description": "Collaborator invitation status: rejected."
+  },
+  "collaboratorInvitationStatusRemoved": "Removed",
+  "@collaboratorInvitationStatusRemoved": {
+    "description": "Collaborator invitation status: removed."
+  },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
     "description": "Coming soon message"
@@ -590,6 +610,10 @@
   "copied": "Copied!",
   "@copied": {
     "description": "Snackbar message shown when user copies a link."
+  },
+  "coproposers": "Co-proposers",
+  "@coproposers": {
+    "description": "Collaborators on the proposal."
   },
   "copyLink": "Copy Link",
   "@copyLink": {
