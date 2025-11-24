@@ -68,8 +68,6 @@ final class DocumentDataMetadata extends Equatable {
          'selfRef have to be exact. Make sure version is not null',
        );
 
-  String get id => selfRef.id;
-
   @override
   List<Object?> get props => [
     type,
@@ -85,8 +83,6 @@ final class DocumentDataMetadata extends Equatable {
     categoryId,
     authors,
   ];
-
-  String get version => selfRef.ver!;
 
   DocumentDataMetadata copyWith({
     DocumentType? type,

@@ -253,13 +253,13 @@ typedef _OldDocumentData = v3.DocumentsData;
 typedef _OldDraftData = v3.DraftsData;
 
 extension on DocumentData {
-  String get id => metadata.id;
+  String get id => metadata.selfRef.id;
 }
 
 extension on DocumentData {
   _OldDocumentData v3() {
-    final idHiLo = UuidHiLo.from(metadata.id);
-    final verHiLo = UuidHiLo.from(metadata.version);
+    final idHiLo = UuidHiLo.from(metadata.selfRef.id);
+    final verHiLo = UuidHiLo.from(metadata.selfRef.ver!);
 
     final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
       metadata,
@@ -273,13 +273,13 @@ extension on DocumentData {
       content: sqlite3.jsonb.encode(content.data),
       metadata: sqlite3.jsonb.encode(metadataJson),
       type: metadata.type.uuid,
-      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+      createdAt: metadata.selfRef.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
 
   _OldDraftData v3Draft() {
-    final idHiLo = UuidHiLo.from(metadata.id);
-    final verHiLo = UuidHiLo.from(metadata.version);
+    final idHiLo = UuidHiLo.from(metadata.selfRef.id);
+    final verHiLo = UuidHiLo.from(metadata.selfRef.ver!);
 
     final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
       metadata,
@@ -300,9 +300,9 @@ extension on DocumentData {
   _NewDocumentData v4() {
     return _NewDocumentData(
       content: sqlite3.jsonb.encode(content.data),
-      id: metadata.id,
+      id: metadata.selfRef.id,
       type: metadata.type.uuid,
-      ver: metadata.version,
+      ver: metadata.selfRef.ver!,
       authors:
           metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       refId: metadata.ref?.id,
@@ -314,7 +314,7 @@ extension on DocumentData {
       templateVer: metadata.template?.ver,
       categoryId: metadata.categoryId?.id,
       categoryVer: metadata.categoryId?.ver,
-      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+      createdAt: metadata.selfRef.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
 
@@ -336,8 +336,8 @@ extension on DocumentData {
   }
 
   _NewDraftData v4Draft() {
-    final idHiLo = UuidHiLo.from(metadata.id);
-    final verHiLo = UuidHiLo.from(metadata.version);
+    final idHiLo = UuidHiLo.from(metadata.selfRef.id);
+    final verHiLo = UuidHiLo.from(metadata.selfRef.ver!);
 
     final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
       metadata,
@@ -345,9 +345,9 @@ extension on DocumentData {
 
     return _NewDraftData(
       content: sqlite3.jsonb.encode(content.data),
-      id: metadata.id,
+      id: metadata.selfRef.id,
       type: metadata.type.uuid,
-      ver: metadata.version,
+      ver: metadata.selfRef.ver!,
       authors:
           metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       refId: metadata.ref?.id,
@@ -359,7 +359,7 @@ extension on DocumentData {
       templateVer: metadata.template?.ver,
       categoryId: metadata.categoryId?.id,
       categoryVer: metadata.categoryId?.ver,
-      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+      createdAt: metadata.selfRef.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
 }

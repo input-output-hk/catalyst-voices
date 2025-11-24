@@ -180,8 +180,8 @@ extension on DocumentData {
   LocalDocumentDraftEntity toEntity() {
     return LocalDocumentDraftEntity(
       content: content,
-      id: metadata.id,
-      ver: metadata.version,
+      id: metadata.selfRef.id,
+      ver: metadata.selfRef.ver!,
       type: metadata.type,
       refId: metadata.ref?.id,
       refVer: metadata.ref?.ver,
@@ -193,7 +193,7 @@ extension on DocumentData {
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
       authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
-      createdAt: metadata.version.dateTime,
+      createdAt: metadata.selfRef.ver!.dateTime,
     );
   }
 }

@@ -254,8 +254,8 @@ extension on DocumentData {
   List<DocumentAuthorEntity> toAuthorEntities() {
     return (metadata.authors ?? const []).map((catId) {
       return DocumentAuthorEntity(
-        documentId: metadata.id,
-        documentVer: metadata.version,
+        documentId: metadata.selfRef.id,
+        documentVer: metadata.selfRef.ver!,
         authorId: catId.toUri().toString(),
         authorIdSignificant: catId.toSignificant().toUri().toString(),
         authorUsername: catId.username,
@@ -266,8 +266,8 @@ extension on DocumentData {
   DocumentEntityV2 toDocEntity() {
     return DocumentEntityV2(
       content: content,
-      id: metadata.id,
-      ver: metadata.version,
+      id: metadata.selfRef.id,
+      ver: metadata.selfRef.ver!,
       type: metadata.type,
       refId: metadata.ref?.id,
       refVer: metadata.ref?.ver,
@@ -279,7 +279,7 @@ extension on DocumentData {
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
       authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
-      createdAt: metadata.version.dateTime,
+      createdAt: metadata.selfRef.ver!.dateTime,
     );
   }
 }

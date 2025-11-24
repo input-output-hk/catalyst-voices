@@ -24,8 +24,6 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   final String id;
   final String? ver;
 
-  // String? get version => ver;
-
   const DocumentRef({
     required this.id,
     this.ver,

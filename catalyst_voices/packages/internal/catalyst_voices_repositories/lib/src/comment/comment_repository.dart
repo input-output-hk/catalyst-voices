@@ -70,8 +70,8 @@ final class DocumentsCommentRepository implements CommentRepository {
     final metadata = SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
       documentType: DocumentType.commentDocument,
-      id: document.metadata.id,
-      ver: document.metadata.version,
+      id: document.metadata.selfRef.id,
+      ver: document.metadata.selfRef.ver,
       ref: SignedDocumentMetadataRef.fromDocumentRef(ref!),
       template: SignedDocumentMetadataRef.fromDocumentRef(
         document.metadata.template!,
