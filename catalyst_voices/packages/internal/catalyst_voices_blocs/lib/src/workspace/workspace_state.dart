@@ -7,6 +7,7 @@ final class WorkspaceState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final WorkspaceStateUserProposals userProposals;
+  final WorkspaceStateProposalInvites userProposalInvites;
   final List<CampaignTimelineViewModel> timelineItems;
   final int fundNumber;
 
@@ -14,6 +15,7 @@ final class WorkspaceState extends Equatable {
     this.isLoading = false,
     this.error,
     this.userProposals = const WorkspaceStateUserProposals(),
+    this.userProposalInvites = const WorkspaceStateProposalInvites(),
     this.timelineItems = const [],
     this.fundNumber = 0,
   });
@@ -26,6 +28,7 @@ final class WorkspaceState extends Equatable {
     isLoading,
     error,
     userProposals,
+    userProposalInvites,
     timelineItems,
     fundNumber,
   ];
@@ -43,6 +46,7 @@ final class WorkspaceState extends Equatable {
     bool? isLoading,
     Optional<LocalizedException>? error,
     WorkspaceStateUserProposals? userProposals,
+    WorkspaceStateProposalInvites? userProposalInvites,
     List<CampaignTimelineViewModel>? timelineItems,
     int? fundNumber,
   }) {
@@ -50,6 +54,7 @@ final class WorkspaceState extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
       userProposals: userProposals ?? this.userProposals,
+      userProposalInvites: userProposalInvites ?? this.userProposalInvites,
       timelineItems: timelineItems ?? this.timelineItems,
       fundNumber: fundNumber ?? this.fundNumber,
     );
@@ -65,6 +70,19 @@ final class WorkspaceStateCampaignTimeline extends Equatable {
 
   @override
   List<Object?> get props => [items];
+}
+
+final class WorkspaceStateProposalInvites extends Equatable {
+  final UserProposalInvites pendingInvites;
+
+  const WorkspaceStateProposalInvites({
+    this.pendingInvites = const UserProposalInvites(
+      status: ProposalsCollaborationStatusFilter.pending,
+    ),
+  });
+
+  @override
+  List<Object?> get props => [pendingInvites];
 }
 
 final class WorkspaceStateUserProposals extends Equatable {
@@ -142,6 +160,18 @@ final class WorkspaceStateUserProposals extends Equatable {
     );
   }
 
+  @override
+  List<Object?> get props => [
+    localProposals,
+    draftProposals,
+    finalProposals,
+    inactiveProposals,
+    published,
+    notPublished,
+    hasComments,
+    currentFilter,
+  ];
+
   WorkspaceStateUserProposals copyWith({
     UserProposalsView? localProposals,
     UserProposalsView? draftProposals,
@@ -163,16 +193,4 @@ final class WorkspaceStateUserProposals extends Equatable {
       currentFilter: currentFilter ?? this.currentFilter,
     );
   }
-
-  @override
-  List<Object?> get props => [
-    localProposals,
-    draftProposals,
-    finalProposals,
-    inactiveProposals,
-    published,
-    notPublished,
-    hasComments,
-    currentFilter,
-  ];
 }
