@@ -28,7 +28,7 @@ impl ConditionalStmt for DocumentRef {
         }
         if let Some(ver) = &self.ver {
             write!(f, " AND ")?;
-            ver.conditional_stmt(f, "(doc_ref->>'id')::uuid")?;
+            ver.conditional_stmt(f, "(doc_ref->>'ver')::uuid")?;
         }
 
         write!(f, ")")

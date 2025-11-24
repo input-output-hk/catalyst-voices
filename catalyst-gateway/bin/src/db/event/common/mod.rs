@@ -13,16 +13,3 @@ pub(crate) trait ConditionalStmt {
         table_field: &str,
     ) -> std::fmt::Result;
 }
-
-impl<T: ConditionalStmt> ConditionalStmt for Option<T> {
-    fn conditional_stmt(
-        &self,
-        f: &mut std::fmt::Formatter<'_>,
-        table_field: &str,
-    ) -> std::fmt::Result {
-        if let Some(v) = self {
-            v.conditional_stmt(f, table_field)?;
-        }
-        Ok(())
-    }
-}
