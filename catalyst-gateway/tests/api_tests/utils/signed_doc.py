@@ -7,10 +7,9 @@ import subprocess
 import json
 from api.v1 import document
 from utils import signed_doc, uuid_v7
-from utils.rbac_chain import rbac_chain_factory, RoleID
+from utils.rbac_chain import rbac_chain_factory, RBACChain, RoleID
 from tempfile import NamedTemporaryFile
 from jsf import JSF
-from rbac_chain import RBACChain
 from enum import IntEnum
 
 
