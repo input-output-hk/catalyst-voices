@@ -1,9 +1,16 @@
 import 'package:catalyst_voices/pages/workspace/user_proposals/user_proposals.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceUserProposals extends StatelessWidget {
-  const WorkspaceUserProposals({super.key});
+  final VoicesTabController<WorkspacePageTab> tabController;
+
+  const WorkspaceUserProposals({
+    super.key,
+    required this.tabController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +20,7 @@ class WorkspaceUserProposals extends StatelessWidget {
         if (!show) {
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
-        return const UserProposals();
+        return UserProposals(tabController: tabController);
       },
     );
   }

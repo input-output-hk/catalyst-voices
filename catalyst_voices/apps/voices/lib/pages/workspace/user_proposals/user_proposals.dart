@@ -1,6 +1,9 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/workspace/user_proposals/user_proposal_section.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/workspace_proposal_filters.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/workspace_tabs.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -9,27 +12,40 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
 class UserProposals extends StatelessWidget {
-  const UserProposals({super.key});
+  final VoicesTabController<WorkspacePageTab> tabController;
+
+  const UserProposals({
+    super.key,
+    required this.tabController,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: 32),
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
       sliver: SliverMainAxisGroup(
         slivers: <Widget>[
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: _Header(),
           ),
           SliverToBoxAdapter(
+            child: WorkspaceTabs(tabController: tabController),
+          ),
+          const SliverToBoxAdapter(
             child: _Divider(),
           ),
-          SliverToBoxAdapter(
+           SliverToBoxAdapter(
+            child: WorkspaceProposalFilters(
+              tabController: tabController,
+            ),
+          ),
+          const SliverToBoxAdapter(
             child: SizedBox(height: 20),
           ),
-          _UserSubmittedProposals(),
-          _UserDraftProposals(),
-          _UserLocalProposals(),
-          _UserInactiveProposals(),
+          const _UserSubmittedProposals(),
+          const _UserDraftProposals(),
+          const _UserLocalProposals(),
+          const _UserInactiveProposals(),
         ],
       ),
     );
@@ -41,10 +57,8 @@ class _Divider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDivider(
-      indent: 0,
-      endIndent: 0,
-      height: 24,
+    return VoicesDivider.expanded(
+      height: 1,
       color: context.colorScheme.primary,
     );
   }
