@@ -104,15 +104,13 @@ class DocBuilderReturns:
         self.role_id = role_id
 
 
-def generic_doc_builder(
-    rbac_chain: RBACChain,
+def create_metadata(
     doc_type: str,
-    templates: list[dict] | None,
-    parameters: list[dict] | None,
-    content: Any,
-) -> DocBuilderReturns:
-    role_id = RoleID.PROPOSER
+    templates: list[Any] | None = None,
+    parameters: list[Any] | None = None,
+) -> dict[str, Any]:
     doc_id = uuid_v7.uuid_v7()
+
     metadata: dict[str, Any] = {
         "content-encoding": "br",
         "content-type": "application/json",
@@ -125,6 +123,16 @@ def generic_doc_builder(
         metadata["templates"] = templates
     if parameters is not None:
         metadata["parameters"] = parameters
+
+    return metadata
+
+
+def generic_doc_builder(
+    rbac_chain: RBACChain,
+    metadata: dict[str, Any],
+    content: Any,
+) -> DocBuilderReturns:
+    role_id = RoleID.PROPOSER
 
     doc_builder = SignedDocument(metadata, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
@@ -220,8 +228,7 @@ def proposal_doc_factory(
 
         template: SignedDocumentBase = proposal_form_template_doc
 
-        result = generic_doc_builder(
-            rbac_chain_factory(),
+        metadata = create_metadata(
             DOC_TYPE["proposal"],
             [
                 {
@@ -233,6 +240,10 @@ def proposal_doc_factory(
             [
                 {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
+        )
+        result = generic_doc_builder(
+            rbac_chain_factory(),
+            metadata,
             JSF(template.content).generate(),
         )
 
@@ -279,8 +290,7 @@ def category_parameters_doc(
     template: SignedDocumentBase = category_parameters_form_template_doc
     param: SignedDocumentBase = campaign_parameters_doc
 
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    metadata = create_metadata(
         DOC_TYPE["category_parameters"],
         [
             {
@@ -292,6 +302,10 @@ def category_parameters_doc(
         [
             {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
         ],
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
         JSF(template.content).generate(),
     )
 
@@ -312,11 +326,14 @@ def category_parameters_form_template_doc(
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = campaign_parameters_doc
 
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    metadata = create_metadata(
         DOC_TYPE["category_parameters_form_template"],
         None,
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
         {"type": "object"},
     )
 
@@ -340,8 +357,7 @@ def campaign_parameters_doc(
     template: SignedDocumentBase = campaign_parameters_form_template_doc
     param: SignedDocumentBase = brand_parameters_doc
 
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    metadata = create_metadata(
         DOC_TYPE["campaign_parameters"],
         [
             {
@@ -353,6 +369,10 @@ def campaign_parameters_doc(
         [
             {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
         ],
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
         JSF(template.content).generate(),
     )
 
@@ -373,11 +393,14 @@ def campaign_parameters_form_template_doc(
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = brand_parameters_doc
 
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    metadata = create_metadata(
         DOC_TYPE["campaign_parameters_form_template"],
         None,
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
         {"type": "object"},
     )
 
@@ -398,8 +421,7 @@ def brand_parameters_doc(
 ) -> SignedDocumentBase:
     template: SignedDocumentBase = brand_parameters_form_template_doc
 
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    metadata = create_metadata(
         DOC_TYPE["brand_parameters"],
         [
             {
@@ -409,6 +431,10 @@ def brand_parameters_doc(
             }
         ],
         None,
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
         JSF(template.content).generate(),
     )
 
@@ -427,11 +453,14 @@ def brand_parameters_doc(
 def brand_parameters_form_template_doc(
     rbac_chain_factory,
 ) -> SignedDocumentBase:
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    metadata = create_metadata(
         DOC_TYPE["brand_parameters_form_template"],
         None,
         None,
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
         {"type": "object"},
     )
 
