@@ -3976,5 +3976,36 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
+  },
+  "noOfProposals": "Proposals · {count}",
+  "@noOfProposals": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfProposalInvites": "Proposal Invites · {count}",
+  "@noOfProposalInvites": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allProposals": "All Proposals",
+  "@allProposals": {
+    "description": "text indicating to view all proposals"
+  },
+  "mainProposer": "Main Proposer",
+  "@mainProposer": {
+    "description": "text indicating to view Main Proposer proposals"
+  },
+
+  "collaborator": "Co-Proposer",
+  "@collaborator": {
+    "description": "text indicating to view Collaborator proposals"
   }
 }
