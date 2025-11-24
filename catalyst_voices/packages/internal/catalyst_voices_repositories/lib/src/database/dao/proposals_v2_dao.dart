@@ -570,33 +570,24 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   ///    - Identifies the newest version of each proposal
   ///    - Uses: idx_documents_v2_type_id
   ///
-  /// 2. **version_lists**
-  ///    - Collects all version ids for each proposal into comma-separated string
-  ///    - Ordered by ver ASC for consistent version history
-  ///    - Used to show version dropdown in UI
-  ///
-  /// 3. **latest_actions**
+  /// 2. **latest_actions**
   ///    - Groups all proposal actions by ref_id and finds MAX(ver)
   ///    - Ensures we only check the most recent action per proposal
   ///    - Uses: idx_documents_v2_type_ref_id
   ///
-  /// 4. **action_status**
+  /// 3. **action_status**
   ///    - Joins actual action documents with latest_actions
   ///    - Extracts action type ('draft'/'final'/'hide') from JSON content
   ///    - Extracts ref_ver which may point to specific proposal version
   ///    - COALESCE defaults to 'draft' when action field is missing
   ///    - Uses: idx_documents_v2_type_ref_id_ver
   ///
-  /// 5. **effective_proposals**
+  /// 4. **effective_proposals**
   ///    - Applies version resolution logic:
   ///      * Hide action: Filtered out by WHERE NOT EXISTS
   ///      * Final action with ref_ver: Uses ref_ver (specific pinned version)
   ///      * Final action without ref_ver OR draft OR no action: Uses max_ver (latest)
   ///    - LEFT JOIN ensures proposals without actions are included (default to draft)
-  ///
-  /// 6. **comments_count**
-  ///    - Counts comments per proposal version
-  ///    - Joins on both ref_id and ref_ver for version-specific counts
   ///
   /// **Final Query:**
   /// - Joins documents_v2 with effective_proposals to get full document data
@@ -625,22 +616,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final cteQuery =
         '''
-   WITH latest_proposals AS (
+    WITH latest_proposals AS (
       SELECT id, MAX(ver) as max_ver
       FROM documents_v2
       WHERE type = ?
-      GROUP BY id
-    ),
-    version_lists AS (
-      SELECT 
-        id,
-        GROUP_CONCAT(ver, ',') as version_ids_str
-      FROM (
-        SELECT id, ver
-        FROM documents_v2
-        WHERE type = ?
-        ORDER BY id, ver ASC
-      )
       GROUP BY id
     ),
     latest_actions AS (
@@ -661,39 +640,46 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     effective_proposals AS (
       SELECT 
         lp.id,
+        -- Business Logic: Use specific version if final, otherwise latest
         CASE 
           WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL AND ast.ref_ver != '' THEN ast.ref_ver
           ELSE lp.max_ver
         END as ver,
-        ast.action_type,
-        vl.version_ids_str
+        ast.action_type
       FROM latest_proposals lp
       LEFT JOIN action_status ast ON lp.id = ast.ref_id
-      LEFT JOIN version_lists vl ON lp.id = vl.id
       WHERE NOT EXISTS (
+        -- Business Logic: Hide action hides all versions
         SELECT 1 FROM action_status hidden 
         WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
       )
-    ),
-    comments_count AS (
-      SELECT 
-        c.ref_id,
-        c.ref_ver,
-        COUNT(*) as count
-      FROM documents_v2 c
-      WHERE c.type = ?
-      GROUP BY c.ref_id, c.ref_ver
     )
     SELECT 
       $proposalColumns, 
       $templateColumns, 
-      ep.action_type, 
-      ep.version_ids_str,
-      COALESCE(cc.count, 0) as comments_count,
+      ep.action_type,
+      
+      -- Only executes for the rows in the page
+      (
+        SELECT GROUP_CONCAT(v_list.ver, ',')
+        FROM (
+          SELECT ver 
+          FROM documents_v2 v_sub 
+          WHERE v_sub.id = p.id AND v_sub.type = ? 
+          ORDER BY v_sub.ver ASC
+        ) v_list
+      ) as version_ids_str,
+
+      -- Only executes for the rows in the page
+      (
+        SELECT COUNT(*) 
+        FROM documents_v2 c 
+        WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
+      ) as comments_count,
+
       COALESCE(dlm.is_favorite, 0) as is_favorite
     FROM documents_v2 p
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
-    LEFT JOIN comments_count cc ON p.id = cc.ref_id AND p.ver = cc.ref_ver
     LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
     LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
     WHERE p.type = ? $whereClause
@@ -714,13 +700,20 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return customSelect(
       cteQuery,
       variables: [
-        Variable.withString(DocumentType.proposalDocument.uuid),
+        // CTE Variables
+        // latest_proposals, latest_actions, action_status
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
+        // Select Subquery Variables (Order matters!)
+        // version_ids_str subquery, comments_count subquery
+        Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.commentDocument.uuid),
+        // Main Join Variables
+        // template join, main WHERE
         Variable.withString(DocumentType.proposalTemplate.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
+        // Limit/Offset
         Variable.withInt(size),
         Variable.withInt(page * size),
       ],

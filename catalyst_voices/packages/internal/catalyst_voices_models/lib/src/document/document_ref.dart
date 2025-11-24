@@ -42,6 +42,8 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// Whether the ref specifies the document [version].
   bool get isExact => version != null;
 
+  bool get isLoose => !isExact;
+
   @override
   List<Object?> get props => [id, version];
 
