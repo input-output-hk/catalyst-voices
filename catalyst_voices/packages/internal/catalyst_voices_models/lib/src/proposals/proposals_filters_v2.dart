@@ -24,6 +24,7 @@ final class ProposalsCampaignFilters extends Equatable {
   String toString() => 'categoriesIds: $categoriesIds';
 }
 
+// TODO(damian-molinski): It should pick between looking only collaborators or author
 final class ProposalsCollaborationFilters extends Equatable {
   final CatalystId? collaborator;
   final ProposalsCollaborationStatusFilter? status;

@@ -139,6 +139,7 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
           get<DocumentMapper>(),
           get<DownloaderService>(),
+          get<UserService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {

@@ -7,6 +7,12 @@ enum WorkspaceFilters {
 
   const WorkspaceFilters();
 
+  bool get isAllProposals => this == allProposals;
+
+  bool get isCollaborator => this == collaborator;
+
+  bool get isMainProposer => this == mainProposer;
+
   String localizedName(VoicesLocalizations l10n) {
     return switch (this) {
       allProposals => l10n.allProposals,

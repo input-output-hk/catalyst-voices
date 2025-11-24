@@ -18,21 +18,26 @@ final _logger = Logger('WorkspaceBloc');
 /// Manages users' proposals. Allows to load, import, export, forget, unlock and delete proposals.
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     with BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>, BlocErrorEmitterMixin {
-  // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
   final DocumentMapper _documentMapper;
   final DownloaderService _downloaderService;
+  final UserService _userService;
 
   WorkspaceBlocCache _cache = const WorkspaceBlocCache();
 
   StreamSubscription<List<DetailProposal>>? _proposalsSub;
+
+  StreamSubscription<CatalystId?>? _activeAccountIdSub;
+
+  
 
   WorkspaceBloc(
     this._campaignService,
     this._proposalService,
     this._documentMapper,
     this._downloaderService,
+    this._userService,
   ) : super(const WorkspaceState()) {
     on<LoadProposalsEvent>(_loadProposals);
     on<ImportProposalEvent>(_importProposal);
@@ -44,11 +49,16 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<ForgetProposalEvent>(_forgetProposal);
     on<GetTimelineItemsEvent>(_getTimelineItems);
     on<ChangeWorkspaceFilters>(_changeFilters);
+    on<WatchUserCatalystIdEvent>(_watchUserCatalystId);
   }
 
   @override
   Future<void> close() async {
     await _cancelProposalSubscriptions();
+
+    await _activeAccountIdSub?.cancel();
+    _activeAccountIdSub = null;
+
     return super.close();
   }
 
@@ -75,12 +85,22 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _changeFilters(ChangeWorkspaceFilters event, Emitter<WorkspaceState> emit) async {
+    final filter = event.filters;
     emit(
       state.copyWith(
         userProposals: state.userProposals.copyWith(
-          currentFilter: event.filters,
+          currentFilter: filter,
         ),
       ),
+    );
+    final filters = ProposalsFiltersV2(
+      author: filter.isAllProposals || filter.isMainProposer ? _cache.activeAccountId : null,
+      collaboration: ProposalsCollaborationFilters(
+        collaborator: filter.isCollaborator || filter.isAllProposals
+            ? _cache.activeAccountId
+            : null,
+      ),
+    
     );
   }
 
@@ -175,6 +195,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     emit(state.copyWith(timelineItems: timeline, fundNumber: campaign.fundNumber));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
+  }
+
+  void _handleActiveAccountIdChange(CatalystId? id) {
+    _cache = _cache.copyWith(activeAccountId: Optional(id));
+
+    add(ChangeWorkspaceFilters(state.userProposals.currentFilter));
   }
 
   Future<void> _importProposal(ImportProposalEvent event, Emitter<WorkspaceState> emit) async {
@@ -280,6 +306,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       categoryId: proposal.categoryId,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
+  }
+
+  void _watchUserCatalystId(WatchUserCatalystIdEvent event, Emitter<WorkspaceState> emit) {
+    _activeAccountIdSub = _userService.watchUser
+        .map((event) => event.activeAccount?.catalystId)
+        .distinct()
+        .listen(_handleActiveAccountIdChange);
   }
 
   Future<void> _watchUserProposals(

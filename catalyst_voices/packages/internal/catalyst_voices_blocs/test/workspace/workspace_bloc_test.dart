@@ -15,6 +15,7 @@ void main() {
     late MockProposalService mockProposalService;
     late MockDocumentMapper mockDocumentMapper;
     late MockDownloaderService mockDownloaderService;
+    late MockUserService mockUserService;
 
     late WorkspaceBloc workspaceBloc;
 
@@ -43,12 +44,14 @@ void main() {
       mockProposalService = MockProposalService();
       mockDocumentMapper = MockDocumentMapper();
       mockDownloaderService = MockDownloaderService();
+      mockUserService = MockUserService();
 
       workspaceBloc = WorkspaceBloc(
         mockCampaignService,
         mockProposalService,
         mockDocumentMapper,
         mockDownloaderService,
+        mockUserService,
       );
     });
 
@@ -484,3 +487,5 @@ class MockDocumentMapper extends Mock implements DocumentMapper {}
 class MockDownloaderService extends Mock implements DownloaderService {}
 
 class MockProposalService extends Mock implements ProposalService {}
+
+class MockUserService extends Mock implements UserService {}

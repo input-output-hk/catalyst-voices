@@ -81,6 +81,10 @@ final class UnlockProposalEvent extends WorkspaceEvent {
   List<Object?> get props => [ref];
 }
 
+final class WatchUserCatalystIdEvent extends WorkspaceEvent {
+  const WatchUserCatalystIdEvent();
+}
+
 final class WatchUserProposalsEvent extends WorkspaceEvent {
   const WatchUserProposalsEvent();
 }

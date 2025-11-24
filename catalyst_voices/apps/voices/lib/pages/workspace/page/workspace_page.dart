@@ -117,6 +117,7 @@ class _WorkspacePageState extends State<WorkspacePage>
     // ignore: cascade_invocations
     bloc
       ..add(const WatchUserProposalsEvent())
+      ..add(const WatchUserCatalystIdEvent())
       ..add(const GetTimelineItemsEvent());
 
     final selectedTab = _determineTab(widget.tab);

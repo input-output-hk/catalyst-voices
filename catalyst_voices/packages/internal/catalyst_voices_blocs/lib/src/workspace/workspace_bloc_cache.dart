@@ -7,25 +7,30 @@ import 'package:equatable/equatable.dart';
 final class WorkspaceBlocCache extends Equatable {
   final Campaign? campaign;
   final List<UsersProposalOverview>? proposals;
+  final CatalystId? activeAccountId;
 
   const WorkspaceBlocCache({
     this.campaign,
     this.proposals,
+    this.activeAccountId,
   });
 
   @override
   List<Object?> get props => [
     campaign,
     proposals,
+    activeAccountId,
   ];
 
   WorkspaceBlocCache copyWith({
     Optional<Campaign>? campaign,
     Optional<List<UsersProposalOverview>>? proposals,
+    Optional<CatalystId>? activeAccountId,
   }) {
     return WorkspaceBlocCache(
       campaign: campaign.dataOr(this.campaign),
       proposals: proposals.dataOr(this.proposals),
+      activeAccountId: activeAccountId.dataOr(this.activeAccountId),
     );
   }
 }
