@@ -6,7 +6,7 @@ import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_in
 WalletApiException fallbackApiException(Object ex) {
   throw WalletApiException(
     code: WalletApiErrorCode.invalidRequest,
-    info: ex.toString(),
+    info: ex,
   );
 }
 
