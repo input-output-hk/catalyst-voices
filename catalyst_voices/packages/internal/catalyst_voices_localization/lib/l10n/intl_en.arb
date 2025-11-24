@@ -4007,5 +4007,9 @@
   "collaborator": "Co-Proposer",
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
+  },
+  "noPendingInvitesMessage": "You don’t have any proposal invites",
+  "@noPendingInvitesMessage": {
+    "description": "Message shown when user don't have any pending messages"
   }
 }

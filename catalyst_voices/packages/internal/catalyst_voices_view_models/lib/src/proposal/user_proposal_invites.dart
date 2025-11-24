@@ -4,12 +4,12 @@ import 'package:equatable/equatable.dart';
 class UserProposalInvites extends Equatable {
   // TODO(LynxLynxx): refactor this when we know how invites will look like;
   final ProposalsCollaborationStatusFilter status;
-  final List<Object> invites;
+  final List<Object> items;
 
-  const UserProposalInvites({required this.status, this.invites = const []});
+  const UserProposalInvites({required this.status, this.items = const []});
 
   @override
-  List<Object?> get props => [status, invites];
+  List<Object?> get props => [status, items];
 
   UserProposalInvites copyWith({
     ProposalsCollaborationStatusFilter? status,
@@ -17,7 +17,7 @@ class UserProposalInvites extends Equatable {
   }) {
     return UserProposalInvites(
       status: status ?? this.status,
-      invites: invites ?? this.invites,
+      items: invites ?? items,
     );
   }
 }
