@@ -106,7 +106,10 @@ final class WorkspaceStateUserProposals extends Equatable {
     this.currentFilter = WorkspaceFilters.allProposals,
   });
 
-  factory WorkspaceStateUserProposals.fromList(List<UsersProposalOverview> proposals) {
+  factory WorkspaceStateUserProposals.fromList(
+    List<UsersProposalOverview> proposals,
+    WorkspaceFilters filter,
+  ) {
     // Single-pass filtering for better performance
     final localProposalsList = <UsersProposalOverview>[];
     final draftProposalsList = <UsersProposalOverview>[];
@@ -157,6 +160,7 @@ final class WorkspaceStateUserProposals extends Equatable {
       published: UserProposalsView(items: publishedList),
       notPublished: UserProposalsView(items: notPublishedList),
       hasComments: hasComments,
+      currentFilter: filter,
     );
   }
 

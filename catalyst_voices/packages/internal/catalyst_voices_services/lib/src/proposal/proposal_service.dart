@@ -146,7 +146,9 @@ abstract interface class ProposalService {
     required ProposalsOrder order,
   });
 
-  Stream<List<DetailProposal>> watchUserProposals();
+  Stream<List<DetailProposal>> watchUserProposals({
+    required ProposalsFiltersV2 filters,
+  });
 
   Stream<ProposalsCount> watchUserProposalsCount();
 }
@@ -551,8 +553,13 @@ final class ProposalServiceImpl implements ProposalService {
         .asyncMap(_mapProposalDataPage);
   }
 
+  // TODO(LynxLynxx): Apply filters to the proposals
+  // TODO(LynxLynxx): we can't use watchProposalsBriefPageV2 as we need aditional information about
+  // other versions of proposals which ProposalBriefData doesn't have
   @override
-  Stream<List<DetailProposal>> watchUserProposals() async* {
+  Stream<List<DetailProposal>> watchUserProposals({
+    required ProposalsFiltersV2 filters,
+  }) async* {
     yield* _userService //
         .watchUser
         .distinct()

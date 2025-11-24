@@ -30,8 +30,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
 
-  
-
   WorkspaceBloc(
     this._campaignService,
     this._proposalService,
@@ -86,6 +84,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   Future<void> _changeFilters(ChangeWorkspaceFilters event, Emitter<WorkspaceState> emit) async {
     final filter = event.filters;
+    if (state.userProposals.currentFilter == filter) return;
+
     emit(
       state.copyWith(
         userProposals: state.userProposals.copyWith(
@@ -100,8 +100,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
             ? _cache.activeAccountId
             : null,
       ),
-    
     );
+
+    await _cancelProposalSubscriptions();
+    _setupProposalsSubscription(filters: filters);
   }
 
   Future<void> _deleteProposal(DeleteDraftProposalEvent event, Emitter<WorkspaceState> emit) async {
@@ -269,7 +271,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   /// This ensures derived views (published, notPublished, hasComments) stay in sync.
   WorkspaceStateUserProposals _rebuildProposalsState() {
     final proposals = _cache.proposals ?? [];
-    return WorkspaceStateUserProposals.fromList(proposals);
+    final filter = state.userProposals.currentFilter;
+    return WorkspaceStateUserProposals.fromList(proposals, filter);
   }
 
   /// Removes a proposal from the cache by its reference.
@@ -278,20 +281,22 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     _cache = _cache.copyWith(proposals: Optional(updatedProposals));
   }
 
-  void _setupProposalsSubscription() {
-    _proposalsSub = _proposalService.watchUserProposals().listen(
-      (proposals) async {
-        if (isClosed) return;
-        _logger.info('Stream received ${proposals.length} proposals');
-        final mappedProposals = await _mapProposalToViewModel(proposals);
-        add(LoadProposalsEvent(mappedProposals));
-      },
-      onError: (Object error, StackTrace stackTrace) {
-        if (isClosed) return;
-        _logger.info('Users proposals stream error', error, stackTrace);
-        add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
-      },
-    );
+  void _setupProposalsSubscription({required ProposalsFiltersV2 filters}) {
+    _proposalsSub = _proposalService
+        .watchUserProposals(filters: filters)
+        .listen(
+          (proposals) async {
+            if (isClosed) return;
+            _logger.info('Stream received ${proposals.length} proposals');
+            final mappedProposals = await _mapProposalToViewModel(proposals);
+            add(LoadProposalsEvent(mappedProposals));
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            if (isClosed) return;
+            _logger.info('Users proposals stream error', error, stackTrace);
+            add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
+          },
+        );
   }
 
   Future<void> _unlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {
@@ -331,6 +336,18 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     _logger.info('$state and ${state.showProposals}');
 
     await _cancelProposalSubscriptions();
-    _setupProposalsSubscription();
+
+    // Build filters from current state
+    final filter = state.userProposals.currentFilter;
+    final filters = ProposalsFiltersV2(
+      author: filter.isAllProposals || filter.isMainProposer ? _cache.activeAccountId : null,
+      collaboration: ProposalsCollaborationFilters(
+        collaborator: filter.isCollaborator || filter.isAllProposals
+            ? _cache.activeAccountId
+            : null,
+      ),
+    );
+
+    _setupProposalsSubscription(filters: filters);
   }
 }

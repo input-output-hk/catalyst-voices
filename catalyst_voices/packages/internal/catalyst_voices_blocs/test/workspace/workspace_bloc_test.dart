@@ -103,7 +103,9 @@ void main() {
         );
       },
       build: () {
-        when(() => mockProposalService.watchUserProposals()).thenAnswer(
+        when(
+          () => mockProposalService.watchUserProposals(filters: const ProposalsFiltersV2()),
+        ).thenAnswer(
           (_) => Stream.value(
             [ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef)],
           ),
@@ -159,7 +161,9 @@ void main() {
         );
       },
       build: () {
-        when(() => mockProposalService.watchUserProposals()).thenAnswer(
+        when(
+          () => mockProposalService.watchUserProposals(filters: const ProposalsFiltersV2()),
+        ).thenAnswer(
           (_) => Stream.value([
             ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
             ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
@@ -181,7 +185,7 @@ void main() {
       'watch user proposals - failure',
       build: () {
         when(
-          () => mockProposalService.watchUserProposals(),
+          () => mockProposalService.watchUserProposals(filters: const ProposalsFiltersV2()),
         ).thenAnswer((_) => Stream.error(Exception('Failed to load')));
         return workspaceBloc;
       },
