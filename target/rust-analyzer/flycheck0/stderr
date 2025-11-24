@@ -1,0 +1,18 @@
+    Updating git repository `https://github.com/input-output-hk/catalyst-libs.git`
+    Updating git repository `https://github.com/input-output-hk/catalyst-libs.git`
+    Updating git repository `https://github.com/input-output-hk/catalyst-libs.git`
+    Updating git repository `https://github.com/input-output-hk/catalyst-libs.git`
+    Updating git repository `https://github.com/input-output-hk/catalyst-libs.git`
+    Updating crates.io index
+    Updating git repository `https://github.com/input-output-hk/catalyst-pallas.git`
+error: failed to select a version for `chrono`.
+    ... required by package `catalyst-signed-doc v0.0.10 (https://github.com/input-output-hk/catalyst-libs.git?tag=catalyst-signed-doc%2Fv0.0.10#30325391)`
+    ... which satisfies git dependency `catalyst-signed-doc` of package `cat-gateway v0.1.0 (/home/stefano/work/catalyst-voices/catalyst-gateway/bin)`
+versions that meet the requirements `^0.4.42` are: 0.4.42
+
+all possible versions conflict with previously selected packages.
+
+  previously selected package `chrono v0.4.41`
+    ... which satisfies dependency `chrono = "^0.4.38"` (locked to 0.4.41) of package `cat-gateway v0.1.0 (/home/stefano/work/catalyst-voices/catalyst-gateway/bin)`
+
+failed to select a version for `chrono` which could resolve this conflict
