@@ -5,8 +5,8 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class ProposalAcceptInvitationDialog {
-  static Future<void> show(BuildContext context) {
-    return VoicesDialog.show(
+  static Future<bool?> show(BuildContext context) {
+    return VoicesDialog.show<bool>(
       context: context,
       builder: (context) {
         return VoicesInfoDialog(
@@ -27,8 +27,8 @@ class ProposalAcceptInvitationDialog {
 }
 
 class ProposalRejectInvitationDialog {
-  static Future<void> show(BuildContext context) {
-    return VoicesDialog.show(
+  static Future<bool?> show(BuildContext context) {
+    return VoicesDialog.show<bool>(
       context: context,
       builder: (context) {
         return VoicesInfoDialog(
