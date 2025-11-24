@@ -476,7 +476,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final templateRef = category.proposalTemplateRef;
 
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: templateRef,
+        id: templateRef,
       );
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
@@ -498,7 +498,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final proposalRef = await _proposalService.getLatestProposalVersion(ref: event.proposalId);
+    final proposalRef = await _proposalService.getLatestProposalVersion(id: event.proposalId);
 
     if (state.metadata.documentRef == proposalRef) {
       _logger.info('Loading proposal: $proposalRef ignored, already loaded');
@@ -509,7 +509,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     await _loadState(emit, () async {
       final proposalData = await _proposalService.getProposalDetail(
-        ref: proposalRef,
+        id: proposalRef,
       );
       final versionsIds = proposalData.versions.map((e) => e.id.ver).whereType<String>().toList();
       final proposal = Proposal.fromData(proposalData, versionsIds);
@@ -577,7 +577,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryId);
       final templateRef = category.proposalTemplateRef;
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: templateRef,
+        id: templateRef,
       );
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);

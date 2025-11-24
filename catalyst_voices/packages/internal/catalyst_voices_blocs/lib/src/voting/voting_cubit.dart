@@ -161,7 +161,7 @@ final class VotingCubit extends Cubit<VotingState>
 
     try {
       if (isFavorite) {
-        await _proposalService.addFavoriteProposal(ref: ref);
+        await _proposalService.addFavoriteProposal(id: ref);
       } else {
         await _proposalService.removeFavoriteProposal(ref: ref);
       }

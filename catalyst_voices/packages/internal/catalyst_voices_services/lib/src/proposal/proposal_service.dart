@@ -20,7 +20,7 @@ abstract interface class ProposalService {
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   /// Creates a new proposal draft locally.
@@ -33,7 +33,7 @@ abstract interface class ProposalService {
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
-  Future<void> deleteDraftProposal(DraftRef ref);
+  Future<void> deleteDraftProposal(DraftRef id);
 
   /// Encodes the [document] to exportable format.
   ///
@@ -50,18 +50,18 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
-  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref});
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef id});
 
   Future<DetailProposal> getProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   Future<ProposalDetailData> getProposalDetail({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
@@ -148,8 +148,8 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
-  Future<void> addFavoriteProposal({required DocumentRef ref}) {
-    return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: true);
+  Future<void> addFavoriteProposal({required DocumentRef id}) {
+    return _proposalRepository.updateProposalFavorite(id: id.id, isFavorite: true);
   }
 
   @override
@@ -177,8 +177,8 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> deleteDraftProposal(DraftRef ref) {
-    return _proposalRepository.deleteDraftProposal(ref);
+  Future<void> deleteDraftProposal(DraftRef id) {
+    return _proposalRepository.deleteDraftProposal(id);
   }
 
   @override
@@ -214,10 +214,10 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref}) async {
-    final latest = await _documentRepository.getLatestOf(ref: ref);
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef id}) async {
+    final latest = await _documentRepository.getLatestOf(id: id);
     if (latest == null) {
-      throw DocumentNotFoundException(ref: ref);
+      throw DocumentNotFoundException(ref: id);
     }
 
     return latest;
@@ -225,17 +225,17 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DetailProposal> getProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   }) async {
-    final proposalData = await _proposalRepository.getProposal(ref: ref);
+    final proposalData = await _proposalRepository.getProposal(ref: id);
     final versions = await _getDetailVersionsOfProposal(proposalData);
 
     return DetailProposal.fromData(proposalData, versions);
   }
 
   @override
-  Future<ProposalDetailData> getProposalDetail({required DocumentRef ref}) async {
-    final proposalData = await _proposalRepository.getProposal(ref: ref);
+  Future<ProposalDetailData> getProposalDetail({required DocumentRef id}) async {
+    final proposalData = await _proposalRepository.getProposal(ref: id);
     final version = await _getDetailVersionsOfProposal(proposalData);
 
     return ProposalDetailData(
@@ -248,10 +248,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef id,
   }) async {
     final proposalTemplate = await _proposalRepository.getProposalTemplate(
-      ref: ref,
+      ref: id,
     );
 
     return proposalTemplate;

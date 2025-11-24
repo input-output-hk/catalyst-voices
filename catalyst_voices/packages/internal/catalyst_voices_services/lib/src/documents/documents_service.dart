@@ -21,10 +21,10 @@ abstract interface class DocumentsService {
   /// if [keepLocalDrafts] is true local drafts and their templates will be kept.
   Future<int> clear({bool keepLocalDrafts});
 
-  Future<bool> isFavorite(DocumentRef ref);
+  Future<bool> isFavorite(DocumentRef id);
 
-  /// Returns all matching [DocumentData] for given [ref].
-  Future<List<DocumentData>> lookup(DocumentRef ref);
+  /// Returns all matching [DocumentData] for given [id].
+  Future<List<DocumentData>> lookup(DocumentRef id);
 
   /// Syncs locally stored documents with api.
   ///
@@ -59,13 +59,13 @@ final class DocumentsServiceImpl implements DocumentsService {
   }
 
   @override
-  Future<bool> isFavorite(DocumentRef ref) {
-    return _documentRepository.isFavorite(ref);
+  Future<bool> isFavorite(DocumentRef id) {
+    return _documentRepository.isFavorite(id);
   }
 
   @override
-  Future<List<DocumentData>> lookup(DocumentRef ref) {
-    return _documentRepository.findAllVersions(ref: ref);
+  Future<List<DocumentData>> lookup(DocumentRef id) {
+    return _documentRepository.findAllVersions(id: id);
   }
 
   @override
@@ -267,18 +267,18 @@ final class DocumentsServiceImpl implements DocumentsService {
     Set<DocumentBaseType> exclude,
     Set<String> excludeIds,
   ) async {
-    final refs = index.docs
+    final ids = index.docs
         .map((e) => e.refs(exclude: exclude))
         .expand((refs) => refs)
         .where((ref) => !excludeIds.contains(ref.id))
         .toSet()
         .toList();
 
-    final cachedRefs = await _documentRepository.isCachedBulk(refs: refs);
+    final cachedRefs = await _documentRepository.isCachedBulk(ids: ids);
 
-    refs.removeWhere(cachedRefs.contains);
+    ids.removeWhere(cachedRefs.contains);
 
-    return refs.toList();
+    return ids.toList();
   }
 
   /// Fetches the [DocumentData] for a list of [SignedDocumentRef]s concurrently.
@@ -299,7 +299,7 @@ final class DocumentsServiceImpl implements DocumentsService {
       (ref) {
         return pool.withResource(() {
           return _documentRepository
-              .getDocumentData(ref: ref, useCache: false)
+              .getDocumentData(id: ref, useCache: false)
               .then<Result<DocumentData, RefSyncException>>(Success.new)
               .onError((error, stack) {
                 return Failure(RefSyncException(ref, source: error));

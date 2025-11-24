@@ -12,14 +12,14 @@ abstract interface class DocumentsV2Dao {
   /// Counts the number of documents matching the provided filters.
   ///
   /// [type] filters by the document type (e.g., proposal, comment).
-  /// [ref] filters by the document's own identity.
+  /// [id] filters by the document's own identity.
   ///   - If [DocumentRef.isExact], counts matches for that specific version.
   ///   - If [DocumentRef.isLoose], counts all versions of that document ID.
   /// [referencing] filters documents that *reference* the given target.
   ///   - Example: Count all comments ([type]=comment) that point to proposal X ([referencing]=X).
   Future<int> count({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   });
 
@@ -36,17 +36,17 @@ abstract interface class DocumentsV2Dao {
 
   /// Checks if a document exists in the database.
   ///
-  /// [ref] determines the scope of the check:
+  /// [id] determines the scope of the check:
   /// - [SignedDocumentRef.exact]: Returns true only if that specific version exists.
   /// - [SignedDocumentRef.loose]: Returns true if *any* version of that ID exists.
-  Future<bool> exists(DocumentRef ref);
+  Future<bool> exists(DocumentRef id);
 
   /// Filters a list of references, returning only those that exist in the database.
   ///
   /// This is useful for bulk validation.
   /// - For exact refs, it checks for exact matches.
   /// - For loose refs, it checks if any version of the ID exists.
-  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> ids);
 
   /// Retrieves a single document matching the criteria.
   ///
@@ -56,7 +56,7 @@ abstract interface class DocumentsV2Dao {
   /// Returns `null` if no matching document is found.
   Future<DocumentEntityV2?> getDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
   });
@@ -72,7 +72,7 @@ abstract interface class DocumentsV2Dao {
   /// (usually `createdAt` DESC) to ensure stable pagination.
   Future<List<DocumentEntityV2>> getDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly,
@@ -82,11 +82,11 @@ abstract interface class DocumentsV2Dao {
 
   /// Finds the latest version of a document given a reference.
   ///
-  /// Even if [ref] points to an older version (exact), this method will find
+  /// Even if [id] points to an older version (exact), this method will find
   /// the version with the newest [DocumentEntityV2.createdAt] timestamp for that [DocumentRef.id].
   ///
   /// Returns `null` if the document ID does not exist in the database.
-  Future<DocumentRef?> getLatestOf(DocumentRef ref);
+  Future<DocumentRef?> getLatestOf(DocumentRef id);
 
   /// Saves a single document and its associated authors.
   ///
@@ -105,7 +105,7 @@ abstract interface class DocumentsV2Dao {
   /// affects the count.
   Stream<int> watchCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   });
 
@@ -115,7 +115,7 @@ abstract interface class DocumentsV2Dao {
   /// inserted, updated, or deleted.
   Stream<DocumentEntityV2?> watchDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
   });
@@ -129,7 +129,7 @@ abstract interface class DocumentsV2Dao {
   /// as the query is re-run on every write to the `documents_v2` table.
   Stream<List<DocumentEntityV2>> watchDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly,
@@ -152,12 +152,12 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<int> count({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _queryCount(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
     ).getSingle().then((value) => value ?? 0);
   }
@@ -176,13 +176,13 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<bool> exists(DocumentRef ref) {
+  Future<bool> exists(DocumentRef id) {
     final query = selectOnly(documentsV2)
       ..addColumns([const Constant(1)])
-      ..where(documentsV2.id.equals(ref.id));
+      ..where(documentsV2.id.equals(id.id));
 
-    if (ref.isExact) {
-      query.where(documentsV2.ver.equals(ref.ver!));
+    if (id.isExact) {
+      query.where(documentsV2.ver.equals(id.ver!));
     }
 
     query.limit(1);
@@ -191,10 +191,10 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) async {
-    if (refs.isEmpty) return [];
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> ids) async {
+    if (ids.isEmpty) return [];
 
-    final uniqueIds = refs.map((ref) => ref.id).toSet();
+    final uniqueIds = ids.map((ref) => ref.id).toSet();
 
     // Single query: Fetch all (id, ver) for matching ids
     final query = selectOnly(documentsV2)
@@ -218,7 +218,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    return refs.where((ref) {
+    return ids.where((ref) {
       final vers = idToVers[ref.id];
       if (vers == null || vers.isEmpty) return false;
 
@@ -229,13 +229,13 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<DocumentEntityV2?> getDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
   }) {
     return _queryDocument(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
       author: author,
     ).getSingleOrNull();
@@ -244,7 +244,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<List<DocumentEntityV2>> getDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly = false,
@@ -253,7 +253,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }) {
     return _queryDocuments(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
       filters: filters,
       latestOnly: latestOnly,
@@ -263,10 +263,10 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<DocumentRef?> getLatestOf(DocumentRef ref) {
+  Future<DocumentRef?> getLatestOf(DocumentRef id) {
     final query = selectOnly(documentsV2)
       ..addColumns([documentsV2.id, documentsV2.ver])
-      ..where(documentsV2.id.equals(ref.id))
+      ..where(documentsV2.id.equals(id.id))
       ..orderBy([OrderingTerm.desc(documentsV2.createdAt)])
       ..limit(1);
 
@@ -310,12 +310,12 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Stream<int> watchCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _queryCount(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
     ).watchSingle().map((value) => value ?? 0);
   }
@@ -323,13 +323,13 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Stream<DocumentEntityV2?> watchDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
   }) {
     return _queryDocument(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
       author: author,
     ).watchSingleOrNull();
@@ -338,7 +338,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Stream<List<DocumentEntityV2>> watchDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly = false,
@@ -347,7 +347,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }) {
     return _queryDocuments(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
       filters: filters,
       latestOnly: latestOnly,
@@ -358,7 +358,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   Selectable<int?> _queryCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     final count = countAll();
@@ -368,11 +368,11 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where(documentsV2.type.equalsValue(type));
     }
 
-    if (ref != null) {
-      query.where(documentsV2.id.equals(ref.id));
+    if (id != null) {
+      query.where(documentsV2.id.equals(id.id));
 
-      if (ref.isExact) {
-        query.where(documentsV2.ver.equals(ref.ver!));
+      if (id.isExact) {
+        query.where(documentsV2.ver.equals(id.ver!));
       }
     }
 
@@ -389,17 +389,17 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   Selectable<DocumentEntityV2> _queryDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
   }) {
     final query = select(documentsV2);
 
-    if (ref != null) {
-      query.where((tbl) => tbl.id.equals(ref.id));
+    if (id != null) {
+      query.where((tbl) => tbl.id.equals(id.id));
 
-      if (ref.isExact) {
-        query.where((tbl) => tbl.ver.equals(ref.ver!));
+      if (id.isExact) {
+        query.where((tbl) => tbl.ver.equals(id.ver!));
       }
     }
 
@@ -438,7 +438,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   SimpleSelectStatement<$DocumentsV2Table, DocumentEntityV2> _queryDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     required bool latestOnly,
@@ -452,11 +452,11 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.type.equalsValue(type));
     }
 
-    if (ref != null) {
-      query.where((tbl) => tbl.id.equals(ref.id));
+    if (id != null) {
+      query.where((tbl) => tbl.id.equals(id.id));
 
-      if (ref.isExact) {
-        query.where((tbl) => tbl.ver.equals(ref.ver!));
+      if (id.isExact) {
+        query.where((tbl) => tbl.ver.equals(id.ver!));
       }
     }
 
@@ -472,7 +472,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
     }
 
-    if (latestOnly && ref?.ver == null) {
+    if (latestOnly && id?.ver == null) {
       final inner = alias(documentsV2, 'inner');
 
       query.where((tbl) {

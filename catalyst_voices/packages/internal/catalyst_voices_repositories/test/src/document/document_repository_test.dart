@@ -75,7 +75,7 @@ void main() {
         // When
         final ref = proposal.id;
         final proposalDocument = await repository.getDocumentData(
-          ref: ref,
+          id: ref,
         );
 
         // Then
@@ -107,7 +107,7 @@ void main() {
         // When
         final ref = proposal.id;
         final proposalDocumentFuture = repository.getDocumentData(
-          ref: ref,
+          id: ref,
         );
 
         // Then
@@ -136,8 +136,8 @@ void main() {
           when(() => remoteDocuments.get(ref)).thenAnswer((_) => Future.value(documentData));
 
           // When
-          await repository.getDocumentData(ref: ref);
-          await repository.getDocumentData(ref: ref);
+          await repository.getDocumentData(id: ref);
+          await repository.getDocumentData(id: ref);
 
           // Then
           verify(() => remoteDocuments.get(ref)).called(1);
@@ -166,7 +166,7 @@ void main() {
           ).thenAnswer((_) => Future.value(documentData));
 
           // When
-          await repository.getDocumentData(ref: ref);
+          await repository.getDocumentData(id: ref);
 
           // Then
           verify(() => remoteDocuments.getLatestVersion(id)).called(1);
@@ -284,7 +284,7 @@ void main() {
 
             // Then
             final savedDocumentData = await repository.getDocumentData(
-              ref: documentDataToSave.metadata.id,
+              id: documentDataToSave.metadata.id,
             );
 
             expect(savedDocumentData, equals(documentDataToSave));

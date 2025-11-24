@@ -86,7 +86,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       emit(state.copyWith(isLoading: true));
 
-      final proposal = await _proposalService.getProposalDetail(ref: ref);
+      final proposal = await _proposalService.getProposalDetail(id: ref);
       final category = await _campaignService.getCategory(proposal.document.metadata.categoryId);
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: proposal.document.metadata.categoryId,
@@ -255,7 +255,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     emit(state.copyWithFavorite(isFavorite: value));
 
     if (value) {
-      await _proposalService.addFavoriteProposal(ref: ref!);
+      await _proposalService.addFavoriteProposal(id: ref!);
     } else {
       await _proposalService.removeFavoriteProposal(ref: ref!);
     }

@@ -58,7 +58,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final category = await _campaignService.getCategory(categoryId);
       final templateRef = category.proposalTemplateRef;
       final template = await _proposalService.getProposalTemplate(
-        ref: templateRef,
+        id: templateRef,
       );
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
@@ -196,7 +196,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
         ?.proposalTemplateRef;
 
     final template = templateRef != null
-        ? await _proposalService.getProposalTemplate(ref: templateRef)
+        ? await _proposalService.getProposalTemplate(id: templateRef)
         : null;
     final titleRange = template?.title?.strLengthRange;
 

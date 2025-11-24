@@ -26,7 +26,7 @@ final class VotingMockService implements VotingService {
 
   @override
   Future<VoteProposal> getVoteProposal(DocumentRef proposalRef) async {
-    final proposal = await _proposalService.getProposal(ref: proposalRef);
+    final proposal = await _proposalService.getProposal(id: proposalRef);
     final lastCastedVote = await getProposalLastCastedVote(proposalRef);
 
     final category = _cacheCampaign!.categories.firstWhere(

@@ -43,7 +43,7 @@ final class DocumentsCommentRepository implements CommentRepository {
   Future<CommentTemplate> getCommentTemplate({
     required SignedDocumentRef ref,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(ref: ref);
+    final documentData = await _documentRepository.getDocumentData(id: ref);
 
     return _buildCommentTemplate(documentData: documentData);
   }

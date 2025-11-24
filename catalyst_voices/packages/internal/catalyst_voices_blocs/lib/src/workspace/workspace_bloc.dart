@@ -103,7 +103,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   Future<void> _exportProposal(ExportProposal event, Emitter<WorkspaceState> emit) async {
     try {
-      final docData = await _proposalService.getProposalDetail(ref: event.ref);
+      final docData = await _proposalService.getProposalDetail(id: event.ref);
 
       final docMetadata = _buildDocumentMetadata(docData.document);
       final documentContent = _buildDocumentContent(docData.document.document);
