@@ -5,7 +5,7 @@ use std::{cmp::min, time::Duration};
 use cardano_chain_follower::{ChainSyncConfig, Network, turbo_downloader::DlConfig};
 use tracing::info;
 
-use super::str_env_var::{StringEnvVar, StringEnvVarParams};
+use super::str_env_var::StringEnvVar;
 
 /// Default chain to follow.
 const DEFAULT_NETWORK: NetworkFromStr = NetworkFromStr::Mainnet;
@@ -84,17 +84,14 @@ const DEFAULT_DEVNET_SHELLEY_KNOWN_TIME: u64 = 1_595_967_616;
 /// Configuration for the chain follower.
 #[derive(Clone)]
 pub(crate) struct EnvVars {
-    /// The Blockchain we sync from.
-    pub(crate) chain: Network,
+    /// Cardano chain follower config
+    pub(crate) cfg: ChainSyncConfig,
 
     /// The maximum number of sync tasks.
     pub(crate) sync_tasks: u16,
 
     /// The maximum number of slots a sync task will process at once.
     pub(crate) sync_chunk_max_slots: u64,
-
-    /// The Mithril Downloader Configuration.
-    pub(crate) dl_config: DlConfig,
 }
 
 #[derive(strum::EnumString, strum::VariantNames, strum::Display)]
@@ -120,10 +117,7 @@ impl From<NetworkFromStr> for Network {
             NetworkFromStr::Devnet => {
                 let genesis_key = StringEnvVar::new(
                     "CHAIN_FOLLOWER_DEVNET_GENESIS_KEY",
-                    StringEnvVarParams::Plain(
-                        "DEFAULT_DEVNET_GENESIS_KEY".into(),
-                        DEFAULT_DEVNET_GENESIS_KEY.to_string().into(),
-                    ),
+                    DEFAULT_DEVNET_GENESIS_KEY.into(),
                 );
                 let magic = StringEnvVar::new_as_int(
                     "CHAIN_FOLLOWER_DEVNET_MAGIC",
@@ -157,10 +151,7 @@ impl From<NetworkFromStr> for Network {
                 );
                 let byron_known_hash = StringEnvVar::new(
                     "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_HASH",
-                    StringEnvVarParams::Plain(
-                        "DEFAULT_DEVNET_BYRON_KNOWN_HASH".into(),
-                        DEFAULT_DEVNET_BYRON_KNOWN_HASH.to_string().into(),
-                    ),
+                    DEFAULT_DEVNET_BYRON_KNOWN_HASH.into(),
                 );
                 let byron_known_time = StringEnvVar::new_as_int(
                     "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_TIME",
@@ -188,10 +179,7 @@ impl From<NetworkFromStr> for Network {
                 );
                 let shelley_known_hash = StringEnvVar::new(
                     "CHAIN_FOLLOWER_DEVNET_SHELLEY_KNOWN_HASH",
-                    StringEnvVarParams::Plain(
-                        "DEFAULT_DEVNET_SHELLEY_KNOWN_HASH".into(),
-                        DEFAULT_DEVNET_SHELLEY_KNOWN_HASH.to_string().into(),
-                    ),
+                    DEFAULT_DEVNET_SHELLEY_KNOWN_HASH.into(),
                 );
                 let shelley_known_time = StringEnvVar::new_as_int(
                     "CHAIN_FOLLOWER_DEVNET_SHELLEY_KNOWN_TIME",
@@ -199,7 +187,6 @@ impl From<NetworkFromStr> for Network {
                     0,
                     u64::MAX,
                 );
-
                 Self::Devnet {
                     genesis_key: genesis_key.as_string(),
                     magic,
@@ -240,8 +227,33 @@ impl EnvVars {
             MAX_SYNC_MAX_SLOTS,
         );
 
-        let cfg = ChainSyncConfig::default_for(chain.clone());
-        let mut dl_config = cfg.mithril_cfg.dl_config.clone().unwrap_or_default();
+        let mut cfg = ChainSyncConfig::default_for(chain.clone());
+
+        cfg.mithril_cfg = cfg
+            .mithril_cfg
+            .with_dl_config(Self::new_mithril_dl_config());
+
+        if let Some(relay_address) =
+            StringEnvVar::new_optional("CHAIN_FOLLOWER_RELAY_ADDRESS", false)
+        {
+            cfg = cfg.relay(relay_address.as_string());
+        }
+        if let Some(mithril_aggregator_url) =
+            StringEnvVar::new_optional("CHAIN_FOLLOWER_MITHRIL_AGGREGATOR_URL", false)
+        {
+            cfg.mithril_cfg.aggregator_url = mithril_aggregator_url.as_string();
+        }
+
+        Self {
+            cfg,
+            sync_tasks,
+            sync_chunk_max_slots: sync_slots,
+        }
+    }
+
+    /// Setting up a Mithril `DlConfig` from the env vars.
+    fn new_mithril_dl_config() -> DlConfig {
+        let mut dl_config = DlConfig::new();
 
         let workers = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_DL_CONNECTIONS",
@@ -305,21 +317,19 @@ impl EnvVars {
         } else {
             dl_config = dl_config.with_data_read_timeout(Duration::from_secs(dl_data_timeout));
         }
+        dl_config
+    }
 
-        Self {
-            chain,
-            sync_tasks,
-            sync_chunk_max_slots: sync_slots,
-            dl_config,
-        }
+    /// Returns the configured Network
+    pub(crate) fn chain(&self) -> &Network {
+        &self.cfg.chain
     }
 
     /// Log the configuration of this Chain Follower
     pub(crate) fn log(&self) {
         info!(
-            chain = self.chain.to_string(),
+            cfg = ?self.cfg,
             sync_tasks = self.sync_tasks,
-            dl_config = ?self.dl_config,
             "Chain Follower Configuration"
         );
     }

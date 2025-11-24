@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -118,6 +120,8 @@ abstract interface class ProposalService {
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   });
+
+  Future<bool> validateForCollaborator(CatalystId id);
 
   /// Fetches favorites proposals ids of the user
   Stream<List<String>> watchFavoritesProposalsIds();
@@ -496,6 +500,14 @@ final class ProposalServiceImpl implements ProposalService {
         content: content,
       ),
     );
+  }
+
+  @override
+  Future<bool> validateForCollaborator(CatalystId id) async {
+    // TODO(LynxLynxx): Add implementation
+    return Future.delayed(const Duration(seconds: 1), () {
+      return Random().nextBool();
+    });
   }
 
   @override
