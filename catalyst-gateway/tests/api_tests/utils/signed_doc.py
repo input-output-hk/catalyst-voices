@@ -281,17 +281,23 @@ def proposal_form_template_doc_factory(
                 "Invalid parameter type for proposal form template document"
             )
 
-        metadata = create_metadata(
+        tmp_metadata = create_metadata(
             DOC_TYPE["proposal_form_template"],
             None,
             [
                 {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
         )
+
         with open(
             "./test_data/signed_docs/proposal_form_template.json", "r"
         ) as json_file:
-            _, content = json.load(json_file)
+            metadata, content = json.load(json_file)
+
+        metadata["id"] = tmp_metadata["id"]
+        metadata["ver"] = tmp_metadata["ver"]
+        metadata["templates"] = tmp_metadata["templates"]
+
         result = generic_doc_builder(
             rbac_chain_factory(),
             metadata,
