@@ -73,7 +73,9 @@ melos:
 
     l10n:
       run: |
-        melos exec --scope="catalyst_voices_localization" -- flutter gen-l10n
+        melos exec --scope="catalyst_voices_localization" -- flutter gen-l10n && \
+        cd packages/internal/catalyst_voices_localization && \
+        dart lib/src/manage_l10n.dart --sort
       description: |
         Run `flutter gen-l10n` in catalyst_voices_localization package to generate l10n bindings.
 
