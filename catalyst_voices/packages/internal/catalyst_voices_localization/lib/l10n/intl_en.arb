@@ -1296,21 +1296,75 @@
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
   },
-  "errorWalletLinkAccountChange": "Wallet account change",
+  "errorWalletLinkAccountChange": "Wallet account has changed.",
   "@errorWalletLinkAccountChange": {
     "description": "Error message shown when wallet account has changed"
   },
-  "errorWalletLinkInternalError": "Wallet authorisation internal error",
+  "errorWalletLinkInternalError": "Wallet error occurred during execution of this API call.",
   "@errorWalletLinkInternalError": {
     "description": "Error message shown when internal error occurs during wallet authorization"
   },
-  "errorWalletLinkInvalidRequest": "Wallet authorisation invalid request",
+  "errorWalletLinkInvalidRequest": "Wallet inputs do not conform to this spec or are otherwise invalid.",
   "@errorWalletLinkInvalidRequest": {
     "description": "Error message shown when wallet authorization request is invalid"
   },
-  "errorWalletLinkRefused": "Wallet authorisation failed",
+  "errorWalletLinkInvalidRequestCode": "Wallet request failed with code {code}.",
+  "@errorWalletLinkInvalidRequestCode": {
+    "description": "Error message shown when wallet authorization request is invalid",
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "errorWalletLinkRefused": "The wallet request was refused due to lack of access.",
   "@errorWalletLinkRefused": {
     "description": "Error message shown when wallet authorization is refused"
+  },
+  "errorWalletTxSendRefused": "Wallet refuses to send the tx (could be rate limiting).",
+  "@errorWalletTxSendRefused": {
+    "description": "Error message shown when wallet throws TxSend exception"
+  },
+  "errorWalletTxSendFailure": "Wallet could not send the tx.",
+  "@errorWalletTxSendFailure": {
+    "description": "Error message shown when wallet throws TxSend exception"
+  },
+  "errorWalletTxSignProofGeneration": "Wallet was unable to sign the transaction.",
+  "@errorWalletTxSignProofGeneration": {
+    "description": "Error message shown when wallet throws TxSign exception"
+  },
+  "errorWalletTxSignUserDeclined": "Transaction declined.",
+  "@errorWalletTxSignUserDeclined": {
+    "description": "Error message shown when wallet throws TxSign exception"
+  },
+  "errorWalletTxSignDepreciatedCertificate": "Transaction contains depreciated certificate.",
+  "@errorWalletTxSignDepreciatedCertificate": {
+    "description": "Error message shown when wallet throws TxSign exception"
+  },
+  "errorWalletDataSignProofGeneration": "Wallet was unable to sign the data.",
+  "@errorWalletDataSignProofGeneration": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletDataSignAddressNotPk": "Wallet was unable to sign the data because of address format.",
+  "@errorWalletDataSignAddressNotPk": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletDataSignUserDeclined": "Transaction declined.",
+  "@errorWalletDataSignUserDeclined": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletPaginationMaxSize": "Wallet pagination max size({maxSize}) exceeded.",
+  "@errorWalletPaginationMaxSize": {
+    "description": "Error message shown when wallet throws DataSign exception",
+    "placeholders": {
+      "maxSize": {
+        "type": "int"
+      }
+    }
+  },
+  "errorCardanoWalletUnknown": "Wallet failed unexpectedly.",
+  "@errorCardanoWalletUnknown": {
+    "description": "Generic wallet exception"
   },
   "eternlWallet": "Eternl Wallet",
   "@eternlWallet": {
@@ -2853,10 +2907,6 @@
   "registrationSeedPhraseNotFound": "Seed phrase was not found. Make sure correct words are correct.",
   "@registrationSeedPhraseNotFound": {
     "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
-  },
-  "registrationTransactionFailed": "Transaction failed",
-  "@registrationTransactionFailed": {
-    "description": "Indicates an error when submitting a registration transaction failed."
   },
   "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 {currency}), be sure your wallet has a minimum of {money}.",
   "@registrationTransactionFeeDescription": {

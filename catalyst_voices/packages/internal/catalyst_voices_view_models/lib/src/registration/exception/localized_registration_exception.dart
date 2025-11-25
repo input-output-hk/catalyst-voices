@@ -47,14 +47,10 @@ sealed class LocalizedRegistrationException extends LocalizedException {
   const LocalizedRegistrationException();
 
   /// Creates a subclass of [LocalizedException] matching the [exception].
-  factory LocalizedRegistrationException.from(
-    RegistrationException exception,
-  ) {
+  factory LocalizedRegistrationException.from(RegistrationException exception) {
     return switch (exception) {
       RegistrationInsufficientBalanceException() =>
         const LocalizedRegistrationInsufficientBalanceException(),
-      RegistrationTransactionException() => const LocalizedRegistrationTransactionException(),
-      RegistrationUnknownException() => const LocalizedRegistrationUnknownException(),
       RegistrationNetworkIdMismatchException(:final targetNetworkId) =>
         LocalizedRegistrationNetworkIdMismatchException(
           targetNetworkId: targetNetworkId,
@@ -66,6 +62,16 @@ sealed class LocalizedRegistrationException extends LocalizedException {
       RegistrationMissingRequiredSignerException(:final missingRequiredSigners) =>
         LocalizedRegistrationOutputPublicKeyHashNotInRequiredSigner(missingRequiredSigners),
     };
+  }
+
+  static LocalizedException create(Object exception) {
+    if (exception is RegistrationException) return LocalizedRegistrationException.from(exception);
+    if (exception is CardanoWalletException) return LocalizedWalletException.from(exception);
+
+    return LocalizedException.create(
+      exception,
+      fallback: LocalizedRegistrationUnknownException.new,
+    );
   }
 }
 
@@ -120,14 +126,6 @@ final class LocalizedRegistrationSeedPhraseNotFoundException
 
   @override
   String message(BuildContext context) => context.l10n.registrationSeedPhraseNotFound;
-}
-
-/// An exception thrown when submitting a registration transaction fails.
-final class LocalizedRegistrationTransactionException extends LocalizedRegistrationException {
-  const LocalizedRegistrationTransactionException();
-
-  @override
-  String message(BuildContext context) => context.l10n.registrationTransactionFailed;
 }
 
 /// A generic error for describing a failure during user registration.
@@ -208,23 +206,5 @@ final class LocalizedUnlockPasswordNotFoundException extends LocalizedRegistrati
   @override
   String message(BuildContext context) {
     return context.l10n.registrationSaveProgressUnlockPasswordNotFoundException;
-  }
-}
-
-final class LocalizedWalletLinkException extends LocalizedRegistrationException {
-  final WalletApiErrorCode code;
-
-  LocalizedWalletLinkException({
-    required this.code,
-  });
-
-  @override
-  String message(BuildContext context) {
-    return switch (code) {
-      WalletApiErrorCode.invalidRequest => context.l10n.errorWalletLinkInvalidRequest,
-      WalletApiErrorCode.internalError => context.l10n.errorWalletLinkInternalError,
-      WalletApiErrorCode.refused => context.l10n.errorWalletLinkRefused,
-      WalletApiErrorCode.accountChange => context.l10n.errorWalletLinkAccountChange,
-    };
   }
 }
