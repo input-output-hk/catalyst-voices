@@ -135,4 +135,5 @@ browser_extensions/
 # Playwright
 /browser-profiles/
 
+# Rust analyzer
 /target

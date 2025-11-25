@@ -28,6 +28,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   final DocumentMapper _documentMapper;
   final VotingBallotBuilder _ballotBuilder;
   final VotingService _votingService;
+  final FeatureFlagsService _featureFlagsService;
 
   ProposalCubitCache _cache = const ProposalCubitCache();
 
@@ -43,12 +44,13 @@ final class ProposalCubit extends Cubit<ProposalState>
     this._documentMapper,
     this._ballotBuilder,
     this._votingService,
+    this._featureFlagsService,
   ) : super(const ProposalState()) {
     _cache = _cache.copyWith(
       activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
     );
-    _activeAccountIdSub = _userService.watchUser
-        .map((event) => event.activeAccount?.catalystId)
+    _activeAccountIdSub = _userService.watchUnlockedActiveAccount
+        .map((activeAccount) => activeAccount?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChanged);
   }
@@ -77,7 +79,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       final isReadOnlyMode = await _isReadOnlyMode();
       final campaign = await _campaignService.getActiveCampaign();
       final isVotingStage = _isVotingStage(campaign);
-      final showComments = campaign?.supportsComments ?? false;
+      final showComments = campaign != null && !isVotingStage;
       _logger.info('Loading $ref');
 
       _cache = _cache.copyWith(ref: Optional.of(ref));
@@ -496,8 +498,9 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   bool _isVotingStage(Campaign? campaign) {
-    final votingState = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
-    return votingState?.status.isActive ?? false;
+    if (!_featureFlagsService.isEnabled(Features.voting)) return false;
+
+    return campaign?.isVotingStateActive ?? false;
   }
 
   ProposalViewData _rebuildProposalState() {
