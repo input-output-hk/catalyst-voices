@@ -5,7 +5,7 @@ from api.v2 import document as document_v2
 from utils.rbac_chain import rbac_chain_factory
 from utils.signed_doc import (
     proposal_doc_factory,
-    proposal_form_template_doc,
+    proposal_form_template_doc_factory,
     category_parameters_doc,
     category_parameters_form_template_doc,
     campaign_parameters_doc,

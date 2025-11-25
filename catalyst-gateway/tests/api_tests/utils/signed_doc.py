@@ -207,7 +207,7 @@ class ProposalParameterType(IntEnum):
 @pytest.fixture
 def proposal_doc_factory(
     rbac_chain_factory,
-    proposal_form_template_doc,
+    proposal_form_template_doc_factory,
     category_parameters_doc,
     campaign_parameters_doc,
     brand_parameters_doc,
@@ -225,7 +225,9 @@ def proposal_doc_factory(
         else:
             raise Exception("Invalid parameter type for proposal document")
 
-        template: SignedDocumentBase = proposal_form_template_doc
+        template: SignedDocumentBase = proposal_form_template_doc_factory(
+            parameter_type
+        )
 
         metadata = create_metadata(
             DOC_TYPE["proposal"],
@@ -260,24 +262,55 @@ def proposal_doc_factory(
 
 
 @pytest.fixture
-def proposal_form_template_doc(rbac_chain_factory) -> SignedDocumentBase:
-    role_id = RoleID.PROPOSER
-    with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
-        metadata, content = json.load(json_file)
+def proposal_form_template_doc_factory(
+    rbac_chain_factory,
+    category_parameters_doc,
+    campaign_parameters_doc,
+    brand_parameters_doc,
+):
+    def __factory__(parameter_type: ProposalParameterType):
+        param: SignedDocumentBase
+        if parameter_type == ProposalParameterType.CATEGORY:
+            param = category_parameters_doc
+        elif parameter_type == ProposalParameterType.CAMPAIGN:
+            param = campaign_parameters_doc
+        elif parameter_type == ProposalParameterType.BRAND:
+            param = brand_parameters_doc
+        else:
+            raise Exception(
+                "Invalid parameter type for proposal form template document"
+            )
 
-    doc_builder = SignedDocument(metadata, content)
-    rbac_chain = rbac_chain_factory()
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        metadata = create_metadata(
+            DOC_TYPE["proposal_form_template"],
+            None,
+            [
+                {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
+            ],
+        )
+        with open(
+            "./test_data/signed_docs/proposal_form_template.json", "r"
+        ) as json_file:
+            _, content = json.load(json_file)
+        result = generic_doc_builder(
+            rbac_chain_factory(),
+            metadata,
+            content,
+        )
 
-    resp = document.put(
-        data=doc_builder.build_and_sign(cat_id, sk_hex),
-        token=rbac_chain.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
+        resp = document.put(
+            data=result.signed_doc,
+            token=result.auth_token,
+        )
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
-    return SignedDocumentBase(metadata, content)
+        return SignedDocumentBase(
+            result.doc_builder.metadata, result.doc_builder.content
+        )
+
+    return __factory__
 
 
 @pytest.fixture
