@@ -566,7 +566,7 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   // TODO(LynxLynxx): Apply filters to the proposals
-  // TODO(LynxLynxx): we can't use watchProposalsBriefPageV2 as we need aditional information about
+  // TODO(LynxLynxx): we can't use watchProposalsBriefPageV2 as we need additional information about
   // other versions of proposals which ProposalBriefData doesn't have
   @override
   Stream<List<DetailProposal>> watchUserProposals({
