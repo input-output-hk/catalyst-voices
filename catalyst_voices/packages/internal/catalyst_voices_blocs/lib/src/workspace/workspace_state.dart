@@ -9,6 +9,7 @@ final class WorkspaceState extends Equatable {
   final WorkspaceStateUserProposals userProposals;
   final WorkspaceStateProposalInvites userProposalInvites;
   final List<CampaignTimelineViewModel> timelineItems;
+  final WorkspaceStateProposalInvitesCount proposalInvitesCount;
   final int fundNumber;
 
   const WorkspaceState({
@@ -16,6 +17,7 @@ final class WorkspaceState extends Equatable {
     this.error,
     this.userProposals = const WorkspaceStateUserProposals(),
     this.userProposalInvites = const WorkspaceStateProposalInvites(),
+    this.proposalInvitesCount = const WorkspaceStateProposalInvitesCount(),
     this.timelineItems = const [],
     this.fundNumber = 0,
   });
@@ -29,6 +31,7 @@ final class WorkspaceState extends Equatable {
     error,
     userProposals,
     userProposalInvites,
+    proposalInvitesCount,
     timelineItems,
     fundNumber,
   ];
@@ -47,6 +50,7 @@ final class WorkspaceState extends Equatable {
     Optional<LocalizedException>? error,
     WorkspaceStateUserProposals? userProposals,
     WorkspaceStateProposalInvites? userProposalInvites,
+    WorkspaceStateProposalInvitesCount? proposalInvitesCount,
     List<CampaignTimelineViewModel>? timelineItems,
     int? fundNumber,
   }) {
@@ -55,6 +59,7 @@ final class WorkspaceState extends Equatable {
       error: error.dataOr(this.error),
       userProposals: userProposals ?? this.userProposals,
       userProposalInvites: userProposalInvites ?? this.userProposalInvites,
+      proposalInvitesCount: proposalInvitesCount ?? this.proposalInvitesCount,
       timelineItems: timelineItems ?? this.timelineItems,
       fundNumber: fundNumber ?? this.fundNumber,
     );
@@ -83,6 +88,33 @@ final class WorkspaceStateProposalInvites extends Equatable {
 
   @override
   List<Object?> get props => [pendingInvites];
+}
+
+final class WorkspaceStateProposalInvitesCount extends Equatable {
+  final int invitesCount;
+  final int proposalCount;
+
+  const WorkspaceStateProposalInvitesCount({this.invitesCount = 0, this.proposalCount = 0});
+
+  @override
+  List<Object?> get props => [];
+
+  WorkspaceStateProposalInvitesCount copyWith({
+    int? invitesCount,
+    int? proposalCount,
+  }) {
+    return WorkspaceStateProposalInvitesCount(
+      invitesCount: invitesCount ?? this.invitesCount,
+      proposalCount: proposalCount ?? this.proposalCount,
+    );
+  }
+
+  int ofType(WorkspacePageTab tab) {
+    return switch (tab) {
+      WorkspacePageTab.proposals => proposalCount,
+      WorkspacePageTab.proposalInvites => invitesCount,
+    };
+  }
 }
 
 final class WorkspaceStateUserProposals extends Equatable {

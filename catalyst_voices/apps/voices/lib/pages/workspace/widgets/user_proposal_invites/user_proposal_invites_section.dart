@@ -35,7 +35,7 @@ class _PendingProposalInvites extends StatelessWidget {
         child: EmptyState(
           title: Text(context.l10n.noPendingInvitesMessage),
           image: VoicesImagesScheme(
-            image: VoicesAssets.images.noProposalForeground.buildPicture(),
+            image: VoicesAssets.images.svg.noProposalForeground.buildPicture(),
             background: Container(
               height: 180,
               decoration: BoxDecoration(

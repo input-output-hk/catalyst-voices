@@ -13,6 +13,29 @@ class WorkspaceTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, WorkspaceStateProposalInvitesCount>(
+      selector: (state) {
+        return state.proposalInvitesCount;
+      },
+      builder: (context, count) {
+        return _WorkspaceTabs(count: count, tabController: tabController);
+      },
+    );
+  }
+}
+
+class _WorkspaceTabs extends StatelessWidget {
+  final WorkspaceStateProposalInvitesCount count;
+
+  final VoicesTabController<WorkspacePageTab> tabController;
+
+  const _WorkspaceTabs({
+    required this.count,
+    required this.tabController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return VoicesTabBar(
       dividerHeight: 0,
       controller: tabController,
@@ -24,8 +47,7 @@ class WorkspaceTabs extends StatelessWidget {
           VoicesTab(
             data: tab,
             key: Key(tab.name),
-            // TODO(LynxLynxx): Inject number
-            child: VoicesTabText(tab.noOf(context, count: 1)),
+            child: VoicesTabText(tab.noOf(context, count: count.ofType(tab))),
           ),
       ],
     );

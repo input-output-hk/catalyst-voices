@@ -228,6 +228,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         isLoading: false,
         error: const Optional.empty(),
         userProposals: _rebuildProposalsState(),
+        proposalInvitesCount: _rebuildProposalsInvitesCountState(),
       ),
     );
   }
@@ -265,6 +266,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     }).toList();
 
     return Future.wait(futures);
+  }
+
+  WorkspaceStateProposalInvitesCount _rebuildProposalsInvitesCountState() {
+    return WorkspaceStateProposalInvitesCount(
+      invitesCount: _cache.invitesCount,
+      proposalCount: _cache.proposalsCount,
+    );
   }
 
   /// Rebuilds WorkspaceStateUserProposals from the current cache.
