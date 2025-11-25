@@ -296,7 +296,7 @@ def proposal_form_template_doc_factory(
 
         metadata["id"] = tmp_metadata["id"]
         metadata["ver"] = tmp_metadata["ver"]
-        metadata["templates"] = tmp_metadata["templates"]
+        metadata["parameters"] = tmp_metadata["parameters"]
 
         result = generic_doc_builder(
             rbac_chain_factory(),
