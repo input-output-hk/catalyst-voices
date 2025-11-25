@@ -46,7 +46,6 @@ class ProposalHeaderWrapper extends StatelessWidget {
     return Stack(
       children: [
         child,
-        const ProposalAppClosed(),
         const Positioned(
           left: 0,
           right: 0,
@@ -56,6 +55,7 @@ class ProposalHeaderWrapper extends StatelessWidget {
             // is not under the ProposalHeader while ProposalHeader is animating.
             verticalDirection: VerticalDirection.up,
             children: [
+              ProposalAppClosed(),
               ProposalHeader(),
               ProposalInvitationBanner(),
             ],
