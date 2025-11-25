@@ -295,7 +295,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
-    required List<CollaboratorInvite> collaborators,
+    required List<Collaborator> collaborators,
     required bool isFavorite,
     required bool isVotingStage,
     required bool showComments,
@@ -322,7 +322,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ? comments.fold(0, (prev, next) => prev + 1 + next.repliesCount)
         : null;
 
-    final collaboratorsState = CollaboratorInvitesState.filterByActiveAccount(
+    final collaboratorsState = Collaborators.filterByActiveAccount(
       activeAccountId: activeAccountId,
       authorId: proposal?.document.authorId,
       collaborators: collaborators,
@@ -402,7 +402,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
-    required CollaboratorInvitesState collaborators,
+    required Collaborators collaborators,
     required bool hasActiveAccount,
     required bool hasAccountUsername,
     required int? commentsCount,
@@ -478,7 +478,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     ];
   }
 
-  Future<List<CollaboratorInvite>> _getCollaborators() async {
+  Future<List<Collaborator>> _getCollaborators() async {
     // TODO(dt-iohk): connect to real data source and remove hardcoded collaborators.
     /* cSpell:disable */
     final uri = Uri.parse(
@@ -489,8 +489,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     final catalystId = CatalystId.fromUri(uri);
 
     return [
-      for (final status in CollaboratorInviteStatus.values)
-        CollaboratorInvite(
+      for (final status in CollaboratorInvitationStatus.values)
+        Collaborator(
           catalystId: catalystId,
           status: status,
         ),

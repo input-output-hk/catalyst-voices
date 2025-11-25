@@ -2483,6 +2483,18 @@
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
   },
+  "proposalViewInvitationBannerAcceptButton": "Accept Invitation",
+  "@proposalViewInvitationBannerAcceptButton": {
+    "description": "The accept button label in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewInvitationBannerMessage": "You have been invited to join this proposal iteration as a co-proposer",
+  "@proposalViewInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewInvitationBannerRejectButton": "Reject Invitation",
+  "@proposalViewInvitationBannerRejectButton": {
+    "description": "The reject button label in the collaborator invitation banner on the proposal viewer page."
+  },
   "proposalViewLoadErrorMessage": "We weren't able to load that proposal.",
   "@proposalViewLoadErrorMessage": {
     "description": "Error message shown when proposal cannot be loaded (i.e. due to connection error)."

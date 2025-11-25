@@ -11,7 +11,7 @@ final class ProposalCubitCache extends Equatable {
   final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
-  final List<CollaboratorInvite>? collaborators;
+  final List<Collaborator>? collaborators;
   final bool? isFavorite;
   final bool? isVotingStage;
   final bool? showComments;
@@ -56,7 +56,7 @@ final class ProposalCubitCache extends Equatable {
     Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
-    Optional<List<CollaboratorInvite>>? collaborators,
+    Optional<List<Collaborator>>? collaborators,
     Optional<bool>? isFavorite,
     Optional<bool>? isVotingStage,
     Optional<bool>? showComments,
