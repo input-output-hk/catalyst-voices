@@ -53,6 +53,19 @@ final class ProposalCubit extends Cubit<ProposalState>
         .listen(_handleActiveAccountIdChanged);
   }
 
+  Future<void> acceptInvitation() async {
+    try {
+      await _proposalService.respondToCollaboratorInvite(
+        ref: _cache.ref!,
+        action: CollaboratorInvitationAction.accept,
+      );
+      emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsAccepted: true)));
+    } catch (error, stackTrace) {
+      _logger.severe('acceptInvitation', error, stackTrace);
+      emitError(LocalizedException.create(error));
+    }
+  }
+
   void clear() {
     _cache = _cache.copyWithoutProposal();
     emit(const ProposalState());
@@ -70,6 +83,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     _watchedCastedVotesSub = null;
 
     return super.close();
+  }
+
+  Future<void> dismissInvitation() async {
+    emit(state.copyWith(invitation: const CollaboratorInvitationState()));
   }
 
   Future<void> load({required DocumentRef ref}) async {
@@ -167,6 +184,19 @@ final class ProposalCubit extends Cubit<ProposalState>
       if (!isClosed) {
         emit(state.copyWith(isLoading: false));
       }
+    }
+  }
+
+  Future<void> rejectInvitation() async {
+    try {
+      await _proposalService.respondToCollaboratorInvite(
+        ref: _cache.ref!,
+        action: CollaboratorInvitationAction.reject,
+      );
+      emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsRejected: true)));
+    } catch (error, stackTrace) {
+      _logger.severe('rejectInvitation', error, stackTrace);
+      emitError(LocalizedException.create(error));
     }
   }
 
