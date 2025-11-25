@@ -47,7 +47,7 @@ void main() {
             ),
           );
           when(
-            () => documentRepository.isCachedBulk(refs: any(named: 'refs')),
+            () => documentRepository.isCachedBulk(ids: any(named: 'ids')),
           ).thenAnswer((_) async => []);
 
           // When
@@ -81,11 +81,11 @@ void main() {
           final indexDoc = DocumentIndexDoc(
             id: docRef.id,
             ver: [
-              DocumentIndexDocVersion(ver: docRef.version!, type: DocumentType.proposalTemplate),
+              DocumentIndexDocVersion(ver: docRef.ver!, type: DocumentType.proposalTemplate),
             ],
           );
           final docData = DocumentData(
-            metadata: DocumentDataMetadata(type: DocumentType.proposalTemplate, selfRef: docRef),
+            metadata: DocumentDataMetadata(type: DocumentType.proposalTemplate, id: docRef),
             content: const DocumentDataContent({}),
           );
 
@@ -114,13 +114,13 @@ void main() {
 
           // Not cached
           when(
-            () => documentRepository.isCachedBulk(refs: any(named: 'refs')),
+            () => documentRepository.isCachedBulk(ids: any(named: 'ids')),
           ).thenAnswer((_) async => []);
 
           // Fetch succeeds
           when(
             () => documentRepository.getDocumentData(
-              ref: any(named: 'ref'),
+              id: any(named: 'id'),
               useCache: any(named: 'useCache'),
             ),
           ).thenAnswer((_) async => docData);
@@ -137,7 +137,7 @@ void main() {
 
           verify(
             () => documentRepository.getDocumentData(
-              ref: docRef,
+              id: docRef,
               useCache: false,
             ),
           ).called(1);
@@ -157,7 +157,7 @@ void main() {
           final indexDoc = DocumentIndexDoc(
             id: docRef.id,
             ver: [
-              DocumentIndexDocVersion(ver: docRef.version!, type: DocumentType.proposalTemplate),
+              DocumentIndexDocVersion(ver: docRef.ver!, type: DocumentType.proposalTemplate),
             ],
           );
 
@@ -185,7 +185,7 @@ void main() {
 
           // Cached!
           when(
-            () => documentRepository.isCachedBulk(refs: any(named: 'refs')),
+            () => documentRepository.isCachedBulk(ids: any(named: 'ids')),
           ).thenAnswer((_) async => [docRef]);
 
           // When
@@ -197,7 +197,7 @@ void main() {
           // Verify fetch was NEVER called
           verifyNever(
             () => documentRepository.getDocumentData(
-              ref: any(named: 'ref'),
+              id: any(named: 'id'),
               useCache: any(named: 'useCache'),
             ),
           );

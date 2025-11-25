@@ -123,7 +123,7 @@ void main() {
           verify(() => documentsService.clear(keepLocalDrafts: true)).called(1);
 
           final storedMeta = await appMetaStorage.read();
-          expect(storedMeta.activeCampaign, newCampaign.selfRef);
+          expect(storedMeta.activeCampaign, newCampaign.id);
         },
       );
 
