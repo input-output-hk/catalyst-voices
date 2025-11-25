@@ -20,7 +20,7 @@ final class DocumentRefDto {
   });
 
   factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
-    final migrated = _migrateJson1(json);
+    final migrated = migrateJson1(json);
 
     return _$DocumentRefDtoFromJson(migrated);
   }
@@ -47,7 +47,13 @@ final class DocumentRefDto {
     };
   }
 
-  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('version') && !json.containsKey('ver');
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
     if (modified.containsKey('version') && !modified.containsKey('ver')) {

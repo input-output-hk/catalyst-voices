@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_data_dto.g.dart';
@@ -109,9 +110,9 @@ final class DocumentDataMetadataDto {
   });
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
-    var migrated = _migrateJson1(json);
-    migrated = _migrateJson2(migrated);
-    migrated = _migrateJson3(migrated);
+    var migrated = migrateJson1(json);
+    migrated = migrateJson2(migrated);
+    migrated = migrateJson3(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
@@ -151,10 +152,16 @@ final class DocumentDataMetadataDto {
     );
   }
 
-  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('id') && json.containsKey('version');
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
-    if (modified.containsKey('id') && modified.containsKey('version')) {
+    if (needsMigration) {
       final id = modified.remove('id') as String;
       final version = modified.remove('version') as String;
 
@@ -168,7 +175,13 @@ final class DocumentDataMetadataDto {
     return modified;
   }
 
-  static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson2(Map<String, dynamic> json) {
+    final needsMigration = json['brandId'] is String || json['campaignId'] is String;
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
     if (modified['brandId'] is String) {
@@ -191,7 +204,13 @@ final class DocumentDataMetadataDto {
     return modified;
   }
 
-  static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson3(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('selfRef');
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
     if (modified.containsKey('selfRef')) {

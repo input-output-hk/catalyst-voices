@@ -243,9 +243,14 @@ class DocumentDataMetadataDtoDbV3 {
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoDbV3ToJson(this);
 
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('id') && json.containsKey('version');
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
-    if (modified.containsKey('id') && modified.containsKey('version')) {
+    if (needsMigration) {
       final id = modified.remove('id') as String;
       final version = modified.remove('version') as String;
 
@@ -260,6 +265,11 @@ class DocumentDataMetadataDtoDbV3 {
   }
 
   static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
+    final needsMigration = json['brandId'] is String || json['campaignId'] is String;
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
     if (modified['brandId'] is String) {
@@ -283,6 +293,11 @@ class DocumentDataMetadataDtoDbV3 {
   }
 
   static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('selfRef');
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
     if (modified.containsKey('selfRef')) {
@@ -328,6 +343,11 @@ final class DocumentRefDtoDbV3 {
   Map<String, dynamic> toJson() => _$DocumentRefDtoDbV3ToJson(this);
 
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('version') && !json.containsKey('ver');
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
     if (modified.containsKey('version') && !modified.containsKey('ver')) {
