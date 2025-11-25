@@ -203,14 +203,199 @@ class ProposalParameterType(IntEnum):
     BRAND = 2
 
 
+# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture
-def brand_parameters_form_template_doc(
+def proposal_doc_factory(
     rbac_chain_factory,
+    proposal_form_template_doc,
+    category_parameters_doc,
+    campaign_parameters_doc,
+    brand_parameters_doc,
+):
+    def __factory__(
+        parameter_type: ProposalParameterType,
+    ) -> tuple[SignedDocument, RoleID]:
+        param: SignedDocumentBase
+        if parameter_type == ProposalParameterType.CATEGORY:
+            param = category_parameters_doc
+        elif parameter_type == ProposalParameterType.CAMPAIGN:
+            param = campaign_parameters_doc
+        elif parameter_type == ProposalParameterType.BRAND:
+            param = brand_parameters_doc
+        else:
+            raise Exception("Invalid parameter type for proposal document")
+
+        template: SignedDocumentBase = proposal_form_template_doc
+
+        metadata = create_metadata(
+            DOC_TYPE["proposal"],
+            [
+                {
+                    "id": template.metadata["id"],
+                    "ver": template.metadata["ver"],
+                    "cid": "0x",
+                }
+            ],
+            [
+                {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
+            ],
+        )
+        result = generic_doc_builder(
+            rbac_chain_factory(),
+            metadata,
+            JSF(template.content).generate(),
+        )
+
+        resp = document.put(
+            data=result.signed_doc,
+            token=result.auth_token,
+        )
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
+
+        return result.doc_builder, result.role_id
+
+    return __factory__
+
+
+@pytest.fixture
+def proposal_form_template_doc(rbac_chain_factory) -> SignedDocumentBase:
+    role_id = RoleID.PROPOSER
+    with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
+        metadata, content = json.load(json_file)
+
+    doc_builder = SignedDocument(metadata, content)
+    rbac_chain = rbac_chain_factory()
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+
+    resp = document.put(
+        data=doc_builder.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
+
+    return SignedDocumentBase(metadata, content)
+
+
+@pytest.fixture
+def category_parameters_doc(
+    rbac_chain_factory,
+    category_parameters_form_template_doc,
+    campaign_parameters_doc,
 ) -> SignedDocumentBase:
+    template: SignedDocumentBase = category_parameters_form_template_doc
+    param: SignedDocumentBase = campaign_parameters_doc
+
     metadata = create_metadata(
-        DOC_TYPE["brand_parameters_form_template"],
+        DOC_TYPE["category_parameters"],
+        [
+            {
+                "id": template.metadata["id"],
+                "ver": template.metadata["ver"],
+                "cid": "0x",
+            }
+        ],
+        [
+            {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
+        ],
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
+        JSF(template.content).generate(),
+    )
+
+    resp = document.put(
+        data=result.signed_doc,
+        token=result.auth_token,
+    )
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
+
+    return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+
+
+@pytest.fixture
+def category_parameters_form_template_doc(
+    rbac_chain_factory, campaign_parameters_doc
+) -> SignedDocumentBase:
+    param: SignedDocumentBase = campaign_parameters_doc
+
+    metadata = create_metadata(
+        DOC_TYPE["category_parameters_form_template"],
         None,
+        [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
+        {"type": "object"},
+    )
+
+    resp = document.put(
+        data=result.signed_doc,
+        token=result.auth_token,
+    )
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
+
+    return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+
+
+@pytest.fixture
+def campaign_parameters_doc(
+    rbac_chain_factory,
+    campaign_parameters_form_template_doc,
+    brand_parameters_doc,
+) -> SignedDocumentBase:
+    template: SignedDocumentBase = campaign_parameters_form_template_doc
+    param: SignedDocumentBase = brand_parameters_doc
+
+    metadata = create_metadata(
+        DOC_TYPE["campaign_parameters"],
+        [
+            {
+                "id": template.metadata["id"],
+                "ver": template.metadata["ver"],
+                "cid": "0x",
+            }
+        ],
+        [
+            {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
+        ],
+    )
+    result = generic_doc_builder(
+        rbac_chain_factory(),
+        metadata,
+        JSF(template.content).generate(),
+    )
+
+    resp = document.put(
+        data=result.signed_doc,
+        token=result.auth_token,
+    )
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
+
+    return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
+
+
+@pytest.fixture
+def campaign_parameters_form_template_doc(
+    rbac_chain_factory, brand_parameters_doc
+) -> SignedDocumentBase:
+    param: SignedDocumentBase = brand_parameters_doc
+
+    metadata = create_metadata(
+        DOC_TYPE["campaign_parameters_form_template"],
         None,
+        [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -256,21 +441,21 @@ def brand_parameters_doc(
         data=result.signed_doc,
         token=result.auth_token,
     )
-    assert resp.status_code == 201
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
 
     return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
 
 
 @pytest.fixture
-def campaign_parameters_form_template_doc(
-    rbac_chain_factory, brand_parameters_doc
+def brand_parameters_form_template_doc(
+    rbac_chain_factory,
 ) -> SignedDocumentBase:
-    param: SignedDocumentBase = brand_parameters_doc
-
     metadata = create_metadata(
-        DOC_TYPE["campaign_parameters_form_template"],
+        DOC_TYPE["brand_parameters_form_template"],
         None,
-        [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+        None,
     )
     result = generic_doc_builder(
         rbac_chain_factory(),
@@ -282,156 +467,8 @@ def campaign_parameters_form_template_doc(
         data=result.signed_doc,
         token=result.auth_token,
     )
-    assert resp.status_code == 201
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
 
     return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
-
-
-@pytest.fixture
-def campaign_parameters_doc(
-    rbac_chain_factory,
-    campaign_parameters_form_template_doc,
-    brand_parameters_doc,
-) -> SignedDocumentBase:
-    template: SignedDocumentBase = campaign_parameters_form_template_doc
-    param: SignedDocumentBase = brand_parameters_doc
-
-    metadata = create_metadata(
-        DOC_TYPE["campaign_parameters"],
-        [
-            {
-                "id": template.metadata["id"],
-                "ver": template.metadata["ver"],
-                "cid": "0x",
-            }
-        ],
-        [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
-    )
-    result = generic_doc_builder(
-        rbac_chain_factory(), metadata, JSF(template.content).generate()
-    )
-
-    resp = document.put(
-        data=result.signed_doc,
-        token=result.auth_token,
-    )
-    assert resp.status_code == 201
-
-    return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
-
-
-@pytest.fixture
-def category_parameters_form_template_doc(
-    rbac_chain_factory, campaign_parameters_doc
-) -> SignedDocumentBase:
-    param: SignedDocumentBase = campaign_parameters_doc
-
-    metadata = create_metadata(
-        DOC_TYPE["category_parameters_form_template"],
-        None,
-        [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
-    )
-    result = generic_doc_builder(rbac_chain_factory(), metadata, {"type": "object"})
-
-    resp = document.put(
-        data=result.signed_doc,
-        token=result.auth_token,
-    )
-    assert resp.status_code == 201
-
-    return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
-
-
-@pytest.fixture
-def category_parameters_doc(
-    rbac_chain_factory,
-    category_parameters_form_template_doc,
-    campaign_parameters_doc,
-) -> SignedDocumentBase:
-    template = category_parameters_form_template_doc
-    param = campaign_parameters_doc
-
-    metadata = create_metadata(
-        DOC_TYPE["category_parameters"],
-        [{"id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x"}],
-        [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
-    )
-    result = generic_doc_builder(
-        rbac_chain_factory(), metadata, JSF(template.content).generate()
-    )
-
-    resp = document.put(
-        data=result.signed_doc,
-        token=result.auth_token,
-    )
-    assert resp.status_code == 201
-
-    return SignedDocumentBase(result.doc_builder.metadata, result.doc_builder.content)
-
-
-@pytest.fixture
-def proposal_form_template_doc(rbac_chain_factory) -> SignedDocumentBase:
-    role_id = RoleID.PROPOSER
-    with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
-        metadata, content = json.load(json_file)
-
-    doc_builder = SignedDocument(metadata, content)
-    rbac_chain = rbac_chain_factory()
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-
-    resp = document.put(
-        data=doc_builder.build_and_sign(cat_id, sk_hex),
-        token=rbac_chain.auth_token(),
-    )
-    assert resp.status_code == 201
-
-    return SignedDocumentBase(metadata, content)
-
-
-# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
-@pytest.fixture
-def proposal_doc_factory(
-    rbac_chain_factory,
-    proposal_form_template_doc,
-    category_parameters_doc,
-    campaign_parameters_doc,
-    brand_parameters_doc,
-):
-    def __factory__(
-        parameter_type: ProposalParameterType,
-    ) -> tuple[SignedDocument, RoleID]:
-        if parameter_type == ProposalParameterType.CATEGORY:
-            param = category_parameters_doc
-        elif parameter_type == ProposalParameterType.CAMPAIGN:
-            param = campaign_parameters_doc
-        elif parameter_type == ProposalParameterType.BRAND:
-            param = brand_parameters_doc
-        else:
-            raise Exception("Invalid parameter type for proposal document")
-
-        template = proposal_form_template_doc
-
-        metadata = create_metadata(
-            DOC_TYPE["proposal"],
-            [
-                {
-                    "id": template.metadata["id"],
-                    "ver": template.metadata["ver"],
-                    "cid": "0x",
-                }
-            ],
-            [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
-        )
-        result = generic_doc_builder(
-            rbac_chain_factory(), metadata, JSF(template.content).generate()
-        )
-
-        resp = document.put(
-            data=result.signed_doc,
-            token=result.auth_token,
-        )
-        assert resp.status_code == 201
-
-        return result.doc_builder, result.role_id
-
-    return __factory__

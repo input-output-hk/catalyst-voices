@@ -3,7 +3,17 @@ from utils import uuid_v7
 from api.v1 import document as document_v1
 from api.v2 import document as document_v2
 from utils.rbac_chain import rbac_chain_factory
-from utils.signed_doc import proposal_doc_factory, ProposalParameterType
+from utils.signed_doc import (
+    proposal_doc_factory,
+    proposal_form_template_doc,
+    category_parameters_doc,
+    category_parameters_form_template_doc,
+    campaign_parameters_doc,
+    campaign_parameters_form_template_doc,
+    brand_parameters_doc,
+    brand_parameters_form_template_doc,
+    ProposalParameterType
+)
 
 
 @pytest.mark.preprod_indexing
