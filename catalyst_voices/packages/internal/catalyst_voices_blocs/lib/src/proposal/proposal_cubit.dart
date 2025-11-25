@@ -85,15 +85,26 @@ final class ProposalCubit extends Cubit<ProposalState>
       _cache = _cache.copyWith(ref: Optional.of(ref));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
-      final proposalCollaborators = await _getCollaborators();
 
-      final (isReadOnlyMode, campaign, category, commentTemplate, isFavorite) = await (
+      final (
+        isReadOnlyMode,
+        campaign,
+        category,
+        commentTemplate,
+        isFavorite,
+        proposalCollaborators,
+      ) = await (
         _isReadOnlyMode(),
         _campaignService.getActiveCampaign(),
         _campaignService.getCategory(proposal.document.metadata.categoryId),
         _commentService.getCommentTemplateFor(category: proposal.document.metadata.categoryId),
         _proposalService.watchIsFavoritesProposal(ref: ref).first,
+        _getCollaborators(),
       ).wait;
+
+      if (isClosed) {
+        return;
+      }
 
       final isVotingStage = _isVotingStage(campaign);
       final showComments = campaign?.supportsComments ?? false;
@@ -110,14 +121,14 @@ final class ProposalCubit extends Cubit<ProposalState>
         readOnlyMode: Optional(isReadOnlyMode),
       );
 
-      await _commentsSub?.cancel();
+      unawaited(_commentsSub?.cancel());
       _commentsSub = _commentService
           // Note. watch comments on exact version of proposal.
           .watchCommentsWith(ref: proposal.document.metadata.selfRef)
           .distinct(listEquals)
           .listen(_handleCommentsChange);
 
-      await _watchedCastedVotesSub?.cancel();
+      unawaited(_watchedCastedVotesSub?.cancel());
       _watchedCastedVotesSub = _votingService
           .watchedCastedVotes()
           .map((vote) => vote.forProposal(ref))
@@ -125,25 +136,24 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       _ballotBuilder.addListener(_handleBallotBuilderChange);
 
-      if (!isClosed) {
-        final proposalState = _rebuildProposalState();
+      final proposalState = _rebuildProposalState();
 
-        emit(ProposalState(data: proposalState, readOnlyMode: isReadOnlyMode));
+      emit(ProposalState(data: proposalState, readOnlyMode: isReadOnlyMode));
 
-        if (proposalState.isCurrentVersionLatest == false &&
-            isVotingStage &&
-            _cache.activeAccountId != null) {
-          emitSignal(const ViewingOlderVersionWhileVotingSignal());
-        } else if (proposalState.isCurrentVersionLatest == false) {
-          emitSignal(const ViewingOlderVersionSignal());
-        }
+      if (proposalState.isCurrentVersionLatest == false &&
+          isVotingStage &&
+          _cache.activeAccountId != null) {
+        emitSignal(const ViewingOlderVersionWhileVotingSignal());
+      } else if (proposalState.isCurrentVersionLatest == false) {
+        emitSignal(const ViewingOlderVersionSignal());
       }
     } catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
 
-      _cache = _cache.copyWithoutProposal();
-
-      emit(ProposalState(error: LocalizedException.create(error)));
+      if (!isClosed) {
+        _cache = _cache.copyWithoutProposal();
+        emit(ProposalState(error: LocalizedException.create(error)));
+      }
     } finally {
       if (!isClosed) {
         emit(state.copyWith(isLoading: false));
@@ -476,6 +486,18 @@ final class ProposalCubit extends Cubit<ProposalState>
       ...proposalSegments,
       if ((canComment || comments.isNotEmpty) && showComments) commentsSegment,
     ];
+  }
+
+  // TODO(dt-iohk): remove dummy logic when data source for invitations is ready
+  Future<CollaboratorInvitation?> _getCollaboratorInvitation(
+    List<Collaborator> collaborators,
+    CatalystId? activeAccountId,
+  ) async {
+    if (activeAccountId != null && collaborators.none((e) => e.catalystId == activeAccountId)) {
+      return const CollaboratorInvitation();
+    }
+
+    return null;
   }
 
   Future<List<Collaborator>> _getCollaborators() async {
