@@ -1300,7 +1300,7 @@
   "@errorWalletLinkAccountChange": {
     "description": "Error message shown when wallet account has changed"
   },
-  "errorWalletLinkInternalError": "An wallet error occurred during execution of this API call.",
+  "errorWalletLinkInternalError": "Wallet error occurred during execution of this API call.",
   "@errorWalletLinkInternalError": {
     "description": "Error message shown when internal error occurs during wallet authorization"
   },
@@ -1321,39 +1321,39 @@
   "@errorWalletLinkRefused": {
     "description": "Error message shown when wallet authorization is refused"
   },
-  "errorWalletTxSendRefused": "Wallet refuses to send the tx (could be rate limiting)",
+  "errorWalletTxSendRefused": "Wallet refuses to send the tx (could be rate limiting).",
   "@errorWalletTxSendRefused": {
     "description": "Error message shown when wallet throws TxSend exception"
   },
-  "errorWalletTxSendFailure": "Wallet could not send the tx",
+  "errorWalletTxSendFailure": "Wallet could not send the tx.",
   "@errorWalletTxSendFailure": {
     "description": "Error message shown when wallet throws TxSend exception"
   },
-  "errorWalletTxSignProofGeneration": "Wallet was unable to sign the transaction",
+  "errorWalletTxSignProofGeneration": "Wallet was unable to sign the transaction.",
   "@errorWalletTxSignProofGeneration": {
     "description": "Error message shown when wallet throws TxSign exception"
   },
-  "errorWalletTxSignUserDeclined": "Transaction declined",
+  "errorWalletTxSignUserDeclined": "Transaction declined.",
   "@errorWalletTxSignUserDeclined": {
     "description": "Error message shown when wallet throws TxSign exception"
   },
-  "errorWalletTxSignDepreciatedCertificate": "Transaction contains depreciated certificate",
+  "errorWalletTxSignDepreciatedCertificate": "Transaction contains depreciated certificate.",
   "@errorWalletTxSignDepreciatedCertificate": {
     "description": "Error message shown when wallet throws TxSign exception"
   },
-  "errorWalletDataSignProofGeneration": "Wallet was unable to sign the data",
+  "errorWalletDataSignProofGeneration": "Wallet was unable to sign the data.",
   "@errorWalletDataSignProofGeneration": {
     "description": "Error message shown when wallet throws DataSign exception"
   },
-  "errorWalletDataSignAddressNotPk": "Wallet was unable to sign the data because of address format",
+  "errorWalletDataSignAddressNotPk": "Wallet was unable to sign the data because of address format.",
   "@errorWalletDataSignAddressNotPk": {
     "description": "Error message shown when wallet throws DataSign exception"
   },
-  "errorWalletDataSignUserDeclined": "Transaction declined",
+  "errorWalletDataSignUserDeclined": "Transaction declined.",
   "@errorWalletDataSignUserDeclined": {
     "description": "Error message shown when wallet throws DataSign exception"
   },
-  "errorWalletPaginationMaxSize": "Wallet pagination max size({maxSize}) exceeded",
+  "errorWalletPaginationMaxSize": "Wallet pagination max size({maxSize}) exceeded.",
   "@errorWalletPaginationMaxSize": {
     "description": "Error message shown when wallet throws DataSign exception",
     "placeholders": {
@@ -1362,7 +1362,7 @@
       }
     }
   },
-  "errorCardanoWalletUnknown": "Wallet failed unexpectedly",
+  "errorCardanoWalletUnknown": "Wallet failed unexpectedly.",
   "@errorCardanoWalletUnknown": {
     "description": "Generic wallet exception"
   },

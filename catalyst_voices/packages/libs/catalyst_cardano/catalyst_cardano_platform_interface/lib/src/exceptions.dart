@@ -139,19 +139,26 @@ final class WalletApiException extends CardanoWalletException {
   final WalletApiErrorCode code;
 
   /// The human readable info about the exception.
-  final Object info;
+  final String info;
+
+  /// The optional code which may have caused exception in first place.
+  /// For example when wallet used unsupported tag code.
+  final int? sourceCode;
 
   /// The default constructor for [WalletApiException].
   const WalletApiException({
     required this.code,
     required this.info,
+    this.sourceCode,
   });
 
   @override
-  List<Object?> get props => [code, info];
+  List<Object?> get props => [code, info, sourceCode];
 
   @override
-  String toString() => 'WalletApiException(code=$code,info=$info)';
+  String toString() => sourceCode == null
+      ? 'WalletApiException(code=$code,info=$info)'
+      : 'WalletApiException(code=$code,info=$info,sourceCode=$sourceCode)';
 }
 
 /// A specific error code related to the [WalletDataSignException].

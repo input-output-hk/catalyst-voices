@@ -19,26 +19,19 @@ abstract base class LocalizedWalletException extends LocalizedException {
 
 final class _LocalizedWalletLinkException extends LocalizedWalletException {
   final WalletApiErrorCode code;
-  final Object info;
+  final String info;
+  final int? sourceCode;
 
-  _LocalizedWalletLinkException(WalletApiException source) : code = source.code, info = source.info;
-
-  int? get _infoTagCode {
-    final info = this.info;
-    if (info is Map<String, dynamic> && info['code'] is int) {
-      return info['code'] as int;
-    }
-
-    return null;
-  }
+  _LocalizedWalletLinkException(WalletApiException source)
+    : code = source.code,
+      info = source.info,
+      sourceCode = source.sourceCode;
 
   @override
   String message(BuildContext context) {
-    final infoTagCode = _infoTagCode;
-
     return switch (code) {
-      WalletApiErrorCode.invalidRequest when infoTagCode != null =>
-        context.l10n.errorWalletLinkInvalidRequestCode(infoTagCode),
+      WalletApiErrorCode.invalidRequest when sourceCode != null =>
+        context.l10n.errorWalletLinkInvalidRequestCode(sourceCode!),
       WalletApiErrorCode.invalidRequest => context.l10n.errorWalletLinkInvalidRequest,
       WalletApiErrorCode.internalError => context.l10n.errorWalletLinkInternalError,
       WalletApiErrorCode.refused => context.l10n.errorWalletLinkRefused,
