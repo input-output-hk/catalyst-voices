@@ -48,7 +48,7 @@ final class DocumentRefDto {
   }
 
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+    final modified = Map.of(json);
 
     if (modified.containsKey('version') && !modified.containsKey('ver')) {
       modified['ver'] = modified.remove('version');
