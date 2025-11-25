@@ -49,14 +49,12 @@ jobs:
           enable_caching: "true"
           version: 0.21.0
 
-
   slack-notification:
     needs: tests
     if: ${{ always() }} # && needs.tests.result == 'failure' }}
-    uses: input-output-hk/catalyst-qa/.github/workflows/qa-notification.yml@main
+    uses: input-output-hk/catalyst-ci/.github/workflows/qa-notify.yml@feat/slack-notify-workflow
     with:
       failed_repo: ${{ github.repository }}
       failed_run_id: ${{ github.run_id }}
     secrets:
       slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-      token: ${{ secrets.QA_REPO_PAT }}
