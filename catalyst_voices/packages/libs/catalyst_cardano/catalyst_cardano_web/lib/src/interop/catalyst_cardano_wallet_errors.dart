@@ -4,15 +4,18 @@ import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_in
 
 /// Creates a fallback exception from [ex].
 WalletApiException fallbackApiException(Object ex) {
-  int? sourceCode;
-  if (ex is Map<String, dynamic> && ex['code'] is int) {
-    sourceCode = ex['code'] as int;
+  final infoCode = _InfoCodeError.tryFrom(ex);
+  if (infoCode != null) {
+    return WalletApiException(
+      code: WalletApiErrorCode.invalidRequest,
+      info: infoCode.info,
+      sourceCode: infoCode.code,
+    );
   }
 
-  throw WalletApiException(
+  return WalletApiException(
     code: WalletApiErrorCode.invalidRequest,
     info: ex.toString(),
-    sourceCode: sourceCode,
   );
 }
 
