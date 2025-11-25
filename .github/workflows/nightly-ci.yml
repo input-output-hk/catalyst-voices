@@ -59,3 +59,4 @@ jobs:
       failed_run_id: ${{ github.run_id }}
     secrets:
       slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+      token: ${{ secrets.QA_REPO_PAT }}
