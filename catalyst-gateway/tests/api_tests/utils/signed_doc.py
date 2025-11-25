@@ -8,6 +8,7 @@ import json
 from api.v1 import document
 from utils import signed_doc, uuid_v7
 from utils.rbac_chain import rbac_chain_factory, RBACChain, RoleID
+from utils.admin import AdminKey, admin_cat_id
 from tempfile import NamedTemporaryFile
 from jsf import JSF
 from enum import IntEnum
@@ -207,6 +208,7 @@ class ProposalParameterType(IntEnum):
 @pytest.fixture
 def proposal_doc_factory(
     rbac_chain_factory,
+    admin_cat_id,
     proposal_form_template_doc_factory,
     category_parameters_doc,
     campaign_parameters_doc,
@@ -264,6 +266,7 @@ def proposal_doc_factory(
 @pytest.fixture
 def proposal_form_template_doc_factory(
     rbac_chain_factory,
+    admin_cat_id,
     category_parameters_doc,
     campaign_parameters_doc,
     brand_parameters_doc,
@@ -322,6 +325,7 @@ def proposal_form_template_doc_factory(
 @pytest.fixture
 def category_parameters_doc(
     rbac_chain_factory,
+    admin_cat_id,
     category_parameters_form_template_doc,
     campaign_parameters_doc,
 ) -> SignedDocumentBase:
@@ -360,7 +364,7 @@ def category_parameters_doc(
 
 @pytest.fixture
 def category_parameters_form_template_doc(
-    rbac_chain_factory, campaign_parameters_doc
+    rbac_chain_factory, admin_cat_id, campaign_parameters_doc
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = campaign_parameters_doc
 
@@ -389,6 +393,7 @@ def category_parameters_form_template_doc(
 @pytest.fixture
 def campaign_parameters_doc(
     rbac_chain_factory,
+    admin_cat_id,
     campaign_parameters_form_template_doc,
     brand_parameters_doc,
 ) -> SignedDocumentBase:
@@ -427,7 +432,7 @@ def campaign_parameters_doc(
 
 @pytest.fixture
 def campaign_parameters_form_template_doc(
-    rbac_chain_factory, brand_parameters_doc
+    rbac_chain_factory, admin_cat_id, brand_parameters_doc
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = brand_parameters_doc
 
@@ -455,7 +460,7 @@ def campaign_parameters_form_template_doc(
 
 @pytest.fixture
 def brand_parameters_doc(
-    rbac_chain_factory, brand_parameters_form_template_doc
+    rbac_chain_factory, admin_cat_id, brand_parameters_form_template_doc
 ) -> SignedDocumentBase:
     template: SignedDocumentBase = brand_parameters_form_template_doc
 
@@ -489,7 +494,7 @@ def brand_parameters_doc(
 
 @pytest.fixture
 def brand_parameters_form_template_doc(
-    rbac_chain_factory,
+    rbac_chain_factory, admin_cat_id
 ) -> SignedDocumentBase:
     metadata = create_metadata(
         DOC_TYPE["brand_parameters_form_template"],

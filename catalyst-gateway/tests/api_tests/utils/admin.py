@@ -1,0 +1,30 @@
+import pytest
+import base64
+import json
+from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
+
+
+class AdminKey:
+    sk_key: BIP32ED25519PrivateKey
+
+    def __init__(self, hex_sk: str):
+        self.sk = BIP32ED25519PrivateKey(bytes.fromhex(hex_sk), bytes())
+
+    def pk(self) -> BIP32ED25519PublicKey:
+        return BIP32ED25519PublicKey.from_private_key(self.sk)
+
+    def base64url_pk(self) -> str:
+        return (
+            base64.urlsafe_b64encode(self.pk().public_key).rstrip(b"=").decode("ascii")
+        )
+
+    def cat_id(self) -> str:
+        return f"admin.catalyst://preview.cardano/{self.base64url_pk()}/0/10"
+
+
+@pytest.fixture
+def admin_cat_id() -> AdminKey:
+    with open("./test_data/rbac_regs/only_role_0.jsonc", "r") as json_file:
+        keys = json.load(json_file)
+
+    return AdminKey(keys["0"][0]["sk"])
