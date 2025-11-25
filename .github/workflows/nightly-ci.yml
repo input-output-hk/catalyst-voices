@@ -130,40 +130,12 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
-  slack:
-    name: slack notification
+  slack-notification:
     needs: tests
-    runs-on: ubuntu-latest
-    if: failure()
-    steps:
-      - uses: slackapi/slack-github-action@v2.1.1
-        with:
-          payload: |
-            {
-              "text": "😭 *Voices Nightly Tests Failed* 😭",
-              "attachments": [
-                {
-                  "color": "danger",
-                  "blocks": [
-                    {
-                      "type": "section",
-                      "text": {
-                        "type": "mrkdwn",
-                        "text": "*Workflow:* ${{ github.workflow }} failed on ${{ github.ref_name }}.\n\n*Action Required:* <!channel> please review the logs."
-                      }
-                    },
-                    {
-                      "type": "context",
-                      "elements": [
-                        {
-                          "type": "mrkdwn",
-                          "text": "View Logs: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here>"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: webhook-trigger
+    if: ${{ always() && needs.tests.result == 'failure' }}
+    uses: input-output-hk/catalyst-qa/.github/workflows/qa-notification.yml@main
+    with:
+      failed_repo: ${{ github.repository }}
+      failed_run_id: ${{ github.run_id }}
+    secrets:
+      slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
