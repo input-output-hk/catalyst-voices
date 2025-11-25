@@ -19,19 +19,19 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   @override
   Future<int> count({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _queryCount(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
     ).getSingle().then((value) => value ?? 0);
   }
 
   @override
   Future<int> deleteWhere({
-    DocumentRef? ref,
+    DocumentRef? id,
     List<DocumentType>? excludeTypes,
   }) {
     final query = delete(localDocumentsDrafts);
@@ -44,13 +44,13 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   }
 
   @override
-  Future<bool> exists(DocumentRef ref) {
+  Future<bool> exists(DocumentRef id) {
     final query = selectOnly(localDocumentsDrafts)
       ..addColumns([const Constant(1)])
-      ..where(localDocumentsDrafts.id.equals(ref.id));
+      ..where(localDocumentsDrafts.id.equals(id.id));
 
-    if (ref.isExact) {
-      query.where(localDocumentsDrafts.ver.equals(ref.version!));
+    if (id.isExact) {
+      query.where(localDocumentsDrafts.ver.equals(id.ver!));
     }
 
     query.limit(1);
@@ -59,10 +59,10 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   }
 
   @override
-  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) async {
-    if (refs.isEmpty) return [];
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> ids) async {
+    if (ids.isEmpty) return [];
 
-    final uniqueIds = refs.map((ref) => ref.id).toSet();
+    final uniqueIds = ids.map((ref) => ref.id).toSet();
 
     // Single query: Fetch all (id, ver) for matching ids
     final query = selectOnly(localDocumentsDrafts)
@@ -86,27 +86,27 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       );
     }
 
-    return refs.where((ref) {
+    return ids.where((ref) {
       final vers = idToVers[ref.id];
       if (vers == null || vers.isEmpty) return false;
 
-      return !ref.isExact || vers.contains(ref.version);
+      return !ref.isExact || vers.contains(ref.ver);
     }).toList();
   }
 
   @override
   Future<LocalDocumentDraftEntity?> getDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
-    return _queryDocument(type: type, ref: ref, referencing: referencing).getSingleOrNull();
+    return _queryDocument(type: type, id: id, referencing: referencing).getSingleOrNull();
   }
 
   @override
   Future<List<LocalDocumentDraftEntity>> getDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly = false,
@@ -115,7 +115,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   }) {
     return _queryDocuments(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
       filters: filters,
       latestOnly: latestOnly,
@@ -125,10 +125,10 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   }
 
   @override
-  Future<DocumentRef?> getLatestOf(DocumentRef ref) {
+  Future<DocumentRef?> getLatestOf(DocumentRef id) {
     final query = selectOnly(localDocumentsDrafts)
       ..addColumns([localDocumentsDrafts.id, localDocumentsDrafts.ver])
-      ..where(localDocumentsDrafts.id.equals(ref.id))
+      ..where(localDocumentsDrafts.id.equals(id.id))
       ..orderBy([OrderingTerm.desc(localDocumentsDrafts.createdAt)])
       ..limit(1);
 
@@ -136,7 +136,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
         .map(
           (row) => DraftRef(
             id: row.read(localDocumentsDrafts.id)!,
-            version: row.read(localDocumentsDrafts.ver),
+            ver: row.read(localDocumentsDrafts.ver),
           ),
         )
         .getSingleOrNull();
@@ -155,15 +155,15 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
 
   @override
   Future<void> updateContent({
-    required DocumentRef ref,
+    required DocumentRef id,
     required DocumentDataContent content,
   }) async {
     final insertable = LocalDocumentsDraftsCompanion(content: Value(content));
 
-    final query = update(localDocumentsDrafts)..where((tbl) => tbl.id.equals(ref.id));
+    final query = update(localDocumentsDrafts)..where((tbl) => tbl.id.equals(id.id));
 
-    if (ref.isExact) {
-      query.where((tbl) => tbl.ver.equals(ref.version!));
+    if (id.isExact) {
+      query.where((tbl) => tbl.ver.equals(id.ver!));
     }
 
     await query.write(insertable);
@@ -172,12 +172,12 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   @override
   Stream<int> watchCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _queryCount(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
     ).watchSingle().map((value) => value ?? 0);
   }
@@ -185,16 +185,16 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   @override
   Stream<LocalDocumentDraftEntity?> watchDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
-    return _queryDocument(type: type, ref: ref, referencing: referencing).watchSingleOrNull();
+    return _queryDocument(type: type, id: id, referencing: referencing).watchSingleOrNull();
   }
 
   @override
   Stream<List<LocalDocumentDraftEntity>> watchDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly = false,
@@ -203,7 +203,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
   }) {
     return _queryDocuments(
       type: type,
-      ref: ref,
+      id: id,
       referencing: referencing,
       filters: filters,
       latestOnly: latestOnly,
@@ -214,7 +214,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
 
   Selectable<int?> _queryCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     final count = countAll();
@@ -224,11 +224,11 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       query.where(localDocumentsDrafts.type.equalsValue(type));
     }
 
-    if (ref != null) {
-      query.where(localDocumentsDrafts.id.equals(ref.id));
+    if (id != null) {
+      query.where(localDocumentsDrafts.id.equals(id.id));
 
-      if (ref.isExact) {
-        query.where(localDocumentsDrafts.ver.equals(ref.version!));
+      if (id.isExact) {
+        query.where(localDocumentsDrafts.ver.equals(id.ver!));
       }
     }
 
@@ -236,7 +236,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       query.where(localDocumentsDrafts.refId.equals(referencing.id));
 
       if (referencing.isExact) {
-        query.where(localDocumentsDrafts.refVer.equals(referencing.version!));
+        query.where(localDocumentsDrafts.refVer.equals(referencing.ver!));
       }
     }
 
@@ -245,16 +245,16 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
 
   Selectable<LocalDocumentDraftEntity> _queryDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     final query = select(localDocumentsDrafts);
 
-    if (ref != null) {
-      query.where((tbl) => tbl.id.equals(ref.id));
+    if (id != null) {
+      query.where((tbl) => tbl.id.equals(id.id));
 
-      if (ref.isExact) {
-        query.where((tbl) => tbl.ver.equals(ref.version!));
+      if (id.isExact) {
+        query.where((tbl) => tbl.ver.equals(id.ver!));
       }
     }
 
@@ -262,7 +262,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       query.where((tbl) => tbl.refId.equals(referencing.id));
 
       if (referencing.isExact) {
-        query.where((tbl) => tbl.refVer.equals(referencing.version!));
+        query.where((tbl) => tbl.refVer.equals(referencing.ver!));
       }
     }
 
@@ -281,7 +281,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
 
   SimpleSelectStatement<$LocalDocumentsDraftsTable, LocalDocumentDraftEntity> _queryDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     required bool latestOnly,
@@ -295,11 +295,11 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       query.where((tbl) => tbl.type.equalsValue(type));
     }
 
-    if (ref != null) {
-      query.where((tbl) => tbl.id.equals(ref.id));
+    if (id != null) {
+      query.where((tbl) => tbl.id.equals(id.id));
 
-      if (ref.isExact) {
-        query.where((tbl) => tbl.ver.equals(ref.version!));
+      if (id.isExact) {
+        query.where((tbl) => tbl.ver.equals(id.ver!));
       }
     }
 
@@ -307,7 +307,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       query.where((tbl) => tbl.refId.equals(referencing.id));
 
       if (referencing.isExact) {
-        query.where((tbl) => tbl.refVer.equals(referencing.version!));
+        query.where((tbl) => tbl.refVer.equals(referencing.ver!));
       }
     }
 
@@ -315,7 +315,7 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
     }
 
-    if (latestOnly && ref?.version == null) {
+    if (latestOnly && id?.ver == null) {
       final inner = alias(localDocumentsDrafts, 'inner');
 
       query.where((tbl) {
@@ -340,28 +340,28 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
 abstract interface class LocalDraftDocumentsV2Dao {
   Future<int> count({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   });
 
   Future<int> deleteWhere({
-    DocumentRef? ref,
+    DocumentRef? id,
     List<DocumentType>? excludeTypes,
   });
 
-  Future<bool> exists(DocumentRef ref);
+  Future<bool> exists(DocumentRef id);
 
-  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> ids);
 
   Future<LocalDocumentDraftEntity?> getDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   });
 
   Future<List<LocalDocumentDraftEntity>> getDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly,
@@ -369,30 +369,30 @@ abstract interface class LocalDraftDocumentsV2Dao {
     int offset,
   });
 
-  Future<DocumentRef?> getLatestOf(DocumentRef ref);
+  Future<DocumentRef?> getLatestOf(DocumentRef id);
 
   Future<void> saveAll(List<LocalDocumentDraftEntity> entries);
 
   Future<void> updateContent({
-    required DocumentRef ref,
+    required DocumentRef id,
     required DocumentDataContent content,
   });
 
   Stream<int> watchCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   });
 
   Stream<LocalDocumentDraftEntity?> watchDocument({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   });
 
   Stream<List<LocalDocumentDraftEntity>> watchDocuments({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? filters,
     bool latestOnly,

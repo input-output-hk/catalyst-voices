@@ -34,7 +34,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
-      await _proposalService.addFavoriteProposal(ref: ref);
+      await _proposalService.addFavoriteProposal(id: ref);
     } catch (e, st) {
       _logger.severe('Error adding favorite', e, st);
       emitError(LocalizedException.create(e));
@@ -119,7 +119,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   void _handleActiveCampaignChange(Campaign? campaign) {
-    if (_cache.activeCampaign?.selfRef == campaign?.selfRef) {
+    if (_cache.activeCampaign?.id == campaign?.id) {
       return;
     }
 
@@ -175,8 +175,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     final categoriesModel = categories.map(
       (category) {
         final categoryTotalAsk =
-            campaignTotalAsk.categoriesAsks[category.selfRef] ??
-            CampaignCategoryTotalAsk.zero(category.selfRef);
+            campaignTotalAsk.categoriesAsks[category.id] ??
+            CampaignCategoryTotalAsk.zero(category.id);
 
         return CampaignCategoryDetailsViewModel.fromModel(
           category,
@@ -200,7 +200,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     unawaited(_activeCampaignSub?.cancel());
 
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.selfRef != next?.selfRef)
+        .distinct((previous, next) => previous?.id != next?.id)
         .listen(_handleActiveCampaignChange);
   }
 

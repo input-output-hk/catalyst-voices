@@ -58,7 +58,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final category = await _campaignService.getCategory(categoryId);
       final templateRef = category.proposalTemplateRef;
       final template = await _proposalService.getProposalTemplate(
-        ref: templateRef,
+        id: templateRef,
       );
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
@@ -154,7 +154,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   }
 
   void _handleActiveCampaignChange(Campaign? campaign) {
-    if (_cache.activeCampaign?.selfRef == campaign?.selfRef) {
+    if (_cache.activeCampaign?.id == campaign?.id) {
       return;
     }
 
@@ -190,21 +190,21 @@ class NewProposalCubit extends Cubit<NewProposalState>
     final templateRef = campaignCategories
         .cast<CampaignCategory?>()
         .firstWhere(
-          (e) => e?.selfRef == preselectedCategory,
+          (e) => e?.id == preselectedCategory,
           orElse: () => campaignCategories.firstOrNull,
         )
         ?.proposalTemplateRef;
 
     final template = templateRef != null
-        ? await _proposalService.getProposalTemplate(ref: templateRef)
+        ? await _proposalService.getProposalTemplate(id: templateRef)
         : null;
     final titleRange = template?.title?.strLengthRange;
 
     final mappedCategories = campaignCategories.map(
       (category) {
         final categoryTotalAsk =
-            campaignTotalAsk.categoriesAsks[category.selfRef] ??
-            CampaignCategoryTotalAsk.zero(category.selfRef);
+            campaignTotalAsk.categoriesAsks[category.id] ??
+            CampaignCategoryTotalAsk.zero(category.id);
 
         return CampaignCategoryDetailsViewModel.fromModel(
           category,
@@ -239,7 +239,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   void _watchActiveCampaign() {
     unawaited(_activeCampaignSub?.cancel());
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.selfRef != next?.selfRef)
+        .distinct((previous, next) => previous?.id != next?.id)
         .listen(_handleActiveCampaignChange);
   }
 

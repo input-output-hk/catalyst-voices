@@ -1,3 +1,5 @@
+// ignore: directives_ordering,unused_import
+import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:drift/drift.dart';
 
 /// Normalized junction table for document authors with efficient querying capabilities.

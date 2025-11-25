@@ -18,7 +18,7 @@ final class ProposalsCampaignFilters extends Equatable {
   }
 
   factory ProposalsCampaignFilters.from(Campaign campaign) {
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet();
+    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet();
     return ProposalsCampaignFilters(categoriesIds: categoriesIds);
   }
 

@@ -22,7 +22,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     final bytes = await _api.gateway
         .apiV1DocumentDocumentIdGet(
           documentId: ref.id,
-          version: ref.version,
+          version: ref.ver,
         )
         .successBodyBytesOrThrow();
 
@@ -37,7 +37,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       return null;
     }
 
-    return SignedDocumentRef(id: ref.id, version: ver);
+    return SignedDocumentRef(id: ref.id, ver: ver);
   }
 
   @override
@@ -45,7 +45,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     final ver = allConstantDocumentRefs
         .firstWhereOrNull((element) => element.hasId(id))
         ?.withId(id)
-        ?.version;
+        ?.ver;
 
     if (ver != null) {
       return Future.value(ver);
@@ -106,7 +106,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
             return DocumentIndexListDto(
               id: e.id,
               ver: [
-                IndividualDocumentVersion(ver: e.version!, type: type.uuid),
+                IndividualDocumentVersion(ver: e.ver!, type: type.uuid),
               ],
             );
           },
@@ -206,7 +206,7 @@ abstract interface class DocumentDataRemoteSource implements DocumentDataSource 
 }
 
 extension on DocumentRefForFilteredDocuments {
-  SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
+  SignedDocumentRef toRef() => SignedDocumentRef(id: id, ver: ver);
 }
 
 extension on DocumentIndexList {

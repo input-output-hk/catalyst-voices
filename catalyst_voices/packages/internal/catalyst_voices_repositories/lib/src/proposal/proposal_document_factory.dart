@@ -15,7 +15,7 @@ abstract final class ProposalDocumentFactory {
     );
 
     final metadata = ProposalMetadata(
-      selfRef: documentData.metadata.selfRef,
+      id: documentData.metadata.id,
       templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
       authors: documentData.metadata.authors ?? [],

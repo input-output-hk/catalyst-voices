@@ -20,7 +20,7 @@ final class Campaign extends Equatable {
 
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
   // 'draft' version of campaign like Proposal
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final String name;
   final String description;
   final MultiCurrencyAmount allFunds;
@@ -30,7 +30,7 @@ final class Campaign extends Equatable {
   final CampaignPublish publish;
 
   const Campaign({
-    required this.selfRef,
+    required this.id,
     required this.name,
     required this.description,
     required this.allFunds,
@@ -42,7 +42,7 @@ final class Campaign extends Equatable {
 
   factory Campaign.f14() {
     return Campaign(
-      selfRef: f14Ref,
+      id: f14Ref,
       name: 'Catalyst Fund14',
       description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
@@ -56,7 +56,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
 
   factory Campaign.f15() {
     return Campaign(
-      selfRef: f15Ref,
+      id: f15Ref,
       name: 'Catalyst Fund15',
       description: '''TODO''',
       allFunds: MultiCurrencyAmount.list([
@@ -101,7 +101,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     name,
     description,
     allFunds,
@@ -153,7 +153,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
   }
 
   Campaign copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
     String? name,
     String? description,
     MultiCurrencyAmount? allFunds,
@@ -163,7 +163,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     List<CampaignCategory>? categories,
   }) {
     return Campaign(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
       allFunds: allFunds ?? this.allFunds,
@@ -175,7 +175,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
   }
 
   bool hasCategory(String id) {
-    return categories.any((element) => element.selfRef.id == id);
+    return categories.any((element) => element.id.id == id);
   }
 
   /// Returns the state of the campaign for a specific phase.

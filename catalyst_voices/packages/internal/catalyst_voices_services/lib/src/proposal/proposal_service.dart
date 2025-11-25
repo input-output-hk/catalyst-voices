@@ -20,7 +20,7 @@ abstract interface class ProposalService {
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   /// Creates a new proposal draft locally.
@@ -33,7 +33,7 @@ abstract interface class ProposalService {
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
-  Future<void> deleteDraftProposal(DraftRef ref);
+  Future<void> deleteDraftProposal(DraftRef id);
 
   /// Encodes the [document] to exportable format.
   ///
@@ -50,18 +50,18 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
-  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref});
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef id});
 
   Future<DetailProposal> getProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   Future<ProposalDetailData> getProposalDetail({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
@@ -106,7 +106,7 @@ abstract interface class ProposalService {
 
   /// Upserts a proposal draft in the local storage.
   Future<void> upsertDraftProposal({
-    required DraftRef selfRef,
+    required DraftRef id,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
@@ -148,8 +148,8 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
-  Future<void> addFavoriteProposal({required DocumentRef ref}) {
-    return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: true);
+  Future<void> addFavoriteProposal({required DocumentRef id}) {
+    return _proposalRepository.updateProposalFavorite(id: id.id, isFavorite: true);
   }
 
   @override
@@ -164,7 +164,7 @@ final class ProposalServiceImpl implements ProposalService {
       document: DocumentData(
         metadata: DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          selfRef: draftRef,
+          id: draftRef,
           template: template,
           categoryId: categoryId,
           authors: [catalystId],
@@ -177,8 +177,8 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> deleteDraftProposal(DraftRef ref) {
-    return _proposalRepository.deleteDraftProposal(ref);
+  Future<void> deleteDraftProposal(DraftRef id) {
+    return _proposalRepository.deleteDraftProposal(id);
   }
 
   @override
@@ -214,10 +214,10 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref}) async {
-    final latest = await _documentRepository.getLatestOf(ref: ref);
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef id}) async {
+    final latest = await _documentRepository.getLatestOf(id: id);
     if (latest == null) {
-      throw DocumentNotFoundException(ref: ref);
+      throw DocumentNotFoundException(ref: id);
     }
 
     return latest;
@@ -225,17 +225,17 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DetailProposal> getProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   }) async {
-    final proposalData = await _proposalRepository.getProposal(ref: ref);
+    final proposalData = await _proposalRepository.getProposal(ref: id);
     final versions = await _getDetailVersionsOfProposal(proposalData);
 
     return DetailProposal.fromData(proposalData, versions);
   }
 
   @override
-  Future<ProposalDetailData> getProposalDetail({required DocumentRef ref}) async {
-    final proposalData = await _proposalRepository.getProposal(ref: ref);
+  Future<ProposalDetailData> getProposalDetail({required DocumentRef id}) async {
+    final proposalData = await _proposalRepository.getProposal(ref: id);
     final version = await _getDetailVersionsOfProposal(proposalData);
 
     return ProposalDetailData(
@@ -248,10 +248,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef id,
   }) async {
     final proposalTemplate = await _proposalRepository.getProposalTemplate(
-      ref: ref,
+      ref: id,
     );
 
     return proposalTemplate;
@@ -293,13 +293,13 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
-    final originalRef = document.ref;
+    final originalRef = document.id;
 
     // There is a system requirement to publish fresh documents,
     // where version timestamp is not older than a predefined interval.
     // Because of it we're regenerating a version just before publishing.
     final freshRef = originalRef.freshVersion();
-    final freshDocument = document.copyWith(selfRef: freshRef);
+    final freshDocument = document.copyWith(id: freshRef);
 
     await _signerService.useProposerCredentials(
       (catalystId, privateKey) {
@@ -377,7 +377,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> upsertDraftProposal({
-    required DraftRef selfRef,
+    required DraftRef id,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
@@ -391,7 +391,7 @@ final class ProposalServiceImpl implements ProposalService {
       document: DocumentData(
         metadata: DocumentDataMetadata(
           type: DocumentType.proposalDocument,
-          selfRef: selfRef,
+          id: id,
           template: template,
           categoryId: categoryId,
           authors: [catalystId],
@@ -507,7 +507,7 @@ final class ProposalServiceImpl implements ProposalService {
 
                 final groupedProposals = groupBy(
                   validProposalsData,
-                  (data) => data.document.metadata.selfRef.id,
+                  (data) => data.document.metadata.id.id,
                 );
 
                 final filteredProposalsData = groupedProposals.values
@@ -551,14 +551,12 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Stream<ProposalData?>> _createProposalDataStream(
     ProposalDocument doc,
   ) async {
-    final selfRef = doc.metadata.selfRef;
+    final proposalId = doc.metadata.id;
 
-    final commentsCountStream = _proposalRepository.watchCommentsCount(
-      referencing: selfRef,
-    );
+    final commentsCountStream = _proposalRepository.watchCommentsCount(referencing: proposalId);
 
     return Rx.combineLatest2(
-      _proposalRepository.watchProposalPublish(referencing: selfRef),
+      _proposalRepository.watchProposalPublish(referencing: proposalId),
       commentsCountStream,
       (ProposalPublish? publishState, int commentsCount) {
         if (publishState == null) return null;
@@ -575,16 +573,14 @@ final class ProposalServiceImpl implements ProposalService {
   // Helper method to fetch versions for a proposal
   Future<List<ProposalVersion>> _getDetailVersionsOfProposal(ProposalData proposal) async {
     final versions = await _proposalRepository.queryVersionsOfId(
-      id: proposal.document.metadata.selfRef.id,
+      id: proposal.document.metadata.id.id,
       includeLocalDrafts: true,
     );
     final versionsData = (await Future.wait(
       versions.map(
         (e) async {
-          final selfRef = e.metadata.selfRef;
-          final action = await _proposalRepository.getProposalPublishForRef(
-            ref: selfRef,
-          );
+          final proposalId = e.metadata.id;
+          final action = await _proposalRepository.getProposalPublishForRef(ref: proposalId);
           if (action == null) {
             return null;
           }
@@ -620,21 +616,21 @@ final class ProposalServiceImpl implements ProposalService {
     final isFinal = data.isFinal;
 
     final draftVote = isFinal
-        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.selfRef)
+        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
         : null;
     final castedVote = isFinal
-        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.selfRef)
+        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
         : null;
 
     return ProposalBriefData(
-      selfRef: proposal.selfRef,
+      id: proposal.id,
       authorName: proposal.authorName ?? '',
       title: proposal.title ?? '',
       description: proposal.description ?? '',
       categoryName: proposal.categoryName ?? '',
       durationInMonths: proposal.durationInMonths ?? 0,
       fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      createdAt: proposal.selfRef.version!.dateTime,
+      createdAt: proposal.id.ver!.dateTime,
       iteration: data.iteration,
       commentsCount: isFinal ? null : data.commentsCount,
       isFinal: isFinal,

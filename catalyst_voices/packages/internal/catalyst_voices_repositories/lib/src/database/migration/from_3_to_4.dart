@@ -189,7 +189,7 @@ Future<void> _migrateFavorites(
 @JsonSerializable()
 class DocumentDataMetadataDtoDbV3 {
   final String type;
-  final DocumentRefDtoDbV3 selfRef;
+  final DocumentRefDtoDbV3 id;
   final DocumentRefDtoDbV3? ref;
   final SecuredDocumentRefDtoDbV3? refHash;
   final DocumentRefDtoDbV3? template;
@@ -203,7 +203,7 @@ class DocumentDataMetadataDtoDbV3 {
 
   DocumentDataMetadataDtoDbV3({
     required this.type,
-    required this.selfRef,
+    required this.id,
     this.ref,
     this.refHash,
     this.template,
@@ -219,6 +219,7 @@ class DocumentDataMetadataDtoDbV3 {
   factory DocumentDataMetadataDtoDbV3.fromJson(Map<String, dynamic> json) {
     var migrated = _migrateJson1(json);
     migrated = _migrateJson2(migrated);
+    migrated = _migrateJson3(migrated);
 
     return _$DocumentDataMetadataDtoDbV3FromJson(migrated);
   }
@@ -226,7 +227,7 @@ class DocumentDataMetadataDtoDbV3 {
   DocumentDataMetadataDtoDbV3.fromModel(DocumentDataMetadata data)
     : this(
         type: data.type.uuid,
-        selfRef: data.selfRef.toDto(),
+        id: data.id.toDto(),
         ref: data.ref?.toDto(),
         refHash: data.refHash?.toDto(),
         template: data.template?.toDto(),
@@ -242,9 +243,14 @@ class DocumentDataMetadataDtoDbV3 {
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoDbV3ToJson(this);
 
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+    final needsMigration = json.containsKey('id') && json.containsKey('version');
+    if (!needsMigration) {
+      return json;
+    }
 
-    if (modified.containsKey('id') && modified.containsKey('version')) {
+    final modified = Map.of(json);
+
+    if (needsMigration) {
       final id = modified.remove('id') as String;
       final version = modified.remove('version') as String;
 
@@ -259,7 +265,12 @@ class DocumentDataMetadataDtoDbV3 {
   }
 
   static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+    final needsMigration = json['brandId'] is String || json['campaignId'] is String;
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
 
     if (modified['brandId'] is String) {
       final id = modified.remove('brandId') as String;
@@ -280,23 +291,40 @@ class DocumentDataMetadataDtoDbV3 {
 
     return modified;
   }
+
+  static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('selfRef');
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
+
+    if (modified.containsKey('selfRef')) {
+      modified['id'] = modified.remove('selfRef');
+    }
+
+    return modified;
+  }
 }
 
 @JsonSerializable()
 final class DocumentRefDtoDbV3 {
   final String id;
-  final String? version;
+  final String? ver;
   @JsonKey(unknownEnumValue: DocumentRefDtoTypeDbV3.signed)
   final DocumentRefDtoTypeDbV3 type;
 
   const DocumentRefDtoDbV3({
     required this.id,
-    this.version,
+    this.ver,
     required this.type,
   });
 
   factory DocumentRefDtoDbV3.fromJson(Map<String, dynamic> json) {
-    return _$DocumentRefDtoDbV3FromJson(json);
+    final migrated = _migrateJson1(json);
+
+    return _$DocumentRefDtoDbV3FromJson(migrated);
   }
 
   factory DocumentRefDtoDbV3.fromModel(DocumentRef data) {
@@ -307,12 +335,27 @@ final class DocumentRefDtoDbV3 {
 
     return DocumentRefDtoDbV3(
       id: data.id,
-      version: data.version,
+      ver: data.ver,
       type: type,
     );
   }
 
   Map<String, dynamic> toJson() => _$DocumentRefDtoDbV3ToJson(this);
+
+  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('version') && !json.containsKey('ver');
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
+
+    if (modified.containsKey('version') && !modified.containsKey('ver')) {
+      modified['ver'] = modified.remove('version');
+    }
+
+    return modified;
+  }
 }
 
 enum DocumentRefDtoTypeDbV3 { signed, draft }
@@ -354,8 +397,8 @@ extension on DocumentDataMetadataDtoDbV3 {
   List<DocumentAuthorEntity> toAuthorEntity() {
     return (authors ?? const []).map(CatalystId.parse).map((catId) {
       return DocumentAuthorEntity(
-        documentId: selfRef.id,
-        documentVer: selfRef.version!,
+        documentId: id.id,
+        documentVer: id.ver!,
         authorId: catId.toUri().toString(),
         authorIdSignificant: catId.toSignificant().toUri().toString(),
         authorUsername: catId.username,
@@ -367,19 +410,19 @@ extension on DocumentDataMetadataDtoDbV3 {
     required Map<String, dynamic> content,
   }) {
     return DocumentEntityV2(
-      id: selfRef.id,
-      ver: selfRef.version!,
+      id: id.id,
+      ver: id.ver!,
       type: DocumentType.fromJson(type),
-      createdAt: selfRef.version!.dateTime,
+      createdAt: id.ver!.dateTime,
       refId: ref?.id,
-      refVer: ref?.version,
+      refVer: ref?.ver,
       replyId: reply?.id,
-      replyVer: reply?.version,
+      replyVer: reply?.ver,
       section: section,
       categoryId: categoryId?.id,
-      categoryVer: categoryId?.version,
+      categoryVer: categoryId?.ver,
       templateId: template?.id,
-      templateVer: template?.version,
+      templateVer: template?.ver,
       authors: authors?.join(',') ?? '',
       content: DocumentDataContent(content),
     );
@@ -389,19 +432,19 @@ extension on DocumentDataMetadataDtoDbV3 {
     required Map<String, dynamic> content,
   }) {
     return LocalDocumentDraftEntity(
-      id: selfRef.id,
-      ver: selfRef.version!,
+      id: id.id,
+      ver: id.ver!,
       type: DocumentType.fromJson(type),
-      createdAt: selfRef.version!.dateTime,
+      createdAt: id.ver!.dateTime,
       refId: ref?.id,
-      refVer: ref?.version,
+      refVer: ref?.ver,
       replyId: reply?.id,
-      replyVer: reply?.version,
+      replyVer: reply?.ver,
       section: section,
       categoryId: categoryId?.id,
-      categoryVer: categoryId?.version,
+      categoryVer: categoryId?.ver,
       templateId: template?.id,
-      templateVer: template?.version,
+      templateVer: template?.ver,
       authors: authors?.join(',') ?? '',
       content: DocumentDataContent(content),
     );

@@ -57,12 +57,12 @@ void main() {
       // 2. Document Favorites
       final oldDocumentsFavoritesData = docs
           .mapIndexed(
-            (index, e) => _buildDocFavV3(id: e.id, isFavorite: index.isEven),
+            (index, e) => _buildDocFavV3(id: e.id.id, isFavorite: index.isEven),
           )
           .toList();
       final expectedNewDocumentsFavoritesData = docs
           .mapIndexed(
-            (index, e) => _buildDocFavV4(id: e.id, isFavorite: index.isEven),
+            (index, e) => _buildDocFavV4(id: e.id.id, isFavorite: index.isEven),
           )
           .toList();
 
@@ -179,7 +179,7 @@ DocumentData _buildDoc({
 
   final metadata = DocumentDataMetadata(
     type: type,
-    selfRef: DocumentRef.build(id: id, version: ver, isDraft: isDraft),
+    id: DocumentRef.build(id: id, ver: ver, isDraft: isDraft),
     section: section,
     ref: ref,
     reply: reply,
@@ -253,13 +253,9 @@ typedef _OldDocumentData = v3.DocumentsData;
 typedef _OldDraftData = v3.DraftsData;
 
 extension on DocumentData {
-  String get id => metadata.id;
-}
-
-extension on DocumentData {
   _OldDocumentData v3() {
-    final idHiLo = UuidHiLo.from(metadata.id);
-    final verHiLo = UuidHiLo.from(metadata.version);
+    final idHiLo = UuidHiLo.from(metadata.id.id);
+    final verHiLo = UuidHiLo.from(metadata.id.ver!);
 
     final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
       metadata,
@@ -273,13 +269,13 @@ extension on DocumentData {
       content: sqlite3.jsonb.encode(content.data),
       metadata: sqlite3.jsonb.encode(metadataJson),
       type: metadata.type.uuid,
-      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+      createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
 
   _OldDraftData v3Draft() {
-    final idHiLo = UuidHiLo.from(metadata.id);
-    final verHiLo = UuidHiLo.from(metadata.version);
+    final idHiLo = UuidHiLo.from(metadata.id.id);
+    final verHiLo = UuidHiLo.from(metadata.id.ver!);
 
     final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
       metadata,
@@ -300,27 +296,27 @@ extension on DocumentData {
   _NewDocumentData v4() {
     return _NewDocumentData(
       content: sqlite3.jsonb.encode(content.data),
-      id: metadata.id,
+      id: metadata.id.id,
       type: metadata.type.uuid,
-      ver: metadata.version,
+      ver: metadata.id.ver!,
       authors:
           metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       refId: metadata.ref?.id,
-      refVer: metadata.ref?.version,
+      refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.version,
+      replyVer: metadata.reply?.ver,
       section: metadata.section,
       templateId: metadata.template?.id,
-      templateVer: metadata.template?.version,
+      templateVer: metadata.template?.ver,
       categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.version,
-      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+      categoryVer: metadata.categoryId?.ver,
+      createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
 
   List<_NewDocumentAuthor> v4Authors() {
-    final documentId = metadata.selfRef.id;
-    final documentVer = metadata.selfRef.version!;
+    final documentId = metadata.id.id;
+    final documentVer = metadata.id.ver!;
 
     return (metadata.authors ?? []).map(
       (catId) {
@@ -336,8 +332,8 @@ extension on DocumentData {
   }
 
   _NewDraftData v4Draft() {
-    final idHiLo = UuidHiLo.from(metadata.id);
-    final verHiLo = UuidHiLo.from(metadata.version);
+    final idHiLo = UuidHiLo.from(metadata.id.id);
+    final verHiLo = UuidHiLo.from(metadata.id.ver!);
 
     final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
       metadata,
@@ -345,21 +341,21 @@ extension on DocumentData {
 
     return _NewDraftData(
       content: sqlite3.jsonb.encode(content.data),
-      id: metadata.id,
+      id: metadata.id.id,
       type: metadata.type.uuid,
-      ver: metadata.version,
+      ver: metadata.id.ver!,
       authors:
           metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       refId: metadata.ref?.id,
-      refVer: metadata.ref?.version,
+      refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.version,
+      replyVer: metadata.reply?.ver,
       section: metadata.section,
       templateId: metadata.template?.id,
-      templateVer: metadata.template?.version,
+      templateVer: metadata.template?.ver,
       categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.version,
-      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+      categoryVer: metadata.categoryId?.ver,
+      createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
 }

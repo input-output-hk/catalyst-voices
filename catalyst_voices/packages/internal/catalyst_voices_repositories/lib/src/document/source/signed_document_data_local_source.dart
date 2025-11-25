@@ -13,7 +13,7 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
   @override
   Future<DocumentData?> findFirst({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? authorId,
   });
@@ -24,7 +24,7 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
   @override
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? authorId,
     bool latestOnly,

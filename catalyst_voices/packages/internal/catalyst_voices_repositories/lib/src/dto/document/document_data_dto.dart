@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_data_dto.g.dart';
@@ -81,7 +82,7 @@ final class DocumentDataMetadataDto {
     fromJson: DocumentType.fromJson,
   )
   final DocumentType type;
-  final DocumentRefDto selfRef;
+  final DocumentRefDto id;
   final DocumentRefDto? ref;
   final SecuredDocumentRefDto? refHash;
   final DocumentRefDto? template;
@@ -95,7 +96,7 @@ final class DocumentDataMetadataDto {
 
   DocumentDataMetadataDto({
     required this.type,
-    required this.selfRef,
+    required this.id,
     this.ref,
     this.refHash,
     this.template,
@@ -109,8 +110,9 @@ final class DocumentDataMetadataDto {
   });
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
-    var migrated = _migrateJson1(json);
-    migrated = _migrateJson2(migrated);
+    var migrated = migrateJson1(json);
+    migrated = migrateJson2(migrated);
+    migrated = migrateJson3(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
@@ -118,7 +120,7 @@ final class DocumentDataMetadataDto {
   DocumentDataMetadataDto.fromModel(DocumentDataMetadata data)
     : this(
         type: data.type,
-        selfRef: data.selfRef.toDto(),
+        id: data.id.toDto(),
         ref: data.ref?.toDto(),
         refHash: data.refHash?.toDto(),
         template: data.template?.toDto(),
@@ -136,7 +138,7 @@ final class DocumentDataMetadataDto {
   DocumentDataMetadata toModel() {
     return DocumentDataMetadata(
       type: type,
-      selfRef: selfRef.toModel(),
+      id: id.toModel(),
       ref: ref?.toModel(),
       refHash: refHash?.toModel(),
       template: template?.toModel().toSignedDocumentRef(),
@@ -150,10 +152,16 @@ final class DocumentDataMetadataDto {
     );
   }
 
-  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('id') && json.containsKey('version');
+    if (!needsMigration) {
+      return json;
+    }
 
-    if (modified.containsKey('id') && modified.containsKey('version')) {
+    final modified = Map.of(json);
+
+    if (needsMigration) {
       final id = modified.remove('id') as String;
       final version = modified.remove('version') as String;
 
@@ -167,8 +175,14 @@ final class DocumentDataMetadataDto {
     return modified;
   }
 
-  static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson2(Map<String, dynamic> json) {
+    final needsMigration = json['brandId'] is String || json['campaignId'] is String;
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
 
     if (modified['brandId'] is String) {
       final id = modified.remove('brandId') as String;
@@ -185,6 +199,22 @@ final class DocumentDataMetadataDto {
         type: DocumentRefDtoType.signed,
       );
       modified['campaignId'] = dto.toJson();
+    }
+
+    return modified;
+  }
+
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson3(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('selfRef');
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
+
+    if (modified.containsKey('selfRef')) {
+      modified['id'] = modified.remove('selfRef');
     }
 
     return modified;

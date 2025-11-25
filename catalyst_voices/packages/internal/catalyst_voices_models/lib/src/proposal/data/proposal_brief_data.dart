@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final String authorName;
   final String title;
   final String description;
@@ -17,7 +17,7 @@ final class ProposalBriefData extends Equatable {
   final ProposalBriefDataVotes? votes;
 
   const ProposalBriefData({
-    required this.selfRef,
+    required this.id,
     required this.authorName,
     required this.title,
     required this.description,
@@ -34,7 +34,7 @@ final class ProposalBriefData extends Equatable {
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     authorName,
     title,
     description,

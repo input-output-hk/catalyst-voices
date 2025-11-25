@@ -4,7 +4,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 class ProposalBrief extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final String title;
   final String categoryName;
   final String? author;
@@ -19,7 +19,7 @@ class ProposalBrief extends Equatable {
   final VoteButtonData? voteData;
 
   const ProposalBrief({
-    required this.selfRef,
+    required this.id,
     required this.title,
     required this.categoryName,
     this.author,
@@ -36,7 +36,7 @@ class ProposalBrief extends Equatable {
 
   factory ProposalBrief.fromData(ProposalBriefData data) {
     return ProposalBrief(
-      selfRef: data.selfRef,
+      id: data.id,
       title: data.title,
       categoryName: data.categoryName,
       author: data.authorName,
@@ -54,7 +54,7 @@ class ProposalBrief extends Equatable {
 
   factory ProposalBrief.prototype() {
     return ProposalBrief(
-      selfRef: SignedDocumentRef.generateFirstRef(),
+      id: SignedDocumentRef.generateFirstRef(),
       title: 'Proposal Title',
       categoryName: 'Category Name',
       author: 'Author Name',
@@ -74,7 +74,7 @@ class ProposalBrief extends Equatable {
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     title,
     categoryName,
     author,
@@ -90,7 +90,7 @@ class ProposalBrief extends Equatable {
   ];
 
   ProposalBrief copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
     String? title,
     String? categoryName,
     Optional<String>? author,
@@ -105,7 +105,7 @@ class ProposalBrief extends Equatable {
     Optional<VoteButtonData>? voteData,
   }) {
     return ProposalBrief(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       title: title ?? this.title,
       categoryName: categoryName ?? this.categoryName,
       author: author.dataOr(this.author),

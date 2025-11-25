@@ -15,10 +15,10 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   @override
   Future<int> count({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
-    return _database.localDocumentsV2Dao.count(type: type, ref: ref, referencing: referencing);
+    return _database.localDocumentsV2Dao.count(type: type, id: id, referencing: referencing);
   }
 
   @override
@@ -26,23 +26,23 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     DocumentRef? ref,
     List<DocumentType>? excludeTypes,
   }) {
-    return _database.localDocumentsV2Dao.deleteWhere(ref: ref, excludeTypes: excludeTypes);
+    return _database.localDocumentsV2Dao.deleteWhere(id: ref, excludeTypes: excludeTypes);
   }
 
   @override
-  Future<bool> exists({required DocumentRef ref}) {
-    return _database.localDocumentsV2Dao.exists(ref);
+  Future<bool> exists({required DocumentRef id}) {
+    return _database.localDocumentsV2Dao.exists(id);
   }
 
   @override
-  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) {
-    return _database.localDocumentsV2Dao.filterExisting(refs);
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> ids) {
+    return _database.localDocumentsV2Dao.filterExisting(ids);
   }
 
   @override
   Future<List<DocumentData>> findAll({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 100,
@@ -51,7 +51,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     return _database.localDocumentsV2Dao
         .getDocuments(
           type: type,
-          ref: ref,
+          id: id,
           referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
@@ -63,16 +63,16 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   @override
   Future<DocumentData?> findFirst({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
-        .getDocument(type: type, ref: ref, referencing: referencing)
+        .getDocument(type: type, id: id, referencing: referencing)
         .then((value) => value?.toModel());
   }
 
   @override
-  Future<DocumentData?> get(DocumentRef ref) => findFirst(ref: ref);
+  Future<DocumentData?> get(DocumentRef ref) => findFirst(id: ref);
 
   @override
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref) async {
@@ -94,17 +94,17 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {
-    await _database.localDocumentsV2Dao.updateContent(ref: ref, content: content);
+    await _database.localDocumentsV2Dao.updateContent(id: ref, content: content);
   }
 
   @override
   Stream<DocumentData?> watch({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
-        .watchDocument(type: type, ref: ref, referencing: referencing)
+        .watchDocument(type: type, id: id, referencing: referencing)
         .distinct()
         .map((value) => value?.toModel());
   }
@@ -112,7 +112,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   @override
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 100,
@@ -121,7 +121,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     return _database.localDocumentsV2Dao
         .watchDocuments(
           type: type,
-          ref: ref,
+          id: id,
           referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
@@ -134,13 +134,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   @override
   Stream<int> watchCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _database.localDocumentsV2Dao
         .watchCount(
           type: type,
-          ref: ref,
+          id: id,
           referencing: referencing,
         )
         .distinct();
@@ -152,7 +152,7 @@ extension on LocalDocumentDraftEntity {
     return DocumentData(
       metadata: DocumentDataMetadata(
         type: type,
-        selfRef: DraftRef(id: id, version: ver),
+        id: DraftRef(id: id, ver: ver),
         ref: refId.toRef(refVer),
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
@@ -172,7 +172,7 @@ extension on String? {
       return null;
     }
 
-    return SignedDocumentRef(id: id, version: ver);
+    return SignedDocumentRef(id: id, ver: ver);
   }
 }
 
@@ -180,20 +180,20 @@ extension on DocumentData {
   LocalDocumentDraftEntity toEntity() {
     return LocalDocumentDraftEntity(
       content: content,
-      id: metadata.id,
-      ver: metadata.version,
+      id: metadata.id.id,
+      ver: metadata.id.ver!,
       type: metadata.type,
       refId: metadata.ref?.id,
-      refVer: metadata.ref?.version,
+      refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.version,
+      replyVer: metadata.reply?.ver,
       section: metadata.section,
       categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.version,
+      categoryVer: metadata.categoryId?.ver,
       templateId: metadata.template?.id,
-      templateVer: metadata.template?.version,
+      templateVer: metadata.template?.ver,
       authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
-      createdAt: metadata.version.dateTime,
+      createdAt: metadata.id.ver!.dateTime,
     );
   }
 }

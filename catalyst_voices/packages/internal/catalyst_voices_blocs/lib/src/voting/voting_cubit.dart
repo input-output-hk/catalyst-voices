@@ -161,7 +161,7 @@ final class VotingCubit extends Cubit<VotingState>
 
     try {
       if (isFavorite) {
-        await _proposalService.addFavoriteProposal(ref: ref);
+        await _proposalService.addFavoriteProposal(id: ref);
       } else {
         await _proposalService.removeFavoriteProposal(ref: ref);
       }
@@ -190,9 +190,9 @@ final class VotingCubit extends Cubit<VotingState>
   ) {
     return categories.map((e) {
       return ProposalsCategorySelectorItem(
-        ref: e.selfRef,
+        ref: e.id,
         name: e.formattedCategoryName,
-        isSelected: e.selfRef.id == selectedCategoryId,
+        isSelected: e.id.id == selectedCategoryId,
       );
     }).toList();
   }
@@ -314,7 +314,7 @@ final class VotingCubit extends Cubit<VotingState>
     final filters = _cache.filters;
 
     final selectedCategory = campaign?.categories.firstWhereOrNull(
-      (e) => e.selfRef.id == selectedCategoryId,
+      (e) => e.id.id == selectedCategoryId,
     );
 
     final fundNumber = campaign?.fundNumber;
@@ -367,11 +367,9 @@ final class VotingCubit extends Cubit<VotingState>
     if (page != null) {
       var items = List.of(page.items);
       if (_cache.tab != VotingPageTab.favorites || isFavorite) {
-        items = items
-            .map((e) => e.selfRef == ref ? e.copyWith(isFavorite: isFavorite) : e)
-            .toList();
+        items = items.map((e) => e.id == ref ? e.copyWith(isFavorite: isFavorite) : e).toList();
       } else {
-        items = items.where((element) => element.selfRef != ref).toList();
+        items = items.where((element) => element.id != ref).toList();
       }
 
       final diff = page.items.length - items.length;

@@ -112,7 +112,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> deleteDraftProposal(DraftRef ref) {
-    return _documentRepository.deleteDocumentDraft(ref: ref);
+    return _documentRepository.deleteDocumentDraft(id: ref);
   }
 
   @override
@@ -128,7 +128,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(ref: ref);
+    final documentData = await _documentRepository.getDocumentData(id: ref);
     final commentsCount = await _documentRepository.getRefCount(
       referencing: ref,
       type: DocumentType.commentDocument,
@@ -138,7 +138,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       throw const NotFoundException(message: 'Proposal is hidden');
     }
     final templateRef = documentData.metadata.template!;
-    final documentTemplate = await _documentRepository.getDocumentData(ref: templateRef);
+    final documentTemplate = await _documentRepository.getDocumentData(id: templateRef);
     final proposalDocument = _buildProposalDocument(
       documentData: documentData,
       templateData: documentTemplate,
@@ -168,7 +168,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(ref: ref);
+    final documentData = await _documentRepository.getDocumentData(id: ref);
 
     return ProposalTemplateFactory.create(documentData);
   }
@@ -207,7 +207,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
         id: actionRef.id,
-        ver: actionRef.version,
+        ver: actionRef.ver,
         ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
         categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
       ),
@@ -384,8 +384,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
       documentType: DocumentType.proposalDocument,
-      id: metadata.id,
-      ver: metadata.version,
+      id: metadata.id.id,
+      ver: metadata.id.ver,
       template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
       categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );

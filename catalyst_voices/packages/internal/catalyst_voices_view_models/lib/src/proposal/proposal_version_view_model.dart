@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalVersionViewModel extends Equatable {
   final String title;
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final DateTime createdAt;
   final ProposalPublish publish;
   final bool isLatest;
@@ -12,7 +12,7 @@ final class ProposalVersionViewModel extends Equatable {
 
   const ProposalVersionViewModel({
     required this.title,
-    required this.selfRef,
+    required this.id,
     required this.createdAt,
     required this.publish,
     required this.isLatest,
@@ -28,7 +28,7 @@ final class ProposalVersionViewModel extends Equatable {
   }) {
     return ProposalVersionViewModel(
       title: version.title,
-      selfRef: version.selfRef,
+      id: version.id,
       createdAt: version.createdAt,
       publish: version.publish,
       isLatest: isLatest,
@@ -40,7 +40,7 @@ final class ProposalVersionViewModel extends Equatable {
   @override
   List<Object?> get props => [
     title,
-    selfRef,
+    id,
     createdAt,
     publish,
     isLatest,
@@ -50,7 +50,7 @@ final class ProposalVersionViewModel extends Equatable {
 
   ProposalVersionViewModel copyWith({
     String? title,
-    DocumentRef? selfRef,
+    DocumentRef? id,
     DateTime? createdAt,
     ProposalPublish? publish,
     bool? isLatest,
@@ -59,7 +59,7 @@ final class ProposalVersionViewModel extends Equatable {
   }) {
     return ProposalVersionViewModel(
       title: title ?? this.title,
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       publish: publish ?? this.publish,
       isLatest: isLatest ?? this.isLatest,
@@ -78,9 +78,9 @@ extension ProposalVersionViewModelMapper on List<ProposalVersion> {
     return map(
       (version) => ProposalVersionViewModel.fromProposalVersion(
         version,
-        isLatest: first.selfRef == version.selfRef,
-        isLatestLocal: first.selfRef == version.selfRef && version.publish.isLocal,
-        versionNumber: versionNumber(version.selfRef.version!),
+        isLatest: first.id == version.id,
+        isLatestLocal: first.id == version.id && version.publish.isLocal,
+        versionNumber: versionNumber(version.id.ver!),
       ),
     ).toList();
   }

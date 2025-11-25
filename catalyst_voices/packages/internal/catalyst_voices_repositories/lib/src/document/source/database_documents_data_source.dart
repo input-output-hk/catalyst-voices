@@ -26,10 +26,10 @@ final class DatabaseDocumentsDataSource
   @override
   Future<int> count({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
-    return _database.documentsV2Dao.count(type: type, ref: ref, referencing: referencing);
+    return _database.documentsV2Dao.count(type: type, id: id, referencing: referencing);
   }
 
   @override
@@ -40,19 +40,19 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<bool> exists({required DocumentRef ref}) {
-    return _database.documentsV2Dao.exists(ref);
+  Future<bool> exists({required DocumentRef id}) {
+    return _database.documentsV2Dao.exists(id);
   }
 
   @override
-  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) {
-    return _database.documentsV2Dao.filterExisting(refs);
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> ids) {
+    return _database.documentsV2Dao.filterExisting(ids);
   }
 
   @override
   Future<List<DocumentData>> findAll({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     bool latestOnly = false,
     int limit = 200,
@@ -61,7 +61,7 @@ final class DatabaseDocumentsDataSource
     return _database.documentsV2Dao
         .getDocuments(
           type: type,
-          ref: ref,
+          id: id,
           referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
@@ -73,17 +73,17 @@ final class DatabaseDocumentsDataSource
   @override
   Future<DocumentData?> findFirst({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? authorId,
   }) {
     return _database.documentsV2Dao
-        .getDocument(type: type, ref: ref, referencing: referencing, author: authorId)
+        .getDocument(type: type, id: id, referencing: referencing, author: authorId)
         .then((value) => value?.toModel());
   }
 
   @override
-  Future<DocumentData?> get(DocumentRef ref) => findFirst(ref: ref);
+  Future<DocumentData?> get(DocumentRef ref) => findFirst(id: ref);
 
   @override
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
@@ -121,11 +121,11 @@ final class DatabaseDocumentsDataSource
   @override
   Stream<DocumentData?> watch({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _database.documentsV2Dao
-        .watchDocument(type: type, ref: ref, referencing: referencing)
+        .watchDocument(type: type, id: id, referencing: referencing)
         .distinct()
         .map((value) => value?.toModel());
   }
@@ -133,7 +133,7 @@ final class DatabaseDocumentsDataSource
   @override
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? authorId,
     bool latestOnly = false,
@@ -143,7 +143,7 @@ final class DatabaseDocumentsDataSource
     return _database.documentsV2Dao
         .watchDocuments(
           type: type,
-          ref: ref,
+          id: id,
           referencing: referencing,
           latestOnly: latestOnly,
           limit: limit,
@@ -156,13 +156,13 @@ final class DatabaseDocumentsDataSource
   @override
   Stream<int> watchCount({
     DocumentType? type,
-    DocumentRef? ref,
+    DocumentRef? id,
     DocumentRef? referencing,
   }) {
     return _database.documentsV2Dao
         .watchCount(
           type: type,
-          ref: ref,
+          id: id,
           referencing: referencing,
         )
         .distinct();
@@ -226,7 +226,7 @@ extension on DocumentEntityV2 {
     return DocumentData(
       metadata: DocumentDataMetadata(
         type: type,
-        selfRef: SignedDocumentRef(id: id, version: ver),
+        id: SignedDocumentRef(id: id, ver: ver),
         ref: refId.toRef(refVer),
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
@@ -246,7 +246,7 @@ extension on String? {
       return null;
     }
 
-    return SignedDocumentRef(id: id, version: ver);
+    return SignedDocumentRef(id: id, ver: ver);
   }
 }
 
@@ -254,8 +254,8 @@ extension on DocumentData {
   List<DocumentAuthorEntity> toAuthorEntities() {
     return (metadata.authors ?? const []).map((catId) {
       return DocumentAuthorEntity(
-        documentId: metadata.id,
-        documentVer: metadata.version,
+        documentId: metadata.id.id,
+        documentVer: metadata.id.ver!,
         authorId: catId.toUri().toString(),
         authorIdSignificant: catId.toSignificant().toUri().toString(),
         authorUsername: catId.username,
@@ -266,20 +266,20 @@ extension on DocumentData {
   DocumentEntityV2 toDocEntity() {
     return DocumentEntityV2(
       content: content,
-      id: metadata.id,
-      ver: metadata.version,
+      id: metadata.id.id,
+      ver: metadata.id.ver!,
       type: metadata.type,
       refId: metadata.ref?.id,
-      refVer: metadata.ref?.version,
+      refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.version,
+      replyVer: metadata.reply?.ver,
       section: metadata.section,
       categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.version,
+      categoryVer: metadata.categoryId?.ver,
       templateId: metadata.template?.id,
-      templateVer: metadata.template?.version,
+      templateVer: metadata.template?.ver,
       authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
-      createdAt: metadata.version.dateTime,
+      createdAt: metadata.id.ver!.dateTime,
     );
   }
 }

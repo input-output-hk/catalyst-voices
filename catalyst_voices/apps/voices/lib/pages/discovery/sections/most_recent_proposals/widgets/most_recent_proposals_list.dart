@@ -47,7 +47,7 @@ class _MostRecentProposalsList extends StatelessWidget {
       itemCount: proposals.length,
       itemBuilder: (context, index) {
         final proposal = proposals[index];
-        final ref = proposal.selfRef;
+        final ref = proposal.id;
         return Padding(
           key: Key('PendingProposalCard_$ref'),
           padding: EdgeInsets.only(right: index < proposals.length - 1 ? 12 : 0),
@@ -82,7 +82,7 @@ class _MostRecentProposalsList extends StatelessWidget {
     unawaited(
       ProposalRoute(
         proposalId: ref.id,
-        version: ref.version,
+        version: ref.ver,
       ).push(context),
     );
   }
