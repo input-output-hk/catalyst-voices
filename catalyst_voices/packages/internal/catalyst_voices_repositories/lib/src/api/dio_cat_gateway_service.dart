@@ -17,8 +17,8 @@ import 'package:dio/dio.dart';
 /// # Catalyst Gateway API.
 /// The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst Voices voting events.
 ///
-/// Based on OpenAPI Catalyst Gateway API version 0.7.0
-/// catalyst-openapi/v0.7.0 - https://github.com/input-output-hk/catalyst-voices/releases/tag/catalyst-openapi%2Fv0.7.0
+/// Based on OpenAPI Catalyst Gateway API version 0.9.0
+/// catalyst-openapi/v0.9.0 - https://github.com/input-output-hk/catalyst-voices/releases/tag/catalyst-openapi%2Fv0.9.0
 abstract interface class CatGatewayService {
   factory CatGatewayService.dio({
     required String baseUrl,
@@ -36,7 +36,7 @@ abstract interface class CatGatewayService {
 
   void close();
 
-  /// Post A Signed Document Index Query for Newer Versions of v0.0.4.
+  /// Post A Signed Document Index Query (v2).
   /// Produces a summary of signed documents that meet the criteria
   /// defined in the request body for new signed document versions of v0.0.4.
   ///

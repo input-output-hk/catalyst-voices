@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_repositories/src/api/models/problem_report_entry.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'invalid_registration.g.dart';
@@ -23,7 +24,7 @@ final class InvalidRegistration {
 
   /// Error Message
   /// A problem report.
-  final String report;
+  final ProblemReportEntry report;
 
   /// Transaction Id/Hash
   /// A previous transaction ID.

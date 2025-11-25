@@ -14,15 +14,15 @@ final class StakeInfo {
   /// Cardano Blockchain Slot Number
   /// Block's slot number which contains the latest unspent UTXO.
   @JsonKey(name: 'slot_number')
-  final int? slotNumber;
+  final int slotNumber;
 
   /// TXO assets infos.
   final List<StakedTxoAssetInfo> assets;
 
   const StakeInfo({
     required this.adaAmount,
-    this.slotNumber,
-    this.assets = const <StakedTxoAssetInfo>[],
+    required this.slotNumber,
+    required this.assets,
   });
 
   factory StakeInfo.fromJson(Map<String, dynamic> json) => _$StakeInfoFromJson(json);
