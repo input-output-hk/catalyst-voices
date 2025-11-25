@@ -47,11 +47,19 @@ class ProposalHeaderWrapper extends StatelessWidget {
       children: [
         child,
         const ProposalAppClosed(),
-        const Column(
-          children: [
-            ProposalInvitationBanner(),
-            ProposalHeader(),
-          ],
+        const Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          child: Column(
+            // Change vertical direction to change the paint order so that the ProposalInvitationBanner
+            // is not under the ProposalHeader while ProposalHeader is animating.
+            verticalDirection: VerticalDirection.up,
+            children: [
+              ProposalHeader(),
+              ProposalInvitationBanner(),
+            ],
+          ),
         ),
       ],
     );

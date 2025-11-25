@@ -91,7 +91,10 @@ class _InvitationDismissibleBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+        border: Border(bottom: BorderSide(color: Theme.of(context).colors.outlineBorder)),
+      ),
       child: AffixDecorator(
         // Reserve space for the 'x' button to have symmetry.
         prefix: const SizedBox(width: 28, height: 28),
@@ -130,7 +133,10 @@ class _InvitationPendingBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 32),
-      color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+        border: Border(bottom: BorderSide(color: Theme.of(context).colors.outlineBorder)),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
