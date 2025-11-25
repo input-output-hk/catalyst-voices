@@ -154,12 +154,10 @@ final class SyncManagerImpl implements SyncManager {
       stopwatch.stop();
       timelineArgs.took = stopwatch.elapsed;
 
-      unawaited(timeline.finish(arguments: timelineArgs));
-      unawaited(
-        _updateSuccessfulSyncStats(
-          newRefsCount: syncResult.newDocumentsCount,
-          duration: stopwatch.elapsed,
-        ),
+      await timeline.finish(arguments: timelineArgs);
+      await _updateSuccessfulSyncStats(
+        newRefsCount: syncResult.newDocumentsCount,
+        duration: stopwatch.elapsed,
       );
     }
   }
