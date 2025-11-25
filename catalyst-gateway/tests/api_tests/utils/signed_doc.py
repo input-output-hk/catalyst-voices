@@ -7,8 +7,13 @@ import subprocess
 import json
 from api.v1 import document
 from utils import signed_doc, uuid_v7
-from utils.rbac_chain import rbac_chain_factory, RBACChain, RoleID
-from utils.admin import AdminKey, admin_cat_id
+from utils.rbac_chain import (
+    rbac_chain_factory,
+    RBACChain,
+    RoleID,
+    generate_rbac_auth_token,
+)
+from utils.admin import AdminKey, admin_key
 from tempfile import NamedTemporaryFile
 from jsf import JSF
 from enum import IntEnum
@@ -127,7 +132,7 @@ def create_metadata(
     return metadata
 
 
-def generic_doc_builder(
+def generic_doc_builder_with_rbac(
     rbac_chain: RBACChain,
     metadata: dict[str, Any],
     content: Any,
@@ -141,6 +146,29 @@ def generic_doc_builder(
         doc_builder=doc_builder,
         signed_doc=doc_builder.build_and_sign(cat_id, sk_hex),
         auth_token=rbac_chain.auth_token(),
+        cat_id=cat_id,
+        role_id=role_id,
+    )
+
+
+def generic_doc_builder_with_admin_key(
+    admin_key: AdminKey,
+    metadata: dict[str, Any],
+    content: Any,
+) -> DocBuilderReturns:
+    role_id = RoleID.ROLE_0
+
+    doc_builder = SignedDocument(metadata, content)
+    cat_id = admin_key.cat_id()
+    sk_hex = admin_key.sk_hex
+    auth_token = generate_rbac_auth_token(
+        network="cardano", subnet="preprod", pk_hex=admin_key.pk_hex(), sk_hex=sk_hex
+    )
+
+    return DocBuilderReturns(
+        doc_builder=doc_builder,
+        signed_doc=doc_builder.build_and_sign(cat_id, sk_hex),
+        auth_token=auth_token,
         cat_id=cat_id,
         role_id=role_id,
     )
@@ -208,7 +236,6 @@ class ProposalParameterType(IntEnum):
 @pytest.fixture
 def proposal_doc_factory(
     rbac_chain_factory,
-    admin_cat_id,
     proposal_form_template_doc_factory,
     category_parameters_doc,
     campaign_parameters_doc,
@@ -244,7 +271,7 @@ def proposal_doc_factory(
                 {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
         )
-        result = generic_doc_builder(
+        result = generic_doc_builder_with_rbac(
             rbac_chain_factory(),
             metadata,
             JSF(template.content).generate(),
@@ -266,7 +293,7 @@ def proposal_doc_factory(
 @pytest.fixture
 def proposal_form_template_doc_factory(
     rbac_chain_factory,
-    admin_cat_id,
+    admin_key,
     category_parameters_doc,
     campaign_parameters_doc,
     brand_parameters_doc,
@@ -301,8 +328,8 @@ def proposal_form_template_doc_factory(
         metadata["ver"] = tmp_metadata["ver"]
         metadata["parameters"] = tmp_metadata["parameters"]
 
-        result = generic_doc_builder(
-            rbac_chain_factory(),
+        result = generic_doc_builder_with_admin_key(
+            admin_key,
             metadata,
             content,
         )
@@ -325,7 +352,7 @@ def proposal_form_template_doc_factory(
 @pytest.fixture
 def category_parameters_doc(
     rbac_chain_factory,
-    admin_cat_id,
+    admin_key,
     category_parameters_form_template_doc,
     campaign_parameters_doc,
 ) -> SignedDocumentBase:
@@ -345,8 +372,8 @@ def category_parameters_doc(
             {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
         ],
     )
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    result = generic_doc_builder_with_admin_key(
+        admin_key,
         metadata,
         JSF(template.content).generate(),
     )
@@ -364,7 +391,7 @@ def category_parameters_doc(
 
 @pytest.fixture
 def category_parameters_form_template_doc(
-    rbac_chain_factory, admin_cat_id, campaign_parameters_doc
+    rbac_chain_factory, admin_key, campaign_parameters_doc
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = campaign_parameters_doc
 
@@ -373,8 +400,8 @@ def category_parameters_form_template_doc(
         None,
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    result = generic_doc_builder_with_admin_key(
+        admin_key,
         metadata,
         {"type": "object"},
     )
@@ -393,7 +420,7 @@ def category_parameters_form_template_doc(
 @pytest.fixture
 def campaign_parameters_doc(
     rbac_chain_factory,
-    admin_cat_id,
+    admin_key,
     campaign_parameters_form_template_doc,
     brand_parameters_doc,
 ) -> SignedDocumentBase:
@@ -413,8 +440,8 @@ def campaign_parameters_doc(
             {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
         ],
     )
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    result = generic_doc_builder_with_admin_key(
+        admin_key,
         metadata,
         JSF(template.content).generate(),
     )
@@ -432,7 +459,7 @@ def campaign_parameters_doc(
 
 @pytest.fixture
 def campaign_parameters_form_template_doc(
-    rbac_chain_factory, admin_cat_id, brand_parameters_doc
+    rbac_chain_factory, admin_key, brand_parameters_doc
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = brand_parameters_doc
 
@@ -441,8 +468,8 @@ def campaign_parameters_form_template_doc(
         None,
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    result = generic_doc_builder_with_admin_key(
+        admin_key,
         metadata,
         {"type": "object"},
     )
@@ -460,7 +487,7 @@ def campaign_parameters_form_template_doc(
 
 @pytest.fixture
 def brand_parameters_doc(
-    rbac_chain_factory, admin_cat_id, brand_parameters_form_template_doc
+    rbac_chain_factory, admin_key, brand_parameters_form_template_doc
 ) -> SignedDocumentBase:
     template: SignedDocumentBase = brand_parameters_form_template_doc
 
@@ -475,8 +502,8 @@ def brand_parameters_doc(
         ],
         None,
     )
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    result = generic_doc_builder_with_admin_key(
+        admin_key,
         metadata,
         JSF(template.content).generate(),
     )
@@ -494,15 +521,15 @@ def brand_parameters_doc(
 
 @pytest.fixture
 def brand_parameters_form_template_doc(
-    rbac_chain_factory, admin_cat_id
+    rbac_chain_factory, admin_key
 ) -> SignedDocumentBase:
     metadata = create_metadata(
         DOC_TYPE["brand_parameters_form_template"],
         None,
         None,
     )
-    result = generic_doc_builder(
-        rbac_chain_factory(),
+    result = generic_doc_builder_with_admin_key(
+        admin_key,
         metadata,
         {"type": "object"},
     )

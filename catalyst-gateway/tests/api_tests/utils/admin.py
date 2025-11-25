@@ -5,13 +5,22 @@ from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
 
 
 class AdminKey:
+    sk_hex: str
     sk_key: BIP32ED25519PrivateKey
 
-    def __init__(self, hex_sk: str):
-        self.sk = BIP32ED25519PrivateKey(bytes.fromhex(hex_sk), bytes())
+    def __init__(self, sk_hex: str):
+        self.sk_hex = sk_hex
+
+        sk = bytes.fromhex(sk_hex)[:64]
+        chain_code = bytes.fromhex(sk_hex)[64:]
+
+        self.sk = BIP32ED25519PrivateKey(sk, chain_code)
 
     def pk(self) -> BIP32ED25519PublicKey:
         return BIP32ED25519PublicKey.from_private_key(self.sk)
+
+    def pk_hex(self) -> str:
+        return self.pk().public_key.hex()
 
     def base64url_pk(self) -> str:
         return (
@@ -19,11 +28,11 @@ class AdminKey:
         )
 
     def cat_id(self) -> str:
-        return f"admin.catalyst://preview.cardano/{self.base64url_pk()}/0/10"
+        return f"admin.catalyst://preprod.cardano/{self.base64url_pk()}/0/10"
 
 
 @pytest.fixture
-def admin_cat_id() -> AdminKey:
+def admin_key() -> AdminKey:
     with open("./test_data/rbac_regs/only_role_0.jsonc", "r") as json_file:
         keys = json.load(json_file)
 
