@@ -17,118 +17,81 @@ final class DocumentIndexQueryFilter {
   /// ## Signed Document Type.
   ///
   /// The document type must match one of the
-  /// [Registered Document Types](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+  /// [Registered Document Types](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/)
   ///
   /// UUIDv4 Formatted 128bit value.
   ///
-  /// Max items 10
+  /// Max 10 items.
   final List<String>? type;
 
-  /// Document ID Selector
+  /// ## Document ID
   ///
-  /// Either a absolute single Document ID or a range of Document IDs
+  /// Either an absolute single Document ID or a range of
+  /// [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
   final IdSelector? id;
 
-  /// Document Version Selector
+  /// ## Document Version
   ///
-  /// Either a absolute single Document Version or a range of Document Versions
+  /// Either an absolute single Document Version or a range of
+  /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
   final VerSelector? ver;
 
   /// ## Document Reference
   ///
-  /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
+  /// A [reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ref)
   /// to another signed document.  This fields can match any reference that matches the
-  /// defined [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+  /// defined [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
   /// and/or
-  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+  /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
   ///
   /// The kind of document that the reference refers to is defined by the
-  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
-  ///
-  /// Max items 10
-  final List<IdAndVerRef>? ref;
+  /// [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/)
+  final IdAndVerRef? ref;
 
   /// ## Document Template
   ///
   /// Documents that are created based on a template include the
-  /// [template reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#template-template-reference)
+  /// [template reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#template)
   /// to another signed document.  This fields can match any template reference that
-  /// matches the defined [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+  /// matches the defined [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
   /// and/or
-  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+  /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
   ///
   /// The kind of document that the reference refers to is defined by the
-  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+  /// [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/)
   /// however, it will always be a template type document that matches the document
   /// itself.
-  ///
-  /// Max items 10
-  final List<IdAndVerRef>? template;
+  final IdAndVerRef? template;
 
   /// ## Document Reply
   ///
   /// This is a
-  /// [reply reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#reply-reply-reference)
+  /// [reply reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#reply)
   /// which links one document to another, when acting as a reply to it.
   /// Replies typically reference the same kind of document.
   /// This fields can match any reply reference that matches the defined
-  /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+  /// [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
   /// and/or
-  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+  /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
   ///
   /// The kind of document that the reference refers to is defined by the
-  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  ///
-  /// Max items 10
-  final List<IdAndVerRef>? reply;
+  /// [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
+  final IdAndVerRef? reply;
 
-  /// ## Brand
+  /// ## Document Parameters
   ///
   /// This is a
-  /// [brand reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#brand_id)
-  /// to a brand document which defines the brand the document falls under.
-  /// This fields can match any brand reference that matches the defined
-  /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+  /// [parameters reference](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#parameters).
+  /// Reference to a configuration document.
+  /// This fields can match any reference that matches the defined
+  /// [Document IDs](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#id)
   /// and/or
-  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+  /// [Document Versions](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/metadata/#ver)
   ///
-  /// Whether a Document Type has a brand reference is defined by its
-  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  ///
-  /// Max items 10
-  final List<IdAndVerRef>? brand;
-
-  /// ## Campaign
-  ///
-  /// This is a
-  /// [campaign reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#campaign_id)
-  /// to a campaign document which defines the campaign the document falls under.
-  /// This fields can match any campaign reference that matches the defined
-  /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-  /// and/or
-  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-  ///
-  /// Whether a Document Type has a campaign reference is defined by its
-  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  ///
-  /// Max items 10
-  final List<IdAndVerRef>? campaign;
-
-  /// ## Category
-  ///
-  /// This is a
-  /// [category reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#category_id)
-  /// to a category document which defines the category the document falls under.
-  /// This fields can match any category reference that matches the defined
-  /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-  /// and/or
-  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-  ///
-  /// Whether a Document Type has a category reference is defined by its
-  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  ///
-  /// Max items 10
-  final List<IdAndVerRef>? category;
+  /// Whether a Document Type has a brand, campaign, category etc. reference is defined
+  /// by its [Document Type](https://docs.dev.projectcatalyst.io/libs/main/architecture/08_concepts/signed_doc/types/).
+  @JsonKey(name: 'doc_parameters')
+  final IdAndVerRef? parameters;
 
   const DocumentIndexQueryFilter({
     this.type,
@@ -137,9 +100,7 @@ final class DocumentIndexQueryFilter {
     this.ref,
     this.template,
     this.reply,
-    this.brand,
-    this.campaign,
-    this.category,
+    this.parameters,
   });
 
   Map<String, dynamic> toJson() => _$DocumentIndexQueryFilterToJson(this);

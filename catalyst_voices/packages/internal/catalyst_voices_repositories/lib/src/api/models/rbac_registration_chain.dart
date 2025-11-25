@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_repositories/src/api/models/invalid_registration.dart';
 import 'package:catalyst_voices_repositories/src/api/models/rbac_role_data.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_stake_address_info.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rbac_registration_chain.g.dart';
@@ -34,6 +35,10 @@ final class RbacRegistrationChain {
   /// A list of invalid registrations.
   final List<InvalidRegistration> invalid;
 
+  /// A list of stake addresses of the chain.
+  @JsonKey(name: 'stake_addresses')
+  final List<RbacStakeAddressInfo> stakeAddresses;
+
   const RbacRegistrationChain({
     required this.catalystId,
     this.lastPersistentTxn,
@@ -41,6 +46,7 @@ final class RbacRegistrationChain {
     this.purpose = const [],
     this.roles = const [],
     this.invalid = const [],
+    this.stakeAddresses = const [],
   });
 
   factory RbacRegistrationChain.fromJson(Map<String, dynamic> json) =>

@@ -104,7 +104,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }) async {
     final categoryIds = campaign.categories.map((e) => e.selfRef.id).toList();
     final categoryFilter = IdAndVerRef.idOnly(IdSelector.inside(categoryIds));
-    final documentFilter = DocumentIndexQueryFilter(category: [categoryFilter]);
+    final documentFilter = DocumentIndexQueryFilter(parameters: categoryFilter);
 
     return _api.gateway
         .documentIndex(
