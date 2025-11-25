@@ -422,7 +422,6 @@ def proposal_doc_factory(
             ],
             [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
         )
-
         result = generic_doc_builder(
             rbac_chain_factory(), metadata, JSF(template.content).generate()
         )
