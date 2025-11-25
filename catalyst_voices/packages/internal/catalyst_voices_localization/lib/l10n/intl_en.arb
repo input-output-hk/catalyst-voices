@@ -2483,17 +2483,25 @@
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
   },
-  "proposalViewInvitationBannerAcceptButton": "Accept Invitation",
-  "@proposalViewInvitationBannerAcceptButton": {
+  "proposalViewPendingInvitationBannerAcceptButton": "Accept Invitation",
+  "@proposalViewPendingInvitationBannerAcceptButton": {
     "description": "The accept button label in the collaborator invitation banner on the proposal viewer page."
   },
-  "proposalViewInvitationBannerMessage": "You have been invited to join this proposal iteration as a co-proposer",
-  "@proposalViewInvitationBannerMessage": {
+  "proposalViewPendingInvitationBannerMessage": "You have been invited to join this proposal iteration as a co-proposer",
+  "@proposalViewPendingInvitationBannerMessage": {
     "description": "The message in the collaborator invitation banner on the proposal viewer page."
   },
-  "proposalViewInvitationBannerRejectButton": "Reject Invitation",
-  "@proposalViewInvitationBannerRejectButton": {
+  "proposalViewPendingInvitationBannerRejectButton": "Reject Invitation",
+  "@proposalViewPendingInvitationBannerRejectButton": {
     "description": "The reject button label in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewAcceptedInvitationBannerMessage": "**Invitation Accepted:** You'll be named as a collaborator and will be eligible for funding on final proposals with your team. You'll need to continue approving future iterations to remain named.",
+  "@proposalViewAcceptedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation."
+  },
+  "proposalViewRejectedInvitationBannerMessage": "**Invitation Rejected:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
+  "@proposalViewRejectedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation."
   },
   "proposalViewLoadErrorMessage": "We weren't able to load that proposal.",
   "@proposalViewLoadErrorMessage": {

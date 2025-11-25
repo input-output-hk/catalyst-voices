@@ -34,8 +34,6 @@ final class ProposalState extends Equatable {
 
   bool get showError => !isLoading && error != null;
 
-  bool get showInvitation => !invitation.isDismissed && invitation.invitation != null;
-
   ProposalState copyWith({
     bool? isLoading,
     ProposalViewData? data,

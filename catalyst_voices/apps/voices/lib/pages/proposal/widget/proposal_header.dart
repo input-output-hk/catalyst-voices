@@ -2,7 +2,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_app_closed.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_favorite_button.dart';
-import 'package:catalyst_voices/pages/proposal/widget/proposal_invite_banner.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_invitation_banner.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_share_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';

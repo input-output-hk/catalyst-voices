@@ -3,13 +3,15 @@ import 'package:equatable/equatable.dart';
 
 final class CollaboratorInvitationState extends Equatable {
   final CollaboratorInvitation? invitation;
-  final bool isDismissed;
+  final bool showAsAccepted;
+  final bool showAsRejected;
 
   const CollaboratorInvitationState({
     this.invitation,
-    this.isDismissed = false,
+    this.showAsAccepted = false,
+    this.showAsRejected = false,
   });
 
   @override
-  List<Object?> get props => [invitation, isDismissed];
+  List<Object?> get props => [invitation, showAsAccepted, showAsRejected];
 }
