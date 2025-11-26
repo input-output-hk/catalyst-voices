@@ -15,8 +15,9 @@ use anyhow::Context;
 use cardano_chain_follower::{MultiEraBlock, Slot, StakeAddress, TxnIndex, hashes::TransactionId};
 use catalyst_types::{catalyst_id::CatalystId, problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
+use futures::{StreamExt, TryStreamExt};
 use rbac_registration::{
-    cardano::{cip509::Cip509, state::RbacChainsState as _},
+    cardano::{cip509::Cip509, provider::RbacChainsProvider as _},
     registration::cardano::RegistrationChain,
 };
 use scylla::client::session::Session;
@@ -29,7 +30,7 @@ use crate::{
         session::CassandraSession,
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
-    rbac::{RbacBlockIndexingContext, cache_persistent_rbac_chain, state::RbacChainsState},
+    rbac::{RbacBlockIndexingContext, cache_persistent_rbac_chain, provider::RbacChainsProvider},
     settings::cassandra_db::EnvVars,
 };
 
@@ -144,7 +145,7 @@ impl Rbac509InsertQuery {
         context: &mut RbacBlockIndexingContext,
     ) -> anyhow::Result<()> {
         // Find a chain this registration belongs to.
-        let state = RbacChainsState::new(is_persistent, context);
+        let state = RbacChainsProvider::new(is_persistent, context);
 
         let slot = reg.origin().point().slot_or_default();
         let txn_index = reg.origin().txn_index();
@@ -193,7 +194,8 @@ impl Rbac509InsertQuery {
             .iter()
             .filter_map(|v| reg.signing_public_key_for_role(*v))
             .collect::<HashSet<_>>();
-        let modified_chains = state.consume();
+        // During the chain update, it cannot be an any stake addresses updates
+        let modified_chains = HashMap::new();
         let purpose = reg.purpose();
 
         if is_persistent {
@@ -224,14 +226,17 @@ impl Rbac509InsertQuery {
         is_persistent: bool,
         context: &mut RbacBlockIndexingContext,
     ) -> anyhow::Result<()> {
-        let mut state = RbacChainsState::new(is_persistent, context);
+        /// Size of the buffered list adaptor of futures.
+        const FUTURES_BUFFER_SIZE: usize = 10;
+
+        let provider = RbacChainsProvider::new(is_persistent, context);
 
         let slot = reg.origin().point().slot_or_default();
         let txn_index = reg.origin().txn_index();
         let txn_hash = reg.txn_hash();
 
         // Try to start a new chain.
-        let Some(new_chain) = RegistrationChain::new(reg, &mut state).await? else {
+        let Some(new_chain) = RegistrationChain::new(reg, &provider).await? else {
             if let Some(cat_id) = reg.catalyst_id() {
                 self.record_invalid_registration(
                     txn_hash,
@@ -264,8 +269,30 @@ impl Rbac509InsertQuery {
             .iter()
             .filter_map(|v| reg.signing_public_key_for_role(*v))
             .collect::<HashSet<_>>();
-        let modified_chains = state.consume();
         let purpose = reg.purpose();
+
+        let futures = reg.stake_addresses().clone().into_iter().map(|addr| {
+            async {
+                anyhow::Ok((
+                    provider.chain_catalyst_id_from_stake_address(&addr).await?,
+                    addr,
+                ))
+            }
+        });
+        let modified_chains = futures::stream::iter(futures)
+            .buffer_unordered(FUTURES_BUFFER_SIZE)
+            .try_fold(
+                HashMap::<CatalystId, HashSet<StakeAddress>>::new(),
+                |mut acc, (cat_id, addr)| {
+                    async {
+                        if let Some(cat_id) = cat_id {
+                            acc.entry(cat_id).or_default().insert(addr);
+                        }
+                        anyhow::Ok(acc)
+                    }
+                },
+            )
+            .await?;
 
         self.record_valid_registration(
             txn_hash,

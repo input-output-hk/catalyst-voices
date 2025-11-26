@@ -1,7 +1,5 @@
 //! An implementation of the `rbac_registration::cardano::state::RbacChainsState` trait
 
-use std::collections::{HashMap, HashSet};
-
 use anyhow::Context;
 use cardano_chain_follower::{StakeAddress, hashes::TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
@@ -20,19 +18,14 @@ use crate::{
 
 /// A helper struct to handle RBAC related state from the DB and caches.
 /// Implements `rbac_registration::cardano::state::RbacChainsState` trait.
-pub(crate) struct RbacChainsState<'a> {
+pub(crate) struct RbacChainsProvider<'a> {
     /// `index-db` corresponding flag
     is_persistent: bool,
     /// `RbacBlockIndexingContext` reference
     context: &'a RbacBlockIndexingContext,
-    /// Recorded modified registration chains by the `take_stake_address_from_chains`
-    /// method. During the `take_stake_address_from_chains` execution nothing is
-    /// written into the `index-db`, all these data would be written to the DB in a
-    /// batch. To consume this field call `consume` method
-    modified_chains: HashMap<CatalystId, HashSet<StakeAddress>>,
 }
 
-impl<'a> RbacChainsState<'a> {
+impl<'a> RbacChainsProvider<'a> {
     /// Creates a new instance of `RbacChainsState`
     pub fn new(
         is_persistent: bool,
@@ -41,13 +34,7 @@ impl<'a> RbacChainsState<'a> {
         Self {
             is_persistent,
             context,
-            modified_chains: HashMap::new(),
         }
-    }
-
-    /// Consumes `RbacChainsState` instance and returns recorded `modified_chains` field.
-    pub fn consume(self) -> HashMap<CatalystId, HashSet<StakeAddress>> {
-        self.modified_chains
     }
 
     /// Returns a Catalyst ID corresponding to the given transaction hash.
@@ -80,7 +67,7 @@ impl<'a> RbacChainsState<'a> {
     }
 }
 
-impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> {
+impl rbac_registration::cardano::provider::RbacChainsProvider for RbacChainsProvider<'_> {
     async fn chain(
         &self,
         id: &CatalystId,
@@ -136,13 +123,32 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
         Ok(false)
     }
 
-    async fn is_stake_address_used(
+    async fn chain_catalyst_id_from_stake_address(
         &self,
         address: &StakeAddress,
-    ) -> anyhow::Result<bool> {
-        catalyst_id_from_stake_address(address, self.is_persistent, self.context)
-            .await
-            .map(|v| v.is_some())
+    ) -> anyhow::Result<Option<CatalystId>> {
+        use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
+
+        // Check the context first.
+        if let Some(catalyst_id) = self.context.find_address(address) {
+            return Ok(Some(catalyst_id.to_owned()));
+        }
+
+        // Then try to find in the persistent database.
+        let session =
+            CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+        if let Some(id) = Query::latest(&session, address).await? {
+            return Ok(Some(id));
+        }
+
+        // Conditionally check the volatile database.
+        if !self.is_persistent {
+            let session =
+                CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+            return Query::latest(&session, address).await;
+        }
+
+        Ok(None)
     }
 
     async fn chain_catalyst_id_from_signing_public_key(
@@ -172,60 +178,6 @@ impl rbac_registration::cardano::state::RbacChainsState for RbacChainsState<'_> 
 
         Ok(None)
     }
-
-    async fn take_stake_address_from_chains<I>(
-        &mut self,
-        addresses: I,
-    ) -> anyhow::Result<()>
-    where
-        I: IntoIterator<Item = StakeAddress> + Send,
-        <I as IntoIterator>::IntoIter: Send,
-    {
-        for addr in addresses {
-            if let Some(cat_id) =
-                catalyst_id_from_stake_address(&addr, self.is_persistent, self.context).await?
-            {
-                self.modified_chains
-                    .entry(cat_id)
-                    .and_modify(|e| {
-                        e.insert(addr.clone());
-                    })
-                    .or_insert([addr].into_iter().collect());
-            }
-        }
-
-        Ok(())
-    }
-}
-
-/// Returns a Catalyst ID corresponding to the given stake address.
-async fn catalyst_id_from_stake_address(
-    address: &StakeAddress,
-    is_persistent: bool,
-    context: &RbacBlockIndexingContext,
-) -> anyhow::Result<Option<CatalystId>> {
-    use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
-
-    // Check the context first.
-    if let Some(catalyst_id) = context.find_address(address) {
-        return Ok(Some(catalyst_id.to_owned()));
-    }
-
-    // Then try to find in the persistent database.
-    let session =
-        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
-    if let Some(id) = Query::latest(&session, address).await? {
-        return Ok(Some(id));
-    }
-
-    // Conditionally check the volatile database.
-    if !is_persistent {
-        let session =
-            CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
-        return Query::latest(&session, address).await;
-    }
-
-    Ok(None)
 }
 
 /// Returns `true` if there is at least one registration with the given Catalyst ID.
