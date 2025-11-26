@@ -23,6 +23,29 @@ class UserProposalInvitesSection extends StatelessWidget {
   }
 }
 
+class _EmptyProposalInvites extends StatelessWidget {
+  const _EmptyProposalInvites();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: EmptyState(
+        title: Text(context.l10n.noPendingInvitesMessage),
+        image: VoicesImagesScheme(
+          image: VoicesAssets.images.svg.noProposalForeground.buildPicture(),
+          background: Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: context.colors.onSurfaceNeutral08,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _PendingProposalInvites extends StatelessWidget {
   final UserProposalInvites invites;
 
@@ -31,21 +54,7 @@ class _PendingProposalInvites extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (invites.items.isEmpty) {
-      return SliverToBoxAdapter(
-        child: EmptyState(
-          title: Text(context.l10n.noPendingInvitesMessage),
-          image: VoicesImagesScheme(
-            image: VoicesAssets.images.svg.noProposalForeground.buildPicture(),
-            background: Container(
-              height: 180,
-              decoration: BoxDecoration(
-                color: context.colors.onSurfaceNeutral08,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        ),
-      );
+      return const _EmptyProposalInvites();
     }
 
     return SliverList.builder(

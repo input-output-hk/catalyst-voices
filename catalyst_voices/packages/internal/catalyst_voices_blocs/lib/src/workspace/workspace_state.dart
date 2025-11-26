@@ -97,7 +97,7 @@ final class WorkspaceStateProposalInvitesCount extends Equatable {
   const WorkspaceStateProposalInvitesCount({this.invitesCount = 0, this.proposalCount = 0});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [invitesCount, proposalCount];
 
   WorkspaceStateProposalInvitesCount copyWith({
     int? invitesCount,

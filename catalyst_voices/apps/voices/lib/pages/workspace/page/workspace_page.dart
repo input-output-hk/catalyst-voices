@@ -33,7 +33,7 @@ class _WorkspacePageState extends State<WorkspacePage>
         TickerProviderStateMixin,
         SignalHandlerStateMixin<WorkspaceBloc, WorkspaceSignal, WorkspacePage>,
         ErrorHandlerStateMixin<WorkspaceBloc, WorkspacePage> {
-  late VoicesTabController<WorkspacePageTab> _tabController;
+  late final VoicesTabController<WorkspacePageTab> _tabController;
 
   @override
   Widget build(BuildContext context) {

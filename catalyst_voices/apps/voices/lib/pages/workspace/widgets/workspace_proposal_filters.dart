@@ -31,12 +31,12 @@ class WorkspaceProposalFilters extends StatelessWidget {
 class _FilterChip extends StatelessWidget {
   final WorkspaceFilters selectedFilter;
   final WorkspaceFilters filter;
-  final ValueChanged<WorkspaceFilters>? onTap;
+  final ValueChanged<WorkspaceFilters> onTap;
 
   const _FilterChip({
     required this.selectedFilter,
     required this.filter,
-    this.onTap,
+    required this.onTap,
   });
 
   @override
@@ -46,7 +46,7 @@ class _FilterChip extends StatelessWidget {
       content: Text(filter.localizedName(context.l10n)),
       backgroundColor: filter.backgroundColor(context, selectedFilter),
       borderRadius: BorderRadius.circular(16),
-      onTap: () => onTap!(filter),
+      onTap: () => onTap(filter),
     );
   }
 }
@@ -63,23 +63,15 @@ class _Filters extends StatelessWidget {
       padding: const EdgeInsets.only(top: 20),
       child: Wrap(
         spacing: 12,
-        children: [
-          _FilterChip(
-            filter: WorkspaceFilters.allProposals,
-            selectedFilter: filter,
-            onTap: onTap,
-          ),
-          _FilterChip(
-            filter: WorkspaceFilters.mainProposer,
-            selectedFilter: filter,
-            onTap: onTap,
-          ),
-          _FilterChip(
-            filter: WorkspaceFilters.collaborator,
-            selectedFilter: filter,
-            onTap: onTap,
-          ),
-        ],
+        children: WorkspaceFilters.values
+            .map(
+              (value) => _FilterChip(
+                selectedFilter: filter,
+                filter: value,
+                onTap: onTap,
+              ),
+            )
+            .toList(),
       ),
     );
   }

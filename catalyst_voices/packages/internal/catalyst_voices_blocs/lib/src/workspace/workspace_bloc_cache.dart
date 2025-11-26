@@ -10,17 +10,17 @@ final class WorkspaceBlocCache extends Equatable {
   // TODO(LynxLynxx): Update to proper View model
   final List<Object>? invites;
   final CatalystId? activeAccountId;
+  final int invitesCount;
+  final int proposalCount;
 
   const WorkspaceBlocCache({
     this.campaign,
     this.proposals,
     this.invites,
     this.activeAccountId,
+    this.invitesCount = 0,
+    this.proposalCount = 0,
   });
-
-  int get invitesCount => invites?.length ?? 0;
-
-  int get proposalsCount => proposals?.length ?? 0;
 
   @override
   List<Object?> get props => [
@@ -28,6 +28,8 @@ final class WorkspaceBlocCache extends Equatable {
     proposals,
     invites,
     activeAccountId,
+    invitesCount,
+    proposalCount,
   ];
 
   WorkspaceBlocCache copyWith({
@@ -35,12 +37,16 @@ final class WorkspaceBlocCache extends Equatable {
     Optional<List<UsersProposalOverview>>? proposals,
     Optional<List<Object>>? invites,
     Optional<CatalystId>? activeAccountId,
+    int? invitesCount,
+    int? proposalCount,
   }) {
     return WorkspaceBlocCache(
       campaign: campaign.dataOr(this.campaign),
       proposals: proposals.dataOr(this.proposals),
       invites: invites.dataOr(this.invites),
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
+      invitesCount: invitesCount ?? this.invitesCount,
+      proposalCount: proposalCount ?? this.proposalCount,
     );
   }
 }

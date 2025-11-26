@@ -93,15 +93,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         ),
       ),
     );
-    final filters = ProposalsFiltersV2(
-      author: filter.isAllProposals || filter.isMainProposer ? _cache.activeAccountId : null,
-      collaboration: ProposalsCollaborationFilters(
-        collaborator: filter.isCollaborator || filter.isAllProposals
-            ? _cache.activeAccountId
-            : null,
-      ),
-    );
 
+    final filters = _rebuildProposalFilters(filter: filter);
+
+    // TODO(LynxLynxx): Setup count subscription
     await _cancelProposalSubscriptions();
     _setupProposalsSubscription(filters: filters);
   }
@@ -205,6 +200,19 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     add(ChangeWorkspaceFilters(state.userProposals.currentFilter));
   }
 
+  void _handleProposalsError(Object error, StackTrace stackTrace) {
+    if (isClosed) return;
+    _logger.info('Users proposals stream error', error, stackTrace);
+    add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
+  }
+
+  Future<void> _handleProposalsUpdate(List<DetailProposal> proposals) async {
+    _logger.info('Stream received ${proposals.length} proposals');
+    final mappedProposals = await _mapProposalToViewModel(proposals);
+    if (isClosed) return;
+    add(LoadProposalsEvent(mappedProposals));
+  }
+
   Future<void> _importProposal(ImportProposalEvent event, Emitter<WorkspaceState> emit) async {
     try {
       emit(state.copyWith(isLoading: true));
@@ -221,7 +229,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
-    _cache = _cache.copyWith(proposals: Optional(event.proposals));
+    _cache = _cache.copyWith(
+      proposals: Optional(event.proposals),
+      // TODO(LynxLynxx): Update this in count stream instead.
+      proposalCount: event.proposals.length,
+    );
 
     emit(
       state.copyWith(
@@ -268,10 +280,24 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     return Future.wait(futures);
   }
 
+  ProposalsFiltersV2 _rebuildProposalFilters({WorkspaceFilters? filter}) {
+    final newFilter = filter ?? state.userProposals.currentFilter;
+
+    // TODO(LynxLynxx): AllProposals should be either where activeAccountId == author OR activeAccountId is a collaborator
+    return ProposalsFiltersV2(
+      author: newFilter.isAllProposals || newFilter.isMainProposer ? _cache.activeAccountId : null,
+      collaboration: ProposalsCollaborationFilters(
+        collaborator: newFilter.isCollaborator || newFilter.isAllProposals
+            ? _cache.activeAccountId
+            : null,
+      ),
+    );
+  }
+
   WorkspaceStateProposalInvitesCount _rebuildProposalsInvitesCountState() {
     return WorkspaceStateProposalInvitesCount(
       invitesCount: _cache.invitesCount,
-      proposalCount: _cache.proposalsCount,
+      proposalCount: _cache.proposalCount,
     );
   }
 
@@ -293,17 +319,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     _proposalsSub = _proposalService
         .watchUserProposals(filters: filters)
         .listen(
-          (proposals) async {
-            if (isClosed) return;
-            _logger.info('Stream received ${proposals.length} proposals');
-            final mappedProposals = await _mapProposalToViewModel(proposals);
-            add(LoadProposalsEvent(mappedProposals));
-          },
-          onError: (Object error, StackTrace stackTrace) {
-            if (isClosed) return;
-            _logger.info('Users proposals stream error', error, stackTrace);
-            add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
-          },
+          _handleProposalsUpdate,
+          onError: _handleProposalsError,
         );
   }
 
@@ -322,8 +339,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   void _watchUserCatalystId(WatchUserCatalystIdEvent event, Emitter<WorkspaceState> emit) {
-    _activeAccountIdSub = _userService.watchUser
-        .map((event) => event.activeAccount?.catalystId)
+    _activeAccountIdSub = _userService.watchUnlockedActiveAccount
+        .map((event) => event?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChange);
   }
@@ -346,15 +363,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _cancelProposalSubscriptions();
 
     // Build filters from current state
-    final filter = state.userProposals.currentFilter;
-    final filters = ProposalsFiltersV2(
-      author: filter.isAllProposals || filter.isMainProposer ? _cache.activeAccountId : null,
-      collaboration: ProposalsCollaborationFilters(
-        collaborator: filter.isCollaborator || filter.isAllProposals
-            ? _cache.activeAccountId
-            : null,
-      ),
-    );
+    // final filter = state.userProposals.currentFilter;
+    final filters = _rebuildProposalFilters();
 
     _setupProposalsSubscription(filters: filters);
   }

@@ -13,29 +13,6 @@ class WorkspaceTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, WorkspaceStateProposalInvitesCount>(
-      selector: (state) {
-        return state.proposalInvitesCount;
-      },
-      builder: (context, count) {
-        return _WorkspaceTabs(count: count, tabController: tabController);
-      },
-    );
-  }
-}
-
-class _WorkspaceTabs extends StatelessWidget {
-  final WorkspaceStateProposalInvitesCount count;
-
-  final VoicesTabController<WorkspacePageTab> tabController;
-
-  const _WorkspaceTabs({
-    required this.count,
-    required this.tabController,
-  });
-
-  @override
-  Widget build(BuildContext context) {
     return VoicesTabBar(
       dividerHeight: 0,
       controller: tabController,
@@ -46,10 +23,27 @@ class _WorkspaceTabs extends StatelessWidget {
         for (final tab in tabController.tabs)
           VoicesTab(
             data: tab,
-            key: Key(tab.name),
-            child: VoicesTabText(tab.noOf(context, count: count.ofType(tab))),
+            key: tab.tabKey(),
+            child: _TabText(key: ValueKey('${tab.name}Text'), tab: tab),
           ),
       ],
+    );
+  }
+}
+
+class _TabText extends StatelessWidget {
+  final WorkspacePageTab tab;
+
+  const _TabText({
+    required super.key,
+    required this.tab,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, int>(
+      selector: (state) => state.proposalInvitesCount.ofType(tab),
+      builder: (context, count) => VoicesTabText(tab.noOf(context, count: count)),
     );
   }
 }
@@ -62,6 +56,13 @@ extension on WorkspacePageTab {
     return switch (this) {
       WorkspacePageTab.proposals => context.l10n.noOfProposals(count),
       WorkspacePageTab.proposalInvites => context.l10n.noOfProposalInvites(count),
+    };
+  }
+
+  Key tabKey() {
+    return switch (this) {
+      WorkspacePageTab.proposals => const Key('UserProposals'),
+      WorkspacePageTab.proposalInvites => const Key('ProposalInvites'),
     };
   }
 }
