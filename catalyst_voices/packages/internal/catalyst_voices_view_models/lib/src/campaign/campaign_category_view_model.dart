@@ -15,7 +15,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final String subname;
   final String description;
   final String shortDescription;
-  final int proposalsCount;
+  final int finalProposalsCount;
   final MultiCurrencyAmount availableFunds;
   final MultiCurrencyAmount totalAsk;
   final Range<Money> range;
@@ -26,12 +26,12 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final DateTime submissionCloseDate;
 
   const CampaignCategoryDetailsViewModel({
-    required super.id,
+    required super.ref,
     required super.name,
     required this.subname,
     required this.description,
     required this.shortDescription,
-    required this.proposalsCount,
+    required this.finalProposalsCount,
     required this.availableFunds,
     required this.image,
     required this.totalAsk,
@@ -42,17 +42,21 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.submissionCloseDate,
   });
 
-  factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
+  factory CampaignCategoryDetailsViewModel.fromModel(
+    CampaignCategory model, {
+    required int finalProposalsCount,
+    required MultiCurrencyAmount totalAsk,
+  }) {
     return CampaignCategoryDetailsViewModel(
-      id: model.selfRef,
+      ref: model.id,
       name: model.categoryName,
       subname: model.categorySubname,
       description: model.description,
       shortDescription: model.shortDescription,
-      proposalsCount: model.proposalsCount,
+      finalProposalsCount: finalProposalsCount,
       availableFunds: model.availableFunds,
-      image: CategoryImageUrl.image(model.selfRef.id),
-      totalAsk: model.totalAsk,
+      image: CategoryImageUrl.image(model.id.id),
+      totalAsk: totalAsk,
       range: model.range,
       descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),
       dos: model.dos,
@@ -67,13 +71,13 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   /// such as when wrapping widgets with Skeletonizer during data loading.
   factory CampaignCategoryDetailsViewModel.placeholder({String? id}) {
     return CampaignCategoryDetailsViewModel(
-      id: SignedDocumentRef(id: id ?? const Uuid().v7()),
+      ref: SignedDocumentRef(id: id ?? const Uuid().v7()),
       name: 'Cardano Open:',
       subname: 'Developers',
       description:
           '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
       shortDescription: '',
-      proposalsCount: 263,
+      finalProposalsCount: 263,
       availableFunds: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
           currency: Currencies.ada,
@@ -118,7 +122,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     ...super.props,
     subname,
     description,
-    proposalsCount,
+    finalProposalsCount,
     availableFunds,
     totalAsk,
     range,
@@ -131,16 +135,16 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 }
 
 final class CampaignCategoryViewModel extends Equatable {
-  final SignedDocumentRef id;
+  final SignedDocumentRef ref;
   final String name;
 
   const CampaignCategoryViewModel({
-    required this.id,
+    required this.ref,
     required this.name,
   });
 
   @override
-  List<Object?> get props => [id, name];
+  List<Object?> get props => [ref, name];
 }
 
 final class CategoryImageUrl {

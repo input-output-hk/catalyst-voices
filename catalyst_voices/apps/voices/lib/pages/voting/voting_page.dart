@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class VotingPage extends StatefulWidget {
-  final SignedDocumentRef? categoryId;
+  final String? categoryId;
   final VotingPageTab? tab;
 
   const VotingPage({
@@ -38,7 +38,7 @@ class _VotingPageState extends State<VotingPage>
         ErrorHandlerStateMixin<VotingCubit, VotingPage>,
         SignalHandlerStateMixin<VotingCubit, VotingSignal, VotingPage> {
   late VoicesTabController<VotingPageTab> _tabController;
-  late final PagingController<ProposalBriefVoting> _pagingController;
+  late final PagingController<ProposalBrief> _pagingController;
   late final StreamSubscription<List<VotingPageTab>> _tabsSubscription;
 
   @override
@@ -78,9 +78,8 @@ class _VotingPageState extends State<VotingPage>
 
     if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<VotingCubit>().changeFilters(
-        onlyMy: Optional(tab == VotingPageTab.my),
-        category: Optional(widget.categoryId),
-        type: tab.filter,
+        categoryId: Optional(widget.categoryId),
+        tab: Optional(tab),
       );
 
       _doResetPagination();
@@ -103,7 +102,7 @@ class _VotingPageState extends State<VotingPage>
   void handleSignal(VotingSignal signal) {
     switch (signal) {
       case ChangeCategoryVotingSignal(:final to):
-        _updateRoute(categoryId: Optional(to?.id));
+        _updateRoute(categoryId: Optional(to));
       case ChangeTabVotingSignal(:final tab):
         _updateRoute(tab: tab);
       case ResetPaginationVotingSignal():
@@ -146,9 +145,8 @@ class _VotingPageState extends State<VotingPage>
     ).distinct().listen(_updateTabsIfNeeded);
 
     votingCubit.init(
-      onlyMyProposals: selectedTab == VotingPageTab.my,
-      category: widget.categoryId,
-      type: selectedTab.filter,
+      categoryId: widget.categoryId,
+      tab: selectedTab,
     );
 
     _pagingController
@@ -181,7 +179,7 @@ class _VotingPageState extends State<VotingPage>
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
-    ProposalBriefVoting? lastProposalId,
+    ProposalBrief? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<VotingCubit>().getProposals(request);
@@ -192,7 +190,7 @@ class _VotingPageState extends State<VotingPage>
     VotingPageTab? tab,
   }) {
     Router.neglect(context, () {
-      final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
+      final effectiveCategoryId = categoryId.dataOr(widget.categoryId);
       final effectiveTab = tab?.name ?? widget.tab?.name;
 
       VotingRoute(

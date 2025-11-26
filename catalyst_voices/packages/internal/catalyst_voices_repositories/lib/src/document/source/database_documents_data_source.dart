@@ -1,102 +1,101 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 final class DatabaseDocumentsDataSource
     implements SignedDocumentDataSource, ProposalDocumentDataLocalSource {
   final CatalystDatabase _database;
+  final CatalystProfiler _profiler;
 
   DatabaseDocumentsDataSource(
     this._database,
+    this._profiler,
   );
 
   @override
-  Future<int> deleteAll() {
-    return _database.documentsDao.deleteAll();
-  }
-
-  @override
-  Future<int> deleteAllRespectingLocalDrafts() {
-    return _database.documentsDao.deleteAll(keepTemplatesForLocalDrafts: true);
-  }
-
-  @override
-  Future<bool> exists({required DocumentRef ref}) {
-    return _database.documentsDao.count(ref: ref).then((count) => count > 0);
-  }
-
-  @override
-  Future<DocumentData> get({required DocumentRef ref}) async {
-    final entity = await _database.documentsDao.query(ref: ref);
-    if (entity == null) {
-      throw DocumentNotFoundException(ref: ref);
-    }
-
-    return entity.toModel();
-  }
-
-  @override
-  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
-    return _database.documentsDao
-        .queryAll(ref: ref)
-        .then((value) => value.map((e) => e.toModel()).toList());
-  }
-
-  @override
-  Future<DocumentData?> getLatest({
-    CatalystId? authorId,
+  Future<int> count({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
   }) {
-    return _database.documentsDao
-        .queryLatestDocumentData(authorId: authorId)
-        .then((value) => value?.toModel());
+    return _database.documentsV2Dao.count(type: type, id: id, referencing: referencing);
   }
 
   @override
-  Future<List<ProposalDocumentData>> getProposals({
-    SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
+  Future<int> delete({
+    List<DocumentType>? excludeTypes,
   }) {
-    return _database.proposalsDao
-        .queryProposals(
-          categoryRef: categoryRef,
-          filters: ProposalsFilters.forActiveCampaign(type: type),
+    return _database.documentsV2Dao.deleteWhere(excludeTypes: excludeTypes);
+  }
+
+  @override
+  Future<bool> exists({required DocumentRef id}) {
+    return _database.documentsV2Dao.exists(id);
+  }
+
+  @override
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> ids) {
+    return _database.documentsV2Dao.filterExisting(ids);
+  }
+
+  @override
+  Future<List<DocumentData>> findAll({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+    bool latestOnly = false,
+    int limit = 200,
+    int offset = 0,
+  }) {
+    return _database.documentsV2Dao
+        .getDocuments(
+          type: type,
+          id: id,
+          referencing: referencing,
+          latestOnly: latestOnly,
+          limit: limit,
+          offset: offset,
         )
         .then((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override
-  Future<Page<ProposalDocumentData>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) {
-    return _database.proposalsDao
-        .queryProposalsPage(request: request, filters: filters, order: order)
-        .then((page) => page.map((e) => e.toModel()));
-  }
-
-  @override
-  Future<int> getRefCount({
-    required DocumentRef ref,
-    required DocumentType type,
-  }) {
-    return _database.documentsDao.countRefDocumentByType(ref: ref, type: type);
-  }
-
-  @override
-  Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef refTo,
+  Future<DocumentData?> findFirst({
     DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+    CatalystId? authorId,
   }) {
-    return _database.documentsDao
-        .queryRefToDocumentData(refTo: refTo, type: type)
-        .then((e) => e?.toModel());
+    return _database.documentsV2Dao
+        .getDocument(type: type, id: id, referencing: referencing, author: authorId)
+        .then((value) => value?.toModel());
   }
 
   @override
-  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
-    final documentEntities = await _database.documentsDao.queryVersionsOfId(id: id);
-    return documentEntities.map((e) => e.toModel()).toList();
+  Future<DocumentData?> get(DocumentRef ref) => findFirst(id: ref);
+
+  @override
+  Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
+    return _database.documentsV2Dao.getLatestOf(ref);
+  }
+
+  @override
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) {
+    return _database.proposalsV2Dao.getProposalsTotalTask(filters: filters, nodeId: nodeId);
   }
 
   @override
@@ -104,117 +103,210 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
-    final documentsWithMetadata = data.map(
-      (data) {
-        final idHiLo = UuidHiLo.from(data.metadata.id);
-        final verHiLo = UuidHiLo.from(data.metadata.version);
+    final entries = data
+        .map((e) => DocumentWithAuthorsEntity(e.toDocEntity(), e.toAuthorEntities()))
+        .toList();
 
-        final document = DocumentEntity(
-          idHi: idHiLo.high,
-          idLo: idHiLo.low,
-          verHi: verHiLo.high,
-          verLo: verHiLo.low,
-          type: data.metadata.type,
-          content: data.content,
-          metadata: data.metadata,
-          createdAt: DateTime.timestamp(),
-        );
-
-        // TODO(damian-molinski): Need to decide what goes into metadata table.
-        final metadata = <DocumentMetadataEntity>[
-          //
-        ];
-
-        return (document: document, metadata: metadata);
-      },
-    ).toList();
-
-    await _database.documentsDao.saveAll(documentsWithMetadata);
+    await _database.documentsV2Dao.saveAll(entries);
   }
 
   @override
-  Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.documentsDao.watch(ref: ref).map((entity) => entity?.toModel());
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) async {
+    await _database.proposalsV2Dao.updateProposalFavorite(id: id, isFavorite: isFavorite);
+  }
+
+  @override
+  Stream<DocumentData?> watch({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+  }) {
+    return _database.documentsV2Dao
+        .watchDocument(type: type, id: id, referencing: referencing)
+        .distinct()
+        .map((value) => value?.toModel());
   }
 
   @override
   Stream<List<DocumentData>> watchAll({
-    int? limit,
-    required bool unique,
     DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
     CatalystId? authorId,
-    DocumentRef? refTo,
+    bool latestOnly = false,
+    int limit = 200,
+    int offset = 0,
   }) {
-    return _database.documentsDao
-        .watchAll(
-          limit: limit,
-          unique: unique,
+    return _database.documentsV2Dao
+        .watchDocuments(
           type: type,
-          authorId: authorId,
-          refTo: refTo,
+          id: id,
+          referencing: referencing,
+          latestOnly: latestOnly,
+          limit: limit,
+          offset: offset,
         )
-        .map((entities) {
-          return List<DocumentData>.from(entities.map((e) => e.toModel()));
-        });
+        .distinct(listEquals)
+        .map((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override
   Stream<int> watchCount({
-    DocumentRef? refTo,
     DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
   }) {
-    return _database.documentsDao.watchCount(
-      refTo: refTo,
-      type: type,
-    );
+    return _database.documentsV2Dao
+        .watchCount(
+          type: type,
+          id: id,
+          referencing: referencing,
+        )
+        .distinct();
   }
 
   @override
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  }) {
-    return _database.proposalsDao.watchCount(filters: filters);
-  }
-
-  @override
-  Stream<Page<ProposalDocumentData>> watchProposalsPage({
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _database.proposalsDao
-        .watchProposalsPage(request: request, filters: filters, order: order)
-        .map((page) => page.map((e) => e.toModel()));
+    final tr = _profiler.startTransaction('Query proposals: $request:$order:$filters');
+
+    return _database.proposalsV2Dao
+        .watchProposalsBriefPage(request: request, order: order, filters: filters)
+        .doOnData(
+          (_) {
+            if (!tr.finished) unawaited(tr.finish());
+          },
+        )
+        .distinct()
+        .map((page) => page.map((data) => data.toModel()));
   }
 
   @override
-  Stream<DocumentData?> watchRefToDocumentData({
-    required DocumentRef refTo,
-    required DocumentType type,
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _database.documentsDao
-        .watchRefToDocumentData(refTo: refTo, type: type)
-        .map((e) => e?.toModel());
+    final tr = _profiler.startTransaction('Query proposals count: $filters');
+
+    return _database.proposalsV2Dao.watchVisibleProposalsCount(filters: filters).doOnData(
+      (_) {
+        if (!tr.finished) unawaited(tr.finish());
+      },
+    ).distinct();
+  }
+
+  @override
+  Stream<ProposalsTotalAsk> watchProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  }) {
+    return _database.proposalsV2Dao
+        .watchProposalsTotalTask(filters: filters, nodeId: nodeId)
+        .distinct();
+  }
+
+  @override
+  Stream<List<DocumentData>> watchProposalTemplates({
+    required CampaignFilters filters,
+  }) {
+    return _database.documentsV2Dao
+        .watchDocuments(type: DocumentType.proposalTemplate, filters: filters)
+        .distinct(listEquals)
+        .map((event) => event.map((e) => e.toModel()).toList());
   }
 }
 
-extension on DocumentEntity {
+extension on DocumentEntityV2 {
   DocumentData toModel() {
     return DocumentData(
-      metadata: metadata,
+      metadata: DocumentDataMetadata(
+        type: type,
+        id: SignedDocumentRef(id: id, ver: ver),
+        ref: refId.toRef(refVer),
+        template: templateId.toRef(templateVer),
+        reply: replyId.toRef(replyVer),
+        section: section,
+        categoryId: categoryId.toRef(categoryVer),
+        authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
+      ),
       content: content,
     );
   }
 }
 
-extension on JoinedProposalEntity {
-  ProposalDocumentData toModel() {
-    return ProposalDocumentData(
-      proposal: proposal.toModel(),
-      template: template.toModel(),
-      action: action?.toModel(),
+extension on String? {
+  SignedDocumentRef? toRef([String? ver]) {
+    final id = this;
+    if (id == null) {
+      return null;
+    }
+
+    return SignedDocumentRef(id: id, ver: ver);
+  }
+}
+
+extension on DocumentData {
+  List<DocumentAuthorEntity> toAuthorEntities() {
+    return (metadata.authors ?? const []).map((catId) {
+      return DocumentAuthorEntity(
+        documentId: metadata.id.id,
+        documentVer: metadata.id.ver!,
+        authorId: catId.toUri().toString(),
+        authorIdSignificant: catId.toSignificant().toUri().toString(),
+        authorUsername: catId.username,
+      );
+    }).toList();
+  }
+
+  DocumentEntityV2 toDocEntity() {
+    return DocumentEntityV2(
+      content: content,
+      id: metadata.id.id,
+      ver: metadata.id.ver!,
+      type: metadata.type,
+      refId: metadata.ref?.id,
+      refVer: metadata.ref?.ver,
+      replyId: metadata.reply?.id,
+      replyVer: metadata.reply?.ver,
+      section: metadata.section,
+      categoryId: metadata.categoryId?.id,
+      categoryVer: metadata.categoryId?.ver,
+      templateId: metadata.template?.id,
+      templateVer: metadata.template?.ver,
+      authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
+      createdAt: metadata.id.ver!.dateTime,
+    );
+  }
+}
+
+extension on JoinedProposalBriefEntity {
+  JoinedProposalBriefData toModel() {
+    final proposalDocumentData = proposal.toModel();
+    final templateDocumentData = template?.toModel();
+
+    final proposalOrDocument = templateDocumentData == null
+        ? ProposalOrDocument.data(proposalDocumentData)
+        : () {
+            final template = ProposalTemplateFactory.create(templateDocumentData);
+            final proposal = ProposalDocumentFactory.create(
+              proposalDocumentData,
+              template: template,
+            );
+
+            return ProposalOrDocument.proposal(proposal);
+          }();
+
+    return JoinedProposalBriefData(
+      proposal: proposalOrDocument,
+      actionType: actionType,
+      versionIds: versionIds,
       commentsCount: commentsCount,
-      versions: versions,
+      isFavorite: isFavorite,
     );
   }
 }

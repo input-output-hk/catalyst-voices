@@ -50,7 +50,7 @@ class _ListOfProposals extends StatelessWidget {
         final item = items[index];
 
         return WorkspaceProposalCard(
-          key: ValueKey(item.selfRef),
+          key: ValueKey(item.id),
           proposal: item,
         );
       },

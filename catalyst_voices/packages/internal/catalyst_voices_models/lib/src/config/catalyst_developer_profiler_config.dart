@@ -18,6 +18,8 @@ final class CatalystDeveloperProfilerConfig extends Equatable {
   bool get debugProfilePaintsEnabledConfig =>
       const bool.fromEnvironment('DEBUG_PROFILE_PAINTS_ENABLED');
 
+  bool get console => const bool.fromEnvironment('CONSOLE_PROFILE');
+
   @override
   List<Object?> get props => [];
 
@@ -28,7 +30,8 @@ final class CatalystDeveloperProfilerConfig extends Equatable {
         'debugProfileBuildsEnabledUserWidgetsConfig: $debugProfileBuildsEnabledUserWidgetsConfig, '
         'debugProfileDeveloperProfilerEnableAll: $debugProfileDeveloperProfilerEnableAll, '
         'debugProfileLayoutsEnabledConfig: $debugProfileLayoutsEnabledConfig, '
-        'debugProfilePaintsEnabledConfig: $debugProfilePaintsEnabledConfig'
+        'debugProfilePaintsEnabledConfig: $debugProfilePaintsEnabledConfig, '
+        'console: $console'
         '}';
   }
 }

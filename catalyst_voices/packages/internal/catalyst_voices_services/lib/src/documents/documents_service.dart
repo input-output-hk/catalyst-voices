@@ -21,8 +21,10 @@ abstract interface class DocumentsService {
   /// if [keepLocalDrafts] is true local drafts and their templates will be kept.
   Future<int> clear({bool keepLocalDrafts});
 
-  /// Returns all matching [DocumentData] for given [ref].
-  Future<List<DocumentData>> lookup(DocumentRef ref);
+  Future<bool> isFavorite(DocumentRef id);
+
+  /// Returns all matching [DocumentData] for given [id].
+  Future<List<DocumentData>> lookup(DocumentRef id);
 
   /// Syncs locally stored documents with api.
   ///
@@ -57,8 +59,13 @@ final class DocumentsServiceImpl implements DocumentsService {
   }
 
   @override
-  Future<List<DocumentData>> lookup(DocumentRef ref) {
-    return _documentRepository.getAllDocumentsData(ref: ref);
+  Future<bool> isFavorite(DocumentRef id) {
+    return _documentRepository.isFavorite(id);
+  }
+
+  @override
+  Future<List<DocumentData>> lookup(DocumentRef id) {
+    return _documentRepository.findAllVersions(id: id);
   }
 
   @override
@@ -71,7 +78,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     _logger.finer('Indexing documents for f${campaign.fundNumber}');
 
     var syncResult = const DocumentsSyncResult();
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet().toList();
+    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet().toList();
 
     // The sync process is ordered. Templates are synced first as other documents
     // may depend on them.
@@ -138,6 +145,11 @@ final class DocumentsServiceImpl implements DocumentsService {
       await pool.close();
       _logger.finer('Sync pool closed.');
       onProgress?.call(1);
+    }
+
+    // Analyze is kind of expensive so run it when significant amount of docs were added
+    if (syncResult.newDocumentsCount > 100) {
+      await _documentRepository.analyzeDatabase();
     }
 
     return syncResult;
@@ -254,20 +266,19 @@ final class DocumentsServiceImpl implements DocumentsService {
     DocumentIndex index,
     Set<DocumentBaseType> exclude,
     Set<String> excludeIds,
-  ) {
-    return index.docs
+  ) async {
+    final ids = index.docs
         .map((e) => e.refs(exclude: exclude))
         .expand((refs) => refs)
         .where((ref) => !excludeIds.contains(ref.id))
         .toSet()
-        .map((ref) {
-          return _documentRepository
-              .isCached(ref: ref)
-              .onError((_, _) => false)
-              .then((value) => value ? null : ref);
-        })
-        .wait
-        .then((refs) => refs.nonNulls.toList());
+        .toList();
+
+    final cachedRefs = await _documentRepository.isCachedBulk(ids: ids);
+
+    ids.removeWhere(cachedRefs.contains);
+
+    return ids.toList();
   }
 
   /// Fetches the [DocumentData] for a list of [SignedDocumentRef]s concurrently.
@@ -288,7 +299,7 @@ final class DocumentsServiceImpl implements DocumentsService {
       (ref) {
         return pool.withResource(() {
           return _documentRepository
-              .getDocumentData(ref: ref, useCache: false)
+              .getDocumentData(id: ref, useCache: false)
               .then<Result<DocumentData, RefSyncException>>(Success.new)
               .onError((error, stack) {
                 return Failure(RefSyncException(ref, source: error));

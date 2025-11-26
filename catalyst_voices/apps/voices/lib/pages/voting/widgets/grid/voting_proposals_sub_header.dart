@@ -9,7 +9,7 @@ class VotingProposalsSubHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<VotingCubit, VotingState, bool>(
-      selector: (state) => state.selectedCategory != null,
+      selector: (state) => state.hasSelectedCategory,
       builder: (context, hasCategory) {
         return Text(
           hasCategory ? context.l10n.categoryProposals : context.l10n.proposals,
