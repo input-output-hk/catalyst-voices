@@ -80,6 +80,24 @@ services:
         condition: service_healthy
     network_mode: host
 
+  devnet-tests:
+    image: devnet-tests:latest
+    container_name: devnet-tests
+    environment:
+      - CARDANO_NODE_SOCKET_PATH=/shared-data/artifacts/devnet/node-pool1/ipc/node.sock
+      - CARDANO_CLI_BIN=/shared-data/artifacts/devnet/bin/cardano-cli
+      - GENESIS_WALLET_ADDR=/shared-data/artifacts/devnet/addresses/utxo1.addr
+      - GENESIS_WALLET_SKEY=/shared-data/artifacts/devnet/addresses/utxo1.skey
+      - NETWORK_MAGIC=42
+      - CARDANO_API_URL=localhost:8090
+      - GATEWAY_API_URL=localhost:3030
+    volumes:
+      - data:/shared-data
+    depends_on:
+      cat-gateway:
+        condition: service_healthy
+    network_mode: host
+
   schemathesis-runner:
     image: schemathesis-runner:latest
     container_name: schemathesis-runner

@@ -4,6 +4,7 @@ VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.6.3 AS spectral-ci
 IMPORT .. AS gateway
 IMPORT github.com/input-output-hk/catalyst-qa/catalyst-devnet:devnet/v0.0.3 AS devnet
+IMPORT github.com/input-output-hk/catalyst-qa/tests:devnet/v0.0.3 AS devnet-tests
 
 # build all necessary docker images required to run `docker-compose.yml` services
 all-images:
@@ -16,6 +17,7 @@ all-images:
     BUILD +package-event-db-v1
     BUILD +package-haproxy
     BUILD devnet+docker
+    BUILD devnet-tests+docker
 
 # a special package for applying migrations only up to "V2_**" migrations
 package-event-db-v1:
