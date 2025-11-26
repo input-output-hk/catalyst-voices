@@ -2,6 +2,7 @@ import pytest
 import base64
 import json
 from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
+from utils.rbac_chain import generate_rbac_auth_token
 
 
 class AdminKey:
@@ -22,13 +23,21 @@ class AdminKey:
     def pk_hex(self) -> str:
         return self.pk().public_key.hex()
 
-    def base64url_pk(self) -> str:
+    def pk_base64url(self) -> str:
         return (
             base64.urlsafe_b64encode(self.pk().public_key).rstrip(b"=").decode("ascii")
         )
 
     def cat_id(self) -> str:
-        return f"admin.catalyst://preprod.cardano/{self.base64url_pk()}/0/10"
+        return f"admin.catalyst://preprod.cardano/{self.pk_base64url()}/0/10"
+
+    def auth_token(self) -> str:
+        return generate_rbac_auth_token(
+            network="cardano",
+            subnet="preprod",
+            pk_hex=self.pk_hex(),
+            sk_hex=self.sk_hex,
+        )
 
 
 @pytest.fixture

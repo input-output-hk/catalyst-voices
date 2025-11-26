@@ -34,11 +34,11 @@ class RBACChain:
 
     def auth_token(
         self,
-        cid: str = None,
-        sig: str = None,
-        username: str = None,
+        cid: str | None = None,
+        sig: str | None = None,
+        username: str | None = None,
         is_uri: bool = False,
-        nonce: str = None,
+        nonce: str | None = None,
     ) -> str:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
         return generate_rbac_auth_token(
@@ -105,11 +105,11 @@ def generate_cat_id(
     network: str,
     pk_hex: str,
     is_uri: bool = True,
-    subnet: str = None,
-    role_id: str = None,
-    rotation: str = None,
-    username: str = None,
-    nonce: str = None,
+    subnet: str | None = None,
+    role_id: RoleID | None = None,
+    rotation: str | None = None,
+    username: str | None = None,
+    nonce: str | None = None,
 ) -> str:
     pk = bytes.fromhex(pk_hex)[:32]
     role0_pk_b64 = base64_url(pk)
@@ -150,11 +150,11 @@ def generate_rbac_auth_token(
     subnet: str,
     pk_hex: str,
     sk_hex: str,
-    cid: str = None,
-    sig: str = None,
-    username: str = None,
+    cid: str | None = None,
+    sig: str | None = None,
+    username: str | None = None,
     is_uri: bool = False,
-    nonce: str = None,
+    nonce: str | None = None,
 ) -> str:
     pk = bytes.fromhex(pk_hex)[:32]
     sk = bytes.fromhex(sk_hex)[:64]
