@@ -4,7 +4,7 @@ library catalyst_cardano_interop;
 import 'dart:js_interop';
 
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
-import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_wallet_proxy.dart';
+import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_wallet_js_to_dart_proxy.dart';
 
 /// Lists all injected Cardano wallet extensions that are reachable
 /// via window.cardano.{walletName} in javascript.
@@ -111,11 +111,17 @@ extension type JSCardanoWalletCip95Api(JSObject _) implements JSObject {
   /// See [CardanoWalletCip95Api.getUnregisteredPubStakeKeys].
   external JSPromise<JSArray<JSString>> getUnregisteredPubStakeKeys();
 
-  /// See [CardanoWalletApi.signData].
+  /// See [CardanoWalletCip95Api.signData].
   external JSPromise<JSString> signData(
     JSString address,
     JSString payload,
   );
+
+  /// See [CardanoWalletCip95Api.signTx].
+  external JSPromise<JSString> signTx(
+    JSString tx, [
+    JSBoolean? partialSign,
+  ]);
 }
 
 /// The JS representation of the [CipExtension].

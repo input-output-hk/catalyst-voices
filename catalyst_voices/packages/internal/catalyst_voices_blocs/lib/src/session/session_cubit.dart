@@ -7,7 +7,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/rxdart.dart';
 
 bool _alwaysAllowRegistration = kDebugMode;
 
@@ -25,6 +24,7 @@ final class SessionCubit extends Cubit<SessionState>
   final RegistrationProgressNotifier _registrationProgressNotifier;
   final AccessControl _accessControl;
   final AdminTools _adminTools;
+  final FeatureFlagsService _featureFlagsService;
 
   final _logger = Logger('SessionCubit');
 
@@ -32,11 +32,13 @@ final class SessionCubit extends Cubit<SessionState>
   Account? _account;
   AdminToolsState _adminToolsState;
   bool _hasWallets = false;
+  bool _isVotingFeatureFlagEnabled = false;
 
   StreamSubscription<UserSettings>? _userSettingsSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
   StreamSubscription<Account?>? _accountSub;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
+  StreamSubscription<bool>? _votingFeatureFlagValueSub;
 
   SessionCubit(
     this._userService,
@@ -44,6 +46,7 @@ final class SessionCubit extends Cubit<SessionState>
     this._registrationProgressNotifier,
     this._accessControl,
     this._adminTools,
+    this._featureFlagsService,
   ) : _adminToolsState = _adminTools.state,
       super(const SessionState.initial()) {
     _userSettingsSub = _userService.watchUser
@@ -51,11 +54,8 @@ final class SessionCubit extends Cubit<SessionState>
         .distinct()
         .listen(_handleUserSettings);
 
-    _keychainUnlockedSub = _userService.watchUser
-        .map((user) => user.activeAccount)
-        .switchMap((account) {
-          return account?.keychain.watchIsUnlocked ?? Stream.value(false);
-        })
+    _keychainUnlockedSub = _userService.watchUnlockedActiveAccount
+        .map((account) => account != null)
         .distinct()
         .listen(_onActiveKeychainUnlockChanged);
 
@@ -66,6 +66,10 @@ final class SessionCubit extends Cubit<SessionState>
         .listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
+
+    _votingFeatureFlagValueSub = _featureFlagsService
+        .watchFeatureFlag(Features.voting)
+        .listen(_onVotingFeatureFlagChanged);
 
     if (!_alwaysAllowRegistration) {
       unawaited(checkAvailableWallets());
@@ -99,6 +103,9 @@ final class SessionCubit extends Cubit<SessionState>
 
     await _adminToolsSub?.cancel();
     _adminToolsSub = null;
+
+    await _votingFeatureFlagValueSub?.cancel();
+    _votingFeatureFlagValueSub = null;
 
     return super.close();
   }
@@ -161,12 +168,18 @@ final class SessionCubit extends Cubit<SessionState>
   SessionState _createMockedSessionState() {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
+        final spaces = _isVotingFeatureFlagEnabled
+            ? Space.values
+            : (List.of(Space.values)..remove(Space.voting));
+        final spacesShortcuts = _isVotingFeatureFlagEnabled
+            ? AccessControl.allSpacesShortcutsActivators
+            : (Map.of(AccessControl.allSpacesShortcutsActivators)..remove(Space.voting));
         return SessionState(
           status: SessionStatus.actor,
           account: SessionAccount.mocked(),
-          spaces: Space.values,
-          overallSpaces: Space.values,
-          spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
+          spaces: spaces,
+          overallSpaces: spaces,
+          spacesShortcuts: spacesShortcuts,
           canCreateAccount: true,
         );
       case SessionStatus.guest:
@@ -208,9 +221,15 @@ final class SessionCubit extends Cubit<SessionState>
     }
 
     final sessionAccount = SessionAccount.fromAccount(account);
-    final spaces = _accessControl.spacesAccess(account);
-    final overallSpaces = _accessControl.overallSpaces(account);
-    final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
+    final spaces = _isVotingFeatureFlagEnabled
+        ? _accessControl.spacesAccess(account)
+        : (List.of(_accessControl.spacesAccess(account))..remove(Space.voting));
+    final overallSpaces = _isVotingFeatureFlagEnabled
+        ? _accessControl.overallSpaces(account)
+        : (List.of(_accessControl.overallSpaces(account))..remove(Space.voting));
+    final spacesShortcuts = _isVotingFeatureFlagEnabled
+        ? _accessControl.spacesShortcutsActivators(account)
+        : (Map.of(_accessControl.spacesShortcutsActivators(account))..remove(Space.voting));
 
     return SessionState(
       status: SessionStatus.actor,
@@ -223,8 +242,6 @@ final class SessionCubit extends Cubit<SessionState>
     );
   }
 
-  // TODO(damian-molinski): Refactor active account stream so it emits null when account
-  // keychain is locked.
   void _emitAccountBasedSignal() {
     final account = _account;
 
@@ -275,6 +292,13 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   void _onRegistrationProgressChanged() {
+    _updateState();
+  }
+
+  void _onVotingFeatureFlagChanged(bool isEnabled) {
+    _logger.fine('Voting feature flag changed: $isEnabled');
+
+    _isVotingFeatureFlagEnabled = isEnabled;
     _updateState();
   }
 

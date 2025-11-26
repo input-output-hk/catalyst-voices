@@ -58,72 +58,67 @@ class VoicesAlertDialog extends StatelessWidget {
       xs: const BoxConstraints(),
       sm: const BoxConstraints(maxWidth: 360),
       builder: (context, constraints) {
-        // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
-        // is released and we're using this flutter version
-        // Note: fix scheduled for 3.34.x / 3.35.x flutter version
-        return SelectionArea(
-          child: Dialog(
-            alignment: Alignment.center,
-            constraints: constraints,
-            child: Column(
-              key: const Key('VoicesAlertDialog'),
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 10),
-                if (title != null || isDismissible)
-                  _Title(title: title, isDismissible: isDismissible),
-                if (icon != null)
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: title != null ? 24 : 0,
-                      left: 20,
-                      right: 20,
-                    ),
-                    child: Center(child: icon),
+        return Dialog(
+          alignment: Alignment.center,
+          constraints: constraints,
+          child: Column(
+            key: const Key('VoicesAlertDialog'),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 10),
+              if (title != null || isDismissible)
+                _Title(title: title, isDismissible: isDismissible),
+              if (icon != null)
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: title != null ? 24 : 0,
+                    left: 20,
+                    right: 20,
                   ),
-                if (subtitle != null)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: 16,
-                      left: 20,
-                      right: 20,
-                    ),
-                    child: DefaultTextStyle(
-                      key: const Key('VoicesAlertDialogSubtitle'),
-                      style: Theme.of(context).textTheme.titleSmall!,
-                      textAlign: TextAlign.center,
-                      child: subtitle,
-                    ),
+                  child: Center(child: icon),
+                ),
+              if (subtitle != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 16,
+                    left: 20,
+                    right: 20,
                   ),
-                if (content != null)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: 16,
-                      left: 20,
-                      right: 20,
-                    ),
-                    child: DefaultTextStyle(
-                      style: Theme.of(context).textTheme.bodyMedium!,
-                      textAlign: TextAlign.center,
-                      child: content,
-                    ),
+                  child: DefaultTextStyle(
+                    key: const Key('VoicesAlertDialogSubtitle'),
+                    style: Theme.of(context).textTheme.titleSmall!,
+                    textAlign: TextAlign.center,
+                    child: subtitle,
                   ),
-                if (buttons.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 24),
-                        ...buttons.separatedBy(const SizedBox(height: 8)),
-                      ],
-                    ),
+                ),
+              if (content != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 16,
+                    left: 20,
+                    right: 20,
                   ),
-                const SizedBox(height: 16),
-              ],
-            ),
+                  child: DefaultTextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium!,
+                    textAlign: TextAlign.center,
+                    child: content,
+                  ),
+                ),
+              if (buttons.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 24),
+                      ...buttons.separatedBy(const SizedBox(height: 8)),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 16),
+            ],
           ),
         );
       },

@@ -25,6 +25,9 @@ void main(List<String> args) {
   ).process();
 }
 
+const _ciRootDir = '/frontend';
+const _localRootDir = '/catalyst_voices';
+
 class ArbManager {
   final bool clean;
   final bool sort;
@@ -149,12 +152,12 @@ class ArbManager {
   Directory _findRootDir() {
     var current = Directory.current;
     while (current.path != current.parent.path) {
-      if (current.path.endsWith('catalyst_voices')) {
+      if (current.path.endsWith(_localRootDir) || current.path.endsWith(_ciRootDir)) {
         return current;
       }
       current = current.parent;
     }
-    throw Exception('Could not find catalyst_voices directory');
+    throw Exception('Could not find root directory, searched for [$_localRootDir, $_ciRootDir]');
   }
 
   List<File> _getAllDartFiles(Directory dir) {
