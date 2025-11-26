@@ -1,14 +1,10 @@
 import pytest
 import base64
-import json
 from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
-from utils.rbac_chain import generate_rbac_auth_token
+from utils.rbac_chain import generate_rbac_auth_token, ONLY_ROLE_0_REG_JSON, RoleID
 
 
 class AdminKey:
-    sk_hex: str
-    sk_key: BIP32ED25519PrivateKey
-
     def __init__(self, sk_hex: str):
         self.sk_hex = sk_hex
 
@@ -42,7 +38,4 @@ class AdminKey:
 
 @pytest.fixture
 def admin_key() -> AdminKey:
-    with open("./test_data/rbac_regs/only_role_0.jsonc", "r") as json_file:
-        keys = json.load(json_file)
-
-    return AdminKey(keys["0"][0]["sk"])
+    return AdminKey(ONLY_ROLE_0_REG_JSON[f"{RoleID.ROLE_0}"][0]["sk"])
