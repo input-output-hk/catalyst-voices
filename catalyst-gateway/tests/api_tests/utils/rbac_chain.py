@@ -104,6 +104,7 @@ def rbac_chain_factory():
 def generate_cat_id(
     network: str,
     pk_hex: str,
+    scheme: str = "id.catalyst",
     is_uri: bool = True,
     subnet: str | None = None,
     role_id: RoleID | None = None,
@@ -134,13 +135,13 @@ def generate_cat_id(
 
     # Path
     path = f"{role0_pk_b64}"
-    if role_id:
+    if role_id is not None:
         path += f"/{role_id}"
-        if rotation:
+        if rotation is not None:
             path += f"/{rotation}"
 
     if is_uri:
-        return f"id.catalyst://{authority}/{path}"
+        return f"{scheme}://{authority}/{path}"
     else:
         return f"{authority}/{path}"
 
