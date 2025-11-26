@@ -140,32 +140,32 @@ jobs:
 #          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_rsa1
 #          chmod 600 ~/.ssh/id_rsa1
 
-#      - name: Free Disk Space (Ubuntu)
-#        uses: jlumbroso/free-disk-space@main
-#        with:
-#          # this might remove tools that are actually needed,
-#          # if set to "true" but frees about 6 GB
-#          tool-cache: false
-#          # all of these default to true, but feel free to set to
-#          # "false" if necessary for your workflow
-#          android: true
-#          dotnet: false
-#          haskell: false
-#          large-packages: false
-#          docker-images: false
-#          swap-storage: true
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
 
 #      - name: Setup upterm session
 #        uses: owenthereal/action-upterm@v1
 
-      - name: Check if secret is set
-        run: |
-          if [ -z "${{ secrets.PRIVATE_SSH_KEY }}" ]; then
-            echo "Secret is empty or not set"
-            exit 1
-          else
-            echo "Secret is set"
-          fi
+#      - name: Check if secret is set
+#        run: |
+#          if [ -z "${{ secrets.PRIVATE_SSH_KEY }}" ]; then
+#            echo "Secret is empty or not set"
+#            exit 1
+#          else
+#            echo "Secret is set"
+#          fi
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -239,7 +239,12 @@ jobs:
             exit 1
           fi
 
+      - name: Devnet smoke tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up devnet-tests --exit-code-from devnet-tests
+
       - name: Schemathesis tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up schemathesis-runner --exit-code-from schemathesis-runner
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up schemathesis-runner --exit-code-from schemathesis-runner

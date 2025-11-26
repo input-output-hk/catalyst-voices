@@ -1,0 +1,118 @@
+# cspell: words statusgossip socat
+
+services:
+
+  cat-devnet:
+    image: cat-devnet:latest
+    container_name: cat-devnet
+    healthcheck:
+      #TODO when the issues with block initial sizes is fixed, update the healthcheck https://github.com/input-output-hk/catalyst-voices/issues/3327
+      test:  ["CMD-SHELL","bash /healthcheck.sh"]
+      start_period: 60s
+      interval: 30s
+      retries: 20
+    volumes:
+      - data:/shared-data
+    profiles:
+      - devnet
+    network_mode: host
+
+  event-db:
+    image: event-db:latest
+    container_name: event-db
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_NAME=CatalystEventDev
+      - DB_DESCRIPTION="Catalyst Event DB"
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=catalyst-event-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+      - INIT_AND_DROP_DB=true
+      - WITH_MIGRATIONS=true
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    network_mode: host
+
+  scylla-node:
+    image: scylladb/scylla:latest
+    container_name: scylla-node
+    restart: unless-stopped
+    command: --smp 2 --memory 1G --overprovisioned 1  --rpc-address 0.0.0.0 --broadcast-rpc-address 127.0.0.1 --api-address 0.0.0.0 --alternator-address 0.0.0.0
+    healthcheck:
+      test: cqlsh -e "SHOW VERSION" || exit 1
+      interval: 15s
+      timeout: 30s
+      retries: 10
+    network_mode: host
+
+  cat-gateway:
+    image: cat-gateway:latest
+    container_name: cat-gateway
+    healthcheck:
+      test: "curl -s -i localhost:3030/api/v1/health/started | head -n 1 | grep 204"
+      start_period: 30s
+      interval: 30s
+      timeout: 30s
+      # approximately a 25 minutes of waiting
+      retries: 50
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=localhost:9042
+      - CASSANDRA_VOLATILE_URL=localhost:9042
+      - CHAIN_NETWORK=Devnet
+      - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
+      - INTERNAL_API_KEY=123
+      # - LOG_LEVEL=error
+      # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+    depends_on:
+      event-db:
+        condition: service_healthy
+      scylla-node:
+        condition: service_healthy
+      cat-devnet:
+        condition: service_healthy
+    network_mode: host
+
+  devnet-tests:
+    image: devnet-tests:latest
+    container_name: devnet-tests
+    environment:
+      - CARDANO_NODE_SOCKET_PATH=/shared-data/artifacts/devnet/node-pool1/ipc/node.sock
+      - CARDANO_CLI_BIN=/shared-data/artifacts/devnet/bin/cardano-cli
+      - GENESIS_WALLET_ADDR=/shared-data/artifacts/devnet/addresses/utxo1.addr
+      - GENESIS_WALLET_SKEY=/shared-data/artifacts/devnet/addresses/utxo1.skey
+      - NETWORK_MAGIC=42
+      - CARDANO_API_URL=localhost:8090
+      - GATEWAY_API_URL=localhost:3030
+    volumes:
+      - data:/shared-data
+    depends_on:
+      cat-gateway:
+        condition: service_healthy
+    network_mode: host
+
+  schemathesis-runner:
+    image: schemathesis-runner:latest
+    container_name: schemathesis-runner
+    environment:
+      - API_SPEC=${API_SPEC:-http://cat-gateway:3030/docs/cat-gateway.json}
+      - WAIT_FOR_SCHEMA=${WAIT_FOR_SCHEMA:-500}
+      - MAX_RESPONSE_TIME=${MAX_RESPONSE_TIME:-5000}
+      - HYPOTHESIS_MAX_EXAMPLES=${HYPOTHESIS_MAX_EXAMPLES:-100}
+      # place a seed value to reproduce some specific schemathesis test scenario
+      # - SEED=""
+    depends_on:
+      cat-gateway:
+        condition: service_healthy
+
+volumes:
+    data:
