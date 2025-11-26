@@ -242,7 +242,7 @@ jobs:
       - name: Devnet smoke tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         run: |
-          docker compose -f tests/docker-compose-devnet.yml up devnet-tests --exit-code-from devnet-tests
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up devnet-tests --exit-code-from devnet-tests
 
       - name: Schemathesis tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
