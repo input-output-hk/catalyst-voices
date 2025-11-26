@@ -191,7 +191,7 @@ jobs:
       - name: Spin up devnet
         if: ${{ steps.images.conclusion == 'success' }}
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up cat-devnet -d
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 
       - name: Wait for cat-devnet to become healthy
         run: |
@@ -213,7 +213,7 @@ jobs:
       - name: Spin up catalyst-gateway
         id: gateway-started
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up cat-gateway -d
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-gateway -d
 
       - name: Wait for cat-gateway to become healthy
         id: gateway-healthy
