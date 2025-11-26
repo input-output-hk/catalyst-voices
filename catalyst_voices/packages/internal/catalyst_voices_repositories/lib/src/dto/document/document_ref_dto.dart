@@ -9,18 +9,20 @@ part 'document_ref_dto.g.dart';
 @JsonSerializable()
 final class DocumentRefDto {
   final String id;
-  final String? version;
+  final String? ver;
   @JsonKey(unknownEnumValue: DocumentRefDtoType.signed)
   final DocumentRefDtoType type;
 
   const DocumentRefDto({
     required this.id,
-    this.version,
+    this.ver,
     required this.type,
   });
 
   factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
-    return _$DocumentRefDtoFromJson(json);
+    final migrated = migrateJson1(json);
+
+    return _$DocumentRefDtoFromJson(migrated);
   }
 
   factory DocumentRefDto.fromModel(DocumentRef data) {
@@ -31,7 +33,7 @@ final class DocumentRefDto {
 
     return DocumentRefDto(
       id: data.id,
-      version: data.version,
+      ver: data.ver,
       type: type,
     );
   }
@@ -40,9 +42,25 @@ final class DocumentRefDto {
 
   DocumentRef toModel() {
     return switch (type) {
-      DocumentRefDtoType.signed => SignedDocumentRef(id: id, version: version),
-      DocumentRefDtoType.draft => DraftRef(id: id, version: version),
+      DocumentRefDtoType.signed => SignedDocumentRef(id: id, ver: ver),
+      DocumentRefDtoType.draft => DraftRef(id: id, ver: ver),
     };
+  }
+
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('version') && !json.containsKey('ver');
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
+
+    if (modified.containsKey('version') && !modified.containsKey('ver')) {
+      modified['ver'] = modified.remove('version');
+    }
+
+    return modified;
   }
 }
 

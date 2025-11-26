@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 
 /// Represents a vote on proposal.
 final class Vote extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
 
   /// Reference to proposal on which vote was casted.
   final DocumentRef proposal;
@@ -14,48 +14,48 @@ final class Vote extends Equatable {
   final VoteType type;
 
   Vote({
-    required this.selfRef,
+    required this.id,
     required this.proposal,
     required this.type,
-  }) : assert(selfRef.version != null, 'selfRef have to be exact!');
+  }) : assert(id.ver != null, 'id have to be exact!');
 
   Vote.draft({
     String? id,
     required this.proposal,
     required this.type,
-  }) : selfRef = id != null ? DraftRef.generateNextRefFor(id) : DraftRef.generateFirstRef();
+  }) : id = id != null ? DraftRef.generateNextRefFor(id) : DraftRef.generateFirstRef();
 
-  /// Extracts timestamp from [selfRef] version.
-  DateTime get createdAt => selfRef.version!.dateTime;
+  /// Extracts timestamp from [id] version.
+  DateTime get createdAt => id.ver!.dateTime;
 
   /// Whether this vote is final and decision was already made.
-  bool get isCasted => selfRef is SignedDocumentRef;
+  bool get isCasted => id is SignedDocumentRef;
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     proposal,
     type,
   ];
 
   Vote copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
     DocumentRef? proposal,
     VoteType? type,
   }) {
     return Vote(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       proposal: proposal ?? this.proposal,
       type: type ?? this.type,
     );
   }
 
-  /// Make a copy of [Vote] with signed [selfRef]. At this point it can not
+  /// Make a copy of [Vote] with signed [id]. At this point it can not
   /// be modified.
   Vote toCasted() {
     assert(!isCasted, 'Vote is already casted!');
 
-    return copyWith(selfRef: selfRef.toSignedDocumentRef());
+    return copyWith(id: id.toSignedDocumentRef());
   }
 }
 

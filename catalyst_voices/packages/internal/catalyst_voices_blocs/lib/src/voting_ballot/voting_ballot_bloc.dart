@@ -10,6 +10,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 
 final _logger = Logger('VotingBallotBloc');
+
 typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 
 final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
@@ -354,7 +355,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     // because .voteOn will just update type with and keep it the same.
     final voteId = _ballotBuilder.hasVotedOn(proposalRef)
         ? null
-        : await _getLastCastedVoteOn(proposalRef).then((vote) => vote?.selfRef.id);
+        : await _getLastCastedVoteOn(proposalRef).then((vote) => vote?.id.id);
 
     _ballotBuilder.voteOn(
       proposal: proposalRef,

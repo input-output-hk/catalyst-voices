@@ -25,6 +25,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   final ProposalService _proposalService;
   final CommentService _commentService;
   final CampaignService _campaignService;
+  final DocumentsService _documentsService;
   final DocumentMapper _documentMapper;
   final VotingBallotBuilder _ballotBuilder;
   final VotingService _votingService;
@@ -40,6 +41,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     this._proposalService,
     this._commentService,
     this._campaignService,
+    this._documentsService,
     this._documentMapper,
     this._ballotBuilder,
     this._votingService,
@@ -84,12 +86,12 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       emit(state.copyWith(isLoading: true));
 
-      final proposal = await _proposalService.getProposalDetail(ref: ref);
+      final proposal = await _proposalService.getProposalDetail(id: ref);
       final category = await _campaignService.getCategory(proposal.document.metadata.categoryId);
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: proposal.document.metadata.categoryId,
       );
-      final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
+      final isFavorite = await _documentsService.isFavorite(ref);
 
       _cache = _cache.copyWith(
         proposal: Optional(proposal),
@@ -105,7 +107,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       await _commentsSub?.cancel();
       _commentsSub = _commentService
           // Note. watch comments on exact version of proposal.
-          .watchCommentsWith(ref: proposal.document.metadata.selfRef)
+          .watchCommentsWith(ref: proposal.document.metadata.id)
           .distinct(listEquals)
           .listen(_handleCommentsChange);
 
@@ -173,9 +175,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
-        selfRef: commentRef,
+        id: commentRef,
         ref: proposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        template: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: reply,
         categoryId: proposalCategoryId,
         authorId: activeAccountId!,
@@ -253,7 +255,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     emit(state.copyWithFavorite(isFavorite: value));
 
     if (value) {
-      await _proposalService.addFavoriteProposal(ref: ref!);
+      await _proposalService.addFavoriteProposal(id: ref!);
     } else {
       await _proposalService.removeFavoriteProposal(ref: ref!);
     }
@@ -295,16 +297,16 @@ final class ProposalCubit extends Cubit<ProposalState>
     required Vote? draftVote,
   }) {
     final proposalDocument = proposal?.document;
-    final proposalDocumentRef = proposalDocument?.metadata.selfRef;
+    final proposalDocumentRef = proposalDocument?.metadata.id;
 
     final proposalVersions = proposal?.versions ?? const [];
     final versions = proposalVersions.reversed.mapIndexed((index, version) {
-      final ver = version.selfRef.version;
+      final ver = version.id.ver;
 
       return DocumentVersion(
         id: ver ?? '',
         number: index + 1,
-        isCurrent: ver == proposalDocumentRef?.version,
+        isCurrent: ver == proposalDocumentRef?.ver,
         isLatest: index == proposalVersions.length - 1,
       );
     }).toList();
@@ -336,7 +338,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       proposalRef: proposalDocumentRef,
       title: proposalDocument?.title ?? '',
       authorName: proposalDocument?.authorName,
-      createdAt: proposalDocumentRef?.version?.tryDateTime,
+      createdAt: proposalDocumentRef?.ver?.tryDateTime,
       commentsCount: commentsCount,
       versions: versions,
       isFavorite: isFavorite,
@@ -396,7 +398,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required Vote? draftVote,
   }) {
     final document = proposal.document;
-    final isDraftProposal = document.metadata.selfRef is DraftRef;
+    final isDraftProposal = document.metadata.id is DraftRef;
     final isLatestVersion = version?.isLatest ?? false;
 
     final votingSegment = _buildProposalVotingOverviewSegment(
@@ -404,7 +406,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       hasActiveAccount: hasActiveAccount,
       isLatestVersion: isLatestVersion,
       isFinal: proposal.publish.isPublished,
-      proposalRef: proposal.document.metadata.selfRef,
+      proposalRef: proposal.document.metadata.id,
       lastCastedVote: lastCastedVote,
       draftVote: draftVote,
     );

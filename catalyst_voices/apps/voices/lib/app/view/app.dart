@@ -47,20 +47,8 @@ class _AppState extends State<App> {
       BlocProvider<SessionCubit>(
         create: (_) => Dependencies.instance.get<SessionCubit>(),
       ),
-      BlocProvider<ProposalsCubit>(
-        create: (_) => Dependencies.instance.get<ProposalsCubit>(),
-      ),
-      BlocProvider<VotingCubit>(
-        create: (_) => Dependencies.instance.get<VotingCubit>(),
-      ),
       BlocProvider<CampaignBuilderCubit>(
         create: (_) => Dependencies.instance.get<CampaignBuilderCubit>(),
-      ),
-      BlocProvider<WorkspaceBloc>(
-        create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
-      ),
-      BlocProvider<DiscoveryCubit>(
-        create: (context) => Dependencies.instance.get<DiscoveryCubit>(),
       ),
       BlocProvider<CategoryDetailCubit>(
         create: (_) => Dependencies.instance.get<CategoryDetailCubit>(),

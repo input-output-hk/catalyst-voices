@@ -22,7 +22,7 @@ final class CommentDocument extends Equatable {
     return DocumentData(
       metadata: DocumentDataMetadata(
         type: DocumentType.commentDocument,
-        selfRef: metadata.selfRef,
+        id: metadata.id,
         ref: metadata.ref,
         template: metadata.template,
         reply: metadata.reply,
@@ -54,7 +54,7 @@ final class CommentMetadata extends DocumentMetadata {
 
   CommentMetadata({
     // Note. no drafts for comments
-    required SignedDocumentRef super.selfRef,
+    required SignedDocumentRef super.id,
     required this.ref,
     required this.template,
     this.reply,
@@ -77,5 +77,5 @@ final class CommentMetadata extends DocumentMetadata {
       ];
 
   @override
-  SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;
+  SignedDocumentRef get id => super.id as SignedDocumentRef;
 }
