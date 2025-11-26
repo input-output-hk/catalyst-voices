@@ -15,6 +15,9 @@ final class ProposalBriefData extends Equatable {
   final bool isFinal;
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
+  // TODO(damina-molinski): To be implemented
+  final List<ProposalBriefDataVersion>? versions;
+  final List<ProposalBriefDataCollaborator>? collaborators;
 
   const ProposalBriefData({
     required this.id,
@@ -30,6 +33,8 @@ final class ProposalBriefData extends Equatable {
     this.isFinal = false,
     this.isFavorite = false,
     this.votes,
+    this.versions,
+    this.collaborators,
   });
 
   @override
@@ -47,7 +52,22 @@ final class ProposalBriefData extends Equatable {
     isFinal,
     isFavorite,
     votes,
+    versions,
+    collaborators,
   ];
+}
+
+final class ProposalBriefDataVersion extends Equatable {
+  final DocumentRef ref;
+  final String? title;
+
+  const ProposalBriefDataVersion({
+    required this.ref,
+    this.title,
+  });
+
+  @override
+  List<Object?> get props => [ref, title];
 }
 
 final class ProposalBriefDataVotes extends Equatable {
@@ -61,4 +81,18 @@ final class ProposalBriefDataVotes extends Equatable {
 
   @override
   List<Object?> get props => [draft, casted];
+}
+
+
+final class ProposalBriefDataCollaborator extends Equatable {
+  final CatalystId id;
+  final ProposalsCollaborationStatusFilter status;
+
+  const ProposalBriefDataCollaborator({
+    required this.id,
+    required this.status,
+  });
+
+  @override
+  List<Object?> get props => [id, status];
 }
