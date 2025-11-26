@@ -21,6 +21,7 @@ export 'document/source/document_data_source.dart';
 export 'document/source/local_document_data_local_source.dart';
 export 'document/source/signed_document_data_local_source.dart';
 export 'dto/document/document_dto.dart' show DocumentExt;
+export 'feature_flags/feature_flags_repository.dart' show FeatureFlagsRepository;
 export 'logging/logging_settings_storage.dart';
 export 'proposal/proposal_repository.dart' show ProposalRepository;
 export 'signed_document/signed_document_manager.dart' show SignedDocumentManager;

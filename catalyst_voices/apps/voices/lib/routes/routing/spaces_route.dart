@@ -10,6 +10,7 @@ import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
+import 'package:catalyst_voices/routes/guards/voting_feature_flag_guard.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -177,7 +178,7 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
+final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
   static const name = 'voting';
 
   final String? categoryId;
@@ -187,6 +188,9 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
     this.categoryId,
     this.tab,
   });
+
+  @override
+  List<RouteGuard> get routeGuards => [const VotingFeatureFlagGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

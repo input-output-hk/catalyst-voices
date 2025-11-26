@@ -73,6 +73,9 @@ class _AppState extends State<App> {
       BlocProvider<VotingBallotBloc>(
         create: (_) => Dependencies.instance.get<VotingBallotBloc>(),
       ),
+      BlocProvider<FeatureFlagsCubit>(
+        create: (_) => Dependencies.instance.get<FeatureFlagsCubit>(),
+      ),
     ];
   }
 }
