@@ -102,9 +102,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
       allRefs.addAll(response.refs);
 
-      // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-      // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-      remaining = response.docs.length < maxPerPage ? 0 : response.page.remaining;
+      remaining = response.page.remaining;
       page = response.page.page + 1;
     } while (remaining > 0);
 
