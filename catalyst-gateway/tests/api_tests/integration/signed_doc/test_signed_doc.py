@@ -2,7 +2,7 @@ import pytest
 from utils import uuid_v7
 from api.v1 import document as document_v1
 from api.v2 import document as document_v2
-from utils.rbac_chain import rbac_chain_factory
+from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import admin_key
 from utils.signed_doc import (
     proposal_doc_factory,
@@ -20,7 +20,8 @@ from utils.signed_doc import (
 @pytest.mark.preprod_indexing
 def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
-    (proposal_doc, role_id) = proposal_doc_factory(ProposalParameterType.CATEGORY)
+    role_id = RoleID.PROPOSER
+    proposal_doc = proposal_doc_factory(ProposalParameterType.CATEGORY, role_id)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc_id = proposal_doc.metadata["id"]
 
@@ -91,7 +92,8 @@ def test_document_index_endpoint(
     proposal_doc_factory,
     rbac_chain_factory,
 ):
-    (doc, role_id) = proposal_doc_factory(ProposalParameterType.CATEGORY)
+    role_id = RoleID.PROPOSER
+    doc = proposal_doc_factory(ProposalParameterType.CATEGORY, role_id)
 
     rbac_chain = rbac_chain_factory()
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)

@@ -196,7 +196,8 @@ def proposal_doc_factory(
 ):
     def __factory__(
         parameter_type: ProposalParameterType,
-    ) -> tuple[SignedDocument, RoleID]:
+        role_id: RoleID
+    ) -> SignedDocument:
         param: SignedDocumentBase
         if parameter_type == ProposalParameterType.CATEGORY:
             param = category_parameters_doc
@@ -226,7 +227,6 @@ def proposal_doc_factory(
         )
         content = JSF(template.content).generate()
 
-        role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
         doc = SignedDocument(metadata, content)
         (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
@@ -239,7 +239,7 @@ def proposal_doc_factory(
             f"Failed to publish document: {resp.status_code} - {resp.text}"
         )
 
-        return doc, role_id
+        return doc
 
     return __factory__
 
