@@ -13,8 +13,6 @@ services:
       retries: 20
     volumes:
       - data:/shared-data
-    profiles:
-      - devnet
     network_mode: host
 
   event-db:
@@ -113,6 +111,7 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
+    network_mode: host
 
 volumes:
     data:
