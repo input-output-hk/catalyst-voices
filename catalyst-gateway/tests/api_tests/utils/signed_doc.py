@@ -227,18 +227,18 @@ def proposal_doc_factory(
 
         role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
-        doc_builder = SignedDocument(metadata, JSF(template.content).generate())
+        doc = SignedDocument(metadata, JSF(template.content).generate())
         (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
 
         resp = document.put(
-            data=doc_builder.build_and_sign(cat_id, sk_hex),
+            data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
         )
         assert resp.status_code == 201, (
             f"Failed to publish document: {resp.status_code} - {resp.text}"
         )
 
-        return doc_builder, role_id
+        return doc, role_id
 
     return __factory__
 
@@ -281,17 +281,17 @@ def proposal_form_template_doc_factory(
         metadata["ver"] = tmp_metadata["ver"]
         metadata["parameters"] = tmp_metadata["parameters"]
 
+        doc = SignedDocument(metadata, content)
+
         resp = document.put(
-            data=SignedDocument(metadata, content).build_and_sign(
-                admin_key.cat_id(), admin_key.sk_hex
-            ),
+            data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
             token=admin_key.auth_token(),
         )
         assert resp.status_code == 201, (
             f"Failed to publish document: {resp.status_code} - {resp.text}"
         )
 
-        return SignedDocumentBase(metadata, content)
+        return doc
 
     return __factory__
 
@@ -320,18 +320,17 @@ def category_parameters_doc(
         ],
     )
     content = JSF(template.content).generate()
+    doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=SignedDocument(metadata, content).build_and_sign(
-            admin_key.cat_id(), admin_key.sk_hex
-        ),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
-    return SignedDocumentBase(metadata, content)
+    return doc
 
 
 @pytest.fixture
@@ -346,18 +345,17 @@ def category_parameters_form_template_doc(
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
     content = {"type": "object"}
+    doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=SignedDocument(metadata, content).build_and_sign(
-            admin_key.cat_id(), admin_key.sk_hex
-        ),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
-    return SignedDocumentBase(metadata, content)
+    return doc
 
 
 @pytest.fixture
@@ -384,18 +382,17 @@ def campaign_parameters_doc(
         ],
     )
     content = JSF(template.content).generate()
+    doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=SignedDocument(metadata, content).build_and_sign(
-            admin_key.cat_id(), admin_key.sk_hex
-        ),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
-    return SignedDocumentBase(metadata, content)
+    return doc
 
 
 @pytest.fixture
@@ -410,18 +407,17 @@ def campaign_parameters_form_template_doc(
         [{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
     content = {"type": "object"}
+    doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=SignedDocument(metadata, content).build_and_sign(
-            admin_key.cat_id(), admin_key.sk_hex
-        ),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
-    return SignedDocumentBase(metadata, content)
+    return doc
 
 
 @pytest.fixture
@@ -442,18 +438,17 @@ def brand_parameters_doc(
         None,
     )
     content = JSF(template.content).generate()
+    doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=SignedDocument(metadata, content).build_and_sign(
-            admin_key.cat_id(), admin_key.sk_hex
-        ),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
-    return SignedDocumentBase(metadata, content)
+    return doc
 
 
 @pytest.fixture
@@ -466,15 +461,14 @@ def brand_parameters_form_template_doc(
         None,
     )
     content = {"type": "object"}
+    doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=SignedDocument(metadata, content).build_and_sign(
-            admin_key.cat_id(), admin_key.sk_hex
-        ),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
-    return SignedDocumentBase(metadata, content)
+    return doc
