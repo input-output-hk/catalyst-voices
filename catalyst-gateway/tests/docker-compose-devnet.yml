@@ -102,7 +102,7 @@ services:
     image: schemathesis-runner:latest
     container_name: schemathesis-runner
     environment:
-      - API_SPEC=${API_SPEC:-http://cat-gateway:3030/docs/cat-gateway.json}
+      - API_SPEC=${API_SPEC:-http://localhost:3030/docs/cat-gateway.json}
       - WAIT_FOR_SCHEMA=${WAIT_FOR_SCHEMA:-500}
       - MAX_RESPONSE_TIME=${MAX_RESPONSE_TIME:-5000}
       - HYPOTHESIS_MAX_EXAMPLES=${HYPOTHESIS_MAX_EXAMPLES:-100}
