@@ -133,7 +133,7 @@ final class ProposalViewCommentsSection extends ProposalCommentsSection
   Iterable<SegmentsListViewItem> get children {
     return comments.mapIndexed((index, comment) {
       return ProposalCommentListItem(
-        id: id.child(comment.comment.metadata.selfRef.id),
+        id: id.child(comment.comment.metadata.id.id),
         comment: comment,
         canReply: canReply,
       );

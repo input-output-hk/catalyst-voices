@@ -91,8 +91,6 @@ Future<BootstrapArgs> bootstrap({
       fromTo: DateRange(from: startConfigTimestamp, to: endConfigTimestamp),
     );
 
-  final runtimeProfiler = CatalystRuntimeProfiler(profiler)..start(at: bootstrapStartTimestamp);
-
   await Dependencies.instance.init(
     config: config,
     environment: environment,
@@ -100,7 +98,6 @@ Future<BootstrapArgs> bootstrap({
     reportingService: _reportingService,
     profiler: profiler,
     startupProfiler: startupProfiler,
-    runtimeProfiler: runtimeProfiler,
   );
 
   final router = buildAppRouter(initialLocation: initialLocation);
@@ -185,8 +182,8 @@ Future<void> cleanUpStorages({
 Future<void> cleanUpUserDataFromDatabase() async {
   final db = Dependencies.instance.get<CatalystDatabase>();
 
-  await db.draftsDao.deleteWhere();
-  await db.favoritesDao.deleteAll();
+  await db.localDocumentsV2Dao.deleteWhere();
+  await db.localMetadataDao.deleteWhere();
 }
 
 @visibleForTesting
@@ -216,14 +213,16 @@ Future<void> registerDependencies({
 /// - [CatalystNoopProfiler] for debug mode (no overhead)
 CatalystProfiler _createProfiler(AppConfig config) {
   if (kProfileMode) {
-    return CatalystDeveloperProfiler.fromConfig(config.developerProfiler);
+    return config.profiler.console
+        ? const CatalystProfiler.console()
+        : CatalystProfiler.developer(config.profiler);
   }
 
   if (_shouldUseSentry) {
-    return const CatalystSentryProfiler();
+    return const CatalystProfiler.sentry();
   }
 
-  return const CatalystNoopProfiler();
+  return const CatalystProfiler.noop();
 }
 
 void _debugPrintStressTest() {

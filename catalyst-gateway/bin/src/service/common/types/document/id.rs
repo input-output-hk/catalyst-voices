@@ -14,7 +14,7 @@ use serde_json::Value;
 
 use self::generic::uuidv7;
 use crate::{
-    db::event::common::eq_or_ranged_uuid::UuidSelector,
+    db::event::common::uuid_selector::UuidSelector,
     service::common::types::{
         array_types::impl_array_types, generic, string_types::impl_string_types,
     },
@@ -302,7 +302,8 @@ impl TryFrom<IdSelector> for UuidSelector {
                     Vec::from(ids.0.r#in)
                         .into_iter()
                         .map(|id| id.0.parse::<uuid::Uuid>())
-                        .collect::<Result<_, _>>()?,
+                        .collect::<Result<Vec<_>, _>>()?
+                        .into(),
                 ))
             },
         }
@@ -344,7 +345,8 @@ impl TryFrom<IdSelectorDocumented> for Option<UuidSelector> {
                     Vec::from(ids.0.r#in)
                         .into_iter()
                         .map(|id| id.0.parse::<uuid::Uuid>())
-                        .collect::<Result<_, _>>()?,
+                        .collect::<Result<Vec<_>, _>>()?
+                        .into(),
                 )))
             },
             IdSelector::In(_) => Ok(None),

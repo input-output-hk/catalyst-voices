@@ -34,7 +34,7 @@ final class DocumentIndexDoc extends Equatable {
         .map((ver) {
           return [
             if (ver.type.baseTypes.none((value) => exclude.contains(value)))
-              SignedDocumentRef(id: id, version: ver.ver),
+              SignedDocumentRef(id: id, ver: ver.ver),
             if (ver.ref case final value?) value,
             if (ver.reply case final value?) value,
             if (ver.template case final value? when !exclude.contains(DocumentBaseType.template))

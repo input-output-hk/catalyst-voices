@@ -6,6 +6,7 @@ import 'package:catalyst_voices_blocs/src/registration/cubits/base_profile_cubit
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
+import 'package:catalyst_voices_blocs/src/registration/utils/logger_level_ext.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -173,17 +174,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       _progressNotifier.clear();
       nextStep();
-    } on RegistrationException catch (error, stack) {
-      _logger.severe('Submit registration failed', error, stack);
-
-      final exception = LocalizedRegistrationException.from(error);
-
-      _onRegistrationStateDataChanged(
-        _registrationState.copyWith(
-          canSubmitTx: Optional(Failure(exception)),
-          isSubmittingTx: false,
-        ),
-      );
     } on EmailAlreadyUsedException {
       emitSignal(const EmailAlreadyUsedSignal());
 
@@ -196,9 +186,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       // have to update their email in the account page.
       nextStep();
     } catch (error, stack) {
-      _logger.severe('Submit registration failed', error, stack);
+      _logger.log(error.level, 'Submit registration failed', error, stack);
 
-      const exception = LocalizedRegistrationUnknownException();
+      final exception = LocalizedRegistrationException.create(error);
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
@@ -283,12 +273,12 @@ final class RegistrationCubit extends Cubit<RegistrationState>
           transactionFee: Optional.of(formattedFee),
         ),
       );
-    } on RegistrationException catch (error, stackTrace) {
-      _logger.severe('Prepare registration', error, stackTrace);
+    } catch (error, stackTrace) {
+      _logger.log(error.level, 'Prepare registration', error, stackTrace);
 
       _transaction = null;
 
-      final exception = LocalizedRegistrationException.from(error);
+      final exception = LocalizedRegistrationException.create(error);
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(

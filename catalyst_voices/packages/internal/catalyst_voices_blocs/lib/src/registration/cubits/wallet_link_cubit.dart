@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/registration/utils/logger_level_ext.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -109,31 +110,8 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       emit(newState);
 
       return true;
-    } on WalletApiException catch (error, stackTrace) {
-      _logger.log(
-        error.code != WalletApiErrorCode.refused && error.code != WalletApiErrorCode.accountChange
-            ? Level.SEVERE
-            : Level.FINER,
-        'select wallet',
-        error,
-        stackTrace,
-      );
-
-      _selectedWallet = null;
-
-      emit(
-        state.copyWith(
-          selectedWallet: const Optional.empty(),
-          walletConnection: const Optional.empty(),
-          walletSummary: const Optional.empty(),
-        ),
-      );
-
-      emitError(LocalizedWalletLinkException(code: error.code));
-
-      return false;
     } catch (error, stackTrace) {
-      _logger.severe('selectWallet', error, stackTrace);
+      _logger.log(error.level, 'selectWallet', error, stackTrace);
 
       _selectedWallet = null;
 
@@ -145,7 +123,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
         ),
       );
 
-      emitError(error);
+      emitError(LocalizedRegistrationException.create(error));
 
       return false;
     }

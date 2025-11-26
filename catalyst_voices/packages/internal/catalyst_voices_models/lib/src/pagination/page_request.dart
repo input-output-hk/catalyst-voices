@@ -15,4 +15,7 @@ final class PageRequest extends Equatable {
     page,
     size,
   ];
+
+  @override
+  String toString() => 'PageRequest(page[$page], size[$size])';
 }

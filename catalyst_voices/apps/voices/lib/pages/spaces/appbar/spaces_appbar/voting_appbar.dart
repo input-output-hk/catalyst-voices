@@ -42,7 +42,7 @@ class _CategoryVotingAppbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<VotingCubit, VotingState, bool>(
-      selector: (state) => state.selectedCategory != null,
+      selector: (state) => state.hasSelectedCategory,
       builder: (context, hasCategory) {
         return _VotingAppbar(
           showLeading: isAppUnlock && hasCategory,

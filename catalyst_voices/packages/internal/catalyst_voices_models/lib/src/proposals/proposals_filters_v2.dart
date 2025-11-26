@@ -17,31 +17,16 @@ final class ProposalsCampaignFilters extends Equatable {
     return ProposalsCampaignFilters(categoriesIds: categoriesIds);
   }
 
+  factory ProposalsCampaignFilters.from(Campaign campaign) {
+    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet();
+    return ProposalsCampaignFilters(categoriesIds: categoriesIds);
+  }
+
   @override
   List<Object?> get props => [categoriesIds];
 
   @override
   String toString() => 'categoriesIds: $categoriesIds';
-}
-
-// TODO(damian-molinski): It should pick between looking only collaborators or author
-final class ProposalsCollaborationFilters extends Equatable {
-  final CatalystId? collaborator;
-  final ProposalsCollaborationStatusFilter? status;
-
-  const ProposalsCollaborationFilters({
-    this.collaborator,
-    this.status,
-  });
-
-  @override
-  List<Object?> get props => [collaborator, status];
-}
-
-enum ProposalsCollaborationStatusFilter {
-  accepted,
-  rejected,
-  pending,
 }
 
 /// A set of filters to be applied when querying for proposals.
@@ -75,8 +60,6 @@ final class ProposalsFiltersV2 extends Equatable {
   /// If null, this filter is not applied.
   final ProposalsCampaignFilters? campaign;
 
-  final ProposalsCollaborationFilters? collaboration;
-
   /// Filters proposals based on whether a specific user has voted on them.
   /// The value is the [CatalystId] of the user.
   /// If null, this filter is not applied.
@@ -95,7 +78,6 @@ final class ProposalsFiltersV2 extends Equatable {
     this.searchQuery,
     this.latestUpdate,
     this.campaign,
-    this.collaboration,
     this.voteBy,
     this.ids,
   });
@@ -109,7 +91,6 @@ final class ProposalsFiltersV2 extends Equatable {
     searchQuery,
     latestUpdate,
     campaign,
-    collaboration,
     voteBy,
     ids,
   ];
@@ -122,7 +103,6 @@ final class ProposalsFiltersV2 extends Equatable {
     Optional<String>? searchQuery,
     Optional<Duration>? latestUpdate,
     Optional<ProposalsCampaignFilters>? campaign,
-    Optional<ProposalsCollaborationFilters>? collaboration,
     Optional<CatalystId>? voteBy,
     Optional<List<String>>? ids,
   }) {
@@ -134,7 +114,6 @@ final class ProposalsFiltersV2 extends Equatable {
       searchQuery: searchQuery.dataOr(this.searchQuery),
       latestUpdate: latestUpdate.dataOr(this.latestUpdate),
       campaign: campaign.dataOr(this.campaign),
-      collaboration: collaboration.dataOr(this.collaboration),
       voteBy: voteBy.dataOr(this.voteBy),
       ids: ids.dataOr(this.ids),
     );
@@ -165,9 +144,6 @@ final class ProposalsFiltersV2 extends Equatable {
     }
     if (campaign != null) {
       parts.add('campaign: $campaign');
-    }
-    if (collaboration != null) {
-      parts.add('collaboration: $collaboration');
     }
     if (voteBy != null) {
       parts.add('votedBy: $voteBy');

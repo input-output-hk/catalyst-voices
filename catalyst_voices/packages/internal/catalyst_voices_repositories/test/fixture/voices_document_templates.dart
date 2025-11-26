@@ -23,8 +23,11 @@ class VoicesDocumentsTemplates {
   static Future<Directory> _getDocsRoot() async {
     var dir = Directory.current;
 
+    final blacklisted = ['catalyst_voices'];
+
     while (true) {
-      final list = dir.listSync();
+      final skip = blacklisted.any((path) => dir.path.endsWith(path));
+      final list = skip ? <FileSystemEntity>[] : dir.listSync();
       final docs = list.firstWhereOrNull((e) => e.path.endsWith('/docs'));
       if (docs != null) {
         return Directory(docs.path);

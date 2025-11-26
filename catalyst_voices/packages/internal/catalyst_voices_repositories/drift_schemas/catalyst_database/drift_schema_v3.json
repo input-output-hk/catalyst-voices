@@ -1,0 +1,495 @@
+{
+  "_meta": {
+    "description": "This file contains a serialized version of schema entities for drift.",
+    "version": "1.2.0"
+  },
+  "options": {
+    "store_date_time_values_as_text": true
+  },
+  "entities": [
+    {
+      "id": 0,
+      "references": [
+      ],
+      "type": "table",
+      "data": {
+        "name": "documents",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id_hi",
+            "getter_name": "idHi",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id_lo",
+            "getter_name": "idLo",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver_hi",
+            "getter_name": "verHi",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver_lo",
+            "getter_name": "verLo",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "content",
+            "getter_name": "content",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.content",
+              "dart_type_name": "DocumentDataContent"
+            }
+          },
+          {
+            "name": "metadata",
+            "getter_name": "metadata",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.metadata",
+              "dart_type_name": "DocumentDataMetadata"
+            }
+          },
+          {
+            "name": "type",
+            "getter_name": "type",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.type",
+              "dart_type_name": "DocumentType"
+            }
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+        ],
+        "explicit_pk": [
+          "id_hi",
+          "id_lo",
+          "ver_hi",
+          "ver_lo"
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "references": [
+      ],
+      "type": "table",
+      "data": {
+        "name": "documents_metadata",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "ver_hi",
+            "getter_name": "verHi",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver_lo",
+            "getter_name": "verLo",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "field_key",
+            "getter_name": "fieldKey",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<DocumentMetadataFieldKey>(DocumentMetadataFieldKey.values)",
+              "dart_type_name": "DocumentMetadataFieldKey"
+            }
+          },
+          {
+            "name": "field_value",
+            "getter_name": "fieldValue",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+        ],
+        "explicit_pk": [
+          "ver_hi",
+          "ver_lo",
+          "field_key"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "references": [
+      ],
+      "type": "table",
+      "data": {
+        "name": "documents_favorites",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id_hi",
+            "getter_name": "idHi",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id_lo",
+            "getter_name": "idLo",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "is_favorite",
+            "getter_name": "isFavorite",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "CHECK (\"is_favorite\" IN (0, 1))",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "CHECK (\"is_favorite\" IN (0, 1))"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "type",
+            "getter_name": "type",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.type",
+              "dart_type_name": "DocumentType"
+            }
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+        ],
+        "explicit_pk": [
+          "id_hi",
+          "id_lo"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "references": [
+      ],
+      "type": "table",
+      "data": {
+        "name": "drafts",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id_hi",
+            "getter_name": "idHi",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id_lo",
+            "getter_name": "idLo",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver_hi",
+            "getter_name": "verHi",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver_lo",
+            "getter_name": "verLo",
+            "moor_type": "bigInt",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "content",
+            "getter_name": "content",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.content",
+              "dart_type_name": "DocumentDataContent"
+            }
+          },
+          {
+            "name": "metadata",
+            "getter_name": "metadata",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.metadata",
+              "dart_type_name": "DocumentDataMetadata"
+            }
+          },
+          {
+            "name": "type",
+            "getter_name": "type",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.type",
+              "dart_type_name": "DocumentType"
+            }
+          },
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+        ],
+        "explicit_pk": [
+          "id_hi",
+          "id_lo",
+          "ver_hi",
+          "ver_lo"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_doc_type",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_unique_ver",
+        "sql": null,
+        "unique": true,
+        "columns": [
+          "ver_hi",
+          "ver_lo"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_doc_metadata_key_value",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "field_key",
+          "field_value"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "references": [
+        2
+      ],
+      "type": "index",
+      "data": {
+        "on": 2,
+        "name": "idx_fav_type",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type"
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "references": [
+        2
+      ],
+      "type": "index",
+      "data": {
+        "on": 2,
+        "name": "idx_fav_unique_id",
+        "sql": null,
+        "unique": true,
+        "columns": [
+          "id_hi",
+          "id_lo"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "references": [
+        3
+      ],
+      "type": "index",
+      "data": {
+        "on": 3,
+        "name": "idx_draft_type",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type"
+        ]
+      }
+    }
+  ]
+}

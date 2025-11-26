@@ -37,6 +37,7 @@ export 'exception/localized_not_found_exception.dart';
 export 'exception/localized_permission_need_explanation_exception.dart';
 export 'exception/localized_permission_need_rationale_exception.dart';
 export 'exception/localized_unknown_exception.dart';
+export 'exception/localized_wallet_exception.dart';
 export 'managers/video_manager_assets.dart';
 export 'menu/menu_item.dart';
 export 'menu/popup_menu_item.dart';
