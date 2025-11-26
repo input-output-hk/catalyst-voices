@@ -224,10 +224,11 @@ def proposal_doc_factory(
                 {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
         )
+        content = JSF(template.content).generate()
 
         role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
-        doc = SignedDocument(metadata, JSF(template.content).generate())
+        doc = SignedDocument(metadata, content)
         (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
 
         resp = document.put(
