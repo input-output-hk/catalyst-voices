@@ -59,10 +59,14 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: _cache.ref!,
         action: CollaboratorInvitationAction.accept,
       );
-      emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsAccepted: true)));
+      if (!isClosed) {
+        emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsAccepted: true)));
+      }
     } catch (error, stackTrace) {
       _logger.severe('acceptInvitation', error, stackTrace);
-      emitError(LocalizedException.create(error));
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
     }
   }
 
@@ -193,10 +197,14 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: _cache.ref!,
         action: CollaboratorInvitationAction.reject,
       );
-      emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsRejected: true)));
+      if (!isClosed) {
+        emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsRejected: true)));
+      }
     } catch (error, stackTrace) {
       _logger.severe('rejectInvitation', error, stackTrace);
-      emitError(LocalizedException.create(error));
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
     }
   }
 

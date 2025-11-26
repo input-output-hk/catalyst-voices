@@ -97,7 +97,7 @@ class _InvitationDismissibleBanner extends StatelessWidget {
       ),
       child: AffixDecorator(
         // Reserve space for the 'x' button to have symmetry.
-        prefix: const SizedBox(width: 28, height: 28),
+        prefix: const SizedBox.square(dimension: 28),
         suffix: VoicesIconButton(
           child: VoicesAssets.icons.x.buildIcon(
             size: 28,
@@ -107,12 +107,12 @@ class _InvitationDismissibleBanner extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 8,
           children: [
             IconTheme(
               data: IconTheme.of(context).copyWith(size: 28),
               child: icon,
             ),
-            const SizedBox(width: 8),
             Flexible(
               child: MarkdownText(
                 MarkdownData(message),

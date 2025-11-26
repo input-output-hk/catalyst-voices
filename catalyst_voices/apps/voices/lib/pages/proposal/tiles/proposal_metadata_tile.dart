@@ -78,8 +78,7 @@ class ProposalMetadataTile extends StatelessWidget {
             description,
             style: context.textTheme.bodyLarge?.copyWith(color: context.colors.textOnPrimaryLevel0),
           ),
-        if (collaborators.collaborators.isNotEmpty)
-          ProposalCollaborators(collaborators: collaborators),
+        if (collaborators.isNotEmpty) ProposalCollaborators(collaborators: collaborators),
         ProposalDeliveryCard(
           fundsRequested: fundsRequested,
           projectDuration: projectDuration,

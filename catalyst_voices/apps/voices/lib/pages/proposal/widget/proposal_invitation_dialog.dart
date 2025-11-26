@@ -10,9 +10,10 @@ class ProposalAcceptInvitationDialog {
       context: context,
       builder: (context) {
         return VoicesInfoDialog(
-          icon: VoicesAssets.icons.documentText.buildIcon(
+          iconThemeData: IconThemeData(
             color: Theme.of(context).colors.iconsForeground,
           ),
+          icon: VoicesAssets.icons.documentText.buildIcon(),
           title: Text(context.l10n.collaboratorInvitationAcceptTitle),
           message: Text(context.l10n.collaboratorInvitationAcceptMessage),
           action: VoicesFilledButton(

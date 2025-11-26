@@ -37,6 +37,8 @@ sealed class Collaborators extends Equatable {
     );
   }
 
+  bool get isNotEmpty => collaborators.isNotEmpty;
+
   @override
   List<Object?> get props => [collaborators];
 }
