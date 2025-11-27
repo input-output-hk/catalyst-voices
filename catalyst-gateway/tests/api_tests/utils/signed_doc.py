@@ -107,7 +107,7 @@ class DocBuilderReturns:
 def create_metadata(
     doc_type: str,
     content_type: str,
-    templates: list[Any] | None = None,
+    template: Any | None = None,
     parameters: list[Any] | None = None,
 ) -> dict[str, Any]:
     doc_id = uuid_v7.uuid_v7()
@@ -120,8 +120,8 @@ def create_metadata(
         "type": doc_type,
     }
 
-    if templates is not None:
-        metadata["templates"] = templates
+    if template is not None:
+        metadata["template"] = template
     if parameters is not None:
         metadata["parameters"] = parameters
 
@@ -215,13 +215,11 @@ def proposal_doc_factory(
 
         metadata = create_metadata(
             doc_type=DOC_TYPE["proposal"],
-            templates=[
-                {
-                    "id": template.metadata["id"],
-                    "ver": template.metadata["ver"],
-                    "cid": "0x",
-                }
-            ],
+            template={
+                "id": template.metadata["id"],
+                "ver": template.metadata["ver"],
+                "cid": "0x",
+            },
         )
         content = JSF(template.content).generate()
 
@@ -306,13 +304,11 @@ def category_parameters_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["category_parameters"],
         content_type="application/json",
-        templates=[
-            {
-                "id": template.metadata["id"],
-                "ver": template.metadata["ver"],
-                "cid": "0x",
-            }
-        ],
+        template={
+            "id": template.metadata["id"],
+            "ver": template.metadata["ver"],
+            "cid": "0x",
+        },
         parameters=[
             {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
         ],
@@ -376,9 +372,11 @@ def campaign_parameters_doc(
                 "cid": "0x",
             }
         ],
-        templates=[
-            {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
-        ],
+        template={
+            "id": param.metadata["id"],
+            "ver": param.metadata["ver"], 
+            "cid": "0x"
+        },
     )
     content = JSF(template.content).generate()
     doc = SignedDocument(metadata, content)
@@ -404,7 +402,7 @@ def campaign_parameters_form_template_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["campaign_parameters_form_template"],
         content_type="application/schema+json",
-        templates=[{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+        parameters=[{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
     content = {"type": "object"}
     doc = SignedDocument(metadata, content)
@@ -430,15 +428,13 @@ def brand_parameters_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["brand_parameters"],
         content_type="application/json",
-        templates=[
-            {
-                "id": template.metadata["id"],
-                "ver": template.metadata["ver"],
-                "cid": "0x",
-            }
-        ],
+        template={
+            "id": template.metadata["id"],
+            "ver": template.metadata["ver"],
+            "cid": "0x",
+        },
     )
-    content = JSF(template.content).generate()
+    content = {}
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
