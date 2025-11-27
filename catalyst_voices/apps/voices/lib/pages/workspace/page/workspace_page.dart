@@ -70,9 +70,8 @@ class _WorkspacePageState extends State<WorkspacePage>
 
     if (widget.tab != oldWidget.tab) {
       _tabController.animateToTab(tab);
-      final currentState = context.read<WorkspaceBloc>().state;
       context.read<WorkspaceBloc>().add(
-        ChangeWorkspaceFilters(currentState.userProposals.currentFilter, tab: tab),
+        ChangeWorkspaceFilters(tab: tab),
       );
     }
   }
@@ -126,13 +125,14 @@ class _WorkspacePageState extends State<WorkspacePage>
     );
 
     _tabController.addListener(() {
-      final currentState = context.read<WorkspaceBloc>().state;
       context.read<WorkspaceBloc>().add(
-        ChangeWorkspaceFilters(currentState.userProposals.currentFilter, tab: _tabController.tab),
+        ChangeWorkspaceFilters(tab: _tabController.tab),
       );
     });
 
-    context.read<WorkspaceBloc>().add(InitWorkspaceEvent(tab: selectedTab));
+    context.read<WorkspaceBloc>()
+      ..add(InitWorkspaceEvent(tab: selectedTab))
+      ..add(const GetTimelineItemsEvent());
   }
 
   WorkspacePageTab _determineTab(WorkspacePageTab? initialTab) {

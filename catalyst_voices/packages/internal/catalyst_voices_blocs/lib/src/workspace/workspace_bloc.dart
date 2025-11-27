@@ -25,8 +25,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   StreamSubscription<Map<WorkspacePageTab, int>>? _workspaceTabCountSub;
   StreamSubscription<Page<UsersProposalOverview>>? _dataPageSub;
 
-  Completer<void>? _dataRequestCompleter;
-
   WorkspaceBloc(
     this._userService,
     this._campaignService,
@@ -74,11 +72,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     await _workspaceTabCountSub?.cancel();
     _workspaceTabCountSub = null;
-
-    if (_dataRequestCompleter != null && !_dataRequestCompleter!.isCompleted) {
-      _dataRequestCompleter!.complete();
-    }
-    _dataRequestCompleter = null;
 
     return super.close();
   }
@@ -134,11 +127,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   void _handleDataChange(Page<UsersProposalOverview> page) {
-    final requestCompleter = _dataRequestCompleter;
-    if (requestCompleter != null && !requestCompleter.isCompleted) {
-      requestCompleter.complete();
-    }
-
     if (isClosed) return;
 
     add(InternalDataChangeEvent(page));
@@ -154,17 +142,23 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     final filter = event.filters;
     final tab = event.tab;
 
-    _cache = _cache.copyWith(workspaceFilter: filter, activeTab: Optional(tab));
+    _cache = tab != null
+        ? _cache.copyWith(workspaceFilter: filter, activeTab: Optional(tab))
+        : _cache.copyWith(workspaceFilter: filter);
+
     emit(
-      state.copyWith(userProposals: state.userProposals.copyWith(currentFilter: filter)),
+      state.copyWith(
+        userProposals: state.userProposals.copyWith(currentFilter: filter),
+        isLoading: true,
+      ),
     );
 
-    if (tab != null) {
-      emitSignal(ChangeTabWorkspaceSignal(tab));
-    }
-
     unawaited(_rebuildWorkspaceTabCountSubs());
-    unawaited(_rebuildDataPageSub());
+    await _rebuildDataPageSub();
+
+    if (!isClosed) {
+      emit(state.copyWith(isLoading: false));
+    }
   }
 
   Future<void> _onDeleteProposal(
@@ -279,11 +273,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     if (_cache.activeTab == WorkspacePageTab.proposals) {
       _cache = _cache.copyWith(proposals: Optional(event.page.items));
       final newState = _rebuildProposalsState();
-      emit(state.copyWith(userProposals: newState));
+      emit(state.copyWith(userProposals: newState, isLoading: false));
     } else if (_cache.activeTab == WorkspacePageTab.proposalInvites) {
       _cache = _cache.copyWith(userProposalInvites: Optional(event.page.items));
       final newState = _rebuildInvitesState();
-      emit(state.copyWith(userProposalInvites: newState));
+      emit(state.copyWith(userProposalInvites: newState, isLoading: false));
     }
   }
 
@@ -315,11 +309,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     // TODO(LynxLynxx): UI for now is not capable of handling infinite scroll with pagination
     const request = PageRequest(page: 0, size: 999);
 
-    if (_dataRequestCompleter != null && !_dataRequestCompleter!.isCompleted) {
-      _dataRequestCompleter!.complete();
-    }
-    _dataRequestCompleter = Completer();
-
     final activeCampaign = await _campaign;
 
     if (isClosed) return;
@@ -344,8 +333,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         )
         .distinct()
         .listen(_handleDataChange);
-
-    await _dataRequestCompleter?.future;
   }
 
   WorkspaceStateProposalInvites _rebuildInvitesState() {

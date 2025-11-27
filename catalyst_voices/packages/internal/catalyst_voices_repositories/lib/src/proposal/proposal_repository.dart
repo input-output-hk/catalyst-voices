@@ -199,6 +199,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+    final documentData = await _documentRepository.getDocumentData(id: proposalRef, useCache: true);
+    final categoryId = documentData.metadata.categoryId!;
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
       metadata: SignedDocumentMetadata(

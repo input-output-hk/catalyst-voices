@@ -5,10 +5,10 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ChangeWorkspaceFilters extends WorkspaceEvent {
-  final WorkspaceFilters filters;
+  final WorkspaceFilters? filters;
   final WorkspacePageTab? tab;
 
-  const ChangeWorkspaceFilters(this.filters, {this.tab});
+  const ChangeWorkspaceFilters({this.filters, this.tab});
 
   @override
   List<Object?> get props => [...super.props, filters, tab];

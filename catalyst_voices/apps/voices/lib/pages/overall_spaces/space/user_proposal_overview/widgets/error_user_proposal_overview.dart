@@ -34,10 +34,7 @@ class _Error extends StatelessWidget {
       child: VoicesErrorIndicator(
         message: error?.message(context) ?? const LocalizedUnknownException().message(context),
         onRetry: () {
-          final currentState = context.read<WorkspaceBloc>().state;
-          context.read<WorkspaceBloc>().add(
-            ChangeWorkspaceFilters(currentState.userProposals.currentFilter),
-          );
+          context.read<WorkspaceBloc>().add(const ChangeWorkspaceFilters());
         },
       ),
     );
