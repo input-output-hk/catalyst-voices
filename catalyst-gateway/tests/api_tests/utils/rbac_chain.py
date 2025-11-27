@@ -78,7 +78,7 @@ class RBACChain:
         )
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def rbac_chain_factory():
     def __rbac_chain_factory(
         chain: Chain = Chain.All,

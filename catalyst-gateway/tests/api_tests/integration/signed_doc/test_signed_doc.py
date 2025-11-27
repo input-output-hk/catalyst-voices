@@ -6,14 +6,13 @@ from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import admin_key
 from utils.signed_doc import (
     proposal_doc_factory,
-    proposal_form_template_doc_factory,
+    proposal_form_template_doc,
     category_parameters_doc,
     category_parameters_form_template_doc,
     campaign_parameters_doc,
     campaign_parameters_form_template_doc,
     brand_parameters_doc,
     brand_parameters_form_template_doc,
-    ProposalParameterType
 )
 
 
@@ -21,7 +20,7 @@ from utils.signed_doc import (
 def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
     role_id = RoleID.PROPOSER
-    proposal_doc = proposal_doc_factory(ProposalParameterType.CATEGORY, role_id)
+    proposal_doc = proposal_doc_factory(role_id)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc_id = proposal_doc.metadata["id"]
 
@@ -65,7 +64,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     # Put a non valid document with same ID different content
     invalid_doc = proposal_doc.copy()
-    invalid_doc.content["setup"]["title"]["title"] = "another title"
+    invalid_doc.content["setup"]["title"] = {"title": "another title"}
     resp = document_v1.put(
         data=invalid_doc.build_and_sign(cat_id, sk_hex),
         token=rbac_chain.auth_token(),
@@ -93,7 +92,7 @@ def test_document_index_endpoint(
     rbac_chain_factory,
 ):
     role_id = RoleID.PROPOSER
-    doc = proposal_doc_factory(ProposalParameterType.CATEGORY, role_id)
+    doc = proposal_doc_factory(role_id)
 
     rbac_chain = rbac_chain_factory()
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
