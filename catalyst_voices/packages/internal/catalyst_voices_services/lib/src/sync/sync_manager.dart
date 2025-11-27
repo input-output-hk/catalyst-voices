@@ -15,6 +15,7 @@ abstract interface class SyncManager {
     SyncStatsStorage statsStorage,
     DocumentsService documentsService,
     CampaignService campaignService,
+    CatalystProfiler profiler,
   ) = SyncManagerImpl;
 
   /// Stream of synchronization progress (0.0 to 1.0).
@@ -32,6 +33,7 @@ final class SyncManagerImpl implements SyncManager {
   final SyncStatsStorage _statsStorage;
   final DocumentsService _documentsService;
   final CampaignService _campaignService;
+  final CatalystProfiler _profiler;
 
   final _lock = Lock();
   final _progressController = StreamController<double>.broadcast();
@@ -44,6 +46,7 @@ final class SyncManagerImpl implements SyncManager {
     this._statsStorage,
     this._documentsService,
     this._campaignService,
+    this._profiler,
   );
 
   @override
@@ -88,7 +91,12 @@ final class SyncManagerImpl implements SyncManager {
       _synchronizationCompleter = Completer();
     }
 
+    final timeline = _profiler.startTransaction('sync');
+    final timelineArgs = CatalystProfilerTimelineFinishArguments();
     final stopwatch = Stopwatch()..start();
+
+    var syncResult = const DocumentsSyncResult();
+
     try {
       _logger.fine('Synchronization started');
 
@@ -104,7 +112,7 @@ final class SyncManagerImpl implements SyncManager {
         _progressController.add(0);
       }
 
-      final result = await _documentsService.sync(
+      syncResult = await _documentsService.sync(
         campaign: activeCampaign,
         onProgress: (value) {
           if (!_progressController.isClosed) {
@@ -113,22 +121,28 @@ final class SyncManagerImpl implements SyncManager {
         },
       );
 
-      stopwatch.stop();
+      unawaited(timeline.finish());
 
-      await _updateSuccessfulSyncStats(
-        newRefsCount: result.newDocumentsCount,
-        duration: stopwatch.elapsed,
-      );
+      _logger.fine('Synchronization completed. New documents: ${syncResult.newDocumentsCount}');
 
-      _logger.fine('Synchronization completed. New documents: ${result.newDocumentsCount}');
-
-      if (result.failedDocumentsCount > 0) {
-        _logger.info('Synchronization failed for documents: ${result.failedDocumentsCount}');
+      if (syncResult.failedDocumentsCount > 0) {
+        _logger.info('Synchronization failed for documents: ${syncResult.failedDocumentsCount}');
       }
+
+      timelineArgs
+        ..status = 'success'
+        ..hint =
+            'new docs[${syncResult.newDocumentsCount}], '
+            'failed docs[${syncResult.failedDocumentsCount}]';
 
       _synchronizationCompleter.complete(true);
     } catch (error, stack) {
-      _logger.fine('Synchronization failed after ${stopwatch.elapsed}', error, stack);
+      _logger.fine('Synchronization failed', error, stack);
+
+      timelineArgs
+        ..status = 'failed'
+        ..throwable = error;
+
       _synchronizationCompleter.complete(false);
 
       rethrow;
@@ -138,8 +152,13 @@ final class SyncManagerImpl implements SyncManager {
       }
 
       stopwatch.stop();
+      timelineArgs.took = stopwatch.elapsed;
 
-      _logger.fine('Synchronization took ${stopwatch.elapsed}');
+      await timeline.finish(arguments: timelineArgs);
+      await _updateSuccessfulSyncStats(
+        newRefsCount: syncResult.newDocumentsCount,
+        duration: stopwatch.elapsed,
+      );
     }
   }
 
@@ -148,7 +167,7 @@ final class SyncManagerImpl implements SyncManager {
     final activeCampaign = await _campaignService.getActiveCampaign();
 
     final previous = appMeta.activeCampaign;
-    final current = activeCampaign?.selfRef;
+    final current = activeCampaign?.id;
 
     if (previous == current) {
       return activeCampaign;

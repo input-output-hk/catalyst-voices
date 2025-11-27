@@ -24,7 +24,7 @@ void main() {
     final documentData = DocumentData(
       metadata: DocumentDataMetadata(
         type: DocumentType.proposalDocument,
-        selfRef: proposalRef,
+        id: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),
         categoryId: categoryRef,
       ),
@@ -64,27 +64,24 @@ void main() {
       setUp: () async {
         when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
           (_) async => Campaign(
-            selfRef: SignedDocumentRef.generateFirstRef(),
+            id: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
             fundNumber: 14,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                id: categoryRef,
                 proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',
                 description: 'Test description',
                 shortDescription: 'Test short description',
-                proposalsCount: 0,
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
@@ -119,28 +116,25 @@ void main() {
       setUp: () async {
         when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
           (_) async => Campaign(
-            selfRef: SignedDocumentRef.generateFirstRef(),
+            id: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
             // TODO(LynxLynxx): refactor it when _mapProposalToViewModel will be refactored
             fundNumber: 0,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                id: categoryRef,
                 proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',
                 description: 'Test description',
                 shortDescription: 'Test short description',
-                proposalsCount: 0,
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
@@ -197,11 +191,11 @@ void main() {
         required ProposalPublish publish,
         required int commentsCount,
         bool isLatestLocal = false,
-        DocumentRef? selfRef,
+        DocumentRef? id,
       }) {
-        final ref = selfRef ?? SignedDocumentRef.generateFirstRef();
+        final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
         return UsersProposalOverview(
-          selfRef: ref,
+          id: effectiveId,
           title: title,
           updateDate: DateTime(2025, 10, 15),
           fundsRequested: Money.zero(currency: Currencies.ada),
@@ -209,7 +203,7 @@ void main() {
           versions: [
             ProposalVersionViewModel(
               title: title,
-              selfRef: ref,
+              id: effectiveId,
               createdAt: DateTime(2025, 10, 15),
               publish: publish,
               isLatest: true,
@@ -338,7 +332,7 @@ void main() {
             title: 'Draft',
             publish: ProposalPublish.publishedDraft,
             commentsCount: 5,
-            selfRef: draftRef,
+            id: draftRef,
           );
           final final$ = createProposal(
             title: 'Final',
@@ -411,7 +405,7 @@ void main() {
           // Load initial proposals
           bloc
             ..add(LoadProposalsEvent([local1, local2, draft]))
-            ..add(ForgetProposalEvent(local2.selfRef));
+            ..add(ForgetProposalEvent(local2.id));
         },
         expect: () => [
           // After load

@@ -8,7 +8,7 @@ final class DocumentDataMetadata extends Equatable {
   final DocumentType type;
 
   /// Reference to this document. Have to be exact.
-  final DocumentRef selfRef;
+  final DocumentRef id;
 
   /// Reference to another document. The purpose of the ref will vary depending
   /// on the document type.
@@ -52,7 +52,7 @@ final class DocumentDataMetadata extends Equatable {
   //  proposal/comment to centralize required fields for each type.
   DocumentDataMetadata({
     required this.type,
-    required this.selfRef,
+    required this.id,
     this.ref,
     this.refHash,
     this.template,
@@ -64,16 +64,14 @@ final class DocumentDataMetadata extends Equatable {
     this.categoryId,
     this.authors,
   }) : assert(
-         selfRef.isExact,
-         'selfRef have to be exact. Make sure version is not null',
+         id.isExact,
+         'id have to be exact. Make sure version is not null',
        );
-
-  String get id => selfRef.id;
 
   @override
   List<Object?> get props => [
     type,
-    selfRef,
+    id,
     ref,
     refHash,
     template,
@@ -86,11 +84,9 @@ final class DocumentDataMetadata extends Equatable {
     authors,
   ];
 
-  String get version => selfRef.version!;
-
   DocumentDataMetadata copyWith({
     DocumentType? type,
-    DocumentRef? selfRef,
+    DocumentRef? id,
     Optional<DocumentRef>? ref,
     Optional<SecuredDocumentRef>? refHash,
     Optional<SignedDocumentRef>? template,
@@ -104,7 +100,7 @@ final class DocumentDataMetadata extends Equatable {
   }) {
     return DocumentDataMetadata(
       type: type ?? this.type,
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       ref: ref.dataOr(this.ref),
       refHash: refHash.dataOr(this.refHash),
       template: template.dataOr(this.template),

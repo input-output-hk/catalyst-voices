@@ -9,7 +9,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class CreateProposalCard extends StatelessWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
   final String categoryName;
   final List<String> categoryDos;
   final List<String> categoryDonts;
@@ -17,7 +17,7 @@ class CreateProposalCard extends StatelessWidget {
 
   const CreateProposalCard({
     super.key,
-    required this.categoryId,
+    required this.categoryRef,
     required this.categoryName,
     required this.categoryDos,
     required this.categoryDonts,
@@ -51,7 +51,7 @@ class CreateProposalCard extends StatelessWidget {
           const SizedBox(height: 24),
           _SubmissionCloseAt(submissionCloseDate),
           const SizedBox(height: 24),
-          CreateProposalButton(categoryRef: categoryId),
+          CreateProposalButton(categoryRef: categoryRef),
         ],
       ),
     );

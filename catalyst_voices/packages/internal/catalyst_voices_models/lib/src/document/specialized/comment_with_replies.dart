@@ -17,16 +17,15 @@ final class CommentWithReplies extends Equatable {
     required List<CommentDocument> comments,
     int depth = 1,
   }) {
-    final replies = comments
-        .where((element) => element.metadata.reply == comment.metadata.selfRef)
-        .map((e) {
-          return CommentWithReplies.build(
-            e,
-            comments: comments,
-            depth: depth + 1,
-          );
-        })
-        .toList();
+    final replies = comments.where((element) => element.metadata.reply == comment.metadata.id).map((
+      e,
+    ) {
+      return CommentWithReplies.build(
+        e,
+        comments: comments,
+        depth: depth + 1,
+      );
+    }).toList();
 
     return CommentWithReplies(
       comment: comment,
@@ -44,7 +43,7 @@ final class CommentWithReplies extends Equatable {
     depth,
   ];
 
-  SignedDocumentRef get ref => comment.metadata.selfRef;
+  SignedDocumentRef get ref => comment.metadata.id;
 
   int get repliesCount {
     return replies.fold(
@@ -82,7 +81,7 @@ final class CommentWithReplies extends Equatable {
     );
   }
 
-  bool isA(SignedDocumentRef ref) => comment.metadata.selfRef == ref;
+  bool isA(SignedDocumentRef ref) => comment.metadata.id == ref;
 
   CommentWithReplies removeReply({
     required SignedDocumentRef ref,
@@ -95,8 +94,8 @@ final class CommentWithReplies extends Equatable {
 
   CommentWithReplies _addReply(CommentDocument reply) {
     assert(
-      comment.metadata.selfRef == reply.metadata.reply,
-      'Reply parent ref does not match with comment selfRef',
+      comment.metadata.id == reply.metadata.reply,
+      'Reply parent ref does not match with comment id',
     );
 
     final commentWithReplies = CommentWithReplies(

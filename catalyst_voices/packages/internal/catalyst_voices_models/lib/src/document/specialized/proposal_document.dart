@@ -171,7 +171,7 @@ final class ProposalMetadata extends DocumentMetadata {
   final List<CatalystId> authors;
 
   ProposalMetadata({
-    required super.selfRef,
+    required super.id,
     required this.templateRef,
     required this.categoryId,
     required this.authors,

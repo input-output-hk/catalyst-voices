@@ -7,14 +7,14 @@ import 'package:uuid_plus/uuid_plus.dart';
 /// Represents ref to any kind of document. Documents often have refs to other document
 /// and this class is representation of that.
 ///
-/// [id] and [version] are usually a UUID, often UUIDv7.
+/// [id] and [ver] are usually a UUID, often UUIDv7.
 ///
-/// Implements [Comparable] and tries to sort base on [version] date time extracted from UUIDv7
+/// Implements [Comparable] and tries to sort base on [ver] date time extracted from UUIDv7
 /// timestamp.
 ///
 /// Ref can be **exact** or **loose**:
-/// - when [version] is non null it is exact because it points to single document.
-/// - when [version] is null it is loose because it points to newest version of document.
+/// - when [ver] is non null it is exact because it points to single document.
+/// - when [ver] is null it is loose because it points to newest version of document.
 ///
 /// Types:
 /// - [SignedDocumentRef] it points to signed, published document.
@@ -22,40 +22,40 @@ import 'package:uuid_plus/uuid_plus.dart';
 /// be malformed and incomplete.
 sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   final String id;
-  final String? version;
+  final String? ver;
 
   const DocumentRef({
     required this.id,
-    this.version,
+    this.ver,
   });
 
   factory DocumentRef.build({
     required String id,
-    String? version,
+    String? ver,
     required bool isDraft,
   }) {
-    return isDraft
-        ? DraftRef(id: id, version: version)
-        : SignedDocumentRef(id: id, version: version);
+    return isDraft ? DraftRef(id: id, ver: ver) : SignedDocumentRef(id: id, ver: ver);
   }
 
-  /// Whether the ref specifies the document [version].
-  bool get isExact => version != null;
+  /// Whether the ref specifies the document [ver].
+  bool get isExact => ver != null;
+
+  bool get isLoose => !isExact;
 
   bool get isValid {
     final isIdValid = Uuid.isValidUUID(fromString: id);
-    final isVersionValid = version == null || Uuid.isValidUUID(fromString: version!);
+    final isVersionValid = ver == null || Uuid.isValidUUID(fromString: ver!);
 
     return isIdValid && isVersionValid;
   }
 
   @override
-  List<Object?> get props => [id, version];
+  List<Object?> get props => [id, ver];
 
   @override
   int compareTo(DocumentRef other) {
-    final dateTime = version?.tryDateTime;
-    final otherDateTime = other.version?.tryDateTime;
+    final dateTime = ver?.tryDateTime;
+    final otherDateTime = other.ver?.tryDateTime;
 
     if (dateTime != null && otherDateTime != null) {
       return dateTime.compareTo(otherDateTime);
@@ -74,7 +74,7 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
 
   DocumentRef copyWith({
     String? id,
-    Optional<String>? version,
+    Optional<String>? ver,
   });
 
   /// Generates a new (fresh) draft version of the document reference.
@@ -83,7 +83,7 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   DraftRef freshVersion() {
     return DraftRef(
       id: id,
-      version: const Uuid().v7(),
+      ver: const Uuid().v7(),
     );
   }
 
@@ -106,11 +106,11 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
 final class DraftRef extends DocumentRef {
   const DraftRef({
     required super.id,
-    super.version,
+    super.ver,
   });
 
-  /// Creates ref for first [version] of [id] draft.
-  const DraftRef.first(String id) : this(id: id, version: id);
+  /// Creates ref for first [ver] of [id] draft.
+  const DraftRef.first(String id) : this(id: id, ver: id);
 
   /// Shortcut for [DraftRef.first].
   factory DraftRef.generateFirstRef() {
@@ -121,18 +121,18 @@ final class DraftRef extends DocumentRef {
   factory DraftRef.generateNextRefFor(String id) {
     return DraftRef(
       id: id,
-      version: const Uuid().v7(),
+      ver: const Uuid().v7(),
     );
   }
 
   @override
   DraftRef copyWith({
     String? id,
-    Optional<String>? version,
+    Optional<String>? ver,
   }) {
     return DraftRef(
       id: id ?? this.id,
-      version: version.dataOr(this.version),
+      ver: ver.dataOr(this.ver),
     );
   }
 
@@ -140,16 +140,16 @@ final class DraftRef extends DocumentRef {
   DraftRef nextVersion() => this;
 
   @override
-  DraftRef toLoose() => copyWith(version: const Optional.empty());
+  DraftRef toLoose() => copyWith(ver: const Optional.empty());
 
   @override
   SignedDocumentRef toSignedDocumentRef() => SignedDocumentRef(
     id: id,
-    version: version,
+    ver: ver,
   );
 
   @override
-  String toString() => isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
+  String toString() => isExact ? 'ExactDraftRef($id.v$ver)' : 'LooseDraftRef($id)';
 }
 
 ///
@@ -170,16 +170,16 @@ final class SecuredDocumentRef extends Equatable {
 final class SignedDocumentRef extends DocumentRef {
   const SignedDocumentRef({
     required super.id,
-    super.version,
+    super.ver,
   });
 
   const SignedDocumentRef.exact({
     required super.id,
-    required String super.version,
+    required String super.ver,
   });
 
   /// Creates ref for first version of [id] document.
-  const SignedDocumentRef.first(String id) : this(id: id, version: id);
+  const SignedDocumentRef.first(String id) : this(id: id, ver: id);
 
   /// Shortcut for [SignedDocumentRef.first].
   factory SignedDocumentRef.generateFirstRef() {
@@ -192,11 +192,11 @@ final class SignedDocumentRef extends DocumentRef {
   @override
   SignedDocumentRef copyWith({
     String? id,
-    Optional<String>? version,
+    Optional<String>? ver,
   }) {
     return SignedDocumentRef(
       id: id ?? this.id,
-      version: version.dataOr(this.version),
+      ver: ver.dataOr(this.ver),
     );
   }
 
@@ -204,17 +204,17 @@ final class SignedDocumentRef extends DocumentRef {
   DraftRef nextVersion() {
     return DraftRef(
       id: id,
-      version: const Uuid().v7(),
+      ver: const Uuid().v7(),
     );
   }
 
   @override
-  SignedDocumentRef toLoose() => copyWith(version: const Optional.empty());
+  SignedDocumentRef toLoose() => copyWith(ver: const Optional.empty());
 
   @override
   SignedDocumentRef toSignedDocumentRef() => this;
 
   @override
   String toString() =>
-      isExact ? 'ExactSignedDocumentRef($id.v$version)' : 'LooseSignedDocumentRef($id)';
+      isExact ? 'ExactSignedDocumentRef($id.v$ver)' : 'LooseSignedDocumentRef($id)';
 }

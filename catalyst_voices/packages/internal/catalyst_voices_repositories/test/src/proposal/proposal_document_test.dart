@@ -31,7 +31,7 @@ void main() {
 
         return ProposalDocument(
           metadata: ProposalMetadata(
-            selfRef: DocumentRefFactory.draftRef(),
+            id: DocumentRefFactory.draftRef(),
             templateRef: DocumentRefFactory.signedDocumentRef(),
             categoryId: DocumentRefFactory.signedDocumentRef(),
             authors: const [],

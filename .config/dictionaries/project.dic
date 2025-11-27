@@ -122,6 +122,7 @@ Embedder
 emiride
 emurgo
 encryptor
+endtemplate
 endfunction
 Eternl
 EUTXO
@@ -398,6 +399,7 @@ Utxos
 uuidv
 varint
 Vespr
+vers
 vite
 vitss
 vkey

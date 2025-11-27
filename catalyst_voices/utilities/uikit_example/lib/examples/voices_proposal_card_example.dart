@@ -29,7 +29,7 @@ class VoicesProposalCardExample extends StatelessWidget {
           children: [
             ProposalBriefCard(
               proposal: ProposalBrief(
-                selfRef: SignedDocumentRef.generateFirstRef(),
+                id: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
                 fundsRequested: Money.fromMajorUnits(

@@ -13,7 +13,7 @@ final class DocumentIndexFilters extends Equatable {
   DocumentIndexFilters.forCampaign(
     this.type, {
     required Campaign campaign,
-  }) : categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet().toList();
+  }) : categoriesIds = campaign.categories.map((e) => e.id.id).toSet().toList();
 
   @override
   List<Object?> get props => [

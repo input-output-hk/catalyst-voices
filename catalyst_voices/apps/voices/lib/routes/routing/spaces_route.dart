@@ -10,6 +10,7 @@ import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
+import 'package:catalyst_voices/routes/guards/voting_feature_flag_guard.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -33,7 +34,7 @@ final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return CategoryPage(
-      categoryId: SignedDocumentRef(id: categoryId),
+      categoryRef: SignedDocumentRef(id: categoryId),
     );
   }
 }
@@ -84,13 +85,10 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final categoryId = this.categoryId;
-    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
-
     final tab = ProposalsPageTab.values.asNameMap()[this.tab];
 
     return ProposalsPage(
-      categoryId: categoryRef,
+      categoryId: categoryId,
       tab: tab,
     );
   }
@@ -180,7 +178,7 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
+final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
   static const name = 'voting';
 
   final String? categoryId;
@@ -192,14 +190,16 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
   });
 
   @override
+  List<RouteGuard> get routeGuards => [const VotingFeatureFlagGuard()];
+
+  @override
   Widget build(BuildContext context, GoRouterState state) {
     final categoryId = this.categoryId;
-    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
     final tab = VotingPageTab.values.asNameMap()[this.tab];
 
     return VotingPage(
-      categoryId: categoryRef,
+      categoryId: categoryId,
       tab: tab,
     );
   }

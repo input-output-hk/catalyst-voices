@@ -28,6 +28,7 @@ final class CatalystNoopProfiler implements CatalystProfiler {
     String name,
     FutureOr<T> Function() body, {
     CatalystProfilerTimelineArguments? arguments,
+    bool debounce = false,
   }) async {
     return body();
   }

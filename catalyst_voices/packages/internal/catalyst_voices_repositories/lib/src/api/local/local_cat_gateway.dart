@@ -26,7 +26,7 @@ String _testAccountAuthorGetter(DocumentRef ref) {
 }
 
 String _v7() {
-  final config = u.V7Options(_time--, null);
+  final config = u.V7Options(_time -= 2000, null);
   return const u.Uuid().v7(config: config);
 }
 
@@ -293,7 +293,7 @@ final class LocalCatGateway implements CatGateway {
       DocumentType.unknown => throw UnimplementedError(),
     };
 
-    final ref = SignedDocumentRef(id: metadata.id!, version: metadata.ver);
+    final ref = SignedDocumentRef(id: metadata.id!, ver: metadata.ver);
     final signature = CoseSignature(
       protectedHeaders: CoseHeaders.protected(
         kid: utf8.encode(authorGetter(ref)),
@@ -319,7 +319,7 @@ final class LocalCatGateway implements CatGateway {
           contentType: SignedDocumentContentType.json,
           documentType: DocumentType.proposalTemplate,
           id: constRefs.proposal.id,
-          ver: constRefs.proposal.version,
+          ver: constRefs.proposal.ver,
           categoryId: constRefs.category.asMetadataRef,
         ),
       ];
@@ -329,7 +329,7 @@ final class LocalCatGateway implements CatGateway {
           contentType: SignedDocumentContentType.json,
           documentType: DocumentType.commentTemplate,
           id: constRefs.comment.id,
-          ver: constRefs.comment.version,
+          ver: constRefs.comment.ver,
           categoryId: constRefs.category.asMetadataRef,
         ),
       ];
@@ -438,6 +438,6 @@ extension on List<SignedDocumentMetadata> {
 
 extension on SignedDocumentRef {
   SignedDocumentMetadataRef get asMetadataRef {
-    return SignedDocumentMetadataRef(id: id, ver: version);
+    return SignedDocumentMetadataRef(id: id, ver: ver);
   }
 }
