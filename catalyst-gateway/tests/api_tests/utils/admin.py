@@ -44,6 +44,6 @@ class AdminKey:
         )
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def admin_key() -> AdminKey:
     return AdminKey(ONLY_ROLE_0_REG_JSON[f"{RoleID.ROLE_0}"][0]["sk"])

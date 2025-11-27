@@ -107,8 +107,8 @@ class DocBuilderReturns:
 def create_metadata(
     doc_type: str,
     content_type: str,
-    template: Any | None = None,
-    parameters: list[Any] | None = None,
+    template: SignedDocumentBase | None = None,
+    parameters: list[SignedDocumentBase] | None = None,
 ) -> dict[str, Any]:
     doc_id = uuid_v7.uuid_v7()
 
@@ -121,9 +121,12 @@ def create_metadata(
     }
 
     if template is not None:
-        metadata["template"] = template
+        metadata["template"] = {"id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x"}
     if parameters is not None:
-        metadata["parameters"] = parameters
+        metadata["parameters"] = list([
+            {"id": p.metadata["id"], "ver": p.metadata["ver"], "cid": "0x"}
+            for p in parameters
+        ])
 
     return metadata
 
@@ -190,36 +193,19 @@ class ParameterType(IntEnum):
 @pytest.fixture
 def proposal_doc_factory(
     rbac_chain_factory,
-    proposal_form_template_doc_factory,
-    category_parameters_doc,
-    campaign_parameters_doc,
+    proposal_form_template_doc,
     brand_parameters_doc,
 ):
     def __factory__(
-        parameter_type: ParameterType,
         role_id: RoleID
     ) -> SignedDocument:
-        param: SignedDocumentBase
-        if parameter_type == ParameterType.CATEGORY:
-            param = category_parameters_doc
-        elif parameter_type == ParameterType.CAMPAIGN:
-            param = campaign_parameters_doc
-        elif parameter_type == ParameterType.BRAND:
-            param = brand_parameters_doc
-        else:
-            raise Exception("Invalid parameter type for proposal document")
-
-        template: SignedDocumentBase = proposal_form_template_doc_factory(
-            parameter_type
-        )
+        param: SignedDocumentBase = brand_parameters_doc
+        template: SignedDocumentBase = proposal_form_template_doc
 
         metadata = create_metadata(
             doc_type=DOC_TYPE["proposal"],
-            template={
-                "id": template.metadata["id"],
-                "ver": template.metadata["ver"],
-                "cid": "0x",
-            },
+            template=template,
+            parameters=[param]
         )
         content = JSF(template.content).generate()
 
@@ -240,59 +226,38 @@ def proposal_doc_factory(
     return __factory__
 
 
-@pytest.fixture
-def proposal_form_template_doc_factory(
+@pytest.fixture(scope='session')
+def proposal_form_template_doc(
     admin_key,
-    category_parameters_doc,
-    campaign_parameters_doc,
     brand_parameters_doc,
 ):
-    def __factory__(parameter_type: ParameterType):
-        param: SignedDocumentBase
-        if parameter_type == ParameterType.CATEGORY:
-            param = category_parameters_doc
-        elif parameter_type == ParameterType.CAMPAIGN:
-            param = campaign_parameters_doc
-        elif parameter_type == ParameterType.BRAND:
-            param = brand_parameters_doc
-        else:
-            raise Exception(
-                "Invalid parameter type for proposal form template document"
-            )
+    param: SignedDocumentBase = brand_parameters_doc
 
-        tmp_metadata = create_metadata(
-            doc_type=DOC_TYPE["proposal_form_template"],
-            content_type="application/schema+json",
-            parameters=[
-                {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
-            ],
-        )
+    metadata = create_metadata(
+        doc_type=DOC_TYPE["proposal_form_template"],
+        content_type="application/schema+json",
+        parameters=[param],
+    )
 
-        with open(
-            "./test_data/signed_docs/proposal_form_template.json", "r"
-        ) as json_file:
-            metadata, content = json.load(json_file)
+    with open(
+        "./test_data/signed_docs/proposal_form_template.json", "r"
+    ) as json_file:
+        content = json.load(json_file)
 
-        metadata["id"] = tmp_metadata["id"]
-        metadata["ver"] = tmp_metadata["ver"]
-        metadata["parameters"] = tmp_metadata["parameters"]
+    doc = SignedDocument(metadata, content)
 
-        doc = SignedDocument(metadata, content)
+    resp = document.put(
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        token=admin_key.auth_token(),
+    )
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
 
-        resp = document.put(
-            data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
-            token=admin_key.auth_token(),
-        )
-        assert resp.status_code == 201, (
-            f"Failed to publish document: {resp.status_code} - {resp.text}"
-        )
-
-        return doc
-
-    return __factory__
+    return doc
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def category_parameters_doc(
     admin_key,
     category_parameters_form_template_doc,
@@ -304,14 +269,8 @@ def category_parameters_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["category_parameters"],
         content_type="application/json",
-        template={
-            "id": template.metadata["id"],
-            "ver": template.metadata["ver"],
-            "cid": "0x",
-        },
-        parameters=[
-            {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
-        ],
+        template=template,
+        parameters=[param],
     )
     content = JSF(template.content).generate()
     doc = SignedDocument(metadata, content)
@@ -327,7 +286,7 @@ def category_parameters_doc(
     return doc
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def category_parameters_form_template_doc(
     admin_key,
     campaign_parameters_doc
@@ -337,7 +296,7 @@ def category_parameters_form_template_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["category_parameters_form_template"],
         content_type="application/schema+json",
-        parameters=[{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+        parameters=[param],
     )
     content = {"type": "object"}
     doc = SignedDocument(metadata, content)
@@ -353,7 +312,7 @@ def category_parameters_form_template_doc(
     return doc
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def campaign_parameters_doc(
     admin_key,
     campaign_parameters_form_template_doc,
@@ -365,18 +324,9 @@ def campaign_parameters_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["campaign_parameters"],
         content_type="application/json",
-        parameters=[
-            {
-                "id": template.metadata["id"],
-                "ver": template.metadata["ver"],
-                "cid": "0x",
-            }
-        ],
-        template={
-            "id": param.metadata["id"],
-            "ver": param.metadata["ver"], 
-            "cid": "0x"
-        },
+        template=template,
+        parameters=[param],
+
     )
     content = JSF(template.content).generate()
     doc = SignedDocument(metadata, content)
@@ -392,7 +342,7 @@ def campaign_parameters_doc(
     return doc
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def campaign_parameters_form_template_doc(
     admin_key,
     brand_parameters_doc
@@ -402,7 +352,7 @@ def campaign_parameters_form_template_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["campaign_parameters_form_template"],
         content_type="application/schema+json",
-        parameters=[{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
+        parameters=[param],
     )
     content = {"type": "object"}
     doc = SignedDocument(metadata, content)
@@ -418,7 +368,7 @@ def campaign_parameters_form_template_doc(
     return doc
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def brand_parameters_doc(
     admin_key,
     brand_parameters_form_template_doc
@@ -428,13 +378,9 @@ def brand_parameters_doc(
     metadata = create_metadata(
         doc_type=DOC_TYPE["brand_parameters"],
         content_type="application/json",
-        template={
-            "id": template.metadata["id"],
-            "ver": template.metadata["ver"],
-            "cid": "0x",
-        },
+        template=template,
     )
-    content = {}
+    content = JSF(template.content).generate()
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
@@ -448,7 +394,7 @@ def brand_parameters_doc(
     return doc
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def brand_parameters_form_template_doc(
     admin_key
 ) -> SignedDocumentBase:

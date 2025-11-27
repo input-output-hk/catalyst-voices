@@ -6,13 +6,6 @@ from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import admin_key
 from utils.signed_doc import (
     proposal_doc_factory,
-    proposal_form_template_doc_factory,
-    category_parameters_doc,
-    category_parameters_form_template_doc,
-    campaign_parameters_doc,
-    campaign_parameters_form_template_doc,
-    brand_parameters_doc,
-    brand_parameters_form_template_doc,
     ParameterType
 )
 
