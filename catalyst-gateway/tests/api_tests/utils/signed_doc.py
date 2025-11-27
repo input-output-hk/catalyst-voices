@@ -183,14 +183,8 @@ def build_signed_doc(
 # ------------------- #
 
 
-class ParameterType(IntEnum):
-    CATEGORY = 0
-    CAMPAIGN = 1
-    BRAND = 2
-
-
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
-@pytest.fixture
+@pytest.fixture(scope='session')
 def proposal_doc_factory(
     rbac_chain_factory,
     proposal_form_template_doc,
@@ -204,6 +198,7 @@ def proposal_doc_factory(
 
         metadata = create_metadata(
             doc_type=DOC_TYPE["proposal"],
+            content_type="application/json",
             template=template,
             parameters=[param]
         )
