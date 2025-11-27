@@ -106,6 +106,7 @@ class DocBuilderReturns:
 
 def create_metadata(
     doc_type: str,
+    content_type: str,
     templates: list[Any] | None = None,
     parameters: list[Any] | None = None,
 ) -> dict[str, Any]:
@@ -113,7 +114,7 @@ def create_metadata(
 
     metadata: dict[str, Any] = {
         "content-encoding": "br",
-        "content-type": "application/json",
+        "content-type": content_type,
         "id": doc_id,
         "ver": doc_id,
         "type": doc_type,
@@ -263,6 +264,7 @@ def proposal_form_template_doc_factory(
 
         tmp_metadata = create_metadata(
             doc_type=DOC_TYPE["proposal_form_template"],
+            content_type="application/schema+json",
             parameters=[
                 {"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"},
             ],
@@ -303,6 +305,7 @@ def category_parameters_doc(
 
     metadata = create_metadata(
         doc_type=DOC_TYPE["category_parameters"],
+        content_type="application/json",
         templates=[
             {
                 "id": template.metadata["id"],
@@ -337,6 +340,7 @@ def category_parameters_form_template_doc(
 
     metadata = create_metadata(
         doc_type=DOC_TYPE["category_parameters_form_template"],
+        content_type="application/schema+json",
         parameters=[{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
     content = {"type": "object"}
@@ -364,6 +368,7 @@ def campaign_parameters_doc(
 
     metadata = create_metadata(
         doc_type=DOC_TYPE["campaign_parameters"],
+        content_type="application/json",
         parameters=[
             {
                 "id": template.metadata["id"],
@@ -398,6 +403,7 @@ def campaign_parameters_form_template_doc(
 
     metadata = create_metadata(
         doc_type=DOC_TYPE["campaign_parameters_form_template"],
+        content_type="application/schema+json",
         templates=[{"id": param.metadata["id"], "ver": param.metadata["ver"], "cid": "0x"}],
     )
     content = {"type": "object"}
@@ -423,6 +429,7 @@ def brand_parameters_doc(
 
     metadata = create_metadata(
         doc_type=DOC_TYPE["brand_parameters"],
+        content_type="application/json",
         templates=[
             {
                 "id": template.metadata["id"],
@@ -451,6 +458,7 @@ def brand_parameters_form_template_doc(
 ) -> SignedDocumentBase:
     metadata = create_metadata(
         doc_type=DOC_TYPE["brand_parameters_form_template"],
+        content_type="application/schema+json"
     )
     content = {"type": "object"}
     doc = SignedDocument(metadata, content)

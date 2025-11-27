@@ -33,8 +33,6 @@ class AdminKey:
             subnet="preprod",
             pk_hex=self.pk_hex(),
             scheme="admin.catalyst",
-            role_id=RoleID.ROLE_0,
-            rotation="10",
         )
 
     def auth_token(self) -> str:
