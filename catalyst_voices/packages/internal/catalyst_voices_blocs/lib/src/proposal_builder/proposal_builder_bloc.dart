@@ -72,6 +72,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
     on<UpdateUsernameEvent>(_onUpdateUsername);
+    on<UpdateCollaboratorsEvent>(_updateCollaborators);
     on<UnlockProposalBuilderEvent>(_unlockProposal);
     on<ForgetProposalBuilderEvent>(_forgetProposal);
 
@@ -187,6 +188,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       validationErrors: state.validationErrors?.withErrorList(proposalDocument.collectErrors()),
       canPublish: isEmailVerified && proposalDocument.isValid,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
+      collaborators: _cache.collaborators ?? [],
     );
   }
 
@@ -672,6 +674,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           )
           .toList();
 
+      // Inject collaborators section at the end of the setup segment
+      if (segment.schema.nodeId.value == 'setup') {
+        sections.add(
+          CollaboratorsSection.create(
+            authorId: _cache.activeAccountId,
+            collaborators: _cache.collaborators ?? [],
+          ),
+        );
+      }
+
       return DocumentSegment(
         id: segment.schema.nodeId,
         sections: sections,
@@ -910,6 +922,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           proposalTitle: proposalTitle,
           currentIteration: currentIteration,
           nextIteration: nextIteration,
+          hasCollaborators: state.collaborators.isNotEmpty,
         ),
       );
     } finally {
@@ -1131,6 +1144,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       _logger.severe('Unlock proposal failed', e, stackTrace);
       emitError(LocalizedException.create(e));
     }
+  }
+
+  void _updateCollaborators(
+    UpdateCollaboratorsEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    _cache = _cache.copyWith(collaborators: Optional(event.collaborators));
+
+    emit(_rebuildState());
   }
 
   Future<void> _updateCommentBuilder(

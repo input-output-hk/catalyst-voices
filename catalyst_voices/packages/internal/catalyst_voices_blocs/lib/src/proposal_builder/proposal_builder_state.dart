@@ -84,6 +84,7 @@ final class ProposalBuilderState extends Equatable {
   final ProposalBuilderValidationErrors? validationErrors;
   final bool canPublish;
   final bool isMaxProposalsLimitReached;
+  final List<CatalystId> collaborators;
 
   const ProposalBuilderState({
     this.isLoading = false,
@@ -100,6 +101,7 @@ final class ProposalBuilderState extends Equatable {
     this.validationErrors,
     this.canPublish = false,
     this.isMaxProposalsLimitReached = true,
+    this.collaborators = const [],
   });
 
   List<Segment> get allSegments => [
@@ -130,6 +132,7 @@ final class ProposalBuilderState extends Equatable {
     validationErrors,
     canPublish,
     isMaxProposalsLimitReached,
+    collaborators,
   ];
 
   bool get showError => !isLoading && error != null;
@@ -164,6 +167,7 @@ final class ProposalBuilderState extends Equatable {
     Optional<ProposalBuilderValidationErrors>? validationErrors,
     bool? canPublish,
     bool? isMaxProposalsLimitReached,
+    List<CatalystId>? collaborators,
   }) {
     return ProposalBuilderState(
       isLoading: isLoading ?? this.isLoading,
@@ -180,6 +184,7 @@ final class ProposalBuilderState extends Equatable {
       validationErrors: validationErrors.dataOr(this.validationErrors),
       canPublish: canPublish ?? this.canPublish,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached ?? this.isMaxProposalsLimitReached,
+      collaborators: collaborators ?? this.collaborators,
     );
   }
 }

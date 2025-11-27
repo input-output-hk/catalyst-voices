@@ -12,6 +12,7 @@ final class ProposalBuilderBlocCache extends Equatable {
   final List<CommentWithReplies>? comments;
   final AccountPublicStatus? accountPublicStatus;
   final bool? isMaxProposalsLimitReached;
+  final List<CatalystId>? collaborators;
 
   const ProposalBuilderBlocCache({
     this.activeAccountId,
@@ -23,6 +24,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     this.comments,
     this.accountPublicStatus,
     this.isMaxProposalsLimitReached,
+    this.collaborators,
   });
 
   bool get isEmailVerified => accountPublicStatus?.isVerified ?? false;
@@ -38,6 +40,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     comments,
     accountPublicStatus,
     isMaxProposalsLimitReached,
+    collaborators,
   ];
 
   ProposalBuilderBlocCache copyWith({
@@ -50,6 +53,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     Optional<List<CommentWithReplies>>? comments,
     Optional<AccountPublicStatus>? accountPublicStatus,
     Optional<bool>? isMaxProposalsLimitReached,
+    Optional<List<CatalystId>>? collaborators,
   }) {
     return ProposalBuilderBlocCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
@@ -63,6 +67,7 @@ final class ProposalBuilderBlocCache extends Equatable {
       isMaxProposalsLimitReached: isMaxProposalsLimitReached.dataOr(
         this.isMaxProposalsLimitReached,
       ),
+      collaborators: collaborators.dataOr(this.collaborators),
     );
   }
 }

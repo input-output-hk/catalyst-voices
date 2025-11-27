@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal_builder/tiles/collaborators_section_tile.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
@@ -169,7 +170,9 @@ class _ProposalBuilderSegments extends StatelessWidget {
                 return const ProposalDivider(height: 48);
               }
 
-              if (item is DocumentSegment || item is DocumentSection) {
+              if (item is DocumentSegment ||
+                  item is DocumentSection ||
+                  item is CollaboratorsSection) {
                 return const SizedBox(height: 12);
               }
 
@@ -260,6 +263,10 @@ class _ProposalBuilderSegments extends StatelessWidget {
       ProposalCommentsSegment() => SegmentHeaderTile(
         id: item.id,
         name: item.resolveTitle(context),
+      ),
+      CollaboratorsSection() => CollaboratorsSectionTile(
+        section: item,
+        isSelected: item.id == selectedNodeId,
       ),
       DocumentSection() => _DocumentSection(
         property: item.property,
