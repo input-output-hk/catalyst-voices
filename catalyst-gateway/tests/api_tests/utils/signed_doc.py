@@ -179,7 +179,7 @@ def build_signed_doc(
 # ------------------- #
 
 
-class ProposalParameterType(IntEnum):
+class ParameterType(IntEnum):
     CATEGORY = 0
     CAMPAIGN = 1
     BRAND = 2
@@ -195,15 +195,15 @@ def proposal_doc_factory(
     brand_parameters_doc,
 ):
     def __factory__(
-        parameter_type: ProposalParameterType,
+        parameter_type: ParameterType,
         role_id: RoleID
     ) -> SignedDocument:
         param: SignedDocumentBase
-        if parameter_type == ProposalParameterType.CATEGORY:
+        if parameter_type == ParameterType.CATEGORY:
             param = category_parameters_doc
-        elif parameter_type == ProposalParameterType.CAMPAIGN:
+        elif parameter_type == ParameterType.CAMPAIGN:
             param = campaign_parameters_doc
-        elif parameter_type == ProposalParameterType.BRAND:
+        elif parameter_type == ParameterType.BRAND:
             param = brand_parameters_doc
         else:
             raise Exception("Invalid parameter type for proposal document")
@@ -252,13 +252,13 @@ def proposal_form_template_doc_factory(
     campaign_parameters_doc,
     brand_parameters_doc,
 ):
-    def __factory__(parameter_type: ProposalParameterType):
+    def __factory__(parameter_type: ParameterType):
         param: SignedDocumentBase
-        if parameter_type == ProposalParameterType.CATEGORY:
+        if parameter_type == ParameterType.CATEGORY:
             param = category_parameters_doc
-        elif parameter_type == ProposalParameterType.CAMPAIGN:
+        elif parameter_type == ParameterType.CAMPAIGN:
             param = campaign_parameters_doc
-        elif parameter_type == ProposalParameterType.BRAND:
+        elif parameter_type == ParameterType.BRAND:
             param = brand_parameters_doc
         else:
             raise Exception(
