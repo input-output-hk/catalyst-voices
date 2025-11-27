@@ -24,5 +24,13 @@ export default defineConfig({
         testIdAttribute: "flt-semantics-identifier",
       },
     },
+    {
+      name: "local-run",
+      use: {
+        ...devices["Desktop Chrome"],
+        testIdAttribute: "flt-semantics-identifier",
+        baseURL: `http://localhost:80`,
+      },
+    },
   ],
 });

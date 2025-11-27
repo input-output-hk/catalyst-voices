@@ -22,7 +22,9 @@ export class InputSeedPhrasePanel extends OnboardingBasePage {
     await this.click(this.uploadKeyButton);
   }
   async resetButtonClick() {
-    await this.click(this.resetButton);
+    if (await this.resetButton.isVisible()) {
+      await this.click(this.resetButton);
+    }
   }
 
   async inputSeedPhraseWords() {

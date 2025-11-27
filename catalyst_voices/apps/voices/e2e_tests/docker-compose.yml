@@ -103,23 +103,41 @@ services:
       - e2e-network
 
   # Playwright E2E Test Runner
+  # Runs Playwright tests with headed Chrome using Xvfb
+  # Uses host networking so localhost:80 reaches nginx
   e2e-test-runner:
     image: e2e-test-runner:latest
     container_name: e2e-test-runner
+    init: true
+    # Share IPC namespace with host - required for Chromium stability
+    ipc: host
+    # Increase shared memory size for Chrome
+    shm_size: "2gb"
     environment:
-      # URL where the Voices frontend is accessible
-      - VOICES_URL=http://voices-frontend:8080
-      # Chrome CDP endpoint for connecting playwright
-      - CHROME_CDP_URL=ws://localhost:9222/devtools/browser
+      # URL where the Voices frontend is accessible via nginx
+      - APP_URL=http://localhost:80
+      # Display for Xvfb (headed mode required for Chrome extensions)
+      - DISPLAY=:99
     volumes:
       # Mount test results for access after tests complete
       - ./test-results:/workspace/test-results
       - ./playwright-report:/workspace/playwright-report
+    # Use host network so localhost:80 reaches the nginx reverse proxy
+    network_mode: host
+    # Run with Xvfb for headed Chrome (required for browser extensions)
+    command:
+      [
+        "xvfb-run",
+        "--auto-servernum",
+        "--server-args=-screen 0 1920x1080x24",
+        "npx",
+        "playwright",
+        "test",
+        "--project=local-run",
+      ]
     depends_on:
-      voices-frontend:
+      nginx:
         condition: service_started
-    networks:
-      - e2e-network
     profiles:
       - test
 
