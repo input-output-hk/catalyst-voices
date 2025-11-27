@@ -21,6 +21,13 @@ final class CollaboratorInvite extends Equatable {
     required this.status,
   });
 
+  factory CollaboratorInvite.fromBriefData(ProposalBriefDataCollaborator briefData) {
+    return CollaboratorInvite(
+      catalystId: briefData.id,
+      status: CollaboratorInviteStatus.fromStatusFilter(briefData.status),
+    );
+  }
+
   @override
   List<Object?> get props => [catalystId, status];
 }
@@ -72,6 +79,19 @@ enum CollaboratorInviteStatus {
 
   /// The collaborator has been removed.
   removed;
+
+  const CollaboratorInviteStatus();
+
+  factory CollaboratorInviteStatus.fromStatusFilter(
+    ProposalsCollaborationStatusFilter statusFilter,
+  ) {
+    return switch (statusFilter) {
+      ProposalsCollaborationStatusFilter.accepted => accepted,
+      ProposalsCollaborationStatusFilter.pending => pending,
+      ProposalsCollaborationStatusFilter.rejected => rejected,
+      // TODO(LynxLynxx): Add missing values left and removed.
+    };
+  }
 
   Color labelColor(BuildContext context) {
     return switch (this) {

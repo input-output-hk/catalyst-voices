@@ -17,7 +17,7 @@ class WorkspaceTabs extends StatelessWidget {
       dividerHeight: 0,
       controller: tabController,
       onTap: (tab) {
-        context.read<WorkspaceBloc>().emitSignal(ChangeTabWorkspaceSignal(tab.data));
+        context.read<WorkspaceCubit>().emitSignal(ChangeTabWorkspaceSignal(tab.data));
       },
       tabs: [
         for (final tab in tabController.tabs)
@@ -41,8 +41,8 @@ class _TabText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, int>(
-      selector: (state) => state.proposalInvitesCount.ofType(tab),
+    return BlocSelector<WorkspaceCubit, WorkspaceState, int>(
+      selector: (state) => state.count[tab] ?? 0,
       builder: (context, count) => VoicesTabText(tab.noOf(context, count: count)),
     );
   }

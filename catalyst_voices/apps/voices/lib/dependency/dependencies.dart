@@ -128,13 +128,13 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
       )
-      ..registerFactory<WorkspaceBloc>(() {
-        return WorkspaceBloc(
+      ..registerFactory<WorkspaceCubit>(() {
+        return WorkspaceCubit(
+          get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
           get<DocumentMapper>(),
           get<DownloaderService>(),
-          get<UserService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {

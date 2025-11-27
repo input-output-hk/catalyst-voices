@@ -29,6 +29,7 @@ void main() {
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),
         publish: ProposalPublish.publishedDraft,
+        iteration: 3,
         versions: [
           ProposalVersionViewModel(
             publish: ProposalPublish.localDraft,

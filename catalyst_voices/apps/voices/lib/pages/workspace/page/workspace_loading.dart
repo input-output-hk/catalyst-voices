@@ -12,7 +12,7 @@ class WorkspaceLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
+    return BlocSelector<WorkspaceCubit, WorkspaceState, bool>(
       selector: (state) => state.isLoading,
       builder: (context, isLoading) {
         return _LoadingStack(

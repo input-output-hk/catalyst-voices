@@ -9,7 +9,7 @@ class WorkspaceError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, LocalizedException?>(
+    return BlocSelector<WorkspaceCubit, WorkspaceState, LocalizedException?>(
       selector: (state) => state.error,
       builder: (context, error) {
         final errorMessage = error?.message(context);
@@ -38,8 +38,7 @@ class _WorkspaceError extends StatelessWidget {
       child: VoicesErrorIndicator(
         message: message,
         onRetry: () {
-          const event = WatchUserProposalsEvent();
-          context.read<WorkspaceBloc>().add(event);
+          context.read<WorkspaceCubit>().changeFilters();
         },
       ),
     );

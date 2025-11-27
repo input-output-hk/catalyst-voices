@@ -128,8 +128,6 @@ abstract interface class ProposalService {
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters,
   });
-
-  Stream<List<DetailProposal>> watchUserProposals();
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -489,66 +487,6 @@ final class ProposalServiceImpl implements ProposalService {
     );
   }
 
-  @override
-  Stream<List<DetailProposal>> watchUserProposals() {
-    return _userService.watchUnlockedActiveAccount.distinct().switchMap((account) {
-      if (account == null) return const Stream.empty();
-
-      final authorId = account.catalystId;
-      if (!account.hasRole(AccountRole.proposer)) {
-        return const Stream.empty();
-      }
-
-      return _proposalRepository
-          .watchUserProposals(authorId: authorId)
-          .distinct()
-          .switchMap<List<DetailProposal>>((documents) async* {
-            if (documents.isEmpty) {
-              yield [];
-              return;
-            }
-            final proposalsDataStreams = await Future.wait(
-              documents.map(_createProposalDataStream).toList(),
-            );
-
-            yield* Rx.combineLatest(
-              proposalsDataStreams,
-              (List<ProposalData?> proposalsData) async {
-                // Note. one is null and two versions of same id.
-                final validProposalsData = proposalsData.whereType<ProposalData>().toList();
-
-                final groupedProposals = groupBy(
-                  validProposalsData,
-                  (data) => data.document.metadata.id.id,
-                );
-
-                final filteredProposalsData = groupedProposals.values
-                    .map((group) {
-                      if (group.any(
-                        (p) => p.publish != ProposalPublish.localDraft,
-                      )) {
-                        return group.where(
-                          (p) => p.publish != ProposalPublish.localDraft,
-                        );
-                      }
-                      return group;
-                    })
-                    .expand((group) => group)
-                    .toList();
-
-                final proposalsWithVersions = await Future.wait(
-                  filteredProposalsData.map((proposalData) async {
-                    final versions = await _getDetailVersionsOfProposal(proposalData);
-                    return DetailProposal.fromData(proposalData, versions);
-                  }),
-                );
-                return proposalsWithVersions;
-              },
-            ).switchMap(Stream.fromFuture);
-          });
-    });
-  }
-
   // TODO(damian-molinski): Remove this when voteBy is implemented.
   Stream<ProposalsFiltersV2> _adaptFilters(ProposalsFiltersV2 filters) {
     if (filters.voteBy == null) {
@@ -558,28 +496,6 @@ final class ProposalServiceImpl implements ProposalService {
     return _castedVotesObserver.watchCastedVotes
         .map((votes) => votes.map((e) => e.proposal.id).toList())
         .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
-  }
-
-  Future<Stream<ProposalData?>> _createProposalDataStream(
-    ProposalDocument doc,
-  ) async {
-    final proposalId = doc.metadata.id;
-
-    final commentsCountStream = _proposalRepository.watchCommentsCount(referencing: proposalId);
-
-    return Rx.combineLatest2(
-      _proposalRepository.watchProposalPublish(referencing: proposalId),
-      commentsCountStream,
-      (ProposalPublish? publishState, int commentsCount) {
-        if (publishState == null) return null;
-
-        return ProposalData(
-          document: doc,
-          publish: publishState,
-          commentsCount: commentsCount,
-        );
-      },
-    );
   }
 
   // Helper method to fetch versions for a proposal
@@ -636,6 +552,8 @@ final class ProposalServiceImpl implements ProposalService {
 
     return ProposalBriefData(
       id: proposal.id,
+      // TODO(damian-molinski): pass categoryId here,
+      categoryId: SignedDocumentRef.generateFirstRef(),
       authorName: proposal.authorName ?? '',
       title: proposal.title ?? '',
       description: proposal.description ?? '',

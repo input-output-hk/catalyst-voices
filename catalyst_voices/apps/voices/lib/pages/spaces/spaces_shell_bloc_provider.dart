@@ -17,8 +17,8 @@ class SpacesShellBlocProvider extends StatelessWidget {
         BlocProvider<VotingCubit>(
           create: (_) => Dependencies.instance.get<VotingCubit>(),
         ),
-        BlocProvider<WorkspaceBloc>(
-          create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
+        BlocProvider<WorkspaceCubit>(
+          create: (context) => Dependencies.instance.get<WorkspaceCubit>(),
         ),
         BlocProvider<DiscoveryCubit>(
           create: (context) => Dependencies.instance.get<DiscoveryCubit>(),

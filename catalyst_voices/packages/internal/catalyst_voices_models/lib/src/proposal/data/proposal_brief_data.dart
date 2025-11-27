@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
   final DocumentRef id;
+  // TODO(damina-molinski): To be implemented
+  final SignedDocumentRef categoryId;
   final String authorName;
   final String title;
   final String description;
@@ -21,6 +23,7 @@ final class ProposalBriefData extends Equatable {
 
   const ProposalBriefData({
     required this.id,
+    required this.categoryId,
     required this.authorName,
     required this.title,
     required this.description,
@@ -40,6 +43,7 @@ final class ProposalBriefData extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    categoryId,
     authorName,
     title,
     description,
@@ -55,6 +59,19 @@ final class ProposalBriefData extends Equatable {
     versions,
     collaborators,
   ];
+}
+
+final class ProposalBriefDataCollaborator extends Equatable {
+  final CatalystId id;
+  final ProposalsCollaborationStatusFilter status;
+
+  const ProposalBriefDataCollaborator({
+    required this.id,
+    required this.status,
+  });
+
+  @override
+  List<Object?> get props => [id, status];
 }
 
 final class ProposalBriefDataVersion extends Equatable {
@@ -81,18 +98,4 @@ final class ProposalBriefDataVotes extends Equatable {
 
   @override
   List<Object?> get props => [draft, casted];
-}
-
-
-final class ProposalBriefDataCollaborator extends Equatable {
-  final CatalystId id;
-  final ProposalsCollaborationStatusFilter status;
-
-  const ProposalBriefDataCollaborator({
-    required this.id,
-    required this.status,
-  });
-
-  @override
-  List<Object?> get props => [id, status];
 }

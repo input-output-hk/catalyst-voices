@@ -1,371 +1,373 @@
-import 'dart:async';
+// import 'dart:async';
 
-import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
-import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
-import 'package:catalyst_voices_blocs/src/workspace/workspace_bloc_cache.dart';
-import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
-import 'package:catalyst_voices_blocs/src/workspace/workspace_signal.dart';
-import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:collection/collection.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
+// import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
+// import 'package:catalyst_voices_blocs/src/workspace/workspace_bloc_cache.dart';
+// import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
+// import 'package:catalyst_voices_blocs/src/workspace/workspace_signal.dart';
+// import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
+// import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+// import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+// import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+// import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+// import 'package:collection/collection.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
 
-final _logger = Logger('WorkspaceBloc');
+// final _logger = Logger('WorkspaceBloc');
 
-/// Manages users' proposals. Allows to load, import, export, forget, unlock and delete proposals.
-final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
-    with BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>, BlocErrorEmitterMixin {
-  final CampaignService _campaignService;
-  final ProposalService _proposalService;
-  final DocumentMapper _documentMapper;
-  final DownloaderService _downloaderService;
-  final UserService _userService;
+// /// Manages users' proposals. Allows to load, import, export, forget, unlock and delete proposals.
+// final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
+//     with BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>, BlocErrorEmitterMixin {
+//   final CampaignService _campaignService;
+//   final ProposalService _proposalService;
+//   final DocumentMapper _documentMapper;
+//   final DownloaderService _downloaderService;
+//   final UserService _userService;
 
-  WorkspaceBlocCache _cache = const WorkspaceBlocCache();
+//   WorkspaceBlocCache _cache = const WorkspaceBlocCache();
 
-  StreamSubscription<List<DetailProposal>>? _proposalsSub;
+//   StreamSubscription<Page<UsersProposalOverview>>? _dataSub;
 
-  StreamSubscription<CatalystId?>? _activeAccountIdSub;
+//   StreamSubscription<List<DetailProposal>>? _proposalsSub;
 
-  WorkspaceBloc(
-    this._campaignService,
-    this._proposalService,
-    this._documentMapper,
-    this._downloaderService,
-    this._userService,
-  ) : super(const WorkspaceState()) {
-    on<LoadProposalsEvent>(_loadProposals);
-    on<ImportProposalEvent>(_importProposal);
-    on<ErrorLoadProposalsEvent>(_errorLoadProposals);
-    on<WatchUserProposalsEvent>(_watchUserProposals);
-    on<ExportProposal>(_exportProposal);
-    on<DeleteDraftProposalEvent>(_deleteProposal);
-    on<UnlockProposalEvent>(_unlockProposal);
-    on<ForgetProposalEvent>(_forgetProposal);
-    on<GetTimelineItemsEvent>(_getTimelineItems);
-    on<ChangeWorkspaceFilters>(_changeFilters);
-    on<WatchUserCatalystIdEvent>(_watchUserCatalystId);
-  }
+//   StreamSubscription<CatalystId?>? _activeAccountIdSub;
 
-  @override
-  Future<void> close() async {
-    await _cancelProposalSubscriptions();
+//   WorkspaceBloc(
+//     this._campaignService,
+//     this._proposalService,
+//     this._documentMapper,
+//     this._downloaderService,
+//     this._userService,
+//   ) : super(const WorkspaceState()) {
+//     on<LoadProposalsEvent>(_loadProposals);
+//     on<ImportProposalEvent>(_importProposal);
+//     on<ErrorLoadProposalsEvent>(_errorLoadProposals);
+//     on<WatchUserProposalsEvent>(_watchUserProposals);
+//     on<ExportProposal>(_exportProposal);
+//     on<DeleteDraftProposalEvent>(_deleteProposal);
+//     on<UnlockProposalEvent>(_unlockProposal);
+//     on<ForgetProposalEvent>(_forgetProposal);
+//     on<GetTimelineItemsEvent>(_getTimelineItems);
+//     on<ChangeWorkspaceFilters>(_changeFilters);
+//     on<WatchUserCatalystIdEvent>(_watchUserCatalystId);
+//   }
 
-    await _activeAccountIdSub?.cancel();
-    _activeAccountIdSub = null;
+//   @override
+//   Future<void> close() async {
+//     await _cancelProposalSubscriptions();
 
-    return super.close();
-  }
+//     await _activeAccountIdSub?.cancel();
+//     _activeAccountIdSub = null;
 
-  DocumentDataContent _buildDocumentContent(Document document) {
-    return _documentMapper.toContent(document);
-  }
+//     return super.close();
+//   }
 
-  DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
-    final id = document.metadata.id;
-    final categoryId = document.metadata.categoryId;
-    final templateRef = document.metadata.templateRef;
+//   DocumentDataContent _buildDocumentContent(Document document) {
+//     return _documentMapper.toContent(document);
+//   }
 
-    return DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
-      id: id,
-      template: templateRef,
-      categoryId: categoryId,
-    );
-  }
+//   DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
+//     final id = document.metadata.id;
+//     final categoryId = document.metadata.categoryId;
+//     final templateRef = document.metadata.templateRef;
 
-  Future<void> _cancelProposalSubscriptions() async {
-    await _proposalsSub?.cancel();
-    _proposalsSub = null;
-  }
+//     return DocumentDataMetadata(
+//       type: DocumentType.proposalDocument,
+//       id: id,
+//       template: templateRef,
+//       categoryId: categoryId,
+//     );
+//   }
 
-  Future<void> _changeFilters(ChangeWorkspaceFilters event, Emitter<WorkspaceState> emit) async {
-    final filter = event.filters;
-    if (state.userProposals.currentFilter == filter) return;
+//   Future<void> _cancelProposalSubscriptions() async {
+//     await _proposalsSub?.cancel();
+//     _proposalsSub = null;
+//   }
 
-    emit(
-      state.copyWith(
-        userProposals: state.userProposals.copyWith(
-          currentFilter: filter,
-        ),
-      ),
-    );
+//   Future<void> _changeFilters(ChangeWorkspaceFilters event, Emitter<WorkspaceState> emit) async {
+//     final filter = event.filters;
+//     if (state.userProposals.currentFilter == filter) return;
 
-    final filters = _rebuildProposalFilters(filter: filter);
+//     emit(
+//       state.copyWith(
+//         userProposals: state.userProposals.copyWith(
+//           currentFilter: filter,
+//         ),
+//       ),
+//     );
 
-    // TODO(LynxLynxx): Setup count subscription
-    await _cancelProposalSubscriptions();
-    _setupProposalsSubscription(filters: filters);
-  }
+//     final filters = _rebuildProposalFilters(filter: filter);
 
-  Future<void> _deleteProposal(DeleteDraftProposalEvent event, Emitter<WorkspaceState> emit) async {
-    try {
-      emit(state.copyWith(isLoading: true));
-      await _proposalService.deleteDraftProposal(event.ref);
+//     // TODO(LynxLynxx): Setup count subscription
+//     await _cancelProposalSubscriptions();
+//     _setupProposalsSubscription(filters: filters);
+//   }
 
-      // Remove proposal from cache and rebuild state
-      _removeProposalFromCache(event.ref);
-      emit(state.copyWith(userProposals: _rebuildProposalsState()));
+//   Future<void> _deleteProposal(DeleteDraftProposalEvent event, Emitter<WorkspaceState> emit) async {
+//     try {
+//       emit(state.copyWith(isLoading: true));
+//       await _proposalService.deleteDraftProposal(event.ref);
 
-      emitSignal(const DeletedDraftWorkspaceSignal());
-    } catch (error, stackTrace) {
-      _logger.severe('Delete proposal failed', error, stackTrace);
-      emitError(const LocalizedProposalDeletionException());
-    } finally {
-      emit(state.copyWith(isLoading: false));
-    }
-  }
+//       // Remove proposal from cache and rebuild state
+//       _removeProposalFromCache(event.ref);
+//       emit(state.copyWith(userProposals: _rebuildProposalsState()));
 
-  Future<void> _errorLoadProposals(
-    ErrorLoadProposalsEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
-    _logger.info('Error loading proposals');
-    emit(state.copyWith(error: Optional(event.error), isLoading: false));
+//       emitSignal(const DeletedDraftWorkspaceSignal());
+//     } catch (error, stackTrace) {
+//       _logger.severe('Delete proposal failed', error, stackTrace);
+//       emitError(const LocalizedProposalDeletionException());
+//     } finally {
+//       emit(state.copyWith(isLoading: false));
+//     }
+//   }
 
-    await _cancelProposalSubscriptions();
-  }
+//   Future<void> _errorLoadProposals(
+//     ErrorLoadProposalsEvent event,
+//     Emitter<WorkspaceState> emit,
+//   ) async {
+//     _logger.info('Error loading proposals');
+//     emit(state.copyWith(error: Optional(event.error), isLoading: false));
 
-  Future<void> _exportProposal(ExportProposal event, Emitter<WorkspaceState> emit) async {
-    try {
-      final docData = await _proposalService.getProposalDetail(id: event.ref);
+//     await _cancelProposalSubscriptions();
+//   }
 
-      final docMetadata = _buildDocumentMetadata(docData.document);
-      final documentContent = _buildDocumentContent(docData.document.document);
+//   Future<void> _exportProposal(ExportProposal event, Emitter<WorkspaceState> emit) async {
+//     try {
+//       final docData = await _proposalService.getProposalDetail(id: event.ref);
 
-      final encodedProposal = await _proposalService.encodeProposalForExport(
-        document: DocumentData(metadata: docMetadata, content: documentContent),
-      );
+//       final docMetadata = _buildDocumentMetadata(docData.document);
+//       final documentContent = _buildDocumentContent(docData.document.document);
 
-      final filename = '${event.prefix}_${event.ref.id}';
-      const extension = ProposalDocument.exportFileExt;
+//       final encodedProposal = await _proposalService.encodeProposalForExport(
+//         document: DocumentData(metadata: docMetadata, content: documentContent),
+//       );
 
-      await _downloaderService.download(data: encodedProposal, filename: '$filename.$extension');
-    } catch (error, stackTrace) {
-      _logger.severe('Exporting proposal failed', error, stackTrace);
-      emitError(LocalizedException.create(error));
-    }
-  }
+//       final filename = '${event.prefix}_${event.ref.id}';
+//       const extension = ProposalDocument.exportFileExt;
 
-  Future<void> _forgetProposal(ForgetProposalEvent event, Emitter<WorkspaceState> emit) async {
-    final proposal = _cache.proposals?.firstWhereOrNull(
-      (e) => e.id == event.ref,
-    );
-    if (proposal == null || proposal.id is! SignedDocumentRef) {
-      return emitError(const LocalizedUnknownException());
-    }
-    try {
-      emit(state.copyWith(isLoading: true));
-      await _proposalService.forgetProposal(
-        proposalRef: proposal.id as SignedDocumentRef,
-        categoryId: proposal.categoryId,
-      );
+//       await _downloaderService.download(data: encodedProposal, filename: '$filename.$extension');
+//     } catch (error, stackTrace) {
+//       _logger.severe('Exporting proposal failed', error, stackTrace);
+//       emitError(LocalizedException.create(error));
+//     }
+//   }
 
-      // Remove proposal from cache and rebuild state
-      _removeProposalFromCache(event.ref);
-      emit(state.copyWith(userProposals: _rebuildProposalsState()));
+//   Future<void> _forgetProposal(ForgetProposalEvent event, Emitter<WorkspaceState> emit) async {
+//     final proposal = _cache.proposals?.firstWhereOrNull(
+//       (e) => e.id == event.ref,
+//     );
+//     if (proposal == null || proposal.id is! SignedDocumentRef) {
+//       return emitError(const LocalizedUnknownException());
+//     }
+//     try {
+//       emit(state.copyWith(isLoading: true));
+//       await _proposalService.forgetProposal(
+//         proposalRef: proposal.id as SignedDocumentRef,
+//         categoryId: proposal.categoryId,
+//       );
 
-      emitSignal(const ForgetProposalSuccessWorkspaceSignal());
-    } catch (e, stackTrace) {
-      emitError(LocalizedException.create(e));
-      _logger.severe('Error forgetting proposal', e, stackTrace);
-    } finally {
-      emit(state.copyWith(isLoading: false));
-    }
-  }
+//       // Remove proposal from cache and rebuild state
+//       _removeProposalFromCache(event.ref);
+//       emit(state.copyWith(userProposals: _rebuildProposalsState()));
 
-  Future<void> _getTimelineItems(
-    GetTimelineItemsEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
-    final campaign = await _campaignService.getActiveCampaign();
-    _cache = _cache.copyWith(campaign: Optional(campaign));
+//       emitSignal(const ForgetProposalSuccessWorkspaceSignal());
+//     } catch (e, stackTrace) {
+//       emitError(LocalizedException.create(e));
+//       _logger.severe('Error forgetting proposal', e, stackTrace);
+//     } finally {
+//       emit(state.copyWith(isLoading: false));
+//     }
+//   }
 
-    if (campaign == null) {
-      return emitError(const LocalizedUnknownException());
-    }
+//   Future<void> _getTimelineItems(
+//     GetTimelineItemsEvent event,
+//     Emitter<WorkspaceState> emit,
+//   ) async {
+//     final campaign = await _campaignService.getActiveCampaign();
+//     _cache = _cache.copyWith(campaign: Optional(campaign));
 
-    final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
+//     if (campaign == null) {
+//       return emitError(const LocalizedUnknownException());
+//     }
 
-    emit(state.copyWith(timelineItems: timeline, fundNumber: campaign.fundNumber));
-    emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
-  }
+//     final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
 
-  void _handleActiveAccountIdChange(CatalystId? id) {
-    _cache = _cache.copyWith(activeAccountId: Optional(id));
+//     emit(state.copyWith(timelineItems: timeline, fundNumber: campaign.fundNumber));
+//     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
+//   }
 
-    add(ChangeWorkspaceFilters(state.userProposals.currentFilter));
-  }
+//   void _handleActiveAccountIdChange(CatalystId? id) {
+//     _cache = _cache.copyWith(activeAccountId: Optional(id));
 
-  void _handleProposalsError(Object error, StackTrace stackTrace) {
-    if (isClosed) return;
-    _logger.info('Users proposals stream error', error, stackTrace);
-    add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
-  }
+//     add(ChangeWorkspaceFilters(state.userProposals.currentFilter));
+//   }
 
-  Future<void> _handleProposalsUpdate(List<DetailProposal> proposals) async {
-    _logger.info('Stream received ${proposals.length} proposals');
-    final mappedProposals = await _mapProposalToViewModel(proposals);
-    if (isClosed) return;
-    add(LoadProposalsEvent(mappedProposals));
-  }
+//   void _handleProposalsError(Object error, StackTrace stackTrace) {
+//     if (isClosed) return;
+//     _logger.info('Users proposals stream error', error, stackTrace);
+//     add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
+//   }
 
-  Future<void> _importProposal(ImportProposalEvent event, Emitter<WorkspaceState> emit) async {
-    try {
-      emit(state.copyWith(isLoading: true));
-      final ref = await _proposalService.importProposal(event.proposalData);
-      emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
-    } on DocumentImportInvalidDataException {
-      emitError(const LocalizedDocumentImportInvalidDataException());
-    } catch (error, stackTrace) {
-      _logger.warning('Importing proposal failed', error, stackTrace);
-      emitError(LocalizedException.create(error));
-    } finally {
-      emit(state.copyWith(isLoading: false));
-    }
-  }
+//   Future<void> _handleProposalsUpdate(List<DetailProposal> proposals) async {
+//     _logger.info('Stream received ${proposals.length} proposals');
+//     final mappedProposals = await _mapProposalToViewModel(proposals);
+//     if (isClosed) return;
+//     add(LoadProposalsEvent(mappedProposals));
+//   }
 
-  Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
-    _cache = _cache.copyWith(
-      proposals: Optional(event.proposals),
-      // TODO(LynxLynxx): Update this in count stream instead.
-      proposalCount: event.proposals.length,
-    );
+//   Future<void> _importProposal(ImportProposalEvent event, Emitter<WorkspaceState> emit) async {
+//     try {
+//       emit(state.copyWith(isLoading: true));
+//       final ref = await _proposalService.importProposal(event.proposalData);
+//       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
+//     } on DocumentImportInvalidDataException {
+//       emitError(const LocalizedDocumentImportInvalidDataException());
+//     } catch (error, stackTrace) {
+//       _logger.warning('Importing proposal failed', error, stackTrace);
+//       emitError(LocalizedException.create(error));
+//     } finally {
+//       emit(state.copyWith(isLoading: false));
+//     }
+//   }
 
-    emit(
-      state.copyWith(
-        isLoading: false,
-        error: const Optional.empty(),
-        userProposals: _rebuildProposalsState(),
-        proposalInvitesCount: _rebuildProposalsInvitesCountState(),
-      ),
-    );
-  }
+//   Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
+//     _cache = _cache.copyWith(
+//       proposals: Optional(event.proposals),
+//       // TODO(LynxLynxx): Update this in count stream instead.
+//       proposalCount: event.proposals.length,
+//     );
 
-  Future<List<UsersProposalOverview>> _mapProposalToViewModel(
-    List<DetailProposal> proposals,
-  ) async {
-    final futures = proposals.map((proposal) async {
-      if (_cache.campaign == null) {
-        final campaign = await _campaignService.getActiveCampaign();
-        _cache = _cache.copyWith(campaign: Optional(campaign));
-      }
-      // TODO(damian-molinski): proposal should have ref to campaign
-      // TODO(LynxLynxx): refactor `watch user proposals - success` test after this refactor
-      final campaigns = Campaign.all;
+//     emit(
+//       state.copyWith(
+//         isLoading: false,
+//         error: const Optional.empty(),
+//         userProposals: _rebuildProposalsState(),
+//         proposalInvitesCount: _rebuildProposalsInvitesCountState(),
+//       ),
+//     );
+//   }
 
-      final categories = campaigns.expand((element) => element.categories);
-      final category = categories.firstWhereOrNull(
-        (e) => e.id.id == proposal.categoryRef.id,
-      );
+//   Future<List<UsersProposalOverview>> _mapProposalToViewModel(
+//     List<DetailProposal> proposals,
+//   ) async {
+//     final futures = proposals.map((proposal) async {
+//       if (_cache.campaign == null) {
+//         final campaign = await _campaignService.getActiveCampaign();
+//         _cache = _cache.copyWith(campaign: Optional(campaign));
+//       }
+//       // TODO(damian-molinski): proposal should have ref to campaign
+//       // TODO(LynxLynxx): refactor `watch user proposals - success` test after this refactor
+//       final campaigns = Campaign.all;
 
-      // TODO(damian-molinski): refactor it
-      final fundNumber = category != null
-          ? campaigns.firstWhere((campaign) => campaign.hasCategory(category.id.id)).fundNumber
-          : 0;
+//       final categories = campaigns.expand((element) => element.categories);
+//       final category = categories.firstWhereOrNull(
+//         (e) => e.id.id == proposal.categoryRef.id,
+//       );
 
-      final fromActiveCampaign = fundNumber == _cache.campaign?.fundNumber;
+//       // TODO(damian-molinski): refactor it
+//       final fundNumber = category != null
+//           ? campaigns.firstWhere((campaign) => campaign.hasCategory(category.id.id)).fundNumber
+//           : 0;
 
-      return UsersProposalOverview.fromProposal(
-        proposal,
-        fundNumber,
-        category?.formattedCategoryName ?? '',
-        fromActiveCampaign: fromActiveCampaign,
-      );
-    }).toList();
+//       final fromActiveCampaign = fundNumber == _cache.campaign?.fundNumber;
 
-    return Future.wait(futures);
-  }
+//       return UsersProposalOverview.fromProposal(
+//         proposal,
+//         fundNumber,
+//         category?.formattedCategoryName ?? '',
+//         fromActiveCampaign: fromActiveCampaign,
+//       );
+//     }).toList();
 
-  ProposalsFiltersV2 _rebuildProposalFilters({WorkspaceFilters? filter}) {
-    final newFilter = filter ?? state.userProposals.currentFilter;
+//     return Future.wait(futures);
+//   }
 
-    // TODO(LynxLynxx): AllProposals should be either where activeAccountId == author OR activeAccountId is a collaborator
-    return ProposalsFiltersV2(
-      author: newFilter.isAllProposals || newFilter.isMainProposer ? _cache.activeAccountId : null,
-      collaboration: ProposalsCollaborationFilters(
-        collaborator: newFilter.isCollaborator || newFilter.isAllProposals
-            ? _cache.activeAccountId
-            : null,
-      ),
-    );
-  }
+//   ProposalsFiltersV2 _rebuildProposalFilters({WorkspaceFilters? filter}) {
+//     final newFilter = filter ?? state.userProposals.currentFilter;
 
-  WorkspaceStateProposalInvitesCount _rebuildProposalsInvitesCountState() {
-    return WorkspaceStateProposalInvitesCount(
-      invitesCount: _cache.invitesCount,
-      proposalCount: _cache.proposalCount,
-    );
-  }
+//     // TODO(LynxLynxx): AllProposals should be either where activeAccountId == author OR activeAccountId is a collaborator
+//     return ProposalsFiltersV2(
+//       author: newFilter.isAllProposals || newFilter.isMainProposer ? _cache.activeAccountId : null,
+//       collaboration: ProposalsCollaborationFilters(
+//         collaborator: newFilter.isCollaborator || newFilter.isAllProposals
+//             ? _cache.activeAccountId
+//             : null,
+//       ),
+//     );
+//   }
 
-  /// Rebuilds WorkspaceStateUserProposals from the current cache.
-  /// This ensures derived views (published, notPublished, hasComments) stay in sync.
-  WorkspaceStateUserProposals _rebuildProposalsState() {
-    final proposals = _cache.proposals ?? [];
-    final filter = state.userProposals.currentFilter;
-    return WorkspaceStateUserProposals.fromList(proposals, filter);
-  }
+//   WorkspaceStateProposalInvitesCount _rebuildProposalsInvitesCountState() {
+//     return WorkspaceStateProposalInvitesCount(
+//       invitesCount: _cache.invitesCount,
+//       proposalCount: _cache.proposalCount,
+//     );
+//   }
 
-  /// Removes a proposal from the cache by its reference.
-  void _removeProposalFromCache(DocumentRef ref) {
-    final updatedProposals = _cache.proposals?.where((e) => e.id.id != ref.id).toList() ?? [];
-    _cache = _cache.copyWith(proposals: Optional(updatedProposals));
-  }
+//   /// Rebuilds WorkspaceStateUserProposals from the current cache.
+//   /// This ensures derived views (published, notPublished, hasComments) stay in sync.
+//   WorkspaceStateUserProposals _rebuildProposalsState() {
+//     final proposals = _cache.proposals ?? [];
+//     final filter = state.userProposals.currentFilter;
+//     return WorkspaceStateUserProposals.fromList(proposals, filter);
+//   }
 
-  void _setupProposalsSubscription({required ProposalsFiltersV2 filters}) {
-    _proposalsSub = _proposalService
-        .watchUserProposals(filters: filters)
-        .listen(
-          _handleProposalsUpdate,
-          onError: _handleProposalsError,
-        );
-  }
+//   /// Removes a proposal from the cache by its reference.
+//   void _removeProposalFromCache(DocumentRef ref) {
+//     final updatedProposals = _cache.proposals?.where((e) => e.id.id != ref.id).toList() ?? [];
+//     _cache = _cache.copyWith(proposals: Optional(updatedProposals));
+//   }
 
-  Future<void> _unlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {
-    final proposal = _cache.proposals?.firstWhereOrNull(
-      (e) => e.id == event.ref,
-    );
-    if (proposal == null || proposal.id is! SignedDocumentRef) {
-      return emitError(const LocalizedUnknownException());
-    }
-    await _proposalService.unlockProposal(
-      proposalRef: proposal.id as SignedDocumentRef,
-      categoryId: proposal.categoryId,
-    );
-    emitSignal(OpenProposalBuilderSignal(ref: event.ref));
-  }
+//   void _setupProposalsSubscription({required ProposalsFiltersV2 filters}) {
+//     _proposalsSub = _proposalService
+//         .watchUserProposals(filters: filters)
+//         .listen(
+//           _handleProposalsUpdate,
+//           onError: _handleProposalsError,
+//         );
+//   }
 
-  void _watchUserCatalystId(WatchUserCatalystIdEvent event, Emitter<WorkspaceState> emit) {
-    _activeAccountIdSub = _userService.watchUnlockedActiveAccount
-        .map((event) => event?.catalystId)
-        .distinct()
-        .listen(_handleActiveAccountIdChange);
-  }
+//   Future<void> _unlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {
+//     final proposal = _cache.proposals?.firstWhereOrNull(
+//       (e) => e.id == event.ref,
+//     );
+//     if (proposal == null || proposal.id is! SignedDocumentRef) {
+//       return emitError(const LocalizedUnknownException());
+//     }
+//     await _proposalService.unlockProposal(
+//       proposalRef: proposal.id as SignedDocumentRef,
+//       categoryId: proposal.categoryId,
+//     );
+//     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
+//   }
 
-  Future<void> _watchUserProposals(
-    WatchUserProposalsEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
-    // As stream is needed in a few places we don't want to create it every time
-    if (_proposalsSub != null && state.error == null) {
-      return;
-    }
+//   void _watchUserCatalystId(WatchUserCatalystIdEvent event, Emitter<WorkspaceState> emit) {
+//     _activeAccountIdSub = _userService.watchUnlockedActiveAccount
+//         .map((event) => event?.catalystId)
+//         .distinct()
+//         .listen(_handleActiveAccountIdChange);
+//   }
 
-    _logger.info('Setup user proposals subscription');
+//   Future<void> _watchUserProposals(
+//     WatchUserProposalsEvent event,
+//     Emitter<WorkspaceState> emit,
+//   ) async {
+//     // As stream is needed in a few places we don't want to create it every time
+//     if (_proposalsSub != null && state.error == null) {
+//       return;
+//     }
 
-    emit(state.copyWith(isLoading: true, error: const Optional.empty()));
+//     _logger.info('Setup user proposals subscription');
 
-    _logger.info('$state and ${state.showProposals}');
+//     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
 
-    await _cancelProposalSubscriptions();
+//     _logger.info('$state and ${state.showProposals}');
 
-    // Build filters from current state
-    // final filter = state.userProposals.currentFilter;
-    final filters = _rebuildProposalFilters();
+//     await _cancelProposalSubscriptions();
 
-    _setupProposalsSubscription(filters: filters);
-  }
-}
+//     // Build filters from current state
+//     // final filter = state.userProposals.currentFilter;
+//     final filters = _rebuildProposalFilters();
+
+//     _setupProposalsSubscription(filters: filters);
+//   }
+// }

@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 final class UsersProposalOverview extends Equatable {
   final DocumentRef id;
@@ -8,12 +9,14 @@ final class UsersProposalOverview extends Equatable {
   final DateTime updateDate;
   final Money fundsRequested;
   final ProposalPublish publish;
+  final int iteration;
   final List<ProposalVersionViewModel> versions;
   final int commentsCount;
   final String category;
   final SignedDocumentRef categoryId;
   final int fundNumber;
   final bool fromActiveCampaign;
+  final List<CollaboratorInvite> invites;
 
   const UsersProposalOverview({
     required this.id,
@@ -21,44 +24,49 @@ final class UsersProposalOverview extends Equatable {
     required this.updateDate,
     required this.fundsRequested,
     required this.publish,
+    required this.iteration,
     required this.versions,
     required this.commentsCount,
     required this.category,
     required this.categoryId,
     required this.fundNumber,
     required this.fromActiveCampaign,
+    this.invites = const [],
   });
 
-  factory UsersProposalOverview.fromProposal(
-    DetailProposal proposal,
-    int fundNumber,
-    String categoryName, {
+  factory UsersProposalOverview.fromProposalBriefData({
+    required ProposalBriefData proposalData,
+    required int fundNumber,
     required bool fromActiveCampaign,
   }) {
+    final updateDate = UuidV7.parseDateTime(
+      proposalData.id.ver ?? proposalData.id.id,
+    );
+    final publish = _ProposalPublishExt.getStatus(
+      isFinal: proposalData.isFinal,
+      ref: proposalData.id,
+    );
+
     return UsersProposalOverview(
-      id: proposal.id,
-      title: proposal.title,
-      updateDate: proposal.updateDate,
-      fundsRequested: proposal.fundsRequested,
-      publish: proposal.publish,
-      versions: proposal.versions.toViewModels(),
-      commentsCount: proposal.commentsCount,
-      category: categoryName,
-      categoryId: proposal.categoryRef,
+      id: proposalData.id,
+      title: proposalData.title,
+      updateDate: updateDate,
+      fundsRequested: proposalData.fundsRequested,
+      publish: publish,
+      iteration: proposalData.iteration,
+      versions: const [],
+      commentsCount: proposalData.commentsCount ?? 0,
+      category: proposalData.categoryName,
+      categoryId: proposalData.categoryId,
       fundNumber: fundNumber,
       fromActiveCampaign: fromActiveCampaign,
+      invites: proposalData.collaborators?.map(CollaboratorInvite.fromBriefData).toList() ?? [],
     );
   }
 
   bool get hasNewerLocalIteration {
     if (versions.isEmpty) return false;
     return versions.any((version) => version.isLatestLocal) && !publish.isLocal;
-  }
-
-  int get iteration {
-    if (versions.isEmpty) return DocumentVersion.firstNumber;
-
-    return versions.firstWhere((version) => version.id == id).versionNumber;
   }
 
   @override
@@ -74,6 +82,7 @@ final class UsersProposalOverview extends Equatable {
     categoryId,
     fundNumber,
     fromActiveCampaign,
+    invites,
   ];
 
   UsersProposalOverview copyWith({
@@ -82,12 +91,14 @@ final class UsersProposalOverview extends Equatable {
     DateTime? updateDate,
     Money? fundsRequested,
     ProposalPublish? publish,
+    int? iteration,
     List<ProposalVersionViewModel>? versions,
     int? commentsCount,
     String? category,
     SignedDocumentRef? categoryId,
     int? fundNumber,
     bool? fromActiveCampaign,
+    List<CollaboratorInvite>? invites,
   }) {
     return UsersProposalOverview(
       id: id ?? this.id,
@@ -95,12 +106,26 @@ final class UsersProposalOverview extends Equatable {
       updateDate: updateDate ?? this.updateDate,
       fundsRequested: fundsRequested ?? this.fundsRequested,
       publish: publish ?? this.publish,
+      iteration: iteration ?? this.iteration,
       versions: versions ?? this.versions,
       commentsCount: commentsCount ?? this.commentsCount,
       category: category ?? this.category,
       categoryId: categoryId ?? this.categoryId,
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
+      invites: invites ?? this.invites,
     );
+  }
+}
+
+extension _ProposalPublishExt on ProposalPublish {
+  static ProposalPublish getStatus({required bool isFinal, required DocumentRef ref}) {
+    if (isFinal && DocumentRef is SignedDocumentRef) {
+      return ProposalPublish.submittedProposal;
+    } else if (!isFinal && DocumentRef is SignedDocumentRef) {
+      return ProposalPublish.publishedDraft;
+    } else {
+      return ProposalPublish.localDraft;
+    }
   }
 }

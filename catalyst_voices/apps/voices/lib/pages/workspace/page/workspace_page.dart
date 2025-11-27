@@ -31,8 +31,8 @@ class WorkspacePage extends StatefulWidget {
 class _WorkspacePageState extends State<WorkspacePage>
     with
         TickerProviderStateMixin,
-        SignalHandlerStateMixin<WorkspaceBloc, WorkspaceSignal, WorkspacePage>,
-        ErrorHandlerStateMixin<WorkspaceBloc, WorkspacePage> {
+        SignalHandlerStateMixin<WorkspaceCubit, WorkspaceSignal, WorkspacePage>,
+        ErrorHandlerStateMixin<WorkspaceCubit, WorkspacePage> {
   late final VoicesTabController<WorkspacePageTab> _tabController;
 
   @override
@@ -70,6 +70,7 @@ class _WorkspacePageState extends State<WorkspacePage>
 
     if (widget.tab != oldWidget.tab) {
       _tabController.animateToTab(tab);
+      context.read<WorkspaceCubit>().changeFilters(tab: tab);
     }
   }
 
@@ -113,13 +114,6 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   void initState() {
     super.initState();
-    final bloc = context.read<WorkspaceBloc>();
-    // ignore: cascade_invocations
-    bloc
-      ..add(const WatchUserCatalystIdEvent())
-      ..add(const WatchUserProposalsEvent())
-      ..add(const GetTimelineItemsEvent());
-
     final selectedTab = _determineTab(widget.tab);
 
     _tabController = VoicesTabController(
@@ -127,6 +121,14 @@ class _WorkspacePageState extends State<WorkspacePage>
       tabs: WorkspacePageTab.values,
       vsync: this,
     );
+
+    _tabController.addListener(() {
+      context.read<WorkspaceCubit>().changeFilters(tab: _tabController.tab);
+    });
+
+    final cubit = context.read<WorkspaceCubit>();
+
+    unawaited(cubit.init(tab: selectedTab));
   }
 
   WorkspacePageTab _determineTab(WorkspacePageTab? initialTab) {

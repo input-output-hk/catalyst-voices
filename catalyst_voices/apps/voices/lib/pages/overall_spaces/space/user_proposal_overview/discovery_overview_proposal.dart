@@ -31,7 +31,7 @@ class _DiscoveryOverviewProposalData extends StatelessWidget {
     return SingleChildScrollView(
       child:
           BlocSelector<
-            WorkspaceBloc,
+            WorkspaceCubit,
             WorkspaceState,
             DataVisibilityState<List<UsersProposalOverview>>
           >(

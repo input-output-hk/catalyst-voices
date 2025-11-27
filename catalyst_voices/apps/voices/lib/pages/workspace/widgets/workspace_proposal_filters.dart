@@ -82,7 +82,7 @@ class _WorkspaceProposalFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, WorkspaceFilters>(
+    return BlocSelector<WorkspaceCubit, WorkspaceState, WorkspaceFilters>(
       selector: (state) => state.userProposals.currentFilter,
       builder: (context, currentFilter) {
         return _Filters(
@@ -94,7 +94,7 @@ class _WorkspaceProposalFilters extends StatelessWidget {
   }
 
   void _changeFilter(BuildContext context, WorkspaceFilters filter) {
-    context.read<WorkspaceBloc>().add(ChangeWorkspaceFilters(filter));
+    context.read<WorkspaceCubit>().changeFilters(workspaceFilter: filter);
   }
 }
 
