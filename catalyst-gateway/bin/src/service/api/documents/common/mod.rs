@@ -212,7 +212,7 @@ impl VerifyingKeyProvider {
 
         let [kid] = kids else {
             anyhow::bail!(
-                "Must have only one signature. Multi-signature document is currently unsupported. kids: {}",
+                "Must have only one signature. Multi-signature document is currently unsupported. kids: [{}]",
                 kids.iter().map(ToString::to_string).join(",")
             );
         };

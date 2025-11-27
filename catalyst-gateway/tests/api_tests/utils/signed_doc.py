@@ -160,7 +160,7 @@ def build_signed_doc(
                 signed_doc_file.name,
                 metadata_file.name,
             ],
-            capture_output=True,
+            # capture_output=True,
         )
 
         subprocess.run(
@@ -171,7 +171,7 @@ def build_signed_doc(
                 bip32_sk_hex,
                 cat_id,
             ],
-            capture_output=True,
+            # capture_output=True,
         )
 
         signed_doc_hex = signed_doc_file.read().hex()
