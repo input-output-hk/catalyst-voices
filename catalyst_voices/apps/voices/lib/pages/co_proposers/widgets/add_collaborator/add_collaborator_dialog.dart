@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 
 class AddCollaboratorDialog extends StatefulWidget {
   final CatalystId authorId;
-  final Collaborators collaborators;
+  final CollaboratorsIds collaborators;
 
   const AddCollaboratorDialog({super.key, required this.authorId, required this.collaborators});
 
@@ -21,13 +21,13 @@ class AddCollaboratorDialog extends StatefulWidget {
   static Future<CatalystId?> show(
     BuildContext context, {
     required CatalystId authorId,
-    Collaborators? collaborators,
+    CollaboratorsIds? collaborators,
   }) async {
     return VoicesDialog.show(
       context: context,
       builder: (context) => AddCollaboratorDialog(
         authorId: authorId,
-        collaborators: collaborators ?? const Collaborators(),
+        collaborators: collaborators ?? const CollaboratorsIds(),
       ),
       routeSettings: const RouteSettings(name: '/add-collaborator-dialog'),
     );
