@@ -1,6 +1,6 @@
 import pytest
 from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
-from rbac_chain import (
+from utils.rbac_chain import (
     generate_rbac_auth_token,
     ONLY_ROLE_0_REG_JSON,
     RoleID,

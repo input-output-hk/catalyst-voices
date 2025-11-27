@@ -8,9 +8,8 @@ import json
 from api.v1 import document
 from utils import signed_doc, uuid_v7
 from utils.rbac_chain import rbac_chain_factory, RoleID
-from utils.admin import AdminKey, admin_key
+from utils.admin import admin_key
 from tempfile import NamedTemporaryFile
-import ranjg
 
 
 DOC_TYPE = {
@@ -201,7 +200,11 @@ def proposal_doc_factory(
             template=template,
             parameters=[param]
         )
-        content = ranjg.gen(template.content)
+        
+        with open(
+            "./test_data/signed_docs/proposal.json", "r"
+        ) as json_file:
+            content = json.load(json_file)
 
         rbac_chain = rbac_chain_factory()
         doc = SignedDocument(metadata, content)
@@ -266,7 +269,7 @@ def category_parameters_doc(
         template=template,
         parameters=[param],
     )
-    content = ranjg.gen(template.content)
+    content = {}
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
@@ -322,7 +325,7 @@ def campaign_parameters_doc(
         parameters=[param],
 
     )
-    content = ranjg.gen(template.content)
+    content = {}
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
@@ -374,7 +377,7 @@ def brand_parameters_doc(
         content_type="application/json",
         template=template,
     )
-    content = ranjg.gen(template.content)
+    content = {}
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
