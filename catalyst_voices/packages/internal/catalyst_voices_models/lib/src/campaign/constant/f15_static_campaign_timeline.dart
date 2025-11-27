@@ -9,7 +9,7 @@ final f15StaticCampaignTimeline = CampaignTimeline(
           '''Proposers submit initial ideas to solve challenges. Each proposal includes the problem, solution, requested ADA budget, and a clear implementation plan.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 11, 11, 12),
-        to: DateTime.utc(2025, 11, 27, 06),
+        to: DateTime.utc(2026, 11, 27, 06),
       ),
       type: CampaignPhaseType.proposalSubmission,
     ),
