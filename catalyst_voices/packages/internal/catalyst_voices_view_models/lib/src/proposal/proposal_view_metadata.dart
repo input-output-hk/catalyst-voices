@@ -1,11 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/src/collaborators/collaborator_invite.dart';
+import 'package:catalyst_voices_view_models/src/collaborators/collaborator_state.dart';
 import 'package:equatable/equatable.dart';
 
 /// View model representing proposal metadata in a view mode
 final class ProposalViewMetadata extends Equatable {
   final Profile author;
-  final CollaboratorInvitesState collaborators;
+  final Collaborators collaborators;
   final String? description;
   final ProposalPublish status;
   final DateTime? createdAt;

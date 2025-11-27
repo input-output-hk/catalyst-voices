@@ -92,6 +92,11 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
+  Future<void> respondToCollaboratorInvite({
+    required DocumentRef ref,
+    required CollaboratorInvitationAction action,
+  });
+
   /// Submits a proposal draft into review.
   ///
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
@@ -325,6 +330,15 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<void> removeFavoriteProposal({required DocumentRef ref}) {
     return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: false);
+  }
+
+  @override
+  Future<void> respondToCollaboratorInvite({
+    required DocumentRef ref,
+    required CollaboratorInvitationAction action,
+  }) async {
+    // TODO(dt-iohk): replace by real implementation once data sources are ready
+    await Future<void>.delayed(const Duration(seconds: 2));
   }
 
   @override

@@ -485,6 +485,30 @@
   "@collaboratorCatalystIdIsMissingProposerRole": {
     "description": "Error message shown to user when he tries to add Catalyst ID of a user that don't have Proposer role"
   },
+  "collaboratorInvitationAcceptButton": "Accept Invitation",
+  "@collaboratorInvitationAcceptButton": {
+    "description": "Dialog button when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptMessage": "Are you sure you want to accept this proposal invitation?\nYou can leave at any time…",
+  "@collaboratorInvitationAcceptMessage": {
+    "description": "Dialog message when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptTitle": "Accept Invitation?",
+  "@collaboratorInvitationAcceptTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectButton": "Reject Invitation",
+  "@collaboratorInvitationRejectButton": {
+    "description": "Dialog button when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectMessage": "Are you sure you want to reject this proposal invitation?\nThis cannot be undone.",
+  "@collaboratorInvitationRejectMessage": {
+    "description": "Dialog message when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectTitle": "Reject Invitation?",
+  "@collaboratorInvitationRejectTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+  },
   "collaboratorInvitationStatusAccepted": "Accepted",
   "@collaboratorInvitationStatusAccepted": {
     "description": "Collaborator invitation status: accepted."
@@ -2518,6 +2542,10 @@
   "@proposalTitleShortDescription": {
     "description": "Short description for the title input field"
   },
+  "proposalViewAcceptedInvitationBannerMessage": "**Invitation Accepted:** You'll be named as a collaborator and will be eligible for funding on final proposals with your team. You'll need to continue approving future iterations to remain named.",
+  "@proposalViewAcceptedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation."
+  },
   "proposalViewFundingRequested": "Funding Requested",
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
@@ -2546,6 +2574,18 @@
   "@proposalViewNotFoundTitle": {
     "description": "Error title shown when proposal cannot be found."
   },
+  "proposalViewPendingInvitationBannerAcceptButton": "Accept Invitation",
+  "@proposalViewPendingInvitationBannerAcceptButton": {
+    "description": "The accept button label in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerMessage": "You have been invited to join this proposal iteration as a co-proposer",
+  "@proposalViewPendingInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerRejectButton": "Reject Invitation",
+  "@proposalViewPendingInvitationBannerRejectButton": {
+    "description": "The reject button label in the collaborator invitation banner on the proposal viewer page."
+  },
   "proposalViewProjectDelivery": "Project Delivery",
   "@proposalViewProjectDelivery": {
     "description": "When viewing proposal"
@@ -2553,6 +2593,10 @@
   "proposalViewProjectDuration": "Project Duration",
   "@proposalViewProjectDuration": {
     "description": "When viewing proposal"
+  },
+  "proposalViewRejectedInvitationBannerMessage": "**Invitation Rejected:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
+  "@proposalViewRejectedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation."
   },
   "proposals": "Proposals",
   "@proposals": {

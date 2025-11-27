@@ -4,12 +4,12 @@ import 'package:equatable/equatable.dart';
 
 class AddCollaboratorState extends Equatable {
   final CatalystId? authorCatalystId;
-  final Collaborators collaborators;
+  final CollaboratorsIds collaborators;
   final CollaboratorIdState collaboratorIdState;
 
   const AddCollaboratorState({
     this.authorCatalystId,
-    this.collaborators = const Collaborators(),
+    this.collaborators = const CollaboratorsIds(),
     this.collaboratorIdState = const CollaboratorIdState(),
   });
 
