@@ -64,7 +64,6 @@ final class ImportProposalEvent extends WorkspaceEvent {
   List<Object?> get props => proposalData;
 }
 
-// New event for initialization
 final class InitWorkspaceEvent extends WorkspaceEvent {
   final WorkspacePageTab? tab;
 

@@ -1,3 +1,5 @@
+// TODO(LynxLynxx): Restore test once ProposalsFiltersV2 will be fully implemented
+
 // import 'dart:typed_data';
 
 // import 'package:bloc_test/bloc_test.dart';
@@ -47,11 +49,11 @@
 //       mockUserService = MockUserService();
 
 //       workspaceBloc = WorkspaceBloc(
+//         mockUserService,
 //         mockCampaignService,
 //         mockProposalService,
 //         mockDocumentMapper,
 //         mockDownloaderService,
-//         mockUserService,
 //       );
 //     });
 
@@ -221,8 +223,8 @@
 //           fromActiveCampaign: true,
 //           commentsCount: commentsCount,
 //           category: 'Test Category',
-//           categoryId: categoryRef,
 //           fundNumber: 14,
+//           iteration: 1,
 //         );
 //       }
 

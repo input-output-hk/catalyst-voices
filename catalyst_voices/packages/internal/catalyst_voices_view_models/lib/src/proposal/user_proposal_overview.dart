@@ -51,6 +51,7 @@ final class UsersProposalOverview extends Equatable {
       fundsRequested: proposalData.fundsRequested,
       publish: publish,
       iteration: proposalData.iteration,
+      // TODO(LynxLynxx): map versions when they will be implemented
       versions: const [],
       commentsCount: proposalData.commentsCount ?? 0,
       category: proposalData.categoryName,
@@ -78,6 +79,7 @@ final class UsersProposalOverview extends Equatable {
     fundNumber,
     fromActiveCampaign,
     invites,
+    iteration,
   ];
 
   UsersProposalOverview copyWith({

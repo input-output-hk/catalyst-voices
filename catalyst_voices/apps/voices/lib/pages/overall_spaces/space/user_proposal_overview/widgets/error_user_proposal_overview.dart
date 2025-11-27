@@ -33,9 +33,7 @@ class _Error extends StatelessWidget {
       padding: const EdgeInsets.only(top: 60),
       child: VoicesErrorIndicator(
         message: error?.message(context) ?? const LocalizedUnknownException().message(context),
-        onRetry: () {
-          context.read<WorkspaceBloc>().add(const ChangeWorkspaceFilters());
-        },
+        onRetry: () => context.read<WorkspaceBloc>().add(const ChangeWorkspaceFilters()),
       ),
     );
   }

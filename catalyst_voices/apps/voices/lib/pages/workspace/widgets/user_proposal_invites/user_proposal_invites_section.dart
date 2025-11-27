@@ -58,6 +58,7 @@ class _PendingProposalInvites extends StatelessWidget {
       return const _EmptyProposalInvites();
     }
 
+    // TODO(LynxLynxx): Update this to proper Invites section
     return UserProposalSection(
       items: invites.items,
       emptyTextMessage: '',

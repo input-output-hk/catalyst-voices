@@ -17,7 +17,7 @@ class WorkspaceTabs extends StatelessWidget {
       dividerHeight: 0,
       controller: tabController,
       onTap: (tab) {
-        // Signal will be emitted by the bloc when the tab changes
+        context.read<WorkspaceBloc>().emitSignal(ChangeTabWorkspaceSignal(tab.data));
       },
       tabs: [
         for (final tab in tabController.tabs)

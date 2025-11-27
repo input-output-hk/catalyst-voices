@@ -38,7 +38,8 @@ class _WorkspaceError extends StatelessWidget {
       child: VoicesErrorIndicator(
         message: message,
         onRetry: () {
-          context.read<WorkspaceBloc>().add(const ChangeWorkspaceFilters());
+          const event = ChangeWorkspaceFilters();
+          context.read<WorkspaceBloc>().add(event);
         },
       ),
     );
