@@ -17,8 +17,8 @@ all-images:
     BUILD +package-event-db-v1
     BUILD +package-haproxy
 
-all-images-devnet:
-    FROM +all-images
+images-devnet:
+    FROM scratch
     BUILD devnet+docker
     BUILD devnet-tests+docker
 

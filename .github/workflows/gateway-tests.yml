@@ -168,7 +168,14 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
-          args: ./catalyst-gateway/tests/+all-images-devnet
+          args: ./catalyst-gateway/tests/+all-images
+
+      - name: Prepare artifacts devnet
+        id: images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+images-devnet
 
       - name: Spin up devnet
         if: ${{ steps.images.conclusion == 'success' }}
