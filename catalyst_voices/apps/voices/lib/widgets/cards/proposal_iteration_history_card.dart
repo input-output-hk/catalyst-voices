@@ -63,7 +63,7 @@ class _Actions extends StatelessWidget {
       );
 
       if (confirmed && context.mounted) {
-        unawaited(context.read<WorkspaceCubit>().deleteProposal(ref as DraftRef));
+        context.read<WorkspaceBloc>().add(DeleteDraftProposalEvent(ref: ref as DraftRef));
       }
     }
   }
@@ -76,7 +76,7 @@ class _Actions extends StatelessWidget {
 
   void _exportProposal(BuildContext context) {
     final prefix = context.l10n.proposal.toLowerCase();
-    unawaited(context.read<WorkspaceCubit>().exportProposal(ref: ref, prefix: prefix));
+    context.read<WorkspaceBloc>().add(ExportProposal(ref, prefix));
   }
 }
 

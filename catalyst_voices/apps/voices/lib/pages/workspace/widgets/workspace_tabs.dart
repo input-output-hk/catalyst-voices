@@ -17,7 +17,7 @@ class WorkspaceTabs extends StatelessWidget {
       dividerHeight: 0,
       controller: tabController,
       onTap: (tab) {
-        context.read<WorkspaceCubit>().emitSignal(ChangeTabWorkspaceSignal(tab.data));
+        // Signal will be emitted by the bloc when the tab changes
       },
       tabs: [
         for (final tab in tabController.tabs)
@@ -41,7 +41,7 @@ class _TabText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, int>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, int>(
       selector: (state) => state.count[tab] ?? 0,
       builder: (context, count) => VoicesTabText(tab.noOf(context, count: count)),
     );

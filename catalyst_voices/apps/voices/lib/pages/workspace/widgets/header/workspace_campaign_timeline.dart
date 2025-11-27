@@ -7,7 +7,7 @@ class WorkspaceCampaignTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, WorkspaceStateCampaignTimeline>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, WorkspaceStateCampaignTimeline>(
       selector: (state) {
         return state.campaignTimeline;
       },

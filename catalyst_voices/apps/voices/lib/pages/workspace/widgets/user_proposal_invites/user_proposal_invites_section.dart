@@ -13,7 +13,7 @@ class UserProposalInvitesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, UserProposalsView>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
       selector: (state) {
         return state.userProposalInvites.userProposalInvites;
       },

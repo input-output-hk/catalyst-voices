@@ -352,13 +352,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     ProposalBuilderEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final categoryId = state.metadata.categoryId;
     final proposalRef = state.metadata.documentRef;
     try {
       emit(state.copyWith(isChanging: true));
       await _proposalService.forgetProposal(
         proposalRef: proposalRef! as SignedDocumentRef,
-        categoryId: categoryId!,
       );
       unawaited(_clearCache());
       emitSignal(const ForgotProposalSuccessBuilderSignal());
@@ -1141,11 +1139,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
-      final categoryId = state.metadata.categoryId!;
       emit(state.copyWith(isChanging: true));
       await _proposalService.unlockProposal(
         proposalRef: proposalRef,
-        categoryId: categoryId,
       );
       final stateMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
       _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));

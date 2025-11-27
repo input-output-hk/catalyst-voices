@@ -74,9 +74,11 @@ class _SpacesListViewState extends State<SpacesListView> {
   @override
   void initState() {
     super.initState();
-    context.read<WorkspaceCubit>().changeFilters(
-      tab: WorkspacePageTab.proposals,
-      workspaceFilter: WorkspaceFilters.allProposals,
+    context.read<WorkspaceBloc>().add(
+      const ChangeWorkspaceFilters(
+        WorkspaceFilters.allProposals,
+        tab: WorkspacePageTab.proposals,
+      ),
     );
   }
 }

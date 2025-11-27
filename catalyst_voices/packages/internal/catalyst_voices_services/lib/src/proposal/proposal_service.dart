@@ -49,7 +49,6 @@ abstract interface class ProposalService {
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<void> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
   });
 
   Future<DocumentRef> getLatestProposalVersion({required DocumentRef id});
@@ -103,7 +102,6 @@ abstract interface class ProposalService {
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> unlockProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
   });
 
   /// Upserts a proposal draft in the local storage.
@@ -195,7 +193,6 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
   }) {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
@@ -204,7 +201,6 @@ final class ProposalServiceImpl implements ProposalService {
         await _proposalRepository.publishProposalAction(
           actionRef: actionRef,
           proposalRef: proposalRef,
-          categoryId: categoryId,
           action: ProposalSubmissionAction.hide,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -343,7 +339,6 @@ final class ProposalServiceImpl implements ProposalService {
         await _proposalRepository.publishProposalAction(
           actionRef: actionRef,
           proposalRef: proposalRef,
-          categoryId: categoryId,
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -357,7 +352,6 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> unlockProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
   }) async {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
@@ -366,7 +360,6 @@ final class ProposalServiceImpl implements ProposalService {
         await _proposalRepository.publishProposalAction(
           actionRef: actionRef,
           proposalRef: proposalRef,
-          categoryId: categoryId,
           action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -553,7 +546,7 @@ final class ProposalServiceImpl implements ProposalService {
     return ProposalBriefData(
       id: proposal.id,
       // TODO(damian-molinski): pass categoryId here,
-      categoryId: SignedDocumentRef.generateFirstRef(),
+      fundNumber: 14,
       authorName: proposal.authorName ?? '',
       title: proposal.title ?? '',
       description: proposal.description ?? '',

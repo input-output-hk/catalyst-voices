@@ -3,8 +3,8 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
   final DocumentRef id;
-  // TODO(damina-molinski): To be implemented
-  final SignedDocumentRef categoryId;
+  // TODO(damian-molinski): To be implemented
+  final int fundNumber;
   final String authorName;
   final String title;
   final String description;
@@ -17,13 +17,13 @@ final class ProposalBriefData extends Equatable {
   final bool isFinal;
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
-  // TODO(damina-molinski): To be implemented
+  // TODO(damian-molinski): To be implemented
   final List<ProposalBriefDataVersion>? versions;
   final List<ProposalBriefDataCollaborator>? collaborators;
 
   const ProposalBriefData({
     required this.id,
-    required this.categoryId,
+    required this.fundNumber,
     required this.authorName,
     required this.title,
     required this.description,
@@ -43,7 +43,7 @@ final class ProposalBriefData extends Equatable {
   @override
   List<Object?> get props => [
     id,
-    categoryId,
+    fundNumber,
     authorName,
     title,
     description,

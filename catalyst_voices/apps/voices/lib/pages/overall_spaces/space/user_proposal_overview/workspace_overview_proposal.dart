@@ -33,7 +33,7 @@ class _WorkspaceDataProposalOverview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         UserProposalsOverviewHeader(title: context.l10n.notPublishedProposals),
-        BlocSelector<WorkspaceCubit, WorkspaceState, DataVisibilityState<UserProposalsView>>(
+        BlocSelector<WorkspaceBloc, WorkspaceState, DataVisibilityState<UserProposalsView>>(
           selector: (state) {
             return (
               data: state.userProposals.notPublished,

@@ -19,7 +19,7 @@ class _ImportProposalButtonState extends State<_ImportProposalButton> {
   Future<void> _importProposal() async {
     final proposal = await _ImportProposalDialog.show(context);
     if (proposal != null && mounted) {
-      unawaited(context.read<WorkspaceCubit>().importProposal(proposal));
+      context.read<WorkspaceBloc>().add(ImportProposalEvent(proposal));
     }
   }
 }

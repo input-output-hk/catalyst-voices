@@ -62,7 +62,6 @@ void main() {
         fundNumber: 14,
         commentsCount: 0,
         category: 'Cardano Use Cases: Concept',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         fromActiveCampaign: true,
       );
     });

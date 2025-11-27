@@ -11,7 +11,7 @@ class UserProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, bool>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
       selector: (state) => state.showProposals,
       builder: (context, show) {
         if (!show) {
@@ -28,7 +28,7 @@ class _UserDraftProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, UserProposalsView>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
       selector: (state) {
         return state.userProposals.draftProposals;
       },
@@ -50,7 +50,7 @@ class _UserInactiveProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, UserProposalsView>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
       selector: (state) {
         return state.userProposals.inactiveProposals;
       },
@@ -74,7 +74,7 @@ class _UserLocalProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, UserProposalsView>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
       selector: (state) {
         return state.userProposals.localProposals;
       },
@@ -112,7 +112,7 @@ class _UserSubmittedProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, UserProposalsView>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
       selector: (state) {
         return state.userProposals.finalProposals;
       },

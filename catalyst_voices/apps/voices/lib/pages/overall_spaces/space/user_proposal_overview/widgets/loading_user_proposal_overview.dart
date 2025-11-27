@@ -7,7 +7,7 @@ class LoadingProposalOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceCubit, WorkspaceState, bool>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
       selector: (state) {
         return state.isLoading;
       },

@@ -13,7 +13,6 @@ final class UsersProposalOverview extends Equatable {
   final List<ProposalVersionViewModel> versions;
   final int commentsCount;
   final String category;
-  final SignedDocumentRef categoryId;
   final int fundNumber;
   final bool fromActiveCampaign;
   final List<CollaboratorInvite> invites;
@@ -28,7 +27,6 @@ final class UsersProposalOverview extends Equatable {
     required this.versions,
     required this.commentsCount,
     required this.category,
-    required this.categoryId,
     required this.fundNumber,
     required this.fromActiveCampaign,
     this.invites = const [],
@@ -36,7 +34,6 @@ final class UsersProposalOverview extends Equatable {
 
   factory UsersProposalOverview.fromProposalBriefData({
     required ProposalBriefData proposalData,
-    required int fundNumber,
     required bool fromActiveCampaign,
   }) {
     final updateDate = UuidV7.parseDateTime(
@@ -57,8 +54,7 @@ final class UsersProposalOverview extends Equatable {
       versions: const [],
       commentsCount: proposalData.commentsCount ?? 0,
       category: proposalData.categoryName,
-      categoryId: proposalData.categoryId,
-      fundNumber: fundNumber,
+      fundNumber: proposalData.fundNumber,
       fromActiveCampaign: fromActiveCampaign,
       invites: proposalData.collaborators?.map(CollaboratorInvite.fromBriefData).toList() ?? [],
     );
@@ -79,7 +75,6 @@ final class UsersProposalOverview extends Equatable {
     versions,
     commentsCount,
     category,
-    categoryId,
     fundNumber,
     fromActiveCampaign,
     invites,
@@ -110,7 +105,6 @@ final class UsersProposalOverview extends Equatable {
       versions: versions ?? this.versions,
       commentsCount: commentsCount ?? this.commentsCount,
       category: category ?? this.category,
-      categoryId: categoryId ?? this.categoryId,
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
       invites: invites ?? this.invites,

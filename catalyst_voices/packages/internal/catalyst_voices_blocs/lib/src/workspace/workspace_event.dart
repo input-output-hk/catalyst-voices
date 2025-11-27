@@ -6,11 +6,12 @@ import 'package:equatable/equatable.dart';
 
 final class ChangeWorkspaceFilters extends WorkspaceEvent {
   final WorkspaceFilters filters;
+  final WorkspacePageTab? tab;
 
-  const ChangeWorkspaceFilters(this.filters);
+  const ChangeWorkspaceFilters(this.filters, {this.tab});
 
   @override
-  List<Object?> get props => [...super.props, filters];
+  List<Object?> get props => [...super.props, filters, tab];
 }
 
 final class DeleteDraftProposalEvent extends WorkspaceEvent {
@@ -61,6 +62,34 @@ final class ImportProposalEvent extends WorkspaceEvent {
 
   @override
   List<Object?> get props => proposalData;
+}
+
+// New event for initialization
+final class InitWorkspaceEvent extends WorkspaceEvent {
+  final WorkspacePageTab? tab;
+
+  const InitWorkspaceEvent({this.tab});
+
+  @override
+  List<Object?> get props => [tab];
+}
+
+final class InternalDataChangeEvent extends WorkspaceEvent {
+  final Page<UsersProposalOverview> page;
+
+  const InternalDataChangeEvent(this.page);
+
+  @override
+  List<Object?> get props => [page];
+}
+
+final class InternalTabCountChangeEvent extends WorkspaceEvent {
+  final Map<WorkspacePageTab, int> count;
+
+  const InternalTabCountChangeEvent(this.count);
+
+  @override
+  List<Object?> get props => [count];
 }
 
 final class LoadProposalsEvent extends WorkspaceEvent {

@@ -118,7 +118,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
       );
 
       if (confirmed && mounted) {
-        unawaited(context.read<WorkspaceCubit>().deleteProposal(widget.ref as DraftRef));
+        context.read<WorkspaceBloc>().add(DeleteDraftProposalEvent(ref: widget.ref as DraftRef));
       }
     }
   }
@@ -133,7 +133,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
           ) ??
           false;
       if (edit && mounted) {
-        unawaited(context.read<WorkspaceCubit>().unlockProposal(widget.ref));
+        context.read<WorkspaceBloc>().add(UnlockProposalEvent(widget.ref));
       }
     } else if (widget.hasNewerLocalIteration) {
       return _showLatestLocalProposalWarningSnackbar();
@@ -146,7 +146,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
 
   void _exportProposal() {
     final prefix = context.l10n.proposal.toLowerCase();
-    unawaited(context.read<WorkspaceCubit>().exportProposal(ref: widget.ref, prefix: prefix));
+    context.read<WorkspaceBloc>().add(ExportProposal(widget.ref, prefix));
   }
 
   Future<void> _forgetProposal() async {
@@ -162,7 +162,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
         _exportProposal();
       case ForgetProposalForgetAction():
         if (mounted) {
-          unawaited(context.read<WorkspaceCubit>().forgetProposal(widget.ref));
+          context.read<WorkspaceBloc>().add(ForgetProposalEvent(widget.ref));
         }
     }
   }

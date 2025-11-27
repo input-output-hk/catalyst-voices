@@ -47,7 +47,6 @@ abstract interface class ProposalRepository {
   Future<void> publishProposalAction({
     required SignedDocumentRef actionRef,
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -193,7 +192,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<void> publishProposalAction({
     required SignedDocumentRef actionRef,
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
