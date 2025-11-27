@@ -10,7 +10,7 @@ from utils import signed_doc, uuid_v7
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import AdminKey, admin_key
 from tempfile import NamedTemporaryFile
-from jsf import JSF
+import ranjg
 from enum import IntEnum
 
 
@@ -202,7 +202,7 @@ def proposal_doc_factory(
             template=template,
             parameters=[param]
         )
-        content = JSF(template.content).generate()
+        content = ranjg.gen(template.content)
 
         rbac_chain = rbac_chain_factory()
         doc = SignedDocument(metadata, content)
@@ -267,7 +267,7 @@ def category_parameters_doc(
         template=template,
         parameters=[param],
     )
-    content = JSF(template.content).generate()
+    content = ranjg.gen(template.content)
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
@@ -323,7 +323,7 @@ def campaign_parameters_doc(
         parameters=[param],
 
     )
-    content = JSF(template.content).generate()
+    content = ranjg.gen(template.content)
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
@@ -375,7 +375,7 @@ def brand_parameters_doc(
         content_type="application/json",
         template=template,
     )
-    content = JSF(template.content).generate()
+    content = ranjg.gen(template.content)
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
