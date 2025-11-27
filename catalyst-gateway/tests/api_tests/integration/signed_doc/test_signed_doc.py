@@ -64,7 +64,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     # Put a non valid document with same ID different content
     invalid_doc = proposal_doc.copy()
-    invalid_doc.content["setup"]["title"]["title"] = "another title"
+    invalid_doc.content["setup"]["title"] = {"title": "another title"}
     resp = document_v1.put(
         data=invalid_doc.build_and_sign(cat_id, sk_hex),
         token=rbac_chain.auth_token(),
