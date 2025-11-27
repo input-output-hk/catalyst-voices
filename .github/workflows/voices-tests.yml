@@ -40,3 +40,35 @@ jobs:
           version: 0.21.0
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
+      - name: Build all images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst_voices/apps/voices/e2e_tests/+all-images
+
+      - name: Spin up Gateway and Voices
+        id: gateway-started
+        if: ${{ steps.images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-voices/apps/voices/e2e_tests/docker-compose.yml up nginx --detach
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              docker logs cat-gateway
+              exit 1
+            fi
+            sleep 5
+          done
