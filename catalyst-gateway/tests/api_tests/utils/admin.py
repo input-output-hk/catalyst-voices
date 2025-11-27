@@ -1,7 +1,6 @@
 import pytest
-import base64
 from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
-from utils.rbac_chain import (
+from rbac_chain import (
     generate_rbac_auth_token,
     ONLY_ROLE_0_REG_JSON,
     RoleID,
@@ -23,9 +22,6 @@ class AdminKey:
 
     def pk_hex(self) -> str:
         return self.pk().public_key.hex()
-
-    def pk_base64url(self) -> str:
-        return base64.urlsafe_b64encode(self.pk().public_key).decode().rstrip("=")
 
     def cat_id(self) -> str:
         return generate_cat_id(

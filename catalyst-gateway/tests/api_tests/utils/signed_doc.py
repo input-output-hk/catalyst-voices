@@ -11,7 +11,6 @@ from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import AdminKey, admin_key
 from tempfile import NamedTemporaryFile
 import ranjg
-from enum import IntEnum
 
 
 DOC_TYPE = {
