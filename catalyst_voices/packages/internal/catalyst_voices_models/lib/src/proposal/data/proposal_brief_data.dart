@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
   final DocumentRef id;
-  final String authorName;
+  final CatalystId? author;
   final String title;
   final String description;
   final String categoryName;
@@ -18,7 +18,7 @@ final class ProposalBriefData extends Equatable {
 
   const ProposalBriefData({
     required this.id,
-    required this.authorName,
+    required this.author,
     required this.title,
     required this.description,
     required this.categoryName,
@@ -35,7 +35,7 @@ final class ProposalBriefData extends Equatable {
   @override
   List<Object?> get props => [
     id,
-    authorName,
+    author,
     title,
     description,
     categoryName,

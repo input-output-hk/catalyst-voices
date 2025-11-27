@@ -18,17 +18,19 @@ class UsernameText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAnonymous = data == null || (data?.isBlank ?? false);
+    final username = data;
+    final isAnonymous = username == null || username.isBlank;
+    final effectiveUsername = isAnonymous ? context.l10n.anonymousUsername : username;
 
     final effectiveStyle = (style ?? const TextStyle()).copyWith(
       fontStyle: isAnonymous ? FontStyle.italic : FontStyle.normal,
     );
 
-    return DefaultTextStyle.merge(
+    return Text(
+      effectiveUsername,
       style: effectiveStyle,
       maxLines: maxLines,
       overflow: overflow,
-      child: Text(isAnonymous ? context.l10n.anonymousUsername : data!),
     );
   }
 }

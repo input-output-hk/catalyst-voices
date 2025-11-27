@@ -636,7 +636,7 @@ final class ProposalServiceImpl implements ProposalService {
 
     return ProposalBriefData(
       id: proposal.id,
-      authorName: proposal.authorName ?? '',
+      author: proposal.author,
       title: proposal.title ?? '',
       description: proposal.description ?? '',
       categoryName: proposal.categoryName ?? '',

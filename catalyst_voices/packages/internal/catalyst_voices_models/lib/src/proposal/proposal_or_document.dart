@@ -8,7 +8,7 @@ import 'package:equatable/equatable.dart';
 /// specific template (`DocumentData`).
 ///
 /// This class provides a unified interface to access common properties
-/// like [title], [authorName], [description], etc., regardless of the
+/// like [title], [author], [description], etc., regardless of the
 /// underlying data type.
 ///
 /// It's useful when dealing with list of proposals and some of them may not have templates
@@ -22,8 +22,8 @@ sealed class ProposalOrDocument extends Equatable {
   /// Creates a [ProposalOrDocument] from a structured [ProposalDocument].
   const factory ProposalOrDocument.proposal(ProposalDocument data) = _Proposal;
 
-  /// The name of the proposal's author.
-  String? get authorName;
+  /// The id of the proposal's author.
+  CatalystId? get author;
 
   // TODO(damian-molinski): Category name should come from query but atm those are not documents.
   /// The name of the proposal's category.
@@ -64,7 +64,7 @@ final class _Document extends ProposalOrDocument {
   const _Document(this.data);
 
   @override
-  String? get authorName => data.metadata.authors?.firstOrNull?.username;
+  CatalystId? get author => data.metadata.authors?.firstOrNull;
 
   @override
   String? get description => ProposalDocument.titleNodeId.from(data.content.data);
@@ -78,10 +78,10 @@ final class _Document extends ProposalOrDocument {
   Money? get fundsRequested => null;
 
   @override
-  List<Object?> get props => [data];
+  DocumentRef get id => data.metadata.id;
 
   @override
-  DocumentRef get id => data.metadata.id;
+  List<Object?> get props => [data];
 
   @override
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
@@ -99,7 +99,7 @@ final class _Proposal extends ProposalOrDocument {
   const _Proposal(this.data);
 
   @override
-  String? get authorName => data.authorName;
+  CatalystId? get author => data.authorId;
 
   @override
   String? get description => data.description;
@@ -111,10 +111,10 @@ final class _Proposal extends ProposalOrDocument {
   Money? get fundsRequested => data.fundsRequested;
 
   @override
-  List<Object?> get props => [data];
+  DocumentRef get id => data.metadata.id;
 
   @override
-  DocumentRef get id => data.metadata.id;
+  List<Object?> get props => [data];
 
   @override
   String? get title => data.title;

@@ -2212,6 +2212,15 @@
   "@orderProposalsUpdateDateDesc": {
     "description": "Order proposals by update date option"
   },
+  "others": "{count} {count, plural, =1{Other} other{Others}}",
+  "@others": {
+    "description": "In context of proposal author and collaborators. Eg. Author & 5 Others",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
     "description": "Below pagination list, next to page switch controls",
