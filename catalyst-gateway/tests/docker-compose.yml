@@ -1,21 +1,6 @@
 # cspell: words statusgossip socat
 
 services:
-
-  cat-devnet:
-    image: cat-devnet:latest
-    container_name: cat-devnet
-    healthcheck:
-      #TODO when the issues with block initial sizes is fixed, update the healthcheck https://github.com/input-output-hk/catalyst-voices/issues/3327
-      test:  ["CMD-SHELL","bash /healthcheck.sh"]
-      start_period: 60s
-      interval: 30s
-      retries: 20
-    volumes:
-      - data:/shared-data
-    profiles:
-      - devnet
-
   event-db:
     image: event-db:latest
     container_name: event-db
@@ -87,9 +72,9 @@ services:
     image: scylladb/scylla:latest
     container_name: scylla-node
     restart: unless-stopped
-    command: ${SCYLLA_CMD:--smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0}
+    command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
     ports:
-      - 9042:9042
+      - "9042:9042"
     healthcheck:
       test: cqlsh -e "SHOW VERSION" || exit 1
       interval: 15s
@@ -107,7 +92,7 @@ services:
       # approximately a 25 minutes of waiting
       retries: 50
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@${EVENT_DB_HOST:-event-db}/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@${EVENT_DB_URL:-event-db}/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=${INDEX_DB_URL:-scylla-node:9042}
       - CASSANDRA_VOLATILE_URL=${INDEX_DB_URL:-scylla-node:9042}
       - CHAIN_NETWORK=${ENV_TARGET:-Preprod}
@@ -185,6 +170,3 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
-
-volumes:
-    data:

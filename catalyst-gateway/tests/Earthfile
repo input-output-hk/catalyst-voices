@@ -16,6 +16,9 @@ all-images:
     BUILD +package-rust-tests-runner
     BUILD +package-event-db-v1
     BUILD +package-haproxy
+
+all-images-devnet:
+    FROM +all-images
     BUILD devnet+docker
     BUILD devnet-tests+docker
 
