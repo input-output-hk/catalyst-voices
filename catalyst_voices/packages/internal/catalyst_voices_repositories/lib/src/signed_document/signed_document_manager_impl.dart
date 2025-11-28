@@ -49,7 +49,11 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     return _CoseSignedDocument(
       coseSign: coseSign,
       payload: payload,
-      metadata: metadata,
+      metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.json,
+        type: DocumentType.proposalDocument,
+        id: const SignedDocumentRef(id: 'id', ver: 'ver'),
+      ),
       signers: coseSign.signatures.map((e) => e.decodeCatalystId()).nonNulls.toList(),
     );
   }
@@ -57,7 +61,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   @override
   Future<SignedDocument> signDocument(
     SignedDocumentPayload document, {
-    required SignedDocumentMetadata metadata,
+    required DocumentDataMetadata metadata,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
@@ -67,8 +71,8 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       'cose_sign_doc',
       () {
         return CoseSign.sign(
-          protectedHeaders: metadata.asCoseProtectedHeaders,
-          unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
+          protectedHeaders: CoseHeaders.protected(),
+          unprotectedHeaders: CoseHeaders.unprotected(),
           payload: compressedPayload,
           signers: [_CatalystSigner(catalystId, privateKey)],
         );
@@ -162,7 +166,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   final SignedDocumentPayload payload;
 
   @override
-  final SignedDocumentMetadata metadata;
+  final DocumentDataMetadata metadata;
 
   @override
   final List<CatalystId> signers;

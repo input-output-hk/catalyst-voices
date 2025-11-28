@@ -12,7 +12,7 @@ abstract final class ProposalTemplateFactory {
 
     final metadata = ProposalTemplateMetadata(
       id: documentData.metadata.id,
-      categoryId: documentData.metadata.categoryId,
+      parameters: documentData.metadata.parameters,
     );
 
     final contentData = documentData.content.data;

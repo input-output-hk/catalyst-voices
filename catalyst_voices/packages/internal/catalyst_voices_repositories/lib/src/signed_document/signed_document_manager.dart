@@ -26,7 +26,7 @@ abstract interface class SignedDocumentManager {
   /// so that it's easier to identify who signed it.
   Future<SignedDocument> signDocument(
     SignedDocumentPayload document, {
-    required SignedDocumentMetadata metadata,
+    required DocumentDataMetadata metadata,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   });

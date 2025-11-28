@@ -85,7 +85,11 @@ void main() {
             ],
           );
           final docData = DocumentData(
-            metadata: DocumentDataMetadata(type: DocumentType.proposalTemplate, id: docRef),
+            metadata: DocumentDataMetadata(
+              contentType: DocumentContentType.json,
+              type: DocumentType.proposalTemplate,
+              id: docRef,
+            ),
             content: const DocumentDataContent({}),
           );
 

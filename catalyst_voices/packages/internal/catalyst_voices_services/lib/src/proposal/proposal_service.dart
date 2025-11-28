@@ -162,11 +162,10 @@ final class ProposalServiceImpl implements ProposalService {
     final catalystId = _getUserCatalystId();
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
-        metadata: DocumentDataMetadata(
-          type: DocumentType.proposalDocument,
+        metadata: DocumentDataMetadata.proposal(
           id: draftRef,
           template: template,
-          categoryId: categoryId,
+          parameters: DocumentParameters({categoryId}),
           authors: [catalystId],
         ),
         content: content,
@@ -389,11 +388,10 @@ final class ProposalServiceImpl implements ProposalService {
 
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
-        metadata: DocumentDataMetadata(
-          type: DocumentType.proposalDocument,
+        metadata: DocumentDataMetadata.proposal(
           id: id,
           template: template,
-          categoryId: categoryId,
+          parameters: DocumentParameters({categoryId}),
           authors: [catalystId],
         ),
         content: content,

@@ -181,7 +181,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) async {
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(document.content.data),
-      metadata: _createProposalMetadata(document.metadata),
+      metadata: document.metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -203,13 +203,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
-      metadata: SignedDocumentMetadata(
-        contentType: SignedDocumentContentType.json,
-        documentType: DocumentType.proposalActionDocument,
-        id: actionRef.id,
-        ver: actionRef.ver,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+      metadata: DocumentDataMetadata.proposalAction(
+        id: actionRef,
+        proposalRef: proposalRef,
+        parameters: DocumentParameters({categoryId}),
       ),
       catalystId: catalystId,
       privateKey: privateKey,
@@ -379,7 +376,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     DocumentDataMetadata metadata,
   ) {
     final template = metadata.template;
-    final categoryId = metadata.categoryId;
+    // final categoryId = metadata.categoryId;
 
     return SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
@@ -387,7 +384,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       id: metadata.id.id,
       ver: metadata.id.ver,
       template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
-      categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+      // categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );
   }
 

@@ -31,7 +31,9 @@ sealed class ProposalOrDocument extends Equatable {
     return Campaign.all
         .map((e) => e.categories)
         .flattened
-        .firstWhereOrNull((category) => category.id == _category)
+        .firstWhereOrNull(
+          (category) => (_parameters ?? const DocumentParameters()).containsId(category.id.id),
+        )
         ?.formattedCategoryName;
   }
 
@@ -55,7 +57,7 @@ sealed class ProposalOrDocument extends Equatable {
 
   /// A private getter for the category reference, used to find the
   /// [categoryName].
-  SignedDocumentRef? get _category;
+  DocumentParameters? get _parameters;
 }
 
 final class _Document extends ProposalOrDocument {
@@ -78,10 +80,10 @@ final class _Document extends ProposalOrDocument {
   Money? get fundsRequested => null;
 
   @override
-  List<Object?> get props => [data];
+  DocumentRef get id => data.metadata.id;
 
   @override
-  DocumentRef get id => data.metadata.id;
+  List<Object?> get props => [data];
 
   @override
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
@@ -90,7 +92,7 @@ final class _Document extends ProposalOrDocument {
   String get version => data.metadata.id.ver!;
 
   @override
-  SignedDocumentRef? get _category => data.metadata.categoryId;
+  DocumentParameters? get _parameters => data.metadata.parameters;
 }
 
 final class _Proposal extends ProposalOrDocument {
@@ -111,10 +113,10 @@ final class _Proposal extends ProposalOrDocument {
   Money? get fundsRequested => data.fundsRequested;
 
   @override
-  List<Object?> get props => [data];
+  DocumentRef get id => data.metadata.id;
 
   @override
-  DocumentRef get id => data.metadata.id;
+  List<Object?> get props => [data];
 
   @override
   String? get title => data.title;
@@ -123,7 +125,7 @@ final class _Proposal extends ProposalOrDocument {
   String get version => data.metadata.id.ver!;
 
   @override
-  SignedDocumentRef? get _category => data.metadata.categoryId;
+  DocumentParameters? get _parameters => data.metadata.parameters;
 }
 
 extension on DocumentNodeId {

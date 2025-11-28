@@ -137,11 +137,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }
 
   DocumentDataMetadata _buildDocumentMetadata([DocumentRef? id]) {
-    return DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
+    return DocumentDataMetadata.proposal(
       id: id ?? state.metadata.documentRef!,
-      template: state.metadata.templateRef,
-      categoryId: state.metadata.categoryId,
+      template: state.metadata.templateRef!,
+      parameters: DocumentParameters({state.metadata.categoryId!}),
+      authors: [_userService.activeAccountId],
     );
   }
 
@@ -1059,7 +1059,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ref: originalProposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: event.reply,
-        categoryId: originalProposalCategoryId,
+        parameters: DocumentParameters({?originalProposalCategoryId}),
         authorId: activeAccountId!,
       ),
       document: event.document,

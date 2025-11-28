@@ -54,6 +54,7 @@ final class DocumentsCommentRepository implements CommentRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
+    /*
     final ref = document.metadata.ref;
     final reply = document.metadata.reply;
     final categoryId = document.metadata.categoryId;
@@ -79,10 +80,15 @@ final class DocumentsCommentRepository implements CommentRepository {
       reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
       categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId!),
     );
+*/
+    assert(
+      document.metadata.ref != null,
+      'CommentDocument have to have a ref to other document',
+    );
 
     final signedDocument = await _signedDocumentManager.signDocument(
-      payload,
-      metadata: metadata,
+      SignedDocumentJsonPayload(document.content.data),
+      metadata: document.metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -147,7 +153,7 @@ final class DocumentsCommentRepository implements CommentRepository {
       ref: documentData.metadata.ref! as SignedDocumentRef,
       template: templateData.metadata.id as SignedDocumentRef,
       reply: documentData.metadata.reply,
-      categoryId: documentData.metadata.categoryId,
+      parameters: documentData.metadata.parameters,
       authorId: authors!.single,
     );
     final content = DocumentDataContentDto.fromModel(
