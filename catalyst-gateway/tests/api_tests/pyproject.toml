@@ -1,4 +1,4 @@
-# cspell: words bitcoinlib addopts beautifulsoup cloudscraper certifi
+# cspell: words bitcoinlib addopts certifi
 
 [tool.poetry]
 name = "api_tests"
@@ -19,8 +19,6 @@ asyncpg = "^0.30.0"
 requests = "^2.32.3"
 python-bitcoinlib = "^0.12.2"
 pycardano = "^0.17.0"
-beautifulsoup4 = "^4.13.4"
-cloudscraper = "^1.2.71"
 certifi = "^2025.1.31"
 cbor2 = "^5.6.5"
 uuid = "^1.30"
