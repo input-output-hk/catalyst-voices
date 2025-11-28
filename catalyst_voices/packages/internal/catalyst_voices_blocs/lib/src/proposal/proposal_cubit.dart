@@ -493,7 +493,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final catalystId = CatalystId.fromUri(uri);
 
     return [
-      for (final status in CollaboratorInviteStatus.values)
+      for (final status in ProposalsCollaborationStatus.values)
         CollaboratorInvite(
           catalystId: catalystId,
           status: status,

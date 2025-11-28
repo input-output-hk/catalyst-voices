@@ -76,7 +76,7 @@ class _Collaborator extends StatelessWidget {
 }
 
 class _Status extends StatelessWidget {
-  final CollaboratorInviteStatus status;
+  final ProposalsCollaborationStatus status;
 
   const _Status({required this.status});
 
@@ -103,7 +103,7 @@ class _Status extends StatelessWidget {
 
 class _Username extends StatelessWidget {
   final CatalystId catalystId;
-  final CollaboratorInviteStatus status;
+  final ProposalsCollaborationStatus status;
 
   const _Username({
     required this.catalystId,

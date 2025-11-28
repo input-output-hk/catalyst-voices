@@ -14,7 +14,7 @@ final class AllCollaboratorInvites extends CollaboratorInvitesState {
 
 final class CollaboratorInvite extends Equatable {
   final CatalystId catalystId;
-  final CollaboratorInviteStatus status;
+  final ProposalsCollaborationStatus status;
 
   const CollaboratorInvite({
     required this.catalystId,
@@ -24,7 +24,7 @@ final class CollaboratorInvite extends Equatable {
   factory CollaboratorInvite.fromBriefData(ProposalBriefDataCollaborator briefData) {
     return CollaboratorInvite(
       catalystId: briefData.id,
-      status: CollaboratorInviteStatus.fromStatus(briefData.status),
+      status: briefData.status,
     );
   }
 
@@ -39,7 +39,7 @@ sealed class CollaboratorInvitesState extends Equatable {
 
   /// Filters collaborator invites by [activeAccountId].
   /// - Returns all [collaborators] if [activeAccountId] is [authorId] or one of [collaborators].
-  /// - Returns collaborators with [CollaboratorInviteStatus.accepted] status otherwise.
+  /// - Returns collaborators with [ProposalsCollaborationStatus.accepted] status otherwise.
   factory CollaboratorInvitesState.filterByActiveAccount({
     required CatalystId? activeAccountId,
     required CatalystId? authorId,
@@ -55,7 +55,7 @@ sealed class CollaboratorInvitesState extends Equatable {
     }
 
     return AcceptedCollaboratorInvites(
-      collaborators.where((e) => e.status == CollaboratorInviteStatus.accepted).toList(),
+      collaborators.where((e) => e.status == ProposalsCollaborationStatus.accepted).toList(),
     );
   }
 
@@ -64,62 +64,34 @@ sealed class CollaboratorInvitesState extends Equatable {
 }
 
 /// A status of the collaborator invited to a document (proposal).
-enum CollaboratorInviteStatus {
-  /// The invitation is pending, the collaborator needs to accept / reject.
-  pending,
-
-  /// The invitation is accepted by the collaborator.
-  accepted,
-
-  /// The invitation is rejected by the collaborator.
-  rejected,
-
-  /// The collaborator has accepted and then left.
-  left,
-
-  /// The collaborator has been removed.
-  removed;
-
-  const CollaboratorInviteStatus();
-
-  factory CollaboratorInviteStatus.fromStatus(
-    ProposalsCollaborationStatus statusFilter,
-  ) {
-    return switch (statusFilter) {
-      ProposalsCollaborationStatus.accepted => accepted,
-      ProposalsCollaborationStatus.pending => pending,
-      ProposalsCollaborationStatus.rejected => rejected,
-      // TODO(LynxLynxx): Add missing values left and removed.
-    };
-  }
-
+extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
   Color labelColor(BuildContext context) {
     return switch (this) {
-      CollaboratorInviteStatus.pending ||
-      CollaboratorInviteStatus.accepted ||
-      CollaboratorInviteStatus.rejected ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
-      CollaboratorInviteStatus.left => Theme.of(context).colors.textDisabled,
+      ProposalsCollaborationStatus.pending ||
+      ProposalsCollaborationStatus.accepted ||
+      ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
+      ProposalsCollaborationStatus.left => Theme.of(context).colors.textDisabled,
     };
   }
 
   String labelText(BuildContext context) {
     return switch (this) {
-      CollaboratorInviteStatus.pending => context.l10n.collaboratorInvitationStatusPending,
-      CollaboratorInviteStatus.accepted => context.l10n.collaboratorInvitationStatusAccepted,
-      CollaboratorInviteStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
-      CollaboratorInviteStatus.left => context.l10n.collaboratorInvitationStatusLeft,
-      CollaboratorInviteStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
+      ProposalsCollaborationStatus.pending => context.l10n.collaboratorInvitationStatusPending,
+      ProposalsCollaborationStatus.accepted => context.l10n.collaboratorInvitationStatusAccepted,
+      ProposalsCollaborationStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
+      ProposalsCollaborationStatus.left => context.l10n.collaboratorInvitationStatusLeft,
+      ProposalsCollaborationStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
     };
   }
 
   Color statusColor(BuildContext context) {
     return switch (this) {
-      CollaboratorInviteStatus.pending => Theme.of(context).colors.iconsDisabled,
-      CollaboratorInviteStatus.accepted => Theme.of(context).colors.iconsSuccess,
-      CollaboratorInviteStatus.rejected ||
-      CollaboratorInviteStatus.removed => Theme.of(context).colors.iconsError,
-      CollaboratorInviteStatus.left => Theme.of(context).colors.iconsDisabled,
+      ProposalsCollaborationStatus.pending => Theme.of(context).colors.iconsDisabled,
+      ProposalsCollaborationStatus.accepted => Theme.of(context).colors.iconsSuccess,
+      ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.removed => Theme.of(context).colors.iconsError,
+      ProposalsCollaborationStatus.left => Theme.of(context).colors.iconsDisabled,
     };
   }
 }
