@@ -36,7 +36,7 @@ class AccountsText extends StatelessWidget {
         style: TextStyle(fontStyle: isAnonymous ? FontStyle.italic : FontStyle.normal),
         children: [
           if (ids.length > 1) ...[
-            const TextSpan(text: ' & '),
+            TextSpan(text: ' ${context.l10n.andSign} '),
             WidgetSpan(
               child: Tooltip(
                 richMessage: WidgetSpan(child: _OtherTooltipOverlay(ids.sublist(1))),

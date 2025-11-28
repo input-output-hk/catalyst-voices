@@ -133,6 +133,10 @@
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
   },
+  "andSign": "&",
+  "@andSign": {
+    "description": "Generic and sign"
+  },
   "anonymousUsername": "Anonymous",
   "@anonymousUsername": {
     "description": "When account does not have specified username this text is shown"
