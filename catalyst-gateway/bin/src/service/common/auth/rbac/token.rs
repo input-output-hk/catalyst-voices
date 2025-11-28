@@ -156,7 +156,7 @@ impl CatalystRBACTokenV1 {
     ) -> Result<(VerifyingKey, KeyRotation)> {
         let res = if self.catalyst_id.is_admin() {
             Settings::admin_cfg()
-                .get_admin_key(&self.catalyst_id)
+                .get_admin_key(&self.catalyst_id, role)
                 .ok_or(VerificationError::NotAdmin)?
         } else {
             let reg_chain = self

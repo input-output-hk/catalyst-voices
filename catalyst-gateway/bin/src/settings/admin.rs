@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use catalyst_types::catalyst_id::key_rotation::KeyRotation;
+use catalyst_types::catalyst_id::{key_rotation::KeyRotation, role_index::RoleId};
 use ed25519_dalek::VerifyingKey;
 
 use super::str_env_var::StringEnvVar;
@@ -31,7 +31,14 @@ impl EnvVars {
                     "Admin Catalyst ID must be in the admin format."
                 );
             }
-            is_admin
+            let is_valid_role_and_rotation = v.role_and_rotation() == (RoleId::Role0, KeyRotation::DEFAULT);
+            if is_valid_role_and_rotation {
+                tracing::error!(
+                    cat_id = v.to_string(),
+                    "Admin Catalyst ID must be role 0 with 0 rotation."
+                );
+            }
+            is_admin && is_valid_role_and_rotation
         });
 
         if admin_key.is_none() {
@@ -46,9 +53,10 @@ impl EnvVars {
     pub(crate) fn get_admin_key(
         &self,
         cat_id: &catalyst_signed_doc::CatalystId,
+        role: RoleId,
     ) -> Option<(VerifyingKey, KeyRotation)> {
         if let Some(ref admin_key) = self.admin_key
-            && cat_id == admin_key
+            && cat_id == admin_key && role == RoleId::Role0
         {
             return Some((admin_key.role0_pk(), KeyRotation::DEFAULT));
         }
