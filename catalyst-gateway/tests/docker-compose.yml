@@ -100,6 +100,9 @@ services:
       - YES_I_REALLY_WANT_TO_PANIC=panic attack
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
+      # cspell: disable
+      - SIGNED_DOC_ADMIN_KEYS=admin.catalyst://preprod.cardano/0KGVpkXVe5-h1RfIb08Mnc-xMZTzSX5VVnPDaHvhrqQ/0/10
+      # cspell: enable
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     ports:
