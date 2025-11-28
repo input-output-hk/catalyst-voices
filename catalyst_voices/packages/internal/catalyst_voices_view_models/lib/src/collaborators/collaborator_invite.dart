@@ -83,12 +83,12 @@ enum CollaboratorInviteStatus {
   const CollaboratorInviteStatus();
 
   factory CollaboratorInviteStatus.fromStatusFilter(
-    ProposalsCollaborationStatusFilter statusFilter,
+    ProposalsCollaborationStatus statusFilter,
   ) {
     return switch (statusFilter) {
-      ProposalsCollaborationStatusFilter.accepted => accepted,
-      ProposalsCollaborationStatusFilter.pending => pending,
-      ProposalsCollaborationStatusFilter.rejected => rejected,
+      ProposalsCollaborationStatus.accepted => accepted,
+      ProposalsCollaborationStatus.pending => pending,
+      ProposalsCollaborationStatus.rejected => rejected,
       // TODO(LynxLynxx): Add missing values left and removed.
     };
   }

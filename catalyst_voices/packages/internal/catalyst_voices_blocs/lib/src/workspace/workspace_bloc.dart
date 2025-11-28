@@ -22,6 +22,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   WorkspaceBlocCache _cache = const WorkspaceBlocCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
+  StreamSubscription<Campaign?>? _activeCampaignSub;
   StreamSubscription<Map<WorkspacePageTab, int>>? _workspaceTabCountSub;
   StreamSubscription<Page<UsersProposalOverview>>? _dataPageSub;
 
@@ -41,13 +42,16 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<ImportProposalEvent>(_onImportProposal);
     on<UnlockProposalEvent>(_onUnlockProposal);
     on<WatchUserCatalystIdEvent>(_onWatchUserCatalystId);
+    on<WatchActiveCampaignChangeEvent>(_onWatchActiveCampaignChange);
     on<InternalDataChangeEvent>(_onInternalDataChange);
     on<InternalTabCountChangeEvent>(_onInternalTabCountChange);
 
-    _activeAccountIdSub = _userService.watchUnlockedActiveAccount
-        .map((event) => event?.catalystId)
-        .distinct()
-        .listen(_handleActiveAccountIdChange);
+    unawaited(
+      _userService.watchUnlockedActiveAccount
+          .map((event) => event?.catalystId)
+          .first
+          .then(_handleActiveAccountIdChange),
+    );
   }
 
   Future<Campaign?> get _campaign async {
@@ -72,6 +76,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     await _workspaceTabCountSub?.cancel();
     _workspaceTabCountSub = null;
+
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
 
     return super.close();
   }
@@ -124,6 +131,20 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     unawaited(_rebuildWorkspaceTabCountSubs());
     unawaited(_rebuildDataPageSub());
+  }
+
+  void _handleActiveCampaignChange(Campaign? campaign) {
+    if (_cache.campaign?.id == campaign?.id) {
+      return;
+    }
+
+    _cache = _cache.copyWith(
+      campaign: Optional(campaign),
+    );
+
+    add(const GetTimelineItemsEvent());
+    unawaited(_rebuildDataPageSub());
+    unawaited(_rebuildWorkspaceTabCountSubs());
   }
 
   void _handleDataChange(Page<UsersProposalOverview> page) {
@@ -213,7 +234,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     try {
       emit(state.copyWith(isLoading: true));
       await _proposalService.forgetProposal(
-        proposalRef: proposal.id as SignedDocumentRef,
+        proposalId: proposal.id as SignedDocumentRef,
       );
 
       // Remove proposal from cache and rebuild state
@@ -235,15 +256,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   ) async {
     final campaign = await _campaign;
 
-    if (isClosed) return;
-
     if (campaign == null) {
       return emitError(const LocalizedUnknownException());
     }
 
     final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
-
-    if (isClosed) return;
 
     emit(state.copyWith(timelineItems: timeline, fundNumber: campaign.fundNumber));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
@@ -267,6 +284,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   Future<void> _onInit(InitWorkspaceEvent event, Emitter<WorkspaceState> emit) async {
     _resetCache(tab: event.tab);
     await _rebuildWorkspaceTabCountSubs();
+    add(const WatchUserCatalystIdEvent());
+    add(const WatchActiveCampaignChangeEvent());
   }
 
   void _onInternalDataChange(InternalDataChangeEvent event, Emitter<WorkspaceState> emit) {
@@ -294,13 +313,32 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       return emitError(const LocalizedUnknownException());
     }
     await _proposalService.unlockProposal(
-      proposalRef: proposal.id as SignedDocumentRef,
+      proposalId: proposal.id as SignedDocumentRef,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
   }
 
-  void _onWatchUserCatalystId(WatchUserCatalystIdEvent event, Emitter<WorkspaceState> emit) {
-    // Already set up in constructor, this event is kept for compatibility
+  Future<void> _onWatchActiveCampaignChange(
+    WatchActiveCampaignChangeEvent event,
+    Emitter<WorkspaceState> state,
+  ) async {
+    await _activeCampaignSub?.cancel();
+
+    _activeCampaignSub = _campaignService.watchActiveCampaign
+        .distinct((previous, next) => previous?.id != next?.id)
+        .listen(_handleActiveCampaignChange);
+  }
+
+  Future<void> _onWatchUserCatalystId(
+    WatchUserCatalystIdEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    await _activeAccountIdSub?.cancel();
+
+    _activeAccountIdSub = _userService.watchUnlockedActiveAccount
+        .map((event) => event?.catalystId)
+        .distinct()
+        .listen(_handleActiveAccountIdChange);
   }
 
   Future<void> _rebuildDataPageSub() async {

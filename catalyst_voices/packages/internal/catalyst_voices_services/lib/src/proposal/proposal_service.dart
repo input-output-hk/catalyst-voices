@@ -48,7 +48,7 @@ abstract interface class ProposalService {
 
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<void> forgetProposal({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
   });
 
   Future<DocumentRef> getLatestProposalVersion({required DocumentRef id});
@@ -95,13 +95,13 @@ abstract interface class ProposalService {
   ///
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> submitProposalForReview({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
     required SignedDocumentRef categoryId,
   });
 
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> unlockProposal({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
   });
 
   /// Upserts a proposal draft in the local storage.
@@ -192,21 +192,21 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<SignedDocumentRef> forgetProposal({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
   }) {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
-        final actionRef = SignedDocumentRef.generateFirstRef();
+        final actionId = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
+          actionId: actionId,
+          proposalId: proposalId,
           action: ProposalSubmissionAction.hide,
           catalystId: catalystId,
           privateKey: privateKey,
         );
 
-        return actionRef;
+        return actionId;
       },
     );
   }
@@ -323,7 +323,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<SignedDocumentRef> submitProposalForReview({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
     required SignedDocumentRef categoryId,
   }) async {
     if (await isMaxProposalsLimitReached()) {
@@ -334,32 +334,32 @@ final class ProposalServiceImpl implements ProposalService {
 
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
-        final actionRef = SignedDocumentRef.generateFirstRef();
+        final actionId = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
+          actionId: actionId,
+          proposalId: proposalId,
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
         );
 
-        return actionRef;
+        return actionId;
       },
     );
   }
 
   @override
   Future<SignedDocumentRef> unlockProposal({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
   }) async {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
+          actionId: actionRef,
+          proposalId: proposalId,
           action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,

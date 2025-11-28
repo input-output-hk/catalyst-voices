@@ -117,6 +117,10 @@ final class WatchUserProposalsEvent extends WorkspaceEvent {
   const WatchUserProposalsEvent();
 }
 
+final class WatchActiveCampaignChangeEvent extends WorkspaceEvent {
+  const WatchActiveCampaignChangeEvent();
+}
+
 sealed class WorkspaceEvent extends Equatable {
   const WorkspaceEvent();
 

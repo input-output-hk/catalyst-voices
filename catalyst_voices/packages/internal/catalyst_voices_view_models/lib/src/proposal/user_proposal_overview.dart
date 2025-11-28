@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 final class UsersProposalOverview extends Equatable {
   final DocumentRef id;
@@ -15,7 +14,7 @@ final class UsersProposalOverview extends Equatable {
   final String category;
   final int fundNumber;
   final bool fromActiveCampaign;
-  final List<CollaboratorInvite> invites;
+  final List<CollaboratorInvite> collaborators;
 
   const UsersProposalOverview({
     required this.id,
@@ -29,16 +28,13 @@ final class UsersProposalOverview extends Equatable {
     required this.category,
     required this.fundNumber,
     required this.fromActiveCampaign,
-    this.invites = const [],
+    this.collaborators = const [],
   });
 
   factory UsersProposalOverview.fromProposalBriefData({
     required ProposalBriefData proposalData,
     required bool fromActiveCampaign,
   }) {
-    final updateDate = UuidV7.parseDateTime(
-      proposalData.id.ver ?? proposalData.id.id,
-    );
     final publish = _ProposalPublishExt.getStatus(
       isFinal: proposalData.isFinal,
       ref: proposalData.id,
@@ -47,7 +43,7 @@ final class UsersProposalOverview extends Equatable {
     return UsersProposalOverview(
       id: proposalData.id,
       title: proposalData.title,
-      updateDate: updateDate,
+      updateDate: proposalData.updateDate,
       fundsRequested: proposalData.fundsRequested,
       publish: publish,
       iteration: proposalData.iteration,
@@ -57,7 +53,8 @@ final class UsersProposalOverview extends Equatable {
       category: proposalData.categoryName,
       fundNumber: proposalData.fundNumber,
       fromActiveCampaign: fromActiveCampaign,
-      invites: proposalData.collaborators?.map(CollaboratorInvite.fromBriefData).toList() ?? [],
+      collaborators:
+          proposalData.collaborators?.map(CollaboratorInvite.fromBriefData).toList() ?? [],
     );
   }
 
@@ -78,7 +75,7 @@ final class UsersProposalOverview extends Equatable {
     category,
     fundNumber,
     fromActiveCampaign,
-    invites,
+    collaborators,
     iteration,
   ];
 
@@ -95,7 +92,7 @@ final class UsersProposalOverview extends Equatable {
     SignedDocumentRef? categoryId,
     int? fundNumber,
     bool? fromActiveCampaign,
-    List<CollaboratorInvite>? invites,
+    List<CollaboratorInvite>? collaborators,
   }) {
     return UsersProposalOverview(
       id: id ?? this.id,
@@ -109,14 +106,14 @@ final class UsersProposalOverview extends Equatable {
       category: category ?? this.category,
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
-      invites: invites ?? this.invites,
+      collaborators: collaborators ?? this.collaborators,
     );
   }
 }
 
 extension _ProposalPublishExt on ProposalPublish {
   static ProposalPublish getStatus({required bool isFinal, required DocumentRef ref}) {
-    if (isFinal && DocumentRef is SignedDocumentRef) {
+    if (isFinal) {
       return ProposalPublish.submittedProposal;
     } else if (!isFinal && DocumentRef is SignedDocumentRef) {
       return ProposalPublish.publishedDraft;

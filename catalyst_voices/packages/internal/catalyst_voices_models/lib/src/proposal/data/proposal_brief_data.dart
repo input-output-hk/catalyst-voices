@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
@@ -59,11 +60,12 @@ final class ProposalBriefData extends Equatable {
     versions,
     collaborators,
   ];
+  DateTime get updateDate => id.ver?.dateTime ?? id.id.dateTime;
 }
 
 final class ProposalBriefDataCollaborator extends Equatable {
   final CatalystId id;
-  final ProposalsCollaborationStatusFilter status;
+  final ProposalsCollaborationStatus status;
 
   const ProposalBriefDataCollaborator({
     required this.id,

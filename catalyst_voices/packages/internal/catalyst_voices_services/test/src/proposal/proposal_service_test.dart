@@ -78,7 +78,7 @@ void main() {
 
       expect(
         () async => proposalService.submitProposalForReview(
-          proposalRef: proposalRef,
+          proposalId: proposalRef,
           categoryId: categoryId,
         ),
         throwsA(isA<ProposalLimitReachedException>()),
