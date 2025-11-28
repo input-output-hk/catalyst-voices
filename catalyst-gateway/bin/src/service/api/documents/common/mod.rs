@@ -208,8 +208,13 @@ impl VerifyingKeyProvider {
         token: &mut CatalystRBACTokenV1,
         kids: &[catalyst_signed_doc::CatalystId],
     ) -> anyhow::Result<Self> {
+        use itertools::Itertools as _;
+
         let [kid] = kids else {
-            anyhow::bail!("Must have only one signature. Multi-signature document is currently unsupported");
+            anyhow::bail!(
+                "Must have only one signature. Multi-signature document is currently unsupported. kids: [{}]",
+                kids.iter().map(ToString::to_string).join(",")
+            );
         };
 
         if kid != token.catalyst_id() {
