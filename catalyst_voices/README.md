@@ -24,10 +24,10 @@ This repository contains the Catalyst Voices app and packages.
             * [Running Code Generation](#running-code-generation)
     * [Code Generation](#code-generation)
       *[Running Code Generation](#running-code-generation)
-      * [Basic Generation](#basic-generation)
+        * [Basic Generation](#basic-generation)
       *[Local Saving](#local-saving)
-      * [GitHub Token / PAT Setup](#github-token--pat-setup)
-      * [Security Notes](#security-notes)
+        * [GitHub Token / PAT Setup](#github-token--pat-setup)
+        * [Security Notes](#security-notes)
     * [Running Tests](#running-tests)
 
 ## Requirements
