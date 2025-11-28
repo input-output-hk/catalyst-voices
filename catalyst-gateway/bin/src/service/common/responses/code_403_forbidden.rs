@@ -28,12 +28,9 @@ pub(crate) struct Forbidden {
 impl Forbidden {
     /// Create a new Server Error Response Payload.
     pub(crate) fn new(
-        msg: Option<String>,
+        msg: String,
         roles: Option<Vec<String>>,
     ) -> Self {
-        let msg = msg.unwrap_or(
-            "Your request was not successful because your authentication credentials do not have the required roles for the requested resource.".to_string(),
-        );
         let id = Uuid::new_v4();
 
         Self {
@@ -48,7 +45,7 @@ impl Example for Forbidden {
     /// Example for the Too Many Requests Payload.
     fn example() -> Self {
         Self::new(
-            None,
+            "Your request was not successful because your authentication credentials do not have the required roles for the requested resource.".to_string(),
             Some(vec!["VOTER".to_string(), "PROPOSER".to_string()]),
         )
     }

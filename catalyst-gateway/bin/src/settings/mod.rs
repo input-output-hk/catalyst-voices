@@ -139,6 +139,9 @@ struct EnvVars {
     /// The Cardano assets caches configuration
     cardano_assets_cache: cardano_assets_cache::EnvVars,
 
+    /// The Adming functionality configuration
+    admin: admin::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -222,6 +225,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         signed_doc: signed_doc::EnvVars::new(),
         rbac: rbac::EnvVars::new(),
         cardano_assets_cache: cardano_assets_cache::EnvVars::new(),
+        admin: admin::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
@@ -313,6 +317,11 @@ impl Settings {
     /// Get the configuration of the Cardano assets cache.
     pub(crate) fn cardano_assets_cache() -> cardano_assets_cache::EnvVars {
         ENV_VARS.cardano_assets_cache.clone()
+    }
+
+    /// Get the configuration of the Admin functionality.
+    pub(crate) fn admin_cfg() -> admin::EnvVars {
+        ENV_VARS.admin.clone()
     }
 
     /// Chain Follower network (The Blockchain network we are configured to use).

@@ -1,18 +1,69 @@
-//! Helpers related to the Admin Role.
+//! Command line and environment variable for admin settings
+
+use std::str::FromStr;
 
 use ed25519_dalek::VerifyingKey;
 
-use crate::settings::ENV_VARS;
+use super::str_env_var::StringEnvVar;
 
-/// Returns the Admin's role0 public key if the given Catalyst ID matches with the
-/// assigned Admin Catalyst ID.
-pub(crate) fn get_admin_key(cat_id: &catalyst_signed_doc::CatalystId) -> Option<VerifyingKey> {
-    let admin_key = ENV_VARS.signed_doc.admin_key();
-    if let Some(admin_key) = admin_key
-        && cat_id == admin_key
-    {
-        return Some(admin_key.role0_pk());
+/// Configuration for the Admin functionality.
+#[derive(Clone)]
+pub(crate) struct EnvVars {
+    /// The Catalyst Signed Document Admin Catalyst ID from the `SIGNED_DOC_ADMIN_KEY`
+    /// env.
+    admin_key: Option<catalyst_signed_doc::CatalystId>,
+}
+
+impl EnvVars {
+    /// Create a config for Catalyst Signed Document validation configuration.
+    pub(super) fn new() -> Self {
+        let admin_key = string_to_catalyst_id(
+            &StringEnvVar::new_optional("SIGNED_DOC_ADMIN_KEY", false)
+                .map(|v| v.as_string())
+                .unwrap_or_default(),
+        )
+        .filter(|v| {
+            let is_admin = v.is_admin();
+            if is_admin {
+                tracing::error!(
+                    cat_id = v.to_string(),
+                    "Admin Catalyst ID must be in the admin format."
+                );
+            }
+            is_admin
+        });
+
+        if admin_key.is_none() {
+            tracing::error!("Missing or invalid Catalyst ID for Admin. This is required.");
+        }
+
+        Self { admin_key }
     }
 
-    None
+    /// Returns the Admin's role0 public key if the given Catalyst ID matches with the
+    /// assigned Admin Catalyst ID.
+    pub(crate) fn get_admin_key(
+        &self,
+        cat_id: &catalyst_signed_doc::CatalystId,
+    ) -> Option<VerifyingKey> {
+        if let Some(ref admin_key) = self.admin_key
+            && cat_id == admin_key
+        {
+            return Some(admin_key.role0_pk());
+        }
+
+        None
+    }
+}
+
+/// Convert an Envvar into the Catalyst ID type, `None` if missing or invalid value.
+fn string_to_catalyst_id(s: &str) -> Option<catalyst_signed_doc::CatalystId> {
+    catalyst_signed_doc::CatalystId::from_str(s)
+        .inspect_err(|err| {
+            tracing::error!(
+                err = ?err,
+                "Cannot parse Admin CatalystId entry"
+            );
+        })
+        .ok()
 }

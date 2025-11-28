@@ -6,7 +6,7 @@ use catalyst_signed_doc::CatalystSignedDocument;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
-    settings::{Settings, admin::get_admin_key},
+    settings::Settings,
 };
 
 /// A wrapper struct to unify both implementations of `CatalystSignedDocumentProvider` and
