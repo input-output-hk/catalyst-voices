@@ -24,7 +24,7 @@ final class CollaboratorInvite extends Equatable {
   factory CollaboratorInvite.fromBriefData(ProposalBriefDataCollaborator briefData) {
     return CollaboratorInvite(
       catalystId: briefData.id,
-      status: CollaboratorInviteStatus.fromStatusFilter(briefData.status),
+      status: CollaboratorInviteStatus.fromStatus(briefData.status),
     );
   }
 
@@ -82,7 +82,7 @@ enum CollaboratorInviteStatus {
 
   const CollaboratorInviteStatus();
 
-  factory CollaboratorInviteStatus.fromStatusFilter(
+  factory CollaboratorInviteStatus.fromStatus(
     ProposalsCollaborationStatus statusFilter,
   ) {
     return switch (statusFilter) {
