@@ -43,14 +43,18 @@ void main() {
   });
 }
 
-const _metadata = SignedDocumentMetadata(
-  contentType: SignedDocumentContentType.json,
-  documentType: DocumentType.proposalDocument,
-);
-
 final _catalystId = CatalystId(
   host: CatalystIdHost.cardanoPreprod.host,
   role0Key: _publicKey.publicKeyBytes,
+);
+
+final _categoryRef = DocumentRefFactory.signedDocumentRef();
+
+final _metadata = DocumentDataMetadata.proposal(
+  id: DocumentRefFactory.signedDocumentRef(),
+  parameters: DocumentParameters({_categoryRef}),
+  template: DocumentRefFactory.signedDocumentRef(),
+  authors: [_catalystId],
 );
 
 final _privateKey = FakeCatalystPrivateKey(bytes: _privateKeyBytes, signature: _signature);

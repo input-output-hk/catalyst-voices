@@ -261,9 +261,3 @@ final class DocumentDataMetadataDto {
 extension on DocumentRef {
   DocumentRefDto toDto() => DocumentRefDto.fromModel(this);
 }
-
-extension on SecuredDocumentRef {
-  SecuredDocumentRefDto toDto() {
-    return SecuredDocumentRefDto.fromModel(this);
-  }
-}

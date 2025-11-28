@@ -5,7 +5,7 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
-import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1005,7 +1005,7 @@ void main() {
     group('saveAll', () {
       test('does nothing for empty list', () async {
         // Given
-        final entities = <DocumentWithAuthorsEntity>[];
+        final entities = <DocumentCompositeEntity>[];
 
         // When
         await dao.saveAll(entities);
@@ -1451,7 +1451,7 @@ void main() {
       });
 
       test('combines latestOnly with limit and offset', () async {
-        final docs = <DocumentWithAuthorsEntity>[];
+        final docs = <DocumentCompositeEntity>[];
         for (var i = 0; i < 10; i++) {
           docs
             ..add(
@@ -2129,14 +2129,17 @@ void main() {
 
       test('respects campaign filters (categories)', () async {
         // Given
-        final doc1 = _createTestDocumentEntity(id: 'd1', categoryId: 'cat-1');
-        final doc2 = _createTestDocumentEntity(id: 'd2', categoryId: 'cat-2');
-        final doc3 = _createTestDocumentEntity(id: 'd3', categoryId: 'cat-1');
+        final cat1 = DocumentRefFactory.signedDocumentRef();
+        final cat2 = DocumentRefFactory.signedDocumentRef();
+
+        final doc1 = _createTestDocumentEntity(id: 'd1', parameters: [cat1]);
+        final doc2 = _createTestDocumentEntity(id: 'd2', parameters: [cat2]);
+        final doc3 = _createTestDocumentEntity(id: 'd3', parameters: [cat1]);
         await dao.saveAll([doc1, doc2, doc3]);
 
         // When
         final result = await dao.getDocuments(
-          filters: const CampaignFilters(categoriesIds: ['cat-1']),
+          filters: CampaignFilters(categoriesIds: [cat1.id]),
           latestOnly: false,
           limit: 100,
           offset: 0,
@@ -2149,28 +2152,31 @@ void main() {
 
       test('combines type, latestOnly and campaign filters', () async {
         // Given
+        final catA = DocumentRefFactory.signedDocumentRef();
+        final catB = DocumentRefFactory.signedDocumentRef();
+
         final oldProposal = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(DateTime(2023)),
           type: DocumentType.proposalDocument,
-          categoryId: 'cat-A',
+          parameters: [catA],
         );
         final newProposal = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(DateTime(2024)),
           type: DocumentType.proposalDocument,
-          categoryId: 'cat-A',
+          parameters: [catA],
         );
         final otherCatProposal = _createTestDocumentEntity(
           id: 'p2',
           ver: _buildUuidV7At(DateTime(2024)),
           type: DocumentType.proposalDocument,
-          categoryId: 'cat-B',
+          parameters: [catB],
         );
         final wrongType = _createTestDocumentEntity(
           id: 't1',
           type: DocumentType.proposalTemplate,
-          categoryId: 'cat-A',
+          parameters: [catA],
         );
 
         await dao.saveAll([oldProposal, newProposal, otherCatProposal, wrongType]);
@@ -2178,7 +2184,7 @@ void main() {
         // When
         final result = await dao.getDocuments(
           type: DocumentType.proposalDocument,
-          filters: const CampaignFilters(categoriesIds: ['cat-A']),
+          filters: CampaignFilters(categoriesIds: [catA.id]),
           latestOnly: true,
           limit: 10,
           offset: 0,
@@ -2297,14 +2303,12 @@ CatalystId _createTestAuthor({
   return CatalystId.parse(buffer.toString());
 }
 
-DocumentWithAuthorsEntity _createTestDocumentEntity({
+DocumentCompositeEntity _createTestDocumentEntity({
   String? id,
   String? ver,
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
   String? authors,
-  String? categoryId,
-  String? categoryVer,
   String? refId,
   String? refVer,
   String? replyId,
@@ -2312,6 +2316,8 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
   String? section,
   String? templateId,
   String? templateVer,
+  List<CatalystId>? collaborators,
+  List<DocumentRef>? parameters,
 }) {
   return DocumentWithAuthorsFactory.create(
     id: id,
@@ -2319,8 +2325,6 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
     contentData: contentData,
     type: type,
     authors: authors,
-    categoryId: categoryId,
-    categoryVer: categoryVer,
     refId: refId,
     refVer: refVer,
     replyId: replyId,
@@ -2328,5 +2332,7 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
     section: section,
     templateId: templateId,
     templateVer: templateVer,
+    parameters: parameters ?? [],
+    collaborators: collaborators ?? [],
   );
 }

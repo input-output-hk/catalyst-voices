@@ -5,7 +5,7 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
-import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -932,7 +932,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2]);
 
           // And: Multiple actions with NULL ref_id
-          final actions = <DocumentWithAuthorsEntity>[];
+          final actions = <DocumentCompositeEntity>[];
           for (var i = 0; i < 3; i++) {
             final actionVer = _buildUuidV7At(latest.add(Duration(hours: i)));
             actions.add(
@@ -1332,7 +1332,7 @@ void main() {
 
         test('count remains consistent across pagination', () async {
           // Given: 25 proposals
-          final proposals = <DocumentWithAuthorsEntity>[];
+          final proposals = <DocumentCompositeEntity>[];
           for (var i = 0; i < 25; i++) {
             final time = DateTime.utc(2025, 1, 1).add(Duration(hours: i));
             final ver = _buildUuidV7At(time);
@@ -3358,16 +3358,19 @@ void main() {
 
         group('by category', () {
           test('filters proposals by category id', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              categoryId: 'category-1',
+              parameters: [cat1],
             );
 
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle),
-              categoryId: 'category-2',
+              parameters: [cat2],
             );
 
             final proposal3 = _createTestDocumentEntity(
@@ -3380,7 +3383,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(
               request: request,
-              filters: const ProposalsFiltersV2(categoryId: 'category-1'),
+              filters: ProposalsFiltersV2(categoryId: cat1.id),
             );
 
             expect(result.items.length, 1);
@@ -3733,18 +3736,21 @@ void main() {
           });
 
           test('escapes special characters in category id', () async {
+            /* cSpell:disable */
+            const cat1 = SignedDocumentRef(id: "cat'egory-1", ver: "cat'egory-1");
+            /* cSpell:enable */
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              /* cSpell:disable */
-              categoryId: "cat'egory-1",
-              /* cSpell:enable */
+              parameters: [cat1],
             );
 
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle),
-              categoryId: 'category-2',
+              parameters: [cat2],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2]);
@@ -3752,9 +3758,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(
               request: request,
-              /* cSpell:disable */
-              filters: const ProposalsFiltersV2(categoryId: "cat'egory-1"),
-              /* cSpell:enable */
+              filters: ProposalsFiltersV2(categoryId: cat1.id),
             );
 
             expect(result.items.length, 1);
@@ -5010,15 +5014,13 @@ String _createTestAuthors(
       .join(',');
 }
 
-DocumentWithAuthorsEntity _createTestDocumentEntity({
+DocumentCompositeEntity _createTestDocumentEntity({
   String? id,
   String? ver,
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
   DateTime? createdAt,
   String? authors,
-  String? categoryId,
-  String? categoryVer,
   String? refId,
   String? refVer,
   String? replyId,
@@ -5026,6 +5028,8 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
   String? section,
   String? templateId,
   String? templateVer,
+  List<CatalystId>? collaborators,
+  List<DocumentRef>? parameters,
 }) {
   return DocumentWithAuthorsFactory.create(
     id: id,
@@ -5034,8 +5038,6 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
     type: type,
     createdAt: createdAt,
     authors: authors,
-    categoryId: categoryId,
-    categoryVer: categoryVer,
     refId: refId,
     refVer: refVer,
     replyId: replyId,
@@ -5043,6 +5045,8 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
     section: section,
     templateId: templateId,
     templateVer: templateVer,
+    parameters: parameters ?? [],
+    collaborators: collaborators ?? [],
   );
 }
 

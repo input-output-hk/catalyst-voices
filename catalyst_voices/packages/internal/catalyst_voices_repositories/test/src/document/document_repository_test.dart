@@ -362,7 +362,7 @@ void main() {
         final publicDraftData = DocumentDataFactory.build(
           id: publicDraftRef,
           template: templateRef,
-          categoryId: DocumentRefFactory.signedDocumentRef(),
+          parameters: DocumentParameters({DocumentRefFactory.signedDocumentRef()}),
           content: publicDraftContent,
         );
 

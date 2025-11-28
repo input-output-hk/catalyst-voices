@@ -48,5 +48,10 @@ void main() {
         });
       });
     });
+
+    // TODO(damian-molinski): add missing tests
+    group('flatten', () {
+      //
+    });
   });
 }
