@@ -31,7 +31,8 @@ impl EnvVars {
                     "Admin Catalyst ID must be in the admin format."
                 );
             }
-            let is_valid_role_and_rotation = v.role_and_rotation() == (RoleId::Role0, KeyRotation::DEFAULT);
+            let is_valid_role_and_rotation =
+                v.role_and_rotation() == (RoleId::Role0, KeyRotation::DEFAULT);
             if is_valid_role_and_rotation {
                 tracing::error!(
                     cat_id = v.to_string(),
@@ -56,7 +57,8 @@ impl EnvVars {
         role: RoleId,
     ) -> Option<(VerifyingKey, KeyRotation)> {
         if let Some(ref admin_key) = self.admin_key
-            && cat_id == admin_key && role == RoleId::Role0
+            && cat_id == admin_key
+            && role == RoleId::Role0
         {
             return Some((admin_key.role0_pk(), KeyRotation::DEFAULT));
         }
