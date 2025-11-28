@@ -149,7 +149,7 @@ impl CatalystRBACTokenV1 {
     }
 
     /// Return the latest signing public key for the provided role.
-    /// If the its an admin RBAC token, returns assosiated Admin public key.
+    /// If the its an admin RBAC token, returns associated Admin public key.
     pub(crate) async fn get_latest_signing_public_key_for_role(
         &mut self,
         role: RoleId,

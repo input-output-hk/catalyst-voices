@@ -139,7 +139,7 @@ struct EnvVars {
     /// The Cardano assets caches configuration
     cardano_assets_cache: cardano_assets_cache::EnvVars,
 
-    /// The Adming functionality configuration
+    /// The Admin functionality configuration
     admin: admin::EnvVars,
 
     /// Internal API Access API Key
