@@ -2,6 +2,7 @@
 
 use std::str::FromStr;
 
+use catalyst_types::catalyst_id::key_rotation::KeyRotation;
 use ed25519_dalek::VerifyingKey;
 
 use super::str_env_var::StringEnvVar;
@@ -45,11 +46,11 @@ impl EnvVars {
     pub(crate) fn get_admin_key(
         &self,
         cat_id: &catalyst_signed_doc::CatalystId,
-    ) -> Option<VerifyingKey> {
+    ) -> Option<(VerifyingKey, KeyRotation)> {
         if let Some(ref admin_key) = self.admin_key
             && cat_id == admin_key
         {
-            return Some(admin_key.role0_pk());
+            return Some((admin_key.role0_pk(), KeyRotation::DEFAULT));
         }
 
         None

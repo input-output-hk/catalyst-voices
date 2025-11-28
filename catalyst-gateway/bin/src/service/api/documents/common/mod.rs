@@ -68,13 +68,9 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        if kid.is_admin() {
-            Ok(get_admin_key(kid))
-        } else {
-            self.verifying_key_provider
-                .try_get_registered_key(kid)
-                .await
-        }
+        self.verifying_key_provider
+            .try_get_registered_key(kid)
+            .await
     }
 }
 
@@ -225,18 +221,10 @@ impl VerifyingKeyProvider {
             anyhow::bail!("Invalid KID {kid}: KID must be a signing key not an encryption key");
         }
 
-        let Some(reg_chain) = token.reg_chain().await? else {
-            anyhow::bail!("Failed to retrieve a registration from corresponding Catalyst ID");
-        };
-
         let (kid_role_index, kid_rotation) = kid.role_and_rotation();
-        let (latest_pk, rotation) = reg_chain
+        let (latest_pk, rotation) = token
             .get_latest_signing_public_key_for_role(kid_role_index)
-            .ok_or_else(|| {
-                anyhow::anyhow!(
-                    "Failed to get last signing key for the proposer role for {kid} Catalyst ID"
-                )
-            })?;
+            .await?;
 
         if rotation != kid_rotation {
             anyhow::bail!(

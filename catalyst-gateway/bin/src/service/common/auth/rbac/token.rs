@@ -11,9 +11,9 @@ use std::{
 use anyhow::{Context, Result, anyhow};
 use base64::{Engine, prelude::BASE64_URL_SAFE_NO_PAD};
 use cardano_chain_follower::Network;
-use catalyst_types::catalyst_id::{CatalystId, role_index::RoleId};
+use catalyst_types::catalyst_id::{CatalystId, key_rotation::KeyRotation, role_index::RoleId};
 use chrono::{TimeDelta, Utc};
-use ed25519_dalek::{Signature, SigningKey, VerifyingKey, ed25519::signature::Signer};
+use ed25519_dalek::{Signature, VerifyingKey};
 use rbac_registration::registration::cardano::RegistrationChain;
 use regex::Regex;
 
@@ -68,14 +68,15 @@ impl CatalystRBACTokenV1 {
     const AUTH_TOKEN_PREFIX: &str = "catid.";
 
     /// Creates a new token instance.
-    // TODO: Remove the attribute when the function is used.
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub(crate) fn new(
         network: &str,
         subnet: Option<&str>,
         role0_pk: VerifyingKey,
-        sk: &SigningKey,
+        sk: &ed25519_dalek::SigningKey,
     ) -> Result<Self> {
+        use ed25519_dalek::ed25519::signature::Signer;
+
         let catalyst_id = CatalystId::new(network, subnet, role0_pk)
             .with_nonce()
             .as_id();
@@ -147,9 +148,13 @@ impl CatalystRBACTokenV1 {
         })
     }
 
-    /// Given the `PublicKey`, verifies the token was correctly signed.
-    pub(crate) async fn verify(&mut self) -> Result<()> {
-        let public_key = if self.catalyst_id.is_admin() {
+    /// Return the latest signing public key for the provided role.
+    /// If the its an admin RBAC token, returns assosiated Admin public key.
+    pub(crate) async fn get_latest_signing_public_key_for_role(
+        &mut self,
+        role: RoleId,
+    ) -> Result<(VerifyingKey, KeyRotation)> {
+        let res = if self.catalyst_id.is_admin() {
             Settings::admin_cfg()
                 .get_admin_key(&self.catalyst_id)
                 .ok_or(VerificationError::NotAdmin)?
@@ -159,7 +164,7 @@ impl CatalystRBACTokenV1 {
                 .await?
                 .ok_or(VerificationError::RegistrationNotFound)?;
             reg_chain
-                .get_latest_signing_public_key_for_role(RoleId::Role0)
+                .get_latest_signing_public_key_for_role(role)
                 .ok_or_else(|| {
                     tracing::debug!(
                         "Unable to get last signing key for {} Catalyst ID",
@@ -167,8 +172,17 @@ impl CatalystRBACTokenV1 {
                     );
                     VerificationError::LatestSigningKey
                 })?
-                .0
         };
+
+        Ok(res)
+    }
+
+    /// Given the `PublicKey`, verifies the token was correctly signed.
+    pub(crate) async fn verify(&mut self) -> Result<()> {
+        let public_key = self
+            .get_latest_signing_public_key_for_role(RoleId::Role0)
+            .await?
+            .0;
 
         Ok(public_key
             .verify_strict(&self.raw, &self.signature)
