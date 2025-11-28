@@ -19,6 +19,23 @@ final class DocumentRefDto {
     required this.type,
   });
 
+  factory DocumentRefDto.fromFlatten(String data) {
+    final parts = data.split('-');
+    if (parts.length != 3) {
+      throw const FormatException('Flatten data do not have 3 parts');
+    }
+
+    final id = parts[0];
+    final ver = parts[1];
+    final type = DocumentRefDtoType.values.asNameMap()[parts[2]];
+
+    if (type == null) {
+      throw FormatException('Unknown type part (${parts[2]})');
+    }
+
+    return DocumentRefDto(id: id, ver: ver, type: type);
+  }
+
   factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
     final migrated = migrateJson1(json);
 
@@ -37,6 +54,8 @@ final class DocumentRefDto {
       type: type,
     );
   }
+
+  String toFlatten() => '$id-$ver-${type.name}';
 
   Map<String, dynamic> toJson() => _$DocumentRefDtoToJson(this);
 

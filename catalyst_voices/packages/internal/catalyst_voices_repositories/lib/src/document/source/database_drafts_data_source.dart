@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 
@@ -151,13 +152,25 @@ extension on LocalDocumentDraftEntity {
   DocumentData toModel() {
     return DocumentData(
       metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.fromJson(contentType),
         type: type,
         id: DraftRef(id: id, ver: ver),
         ref: refId.toRef(refVer),
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
         section: section,
-        categoryId: categoryId.toRef(categoryVer),
+        collaborators: collaborators.isEmpty
+            ? null
+            : collaborators.split(',').map(CatalystId.parse).toList(),
+        parameters: DocumentParameters(
+          parameters.isEmpty
+              ? const <SignedDocumentRef>{}
+              : parameters
+                    .split(',')
+                    .map(DocumentRefDto.fromFlatten)
+                    .map((e) => e.toModel().toSignedDocumentRef())
+                    .toSet(),
+        ),
         authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
       ),
       content: content,
@@ -180,6 +193,7 @@ extension on DocumentData {
   LocalDocumentDraftEntity toEntity() {
     return LocalDocumentDraftEntity(
       content: content,
+      contentType: metadata.contentType.value,
       id: metadata.id.id,
       ver: metadata.id.ver!,
       type: metadata.type,
@@ -188,10 +202,13 @@ extension on DocumentData {
       replyId: metadata.reply?.id,
       replyVer: metadata.reply?.ver,
       section: metadata.section,
-      categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.ver,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
+      collaborators: metadata.collaborators?.map((e) => e.toString()).join(',') ?? '',
+      parameters: metadata.parameters.set
+          .map(DocumentRefDto.fromModel)
+          .map((e) => e.toFlatten())
+          .join(','),
       authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
       createdAt: metadata.id.ver!.dateTime,
     );

@@ -4,11 +4,13 @@ import 'package:drift/drift.dart';
 mixin DocumentTableMetadataMixin on Table {
   TextColumn get authors => text()();
 
-  TextColumn get categoryId => text().nullable()();
+  TextColumn get collaborators => text()();
 
-  TextColumn get categoryVer => text().nullable()();
+  TextColumn get contentType => text()();
 
   TextColumn get id => text()();
+
+  TextColumn get parameters => text()();
 
   TextColumn get refId => text().nullable()();
 

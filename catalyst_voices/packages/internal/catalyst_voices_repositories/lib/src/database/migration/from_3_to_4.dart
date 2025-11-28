@@ -4,8 +4,8 @@ import 'package:catalyst_voices_repositories/src/database/table/document_authors
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:convert/convert.dart' show hex;
 import 'package:drift/drift.dart' hide JsonKey;
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -39,8 +39,7 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
     await _migrateDrafts(m, schema, batchSize: _batchSize);
     await _migrateFavorites(m, schema, batchSize: _batchSize);
 
-    // TODO(damian-molinski): uncomment when migration is done
-    /*await m.drop(schema.documents);
+    await m.drop(schema.documents);
     await m.drop(schema.drafts);
     await m.drop(schema.documentsMetadata);
     await m.drop(schema.documentsFavorites);
@@ -50,7 +49,7 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
     await m.drop(schema.idxDocMetadataKeyValue);
     await m.drop(schema.idxFavType);
     await m.drop(schema.idxFavUniqueId);
-    await m.drop(schema.idxDraftType);*/
+    await m.drop(schema.idxDraftType);
   });
 }
 
@@ -188,31 +187,27 @@ Future<void> _migrateFavorites(
 
 @JsonSerializable()
 class DocumentDataMetadataDtoDbV3 {
+  final String contentType;
   final String type;
   final DocumentRefDtoDbV3 id;
   final DocumentRefDtoDbV3? ref;
-  final SecuredDocumentRefDtoDbV3? refHash;
   final DocumentRefDtoDbV3? template;
   final DocumentRefDtoDbV3? reply;
   final String? section;
-  final DocumentRefDtoDbV3? brandId;
-  final DocumentRefDtoDbV3? campaignId;
-  final String? electionId;
-  final DocumentRefDtoDbV3? categoryId;
+  final List<String>? collaborators;
+  final List<DocumentRefDtoDbV3>? parameters;
   final List<String>? authors;
 
   DocumentDataMetadataDtoDbV3({
+    required this.contentType,
     required this.type,
     required this.id,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.brandId,
-    this.campaignId,
-    this.electionId,
-    this.categoryId,
+    this.collaborators,
+    this.parameters,
     this.authors,
   });
 
@@ -220,23 +215,23 @@ class DocumentDataMetadataDtoDbV3 {
     var migrated = _migrateJson1(json);
     migrated = _migrateJson2(migrated);
     migrated = _migrateJson3(migrated);
+    migrated = _migrateJson4(migrated);
+    migrated = _migrateJson5(migrated);
 
     return _$DocumentDataMetadataDtoDbV3FromJson(migrated);
   }
 
   DocumentDataMetadataDtoDbV3.fromModel(DocumentDataMetadata data)
     : this(
+        contentType: data.contentType.value,
         type: data.type.uuid,
         id: data.id.toDto(),
         ref: data.ref?.toDto(),
-        refHash: data.refHash?.toDto(),
         template: data.template?.toDto(),
         reply: data.reply?.toDto(),
         section: data.section,
-        brandId: data.brandId?.toDto(),
-        campaignId: data.campaignId?.toDto(),
-        electionId: data.electionId,
-        categoryId: data.categoryId?.toDto(),
+        collaborators: data.collaborators?.map((e) => e.toString()).toList(),
+        parameters: data.parameters.set.map((e) => e.toDto()).toList(),
         authors: data.authors?.map((e) => e.toString()).toList(),
       );
 
@@ -293,6 +288,40 @@ class DocumentDataMetadataDtoDbV3 {
   }
 
   static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+    final parametersKeys = ['brandId', 'campaignId', 'categoryId'];
+    final needsMigration = parametersKeys.any(json.containsKey);
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
+    final parameters = <DocumentRefDto>[];
+
+    for (final key in parametersKeys) {
+      final value = modified.remove(key);
+      if (value is Map<String, dynamic>) {
+        parameters.add(DocumentRefDto.fromJson(value));
+      }
+    }
+
+    modified['parameters'] = parameters.map((e) => e.toJson()).toList();
+    return modified;
+  }
+
+  static Map<String, dynamic> _migrateJson4(Map<String, dynamic> json) {
+    final needsMigration = !json.containsKey('contentType');
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
+
+    modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
+
+    return modified;
+  }
+
+  static Map<String, dynamic> _migrateJson5(Map<String, dynamic> json) {
     final needsMigration = json.containsKey('selfRef');
     if (!needsMigration) {
       return json;
@@ -321,6 +350,23 @@ final class DocumentRefDtoDbV3 {
     required this.type,
   });
 
+  factory DocumentRefDtoDbV3.fromFlatten(String data) {
+    final parts = data.split('-');
+    if (parts.length != 3) {
+      throw const FormatException('Flatten data do not have 3 parts');
+    }
+
+    final id = parts[0];
+    final ver = parts[1];
+    final type = DocumentRefDtoTypeDbV3.values.asNameMap()[parts[2]];
+
+    if (type == null) {
+      throw FormatException('Unknown type part (${parts[2]})');
+    }
+
+    return DocumentRefDtoDbV3(id: id, ver: ver, type: type);
+  }
+
   factory DocumentRefDtoDbV3.fromJson(Map<String, dynamic> json) {
     final migrated = _migrateJson1(json);
 
@@ -339,6 +385,8 @@ final class DocumentRefDtoDbV3 {
       type: type,
     );
   }
+
+  String toFlatten() => '$id-$ver-${type.name}';
 
   Map<String, dynamic> toJson() => _$DocumentRefDtoDbV3ToJson(this);
 
@@ -360,37 +408,8 @@ final class DocumentRefDtoDbV3 {
 
 enum DocumentRefDtoTypeDbV3 { signed, draft }
 
-@JsonSerializable()
-final class SecuredDocumentRefDtoDbV3 {
-  final DocumentRefDtoDbV3 ref;
-  final String hash;
-
-  const SecuredDocumentRefDtoDbV3({
-    required this.ref,
-    required this.hash,
-  });
-
-  factory SecuredDocumentRefDtoDbV3.fromJson(Map<String, dynamic> json) {
-    return _$SecuredDocumentRefDtoDbV3FromJson(json);
-  }
-
-  SecuredDocumentRefDtoDbV3.fromModel(SecuredDocumentRef data)
-    : this(
-        ref: DocumentRefDtoDbV3.fromModel(data.ref),
-        hash: hex.encode(data.hash),
-      );
-
-  Map<String, dynamic> toJson() => _$SecuredDocumentRefDtoDbV3ToJson(this);
-}
-
 extension on DocumentRef {
   DocumentRefDtoDbV3 toDto() => DocumentRefDtoDbV3.fromModel(this);
-}
-
-extension on SecuredDocumentRef {
-  SecuredDocumentRefDtoDbV3 toDto() {
-    return SecuredDocumentRefDtoDbV3.fromModel(this);
-  }
 }
 
 extension on DocumentDataMetadataDtoDbV3 {
@@ -399,9 +418,9 @@ extension on DocumentDataMetadataDtoDbV3 {
       return DocumentAuthorEntity(
         documentId: id.id,
         documentVer: id.ver!,
-        authorId: catId.toUri().toString(),
-        authorIdSignificant: catId.toSignificant().toUri().toString(),
-        authorUsername: catId.username,
+        accountId: catId.toUri().toString(),
+        accountSignificantId: catId.toSignificant().toUri().toString(),
+        username: catId.username,
       );
     }).toList();
   }
@@ -410,6 +429,7 @@ extension on DocumentDataMetadataDtoDbV3 {
     required Map<String, dynamic> content,
   }) {
     return DocumentEntityV2(
+      contentType: contentType,
       id: id.id,
       ver: id.ver!,
       type: DocumentType.fromJson(type),
@@ -419,10 +439,10 @@ extension on DocumentDataMetadataDtoDbV3 {
       replyId: reply?.id,
       replyVer: reply?.ver,
       section: section,
-      categoryId: categoryId?.id,
-      categoryVer: categoryId?.ver,
       templateId: template?.id,
       templateVer: template?.ver,
+      collaborators: collaborators?.join(',') ?? '',
+      parameters: parameters?.map((e) => e.toFlatten()).join(',') ?? '',
       authors: authors?.join(',') ?? '',
       content: DocumentDataContent(content),
     );
@@ -432,6 +452,7 @@ extension on DocumentDataMetadataDtoDbV3 {
     required Map<String, dynamic> content,
   }) {
     return LocalDocumentDraftEntity(
+      contentType: contentType,
       id: id.id,
       ver: id.ver!,
       type: DocumentType.fromJson(type),
@@ -441,10 +462,10 @@ extension on DocumentDataMetadataDtoDbV3 {
       replyId: reply?.id,
       replyVer: reply?.ver,
       section: section,
-      categoryId: categoryId?.id,
-      categoryVer: categoryId?.ver,
       templateId: template?.id,
       templateVer: template?.ver,
+      collaborators: collaborators?.join(',') ?? '',
+      parameters: parameters?.map((e) => e.toFlatten()).join(',') ?? '',
       authors: authors?.join(',') ?? '',
       content: DocumentDataContent(content),
     );
