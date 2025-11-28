@@ -15,7 +15,7 @@ final class AddCollaboratorCubit extends Cubit<AddCollaboratorState>
         const AddCollaboratorState(),
       );
 
-  void init({required Collaborators collaborators, required CatalystId authorCatalystId}) {
+  void init({required CollaboratorsIds collaborators, required CatalystId authorCatalystId}) {
     emit(
       AddCollaboratorState(
         collaborators: collaborators,
