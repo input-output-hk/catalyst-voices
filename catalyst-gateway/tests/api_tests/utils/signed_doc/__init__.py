@@ -60,7 +60,7 @@ class SignedDocument(SignedDocumentBase):
         self,
         cat_id: str,
         sk_hex: str,
-        key_type: str,
+        key_type: str = "bip32-extended",
     ) -> str:
         return build_signed_doc(
             metadata_json=self.metadata,
@@ -125,7 +125,7 @@ def build_signed_doc(
                 signed_doc_file.name,
                 metadata_file.name,
             ],
-            # capture_output=True,
+            capture_output=True,
         )
 
         subprocess.run(
@@ -137,7 +137,7 @@ def build_signed_doc(
                 cat_id,
                 key_type
             ],
-            # capture_output=True,
+            capture_output=True,
         )
 
         signed_doc_hex = signed_doc_file.read().hex()
@@ -179,7 +179,7 @@ def proposal_doc_factory(
         (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
 
         resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex, "bip32-extended"),
+            data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
         )
         assert resp.status_code == 201, (
@@ -212,7 +212,7 @@ def proposal_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex, "bip32-extended"),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -241,7 +241,7 @@ def category_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex, "bip32-extended"),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -267,7 +267,7 @@ def category_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex, "bip32-extended"),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -297,7 +297,7 @@ def campaign_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex, "bip32-extended"),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -323,7 +323,7 @@ def campaign_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex, "bip32-extended"),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -349,7 +349,7 @@ def brand_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex, "bip32-extended"),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -371,7 +371,7 @@ def brand_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex, "bip32-extended"),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
