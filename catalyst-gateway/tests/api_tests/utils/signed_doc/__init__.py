@@ -63,11 +63,11 @@ class SignedDocument(SignedDocumentBase):
         key_type: str,
     ) -> str:
         return build_signed_doc(
-            self.metadata,
-            self.content,
-            sk_hex,
-            cat_id,
-            key_type
+            metadata_json=self.metadata,
+            doc_content_json=self.content,
+            sk_hex=sk_hex,
+            cat_id=cat_id,
+            key_type=key_type
         )
 
 def create_metadata(
@@ -100,8 +100,8 @@ def build_signed_doc(
     metadata_json: Dict[str, Any],
     doc_content_json: Dict[str, Any],
     sk_hex: str,
-    key_type: str,
     cat_id: str,
+    key_type: str,
 ) -> str:
     with (
         NamedTemporaryFile() as metadata_file,
@@ -125,7 +125,7 @@ def build_signed_doc(
                 signed_doc_file.name,
                 metadata_file.name,
             ],
-            capture_output=True,
+            # capture_output=True,
         )
 
         subprocess.run(
@@ -137,7 +137,7 @@ def build_signed_doc(
                 cat_id,
                 key_type
             ],
-            capture_output=True,
+            # capture_output=True,
         )
 
         signed_doc_hex = signed_doc_file.read().hex()
