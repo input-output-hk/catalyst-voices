@@ -208,12 +208,13 @@ impl VerifyingKeyProvider {
         token: &mut CatalystRBACTokenV1,
         kids: &[catalyst_signed_doc::CatalystId],
     ) -> anyhow::Result<Self> {
-        if kids.len() > 1 {
-            anyhow::bail!("Multi-signature document is currently unsupported");
-        }
+        use itertools::Itertools as _;
 
         let [kid] = kids else {
-            anyhow::bail!("Multi-signature document is currently unsupported");
+            anyhow::bail!(
+                "Must have only one signature. Multi-signature document is currently unsupported. kids: [{}]",
+                kids.iter().map(ToString::to_string).join(",")
+            );
         };
 
         if kid != token.catalyst_id() {
@@ -230,7 +231,7 @@ impl VerifyingKeyProvider {
 
         let (kid_role_index, kid_rotation) = kid.role_and_rotation();
         let (latest_pk, rotation) = reg_chain
-            .get_latest_signing_pk_for_role(&kid_role_index)
+            .get_latest_signing_public_key_for_role(kid_role_index)
             .ok_or_else(|| {
                 anyhow::anyhow!(
                     "Failed to get last signing key for the proposer role for {kid} Catalyst ID"

@@ -1,6 +1,6 @@
 //! A RBAC context used during indexing.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use cardano_chain_follower::{Slot, StakeAddress, TxnIndex, hashes::TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
@@ -127,7 +127,6 @@ impl RbacBlockIndexingContext {
         slot: Slot,
         txn_index: TxnIndex,
         prv_txn: Option<TransactionId>,
-        removed_stake_addresses: HashSet<StakeAddress>,
     ) {
         use std::collections::hash_map::Entry;
 
@@ -136,10 +135,6 @@ impl RbacBlockIndexingContext {
             slot_no: slot.into(),
             txn_index: txn_index.into(),
             prv_txn_id: prv_txn.map(Into::into),
-            removed_stake_addresses: removed_stake_addresses
-                .into_iter()
-                .map(Into::into)
-                .collect(),
         };
 
         match self.registrations.entry(id) {

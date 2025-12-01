@@ -9,7 +9,10 @@ use tracing::error;
 
 use crate::{
     db::{
-        index::queries::{PreparedQueries, SizedBatch},
+        index::{
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
         types::{DbCatalystId, DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
@@ -59,6 +62,23 @@ impl Params {
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
         }
+    }
+
+    /// Executes prepared queries as a batch.
+    pub(crate) async fn execute_batch(
+        session: &Arc<CassandraSession>,
+        queries: Vec<Self>,
+    ) -> FallibleQueryResults {
+        for q in &queries {
+            session
+                .caches()
+                .rbac_stake_address()
+                .insert(q.stake_address.clone().into(), q.catalyst_id.clone().into());
+        }
+
+        session
+            .execute_batch(PreparedQuery::CatalystIdForStakeAddressInsertQuery, queries)
+            .await
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries
