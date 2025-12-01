@@ -4,7 +4,7 @@ import 'package:drift/drift.dart';
 
 @DataClassName('DocumentParameterEntity')
 @TableIndex(
-  name: 'idx_document_collaborators_composite',
+  name: 'idx_document_parameters_composite',
   columns: {#documentId, #documentVer, #id, #ver},
 )
 class DocumentParameters extends Table {

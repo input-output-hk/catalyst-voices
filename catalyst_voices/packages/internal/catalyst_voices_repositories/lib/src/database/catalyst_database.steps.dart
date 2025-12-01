@@ -28,7 +28,7 @@ final class Schema4 extends i0.VersionedSchema {
     idxDocumentCollaboratorsComposite,
     idxDocumentCollaboratorsIdentity,
     idxDocumentCollaboratorsUsername,
-    idxDocumentCollaboratorsCompositeIndex,
+    idxDocumentParametersComposite,
   ];
   late final Shape0 documentsV2 = Shape0(
     source: i0.VersionedTable(
@@ -191,9 +191,9 @@ final class Schema4 extends i0.VersionedSchema {
     'idx_document_collaborators_username',
     'CREATE INDEX idx_document_collaborators_username ON document_collaborators (username)',
   );
-  final i1.Index idxDocumentCollaboratorsCompositeIndex = i1.Index(
-    'idx_document_collaborators_composite',
-    'CREATE INDEX idx_document_collaborators_composite ON document_parameters (document_id, document_ver, id, ver)',
+  final i1.Index idxDocumentParametersComposite = i1.Index(
+    'idx_document_parameters_composite',
+    'CREATE INDEX idx_document_parameters_composite ON document_parameters (document_id, document_ver, id, ver)',
   );
 }
 

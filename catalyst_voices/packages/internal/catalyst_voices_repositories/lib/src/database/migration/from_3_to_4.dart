@@ -18,38 +18,13 @@ final _logger = Logger('Migration[3-4]');
 
 Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.database.transaction(() async {
-    await m.createTable(schema.documentsV2);
-    await m.createTable(schema.documentAuthors);
-    await m.createTable(schema.documentsLocalMetadata);
-    await m.createTable(schema.localDocumentsDrafts);
-
-    await m.createIndex(schema.idxDocumentsV2TypeId);
-    await m.createIndex(schema.idxDocumentsV2TypeIdVer);
-    await m.createIndex(schema.idxDocumentsV2TypeRefId);
-    await m.createIndex(schema.idxDocumentsV2TypeRefIdVer);
-    await m.createIndex(schema.idxDocumentsV2RefIdVer);
-    await m.createIndex(schema.idxDocumentsV2TypeIdCreatedAt);
-    await m.createIndex(schema.idxDocumentsV2TypeCategoryId);
-    await m.createIndex(schema.idxDocumentsV2TypeRefIdRefVer);
-    await m.createIndex(schema.idxDocumentAuthorsComposite);
-    await m.createIndex(schema.idxDocumentAuthorsIdentity);
-    await m.createIndex(schema.idxDocumentAuthorsUsername);
+    for (final entity in schema.entities) {
+      await m.create(entity);
+    }
 
     await _migrateDocs(m, schema, batchSize: _batchSize);
     await _migrateDrafts(m, schema, batchSize: _batchSize);
     await _migrateFavorites(m, schema, batchSize: _batchSize);
-
-    await m.drop(schema.documents);
-    await m.drop(schema.drafts);
-    await m.drop(schema.documentsMetadata);
-    await m.drop(schema.documentsFavorites);
-
-    await m.drop(schema.idxDocType);
-    await m.drop(schema.idxUniqueVer);
-    await m.drop(schema.idxDocMetadataKeyValue);
-    await m.drop(schema.idxFavType);
-    await m.drop(schema.idxFavUniqueId);
-    await m.drop(schema.idxDraftType);
   });
 }
 

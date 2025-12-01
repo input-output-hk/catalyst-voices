@@ -915,7 +915,7 @@
       "type": "index",
       "data": {
         "on": 3,
-        "name": "idx_document_collaborators_composite",
+        "name": "idx_document_parameters_composite",
         "sql": null,
         "unique": false,
         "columns": [
