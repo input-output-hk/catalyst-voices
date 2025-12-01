@@ -3,7 +3,7 @@ import base64
 import pytest
 from enum import IntEnum, Enum
 import json
-from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
+from utils.ed25519 import Ed25519Keys, Ed25519Type
 
 with open("./test_data/rbac_regs/only_role_0.jsonc", "r") as f:
     ONLY_ROLE_0_REG_JSON = json.load(f)
@@ -41,32 +41,36 @@ class RBACChain:
         nonce: str | None = None,
     ) -> str:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
+        role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
         return generate_rbac_auth_token(
-            self.network,
-            self.subnet,
-            role_0_arr[0]["pk"],
-            role_0_arr[-1]["sk"],
-            cid,
-            sig,
-            username,
-            is_uri,
-            nonce,
+            network=self.network,
+            subnet=self.subnet,
+            role_0_key=role_0_key,
+            cid=cid,
+            sig=sig,
+            username=username,
+            is_uri=is_uri,
+            nonce=nonce,
         )
 
-    # returns a role's catalyst id, with the provided role secret key
-    def cat_id_for_role(self, role_id: RoleID) -> tuple[str, str]:
+    # returns a role's catalyst id, with the provided latest role key
+    def cat_id_for_role(self, role_id: RoleID) -> tuple[str, Ed25519Keys]:
         role_data_arr = self.keys_map[f"{role_id}"]
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
+
+        role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
+        role_latest_key = Ed25519Keys(role_data_arr[-1]["sk"],Ed25519Type.Bip32Extended)
+
         return (
             generate_cat_id(
                 network=self.network,
                 subnet=self.subnet,
                 role_id=role_id,
-                pk_hex=role_0_arr[0]["pk"],
+                role_0_key=role_0_key,
                 rotation=role_data_arr[-1]["rotation"],
                 is_uri=True,
             ),
-            role_data_arr[-1]["sk"],
+            role_latest_key,
         )
 
     def short_cat_id(self) -> str:
@@ -103,7 +107,7 @@ def rbac_chain_factory():
 # Optional field = subnet, role id, rotation, username, nonce
 def generate_cat_id(
     network: str,
-    pk_hex: str,
+    role_0_key: Ed25519Keys,
     scheme: str = "id.catalyst",
     is_uri: bool = True,
     subnet: str | None = None,
@@ -112,8 +116,7 @@ def generate_cat_id(
     username: str | None = None,
     nonce: str | None = None,
 ) -> str:
-    pk = bytes.fromhex(pk_hex)[:32]
-    role0_pk_b64 = base64_url(pk)
+    role0_pk_b64 = base64_url(bytes.fromhex(role_0_key.pk_hex()))
 
     # If nonce is set to none, use current timestamp
     # If set to empty string, use empty string (no nonce)
@@ -149,35 +152,28 @@ def generate_cat_id(
 def generate_rbac_auth_token(
     network: str,
     subnet: str,
-    pk_hex: str,
-    sk_hex: str,
+    signing_key: Ed25519Keys,
+    role_0_key: Ed25519Keys,
     cid: str | None = None,
     sig: str | None = None,
     username: str | None = None,
     is_uri: bool = False,
     nonce: str | None = None,
 ) -> str:
-    pk = bytes.fromhex(pk_hex)[:32]
-    sk = bytes.fromhex(sk_hex)[:64]
-    chain_code = bytes.fromhex(sk_hex)[64:]
-
-    bip32_ed25519_sk = BIP32ED25519PrivateKey(sk, chain_code)
-    bip32_ed25519_pk = BIP32ED25519PublicKey(pk, chain_code)
 
     token_prefix = f"catid.{username}" if username else "catid."
     if cid is None:
         cat_id = f"{token_prefix}{generate_cat_id(
             network=network, 
             subnet=subnet, 
-            pk_hex=pk_hex, 
+            role_0_key=role_0_key, 
             is_uri=is_uri,
             nonce=nonce)}."
     else:
         cat_id = f"{token_prefix}:{cid}."
 
     if sig is None:
-        signature = bip32_ed25519_sk.sign(cat_id.encode())
-        bip32_ed25519_pk.verify(signature, cat_id.encode())
+        signature = signing_key.sign(cat_id.encode())
     else:
         signature = sig.encode()
 

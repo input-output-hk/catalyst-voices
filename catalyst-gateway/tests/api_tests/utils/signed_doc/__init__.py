@@ -9,6 +9,7 @@ from api.v1 import document
 from utils import uuid_v7
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import admin_key
+from utils.ed25519 import Ed25519Keys
 from tempfile import NamedTemporaryFile
 
 
@@ -59,15 +60,13 @@ class SignedDocument(SignedDocumentBase):
     def build_and_sign(
         self,
         cat_id: str,
-        sk_hex: str,
-        key_type: str = "bip32-extended",
+        key: Ed25519Keys,
     ) -> str:
         return build_signed_doc(
             metadata_json=self.metadata,
             doc_content_json=self.content,
-            sk_hex=sk_hex,
+            key=key,
             cat_id=cat_id,
-            key_type=key_type
         )
 
 def create_metadata(
@@ -99,9 +98,8 @@ def create_metadata(
 def build_signed_doc(
     metadata_json: Dict[str, Any],
     doc_content_json: Dict[str, Any],
-    sk_hex: str,
+    key: Ed25519Keys,
     cat_id: str,
-    key_type: str,
 ) -> str:
     with (
         NamedTemporaryFile() as metadata_file,
@@ -133,9 +131,9 @@ def build_signed_doc(
                 mk_signed_doc_path,
                 "sign",
                 signed_doc_file.name,
-                sk_hex,
+                key.sk_hex,
                 cat_id,
-                key_type
+                str(key.type)
             ],
             capture_output=True,
         )
@@ -176,10 +174,10 @@ def proposal_doc_factory(
 
         rbac_chain = rbac_chain_factory()
         doc = SignedDocument(metadata, content)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
 
         resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
+            data=doc.build_and_sign(cat_id, key),
             token=rbac_chain.auth_token(),
         )
         assert resp.status_code == 201, (
@@ -212,7 +210,7 @@ def proposal_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -241,7 +239,7 @@ def category_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -267,7 +265,7 @@ def category_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -297,7 +295,7 @@ def campaign_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -323,7 +321,7 @@ def campaign_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -349,7 +347,7 @@ def brand_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -371,7 +369,7 @@ def brand_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (

@@ -5,25 +5,26 @@ import json
 from utils import signed_doc, uuid_v7
 from tempfile import NamedTemporaryFile
 from utils.rbac_chain import RoleID
+from utils.ed25519 import Ed25519Keys
 
 class SignedDocumentV1(signed_doc.SignedDocumentBase):
     # Build and sign document, returns hex str of document bytes
     def build_and_sign(
         self,
         cat_id: str,
-        bip32_sk_hex: str,
+        key: Ed25519Keys,
     ) -> str:
         return build_signed_doc(
             self.metadata,
             self.content,
-            bip32_sk_hex,
+            key,
             cat_id,
         )
 
 def build_signed_doc(
     metadata_json: Dict[str, Any],
     doc_content_json: Dict[str, Any],
-    bip32_sk_hex: str,
+    key: Ed25519Keys,
     cat_id: str,
 ) -> str:
     with (
@@ -56,7 +57,7 @@ def build_signed_doc(
                 mk_signed_doc_path,
                 "sign",
                 signed_doc_file.name,
-                bip32_sk_hex,
+                key.sk_hex,
                 cat_id,
             ],
             capture_output=True,
