@@ -1,7 +1,7 @@
 name: Catalyst Voices integration tests
 
 on:
-  workflow_call:
+  workflow_dispatch:
 
 concurrency:
   group: voices-tests-${{ github.head_ref || github.ref }}
