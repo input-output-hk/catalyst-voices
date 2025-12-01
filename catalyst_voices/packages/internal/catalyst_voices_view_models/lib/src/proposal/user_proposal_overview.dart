@@ -14,7 +14,7 @@ final class UsersProposalOverview extends Equatable {
   final String category;
   final int fundNumber;
   final bool fromActiveCampaign;
-  final List<CollaboratorInvite> collaborators;
+  final List<Collaborator> collaborators;
 
   const UsersProposalOverview({
     required this.id,
@@ -54,7 +54,7 @@ final class UsersProposalOverview extends Equatable {
       fundNumber: proposalData.fundNumber,
       fromActiveCampaign: fromActiveCampaign,
       collaborators:
-          proposalData.collaborators?.map(CollaboratorInvite.fromBriefData).toList() ?? [],
+          proposalData.collaborators?.map(Collaborator.fromBriefData).toList() ?? [],
     );
   }
 
@@ -92,7 +92,7 @@ final class UsersProposalOverview extends Equatable {
     SignedDocumentRef? categoryId,
     int? fundNumber,
     bool? fromActiveCampaign,
-    List<CollaboratorInvite>? collaborators,
+    List<Collaborator>? collaborators,
   }) {
     return UsersProposalOverview(
       id: id ?? this.id,

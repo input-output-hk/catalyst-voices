@@ -19,6 +19,8 @@ class CatalystIdText extends StatefulWidget {
   final bool showLabel;
   final bool showUsername;
   final bool includeUsername;
+  final bool copyEnabled;
+  final bool tooltipEnabled;
   final TextStyle? style;
   final TextStyle? labelStyle;
   final double labelGap;
@@ -32,6 +34,8 @@ class CatalystIdText extends StatefulWidget {
     this.showLabel = false,
     this.showUsername = false,
     this.includeUsername = true,
+    this.copyEnabled = true,
+    this.tooltipEnabled = true,
     this.style,
     this.labelStyle,
     this.labelGap = 6,
@@ -58,8 +62,8 @@ class _CatalystIdTextState extends State<CatalystIdText> {
       child: Offstage(
         offstage: _effectiveData.isEmpty,
         child: _TapDetector(
-          onTap: _copyDataToClipboard,
-          onHoverExit: _handleHoverExit,
+          onTap: widget.copyEnabled ? _copyDataToClipboard : null,
+          onHoverExit: widget.copyEnabled ? _handleHoverExit : null,
           child: TooltipVisibility(
             visible: _tooltipVisible,
             child: Row(
@@ -72,7 +76,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
                     constraints: const BoxConstraints(),
                     child: _Chip(
                       _effectiveData,
-                      onTap: _copyDataToClipboard,
+                      onTap: widget.copyEnabled ? _copyDataToClipboard : null,
                       style: widget.style,
                       backgroundColor: widget.backgroundColor,
                     ),
@@ -96,7 +100,9 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   void didUpdateWidget(CatalystIdText oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.data != oldWidget.data || widget.isCompact != oldWidget.isCompact) {
+    if (widget.data != oldWidget.data ||
+        widget.isCompact != oldWidget.isCompact ||
+        widget.tooltipEnabled != oldWidget.tooltipEnabled) {
       _fullDataAsString = _buildFullData();
       _effectiveData = _buildTextData();
       _tooltipVisible = _isTooltipVisible();
@@ -165,7 +171,11 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   bool _isTooltipVisible() {
-    return widget.isCompact && _effectiveData.length < _fullDataAsString.length;
+    if (!widget.tooltipEnabled || !widget.isCompact) {
+      return false;
+    }
+
+    return _effectiveData.length < _fullDataAsString.length;
   }
 
   void _removeHighlight() {
@@ -187,7 +197,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
 
 class _Chip extends StatelessWidget {
   final String data;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color? backgroundColor;
   final TextStyle? style;
 
@@ -276,8 +286,8 @@ class _LabelText extends StatelessWidget {
 }
 
 class _TapDetector extends StatelessWidget {
-  final VoidCallback onTap;
-  final VoidCallback onHoverExit;
+  final VoidCallback? onTap;
+  final VoidCallback? onHoverExit;
   final Widget child;
 
   const _TapDetector({
@@ -292,7 +302,7 @@ class _TapDetector extends StatelessWidget {
       onTap: onTap,
       // there is a gap between text and copy
       behavior: HitTestBehavior.translucent,
-      mouseRegionOnExit: (event) => onHoverExit(),
+      mouseRegionOnExit: onHoverExit != null ? (event) => onHoverExit!.call() : null,
       child: child,
     );
   }

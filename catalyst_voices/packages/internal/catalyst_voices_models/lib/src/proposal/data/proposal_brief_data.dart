@@ -6,7 +6,7 @@ final class ProposalBriefData extends Equatable {
   final DocumentRef id;
   // TODO(damian-molinski): To be implemented
   final int fundNumber;
-  final String authorName;
+  final CatalystId? author;
   final String title;
   final String description;
   final String categoryName;
@@ -25,7 +25,7 @@ final class ProposalBriefData extends Equatable {
   const ProposalBriefData({
     required this.id,
     required this.fundNumber,
-    required this.authorName,
+    required this.author,
     required this.title,
     required this.description,
     required this.categoryName,
@@ -45,7 +45,7 @@ final class ProposalBriefData extends Equatable {
   List<Object?> get props => [
     id,
     fundNumber,
-    authorName,
+    author,
     title,
     description,
     categoryName,
