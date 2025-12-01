@@ -58,21 +58,21 @@ jobs:
             \s*FROM.*?:latest
               No images should be built using the 'latest' tag
 
-#  docs-only:
-#    if: ${{ needs.paths-filter.outputs.docs == 'true' && needs.paths-filter.outputs.not-only-docs != 'true' }}
-#    needs: [reject, paths-filter]
-#    uses: input-output-hk/catalyst-forge/.github/workflows/release.yml@ci/v1.10.0
-#    with:
-#      releases: '[{"project":"./docs","name":"docs"}]'
-#      forge_version: 0.21.0
-#
-#  ci:
-#    if: ${{ (!github.event.pull_request.draft && needs.paths-filter.outputs.not-only-docs == 'true') || startsWith(github.ref, 'refs/tags/') }}
-#    needs: [reject, paths-filter]
-#    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
-#    with:
-#      forge_version: 0.21.0
-#      release_only: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+  docs-only:
+    if: ${{ needs.paths-filter.outputs.docs == 'true' && needs.paths-filter.outputs.not-only-docs != 'true' }}
+    needs: [reject, paths-filter]
+    uses: input-output-hk/catalyst-forge/.github/workflows/release.yml@ci/v1.10.0
+    with:
+      releases: '[{"project":"./docs","name":"docs"}]'
+      forge_version: 0.21.0
+
+  ci:
+    if: ${{ (!github.event.pull_request.draft && needs.paths-filter.outputs.not-only-docs == 'true') || startsWith(github.ref, 'refs/tags/') }}
+    needs: [reject, paths-filter]
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
+    with:
+      forge_version: 0.21.0
+      release_only: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
 
   gateway-integration-tests:
     needs: [paths-filter]
@@ -81,12 +81,12 @@ jobs:
     secrets:
       PRIVATE_SSH_KEY: ${{ secrets.PRIVATE_SSH_KEY }}
 
- # voices-integration-tests:
- #   needs: [ci, paths-filter]
- #   if: ${{ needs.paths-filter.outputs.catalyst-voices == 'true' || github.base_ref == 'main' }}
- #   uses: ./.github/workflows/voices-tests.yml
+  voices-integration-tests:
+    needs: [ci, paths-filter]
+    if: ${{ needs.paths-filter.outputs.catalyst-voices == 'true' || github.base_ref == 'main' }}
+    uses: ./.github/workflows/voices-tests.yml
 
- # test-reporting:
- #   needs: [ci, voices-integration-tests, gateway-integration-tests ]
- #   if: ${{ github.base_ref == 'main' }}
- #   uses: ./.github/workflows/generate-allure-report.yml
+  test-reporting:
+    needs: [ci, voices-integration-tests, gateway-integration-tests ]
+    if: ${{ github.base_ref == 'main' }}
+    uses: ./.github/workflows/generate-allure-report.yml
