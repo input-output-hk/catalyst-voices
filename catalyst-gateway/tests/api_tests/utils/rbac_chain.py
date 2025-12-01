@@ -3,7 +3,7 @@ import base64
 import pytest
 from enum import IntEnum, Enum
 import json
-from utils.ed25519 import Ed25519Keys, Ed25519Type
+from utils.ed25519 import Ed25519Keys
 
 with open("./test_data/rbac_regs/only_role_0.jsonc", "r") as f:
     ONLY_ROLE_0_REG_JSON = json.load(f)
@@ -41,7 +41,7 @@ class RBACChain:
         cat_id: str | None = None,
     ) -> str:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
-        role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
+        role_0_key = Ed25519Keys(role_0_arr[0]["sk"])
         return generate_rbac_auth_token(
             scheme=scheme,
             network=self.network,
@@ -59,8 +59,8 @@ class RBACChain:
         role_data_arr = self.keys_map[f"{role_id}"]
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
 
-        role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
-        role_latest_key = Ed25519Keys(role_data_arr[-1]["sk"],Ed25519Type.Bip32Extended)
+        role_0_key = Ed25519Keys(role_0_arr[0]["sk"])
+        role_latest_key = Ed25519Keys(role_data_arr[-1]["sk"])
 
         return (
             generate_cat_id(
@@ -76,7 +76,7 @@ class RBACChain:
 
     def short_cat_id(self) -> str:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
-        role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
+        role_0_key = Ed25519Keys(role_0_arr[0]["sk"])
         return generate_cat_id(
             network=self.network,
             subnet=self.subnet,

@@ -94,7 +94,6 @@ class SignedDocument(SignedDocumentBase):
                     signed_doc_file.name,
                     key.sk_hex,
                     cat_id,
-                    str(key.type)
                 ],
                 capture_output=True,
             )
