@@ -31,11 +31,13 @@ class ProposalBriefCard extends StatefulWidget {
   State<ProposalBriefCard> createState() => _ProposalBriefCardState();
 }
 
-class _Author extends StatelessWidget {
-  final String? author;
+class _AuthorAndCollaborators extends StatelessWidget {
+  final CatalystId? author;
+  final List<CatalystId>? collaborators;
 
-  const _Author({
-    required this.author,
+  const _AuthorAndCollaborators({
+    this.author,
+    this.collaborators,
   });
 
   @override
@@ -48,13 +50,16 @@ class _Author extends StatelessWidget {
         children: [
           ProfileAvatar(
             size: 32,
-            username: author,
+            username: author?.username,
           ),
-          UsernameText(
-            key: const Key('Author'),
-            author,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+          Flexible(
+            child: AccountsText(
+              ids: [?author, ...?collaborators],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
             ),
           ),
         ],
@@ -222,7 +227,10 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                   ),
                   const SizedBox(height: 4),
                   _Title(text: proposal.title),
-                  _Author(author: proposal.author),
+                  _AuthorAndCollaborators(
+                    author: proposal.author,
+                    collaborators: proposal.acceptedCollaboratorsIds,
+                  ),
                   _FundsAndDuration(
                     funds: proposal.formattedFunds,
                     duration: proposal.duration,
