@@ -18,13 +18,18 @@ final _logger = Logger('Migration[3-4]');
 
 Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.database.transaction(() async {
-    for (final entity in schema.entities) {
-      await m.create(entity);
-    }
+    await m.createAll();
 
     await _migrateDocs(m, schema, batchSize: _batchSize);
     await _migrateDrafts(m, schema, batchSize: _batchSize);
     await _migrateFavorites(m, schema, batchSize: _batchSize);
+
+    // Tables are no longer in schema to have to delete them "manually". Indexes are dropped
+    // automatically.
+    await m.deleteTable('documents');
+    await m.deleteTable('documents_metadata');
+    await m.deleteTable('documents_favorites');
+    await m.deleteTable('drafts');
   });
 }
 
