@@ -1,6 +1,6 @@
 //! Get RBAC registrations by Catalyst ID.
 
-use std::{collections::HashSet, sync::Arc};
+use std::sync::Arc;
 
 use scylla::{
     DeserializeRow, SerializeRow,
@@ -14,7 +14,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex},
+    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
 };
 
 /// Get registrations by Catalyst ID query.
@@ -40,8 +40,6 @@ pub(crate) struct Query {
     /// A previous  transaction id.
     #[allow(dead_code)]
     pub prv_txn_id: Option<DbTransactionId>,
-    /// A set of removed stake addresses.
-    pub removed_stake_addresses: HashSet<DbStakeAddress>,
 }
 
 impl Query {

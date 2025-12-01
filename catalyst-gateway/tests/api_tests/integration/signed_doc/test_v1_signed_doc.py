@@ -272,7 +272,7 @@ def deprecated_proposal(rbac_chain):
             "ver": "0194d490-30bf-7473-81c8-a0eaef369619",
         },
     }
-    with open("./test_data/signed_docs/proposal.json", "r") as json_file:
+    with open("./test_data/signed_docs/proposal.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
     doc = SignedDocumentV1(proposal_metadata_json, content)
@@ -300,7 +300,7 @@ def deprecated_comment(rbac_chain, proposal_id):
             "ver": "0194d494-4402-7e0e-b8d6-171f8fea18b0",
         },
     }
-    with open("./test_data/signed_docs/comment.json", "r") as json_file:
+    with open("./test_data/signed_docs/comment.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
     doc = SignedDocumentV1(comment_metadata_json, content)
@@ -323,7 +323,7 @@ def deprecated_proposal_submission(rbac_chain, proposal_id):
             "ver": proposal_id,
         },
     }
-    with open("./test_data/signed_docs/submission_action.json", "r") as json_file:
+    with open("./test_data/signed_docs/submission_action.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
     doc = SignedDocumentV1(sub_action_metadata_json, content)
