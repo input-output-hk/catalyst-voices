@@ -34,6 +34,7 @@ class RBACChain:
 
     def auth_token(
         self,
+        scheme: str | None = None,
         sig: str | None = None,
         username: str | None = None,
         nonce: str | None = None,
@@ -41,6 +42,7 @@ class RBACChain:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
         role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
         return generate_rbac_auth_token(
+            scheme=scheme,
             network=self.network,
             subnet=self.subnet,
             role_0_key=role_0_key,
