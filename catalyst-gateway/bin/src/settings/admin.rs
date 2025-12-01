@@ -25,7 +25,7 @@ impl EnvVars {
         )
         .filter(|v| {
             let is_admin = v.is_admin();
-            if is_admin {
+            if !is_admin {
                 tracing::error!(
                     cat_id = v.to_string(),
                     "Admin Catalyst ID must be in the admin format."
@@ -33,7 +33,7 @@ impl EnvVars {
             }
             let is_valid_role_and_rotation =
                 v.role_and_rotation() == (RoleId::Role0, KeyRotation::DEFAULT);
-            if is_valid_role_and_rotation {
+            if !is_valid_role_and_rotation {
                 tracing::error!(
                     cat_id = v.to_string(),
                     "Admin Catalyst ID must be role 0 with 0 rotation."
