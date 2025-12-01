@@ -71,10 +71,12 @@ class RBACChain:
         )
 
     def short_cat_id(self) -> str:
+        role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
+        role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
         return generate_cat_id(
             network=self.network,
             subnet=self.subnet,
-            pk_hex=self.keys_map[f"{RoleID.ROLE_0}"][0]["pk"],
+            role_0_key=role_0_key,
         )
 
 
