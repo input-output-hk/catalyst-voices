@@ -34,10 +34,8 @@ class RBACChain:
 
     def auth_token(
         self,
-        cid: str | None = None,
         sig: str | None = None,
         username: str | None = None,
-        is_uri: bool = False,
         nonce: str | None = None,
     ) -> str:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
@@ -46,10 +44,8 @@ class RBACChain:
             network=self.network,
             subnet=self.subnet,
             role_0_key=role_0_key,
-            cid=cid,
             sig=sig,
             username=username,
-            is_uri=is_uri,
             nonce=nonce,
         )
 
@@ -68,7 +64,7 @@ class RBACChain:
                 role_id=role_id,
                 role_0_key=role_0_key,
                 rotation=role_data_arr[-1]["rotation"],
-                is_uri=True,
+                schema="id.catalyst",
             ),
             role_latest_key,
         )
@@ -78,7 +74,6 @@ class RBACChain:
             network=self.network,
             subnet=self.subnet,
             pk_hex=self.keys_map[f"{RoleID.ROLE_0}"][0]["pk"],
-            is_uri=False,
         )
 
 
@@ -108,8 +103,7 @@ def rbac_chain_factory():
 def generate_cat_id(
     network: str,
     role_0_key: Ed25519Keys,
-    scheme: str = "id.catalyst",
-    is_uri: bool = True,
+    scheme: str | None,
     subnet: str | None = None,
     role_id: RoleID | None = None,
     rotation: str | None = None,
@@ -143,7 +137,7 @@ def generate_cat_id(
         if rotation is not None:
             path += f"/{rotation}"
 
-    if is_uri:
+    if scheme:
         return f"{scheme}://{authority}/{path}"
     else:
         return f"{authority}/{path}"
@@ -154,23 +148,19 @@ def generate_rbac_auth_token(
     subnet: str,
     signing_key: Ed25519Keys,
     role_0_key: Ed25519Keys,
-    cid: str | None = None,
+    scheme: str | None,
     sig: str | None = None,
     username: str | None = None,
-    is_uri: bool = False,
     nonce: str | None = None,
 ) -> str:
 
     token_prefix = f"catid.{username}" if username else "catid."
-    if cid is None:
-        cat_id = f"{token_prefix}{generate_cat_id(
+    cat_id = f"{token_prefix}{generate_cat_id(
+            scheme=scheme,
             network=network, 
             subnet=subnet, 
             role_0_key=role_0_key, 
-            is_uri=is_uri,
             nonce=nonce)}"
-    else:
-        cat_id = f"{token_prefix}{cid}"
 
     if sig is None:
         signature = signing_key.sign(cat_id.encode())
