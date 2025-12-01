@@ -44,6 +44,7 @@ class RBACChain:
             network=self.network,
             subnet=self.subnet,
             role_0_key=role_0_key,
+            signing_key=role_0_key,
             sig=sig,
             username=username,
             nonce=nonce,
@@ -64,7 +65,7 @@ class RBACChain:
                 role_id=role_id,
                 role_0_key=role_0_key,
                 rotation=role_data_arr[-1]["rotation"],
-                schema="id.catalyst",
+                scheme="id.catalyst",
             ),
             role_latest_key,
         )
@@ -103,7 +104,7 @@ def rbac_chain_factory():
 def generate_cat_id(
     network: str,
     role_0_key: Ed25519Keys,
-    scheme: str | None,
+    scheme: str | None = None,
     subnet: str | None = None,
     role_id: RoleID | None = None,
     rotation: str | None = None,
@@ -148,20 +149,20 @@ def generate_rbac_auth_token(
     subnet: str,
     signing_key: Ed25519Keys,
     role_0_key: Ed25519Keys,
-    scheme: str | None,
+    scheme: str | None = None,
     sig: str | None = None,
     username: str | None = None,
     nonce: str | None = None,
 ) -> str:
 
     token_prefix = "catid."
-    cat_id = generate_cat_id(
+    cat_id = f"{token_prefix}{generate_cat_id(
             scheme=scheme,
             network=network,
             subnet=subnet,
             username=username,
             role_0_key=role_0_key,
-            nonce=nonce)
+            nonce=nonce)}."
 
     if sig is None:
         signature = signing_key.sign(cat_id.encode())
@@ -170,7 +171,7 @@ def generate_rbac_auth_token(
 
     signature_b64 = base64_url(signature)
 
-    return f"{token_prefix}{cat_id}.{signature_b64}"
+    return f"{cat_id}{signature_b64}"
 
 
 def base64_url(data: bytes) -> str:
