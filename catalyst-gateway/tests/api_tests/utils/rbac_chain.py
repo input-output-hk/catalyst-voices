@@ -154,13 +154,14 @@ def generate_rbac_auth_token(
     nonce: str | None = None,
 ) -> str:
 
-    token_prefix = f"catid.{username}" if username else "catid."
-    cat_id = f"{token_prefix}{generate_cat_id(
+    token_prefix = "catid."
+    cat_id = generate_cat_id(
             scheme=scheme,
-            network=network, 
-            subnet=subnet, 
-            role_0_key=role_0_key, 
-            nonce=nonce)}"
+            network=network,
+            subnet=subnet,
+            username=username,
+            role_0_key=role_0_key,
+            nonce=nonce)
 
     if sig is None:
         signature = signing_key.sign(cat_id.encode())
@@ -169,7 +170,7 @@ def generate_rbac_auth_token(
 
     signature_b64 = base64_url(signature)
 
-    return f"{cat_id}.{signature_b64}"
+    return f"{token_prefix}{cat_id}.{signature_b64}"
 
 
 def base64_url(data: bytes) -> str:

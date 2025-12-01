@@ -125,7 +125,7 @@ impl CatalystRBACTokenV1 {
         if catalyst_id.username().is_some_and(|n| !n.is_empty()) {
             return Err(anyhow!("Catalyst ID must not contain username"));
         }
-        if catalyst_id.clone().is_uri() {
+        if catalyst_id.is_uri() {
             return Err(anyhow!("Catalyst ID cannot be in URI format"));
         }
         if catalyst_id.nonce().is_none() {

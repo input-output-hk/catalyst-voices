@@ -13,14 +13,15 @@ class AdminKey:
 
     def cat_id(self) -> str:
         return generate_cat_id(
+            scheme="admin.catalyst",
             network="cardano",
             subnet="preprod",
             role_0_key=self.key,
-            scheme="admin.catalyst",
         )
 
     def auth_token(self) -> str:
         return generate_rbac_auth_token(
+            scheme="admin.catalyst",
             network="cardano",
             subnet="preprod",
             role_0_key=self.key,
