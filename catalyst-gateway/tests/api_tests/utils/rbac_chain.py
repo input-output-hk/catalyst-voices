@@ -38,6 +38,7 @@ class RBACChain:
         sig: str | None = None,
         username: str | None = None,
         nonce: str | None = None,
+        cat_id: str | None = None,
     ) -> str:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
         role_0_key = Ed25519Keys(role_0_arr[0]["sk"], Ed25519Type.Bip32Extended)
@@ -50,6 +51,7 @@ class RBACChain:
             sig=sig,
             username=username,
             nonce=nonce,
+            cat_id=cat_id,
         )
 
     # returns a role's catalyst id, with the provided latest role key
@@ -157,16 +159,20 @@ def generate_rbac_auth_token(
     sig: str | None = None,
     username: str | None = None,
     nonce: str | None = None,
+    cat_id: str | None = None,
 ) -> str:
 
     token_prefix = "catid."
-    cat_id = f"{token_prefix}{generate_cat_id(
-            scheme=scheme,
-            network=network,
-            subnet=subnet,
-            username=username,
-            role_0_key=role_0_key,
-            nonce=nonce)}."
+    if cat_id is None:
+        cat_id = f"{token_prefix}{generate_cat_id(
+                scheme=scheme,
+                network=network,
+                subnet=subnet,
+                username=username,
+                role_0_key=role_0_key,
+                nonce=nonce)}."
+    else:
+        cat_id = f"{token_prefix}{cat_id}."
 
     if sig is None:
         signature = signing_key.sign(cat_id.encode())

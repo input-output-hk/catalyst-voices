@@ -32,10 +32,10 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
     resp = get(lookup=None, token=token[:-1] + "=")
     assert(resp.status_code == 401), f"Expected invalid signature: {resp.status_code} - {resp.text}"
     
-    # # Text after `catid.` is not a Catalyst ID -> 401
-    # token = rbac_chain_factory(Chain.Role0).auth_token(cid="not_a_catid")
-    # resp = get(lookup=None, token=token)
-    # assert(resp.status_code == 401), f"Expected invalid Catalyst ID: {resp.status_code} - {resp.text}"
+    # Text after `catid.` is not a Catalyst ID -> 401
+    token = rbac_chain_factory(Chain.Role0).auth_token(cat_id="not_a_catid")
+    resp = get(lookup=None, token=token)
+    assert(resp.status_code == 401), f"Expected invalid Catalyst ID: {resp.status_code} - {resp.text}"
 
     # Auth token has username -> 401
     token = rbac_chain_factory(Chain.Role0).auth_token(username="bob")
