@@ -14,57 +14,44 @@ class SignedDocumentV1(signed_doc.SignedDocumentBase):
         cat_id: str,
         key: Ed25519Keys,
     ) -> str:
-        return build_signed_doc(
-            self.metadata,
-            self.content,
-            key,
-            cat_id,
-        )
+        with (
+            NamedTemporaryFile() as metadata_file,
+            NamedTemporaryFile() as doc_content_file,
+            NamedTemporaryFile() as signed_doc_file,
+        ):
+            mk_signed_doc_path = os.environ["DEP_MK_SIGNED_DOC_PATH"]
+            json_str = json.dumps(self.metadata)
+            metadata_file.write(json_str.encode(encoding="utf-8"))
+            metadata_file.flush()
 
-def build_signed_doc(
-    metadata_json: Dict[str, Any],
-    doc_content_json: Dict[str, Any],
-    key: Ed25519Keys,
-    cat_id: str,
-) -> str:
-    with (
-        NamedTemporaryFile() as metadata_file,
-        NamedTemporaryFile() as doc_content_file,
-        NamedTemporaryFile() as signed_doc_file,
-    ):
-        mk_signed_doc_path = os.environ["DEP_MK_SIGNED_DOC_PATH"]
-        json_str = json.dumps(metadata_json)
-        metadata_file.write(json_str.encode(encoding="utf-8"))
-        metadata_file.flush()
+            json_str = json.dumps(self.content)
+            doc_content_file.write(json_str.encode(encoding="utf-8"))
+            doc_content_file.flush()
 
-        json_str = json.dumps(doc_content_json)
-        doc_content_file.write(json_str.encode(encoding="utf-8"))
-        doc_content_file.flush()
+            subprocess.run(
+                [
+                    mk_signed_doc_path,
+                    "build",
+                    doc_content_file.name,
+                    signed_doc_file.name,
+                    metadata_file.name,
+                ],
+                capture_output=True,
+            )
 
-        subprocess.run(
-            [
-                mk_signed_doc_path,
-                "build",
-                doc_content_file.name,
-                signed_doc_file.name,
-                metadata_file.name,
-            ],
-            capture_output=True,
-        )
+            subprocess.run(
+                [
+                    mk_signed_doc_path,
+                    "sign",
+                    signed_doc_file.name,
+                    key.sk_hex,
+                    cat_id,
+                ],
+                capture_output=True,
+            )
 
-        subprocess.run(
-            [
-                mk_signed_doc_path,
-                "sign",
-                signed_doc_file.name,
-                key.sk_hex,
-                cat_id,
-            ],
-            capture_output=True,
-        )
-
-        signed_doc_hex = signed_doc_file.read().hex()
-        return signed_doc_hex
+            signed_doc_hex = signed_doc_file.read().hex()
+            return signed_doc_hex
 
 
 # ------------------- #
