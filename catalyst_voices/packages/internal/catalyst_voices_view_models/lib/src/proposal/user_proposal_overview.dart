@@ -53,8 +53,7 @@ final class UsersProposalOverview extends Equatable {
       category: proposalData.categoryName,
       fundNumber: proposalData.fundNumber,
       fromActiveCampaign: fromActiveCampaign,
-      collaborators:
-          proposalData.collaborators?.map(Collaborator.fromBriefData).toList() ?? [],
+      collaborators: proposalData.collaborators?.map(Collaborator.fromBriefData).toList() ?? [],
     );
   }
 
