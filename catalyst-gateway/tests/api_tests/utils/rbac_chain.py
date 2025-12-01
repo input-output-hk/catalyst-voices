@@ -168,9 +168,9 @@ def generate_rbac_auth_token(
             subnet=subnet, 
             role_0_key=role_0_key, 
             is_uri=is_uri,
-            nonce=nonce)}."
+            nonce=nonce)}"
     else:
-        cat_id = f"{token_prefix}:{cid}."
+        cat_id = f"{token_prefix}{cid}"
 
     if sig is None:
         signature = signing_key.sign(cat_id.encode())
@@ -179,7 +179,7 @@ def generate_rbac_auth_token(
 
     signature_b64 = base64_url(signature)
 
-    return f"{cat_id}{signature_b64}"
+    return f"{cat_id}.{signature_b64}"
 
 
 def base64_url(data: bytes) -> str:
