@@ -58,7 +58,7 @@ services:
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - INTERNAL_API_KEY=123
       # cspell: disable
-      - SIGNED_DOC_ADMIN_KEY=admin.catalyst://preprod.cardano/eRJ8lj3AxU2D4ZXpT_TC-pyJPG3wjBNqn2M6Y06dj-o
+      - SIGNED_DOC_ADMIN_KEY=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
       # cspell: enable
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"

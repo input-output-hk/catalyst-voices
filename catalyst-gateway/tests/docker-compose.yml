@@ -104,7 +104,7 @@ services:
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
       # cspell: disable
-      - SIGNED_DOC_ADMIN_KEY=admin.catalyst://preprod.cardano/eRJ8lj3AxU2D4ZXpT_TC-pyJPG3wjBNqn2M6Y06dj-o
+      - SIGNED_DOC_ADMIN_KEY=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
       # cspell: enable
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
@@ -158,7 +158,7 @@ services:
     environment:
       - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
       - CAT_GATEWAY_INTERNAL_API_KEY=123
-      - CAT_GATEWAY_ADMIN_PRIVATE_KEY=0614be970a569b904acf01936890e0c80bcea9b65f15edb0d1f54c85fdcd7b26
+      - CAT_GATEWAY_ADMIN_PRIVATE_KEY=4dc7e0388d106e973d602044daae8838b16bbae651a368d0b5c0d8ee990e09b4
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
     command: >
