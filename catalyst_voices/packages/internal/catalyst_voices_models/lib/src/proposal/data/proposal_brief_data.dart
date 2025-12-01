@@ -1,8 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
   final DocumentRef id;
+  // TODO(damian-molinski): To be implemented
+  final int fundNumber;
   final String authorName;
   final String title;
   final String description;
@@ -15,12 +18,13 @@ final class ProposalBriefData extends Equatable {
   final bool isFinal;
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
-  // TODO(damina-molinski): To be implemented
+  // TODO(damian-molinski): To be implemented
   final List<ProposalBriefDataVersion>? versions;
   final List<ProposalBriefDataCollaborator>? collaborators;
 
   const ProposalBriefData({
     required this.id,
+    required this.fundNumber,
     required this.authorName,
     required this.title,
     required this.description,
@@ -40,6 +44,7 @@ final class ProposalBriefData extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    fundNumber,
     authorName,
     title,
     description,
@@ -55,6 +60,20 @@ final class ProposalBriefData extends Equatable {
     versions,
     collaborators,
   ];
+  DateTime get updateDate => id.ver?.dateTime ?? id.id.dateTime;
+}
+
+final class ProposalBriefDataCollaborator extends Equatable {
+  final CatalystId id;
+  final ProposalsCollaborationStatus status;
+
+  const ProposalBriefDataCollaborator({
+    required this.id,
+    required this.status,
+  });
+
+  @override
+  List<Object?> get props => [id, status];
 }
 
 final class ProposalBriefDataVersion extends Equatable {
@@ -81,18 +100,4 @@ final class ProposalBriefDataVotes extends Equatable {
 
   @override
   List<Object?> get props => [draft, casted];
-}
-
-
-final class ProposalBriefDataCollaborator extends Equatable {
-  final CatalystId id;
-  final ProposalsCollaborationStatusFilter status;
-
-  const ProposalBriefDataCollaborator({
-    required this.id,
-    required this.status,
-  });
-
-  @override
-  List<Object?> get props => [id, status];
 }

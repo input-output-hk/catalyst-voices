@@ -130,11 +130,11 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerFactory<WorkspaceBloc>(() {
         return WorkspaceBloc(
+          get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
           get<DocumentMapper>(),
           get<DownloaderService>(),
-          get<UserService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {

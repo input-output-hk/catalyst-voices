@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/user_proposals/user_proposal_section.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/images/voices_image_scheme.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -12,9 +13,9 @@ class UserProposalInvitesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalInvites>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
       selector: (state) {
-        return state.userProposalInvites.pendingInvites;
+        return state.userProposalInvites.userProposalInvites;
       },
       builder: (context, invites) {
         return _PendingProposalInvites(invites: invites);
@@ -47,7 +48,7 @@ class _EmptyProposalInvites extends StatelessWidget {
 }
 
 class _PendingProposalInvites extends StatelessWidget {
-  final UserProposalInvites invites;
+  final UserProposalsView invites;
 
   const _PendingProposalInvites({required this.invites});
 
@@ -57,14 +58,12 @@ class _PendingProposalInvites extends StatelessWidget {
       return const _EmptyProposalInvites();
     }
 
-    return SliverList.builder(
-      itemCount: invites.items.length,
-      itemBuilder: (context, index) {
-        // final item = invites.items[index];
-
-        // TODO(LynxLynxx): Return invite widget
-        return const Text('');
-      },
+    // TODO(LynxLynxx): Update this to proper Invites section
+    return UserProposalSection(
+      items: invites.items,
+      emptyTextMessage: '',
+      title: context.l10n.notActiveCampaign,
+      info: context.l10n.notActiveCampaignInfoMarkdown,
     );
   }
 }

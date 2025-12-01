@@ -8,12 +8,13 @@ final class UsersProposalOverview extends Equatable {
   final DateTime updateDate;
   final Money fundsRequested;
   final ProposalPublish publish;
+  final int iteration;
   final List<ProposalVersionViewModel> versions;
   final int commentsCount;
   final String category;
-  final SignedDocumentRef categoryId;
   final int fundNumber;
   final bool fromActiveCampaign;
+  final List<CollaboratorInvite> collaborators;
 
   const UsersProposalOverview({
     required this.id,
@@ -21,44 +22,45 @@ final class UsersProposalOverview extends Equatable {
     required this.updateDate,
     required this.fundsRequested,
     required this.publish,
+    required this.iteration,
     required this.versions,
     required this.commentsCount,
     required this.category,
-    required this.categoryId,
     required this.fundNumber,
     required this.fromActiveCampaign,
+    this.collaborators = const [],
   });
 
-  factory UsersProposalOverview.fromProposal(
-    DetailProposal proposal,
-    int fundNumber,
-    String categoryName, {
+  factory UsersProposalOverview.fromProposalBriefData({
+    required ProposalBriefData proposalData,
     required bool fromActiveCampaign,
   }) {
+    final publish = _ProposalPublishExt.getStatus(
+      isFinal: proposalData.isFinal,
+      ref: proposalData.id,
+    );
+
     return UsersProposalOverview(
-      id: proposal.id,
-      title: proposal.title,
-      updateDate: proposal.updateDate,
-      fundsRequested: proposal.fundsRequested,
-      publish: proposal.publish,
-      versions: proposal.versions.toViewModels(),
-      commentsCount: proposal.commentsCount,
-      category: categoryName,
-      categoryId: proposal.categoryRef,
-      fundNumber: fundNumber,
+      id: proposalData.id,
+      title: proposalData.title,
+      updateDate: proposalData.updateDate,
+      fundsRequested: proposalData.fundsRequested,
+      publish: publish,
+      iteration: proposalData.iteration,
+      // TODO(LynxLynxx): map versions when they will be implemented
+      versions: const [],
+      commentsCount: proposalData.commentsCount ?? 0,
+      category: proposalData.categoryName,
+      fundNumber: proposalData.fundNumber,
       fromActiveCampaign: fromActiveCampaign,
+      collaborators:
+          proposalData.collaborators?.map(CollaboratorInvite.fromBriefData).toList() ?? [],
     );
   }
 
   bool get hasNewerLocalIteration {
     if (versions.isEmpty) return false;
     return versions.any((version) => version.isLatestLocal) && !publish.isLocal;
-  }
-
-  int get iteration {
-    if (versions.isEmpty) return DocumentVersion.firstNumber;
-
-    return versions.firstWhere((version) => version.id == id).versionNumber;
   }
 
   @override
@@ -71,9 +73,10 @@ final class UsersProposalOverview extends Equatable {
     versions,
     commentsCount,
     category,
-    categoryId,
     fundNumber,
     fromActiveCampaign,
+    collaborators,
+    iteration,
   ];
 
   UsersProposalOverview copyWith({
@@ -82,12 +85,14 @@ final class UsersProposalOverview extends Equatable {
     DateTime? updateDate,
     Money? fundsRequested,
     ProposalPublish? publish,
+    int? iteration,
     List<ProposalVersionViewModel>? versions,
     int? commentsCount,
     String? category,
     SignedDocumentRef? categoryId,
     int? fundNumber,
     bool? fromActiveCampaign,
+    List<CollaboratorInvite>? collaborators,
   }) {
     return UsersProposalOverview(
       id: id ?? this.id,
@@ -95,12 +100,25 @@ final class UsersProposalOverview extends Equatable {
       updateDate: updateDate ?? this.updateDate,
       fundsRequested: fundsRequested ?? this.fundsRequested,
       publish: publish ?? this.publish,
+      iteration: iteration ?? this.iteration,
       versions: versions ?? this.versions,
       commentsCount: commentsCount ?? this.commentsCount,
       category: category ?? this.category,
-      categoryId: categoryId ?? this.categoryId,
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
+      collaborators: collaborators ?? this.collaborators,
     );
+  }
+}
+
+extension _ProposalPublishExt on ProposalPublish {
+  static ProposalPublish getStatus({required bool isFinal, required DocumentRef ref}) {
+    if (isFinal) {
+      return ProposalPublish.submittedProposal;
+    } else if (!isFinal && DocumentRef is SignedDocumentRef) {
+      return ProposalPublish.publishedDraft;
+    } else {
+      return ProposalPublish.localDraft;
+    }
   }
 }

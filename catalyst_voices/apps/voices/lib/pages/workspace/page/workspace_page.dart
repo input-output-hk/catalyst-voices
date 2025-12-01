@@ -70,6 +70,9 @@ class _WorkspacePageState extends State<WorkspacePage>
 
     if (widget.tab != oldWidget.tab) {
       _tabController.animateToTab(tab);
+      context.read<WorkspaceBloc>().add(
+        ChangeWorkspaceFilters(tab: tab),
+      );
     }
   }
 
@@ -113,13 +116,6 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   void initState() {
     super.initState();
-    final bloc = context.read<WorkspaceBloc>();
-    // ignore: cascade_invocations
-    bloc
-      ..add(const WatchUserCatalystIdEvent())
-      ..add(const WatchUserProposalsEvent())
-      ..add(const GetTimelineItemsEvent());
-
     final selectedTab = _determineTab(widget.tab);
 
     _tabController = VoicesTabController(
@@ -127,6 +123,16 @@ class _WorkspacePageState extends State<WorkspacePage>
       tabs: WorkspacePageTab.values,
       vsync: this,
     );
+
+    _tabController.addListener(() {
+      context.read<WorkspaceBloc>().add(
+        ChangeWorkspaceFilters(tab: _tabController.tab),
+      );
+    });
+
+    context.read<WorkspaceBloc>()
+      ..add(InitWorkspaceEvent(tab: selectedTab))
+      ..add(const GetTimelineItemsEvent());
   }
 
   WorkspacePageTab _determineTab(WorkspacePageTab? initialTab) {

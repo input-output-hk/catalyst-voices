@@ -94,7 +94,7 @@ class _WorkspaceProposalFilters extends StatelessWidget {
   }
 
   void _changeFilter(BuildContext context, WorkspaceFilters filter) {
-    context.read<WorkspaceBloc>().add(ChangeWorkspaceFilters(filter));
+    context.read<WorkspaceBloc>().add(ChangeWorkspaceFilters(filters: filter));
   }
 }
 

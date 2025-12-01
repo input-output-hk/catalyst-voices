@@ -43,6 +43,18 @@ final class ProposalsCollaborationFilters extends Equatable {
 
   @override
   List<Object?> get props => [collaborator, status, excludeStatus];
+
+  ProposalsCollaborationFilters copyWith({
+    Optional<CatalystId>? collaborator,
+    Optional<ProposalsCollaborationStatusFilter>? status,
+    Optional<ProposalsCollaborationStatusFilter>? excludeStatus,
+  }) {
+    return ProposalsCollaborationFilters(
+      collaborator: collaborator.dataOr(this.collaborator),
+      status: status.dataOr(this.status),
+      excludeStatus: excludeStatus.dataOr(this.excludeStatus),
+    );
+  }
 }
 
 enum ProposalsCollaborationStatusFilter {

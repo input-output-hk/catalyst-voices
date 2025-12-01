@@ -6,47 +6,56 @@ import 'package:equatable/equatable.dart';
 /// Cache for [WorkspaceBloc].
 final class WorkspaceBlocCache extends Equatable {
   final Campaign? campaign;
-  final List<UsersProposalOverview>? proposals;
-  // TODO(LynxLynxx): Update to proper View model
-  final List<Object>? invites;
   final CatalystId? activeAccountId;
-  final int invitesCount;
-  final int proposalCount;
+  final WorkspacePageTab? activeTab;
+  final ProposalsFiltersV2 proposalsFilters;
+  final WorkspaceFilters workspaceFilter;
+  final List<CampaignCategory>? categories;
+  final List<UsersProposalOverview>? proposals;
+  final List<UsersProposalOverview>? userProposalInvites;
 
   const WorkspaceBlocCache({
     this.campaign,
-    this.proposals,
-    this.invites,
     this.activeAccountId,
-    this.invitesCount = 0,
-    this.proposalCount = 0,
+    this.activeTab,
+    this.workspaceFilter = WorkspaceFilters.allProposals,
+    this.proposalsFilters = const ProposalsFiltersV2(),
+    this.categories,
+    this.proposals,
+    this.userProposalInvites,
   });
 
   @override
   List<Object?> get props => [
     campaign,
-    proposals,
-    invites,
     activeAccountId,
-    invitesCount,
-    proposalCount,
+    activeTab,
+    workspaceFilter,
+    proposalsFilters,
+    categories,
+    proposals,
+    userProposalInvites,
   ];
 
   WorkspaceBlocCache copyWith({
     Optional<Campaign>? campaign,
-    Optional<List<UsersProposalOverview>>? proposals,
-    Optional<List<Object>>? invites,
     Optional<CatalystId>? activeAccountId,
-    int? invitesCount,
-    int? proposalCount,
+    Optional<WorkspacePageTab>? activeTab,
+    ProposalsFiltersV2? proposalsFilters,
+    WorkspaceFilters? workspaceFilter,
+    Optional<List<CampaignCategory>>? categories,
+    Optional<List<UsersProposalOverview>>? proposals,
+    Optional<List<UsersProposalOverview>>? userProposalInvites,
   }) {
     return WorkspaceBlocCache(
       campaign: campaign.dataOr(this.campaign),
-      proposals: proposals.dataOr(this.proposals),
-      invites: invites.dataOr(this.invites),
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
-      invitesCount: invitesCount ?? this.invitesCount,
-      proposalCount: proposalCount ?? this.proposalCount,
+      activeTab: activeTab.dataOr(this.activeTab),
+      proposalsFilters: proposalsFilters ?? this.proposalsFilters,
+      workspaceFilter: workspaceFilter ?? this.workspaceFilter,
+      categories: categories.dataOr(this.categories),
+      proposals: proposals.dataOr(this.proposals),
+      userProposalInvites: userProposalInvites.dataOr(this.userProposalInvites),
     );
   }
 }

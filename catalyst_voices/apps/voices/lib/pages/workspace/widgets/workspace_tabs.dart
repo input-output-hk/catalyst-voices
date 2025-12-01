@@ -42,7 +42,7 @@ class _TabText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<WorkspaceBloc, WorkspaceState, int>(
-      selector: (state) => state.proposalInvitesCount.ofType(tab),
+      selector: (state) => state.count[tab] ?? 0,
       builder: (context, count) => VoicesTabText(tab.noOf(context, count: count)),
     );
   }
