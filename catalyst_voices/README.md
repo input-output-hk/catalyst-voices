@@ -22,10 +22,12 @@ This repository contains the Catalyst Voices app and packages.
             * [Using Feature Flags with --dart-define](#using-feature-flags-with---dart-define)
         * [Code Generation](#code-generation)
             * [Running Code Generation](#running-code-generation)
-                * [Basic Generation](#basic-generation)
-                * [Local Saving](#local-saving)
-            * [GitHub Token / PAT Setup](#github-token--pat-setup)
-            * [Security Notes](#security-notes)
+    * [Code Generation](#code-generation)
+      *[Running Code Generation](#running-code-generation)
+        * [Basic Generation](#basic-generation)
+      *[Local Saving](#local-saving)
+        * [GitHub Token / PAT Setup](#github-token--pat-setup)
+        * [Security Notes](#security-notes)
     * [Running Tests](#running-tests)
 
 ## Requirements

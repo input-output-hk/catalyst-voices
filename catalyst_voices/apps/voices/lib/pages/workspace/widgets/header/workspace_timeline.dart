@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/workspace/header/workspace_campaign_timeline.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/header/workspace_campaign_timeline.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';

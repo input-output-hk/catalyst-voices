@@ -29,6 +29,7 @@ void main() {
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),
         publish: ProposalPublish.publishedDraft,
+        iteration: 3,
         versions: [
           ProposalVersionViewModel(
             publish: ProposalPublish.localDraft,
@@ -61,7 +62,6 @@ void main() {
         fundNumber: 14,
         commentsCount: 0,
         category: 'Cardano Use Cases: Concept',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         fromActiveCampaign: true,
       );
     });

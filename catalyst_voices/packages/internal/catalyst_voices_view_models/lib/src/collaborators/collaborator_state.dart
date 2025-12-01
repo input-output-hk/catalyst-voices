@@ -17,7 +17,7 @@ sealed class Collaborators extends Equatable {
 
   /// Filters collaborator by [activeAccountId].
   /// - Returns all [collaborators] if [activeAccountId] is [authorId] or one of [collaborators].
-  /// - Returns collaborators with [CollaboratorInvitationStatus.accepted] status otherwise.
+  /// - Returns collaborators with [ProposalsCollaborationStatus.accepted] status otherwise.
   factory Collaborators.filterByActiveAccount({
     required CatalystId? activeAccountId,
     required CatalystId? authorId,
@@ -33,7 +33,7 @@ sealed class Collaborators extends Equatable {
     }
 
     return AcceptedCollaborators(
-      collaborators.where((e) => e.status == CollaboratorInvitationStatus.accepted).toList(),
+      collaborators.where((e) => e.status == ProposalsCollaborationStatus.accepted).toList(),
     );
   }
 

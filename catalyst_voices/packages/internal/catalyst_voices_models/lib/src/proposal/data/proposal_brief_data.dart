@@ -1,8 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
   final DocumentRef id;
+  // TODO(damian-molinski): To be implemented
+  final int fundNumber;
   final CatalystId? author;
   final String title;
   final String description;
@@ -15,9 +18,13 @@ final class ProposalBriefData extends Equatable {
   final bool isFinal;
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
+  // TODO(damian-molinski): To be implemented
+  final List<ProposalBriefDataVersion>? versions;
+  final List<ProposalBriefDataCollaborator>? collaborators;
 
   const ProposalBriefData({
     required this.id,
+    required this.fundNumber,
     required this.author,
     required this.title,
     required this.description,
@@ -30,11 +37,14 @@ final class ProposalBriefData extends Equatable {
     this.isFinal = false,
     this.isFavorite = false,
     this.votes,
+    this.versions,
+    this.collaborators,
   });
 
   @override
   List<Object?> get props => [
     id,
+    fundNumber,
     author,
     title,
     description,
@@ -47,7 +57,36 @@ final class ProposalBriefData extends Equatable {
     isFinal,
     isFavorite,
     votes,
+    versions,
+    collaborators,
   ];
+  DateTime get updateDate => id.ver?.dateTime ?? id.id.dateTime;
+}
+
+final class ProposalBriefDataCollaborator extends Equatable {
+  final CatalystId id;
+  final ProposalsCollaborationStatus status;
+
+  const ProposalBriefDataCollaborator({
+    required this.id,
+    required this.status,
+  });
+
+  @override
+  List<Object?> get props => [id, status];
+}
+
+final class ProposalBriefDataVersion extends Equatable {
+  final DocumentRef ref;
+  final String? title;
+
+  const ProposalBriefDataVersion({
+    required this.ref,
+    this.title,
+  });
+
+  @override
+  List<Object?> get props => [ref, title];
 }
 
 final class ProposalBriefDataVotes extends Equatable {

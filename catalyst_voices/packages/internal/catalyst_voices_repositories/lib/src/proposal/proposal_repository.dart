@@ -45,9 +45,8 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef actionId,
+    required SignedDocumentRef proposalId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -191,9 +190,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef actionId,
+    required SignedDocumentRef proposalId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -201,14 +199,17 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+    // TODO(LynxLynxx): implement new method. _documentRepository.getDocumentMetadata to receive only metadata
+    final documentData = await _documentRepository.getDocumentData(id: proposalId);
+    final categoryId = documentData.metadata.categoryId!;
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
       metadata: SignedDocumentMetadata(
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
-        id: actionRef.id,
-        ver: actionRef.ver,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
+        id: actionId.id,
+        ver: actionId.ver,
+        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalId),
         categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
       ),
       catalystId: catalystId,

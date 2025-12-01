@@ -29,6 +29,40 @@ final class ProposalsCampaignFilters extends Equatable {
   String toString() => 'categoriesIds: $categoriesIds';
 }
 
+// TODO(damian-molinski): It should pick between looking only collaborators or author
+final class ProposalsCollaborationFilters extends Equatable {
+  final CatalystId? collaborator;
+  final ProposalsCollaborationStatusFilter? status;
+  final ProposalsCollaborationStatusFilter? excludeStatus;
+
+  const ProposalsCollaborationFilters({
+    this.collaborator,
+    this.status,
+    this.excludeStatus,
+  });
+
+  @override
+  List<Object?> get props => [collaborator, status, excludeStatus];
+
+  ProposalsCollaborationFilters copyWith({
+    Optional<CatalystId>? collaborator,
+    Optional<ProposalsCollaborationStatusFilter>? status,
+    Optional<ProposalsCollaborationStatusFilter>? excludeStatus,
+  }) {
+    return ProposalsCollaborationFilters(
+      collaborator: collaborator.dataOr(this.collaborator),
+      status: status.dataOr(this.status),
+      excludeStatus: excludeStatus.dataOr(this.excludeStatus),
+    );
+  }
+}
+
+enum ProposalsCollaborationStatusFilter {
+  accepted,
+  rejected,
+  pending,
+}
+
 /// A set of filters to be applied when querying for proposals.
 final class ProposalsFiltersV2 extends Equatable {
   /// Filters proposals by their effective status. If null, this filter is not applied.
@@ -69,6 +103,8 @@ final class ProposalsFiltersV2 extends Equatable {
   /// Temporary filter only for mocked implementation of [voteBy].
   final List<String>? ids;
 
+  final ProposalsCollaborationFilters? collaboration;
+
   /// Creates a set of filters for querying proposals.
   const ProposalsFiltersV2({
     this.status,
@@ -80,6 +116,7 @@ final class ProposalsFiltersV2 extends Equatable {
     this.campaign,
     this.voteBy,
     this.ids,
+    this.collaboration,
   });
 
   @override
@@ -93,6 +130,7 @@ final class ProposalsFiltersV2 extends Equatable {
     campaign,
     voteBy,
     ids,
+    collaboration,
   ];
 
   ProposalsFiltersV2 copyWith({
@@ -105,6 +143,7 @@ final class ProposalsFiltersV2 extends Equatable {
     Optional<ProposalsCampaignFilters>? campaign,
     Optional<CatalystId>? voteBy,
     Optional<List<String>>? ids,
+    Optional<ProposalsCollaborationFilters>? collaboration,
   }) {
     return ProposalsFiltersV2(
       status: status.dataOr(this.status),
@@ -116,6 +155,7 @@ final class ProposalsFiltersV2 extends Equatable {
       campaign: campaign.dataOr(this.campaign),
       voteBy: voteBy.dataOr(this.voteBy),
       ids: ids.dataOr(this.ids),
+      collaboration: collaboration.dataOr(this.collaboration),
     );
   }
 
@@ -150,6 +190,9 @@ final class ProposalsFiltersV2 extends Equatable {
     }
     if (ids != null) {
       parts.add('ids: ${ids!.join(',')}');
+    }
+    if (collaboration != null) {
+      parts.add('collaboration: $collaboration');
     }
 
     buffer

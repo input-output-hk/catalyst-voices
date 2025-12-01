@@ -133,6 +133,10 @@
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
   },
+  "allProposals": "All Proposals",
+  "@allProposals": {
+    "description": "text indicating to view all proposals"
+  },
   "andSign": "&",
   "@andSign": {
     "description": "Generic and sign"
@@ -484,6 +488,10 @@
   "close": "Close",
   "@close": {
     "description": "CTA To close something"
+  },
+  "collaborator": "Co-Proposer",
+  "@collaborator": {
+    "description": "text indicating to view Collaborator proposals"
   },
   "collaboratorCatalystIdIsMissingProposerRole": "This Catalyst ID is missing Proposer role. Only Proposers can be added as Co-Proposers",
   "@collaboratorCatalystIdIsMissingProposerRole": {
@@ -1874,6 +1882,10 @@
   "@lockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after locking the keychain."
   },
+  "mainProposer": "Main Proposer",
+  "@mainProposer": {
+    "description": "text indicating to view Main Proposer proposals"
+  },
   "mainnetNetworkId": "Mainnet",
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
@@ -2090,6 +2102,24 @@
       }
     }
   },
+  "noOfProposalInvites": "Proposal Invites · {count}",
+  "@noOfProposalInvites": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfProposals": "Proposals · {count}",
+  "@noOfProposals": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfVotedOn": "Voted On · {count}",
   "@noOfVotedOn": {
     "description": "Tab label for voted on proposals in voting space",
@@ -2098,6 +2128,10 @@
         "type": "int"
       }
     }
+  },
+  "noPendingInvitesMessage": "You don’t have any proposal invites",
+  "@noPendingInvitesMessage": {
+    "description": "Message shown when user don't have any pending messages"
   },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {

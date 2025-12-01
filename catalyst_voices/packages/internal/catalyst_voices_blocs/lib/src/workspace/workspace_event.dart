@@ -4,6 +4,16 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class ChangeWorkspaceFilters extends WorkspaceEvent {
+  final WorkspaceFilters? filters;
+  final WorkspacePageTab? tab;
+
+  const ChangeWorkspaceFilters({this.filters, this.tab});
+
+  @override
+  List<Object?> get props => [...super.props, filters, tab];
+}
+
 final class DeleteDraftProposalEvent extends WorkspaceEvent {
   final DraftRef ref;
 
@@ -54,6 +64,33 @@ final class ImportProposalEvent extends WorkspaceEvent {
   List<Object?> get props => proposalData;
 }
 
+final class InitWorkspaceEvent extends WorkspaceEvent {
+  final WorkspacePageTab? tab;
+
+  const InitWorkspaceEvent({this.tab});
+
+  @override
+  List<Object?> get props => [tab];
+}
+
+final class InternalDataChangeEvent extends WorkspaceEvent {
+  final Page<UsersProposalOverview> page;
+
+  const InternalDataChangeEvent(this.page);
+
+  @override
+  List<Object?> get props => [page];
+}
+
+final class InternalTabCountChangeEvent extends WorkspaceEvent {
+  final Map<WorkspacePageTab, int> count;
+
+  const InternalTabCountChangeEvent(this.count);
+
+  @override
+  List<Object?> get props => [count];
+}
+
 final class LoadProposalsEvent extends WorkspaceEvent {
   final List<UsersProposalOverview> proposals;
 
@@ -72,8 +109,16 @@ final class UnlockProposalEvent extends WorkspaceEvent {
   List<Object?> get props => [ref];
 }
 
+final class WatchUserCatalystIdEvent extends WorkspaceEvent {
+  const WatchUserCatalystIdEvent();
+}
+
 final class WatchUserProposalsEvent extends WorkspaceEvent {
   const WatchUserProposalsEvent();
+}
+
+final class WatchActiveCampaignChangeEvent extends WorkspaceEvent {
+  const WatchActiveCampaignChangeEvent();
 }
 
 sealed class WorkspaceEvent extends Equatable {
