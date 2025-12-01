@@ -170,7 +170,8 @@ DocumentData _buildDoc({
   DocumentRef? ref,
   SignedDocumentRef? reply,
   SignedDocumentRef? template,
-  SignedDocumentRef? categoryId,
+  List<CatalystId>? collaborators,
+  List<DocumentRef>? parameters,
   List<CatalystId>? authors,
   bool isDraft = false,
 }) {
@@ -179,12 +180,16 @@ DocumentData _buildDoc({
 
   final metadata = DocumentDataMetadata(
     type: type,
+    contentType: DocumentContentType.json,
     id: DocumentRef.build(id: id, ver: ver, isDraft: isDraft),
     section: section,
     ref: ref,
     reply: reply,
     template: template,
-    categoryId: categoryId,
+    collaborators: collaborators,
+    parameters: DocumentParameters(
+      (parameters ?? []).map((e) => e.toSignedDocumentRef()).toSet(),
+    ),
     authors: authors,
   );
 
@@ -228,7 +233,7 @@ List<DocumentData> _generateDocuments(
       ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
       reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
       template: DocumentRefFactory.signedDocumentRef(),
-      categoryId: DocumentRefFactory.signedDocumentRef(),
+      parameters: [DocumentRefFactory.signedDocumentRef()],
       type: index.isEven
           ? DocumentType.proposalDocument
           : DocumentType.commentDocument,

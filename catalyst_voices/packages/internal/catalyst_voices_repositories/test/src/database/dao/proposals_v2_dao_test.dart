@@ -36,6 +36,10 @@ void main() {
       final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
       final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
+      final cat1 = DocumentRefFactory.signedDocumentRef();
+      final cat2 = DocumentRefFactory.signedDocumentRef();
+      final cat3 = DocumentRefFactory.signedDocumentRef();
+
       test('returns 0 for empty database', () async {
         final result = await dao.getVisibleProposalsCount();
 
@@ -152,25 +156,25 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(latest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
         );
 
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: _buildUuidV7At(middle),
-          categoryId: 'cat-2',
+          parameters: [cat2],
         );
 
         final proposal3 = _createTestDocumentEntity(
           id: 'p3',
           ver: _buildUuidV7At(earliest),
-          categoryId: 'cat-3',
+          parameters: [cat2],
         );
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
 
         final result = await dao.getVisibleProposalsCount(
-          filters: const ProposalsFiltersV2(categoryId: 'cat-1'),
+          filters: ProposalsFiltersV2(categoryId: cat1.id),
         );
 
         expect(result, 1);
@@ -180,26 +184,26 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(latest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
         );
 
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: _buildUuidV7At(middle),
-          categoryId: 'cat-2',
+          parameters: [cat2],
         );
 
         final proposal3 = _createTestDocumentEntity(
           id: 'p3',
           ver: _buildUuidV7At(earliest),
-          categoryId: 'cat-3',
+          parameters: [cat3],
         );
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
 
         final result = await dao.getVisibleProposalsCount(
-          filters: const ProposalsFiltersV2(
-            campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+          filters: ProposalsFiltersV2(
+            campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
           ),
         );
 
@@ -210,7 +214,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(latest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
         );
         await db.documentsV2Dao.saveAll([proposal1]);
 
@@ -227,14 +231,14 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(latest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
         );
         await db.documentsV2Dao.saveAll([proposal1]);
 
         final result = await dao.getVisibleProposalsCount(
-          filters: const ProposalsFiltersV2(
-            campaign: ProposalsCampaignFilters(categoriesIds: {'cat-2', 'cat-3'}),
-            categoryId: 'cat-1',
+          filters: ProposalsFiltersV2(
+            campaign: ProposalsCampaignFilters(categoriesIds: {cat2.id, cat3.id}),
+            categoryId: cat1.id,
           ),
         );
 
@@ -3851,6 +3855,8 @@ void main() {
           });
 
           test('applies author, category, and search filters together', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
             final author1 = _createTestAuthor(name: 'john', role0KeySeed: 1);
             final author2 = _createTestAuthor(name: 'jane', role0KeySeed: 2);
 
@@ -3858,7 +3864,7 @@ void main() {
               id: 'matching',
               ver: _buildUuidV7At(latest),
               authors: author1.toString(),
-              categoryId: 'cat-1',
+              parameters: [cat1],
               contentData: {
                 'setup': {
                   'title': {'title': 'Blockchain Project'},
@@ -3870,7 +3876,7 @@ void main() {
               id: 'wrong-author',
               ver: _buildUuidV7At(middle.add(const Duration(hours: 2))),
               authors: author2.toString(),
-              categoryId: 'cat-1',
+              parameters: [cat1],
               contentData: {
                 'setup': {
                   'title': {'title': 'Blockchain Project'},
@@ -3882,7 +3888,7 @@ void main() {
               id: 'wrong-category',
               ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
               authors: author1.toString(),
-              categoryId: 'cat-2',
+              parameters: [cat2],
               contentData: {
                 'setup': {
                   'title': {'title': 'Blockchain Project'},
@@ -3894,7 +3900,7 @@ void main() {
               id: 'wrong-title',
               ver: _buildUuidV7At(middle),
               authors: author1.toString(),
-              categoryId: 'cat-1',
+              parameters: [cat1],
               contentData: {
                 'setup': {
                   'title': {'title': 'Other Project'},
@@ -3914,7 +3920,7 @@ void main() {
               request: request,
               filters: ProposalsFiltersV2(
                 author: author1,
-                categoryId: 'cat-1',
+                categoryId: cat1.id,
                 searchQuery: 'Blockchain',
               ),
             );
@@ -3927,22 +3933,26 @@ void main() {
 
         group('by campaign', () {
           test('filters proposals by campaign categories', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+            final cat3 = DocumentRefFactory.signedDocumentRef();
+
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
-              categoryId: 'cat-2',
+              parameters: [cat2],
             );
 
             final proposal3 = _createTestDocumentEntity(
               id: 'p3',
               ver: _buildUuidV7At(middle),
-              categoryId: 'cat-3',
+              parameters: [cat3],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
@@ -3950,8 +3960,8 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(
               request: request,
-              filters: const ProposalsFiltersV2(
-                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+              filters: ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
               ),
             );
 
@@ -3961,16 +3971,19 @@ void main() {
           });
 
           test('returns empty when campaign categories is empty', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle),
-              categoryId: 'cat-2',
+              parameters: [cat2],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2]);
@@ -3988,22 +4001,26 @@ void main() {
           });
 
           test('combines categoryId with campaign filter when compatible', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+            final cat3 = DocumentRefFactory.signedDocumentRef();
+
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
-              categoryId: 'cat-2',
+              parameters: [cat2],
             );
 
             final proposal3 = _createTestDocumentEntity(
               id: 'p3',
               ver: _buildUuidV7At(middle),
-              categoryId: 'cat-3',
+              parameters: [cat3],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
@@ -4011,35 +4028,39 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(
               request: request,
-              filters: const ProposalsFiltersV2(
-                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
-                categoryId: 'cat-1',
+              filters: ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
+                categoryId: cat1.id,
               ),
             );
 
             expect(result.items.length, 1);
             expect(result.total, 1);
             expect(result.items[0].proposal.id, 'p1');
-            expect(result.items[0].proposal.categoryId, 'cat-1');
+            expect(result.items[0].proposal.parameters.contains(cat1.id), isTrue);
           });
 
           test('returns empty when categoryId not in campaign', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+            final cat3 = DocumentRefFactory.signedDocumentRef();
+
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
-              categoryId: 'cat-2',
+              parameters: [cat2],
             );
 
             final proposal3 = _createTestDocumentEntity(
               id: 'p3',
               ver: _buildUuidV7At(middle),
-              categoryId: 'cat-3',
+              parameters: [cat3],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
@@ -4047,9 +4068,9 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(
               request: request,
-              filters: const ProposalsFiltersV2(
-                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
-                categoryId: 'cat-3',
+              filters: ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
+                categoryId: cat3.id,
               ),
             );
 
@@ -4058,22 +4079,26 @@ void main() {
           });
 
           test('ignores campaign filter when null', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+            final cat3 = DocumentRefFactory.signedDocumentRef();
+
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
-              categoryId: 'cat-2',
+              parameters: [cat2],
             );
 
             final proposal3 = _createTestDocumentEntity(
               id: 'p3',
               ver: _buildUuidV7At(middle),
-              categoryId: 'cat-3',
+              parameters: [cat3],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
@@ -4089,16 +4114,19 @@ void main() {
           });
 
           test('handles null category_id in database', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+            final cat2 = DocumentRefFactory.signedDocumentRef();
+
             final proposalWithCategory = _createTestDocumentEntity(
               id: 'p-with-cat',
               ver: _buildUuidV7At(latest),
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final proposalWithoutCategory = _createTestDocumentEntity(
               id: 'p-without-cat',
               ver: _buildUuidV7At(middle),
-              categoryId: null,
+              parameters: [],
             );
 
             await db.documentsV2Dao.saveAll([proposalWithCategory, proposalWithoutCategory]);
@@ -4106,8 +4134,8 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(
               request: request,
-              filters: const ProposalsFiltersV2(
-                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+              filters: ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
               ),
             );
 
@@ -4122,7 +4150,7 @@ void main() {
               (i) => _createTestDocumentEntity(
                 id: 'p-$i',
                 ver: _buildUuidV7At(earliest.add(Duration(hours: i))),
-                categoryId: 'cat-$i',
+                parameters: [SignedDocumentRef(id: 'cat-$i')],
               ),
             );
 
@@ -4141,24 +4169,30 @@ void main() {
             expect(result.items.length, 3);
             expect(result.total, 3);
             expect(
-              result.items.map((e) => e.proposal.categoryId).toSet(),
-              {'cat-0', 'cat-2', 'cat-4'},
+              result.items.map((e) => e.proposal.parameters).toSet().containsAll([
+                'cat-0',
+                'cat-2',
+                'cat-4',
+              ]),
+              isTrue,
             );
           });
 
           test('campaign filter respects status filter', () async {
+            final cat1 = DocumentRefFactory.signedDocumentRef();
+
             final draftProposalVer = _buildUuidV7At(latest);
             final draftProposal = _createTestDocumentEntity(
               id: 'draft-p',
               ver: draftProposalVer,
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final finalProposalVer = _buildUuidV7At(middle);
             final finalProposal = _createTestDocumentEntity(
               id: 'final-p',
               ver: finalProposalVer,
-              categoryId: 'cat-1',
+              parameters: [cat1],
             );
 
             final finalActionVer = _buildUuidV7At(earliest);
@@ -4176,8 +4210,8 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(
               request: request,
-              filters: const ProposalsFiltersV2(
-                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1'}),
+              filters: ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id}),
                 status: ProposalStatusFilter.draft,
               ),
             );
@@ -4197,6 +4231,10 @@ void main() {
 
       final nodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
 
+      final cat1 = DocumentRefFactory.signedDocumentRef();
+      final cat2 = DocumentRefFactory.signedDocumentRef();
+      final cat3 = DocumentRefFactory.signedDocumentRef();
+
       test('returns empty map when categories list is empty', () async {
         const filters = ProposalsTotalAskFilters();
 
@@ -4212,7 +4250,7 @@ void main() {
         final draftProposal = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(latest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1',
           contentData: {
@@ -4224,8 +4262,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([draftProposal]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4241,7 +4279,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4255,7 +4293,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4285,8 +4323,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4311,7 +4349,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-v1',
           contentData: {
@@ -4325,7 +4363,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-v2',
           contentData: {
@@ -4355,8 +4393,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4385,7 +4423,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4399,7 +4437,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-2',
           templateVer: 'template-2-ver',
           contentData: {
@@ -4429,8 +4467,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4459,7 +4497,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4473,7 +4511,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4503,8 +4541,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4526,7 +4564,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4540,7 +4578,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-2',
+          parameters: [cat2],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4570,8 +4608,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4594,7 +4632,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4608,7 +4646,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-2',
+          parameters: [cat2],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4622,7 +4660,7 @@ void main() {
         final proposal3 = _createTestDocumentEntity(
           id: 'p3',
           ver: proposal3Ver,
-          categoryId: 'cat-3',
+          parameters: [cat3],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4668,8 +4706,8 @@ void main() {
           finalAction3,
         ]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1', 'cat-2']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id, cat2.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4691,7 +4729,7 @@ void main() {
         final proposalV1 = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(earliest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4705,7 +4743,7 @@ void main() {
         final proposalV2 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposalV2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4718,7 +4756,7 @@ void main() {
         final proposalV3 = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(latest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4739,8 +4777,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposalV1, proposalV2, proposalV3, finalAction]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4761,7 +4799,7 @@ void main() {
         final proposalV1 = _createTestDocumentEntity(
           id: 'p1',
           ver: _buildUuidV7At(earliest),
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4775,7 +4813,7 @@ void main() {
         final proposalV2 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposalV2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4796,8 +4834,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposalV1, proposalV2, finalActionWithoutRefVer]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4815,7 +4853,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4829,7 +4867,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: 'template-1',
           templateVer: 'template-1-ver',
           contentData: {
@@ -4859,8 +4897,8 @@ void main() {
 
         await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final result = await dao.getProposalsTotalTask(
@@ -4885,6 +4923,8 @@ void main() {
       final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
       final nodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
+
+      final cat1 = DocumentRefFactory.signedDocumentRef();
 
       test('returns empty map when categories list is empty', () async {
         const filters = ProposalsTotalAskFilters(
@@ -4912,7 +4952,7 @@ void main() {
         final proposal1 = _createTestDocumentEntity(
           id: 'p1',
           ver: proposal1Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: templateRef.id,
           templateVer: templateRef.ver,
           contentData: {
@@ -4934,8 +4974,8 @@ void main() {
         await db.documentsV2Dao.saveAll([proposal1, finalAction1]);
 
         final emissions = <Map<DocumentRef, ProposalsTotalAskPerTemplate>>[];
-        const filters = ProposalsTotalAskFilters(
-          campaign: CampaignFilters(categoriesIds: ['cat-1']),
+        final filters = ProposalsTotalAskFilters(
+          campaign: CampaignFilters(categoriesIds: [cat1.id]),
         );
 
         final subscription = dao
@@ -4950,7 +4990,7 @@ void main() {
         final proposal2 = _createTestDocumentEntity(
           id: 'p2',
           ver: proposal2Ver,
-          categoryId: 'cat-1',
+          parameters: [cat1],
           templateId: templateRef.id,
           templateVer: templateRef.ver,
           contentData: {
