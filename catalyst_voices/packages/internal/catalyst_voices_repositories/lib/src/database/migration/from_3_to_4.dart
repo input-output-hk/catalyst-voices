@@ -78,7 +78,6 @@ Future<void> _migrateDocs(
     });
   }
 
-  print('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
   _logger.info('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
 }
 
