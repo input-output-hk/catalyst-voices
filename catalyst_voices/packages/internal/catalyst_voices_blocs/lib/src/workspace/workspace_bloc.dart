@@ -359,14 +359,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         )
         .map(
           (page) => page.map(
-            (data) {
-              final fromActiveCampaign = activeCampaign?.fundNumber == data.fundNumber;
-
-              return UsersProposalOverview.fromProposalBriefData(
-                proposalData: data,
-                fromActiveCampaign: fromActiveCampaign,
-              );
-            },
+            (data) => UsersProposalOverview.fromProposalBriefData(
+              proposalData: data,
+              fromActiveCampaign: activeCampaign?.fundNumber == data.fundNumber,
+              activeAccountId: _cache.activeAccountId,
+            ),
           ),
         )
         .distinct()

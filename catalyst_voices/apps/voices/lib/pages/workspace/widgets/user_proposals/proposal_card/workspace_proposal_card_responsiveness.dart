@@ -3,12 +3,12 @@ part of 'workspace_proposal_card.dart';
 class _LargeScreen extends StatelessWidget {
   final UsersProposalOverview proposal;
   final bool isSubmitted;
-  final int commentsCount;
+  final WorkspaceProposalType type;
 
   const _LargeScreen({
     required this.proposal,
     required this.isSubmitted,
-    required this.commentsCount,
+    required this.type,
   });
 
   @override
@@ -25,6 +25,7 @@ class _LargeScreen extends StatelessWidget {
               _BodyHeader(
                 title: proposal.title,
                 lastUpdate: proposal.updateDate,
+                ownership: proposal.ownership,
               ),
               ProposalIterationStageChip(
                 status: proposal.publish,
@@ -49,12 +50,13 @@ class _LargeScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            _CampaignData(
-              leadValue: commentsCount == 0
-                  ? context.l10n.notAvailableAbbr
-                  : commentsCount.toString(),
-              subValue: context.l10n.comments(commentsCount),
-            ),
+            if (!type.isInvite)
+              _CampaignData(
+                leadValue: proposal.commentsCount == 0
+                    ? context.l10n.notAvailableAbbr
+                    : proposal.commentsCount.toString(),
+                subValue: context.l10n.comments(proposal.commentsCount),
+              ),
           ],
         ),
         // This allows to center previous row
@@ -67,12 +69,12 @@ class _LargeScreen extends StatelessWidget {
 class _MediumScreen extends StatelessWidget {
   final UsersProposalOverview proposal;
   final bool isSubmitted;
-  final int commentsCount;
+  final WorkspaceProposalType type;
 
   const _MediumScreen({
     required this.proposal,
     required this.isSubmitted,
-    required this.commentsCount,
+    required this.type,
   });
 
   @override
@@ -87,6 +89,7 @@ class _MediumScreen extends StatelessWidget {
             _BodyHeader(
               title: proposal.title,
               lastUpdate: proposal.updateDate,
+              ownership: proposal.ownership,
             ),
             ProposalIterationStageChip(
               status: proposal.publish,
@@ -111,11 +114,14 @@ class _MediumScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            _CampaignData(
-              leadValue: commentsCount == 0
-                  ? context.l10n.notAvailableAbbr
-                  : commentsCount.toString(),
-              subValue: context.l10n.comments(commentsCount),
+            Offstage(
+              offstage: type.isInvite,
+              child: _CampaignData(
+                leadValue: proposal.commentsCount == 0
+                    ? context.l10n.notAvailableAbbr
+                    : proposal.commentsCount.toString(),
+                subValue: context.l10n.comments(proposal.commentsCount),
+              ),
             ),
           ],
         ),
@@ -127,12 +133,12 @@ class _MediumScreen extends StatelessWidget {
 class _SmallScreen extends StatelessWidget {
   final UsersProposalOverview proposal;
   final bool isSubmitted;
-  final int commentsCount;
+  final WorkspaceProposalType type;
 
   const _SmallScreen({
     required this.proposal,
     required this.isSubmitted,
-    required this.commentsCount,
+    required this.type,
   });
 
   @override
@@ -144,6 +150,7 @@ class _SmallScreen extends StatelessWidget {
         _BodyHeader(
           title: proposal.title,
           lastUpdate: proposal.updateDate,
+          ownership: proposal.ownership,
         ),
         ProposalIterationStageChip(
           status: proposal.publish,
@@ -166,11 +173,14 @@ class _SmallScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            _CampaignData(
-              leadValue: commentsCount == 0
-                  ? context.l10n.notAvailableAbbr
-                  : commentsCount.toString(),
-              subValue: context.l10n.comments(commentsCount),
+            Offstage(
+              offstage: type.isInvite,
+              child: _CampaignData(
+                leadValue: proposal.commentsCount == 0
+                    ? context.l10n.notAvailableAbbr
+                    : proposal.commentsCount.toString(),
+                subValue: context.l10n.comments(proposal.commentsCount),
+              ),
             ),
           ],
         ),
@@ -181,29 +191,28 @@ class _SmallScreen extends StatelessWidget {
 
 class _WorkspaceProposalCardResponsiveness extends StatelessWidget {
   final UsersProposalOverview proposal;
+  final WorkspaceProposalType type;
 
-  const _WorkspaceProposalCardResponsiveness(this.proposal);
+  const _WorkspaceProposalCardResponsiveness(this.proposal, {required this.type});
 
   @override
   Widget build(BuildContext context) {
     final isSubmitted = _ProposalSubmitState.of(context)?.isSubmitted ?? false;
-    final commentsCount = proposal.commentsCount;
-
     return ResponsiveChildBuilder(
       sm: (_) => _SmallScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
-        commentsCount: commentsCount,
+        type: type,
       ),
       md: (_) => _MediumScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
-        commentsCount: commentsCount,
+        type: type,
       ),
       lg: (_) => _LargeScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
-        commentsCount: commentsCount,
+        type: type,
       ),
     );
   }

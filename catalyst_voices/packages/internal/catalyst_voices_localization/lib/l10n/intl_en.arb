@@ -1850,6 +1850,18 @@
   "@learnMore": {
     "description": "A label on a clickable element that can show more content."
   },
+  "leaveProposal": "Leave Proposal",
+  "@leaveProposal": {
+    "description": "CTA to leave proposal as collaborator"
+  },
+  "leaveProposalDescription": "Are you sure you want to leave? You won’t be able to undo this. Leaving the proposal means you’ll be removed as a collaborator and won’t be eligible for funding.",
+  "@leaveProposalDescription": {
+    "description": "Description about leaving proposal as collaborator"
+  },
+  "leaveProposalQuestion": "Leave Proposal?",
+  "@leaveProposalQuestion": {
+    "description": "title for leave proposal dialog"
+  },
   "linkCopiedToClipboard": "Link copied to clipboard",
   "@linkCopiedToClipboard": {
     "description": "Snackbar title shown when user copies a link."
@@ -1979,6 +1991,10 @@
   "newAppVersionAvailableTitle": "New version available",
   "@newAppVersionAvailableTitle": {
     "description": "Used in banner to inform user that new version of the app is available"
+  },
+  "newInvites": "New Invites",
+  "@newInvites": {
+    "description": "Title of new invites section"
   },
   "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
   "@newIterationTitle": {
@@ -3176,6 +3192,10 @@
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
+  },
+  "reviewRequest": "Review Request",
+  "@reviewRequest": {
+    "description": "CTA to make user review invite to collaboration on proposal"
   },
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {

@@ -91,6 +91,15 @@ final class InternalTabCountChangeEvent extends WorkspaceEvent {
   List<Object?> get props => [count];
 }
 
+final class LeaveProposalEvent extends WorkspaceEvent {
+  final DocumentRef id;
+
+  const LeaveProposalEvent(this.id);
+
+  @override
+  List<Object?> get props => [...super.props, id];
+}
+
 final class LoadProposalsEvent extends WorkspaceEvent {
   final List<UsersProposalOverview> proposals;
 
@@ -109,16 +118,16 @@ final class UnlockProposalEvent extends WorkspaceEvent {
   List<Object?> get props => [ref];
 }
 
+final class WatchActiveCampaignChangeEvent extends WorkspaceEvent {
+  const WatchActiveCampaignChangeEvent();
+}
+
 final class WatchUserCatalystIdEvent extends WorkspaceEvent {
   const WatchUserCatalystIdEvent();
 }
 
 final class WatchUserProposalsEvent extends WorkspaceEvent {
   const WatchUserProposalsEvent();
-}
-
-final class WatchActiveCampaignChangeEvent extends WorkspaceEvent {
-  const WatchActiveCampaignChangeEvent();
 }
 
 sealed class WorkspaceEvent extends Equatable {

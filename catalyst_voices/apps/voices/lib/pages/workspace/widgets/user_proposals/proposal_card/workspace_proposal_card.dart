@@ -1,8 +1,10 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_menu_action_button.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/user_proposal_invites/review_request_button.dart';
 import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -13,10 +15,12 @@ part 'workspace_proposal_card_responsiveness.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
   final UsersProposalOverview proposal;
+  final WorkspaceProposalType type;
 
   const WorkspaceProposalCard({
     super.key,
     required this.proposal,
+    this.type = WorkspaceProposalType.proposal,
   });
 
   @override
@@ -41,7 +45,7 @@ class WorkspaceProposalCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _Body(proposal),
+              _Body(proposal, type),
               if (isPublishedDraft && proposal.versions.length >= 2)
                 ProposalIterationHistory(
                   proposal: proposal,
@@ -54,25 +58,63 @@ class WorkspaceProposalCard extends StatelessWidget {
   }
 }
 
+enum WorkspaceProposalType {
+  proposal,
+  invite;
+
+  const WorkspaceProposalType();
+
+  bool get isInvite => this == invite;
+}
+
+class _ActionButton extends StatelessWidget {
+  final UsersProposalOverview proposal;
+  final WorkspaceProposalType type;
+
+  const _ActionButton({
+    required this.proposal,
+    required this.type,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (type) {
+      WorkspaceProposalType.proposal => ProposalMenuActionButton(
+        ref: proposal.id,
+        proposalPublish: proposal.publish,
+        title: proposal.title,
+        version: proposal.iteration,
+        hasNewerLocalIteration: proposal.hasNewerLocalIteration,
+        fromActiveCampaign: proposal.fromActiveCampaign,
+        ownership: proposal.ownership,
+      ),
+      WorkspaceProposalType.invite => ReviewRequestButton(id: proposal.id),
+    };
+  }
+}
+
 class _Body extends StatelessWidget {
   final UsersProposalOverview proposal;
+  final WorkspaceProposalType type;
 
-  const _Body(this.proposal);
+  const _Body(this.proposal, this.type);
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _WorkspaceProposalCardResponsiveness(proposal)),
-        ProposalMenuActionButton(
-          ref: proposal.id,
-          proposalPublish: proposal.publish,
-          title: proposal.title,
-          version: proposal.iteration,
-          hasNewerLocalIteration: proposal.hasNewerLocalIteration,
-          fromActiveCampaign: proposal.fromActiveCampaign,
+        Expanded(
+          child: _WorkspaceProposalCardResponsiveness(
+            proposal,
+            type: type,
+          ),
+        ),
+        _ActionButton(
+          proposal: proposal,
+          type: type,
         ),
       ],
     );
