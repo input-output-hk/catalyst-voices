@@ -11,13 +11,13 @@ use std::{
 use anyhow::{Context, Result, anyhow};
 use base64::{Engine, prelude::BASE64_URL_SAFE_NO_PAD};
 use cardano_chain_follower::Network;
-use catalyst_types::catalyst_id::CatalystId;
+use catalyst_types::catalyst_id::{CatalystId, key_rotation::KeyRotation, role_index::RoleId};
 use chrono::{TimeDelta, Utc};
-use ed25519_dalek::{Signature, SigningKey, VerifyingKey, ed25519::signature::Signer};
+use ed25519_dalek::{Signature, VerifyingKey};
 use rbac_registration::registration::cardano::RegistrationChain;
 use regex::Regex;
 
-use crate::rbac::latest_rbac_chain;
+use crate::{rbac::latest_rbac_chain, settings::Settings};
 
 /// Captures just the digits after last slash
 /// This Regex should not fail
@@ -47,19 +47,36 @@ pub(crate) struct CatalystRBACTokenV1 {
     reg_chain: Option<RegistrationChain>,
 }
 
+#[derive(thiserror::Error, Debug)]
+pub(crate) enum VerificationError {
+    /// Not a Admin RBAC token
+    #[error("Not a valid Admin RBAC token")]
+    NotAdmin,
+    /// Registration chain cannot be found.
+    #[error("Registration not found for the auth token.")]
+    RegistrationNotFound,
+    /// Latest signing key cannot be found.
+    #[error("Unable to get the latest signing key.")]
+    LatestSigningKey,
+    /// Invalid RBAC token signature
+    #[error("Invalid RBAC Token signature.")]
+    InvalidSignature,
+}
+
 impl CatalystRBACTokenV1 {
     /// Bearer Token prefix for this token.
     const AUTH_TOKEN_PREFIX: &str = "catid.";
 
     /// Creates a new token instance.
-    // TODO: Remove the attribute when the function is used.
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub(crate) fn new(
         network: &str,
         subnet: Option<&str>,
         role0_pk: VerifyingKey,
-        sk: &SigningKey,
+        sk: &ed25519_dalek::SigningKey,
     ) -> Result<Self> {
+        use ed25519_dalek::ed25519::signature::Signer;
+
         let catalyst_id = CatalystId::new(network, subnet, role0_pk)
             .with_nonce()
             .as_id();
@@ -108,8 +125,8 @@ impl CatalystRBACTokenV1 {
         if catalyst_id.username().is_some_and(|n| !n.is_empty()) {
             return Err(anyhow!("Catalyst ID must not contain username"));
         }
-        if !catalyst_id.clone().is_id() {
-            return Err(anyhow!("Catalyst ID must be in an ID format"));
+        if catalyst_id.is_uri() {
+            return Err(anyhow!("Catalyst ID cannot be in URI format"));
         }
         if catalyst_id.nonce().is_none() {
             return Err(anyhow!("Catalyst ID must have nonce"));
@@ -131,14 +148,45 @@ impl CatalystRBACTokenV1 {
         })
     }
 
+    /// Return the latest signing public key for the provided role.
+    /// If the its an admin RBAC token, returns associated Admin public key.
+    pub(crate) async fn get_latest_signing_public_key_for_role(
+        &mut self,
+        role: RoleId,
+    ) -> Result<(VerifyingKey, KeyRotation)> {
+        let res = if self.catalyst_id.is_admin() {
+            Settings::admin_cfg()
+                .get_admin_key(&self.catalyst_id, role)
+                .ok_or(VerificationError::NotAdmin)?
+        } else {
+            let reg_chain = self
+                .reg_chain()
+                .await?
+                .ok_or(VerificationError::RegistrationNotFound)?;
+            reg_chain
+                .get_latest_signing_public_key_for_role(role)
+                .ok_or_else(|| {
+                    tracing::debug!(
+                        "Unable to get last signing key for {} Catalyst ID",
+                        self.catalyst_id
+                    );
+                    VerificationError::LatestSigningKey
+                })?
+        };
+
+        Ok(res)
+    }
+
     /// Given the `PublicKey`, verifies the token was correctly signed.
-    pub(crate) fn verify(
-        &self,
-        public_key: &VerifyingKey,
-    ) -> Result<()> {
-        public_key
+    pub(crate) async fn verify(&mut self) -> Result<()> {
+        let public_key = self
+            .get_latest_signing_public_key_for_role(RoleId::Role0)
+            .await?
+            .0;
+
+        Ok(public_key
             .verify_strict(&self.raw, &self.signature)
-            .context("Token signature verification failed")
+            .map_err(|_| VerificationError::InvalidSignature)?)
     }
 
     /// Checks that the token timestamp is valid.
@@ -315,16 +363,5 @@ mod tests {
         // Check that the token ISN'T too new if max_skew is three seconds.
         let max_skew = Duration::from_secs(3);
         assert!(token.is_young(max_age, max_skew));
-    }
-
-    #[test]
-    fn verify() {
-        let mut seed = OsRng;
-        let signing_key: SigningKey = SigningKey::generate(&mut seed);
-        let verifying_key = signing_key.verifying_key();
-        let token =
-            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key)
-                .unwrap();
-        token.verify(&verifying_key).unwrap();
     }
 }

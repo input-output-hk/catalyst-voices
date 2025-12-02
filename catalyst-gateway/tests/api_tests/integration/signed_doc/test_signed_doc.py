@@ -21,7 +21,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     rbac_chain = rbac_chain_factory()
     role_id = RoleID.PROPOSER
     proposal_doc = proposal_doc_factory(role_id)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+    (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc_id = proposal_doc.metadata["id"]
 
     # Get the proposal document
@@ -43,7 +43,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     # Put document with different ver
     new_doc = proposal_doc.copy()
     new_doc.new_version()
-    new_doc_cbor = new_doc.build_and_sign(cat_id, sk_hex)
+    new_doc_cbor = new_doc.build_and_sign(cat_id, key)
     resp = document_v1.put(
         data=new_doc_cbor,
         token=rbac_chain.auth_token(),
@@ -66,7 +66,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     invalid_doc = proposal_doc.copy()
     invalid_doc.content["setup"]["title"] = {"title": "another title"}
     resp = document_v1.put(
-        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        data=invalid_doc.build_and_sign(cat_id, key),
         token=rbac_chain.auth_token(),
     )
     assert (
@@ -78,7 +78,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     new_doc.new_version()
     new_doc.content["setup"]["title"]["title"] = "another title"
     resp = document_v1.put(
-        data=new_doc.build_and_sign(cat_id, sk_hex),
+        data=new_doc.build_and_sign(cat_id, key),
         token=rbac_chain.auth_token(),
     )
     assert (
@@ -95,7 +95,7 @@ def test_document_index_endpoint(
     doc = proposal_doc_factory(role_id)
 
     rbac_chain = rbac_chain_factory()
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+    (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
     # submiting 10 documents
     total_amount = 10
 
@@ -104,7 +104,7 @@ def test_document_index_endpoint(
         # keep the same id, but different version
         doc.new_version()
         resp = document_v1.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
+            data=doc.build_and_sign(cat_id, key),
             token=rbac_chain.auth_token(),
         )
         assert (
