@@ -49,16 +49,20 @@ services:
     healthcheck:
       test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
       start_period: 30s
-      interval: 20s
+      interval: 30s
       timeout: 30s
-      retries: 45
+      retries: 50
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=index-db:9042
-      - CASSANDRA_VOLATILE_URL=index-db:9042
-      - CHAIN_NETWORK=Preprod
-      - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@${EVENT_DB_URL:-event-db}/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=${INDEX_DB_URL:-scylla-node:9042}
+      - CASSANDRA_VOLATILE_URL=${INDEX_DB_URL:-scylla-node:9042}
+      - CHAIN_NETWORK=${ENV_TARGET:-Preprod}
       - INTERNAL_API_KEY=123
+      - YES_I_REALLY_WANT_TO_PANIC=panic attack
+      - SERVICE_LIVE_COUNTER_THRESHOLD=100
+      - SERVICE_LIVE_TIMEOUT_INTERVAL=30
+      # cspell: disable
+      - SIGNED_DOC_ADMIN_KEY=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     ports:
