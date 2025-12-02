@@ -1,11 +1,13 @@
-from typing import Dict, Any
 import os
 import subprocess
 import json
-from utils import signed_doc, uuid_v7
+from utils import signed_doc
 from tempfile import NamedTemporaryFile
-from utils.rbac_chain import RoleID
-from utils.ed25519 import Ed25519Keys
+
+from catalyst_python.catalyst_id import RoleID
+from catalyst_python.uuid import uuid_v7
+from catalyst_python.ed25519 import Ed25519Keys
+
 
 class SignedDocumentV1(signed_doc.SignedDocumentBase):
     # Build and sign document, returns hex str of document bytes
@@ -61,7 +63,7 @@ class SignedDocumentV1(signed_doc.SignedDocumentBase):
 
 def proposal(rbac_chain):
     role_id = RoleID.PROPOSER
-    proposal_doc_id = uuid_v7.uuid_v7()
+    proposal_doc_id = uuid_v7()
     proposal_metadata_json = {
         "id": proposal_doc_id,
         "ver": proposal_doc_id,
@@ -90,7 +92,7 @@ def proposal(rbac_chain):
 
 def comment(rbac_chain, proposal_id):
     role_id = RoleID.ROLE_0
-    comment_doc_id = uuid_v7.uuid_v7()
+    comment_doc_id = uuid_v7()
     comment_metadata_json = {
         "id": comment_doc_id,
         "ver": comment_doc_id,
@@ -118,7 +120,7 @@ def comment(rbac_chain, proposal_id):
 
 def proposal_submission(rbac_chain, proposal_id):
     role_id = RoleID.PROPOSER
-    submission_action_id = uuid_v7.uuid_v7()
+    submission_action_id = uuid_v7()
     sub_action_metadata_json = {
         "id": submission_action_id,
         "ver": submission_action_id,
@@ -131,7 +133,9 @@ def proposal_submission(rbac_chain, proposal_id):
             "ver": proposal_id,
         },
     }
-    with open("./test_data/signed_docs/submission_action.deprecated.json", "r") as json_file:
+    with open(
+        "./test_data/signed_docs/submission_action.deprecated.json", "r"
+    ) as json_file:
         content = json.load(json_file)
 
     doc = SignedDocumentV1(sub_action_metadata_json, content)

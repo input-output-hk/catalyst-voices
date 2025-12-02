@@ -84,7 +84,7 @@ for i, record in enumerate(processing_records):
             if amount["unit"] == "lovelace":
                 ada_amount += int(amount["quantity"])
                 continue
-            native_tokens[f"0x{amount["unit"]}"] = native_tokens.get(
+            native_tokens[f"0x{amount['unit']}"] = native_tokens.get(
                 amount["unit"], 0
             ) + int(amount["quantity"])
 

@@ -25,19 +25,19 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     # Get the proposal document
     resp = document_v1.get(document_id=proposal_doc_id)
-    assert (
-        resp.status_code == 200
-    ), f"Failed to get document: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 200, (
+        f"Failed to get document: {resp.status_code} - {resp.text}"
+    )
 
     resp = document_v2.post(filter={"id": {"eq": proposal_doc_id}})
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document (id = eq): {resp.status_code} - {resp.text}"
+    assert resp.status_code == 200, (
+        f"Failed to post document (id = eq): {resp.status_code} - {resp.text}"
+    )
 
     resp = document_v2.post(filter={"id": {"in": [proposal_doc_id]}})
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document (id = in): {resp.status_code} - {resp.text}"
+    assert resp.status_code == 200, (
+        f"Failed to post document (id = in): {resp.status_code} - {resp.text}"
+    )
 
     # Put document with different ver
     new_doc = proposal_doc.copy()
@@ -47,9 +47,9 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
-    assert (
-        resp.status_code == 201
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
 
     # Put a document again
     resp = document_v1.put(
@@ -57,9 +57,9 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         token=rbac_chain.auth_token(),
     )
     # TODO: fix it after fully integrating the latest changes of the 'catalyst-signed-doc' crate
-    assert (
-        resp.status_code == 422
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 422, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
 
     # Put a non valid document with same ID different content
     invalid_doc = proposal_doc.copy()
@@ -68,9 +68,9 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         data=invalid_doc.build_and_sign(cat_id, key),
         token=rbac_chain.auth_token(),
     )
-    assert (
-        resp.status_code == 422
-    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 422, (
+        f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+    )
 
     # Put a signed document with same ID, but different version and different content
     new_doc = proposal_doc.copy()
@@ -80,9 +80,9 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         data=new_doc.build_and_sign(cat_id, key),
         token=rbac_chain.auth_token(),
     )
-    assert (
-        resp.status_code == 201
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 201, (
+        f"Failed to publish document: {resp.status_code} - {resp.text}"
+    )
 
 
 @pytest.mark.preprod_indexing
@@ -106,9 +106,9 @@ def test_document_index_endpoint(
             data=doc.build_and_sign(cat_id, key),
             token=rbac_chain.auth_token(),
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
     limit = 1
     page = 0
@@ -118,9 +118,9 @@ def test_document_index_endpoint(
         page=page,
         filter=filter,
     )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 200, (
+        f"Failed to post document: {resp.status_code} - {resp.text}"
+    )
 
     data = resp.json()
     assert data["page"]["limit"] == limit
@@ -133,9 +133,9 @@ def test_document_index_endpoint(
         page=page,
         filter=filter,
     )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 200, (
+        f"Failed to post document: {resp.status_code} - {resp.text}"
+    )
     data = resp.json()
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
@@ -145,9 +145,9 @@ def test_document_index_endpoint(
         limit=total_amount,
         filter=filter,
     )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 200, (
+        f"Failed to post document: {resp.status_code} - {resp.text}"
+    )
     data = resp.json()
     assert data["page"]["limit"] == total_amount
     assert data["page"]["page"] == 0  # default value
@@ -158,6 +158,6 @@ def test_document_index_endpoint(
         page=92233720368547759,
         filter={},
     )
-    assert (
-        resp.status_code == 412
-    ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 412, (
+        f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
+    )

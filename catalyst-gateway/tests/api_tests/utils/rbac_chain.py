@@ -1,6 +1,7 @@
 import pytest
-from enum import IntEnum, Enum
+from enum import Enum
 import json
+
 from catalyst_python.ed25519 import Ed25519Keys
 from catalyst_python.catalyst_id import generate_cat_id, RoleID
 from catalyst_python.rbac_token import generate_rbac_auth_token
@@ -76,7 +77,7 @@ class RBACChain:
         )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def rbac_chain_factory():
     def __rbac_chain_factory(
         chain: Chain = Chain.All,

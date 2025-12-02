@@ -5,7 +5,8 @@ from datetime import datetime, timezone
 import requests
 from api import cat_gateway_endpoint_url
 
-@pytest.mark.skip('To be refactored when the api is ready')
+
+@pytest.mark.skip("To be refactored when the api is ready")
 def test_date_time_to_slot_number_endpoint():
     health.is_live()
     health.is_ready()
@@ -43,6 +44,7 @@ def test_date_time_to_slot_number_endpoint():
         and res["next"]["block_hash"]
         == "0x9768fb8df7c3e336da30c82dd93dc664135f866080c773402b528288c970c5b0"
     )
+
 
 def get_date_time_to_slot_number(network: str, date_time: datetime):
     # replace special characters

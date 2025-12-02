@@ -6,10 +6,11 @@ import time
 import subprocess
 import json
 from api.v1 import document
-from utils.rbac_chain import rbac_chain_factory, RoleID
+from utils.rbac_chain import rbac_chain_factory
 from utils.admin import admin_key
 from tempfile import NamedTemporaryFile
 
+from catalyst_python.catalyst_id import RoleID
 from catalyst_python.uuid import uuid_v7
 from catalyst_python.ed25519 import Ed25519Keys
 
@@ -101,13 +102,14 @@ class SignedDocument(SignedDocumentBase):
 
             signed_doc_hex = signed_doc_file.read().hex()
             return signed_doc_hex
-        
+
         return build_signed_doc(
             metadata_json=self.metadata,
             doc_content_json=self.content,
             key=key,
             cat_id=cat_id,
         )
+
 
 def create_metadata(
     doc_type: str,
@@ -126,12 +128,18 @@ def create_metadata(
     }
 
     if template is not None:
-        metadata["template"] = {"id": template.metadata["id"], "ver": template.metadata["ver"], "cid": "0x"}
+        metadata["template"] = {
+            "id": template.metadata["id"],
+            "ver": template.metadata["ver"],
+            "cid": "0x",
+        }
     if parameters is not None:
-        metadata["parameters"] = list([
-            {"id": p.metadata["id"], "ver": p.metadata["ver"], "cid": "0x"}
-            for p in parameters
-        ])
+        metadata["parameters"] = list(
+            [
+                {"id": p.metadata["id"], "ver": p.metadata["ver"], "cid": "0x"}
+                for p in parameters
+            ]
+        )
 
     return metadata
 
@@ -142,15 +150,13 @@ def create_metadata(
 
 
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def proposal_doc_factory(
     rbac_chain_factory,
     proposal_form_template_doc,
     brand_parameters_doc,
 ):
-    def __factory__(
-        role_id: RoleID
-    ) -> SignedDocument:
+    def __factory__(role_id: RoleID) -> SignedDocument:
         param: SignedDocumentBase = brand_parameters_doc
         template: SignedDocumentBase = proposal_form_template_doc
 
@@ -158,12 +164,10 @@ def proposal_doc_factory(
             doc_type=DOC_TYPE["proposal"],
             content_type="application/json",
             template=template,
-            parameters=[param]
+            parameters=[param],
         )
-        
-        with open(
-            "./test_data/signed_docs/proposal.json", "r"
-        ) as json_file:
+
+        with open("./test_data/signed_docs/proposal.json", "r") as json_file:
             content = json.load(json_file)
 
         rbac_chain = rbac_chain_factory()
@@ -183,7 +187,7 @@ def proposal_doc_factory(
     return __factory__
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def proposal_form_template_doc(
     admin_key,
     brand_parameters_doc,
@@ -196,9 +200,7 @@ def proposal_form_template_doc(
         parameters=[param],
     )
 
-    with open(
-        "./test_data/signed_docs/proposal_form_template.json", "r"
-    ) as json_file:
+    with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
         content = json.load(json_file)
 
     doc = SignedDocument(metadata, content)
@@ -214,7 +216,7 @@ def proposal_form_template_doc(
     return doc
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def category_parameters_doc(
     admin_key,
     category_parameters_form_template_doc,
@@ -243,10 +245,9 @@ def category_parameters_doc(
     return doc
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def category_parameters_form_template_doc(
-    admin_key,
-    campaign_parameters_doc
+    admin_key, campaign_parameters_doc
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = campaign_parameters_doc
 
@@ -269,7 +270,7 @@ def category_parameters_form_template_doc(
     return doc
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def campaign_parameters_doc(
     admin_key,
     campaign_parameters_form_template_doc,
@@ -283,7 +284,6 @@ def campaign_parameters_doc(
         content_type="application/json",
         template=template,
         parameters=[param],
-
     )
     content = {}
     doc = SignedDocument(metadata, content)
@@ -299,10 +299,9 @@ def campaign_parameters_doc(
     return doc
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def campaign_parameters_form_template_doc(
-    admin_key,
-    brand_parameters_doc
+    admin_key, brand_parameters_doc
 ) -> SignedDocumentBase:
     param: SignedDocumentBase = brand_parameters_doc
 
@@ -325,10 +324,9 @@ def campaign_parameters_form_template_doc(
     return doc
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def brand_parameters_doc(
-    admin_key,
-    brand_parameters_form_template_doc
+    admin_key, brand_parameters_form_template_doc
 ) -> SignedDocumentBase:
     template: SignedDocumentBase = brand_parameters_form_template_doc
 
@@ -351,13 +349,11 @@ def brand_parameters_doc(
     return doc
 
 
-@pytest.fixture(scope='session')
-def brand_parameters_form_template_doc(
-    admin_key
-) -> SignedDocumentBase:
+@pytest.fixture(scope="session")
+def brand_parameters_form_template_doc(admin_key) -> SignedDocumentBase:
     metadata = create_metadata(
         doc_type=DOC_TYPE["brand_parameters_form_template"],
-        content_type="application/schema+json"
+        content_type="application/schema+json",
     )
     content = {"type": "object"}
     doc = SignedDocument(metadata, content)

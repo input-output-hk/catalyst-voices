@@ -4,7 +4,7 @@ from catalyst_python.ed25519 import Ed25519Keys
 from catalyst_python.admin import AdminKey
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def admin_key() -> AdminKey:
     key = Ed25519Keys(os.environ["CAT_GATEWAY_ADMIN_PRIVATE_KEY"])
     return AdminKey(key)

@@ -7,6 +7,7 @@ import requests
 
 from catalyst_python.address import stake_public_key_to_address
 
+
 def check_delegations(provided, expected):
     if type(expected) is list:
         provided_delegations = provided["delegations"]
@@ -22,7 +23,8 @@ def check_delegations(provided, expected):
     else:
         assert provided["voting_key"] == expected
 
-@pytest.mark.skip('To be refactored when the api is ready')
+
+@pytest.mark.skip("To be refactored when the api is ready")
 def test_voter_registration_endpoint():
     health.is_live()
     health.is_ready()
@@ -53,6 +55,7 @@ def test_voter_registration_endpoint():
             and res["nonce"] == expected_nonce
         )
         check_delegations(res["voting_info"], entry["delegations"])
+
 
 def get_voter_registration(address: str, network: str, slot_number: int):
     resp = requests.get(

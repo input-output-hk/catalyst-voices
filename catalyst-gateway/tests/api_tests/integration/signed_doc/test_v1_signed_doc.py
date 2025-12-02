@@ -1,10 +1,9 @@
 # A collection of tests with the deprecated signed documents
 import pytest
-from utils import uuid_v7
 from api.v1 import document as document_v1
 from api.v2 import document as document_v2
 import json
-from utils.rbac_chain import rbac_chain_factory, RoleID
+from utils.rbac_chain import rbac_chain_factory
 from utils.signed_doc.deprecated import comment, proposal, proposal_submission
 
 
@@ -243,12 +242,12 @@ def test_get_migrated_and_f14_documents():
 
     for doc_id, doc_cbor in migrated + fund_14 + fund_15:
         resp = document_v1.get(document_id=doc_id)
-        assert (
-            resp.status_code == 200
-        ), f"Failed to get document: {resp.status_code} - {resp.text}"
-        assert (
-            resp.content.hex() == doc_cbor
-        ), f"Unexpected document cbor bytes for {doc_id}"
+        assert resp.status_code == 200, (
+            f"Failed to get document: {resp.status_code} - {resp.text}"
+        )
+        assert resp.content.hex() == doc_cbor, (
+            f"Unexpected document cbor bytes for {doc_id}"
+        )
 
 
 # Trying to submit a deprecated proposal, comment and proposal actions documents
@@ -271,16 +270,16 @@ def test_put_deprecated_documents(rbac_chain_factory):
             data=cbor,
             token=rbac_chain.auth_token(),
         )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 201, (
+            f"Failed to publish document: {resp.status_code} - {resp.text}"
+        )
 
         resp = document_v1.get(document_id=id)
-        assert (
-            resp.status_code == 200
-        ), f"Failed to get document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 200, (
+            f"Failed to get document: {resp.status_code} - {resp.text}"
+        )
 
         resp = document_v2.post(filter={"id": {"eq": id}})
-        assert (
-            resp.status_code == 200
-        ), f"Failed to get document: {resp.status_code} - {resp.text}"
+        assert resp.status_code == 200, (
+            f"Failed to get document: {resp.status_code} - {resp.text}"
+        )
