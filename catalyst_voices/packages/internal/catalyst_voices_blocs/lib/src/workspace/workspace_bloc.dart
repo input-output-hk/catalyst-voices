@@ -45,6 +45,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<WatchActiveCampaignChangeEvent>(_onWatchActiveCampaignChange);
     on<InternalDataChangeEvent>(_onInternalDataChange);
     on<InternalTabCountChangeEvent>(_onInternalTabCountChange);
+    on<LeaveProposalEvent>(_onLeaveProposal);
 
     unawaited(
       _userService.watchUnlockedActiveAccount
@@ -303,6 +304,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   void _onInternalTabCountChange(InternalTabCountChangeEvent event, Emitter<WorkspaceState> emit) {
     _logger.finest('Proposals count changed: ${event.count}');
     emit(state.copyWith(count: Map.unmodifiable(event.count)));
+  }
+
+  Future<void> _onLeaveProposal(LeaveProposalEvent event, Emitter<WorkspaceState> emit) async {
+    await _proposalService.respondToCollaboratorInvite(
+      ref: event.id,
+      action: CollaboratorInvitationAction.leave,
+    );
   }
 
   Future<void> _onUnlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {
