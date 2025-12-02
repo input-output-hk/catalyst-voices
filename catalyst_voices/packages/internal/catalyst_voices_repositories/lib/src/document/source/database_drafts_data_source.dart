@@ -159,6 +159,13 @@ extension on LocalDocumentDraftEntity {
         section: section,
         categoryId: categoryId.toRef(categoryVer),
         authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
+        // TODO(bstolinski): implement after merging PR:
+        // https://github.com/input-output-hk/catalyst-voices/pull/3791
+        // https://github.com/input-output-hk/catalyst-voices/pull/3790
+        // https://github.com/input-output-hk/catalyst-voices/pull/3440
+        // collaborators: collaborators.isEmpty
+        //     ? null
+        //     : collaborators.split(',').map(CatalystId.parse).toList(),
       ),
       content: content,
     );

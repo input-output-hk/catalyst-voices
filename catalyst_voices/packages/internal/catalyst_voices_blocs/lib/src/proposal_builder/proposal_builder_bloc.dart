@@ -143,6 +143,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       id: id ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
       categoryId: state.metadata.categoryId,
+      collaborators: state.metadata.collaborators,
     );
   }
 
@@ -507,7 +508,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     await _loadState(emit, () async {
-      // TODO(bstolinski): get collaborators
       final proposalData = await _proposalService.getProposalDetail(
         id: proposalRef,
       );
@@ -559,6 +559,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
           authorId: _cache.activeAccountId,
+          collaborators: proposalData.document.metadata.collaborators ?? [],
         ),
         category: category,
         categoryTotalAsk: categoryTotalAsk,

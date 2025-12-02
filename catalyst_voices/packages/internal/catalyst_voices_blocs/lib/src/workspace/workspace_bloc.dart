@@ -91,12 +91,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     final id = document.metadata.id;
     final categoryId = document.metadata.categoryId;
     final templateRef = document.metadata.templateRef;
+    final collaborators = document.metadata.collaborators;
 
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
       id: id,
       template: templateRef,
       categoryId: categoryId,
+      collaborators: collaborators,
     );
   }
 

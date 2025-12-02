@@ -173,6 +173,7 @@ DocumentData _buildDoc({
   SignedDocumentRef? categoryId,
   List<CatalystId>? authors,
   bool isDraft = false,
+  List<CatalystId>? collaborators,
 }) {
   id ??= DocumentRefFactory.randomUuidV7();
   ver ??= id;
@@ -186,6 +187,7 @@ DocumentData _buildDoc({
     template: template,
     categoryId: categoryId,
     authors: authors,
+    collaborators: collaborators,
   );
 
   return DocumentData(
