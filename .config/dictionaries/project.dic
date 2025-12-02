@@ -269,7 +269,7 @@ Pbkdf2
 pbxproj
 Pdart
 permissionless
-pg\_isready
+pg_isready
 pinenacl
 PITR
 plpgsql
