@@ -4,6 +4,10 @@ on:
   workflow_call:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 concurrency:
   group: voices-tests-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
