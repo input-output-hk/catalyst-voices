@@ -51,12 +51,12 @@ dependencies:
   flutter_quill:
     git:
       url: https://github.com/input-output-hk/flutter-quill
-      ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
+      ref: 81aa649db3268b0b69440db1b3313af90d393ae7
   flutter_quill_extensions:
     git:
       url: https://github.com/input-output-hk/flutter-quill
       path: flutter_quill_extensions
-      ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
+      ref: 81aa649db3268b0b69440db1b3313af90d393ae7
   flutter_secure_storage: ^9.2.4
   flutter_web_plugins:
     sdk: flutter
@@ -70,7 +70,7 @@ dependencies:
   markdown_quill:
     git:
       url: https://github.com/input-output-hk/markdown_quill
-      ref: 63058a25ed9b42e1e183edb84bb613ac235c1306
+      ref: 8a8f483a17eff72aa5adcead1449c895ffc23ac1
   mask_text_input_formatter: ^2.9.0
   path_provider: ^2.1.5
   permission_handler: ^12.0.1
