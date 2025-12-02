@@ -6,11 +6,12 @@ import time
 import subprocess
 import json
 from api.v1 import document
-from utils import uuid_v7
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import admin_key
-from utils.ed25519 import Ed25519Keys
 from tempfile import NamedTemporaryFile
+
+from catalyst_python.uuid import uuid_v7
+from catalyst_python.ed25519 import Ed25519Keys
 
 
 DOC_TYPE = {
@@ -45,7 +46,7 @@ class SignedDocumentBase:
 
     def new_version(self):
         time.sleep(1)
-        self.metadata["ver"] = uuid_v7.uuid_v7()
+        self.metadata["ver"] = uuid_v7()
 
     def copy(self):
         new_copy = SignedDocument(
@@ -114,7 +115,7 @@ def create_metadata(
     template: SignedDocumentBase | None = None,
     parameters: list[SignedDocumentBase] | None = None,
 ) -> dict[str, Any]:
-    doc_id = uuid_v7.uuid_v7()
+    doc_id = uuid_v7()
 
     metadata: dict[str, Any] = {
         "content-encoding": "br",

@@ -9,7 +9,7 @@ import os
 import requests
 from loguru import logger
 
-from utils import address
+from catalyst_python.address import stake_public_key_to_address
 
 # relative path to this script file for the output snapshot file
 OUT_FILE = os.environ["CARDANO_ASSETS_OUTPUT_FILE"]
@@ -57,7 +57,7 @@ logger.info(
     f"Start processing start: {START_POSITION}, end: {START_POSITION + min(len(processing_records), RECORDS_LIMIT)}"
 )
 for i, record in enumerate(processing_records):
-    stake_addr = address.stake_public_key_to_address(
+    stake_addr = stake_public_key_to_address(
         key=record["stake_public_key"][2:], is_stake=True, network_type="preprod"
     )
 

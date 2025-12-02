@@ -1,9 +1,11 @@
 import json
 from loguru import logger
 import pytest
-from utils import health, address, sync
+from utils import health, sync
 from api import cat_gateway_endpoint_url
 import requests
+
+from catalyst_python.address import stake_public_key_to_address
 
 def check_delegations(provided, expected):
     if type(expected) is list:
@@ -36,7 +38,7 @@ def test_voter_registration_endpoint():
     for entry in snapshot_tool_data:
         expected_rewards_address = entry["rewards_address"]
         expected_nonce = entry["nonce"]
-        stake_address = address.stake_public_key_to_address(
+        stake_address = stake_public_key_to_address(
             key=entry["stake_public_key"][2:], is_stake=True, network_type=network
         )
         res = get_voter_registration(
