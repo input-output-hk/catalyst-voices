@@ -1,45 +1,35 @@
 import pytest
-from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
+import os
+from utils.ed25519 import Ed25519Keys
 from utils.rbac_chain import (
     generate_rbac_auth_token,
-    ONLY_ROLE_0_REG_JSON,
-    RoleID,
     generate_cat_id,
 )
 
 
 class AdminKey:
-    def __init__(self, sk_hex: str):
-        self.sk_hex = sk_hex
-
-        sk = bytes.fromhex(sk_hex)[:64]
-        chain_code = bytes.fromhex(sk_hex)[64:]
-
-        self.sk = BIP32ED25519PrivateKey(sk, chain_code)
-
-    def pk(self) -> BIP32ED25519PublicKey:
-        return BIP32ED25519PublicKey.from_private_key(self.sk)
-
-    def pk_hex(self) -> str:
-        return self.pk().public_key.hex()
+    def __init__(self, key: Ed25519Keys):
+        self.key = key
 
     def cat_id(self) -> str:
         return generate_cat_id(
+            scheme="admin.catalyst",
             network="cardano",
             subnet="preprod",
-            pk_hex=self.pk_hex(),
-            scheme="admin.catalyst",
+            role_0_key=self.key,
         )
 
     def auth_token(self) -> str:
         return generate_rbac_auth_token(
+            scheme="admin.catalyst",
             network="cardano",
             subnet="preprod",
-            pk_hex=self.pk_hex(),
-            sk_hex=self.sk_hex,
+            role_0_key=self.key,
+            signing_key=self.key,
         )
 
 
 @pytest.fixture(scope='session')
 def admin_key() -> AdminKey:
-    return AdminKey(ONLY_ROLE_0_REG_JSON[f"{RoleID.ROLE_0}"][0]["sk"])
+    key = Ed25519Keys(os.environ["CAT_GATEWAY_ADMIN_PRIVATE_KEY"])
+    return AdminKey(key)
