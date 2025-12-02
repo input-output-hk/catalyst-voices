@@ -53,10 +53,10 @@ services:
       timeout: 30s
       retries: 50
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@${EVENT_DB_URL:-event-db}/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=${INDEX_DB_URL:-scylla-node:9042}
-      - CASSANDRA_VOLATILE_URL=${INDEX_DB_URL:-scylla-node:9042}
-      - CHAIN_NETWORK=${ENV_TARGET:-Preprod}
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=index-db:9042
+      - CASSANDRA_VOLATILE_URL=index-db:9042
+      - CHAIN_NETWORK=Preprod
       - INTERNAL_API_KEY=123
       - YES_I_REALLY_WANT_TO_PANIC=panic attack
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
