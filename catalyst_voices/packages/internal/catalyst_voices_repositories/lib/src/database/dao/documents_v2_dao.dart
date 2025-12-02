@@ -422,7 +422,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           ..addColumns([const Constant(1)])
           ..where(documentAuthors.documentId.equalsExp(tbl.id))
           ..where(documentAuthors.documentVer.equalsExp(tbl.ver))
-          ..where(documentAuthors.authorIdSignificant.equals(significant.toUri().toString()));
+          ..where(documentAuthors.accountSignificantId.equals(significant.toUri().toString()));
         return existsQuery(authorQuery);
       });
     }
@@ -468,9 +468,9 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       }
     }
 
-    if (filters != null) {
-      query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
-    }
+    // if (filters != null) {
+    //   query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
+    // }
 
     if (latestOnly && id?.ver == null) {
       final inner = alias(documentsV2, 'inner');

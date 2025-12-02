@@ -169,7 +169,9 @@ void main() {
           );
 
           // 4. Collaborators
-          final collaborators = await newDb.documentAuthors.select().get();
+          final collaborators = await newDb.documentCollaborators
+              .select()
+              .get();
           expect(
             collaborators.length,
             expectedCollaborators.length,
@@ -386,7 +388,7 @@ extension on DocumentData {
     final documentId = metadata.id.id;
     final documentVer = metadata.id.ver!;
 
-    return (metadata.authors ?? []).map(
+    return (metadata.collaborators ?? []).map(
       (catId) {
         return _NewDocumentCollaborators(
           documentId: documentId,

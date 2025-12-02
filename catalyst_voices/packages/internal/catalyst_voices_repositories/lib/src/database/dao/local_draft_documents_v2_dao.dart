@@ -311,9 +311,9 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       }
     }
 
-    if (filters != null) {
-      query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
-    }
+    // if (filters != null) {
+    //   query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
+    // }
 
     if (latestOnly && id?.ver == null) {
       final inner = alias(localDocumentsDrafts, 'inner');

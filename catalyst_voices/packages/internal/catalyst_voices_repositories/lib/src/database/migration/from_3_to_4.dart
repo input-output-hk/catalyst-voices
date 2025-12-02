@@ -9,7 +9,6 @@ import 'package:catalyst_voices_repositories/src/database/table/local_documents_
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart' hide JsonKey;
-import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sqlite3/common.dart' as sqlite3 show jsonb;
 
@@ -71,12 +70,15 @@ Future<void> _migrateDocs(
 
       batch
         ..insertAll(schema.documentsV2, rows)
-        ..insertAll(schema.documentAuthors, authors);
+        ..insertAll(schema.documentAuthors, authors)
+        ..insertAll(schema.documentParameters, parameters)
+        ..insertAll(schema.documentCollaborators, collaborators);
 
       docsOffset += oldDocs.length;
     });
   }
 
+  print('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
   _logger.info('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
 }
 
@@ -113,9 +115,7 @@ Future<void> _migrateDrafts(
     });
   }
 
-  if (kDebugMode) {
-    print('Finished migrating drafts[$localDraftsOffset], totalCount[$localDraftsCount]');
-  }
+  _logger.info('Finished migrating drafts[$localDraftsOffset], totalCount[$localDraftsCount]');
 }
 
 Future<void> _migrateFavorites(
@@ -153,9 +153,7 @@ Future<void> _migrateFavorites(
     });
   }
 
-  if (kDebugMode) {
-    print('Finished migrating fav[$favOffset], totalCount[$favCount]');
-  }
+  _logger.info('Finished migrating fav[$favOffset], totalCount[$favCount]');
 }
 
 Future<int> _queryCount(String tableName, {required GeneratedDatabase db}) {
