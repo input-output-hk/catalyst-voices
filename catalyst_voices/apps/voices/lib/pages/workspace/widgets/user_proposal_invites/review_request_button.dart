@@ -15,9 +15,7 @@ class ReviewRequestButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
       onTap: () => _onTap(context),
-      child: Text(
-        context.l10n.reviewRequest,
-      ),
+      child: Text(context.l10n.reviewRequest),
     );
   }
 

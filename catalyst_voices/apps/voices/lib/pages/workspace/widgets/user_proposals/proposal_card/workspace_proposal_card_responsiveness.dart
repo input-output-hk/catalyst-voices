@@ -114,15 +114,13 @@ class _MediumScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            Offstage(
-              offstage: type.isInvite,
-              child: _CampaignData(
+            if (!type.isInvite)
+              _CampaignData(
                 leadValue: proposal.commentsCount == 0
                     ? context.l10n.notAvailableAbbr
                     : proposal.commentsCount.toString(),
                 subValue: context.l10n.comments(proposal.commentsCount),
               ),
-            ),
           ],
         ),
       ],
@@ -173,15 +171,13 @@ class _SmallScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            Offstage(
-              offstage: type.isInvite,
-              child: _CampaignData(
+            if (!type.isInvite)
+              _CampaignData(
                 leadValue: proposal.commentsCount == 0
                     ? context.l10n.notAvailableAbbr
                     : proposal.commentsCount.toString(),
                 subValue: context.l10n.comments(proposal.commentsCount),
               ),
-            ),
           ],
         ),
       ],
