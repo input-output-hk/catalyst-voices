@@ -76,7 +76,7 @@ pub(crate) async fn endpoint(
 
     // validate document signatures
     let verifying_key_provider =
-        match VerifyingKeyProvider::try_from_kids(&mut token, &doc.authors()).await {
+        match VerifyingKeyProvider::try_new(&mut token, &doc.authors()).await {
             Ok(value) => value,
             Err(err) if err.is::<CassandraSessionError>() => {
                 return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
