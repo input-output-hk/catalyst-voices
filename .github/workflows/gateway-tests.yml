@@ -3,7 +3,7 @@ name: Catalyst Gateway integration tests
 on:
   workflow_call:
     secrets:
-      PRIVATE_SSH_KEY:
+      QA_REPO_SSH_KEY:
         required: true
 
 concurrency:
