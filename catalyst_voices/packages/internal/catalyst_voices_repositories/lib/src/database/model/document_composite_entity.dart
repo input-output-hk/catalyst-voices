@@ -9,11 +9,10 @@ final class DocumentCompositeEntity {
   final List<DocumentCollaboratorEntity> collaborators;
   final List<DocumentParameterEntity> parameters;
 
-  // TODO(damian-molinski): change to named and optional.
   const DocumentCompositeEntity(
-    this.doc,
-    this.authors,
-    this.collaborators,
-    this.parameters,
-  );
+    this.doc, {
+    this.authors = const [],
+    this.collaborators = const [],
+    this.parameters = const [],
+  });
 }

@@ -93,9 +93,9 @@ final class DocumentWithAuthorsFactory {
 
     return DocumentCompositeEntity(
       docEntity,
-      authorsEntities,
-      collaboratorsEntities,
-      parametersEntities,
+      authors: authorsEntities,
+      parameters: parametersEntities,
+      collaborators: collaboratorsEntities,
     );
   }
 }

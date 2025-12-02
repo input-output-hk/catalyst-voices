@@ -110,9 +110,9 @@ final class DatabaseDocumentsDataSource
         .map(
           (e) => DocumentCompositeEntity(
             e.toDocEntity(),
-            e.toAuthorEntities(),
-            e.toCollaboratorEntities(),
-            e.toParameterEntities(),
+            authors: e.toAuthorEntities(),
+            parameters: e.toParameterEntities(),
+            collaborators: e.toCollaboratorEntities(),
           ),
         )
         .toList();
