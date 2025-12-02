@@ -7,13 +7,17 @@ import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart'
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_image_error.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog.dart';
+// cspell: words emded
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_emded_builders.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_rules.dart';
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_shortcuts.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -278,7 +282,10 @@ class _EditorState extends State<_Editor> {
             placeholder: widget.placeholder ?? context.l10n.placeholderRichText,
             characterShortcutEvents: quill.standardCharactersShortcutEvents,
             /* cSpell:disable */
-            spaceShortcutEvents: quill.standardSpaceShorcutEvents,
+            spaceShortcutEvents: [
+              ...quill.standardSpaceShorcutEvents,
+              formatDividerToDividerStyle,
+            ],
             /* cSpell:enable */
             customStyles: quill.DefaultStyles(
               placeHolder: quill.DefaultTextBlockStyle(
@@ -290,13 +297,19 @@ class _EditorState extends State<_Editor> {
                 null,
               ),
             ),
-            embedBuilders: CatalystPlatform.isWeb
-                ? quill_ext.FlutterQuillEmbeds.editorWebBuilders(
-                    imageEmbedConfig: const QuillEditorImageEmbedConfig(
-                      errorWidget: InsertImageError(),
-                    ),
-                  )
-                : quill_ext.FlutterQuillEmbeds.editorBuilders(),
+            embedBuilders: {
+              ...CatalystPlatform.isWeb
+                  ? quill_ext.FlutterQuillEmbeds.editorWebBuilders(
+                      imageEmbedConfig: const QuillEditorImageEmbedConfig(
+                        errorWidget: InsertImageError(),
+                      ),
+                    )
+                  : quill_ext.FlutterQuillEmbeds.editorBuilders(),
+              const DividerEmbedBuilder(),
+            },
+            unknownEmbedBuilder: kDebugMode
+                ? const DebugUnknownEmbedBuilder()
+                : const UnknownEmbedBuilder(),
           ),
         ),
       ),
