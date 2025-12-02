@@ -19,175 +19,187 @@ import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 
 void main() {
-  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
-  late SchemaVerifier verifier;
+  group(
+    'migration',
+    () {
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      late SchemaVerifier verifier;
 
-  setUpAll(() {
-    verifier = SchemaVerifier(GeneratedHelper());
-  });
+      setUpAll(() {
+        verifier = SchemaVerifier(GeneratedHelper());
+      });
 
-  group('database migrations', () {
-    const versions = GeneratedHelper.versions;
-    for (final (i, fromVersion) in versions.indexed) {
-      group('from $fromVersion', () {
-        for (final toVersion in versions.skip(i + 1)) {
-          test(
-            'to $toVersion',
-            () async {
-              final schema = await verifier.schemaAt(fromVersion);
-              final db = DriftCatalystDatabase(schema.newConnection());
-              await verifier.migrateAndValidate(db, toVersion);
-              await db.close();
-            },
-            onPlatform: driftOnPlatforms,
-          );
+      group('database migrations', () {
+        const versions = GeneratedHelper.versions;
+        for (final (i, fromVersion) in versions.indexed) {
+          group('from $fromVersion', () {
+            for (final toVersion in versions.skip(i + 1)) {
+              test(
+                'to $toVersion',
+                () async {
+                  final schema = await verifier.schemaAt(fromVersion);
+                  final db = DriftCatalystDatabase(schema.newConnection());
+                  await verifier.migrateAndValidate(db, toVersion);
+                  await db.close();
+                },
+                onPlatform: driftOnPlatforms,
+              );
+            }
+          });
         }
       });
-    }
-  });
 
-  test(
-    'migration from v3 to v4 does not corrupt data',
-    () async {
-      // 1. Documents
-      final docs = _generateDocuments(10);
-      final oldDocumentsData = docs.map((e) => e.v3()).toList();
-      final expectedNewDocumentsData = docs.map((e) => e.v4()).toList();
-
-      // 2. Document Favorites
-      final oldDocumentsFavoritesData = docs
-          .mapIndexed(
-            (index, e) => _buildDocFavV3(id: e.id.id, isFavorite: index.isEven),
-          )
-          .toList();
-      final expectedNewDocumentsFavoritesData = docs
-          .mapIndexed(
-            (index, e) => _buildDocFavV4(id: e.id.id, isFavorite: index.isEven),
-          )
-          .toList();
-
-      // 3. Drafts
-      final drafts = _generateDocuments(5, isDraft: true);
-      final oldDraftsData = drafts.map((e) => e.v3Draft()).toList();
-      final expectedNewDraftsData = drafts.map((e) => e.v4Draft()).toList();
-
-      // 4. Authors
-      final expectedAuthors = docs.map((e) => e.v4Authors()).flattened.toList();
-      final expectedParameters = docs
-          .map((e) => e.v4Parameters())
-          .flattened
-          .toList();
-      final expectedCollaborators = docs
-          .map((e) => e.v4Collaborators())
-          .flattened
-          .toList();
-
-      await verifier.testWithDataIntegrity(
-        oldVersion: 3,
-        newVersion: 4,
-        createOld: v3.DatabaseAtV3.new,
-        createNew: v4.DatabaseAtV4.new,
-        openTestedDatabase: DriftCatalystDatabase.new,
-        createItems: (batch, oldDb) {
-          batch
-            ..insertAll(oldDb.documents, oldDocumentsData)
-            ..insertAll(oldDb.documentsFavorites, oldDocumentsFavoritesData)
-            ..insertAll(oldDb.drafts, oldDraftsData);
-        },
-        validateItems: (newDb) async {
+      test(
+        'migration from v3 to v4 does not corrupt data',
+        () async {
           // 1. Documents
-          final migratedDocs = await newDb.documentsV2.select().get();
-          expect(
-            migratedDocs.length,
-            expectedNewDocumentsData.length,
-            reason: 'Should migrate the same number of documents',
-          );
-          // Using a collection matcher for a more readable assertion
-          expect(
-            migratedDocs,
-            orderedEquals(expectedNewDocumentsData),
-            reason:
-                'Migrated documents should match expected '
-                'format and data in the correct order',
-          );
+          final docs = _generateDocuments(10);
+          final oldDocumentsData = docs.map((e) => e.v3()).toList();
+          final expectedNewDocumentsData = docs.map((e) => e.v4()).toList();
 
-          // 2. LocalMetadata (eg. fav)
-          final migratedFavorites = await newDb.documentsLocalMetadata
-              .select()
-              .get();
-          expect(
-            migratedFavorites.length,
-            expectedNewDocumentsFavoritesData.length,
-            reason: 'Should migrate the same number of favorites',
-          );
-          expect(
-            migratedFavorites,
-            // Use unorderedEquals if the insertion order is not guaranteed
-            unorderedEquals(expectedNewDocumentsFavoritesData),
-            reason: 'All favorites should be migrated correctly',
-          );
+          // 2. Document Favorites
+          final oldDocumentsFavoritesData = docs
+              .mapIndexed(
+                (index, e) =>
+                    _buildDocFavV3(id: e.id.id, isFavorite: index.isEven),
+              )
+              .toList();
+          final expectedNewDocumentsFavoritesData = docs
+              .mapIndexed(
+                (index, e) =>
+                    _buildDocFavV4(id: e.id.id, isFavorite: index.isEven),
+              )
+              .toList();
 
-          // 3. Local drafts
-          final migratedDrafts = await newDb.localDocumentsDrafts
-              .select()
-              .get();
-          expect(
-            migratedDrafts.length,
-            expectedNewDraftsData.length,
-            reason: 'Should migrate the same number of drafts',
-          );
-          expect(
-            migratedDrafts,
-            orderedEquals(expectedNewDraftsData),
-            reason: 'Migrated drafts should match expected format and data',
-          );
+          // 3. Drafts
+          final drafts = _generateDocuments(5, isDraft: true);
+          final oldDraftsData = drafts.map((e) => e.v3Draft()).toList();
+          final expectedNewDraftsData = drafts.map((e) => e.v4Draft()).toList();
 
           // 4. Authors
-          final authors = await newDb.documentAuthors.select().get();
-          expect(
-            authors.length,
-            expectedAuthors.length,
-            reason: 'Should migrate the same number of authors',
-          );
-          expect(
-            authors,
-            orderedEquals(expectedAuthors),
-            reason: 'Migrated authors should match expected format and data',
-          );
+          final expectedAuthors = docs
+              .map((e) => e.v4Authors())
+              .flattened
+              .toList();
+          final expectedParameters = docs
+              .map((e) => e.v4Parameters())
+              .flattened
+              .toList();
+          final expectedCollaborators = docs
+              .map((e) => e.v4Collaborators())
+              .flattened
+              .toList();
 
-          // 4. Parameters
-          final parameters = await newDb.documentParameters.select().get();
-          expect(
-            parameters.length,
-            expectedParameters.length,
-            reason: 'Should migrate the same number of parameters',
-          );
-          expect(
-            parameters,
-            orderedEquals(expectedParameters),
-            reason: 'Migrated parameters should match expected format and data',
-          );
+          await verifier.testWithDataIntegrity(
+            oldVersion: 3,
+            newVersion: 4,
+            createOld: v3.DatabaseAtV3.new,
+            createNew: v4.DatabaseAtV4.new,
+            openTestedDatabase: DriftCatalystDatabase.new,
+            createItems: (batch, oldDb) {
+              batch
+                ..insertAll(oldDb.documents, oldDocumentsData)
+                ..insertAll(oldDb.documentsFavorites, oldDocumentsFavoritesData)
+                ..insertAll(oldDb.drafts, oldDraftsData);
+            },
+            validateItems: (newDb) async {
+              // 1. Documents
+              final migratedDocs = await newDb.documentsV2.select().get();
+              expect(
+                migratedDocs.length,
+                expectedNewDocumentsData.length,
+                reason: 'Should migrate the same number of documents',
+              );
+              // Using a collection matcher for a more readable assertion
+              expect(
+                migratedDocs,
+                orderedEquals(expectedNewDocumentsData),
+                reason:
+                    'Migrated documents should match expected '
+                    'format and data in the correct order',
+              );
 
-          // 4. Collaborators
-          final collaborators = await newDb.documentCollaborators
-              .select()
-              .get();
-          expect(
-            collaborators.length,
-            expectedCollaborators.length,
-            reason: 'Should migrate the same number of collaborators',
-          );
-          expect(
-            collaborators,
-            orderedEquals(expectedCollaborators),
-            reason:
-                'Migrated collaborators should '
-                'match expected format and data',
+              // 2. LocalMetadata (eg. fav)
+              final migratedFavorites = await newDb.documentsLocalMetadata
+                  .select()
+                  .get();
+              expect(
+                migratedFavorites.length,
+                expectedNewDocumentsFavoritesData.length,
+                reason: 'Should migrate the same number of favorites',
+              );
+              expect(
+                migratedFavorites,
+                // Use unorderedEquals if the insertion order is not guaranteed
+                unorderedEquals(expectedNewDocumentsFavoritesData),
+                reason: 'All favorites should be migrated correctly',
+              );
+
+              // 3. Local drafts
+              final migratedDrafts = await newDb.localDocumentsDrafts
+                  .select()
+                  .get();
+              expect(
+                migratedDrafts.length,
+                expectedNewDraftsData.length,
+                reason: 'Should migrate the same number of drafts',
+              );
+              expect(
+                migratedDrafts,
+                orderedEquals(expectedNewDraftsData),
+                reason: 'Migrated drafts should match expected format and data',
+              );
+
+              // 4. Authors
+              final authors = await newDb.documentAuthors.select().get();
+              expect(
+                authors.length,
+                expectedAuthors.length,
+                reason: 'Should migrate the same number of authors',
+              );
+              expect(
+                authors,
+                orderedEquals(expectedAuthors),
+                reason:
+                    'Migrated authors should match expected format and data',
+              );
+
+              // 4. Parameters
+              final parameters = await newDb.documentParameters.select().get();
+              expect(
+                parameters.length,
+                expectedParameters.length,
+                reason: 'Should migrate the same number of parameters',
+              );
+              expect(
+                parameters,
+                orderedEquals(expectedParameters),
+                reason:
+                    'Migrated parameters should match expected format and data',
+              );
+
+              // 4. Collaborators
+              final collaborators = await newDb.documentCollaborators
+                  .select()
+                  .get();
+              expect(
+                collaborators.length,
+                expectedCollaborators.length,
+                reason: 'Should migrate the same number of collaborators',
+              );
+              expect(
+                collaborators,
+                orderedEquals(expectedCollaborators),
+                reason:
+                    'Migrated collaborators should '
+                    'match expected format and data',
+              );
+            },
           );
         },
       );
     },
-    onPlatform: driftOnPlatforms,
+    skip: driftSkip,
   );
 }
 
@@ -197,7 +209,7 @@ const _testOrgCatalystIdUri =
 
 const _testUserCatalystIdUri =
     'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
-/* cSpell:enable */
+/* cSpell:enabled */
 
 DocumentData _buildDoc({
   String? id,
@@ -275,12 +287,11 @@ List<DocumentData> _generateDocuments(
       type: index.isEven
           ? DocumentType.proposalDocument
           : DocumentType.commentDocument,
-      /* cSpell:disable */
+
       authors: [
         CatalystId.parse(_testUserCatalystIdUri),
         if (index.isEven) CatalystId.parse(_testOrgCatalystIdUri),
       ],
-      /* cSpell:enable */
     );
   });
 }
