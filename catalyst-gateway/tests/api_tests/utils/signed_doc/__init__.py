@@ -6,9 +6,10 @@ import time
 import subprocess
 import json
 from api.v1 import document
-from utils import signed_doc, uuid_v7
+from utils import uuid_v7
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.admin import admin_key
+from utils.ed25519 import Ed25519Keys
 from tempfile import NamedTemporaryFile
 
 
@@ -54,53 +55,58 @@ class SignedDocumentBase:
         return new_copy
 
 
-class SignedDocumentV1(SignedDocumentBase):
-    # Build and sign document, returns hex str of document bytes
-    def build_and_sign(
-        self,
-        cat_id: str,
-        bip32_sk_hex: str,
-    ) -> str:
-        return signed_doc.build_signed_doc(
-            self.metadata,
-            self.content,
-            bip32_sk_hex,
-            cat_id,
-            os.environ["DEP_MK_SIGNED_DOC_PATH"],
-        )
-
-
 class SignedDocument(SignedDocumentBase):
     # Build and sign document, returns hex str of document bytes
     def build_and_sign(
         self,
         cat_id: str,
-        bip32_sk_hex: str,
+        key: Ed25519Keys,
     ) -> str:
-        return signed_doc.build_signed_doc(
-            self.metadata,
-            self.content,
-            bip32_sk_hex,
-            cat_id,
-            os.environ["MK_SIGNED_DOC_PATH"],
+        with (
+            NamedTemporaryFile() as metadata_file,
+            NamedTemporaryFile() as doc_content_file,
+            NamedTemporaryFile() as signed_doc_file,
+        ):
+            mk_signed_doc_path = os.environ["MK_SIGNED_DOC_PATH"]
+            json_str = json.dumps(self.metadata)
+            metadata_file.write(json_str.encode(encoding="utf-8"))
+            metadata_file.flush()
+
+            json_str = json.dumps(self.content)
+            doc_content_file.write(json_str.encode(encoding="utf-8"))
+            doc_content_file.flush()
+
+            subprocess.run(
+                [
+                    mk_signed_doc_path,
+                    "build",
+                    doc_content_file.name,
+                    signed_doc_file.name,
+                    metadata_file.name,
+                ],
+                capture_output=True,
+            )
+
+            subprocess.run(
+                [
+                    mk_signed_doc_path,
+                    "sign",
+                    signed_doc_file.name,
+                    key.sk_hex,
+                    cat_id,
+                ],
+                capture_output=True,
+            )
+
+            signed_doc_hex = signed_doc_file.read().hex()
+            return signed_doc_hex
+        
+        return build_signed_doc(
+            metadata_json=self.metadata,
+            doc_content_json=self.content,
+            key=key,
+            cat_id=cat_id,
         )
-
-
-class DocBuilderReturns:
-    def __init__(
-        self,
-        doc_builder: SignedDocument,
-        signed_doc: str,
-        auth_token: str,
-        cat_id: str,
-        role_id: RoleID,
-    ):
-        self.doc_builder = doc_builder
-        self.signed_doc = signed_doc
-        self.auth_token = auth_token
-        self.cat_id = cat_id
-        self.role_id = role_id
-
 
 def create_metadata(
     doc_type: str,
@@ -127,53 +133,6 @@ def create_metadata(
         ])
 
     return metadata
-
-
-def build_signed_doc(
-    metadata_json: Dict[str, Any],
-    doc_content_json: Dict[str, Any],
-    bip32_sk_hex: str,
-    # corresponded to the `bip32_sk_hex` `cat_id` string
-    cat_id: str,
-    mk_signed_doc_path,
-) -> str:
-    with (
-        NamedTemporaryFile() as metadata_file,
-        NamedTemporaryFile() as doc_content_file,
-        NamedTemporaryFile() as signed_doc_file,
-    ):
-        json_str = json.dumps(metadata_json)
-        metadata_file.write(json_str.encode(encoding="utf-8"))
-        metadata_file.flush()
-
-        json_str = json.dumps(doc_content_json)
-        doc_content_file.write(json_str.encode(encoding="utf-8"))
-        doc_content_file.flush()
-
-        subprocess.run(
-            [
-                mk_signed_doc_path,
-                "build",
-                doc_content_file.name,
-                signed_doc_file.name,
-                metadata_file.name,
-            ],
-            # capture_output=True,
-        )
-
-        subprocess.run(
-            [
-                mk_signed_doc_path,
-                "sign",
-                signed_doc_file.name,
-                bip32_sk_hex,
-                cat_id,
-            ],
-            # capture_output=True,
-        )
-
-        signed_doc_hex = signed_doc_file.read().hex()
-        return signed_doc_hex
 
 
 # ------------------- #
@@ -208,10 +167,10 @@ def proposal_doc_factory(
 
         rbac_chain = rbac_chain_factory()
         doc = SignedDocument(metadata, content)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
 
         resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
+            data=doc.build_and_sign(cat_id, key),
             token=rbac_chain.auth_token(),
         )
         assert resp.status_code == 201, (
@@ -244,7 +203,7 @@ def proposal_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -273,7 +232,7 @@ def category_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -299,7 +258,7 @@ def category_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -329,7 +288,7 @@ def campaign_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -355,7 +314,7 @@ def campaign_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -381,7 +340,7 @@ def brand_parameters_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -403,7 +362,7 @@ def brand_parameters_form_template_doc(
     doc = SignedDocument(metadata, content)
 
     resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.sk_hex),
+        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
         token=admin_key.auth_token(),
     )
     assert resp.status_code == 201, (

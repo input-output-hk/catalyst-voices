@@ -5,7 +5,7 @@ from api.v1 import document as document_v1
 from api.v2 import document as document_v2
 import json
 from utils.rbac_chain import rbac_chain_factory, RoleID
-from utils.signed_doc import SignedDocumentV1
+from utils.signed_doc.deprecated import comment, proposal, proposal_submission
 
 
 # Getting documents using GET `/v1/document` endpoint.
@@ -251,97 +251,14 @@ def test_get_migrated_and_f14_documents():
         ), f"Unexpected document cbor bytes for {doc_id}"
 
 
-def deprecated_proposal(rbac_chain):
-    role_id = RoleID.PROPOSER
-    proposal_doc_id = uuid_v7.uuid_v7()
-    proposal_metadata_json = {
-        "id": proposal_doc_id,
-        "ver": proposal_doc_id,
-        # Proposal document type
-        "type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
-        "content-type": "application/json",
-        "content-encoding": "br",
-        # Fund 14 proposal template, defined in `V3__signed_documents.sql`
-        "template": {
-            "id": "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
-            "ver": "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
-        },
-        # Fund 14 category, defined in `V3__signed_documents.sql`
-        "parameters": {
-            "id": "0194d490-30bf-7473-81c8-a0eaef369619",
-            "ver": "0194d490-30bf-7473-81c8-a0eaef369619",
-        },
-    }
-    with open("./test_data/signed_docs/proposal.deprecated.json", "r") as json_file:
-        content = json.load(json_file)
-
-    doc = SignedDocumentV1(proposal_metadata_json, content)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex), proposal_doc_id)
-
-
-def deprecated_comment(rbac_chain, proposal_id):
-    role_id = RoleID.ROLE_0
-    comment_doc_id = uuid_v7.uuid_v7()
-    comment_metadata_json = {
-        "id": comment_doc_id,
-        "ver": comment_doc_id,
-        # Comment document type
-        "type": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
-        "content-type": "application/json",
-        "content-encoding": "br",
-        "ref": {
-            "id": proposal_id,
-            "ver": proposal_id,
-        },
-        # Fund 14 comment template, defined in `V3__signed_documents.sql`
-        "template": {
-            "id": "0194d494-4402-7e0e-b8d6-171f8fea18b0",
-            "ver": "0194d494-4402-7e0e-b8d6-171f8fea18b0",
-        },
-    }
-    with open("./test_data/signed_docs/comment.deprecated.json", "r") as json_file:
-        content = json.load(json_file)
-
-    doc = SignedDocumentV1(comment_metadata_json, content)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex), comment_doc_id)
-
-
-def deprecated_proposal_submission(rbac_chain, proposal_id):
-    role_id = RoleID.PROPOSER
-    submission_action_id = uuid_v7.uuid_v7()
-    sub_action_metadata_json = {
-        "id": submission_action_id,
-        "ver": submission_action_id,
-        # submission action type
-        "type": "5e60e623-ad02-4a1b-a1ac-406db978ee48",
-        "content-type": "application/json",
-        "content-encoding": "br",
-        "ref": {
-            "id": proposal_id,
-            "ver": proposal_id,
-        },
-    }
-    with open("./test_data/signed_docs/submission_action.deprecated.json", "r") as json_file:
-        content = json.load(json_file)
-
-    doc = SignedDocumentV1(sub_action_metadata_json, content)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (
-        doc.build_and_sign(cat_id, sk_hex),
-        submission_action_id,
-    )
-
-
 # Trying to submit a deprecated proposal, comment and proposal actions documents
 @pytest.mark.preprod_indexing
 def test_put_deprecated_documents(rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
 
-    proposal_cbor, proposal_id = deprecated_proposal(rbac_chain)
-    comment_cbor, comment_id = deprecated_comment(rbac_chain, proposal_id)
-    proposal_submission_cbor, proposal_submission_id = deprecated_proposal_submission(
+    proposal_cbor, proposal_id = proposal(rbac_chain)
+    comment_cbor, comment_id = comment(rbac_chain, proposal_id)
+    proposal_submission_cbor, proposal_submission_id = proposal_submission(
         rbac_chain, proposal_id
     )
 
