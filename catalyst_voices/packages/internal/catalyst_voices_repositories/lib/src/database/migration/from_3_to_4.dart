@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/schema_versions.g.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
@@ -38,16 +40,17 @@ Future<void> _migrateDocs(
   Schema4 schema, {
   required int batchSize,
 }) async {
-  final docsCount = await schema.documents.count().getSingleOrNull().then((e) => e ?? 0);
+  final docsCount = await _queryCount('documents', db: m.database);
   var docsOffset = 0;
 
   while (docsOffset < docsCount) {
     await m.database.batch((batch) async {
-      final query = schema.documents.select()..limit(batchSize, offset: docsOffset);
-      final oldDocs = await query.get();
-
+      final oldDocs = await _queryRows('documents', batchSize, docsOffset, db: m.database);
       final rows = <RawValuesInsertable<QueryRow>>[];
       final authors = <RawValuesInsertable<QueryRow>>[];
+      final parameters = <RawValuesInsertable<QueryRow>>[];
+      final collaborators = <RawValuesInsertable<QueryRow>>[];
+
       for (final oldDoc in oldDocs) {
         final rawContent = oldDoc.read<Uint8List>('content');
         final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
@@ -56,17 +59,14 @@ Future<void> _migrateDocs(
         final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
         final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
 
-        final entity = metadata.toDocEntity(content: content);
-
-        final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
-
-        rows.add(insertable);
-
-        final authorsInjectable = metadata.toAuthorEntity().map(
-          (entity) => RawValuesInsertable<QueryRow>(entity.toColumns(true)),
+        rows.add(metadata.toDocEntity(content: content).toColumns(true).toInsertable());
+        authors.addAll(metadata.toAuthorEntity().map((e) => e.toColumns(true).toInsertable()));
+        parameters.addAll(
+          metadata.toParameterEntity().map((e) => e.toColumns(true).toInsertable()),
         );
-
-        authors.addAll(authorsInjectable);
+        collaborators.addAll(
+          metadata.toCollaboratorEntity().map((entity) => entity.toColumns(true).toInsertable()),
+        );
       }
 
       batch
@@ -85,17 +85,14 @@ Future<void> _migrateDrafts(
   Schema4 schema, {
   required int batchSize,
 }) async {
-  final localDraftsCount = await schema.drafts.count().getSingleOrNull().then(
-    (value) => value ?? 0,
-  );
+  final localDraftsCount = await _queryCount('drafts', db: m.database);
   var localDraftsOffset = 0;
 
   while (localDraftsOffset < localDraftsCount) {
     await m.database.batch((batch) async {
-      final query = schema.drafts.select()..limit(batchSize, offset: localDraftsOffset);
-      final oldDrafts = await query.get();
-
+      final oldDrafts = await _queryRows('drafts', batchSize, localDraftsOffset, db: m.database);
       final rows = <RawValuesInsertable<QueryRow>>[];
+
       for (final oldDoc in oldDrafts) {
         final rawContent = oldDoc.read<Uint8List>('content');
         final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
@@ -126,16 +123,12 @@ Future<void> _migrateFavorites(
   Schema4 schema, {
   required int batchSize,
 }) async {
-  final favCount = await schema.documentsFavorites.count().getSingleOrNull().then(
-    (value) => value ?? 0,
-  );
+  final favCount = await _queryCount('documents_favorites', db: m.database);
   var favOffset = 0;
 
   while (favOffset < favCount) {
     await m.database.batch((batch) async {
-      final query = schema.documentsFavorites.select()..limit(batchSize, offset: favOffset);
-      final oldFav = await query.get();
-
+      final oldFav = await _queryRows('documents_favorites', batchSize, favOffset, db: m.database);
       final rows = <RawValuesInsertable<QueryRow>>[];
 
       for (final oldDoc in oldFav) {
@@ -163,6 +156,23 @@ Future<void> _migrateFavorites(
   if (kDebugMode) {
     print('Finished migrating fav[$favOffset], totalCount[$favCount]');
   }
+}
+
+Future<int> _queryCount(String tableName, {required GeneratedDatabase db}) {
+  return db
+      .customSelect('SELECT COUNT(*) FROM $tableName')
+      .map((row) => row.read<int>('COUNT(*)'))
+      .getSingleOrNull()
+      .then((value) => value ?? 0);
+}
+
+Future<List<QueryRow>> _queryRows(
+  String tableName,
+  int limit,
+  int offset, {
+  required GeneratedDatabase db,
+}) {
+  return db.customSelect('SELECT * FROM $tableName LIMIT $limit OFFSET $offset').get();
 }
 
 @JsonSerializable()
@@ -405,6 +415,18 @@ extension on DocumentDataMetadataDtoDbV3 {
     }).toList();
   }
 
+  List<DocumentCollaboratorEntity> toCollaboratorEntity() {
+    return (collaborators ?? const []).map(CatalystId.parse).map((catId) {
+      return DocumentCollaboratorEntity(
+        documentId: id.id,
+        documentVer: id.ver!,
+        accountId: catId.toUri().toString(),
+        accountSignificantId: catId.toSignificant().toUri().toString(),
+        username: catId.username,
+      );
+    }).toList();
+  }
+
   DocumentEntityV2 toDocEntity({
     required Map<String, dynamic> content,
   }) {
@@ -450,4 +472,19 @@ extension on DocumentDataMetadataDtoDbV3 {
       content: DocumentDataContent(content),
     );
   }
+
+  List<DocumentParameterEntity> toParameterEntity() {
+    return (parameters ?? const []).map((ref) {
+      return DocumentParameterEntity(
+        id: ref.id,
+        ver: ref.ver!,
+        documentId: id.id,
+        documentVer: id.ver!,
+      );
+    }).toList();
+  }
+}
+
+extension on Map<String, Expression> {
+  RawValuesInsertable<QueryRow> toInsertable() => RawValuesInsertable<QueryRow>(this);
 }

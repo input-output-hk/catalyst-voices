@@ -73,6 +73,14 @@ void main() {
 
       // 4. Authors
       final expectedAuthors = docs.map((e) => e.v4Authors()).flattened.toList();
+      final expectedParameters = docs
+          .map((e) => e.v4Parameters())
+          .flattened
+          .toList();
+      final expectedCollaborators = docs
+          .map((e) => e.v4Collaborators())
+          .flattened
+          .toList();
 
       await verifier.testWithDataIntegrity(
         oldVersion: 3,
@@ -145,6 +153,34 @@ void main() {
             authors,
             orderedEquals(expectedAuthors),
             reason: 'Migrated authors should match expected format and data',
+          );
+
+          // 4. Parameters
+          final parameters = await newDb.documentParameters.select().get();
+          expect(
+            parameters.length,
+            expectedParameters.length,
+            reason: 'Should migrate the same number of parameters',
+          );
+          expect(
+            parameters,
+            orderedEquals(expectedParameters),
+            reason: 'Migrated parameters should match expected format and data',
+          );
+
+          // 4. Collaborators
+          final collaborators = await newDb.documentAuthors.select().get();
+          expect(
+            collaborators.length,
+            expectedCollaborators.length,
+            reason: 'Should migrate the same number of collaborators',
+          );
+          expect(
+            collaborators,
+            orderedEquals(expectedCollaborators),
+            reason:
+                'Migrated collaborators should '
+                'match expected format and data',
           );
         },
       );
@@ -249,7 +285,11 @@ List<DocumentData> _generateDocuments(
 
 typedef _NewDocumentAuthor = v4.DocumentAuthorsData;
 
+typedef _NewDocumentCollaborators = v4.DocumentCollaboratorsData;
+
 typedef _NewDocumentData = v4.DocumentsV2Data;
+
+typedef _NewDocumentParameters = v4.DocumentParametersData;
 
 typedef _NewDraftData = v4.LocalDocumentsDraftsData;
 
@@ -300,6 +340,7 @@ extension on DocumentData {
 
   _NewDocumentData v4() {
     return _NewDocumentData(
+      contentType: metadata.contentType.value,
       content: sqlite3.jsonb.encode(content.data),
       id: metadata.id.id,
       type: metadata.type.uuid,
@@ -313,8 +354,13 @@ extension on DocumentData {
       section: metadata.section,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.ver,
+      collaborators:
+          metadata.collaborators?.map((e) => e.toUri().toString()).join(',') ??
+          '',
+      parameters: metadata.parameters.set
+          .map(DocumentRefDto.fromModel)
+          .map((e) => e.toFlatten())
+          .join(','),
       createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
@@ -328,9 +374,26 @@ extension on DocumentData {
         return _NewDocumentAuthor(
           documentId: documentId,
           documentVer: documentVer,
-          authorId: catId.toUri().toString(),
-          authorIdSignificant: catId.toSignificant().toUri().toString(),
-          authorUsername: catId.username,
+          accountId: catId.toUri().toString(),
+          accountSignificantId: catId.toSignificant().toUri().toString(),
+          username: catId.username,
+        );
+      },
+    ).toList();
+  }
+
+  List<_NewDocumentCollaborators> v4Collaborators() {
+    final documentId = metadata.id.id;
+    final documentVer = metadata.id.ver!;
+
+    return (metadata.authors ?? []).map(
+      (catId) {
+        return _NewDocumentCollaborators(
+          documentId: documentId,
+          documentVer: documentVer,
+          accountId: catId.toUri().toString(),
+          accountSignificantId: catId.toSignificant().toUri().toString(),
+          username: catId.username,
         );
       },
     ).toList();
@@ -345,6 +408,7 @@ extension on DocumentData {
     ).toJson();
 
     return _NewDraftData(
+      contentType: metadata.contentType.value,
       content: sqlite3.jsonb.encode(content.data),
       id: metadata.id.id,
       type: metadata.type.uuid,
@@ -358,9 +422,30 @@ extension on DocumentData {
       section: metadata.section,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.ver,
+      collaborators:
+          metadata.collaborators?.map((e) => e.toUri().toString()).join(',') ??
+          '',
+      parameters: metadata.parameters.set
+          .map(DocumentRefDto.fromModel)
+          .map((e) => e.toFlatten())
+          .join(','),
       createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
+  }
+
+  List<_NewDocumentParameters> v4Parameters() {
+    final documentId = metadata.id.id;
+    final documentVer = metadata.id.ver!;
+
+    return metadata.parameters.set.map(
+      (ref) {
+        return _NewDocumentParameters(
+          id: ref.id,
+          ver: ref.ver!,
+          documentId: documentId,
+          documentVer: documentVer,
+        );
+      },
+    ).toList();
   }
 }
