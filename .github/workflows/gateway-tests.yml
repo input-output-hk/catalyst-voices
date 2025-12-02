@@ -44,7 +44,7 @@ jobs:
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
         with:
-          enable_caching: "true"
+          enable_caching: "false"
           version: 0.21.0
 
       - name: Setup
