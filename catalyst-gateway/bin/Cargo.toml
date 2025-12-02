@@ -23,7 +23,7 @@ c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-h
 catalyst-types = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types/v0.0.10" }
 
 clap = { version = "4.5.20", features = ["derive", "env"] }
-tracing = { version = "0.1.40", features = ["log"] }
+tracing = { version = "0.1.40", features = ["attributes", "log"] }
 tracing-subscriber = { version = "0.3.18", features = [
     "fmt",
     "json",
@@ -113,6 +113,7 @@ tracing-opentelemetry = { version = "0.32" }
 opentelemetry = { version = "0.31" }
 opentelemetry_sdk = { version = "0.31", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.31", features = ["grpc-tonic"] }
+opentelemetry-appender-tracing = { version = "0.31.1" }
 opentelemetry-semantic-conventions = { version = "0.31" }
 
 [dev-dependencies]
