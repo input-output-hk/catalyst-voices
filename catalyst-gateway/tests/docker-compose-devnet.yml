@@ -6,7 +6,6 @@ services:
     image: cat-devnet:latest
     container_name: cat-devnet
     healthcheck:
-      #TODO when the issues with block initial sizes is fixed, update the healthcheck https://github.com/input-output-hk/catalyst-voices/issues/3327
       test:  ["CMD-SHELL","bash /healthcheck.sh"]
       start_period: 60s
       interval: 30s
