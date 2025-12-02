@@ -311,9 +311,17 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
       }
     }
 
-    // if (filters != null) {
-    //   query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
-    // }
+    if (filters != null) {
+      query.where((tbl) {
+        final expressions = filters.categoriesIds.map((id) => tbl.parameters.like('%$id%'));
+
+        return switch (expressions.length) {
+          0 => const Constant(false),
+          1 => expressions.first,
+          _ => expressions.reduce((a, b) => a | b),
+        };
+      });
+    }
 
     if (latestOnly && id?.ver == null) {
       final inner = alias(localDocumentsDrafts, 'inner');

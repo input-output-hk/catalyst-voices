@@ -488,9 +488,18 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       }
     }
 
-    // if (filters != null) {
-    //   query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
-    // }
+    if (filters != null) {
+      query.where((tbl) {
+        final dp = alias(documentParameters, 'dp');
+        return existsQuery(
+          selectOnly(dp)
+            ..addColumns([const Constant(1)])
+            ..where(dp.documentId.equalsExp(tbl.id))
+            ..where(dp.documentVer.equalsExp(tbl.ver))
+            ..where(dp.id.isIn(filters.categoriesIds)),
+        );
+      });
+    }
 
     if (latestOnly && id?.ver == null) {
       final inner = alias(documentsV2, 'inner');
