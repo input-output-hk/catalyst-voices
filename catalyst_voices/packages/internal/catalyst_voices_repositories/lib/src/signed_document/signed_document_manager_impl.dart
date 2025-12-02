@@ -71,8 +71,8 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       'cose_sign_doc',
       () {
         return CoseSign.sign(
-          protectedHeaders: CoseHeaders.protected(),
-          unprotectedHeaders: CoseHeaders.unprotected(),
+          protectedHeaders: const CoseHeaders.protected(),
+          unprotectedHeaders: const CoseHeaders.unprotected(),
           payload: compressedPayload,
           signers: [_CatalystSigner(catalystId, privateKey)],
         );
@@ -207,16 +207,6 @@ extension _CoseSignatureExt on CoseSignature {
 }
 
 extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
-  /// Maps the [SignedDocumentContentType] into COSE representation.
-  StringOrInt? get asCose {
-    switch (this) {
-      case SignedDocumentContentType.json:
-        return const IntValue(CoseValues.jsonContentType);
-      case SignedDocumentContentType.unknown:
-        return null;
-    }
-  }
-
   static SignedDocumentContentType fromCose(StringOrInt? contentType) {
     switch (contentType) {
       case IntValue():
@@ -232,30 +222,6 @@ extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
 }
 
 extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
-  CoseHeaders get asCoseProtectedHeaders {
-    return CoseHeaders.protected(
-      contentType: contentType.asCose,
-      contentEncoding: _brotliEncoding,
-      type: documentType.uuid.asUuid,
-      id: id?.asUuid,
-      ver: ver?.asUuid,
-      ref: ref?.asCose,
-      refHash: refHash?.asCose,
-      template: template?.asCose,
-      reply: reply?.asCose,
-      section: section,
-      collabs: collabs,
-      brandId: brandId?.asCose,
-      campaignId: campaignId?.asCose,
-      electionId: electionId,
-      categoryId: categoryId?.asCose,
-    );
-  }
-
-  CoseHeaders get asCoseUnprotectedHeaders {
-    return const CoseHeaders.unprotected();
-  }
-
   static SignedDocumentMetadata fromCose({
     required CoseHeaders protectedHeaders,
     required CoseHeaders unprotectedHeaders,
@@ -291,11 +257,6 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 }
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
-  ReferenceUuid get asCose => ReferenceUuid(
-    id: id.asUuid,
-    ver: ver?.asUuid,
-  );
-
   static SignedDocumentMetadataRef fromCose(ReferenceUuid ref) {
     return SignedDocumentMetadataRef(
       id: ref.id.value,
@@ -305,19 +266,10 @@ extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
 }
 
 extension _SignedDocumentMetadataRefHashExt on SignedDocumentMetadataRefHash {
-  ReferenceUuidHash get asCose => ReferenceUuidHash(
-    ref: ref.asCose,
-    hash: hash,
-  );
-
   static SignedDocumentMetadataRefHash fromCose(ReferenceUuidHash ref) {
     return SignedDocumentMetadataRefHash(
       ref: _SignedDocumentMetadataRefExt.fromCose(ref.ref),
       hash: ref.hash,
     );
   }
-}
-
-extension _UuidExt on String {
-  Uuid get asUuid => Uuid(this);
 }
