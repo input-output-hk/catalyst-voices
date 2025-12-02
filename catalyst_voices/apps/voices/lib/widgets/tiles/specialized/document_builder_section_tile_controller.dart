@@ -17,6 +17,10 @@ final class DocumentBuilderSectionTileController {
     return _data[nodeId] as T?;
   }
 
+  void removeData(DocumentNodeId nodeId) {
+    _data.remove(nodeId);
+  }
+
   void setData(DocumentNodeId nodeId, Object data) {
     _data[nodeId] = data;
   }

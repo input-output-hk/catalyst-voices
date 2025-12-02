@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/document_builder/document_list_property_builder.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_object_property_builder.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_value_property_builder.dart';
+import 'package:catalyst_voices/widgets/tiles/editable_tile.dart';
 import 'package:catalyst_voices/widgets/tiles/property_tile.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     hide DocumentListPropertyBuilder, DocumentObjectPropertyBuilder, DocumentValuePropertyBuilder;
@@ -10,7 +11,15 @@ import 'package:flutter/material.dart';
 ///
 /// Instead of building a predefined widget it is
 /// possible to override it for given [DocumentNodeId].
-typedef DocumentPropertyActionOverrides = Map<DocumentNodeId, Widget>;
+typedef DocumentPropertyActionOverrides = Map<DocumentNodeId, DocumentPropertyActionWidgetBuilder>;
+
+/// A callback that builds a action widget for given document [property].
+typedef DocumentPropertyActionWidgetBuilder =
+    Widget Function(
+      BuildContext context,
+      DocumentProperty property,
+      ValueChanged<EditableTileChange> onEditableChanged,
+    );
 
 /// A map defining overrides for the [DocumentPropertyBuilder].
 ///

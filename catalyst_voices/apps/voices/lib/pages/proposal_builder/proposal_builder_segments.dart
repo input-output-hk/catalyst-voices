@@ -1,13 +1,15 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/proposal_builder/tiles/collaborators_section_tile.dart';
+import 'package:catalyst_voices/pages/co_proposers/widgets/add_collaborator/add_collaborator_dialog.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/category_brief_dialog.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_data.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -19,16 +21,26 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-part 'proposal_builder_action_widgets.dart';
-part 'proposal_builder_document_widgets.dart';
+part 'widgets/proposal_builder_category_action.dart';
+part 'widgets/proposal_builder_collaborators_action.dart';
+part 'widgets/proposal_builder_document_category.dart';
+part 'widgets/proposal_builder_document_collaborators.dart';
 
 final DocumentPropertyActionOverrides _widgetActionOverrides = {
-  ProposalDocument.categoryDetailsNodeId: const _CategoryDetailsAction(),
+  ProposalDocument.categoryDetailsNodeId: (_, _, _) => const _CategoryDetailsAction(),
+  ProposalDocument.collaboratorsNodeId: (_, property, onEditableChanged) =>
+      _CollaboratorsDetailsAction(
+        property: property,
+        onChanged: onEditableChanged,
+      ),
 };
 
 final DocumentPropertyBuilderOverrides _widgetOverrides = {
-  ProposalDocument.categoryDetailsNodeId: (context, property) =>
-      _CategoryDetails(property: property),
+  ProposalDocument.categoryDetailsNodeId: (_, property) => _CategoryDetails(property: property),
+  ProposalDocument.collaboratorsNodeId: (_, property) => _CollaboratorsDetails(
+    property: property,
+    maxCollaborators: 5,
+  ),
 };
 
 class ProposalBuilderSegmentsSelector extends StatelessWidget {
@@ -95,6 +107,11 @@ class _DocumentSection extends StatelessWidget {
                 ? AutovalidateMode.always
                 : AutovalidateMode.disabled,
             onChanged: (value) {
+              if (property.nodeId == ProposalDocument.collaboratorsNodeId) {
+                _onCollaboratorsChanged(context);
+                return;
+              }
+
               final event = SectionChangedEvent(changes: value);
               context.read<ProposalBuilderBloc>().add(event);
             },
@@ -108,6 +125,15 @@ class _DocumentSection extends StatelessWidget {
 
   void _handleOnTap(BuildContext context) {
     SegmentsControllerScope.of(context).selectSectionStep(property.nodeId, shouldScroll: false);
+  }
+
+  void _onCollaboratorsChanged(BuildContext context) {
+    final tileController = DocumentBuilderSectionTileControllerScope.of(context);
+    final dataNodeId = _CollaboratorsDetails.getDataNodeId(property.nodeId);
+    final collaborators = tileController.getData<List<CatalystId>>(dataNodeId) ?? [];
+    final event = UpdateCollaboratorsEvent(collaborators: collaborators);
+    context.read<ProposalBuilderBloc>().add(event);
+    tileController.removeData(dataNodeId);
   }
 }
 
@@ -170,9 +196,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
                 return const ProposalDivider(height: 48);
               }
 
-              if (item is DocumentSegment ||
-                  item is DocumentSection ||
-                  item is CollaboratorsSection) {
+              if (item is DocumentSegment || item is DocumentSection) {
                 return const SizedBox(height: 12);
               }
 
@@ -263,10 +287,6 @@ class _ProposalBuilderSegments extends StatelessWidget {
       ProposalCommentsSegment() => SegmentHeaderTile(
         id: item.id,
         name: item.resolveTitle(context),
-      ),
-      CollaboratorsSection() => CollaboratorsSectionTile(
-        section: item,
-        isSelected: item.id == selectedNodeId,
       ),
       DocumentSection() => _DocumentSection(
         property: item.property,

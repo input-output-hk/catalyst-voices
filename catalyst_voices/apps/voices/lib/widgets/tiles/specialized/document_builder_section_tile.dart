@@ -101,7 +101,7 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   Widget? get _overrideAction {
     final overrides = widget.actionOverrides?[widget.section.nodeId];
 
-    return overrides;
+    return overrides?.call(context, _editedSection, _onEditModeChange);
   }
 
   List<model.DocumentChange> get _pendingChanges => _data.pendingChanges;

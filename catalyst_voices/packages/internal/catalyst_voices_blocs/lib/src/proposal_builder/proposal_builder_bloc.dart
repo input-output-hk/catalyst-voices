@@ -188,7 +188,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       validationErrors: state.validationErrors?.withErrorList(proposalDocument.collectErrors()),
       canPublish: isEmailVerified && proposalDocument.isValid,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
-      collaborators: _cache.collaborators ?? [],
     );
   }
 
@@ -500,6 +499,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     await _loadState(emit, () async {
+      // TODO(bstolinski): get collaborators
       final proposalData = await _proposalService.getProposalDetail(
         ref: proposalRef,
       );
@@ -552,6 +552,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           categoryId: categoryRef,
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
+          authorId: _cache.activeAccountId,
         ),
         category: category,
       );
@@ -673,16 +674,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
             ),
           )
           .toList();
-
-      // Inject collaborators section at the end of the setup segment
-      if (segment.schema.nodeId.value == 'setup') {
-        sections.add(
-          CollaboratorsSection.create(
-            authorId: _cache.activeAccountId,
-            collaborators: _cache.collaborators ?? [],
-          ),
-        );
-      }
 
       return DocumentSegment(
         id: segment.schema.nodeId,
@@ -910,6 +901,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
       final proposalTitle = state.proposalTitle;
       final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+      final hasCollaborators = state.metadata.collaborators.isNotEmpty;
 
       // if it's local draft and the first version then
       // it should be shown as local which corresponds to null
@@ -922,7 +914,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           proposalTitle: proposalTitle,
           currentIteration: currentIteration,
           nextIteration: nextIteration,
-          hasCollaborators: state.collaborators.isNotEmpty,
+          hasCollaborators: hasCollaborators,
         ),
       );
     } finally {
@@ -1150,9 +1142,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     UpdateCollaboratorsEvent event,
     Emitter<ProposalBuilderState> emit,
   ) {
-    _cache = _cache.copyWith(collaborators: Optional(event.collaborators));
-
-    emit(_rebuildState());
+    final stateMetadata = state.metadata.copyWith(collaborators: event.collaborators);
+    _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
+    emit(state.copyWith(metadata: stateMetadata));
   }
 
   Future<void> _updateCommentBuilder(

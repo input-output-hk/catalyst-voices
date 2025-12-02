@@ -630,7 +630,15 @@
   },
   "coproposers": "Co-proposers",
   "@coproposers": {
-    "description": "Collaborators on the proposal."
+    "description": "Collaborators of the proposal."
+  },
+  "coproposer": "Co-proposer",
+  "@coproposer": {
+    "description": "Collaborator of the proposal."
+  },
+  "coproposersAndApplicants": "Co-Proposers and additional applicants",
+  "@coproposersAndApplicants": {
+    "description": "Label for proposal builder collaborators tile"
   },
   "copyLink": "Copy Link",
   "@copyLink": {

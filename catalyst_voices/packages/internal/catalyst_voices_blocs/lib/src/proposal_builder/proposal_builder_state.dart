@@ -12,6 +12,8 @@ final class ProposalBuilderMetadata extends Equatable {
   final SignedDocumentRef? categoryId;
   final List<DocumentVersion> versions;
   final bool fromActiveCampaign;
+  final CatalystId? authorId;
+  final List<CatalystId> collaborators;
 
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
@@ -21,6 +23,8 @@ final class ProposalBuilderMetadata extends Equatable {
     this.categoryId,
     this.versions = const [],
     this.fromActiveCampaign = true,
+    this.authorId,
+    this.collaborators = const [],
   });
 
   factory ProposalBuilderMetadata.newDraft({
@@ -46,6 +50,8 @@ final class ProposalBuilderMetadata extends Equatable {
     categoryId,
     versions,
     fromActiveCampaign,
+    authorId,
+    collaborators,
   ];
 
   ProposalBuilderMetadata copyWith({
@@ -56,6 +62,8 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<SignedDocumentRef>? categoryId,
     List<DocumentVersion>? versions,
     bool? fromActiveCampaign,
+    Optional<CatalystId>? authorId,
+    List<CatalystId>? collaborators,
   }) {
     return ProposalBuilderMetadata(
       publish: publish ?? this.publish,
@@ -65,6 +73,8 @@ final class ProposalBuilderMetadata extends Equatable {
       categoryId: categoryId.dataOr(this.categoryId),
       versions: versions ?? this.versions,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
+      authorId: authorId.dataOr(this.authorId),
+      collaborators: collaborators ?? this.collaborators,
     );
   }
 }
@@ -84,7 +94,6 @@ final class ProposalBuilderState extends Equatable {
   final ProposalBuilderValidationErrors? validationErrors;
   final bool canPublish;
   final bool isMaxProposalsLimitReached;
-  final List<CatalystId> collaborators;
 
   const ProposalBuilderState({
     this.isLoading = false,
@@ -101,7 +110,6 @@ final class ProposalBuilderState extends Equatable {
     this.validationErrors,
     this.canPublish = false,
     this.isMaxProposalsLimitReached = true,
-    this.collaborators = const [],
   });
 
   List<Segment> get allSegments => [
@@ -132,7 +140,6 @@ final class ProposalBuilderState extends Equatable {
     validationErrors,
     canPublish,
     isMaxProposalsLimitReached,
-    collaborators,
   ];
 
   bool get showError => !isLoading && error != null;
@@ -167,7 +174,6 @@ final class ProposalBuilderState extends Equatable {
     Optional<ProposalBuilderValidationErrors>? validationErrors,
     bool? canPublish,
     bool? isMaxProposalsLimitReached,
-    List<CatalystId>? collaborators,
   }) {
     return ProposalBuilderState(
       isLoading: isLoading ?? this.isLoading,
@@ -184,7 +190,6 @@ final class ProposalBuilderState extends Equatable {
       validationErrors: validationErrors.dataOr(this.validationErrors),
       canPublish: canPublish ?? this.canPublish,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached ?? this.isMaxProposalsLimitReached,
-      collaborators: collaborators ?? this.collaborators,
     );
   }
 }
