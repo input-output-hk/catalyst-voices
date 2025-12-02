@@ -1,10 +1,11 @@
 import 'dart:math' as math;
 
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentParameters;
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
@@ -35,6 +36,7 @@ import 'package:rxdart/rxdart.dart';
   tables: [
     DocumentsV2,
     DocumentAuthors,
+    DocumentParameters,
     DocumentsLocalMetadata,
   ],
 )
@@ -265,19 +267,33 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           SELECT 1 FROM document_authors da
           WHERE da.document_id = p.id 
             AND da.document_ver = p.ver
-            AND da.author_id_significant = '$escapedSignificant'
+            AND da.account_significant_id = '$escapedSignificant'
         )
       ''');
     }
 
     if (filters.categoryId != null) {
       final escapedCategory = _escapeSqlString(filters.categoryId!);
-      clauses.add("p.category_id = '$escapedCategory'");
+      clauses.add('''
+        EXISTS (
+          SELECT 1 FROM document_parameters dp
+          WHERE dp.document_id = p.id
+            AND dp.document_ver = p.ver
+            AND dp.id = '$escapedCategory'
+        )
+      ''');
     } else if (filters.campaign != null) {
       final escapedIds = filters.campaign!.categoriesIds
           .map((id) => "'${_escapeSqlString(id)}'")
           .join(', ');
-      clauses.add('p.category_id IN ($escapedIds)');
+      clauses.add('''
+        EXISTS (
+          SELECT 1 FROM document_parameters dp
+          WHERE dp.document_id = p.id
+            AND dp.document_ver = p.ver
+            AND dp.id IN ($escapedIds)
+        )
+      ''');
     }
 
     if (filters.searchQuery != null && filters.searchQuery!.isNotEmpty) {
@@ -289,7 +305,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
             SELECT 1 FROM document_authors da
             WHERE da.document_id = p.id 
               AND da.document_ver = p.ver
-              AND da.author_username LIKE '%$escapedQuery%' ESCAPE '\\'
+              AND da.username LIKE '%$escapedQuery%' ESCAPE '\\'
           ) OR
           json_extract(p.content, '\$.setup.proposer.applicant') LIKE '%$escapedQuery%' ESCAPE '\\' OR
           json_extract(p.content, '\$.setup.title.title') LIKE '%$escapedQuery%' ESCAPE '\\'
@@ -316,12 +332,26 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     if (filters.categoryId != null) {
       final escapedCategory = _escapeSqlString(filters.categoryId!);
-      clauses.add("p.category_id = '$escapedCategory'");
+      clauses.add('''
+        EXISTS (
+          SELECT 1 FROM document_parameters dp
+          WHERE dp.document_id = p.id
+            AND dp.document_ver = p.ver
+            AND dp.id = '$escapedCategory'
+        )
+      ''');
     } else if (filters.campaign != null) {
       final escapedIds = filters.campaign!.categoriesIds
           .map((id) => "'${_escapeSqlString(id)}'")
           .join(', ');
-      clauses.add('p.category_id IN ($escapedIds)');
+      clauses.add('''
+        EXISTS (
+          SELECT 1 FROM document_parameters dp
+          WHERE dp.document_id = p.id
+            AND dp.document_ver = p.ver
+            AND dp.id IN ($escapedIds)
+        )
+      ''');
     }
 
     return clauses;
@@ -430,6 +460,15 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     WHERE p.type = ? $whereClause
   ''';
 
+    final readsFromTables = <ResultSetImplementation<dynamic, dynamic>>{
+      documentsV2,
+      if (filters.isFavorite != null) documentsLocalMetadata,
+      if (filters.categoryId != null || filters.campaign != null) documentParameters,
+      if (filters.author != null ||
+          (filters.searchQuery != null && filters.searchQuery!.isNotEmpty))
+        documentAuthors,
+    };
+
     return customSelect(
       cteQuery,
       variables: [
@@ -438,10 +477,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
       ],
-      readsFrom: {
-        documentsV2,
-        if (filters.isFavorite != null) documentsLocalMetadata,
-      },
+      readsFrom: readsFromTables,
     ).map((row) => row.readNullable<int>('total') ?? 0);
   }
 
@@ -533,6 +569,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     GROUP BY p.template_id, p.template_ver
   ''';
 
+    final readsFromTables = <ResultSetImplementation<dynamic, dynamic>>{
+      documentsV2,
+      if (filters.categoryId != null || filters.campaign != null) documentParameters,
+    };
+
     return customSelect(
       query,
       variables: [
@@ -540,7 +581,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
       ],
-      readsFrom: {documentsV2},
+      readsFrom: readsFromTables,
     ).map((row) {
       final templateId = row.read<String>('template_id');
       final templateVer = row.read<String>('template_ver');
@@ -690,12 +731,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final readsFromTables = <ResultSetImplementation<dynamic, dynamic>>{
       documentsV2,
       documentsLocalMetadata,
+      if (filters.categoryId != null || filters.campaign != null) documentParameters,
+      if (filters.author != null ||
+          (filters.searchQuery != null && filters.searchQuery!.isNotEmpty))
+        documentAuthors,
     };
-
-    if (filters.author != null ||
-        (filters.searchQuery != null && filters.searchQuery!.isNotEmpty)) {
-      readsFromTables.add(documentAuthors);
-    }
 
     return customSelect(
       cteQuery,

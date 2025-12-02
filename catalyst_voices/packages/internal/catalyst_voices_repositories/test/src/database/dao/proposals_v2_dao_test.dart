@@ -7,8 +7,10 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -4150,30 +4152,38 @@ void main() {
               (i) => _createTestDocumentEntity(
                 id: 'p-$i',
                 ver: _buildUuidV7At(earliest.add(Duration(hours: i))),
-                parameters: [SignedDocumentRef(id: 'cat-$i')],
+                parameters: [SignedDocumentRef(id: 'cat-$i', ver: 'cat-$i')],
               ),
             );
 
             await db.documentsV2Dao.saveAll(proposals);
 
             const request = PageRequest(page: 0, size: 10);
+            const categoriesIds = {'cat-0', 'cat-2', 'cat-4'};
             final result = await dao.getProposalsBriefPage(
               request: request,
               filters: const ProposalsFiltersV2(
-                campaign: ProposalsCampaignFilters(
-                  categoriesIds: {'cat-0', 'cat-2', 'cat-4'},
-                ),
+                campaign: ProposalsCampaignFilters(categoriesIds: categoriesIds),
               ),
             );
+
+            final parameters = result.items
+                .map((e) => e.proposal.parameters)
+                .map(
+                  (e) => e
+                      .split(',')
+                      .map(DocumentRefDto.fromFlatten)
+                      .map((e) => e.toModel().toSignedDocumentRef()),
+                )
+                .flattened
+                .toSet();
+
+            final parametersIds = parameters.map((e) => e.id).toSet();
 
             expect(result.items.length, 3);
             expect(result.total, 3);
             expect(
-              result.items.map((e) => e.proposal.parameters).toSet().containsAll([
-                'cat-0',
-                'cat-2',
-                'cat-4',
-              ]),
+              parametersIds.containsAll(categoriesIds),
               isTrue,
             );
           });

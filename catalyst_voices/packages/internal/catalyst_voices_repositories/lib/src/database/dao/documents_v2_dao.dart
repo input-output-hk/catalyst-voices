@@ -1,8 +1,10 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentParameters;
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:collection/collection.dart';
@@ -142,6 +144,8 @@ abstract interface class DocumentsV2Dao {
   tables: [
     DocumentsV2,
     DocumentAuthors,
+    DocumentParameters,
+    DocumentCollaborators,
   ],
 )
 class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -289,6 +293,8 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final docs = entries.map((e) => e.doc);
     final authors = entries.map((e) => e.authors).flattened;
+    final parameters = entries.map((e) => e.parameters).flattened;
+    final collaborators = entries.map((e) => e.collaborators).flattened;
 
     await batch((batch) {
       batch.insertAll(
@@ -301,6 +307,20 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         batch.insertAll(
           documentAuthors,
           authors,
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
+      if (parameters.isNotEmpty) {
+        batch.insertAll(
+          documentParameters,
+          parameters,
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
+      if (collaborators.isNotEmpty) {
+        batch.insertAll(
+          documentCollaborators,
+          collaborators,
           mode: InsertMode.insertOrIgnore,
         );
       }
