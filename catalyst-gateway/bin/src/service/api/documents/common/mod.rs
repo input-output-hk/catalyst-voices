@@ -6,7 +6,7 @@ use catalyst_signed_doc::CatalystSignedDocument;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
-    settings::{Settings, admin::get_admin_key},
+    settings::Settings,
 };
 
 /// A wrapper struct to unify both implementations of `CatalystSignedDocumentProvider` and
@@ -68,13 +68,9 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        if kid.is_admin() {
-            Ok(get_admin_key(kid))
-        } else {
-            self.verifying_key_provider
-                .try_get_registered_key(kid)
-                .await
-        }
+        self.verifying_key_provider
+            .try_get_registered_key(kid)
+            .await
     }
 }
 
@@ -204,7 +200,7 @@ impl VerifyingKeyProvider {
     /// - The KID is not a singing key.
     /// - The latest signing key for a required role cannot be found.
     /// - The KID is not using the latest rotation.
-    pub(crate) async fn try_from_kids(
+    pub(crate) async fn try_new(
         token: &mut CatalystRBACTokenV1,
         kids: &[catalyst_signed_doc::CatalystId],
     ) -> anyhow::Result<Self> {
@@ -221,22 +217,14 @@ impl VerifyingKeyProvider {
             anyhow::bail!("RBAC Token CatID does not match with the document KIDs");
         }
 
-        let Some(reg_chain) = token.reg_chain().await? else {
-            anyhow::bail!("Failed to retrieve a registration from corresponding Catalyst ID");
-        };
-
         if !kid.is_signature_key() {
             anyhow::bail!("Invalid KID {kid}: KID must be a signing key not an encryption key");
         }
 
         let (kid_role_index, kid_rotation) = kid.role_and_rotation();
-        let (latest_pk, rotation) = reg_chain
+        let (latest_pk, rotation) = token
             .get_latest_signing_public_key_for_role(kid_role_index)
-            .ok_or_else(|| {
-                anyhow::anyhow!(
-                    "Failed to get last signing key for the proposer role for {kid} Catalyst ID"
-                )
-            })?;
+            .await?;
 
         if rotation != kid_rotation {
             anyhow::bail!(

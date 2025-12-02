@@ -1,6 +1,6 @@
 //! Command line and environment variable settings for the Catalyst Signed Docs
 
-use std::{str::FromStr, time::Duration};
+use std::time::Duration;
 
 use super::str_env_var::StringEnvVar;
 
@@ -18,10 +18,6 @@ pub(crate) struct EnvVars {
 
     /// The Catalyst Signed Document threshold, document cannot be too far behind.
     past_threshold: Duration,
-
-    /// The Catalyst Signed Document Admin Catalyst ID from the `SIGNED_DOC_ADMIN_KEYS`
-    /// env.
-    admin_key: Option<catalyst_signed_doc::CatalystId>,
 }
 
 impl EnvVars {
@@ -33,20 +29,9 @@ impl EnvVars {
         let past_threshold =
             StringEnvVar::new_as_duration("SIGNED_DOC_PAST_THRESHOLD", DEFAULT_PAST_THRESHOLD);
 
-        let admin_key = string_to_catalyst_id(
-            &StringEnvVar::new_optional("SIGNED_DOC_ADMIN_KEYS", false)
-                .map(|v| v.as_string())
-                .unwrap_or_default(),
-        );
-
-        if admin_key.is_none() {
-            tracing::error!("Missing or invalid Catalyst ID for Admin. This is required.");
-        }
-
         Self {
             future_threshold,
             past_threshold,
-            admin_key,
         }
     }
 
@@ -61,22 +46,4 @@ impl EnvVars {
     pub(crate) fn past_threshold(&self) -> Duration {
         self.past_threshold
     }
-
-    /// The Catalyst Signed Document Admin key.
-    #[allow(dead_code)]
-    pub(crate) fn admin_key(&self) -> Option<&catalyst_signed_doc::CatalystId> {
-        self.admin_key.as_ref()
-    }
-}
-
-/// Convert an Envvar into the Catalyst ID type, `None` if missing or invalid value.
-fn string_to_catalyst_id(s: &str) -> Option<catalyst_signed_doc::CatalystId> {
-    catalyst_signed_doc::CatalystId::from_str(s)
-        .inspect_err(|err| {
-            tracing::error!(
-                err = ?err,
-                "Cannot parse Admin CatalystId entry"
-            );
-        })
-        .ok()
 }
