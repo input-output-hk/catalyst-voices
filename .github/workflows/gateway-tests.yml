@@ -44,7 +44,7 @@ jobs:
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
         with:
-          enable_caching: "false"
+          enable_caching: "true"
           version: 0.21.0
 
       - name: Setup
@@ -159,6 +159,13 @@ jobs:
         with:
           command: run
           args: ./catalyst-gateway/tests/+all-images
+
+      - name: Prepare artifacts devnet
+        id: images-devnet
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+images-devnet
 
       - name: Spin up devnet
         if: ${{ steps.images.conclusion == 'success' }}
