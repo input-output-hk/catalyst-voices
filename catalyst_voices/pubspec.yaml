@@ -78,19 +78,20 @@ melos:
 
     l10n:
       run: |
+        melos exec --scope="catalyst_voices_localization" -- dart lib/src/manage_l10n.dart --sort && \
         melos exec --scope="catalyst_voices_localization" -- flutter gen-l10n
       description: |
         Run `flutter gen-l10n` in catalyst_voices_localization package to generate l10n bindings.
 
     l10n-check:
       run: |
-        cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --check
+        melos exec --scope="catalyst_voices_localization" -- dart lib/src/manage_l10n.dart --check
       description: |
         Check for unused translation keys in .arb files without modifying them, and check if translation keys are sorted.
 
     l10n-clean:
       run: |
-        cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --clean --sort
+        melos exec --scope="catalyst_voices_localization" -- dart lib/src/manage_l10n.dart --clean --sort
       description: |
         Clean up unused translation keys and sort them alphabetically in .arb files.
 
@@ -118,6 +119,22 @@ melos:
       description: |
         Run `build_runner` in catalyst_voices_repositories package
 
+    build-db-schema:
+      run: |
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
+      description: |
+        Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
+        classes
+
+    build-db-migration:
+      run: |
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema steps drift_schemas/catalyst_database lib/src/database/migration/schema_versions.g.dart
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate drift_schemas/catalyst_database test/src/database/migration/catalyst_database/generated/
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate --data-classes --companions drift_schemas/catalyst_database/ test/src/database/migration/catalyst_database/generated/
+      description: |
+        Run `drift_dev schema steps` in catalyst_voices_repositories package and generates schema migration steps
+        classes
+
     compile_svg:
       run: |
         cd packages/internal/catalyst_voices_assets && \
@@ -125,13 +142,6 @@ melos:
       description: |
         Compile copied SVGs into vector_graphics binary format assets via packages/internal/catalyst_voices_assets/compile_svg.dart.
         Temporary workaround see packages/internal/catalyst_voices_assets/README.md for context.
-
-    db-make-migration:
-      run: |
-        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
-      description: |
-        Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
-        classes
 
     metrics:
       run: |

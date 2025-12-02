@@ -42,7 +42,6 @@ final class Dependencies extends DependencyProvider {
     required ReportingService reportingService,
     CatalystProfiler? profiler,
     CatalystStartupProfiler? startupProfiler,
-    CatalystRuntimeProfiler? runtimeProfiler,
   }) async {
     DependencyProvider.instance = this;
 
@@ -55,9 +54,6 @@ final class Dependencies extends DependencyProvider {
     }
     if (startupProfiler != null) {
       registerSingleton(startupProfiler);
-    }
-    if (runtimeProfiler != null) {
-      registerSingleton(runtimeProfiler);
     }
 
     _registerStorages();
@@ -98,6 +94,7 @@ final class Dependencies extends DependencyProvider {
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
             get<AdminTools>(),
+            get<FeatureFlagsService>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -113,20 +110,18 @@ final class Dependencies extends DependencyProvider {
           blockchainConfig: get<AppConfig>().blockchain,
         );
       })
-      ..registerLazySingleton<ProposalsCubit>(
+      ..registerFactory<ProposalsCubit>(
         () => ProposalsCubit(
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
         ),
       )
-      ..registerLazySingleton<VotingCubit>(
+      ..registerFactory<VotingCubit>(
         () => VotingCubit(
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
-          get<VotingBallotBuilder>(),
-          get<VotingService>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management
@@ -135,6 +130,7 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerFactory<WorkspaceBloc>(() {
         return WorkspaceBloc(
+          get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
           get<DocumentMapper>(),
@@ -171,9 +167,11 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
           get<CommentService>(),
           get<CampaignService>(),
+          get<DocumentsService>(),
           get<DocumentMapper>(),
           get<VotingBallotBuilder>(),
           get<VotingService>(),
+          get<FeatureFlagsService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -210,6 +208,11 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<VotingBallotBuilder>(),
           get<VotingService>(),
+        );
+      })
+      ..registerFactory<FeatureFlagsCubit>(() {
+        return FeatureFlagsCubit(
+          get<FeatureFlagsService>(),
         );
       })
       ..registerFactory<AddCollaboratorCubit>(() {
@@ -254,10 +257,11 @@ final class Dependencies extends DependencyProvider {
         return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
+        final profiler = get<CatalystProfiler>();
         return SignedDocumentManager(
           brotli: const CatalystBrotliCompressor(),
           zstd: const CatalystZstdCompressor(),
-          profiler: get<CatalystRuntimeProfiler>(),
+          profiler: profiler is CatalystConsoleProfiler ? profiler : const CatalystNoopProfiler(),
         );
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
@@ -268,11 +272,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DatabaseDocumentsDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
-        );
-      })
-      ..registerLazySingleton<DocumentFavoriteSource>(() {
-        return DatabaseDocumentFavoriteSource(
-          get<CatalystDatabase>(),
+          get<CatalystProfiler>(),
         );
       })
       ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
@@ -281,13 +281,19 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
-      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<CampaignRepository>(
+        () {
+          return CampaignRepository(
+            get<DatabaseDocumentsDataSource>(),
+          );
+        },
+      )
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
+          get<CatalystDatabase>(),
           get<DatabaseDraftsDataSource>(),
           get<DatabaseDocumentsDataSource>(),
           get<CatGatewayDocumentDataSource>(),
-          get<DocumentFavoriteSource>(),
         );
       })
       ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())
@@ -319,6 +325,12 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<SystemStatusRepository>(
         () => SystemStatusRepository(
           get<ApiServices>(),
+        ),
+      )
+      ..registerLazySingleton<FeatureFlagsRepository>(
+        () => FeatureFlagsRepository(
+          get<AppEnvironment>().type,
+          get<AppConfig>(),
         ),
       );
   }
@@ -405,6 +417,7 @@ final class Dependencies extends DependencyProvider {
         get<SignerService>(),
         get<ActiveCampaignObserver>(),
         get<CastedVotesObserver>(),
+        get<VotingBallotBuilder>(),
       );
     });
     registerLazySingleton<CommentService>(() {
@@ -455,6 +468,14 @@ final class Dependencies extends DependencyProvider {
         );
       },
       dispose: (mediator) => mediator.dispose(),
+    );
+    registerLazySingleton<FeatureFlagsService>(
+      () {
+        return FeatureFlagsService(
+          get<FeatureFlagsRepository>(),
+        );
+      },
+      dispose: (service) => unawaited(service.dispose()),
     );
     registerLazySingleton<SystemStatusService>(() {
       return SystemStatusService(
@@ -525,6 +546,7 @@ final class Dependencies extends DependencyProvider {
           get<SyncStatsStorage>(),
           get<DocumentsService>(),
           get<CampaignService>(),
+          get<CatalystProfiler>(),
         );
       },
       dispose: (manager) async => manager.dispose(),
@@ -547,7 +569,10 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
-    registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+    registerLazySingleton<VotingBallotBuilder>(
+      VotingBallotLocalBuilder.new,
+      dispose: (builder) => builder.dispose(),
+    );
 
     // Not a singleton
     registerFactory<RegistrationStatusPoller>(

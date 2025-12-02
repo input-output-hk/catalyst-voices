@@ -19,14 +19,16 @@ class ProposalsPaginationTile extends StatelessWidget {
     return ProposalBriefCard(
       proposal: proposal,
       onTap: () {
-        final route = ProposalRoute.fromRef(ref: proposal.selfRef);
+        final route = ProposalRoute.fromRef(ref: proposal.id);
 
         unawaited(route.push(context));
       },
       onFavoriteChanged: (isFavorite) {
-        context.read<ProposalsCubit>().onChangeFavoriteProposal(
-          proposal.selfRef,
-          isFavorite: isFavorite,
+        unawaited(
+          context.read<ProposalsCubit>().onChangeFavoriteProposal(
+            proposal.id,
+            isFavorite: isFavorite,
+          ),
         );
       },
     );

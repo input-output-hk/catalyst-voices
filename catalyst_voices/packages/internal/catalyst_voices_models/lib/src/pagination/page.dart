@@ -14,13 +14,16 @@ base class Page<E> extends Equatable {
     required this.items,
   });
 
-  const Page.empty()
-    : this(
-        page: 0,
-        maxPerPage: 0,
-        total: 0,
-        items: const [],
-      );
+  const Page.empty({
+    int page = 0,
+    int maxPerPage = 0,
+    int total = 0,
+  }) : this(
+         page: page,
+         maxPerPage: maxPerPage,
+         total: total,
+         items: const [],
+       );
 
   @override
   List<Object?> get props => [
@@ -36,6 +39,18 @@ base class Page<E> extends Equatable {
       maxPerPage: maxPerPage,
       total: total,
       items: await items.map(mapper).wait,
+    );
+  }
+
+  Page<E> copyWith({
+    int? total,
+    List<E>? items,
+  }) {
+    return Page<E>(
+      page: page,
+      maxPerPage: maxPerPage,
+      total: total ?? this.total,
+      items: items ?? this.items,
     );
   }
 

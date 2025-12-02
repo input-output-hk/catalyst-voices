@@ -147,7 +147,7 @@ final class SignedDocumentMetadataRef extends Equatable {
   factory SignedDocumentMetadataRef.fromDocumentRef(DocumentRef ref) {
     return SignedDocumentMetadataRef(
       id: ref.id,
-      ver: ref.version,
+      ver: ref.ver,
     );
   }
 

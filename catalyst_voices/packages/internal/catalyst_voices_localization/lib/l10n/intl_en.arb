@@ -137,6 +137,14 @@
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
   },
+  "allProposals": "All Proposals",
+  "@allProposals": {
+    "description": "text indicating to view all proposals"
+  },
+  "andSign": "&",
+  "@andSign": {
+    "description": "Generic and sign"
+  },
   "anonymousUsername": "Anonymous",
   "@anonymousUsername": {
     "description": "When account does not have specified username this text is shown"
@@ -485,9 +493,37 @@
   "@close": {
     "description": "CTA To close something"
   },
+  "collaborator": "Co-Proposer",
+  "@collaborator": {
+    "description": "text indicating to view Collaborator proposals"
+  },
   "collaboratorCatalystIdIsMissingProposerRole": "This Catalyst ID is missing Proposer role. Only Proposers can be added as Co-Proposers",
   "@collaboratorCatalystIdIsMissingProposerRole": {
     "description": "Error message shown to user when he tries to add Catalyst ID of a user that don't have Proposer role"
+  },
+  "collaboratorInvitationAcceptButton": "Accept Invitation",
+  "@collaboratorInvitationAcceptButton": {
+    "description": "Dialog button when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptMessage": "Are you sure you want to accept this proposal invitation?\nYou can leave at any time…",
+  "@collaboratorInvitationAcceptMessage": {
+    "description": "Dialog message when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptTitle": "Accept Invitation?",
+  "@collaboratorInvitationAcceptTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectButton": "Reject Invitation",
+  "@collaboratorInvitationRejectButton": {
+    "description": "Dialog button when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectMessage": "Are you sure you want to reject this proposal invitation?\nThis cannot be undone.",
+  "@collaboratorInvitationRejectMessage": {
+    "description": "Dialog message when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectTitle": "Reject Invitation?",
+  "@collaboratorInvitationRejectTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
   },
   "collaboratorInvitationStatusAccepted": "Accepted",
   "@collaboratorInvitationStatusAccepted": {
@@ -1159,6 +1195,10 @@
   "@errorActiveAccountNotFound": {
     "description": "Generic error message when trying to access account resources but non was found."
   },
+  "errorCardanoWalletUnknown": "Wallet failed unexpectedly.",
+  "@errorCardanoWalletUnknown": {
+    "description": "Generic wallet exception"
+  },
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
   "@errorDisplayNameValidationEmpty": {
     "description": "Error message shown when display name field is empty"
@@ -1373,21 +1413,71 @@
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
   },
-  "errorWalletLinkAccountChange": "Wallet account change",
+  "errorWalletDataSignAddressNotPk": "Wallet was unable to sign the data because of address format.",
+  "@errorWalletDataSignAddressNotPk": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletDataSignProofGeneration": "Wallet was unable to sign the data.",
+  "@errorWalletDataSignProofGeneration": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletDataSignUserDeclined": "Transaction declined.",
+  "@errorWalletDataSignUserDeclined": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletLinkAccountChange": "Wallet account has changed.",
   "@errorWalletLinkAccountChange": {
     "description": "Error message shown when wallet account has changed"
   },
-  "errorWalletLinkInternalError": "Wallet authorisation internal error",
+  "errorWalletLinkInternalError": "Wallet error occurred during execution of this API call.",
   "@errorWalletLinkInternalError": {
     "description": "Error message shown when internal error occurs during wallet authorization"
   },
-  "errorWalletLinkInvalidRequest": "Wallet authorisation invalid request",
+  "errorWalletLinkInvalidRequest": "Wallet inputs do not conform to this spec or are otherwise invalid.",
   "@errorWalletLinkInvalidRequest": {
     "description": "Error message shown when wallet authorization request is invalid"
   },
-  "errorWalletLinkRefused": "Wallet authorisation failed",
+  "errorWalletLinkInvalidRequestCode": "Wallet request failed with code {code}.",
+  "@errorWalletLinkInvalidRequestCode": {
+    "description": "Error message shown when wallet authorization request is invalid",
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "errorWalletLinkRefused": "The wallet request was refused due to lack of access.",
   "@errorWalletLinkRefused": {
     "description": "Error message shown when wallet authorization is refused"
+  },
+  "errorWalletPaginationMaxSize": "Wallet pagination max size({maxSize}) exceeded.",
+  "@errorWalletPaginationMaxSize": {
+    "description": "Error message shown when wallet throws DataSign exception",
+    "placeholders": {
+      "maxSize": {
+        "type": "int"
+      }
+    }
+  },
+  "errorWalletTxSendFailure": "Wallet could not send the tx.",
+  "@errorWalletTxSendFailure": {
+    "description": "Error message shown when wallet throws TxSend exception"
+  },
+  "errorWalletTxSendRefused": "Wallet refuses to send the tx (could be rate limiting).",
+  "@errorWalletTxSendRefused": {
+    "description": "Error message shown when wallet throws TxSend exception"
+  },
+  "errorWalletTxSignDepreciatedCertificate": "Transaction contains depreciated certificate.",
+  "@errorWalletTxSignDepreciatedCertificate": {
+    "description": "Error message shown when wallet throws TxSign exception"
+  },
+  "errorWalletTxSignProofGeneration": "Wallet was unable to sign the transaction.",
+  "@errorWalletTxSignProofGeneration": {
+    "description": "Error message shown when wallet throws TxSign exception"
+  },
+  "errorWalletTxSignUserDeclined": "Transaction declined.",
+  "@errorWalletTxSignUserDeclined": {
+    "description": "Error message shown when wallet throws TxSign exception"
   },
   "eternlWallet": "Eternl Wallet",
   "@eternlWallet": {
@@ -1817,6 +1907,10 @@
   "@lockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after locking the keychain."
   },
+  "mainProposer": "Main Proposer",
+  "@mainProposer": {
+    "description": "text indicating to view Main Proposer proposals"
+  },
   "mainnetNetworkId": "Mainnet",
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
@@ -2033,6 +2127,24 @@
       }
     }
   },
+  "noOfProposalInvites": "Proposal Invites · {count}",
+  "@noOfProposalInvites": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfProposals": "Proposals · {count}",
+  "@noOfProposals": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfVotedOn": "Voted On · {count}",
   "@noOfVotedOn": {
     "description": "Tab label for voted on proposals in voting space",
@@ -2041,6 +2153,10 @@
         "type": "int"
       }
     }
+  },
+  "noPendingInvitesMessage": "You don’t have any proposal invites",
+  "@noPendingInvitesMessage": {
+    "description": "Message shown when user don't have any pending messages"
   },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
@@ -2182,6 +2298,15 @@
   "orderProposalsUpdateDateDesc": "Newest to oldest",
   "@orderProposalsUpdateDateDesc": {
     "description": "Order proposals by update date option"
+  },
+  "others": "{count} {count, plural, =1{Other} other{Others}}",
+  "@others": {
+    "description": "In context of proposal author and collaborators. Eg. Author & 5 Others",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
@@ -2480,6 +2605,10 @@
   "@proposalTitleShortDescription": {
     "description": "Short description for the title input field"
   },
+  "proposalViewAcceptedInvitationBannerMessage": "**Invitation Accepted:** You'll be named as a collaborator and will be eligible for funding on final proposals with your team. You'll need to continue approving future iterations to remain named.",
+  "@proposalViewAcceptedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation."
+  },
   "proposalViewFundingRequested": "Funding Requested",
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
@@ -2508,6 +2637,18 @@
   "@proposalViewNotFoundTitle": {
     "description": "Error title shown when proposal cannot be found."
   },
+  "proposalViewPendingInvitationBannerAcceptButton": "Accept Invitation",
+  "@proposalViewPendingInvitationBannerAcceptButton": {
+    "description": "The accept button label in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerMessage": "You have been invited to join this proposal iteration as a co-proposer",
+  "@proposalViewPendingInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerRejectButton": "Reject Invitation",
+  "@proposalViewPendingInvitationBannerRejectButton": {
+    "description": "The reject button label in the collaborator invitation banner on the proposal viewer page."
+  },
   "proposalViewProjectDelivery": "Project Delivery",
   "@proposalViewProjectDelivery": {
     "description": "When viewing proposal"
@@ -2515,6 +2656,10 @@
   "proposalViewProjectDuration": "Project Duration",
   "@proposalViewProjectDuration": {
     "description": "When viewing proposal"
+  },
+  "proposalViewRejectedInvitationBannerMessage": "**Invitation Rejected:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
+  "@proposalViewRejectedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation."
   },
   "proposals": "Proposals",
   "@proposals": {
@@ -2954,10 +3099,6 @@
   "registrationSeedPhraseNotFound": "Seed phrase was not found. Make sure correct words are correct.",
   "@registrationSeedPhraseNotFound": {
     "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
-  },
-  "registrationTransactionFailed": "Transaction failed",
-  "@registrationTransactionFailed": {
-    "description": "Indicates an error when submitting a registration transaction failed."
   },
   "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 {currency}), be sure your wallet has a minimum of {money}.",
   "@registrationTransactionFeeDescription": {

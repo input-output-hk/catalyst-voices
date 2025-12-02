@@ -16,8 +16,7 @@ class ProposalBriefCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
-  // TODO(LynxxLynx): This should come from campaign settings
-  final bool readOnly;
+  final bool canVote;
 
   const ProposalBriefCard({
     super.key,
@@ -25,18 +24,20 @@ class ProposalBriefCard extends StatefulWidget {
     this.onTap,
     this.onFavoriteChanged,
     this.onVoteAction,
-    this.readOnly = false,
+    this.canVote = true,
   });
 
   @override
   State<ProposalBriefCard> createState() => _ProposalBriefCardState();
 }
 
-class _Author extends StatelessWidget {
-  final String? author;
+class _AuthorAndCollaborators extends StatelessWidget {
+  final CatalystId? author;
+  final List<CatalystId>? collaborators;
 
-  const _Author({
-    required this.author,
+  const _AuthorAndCollaborators({
+    this.author,
+    this.collaborators,
   });
 
   @override
@@ -49,13 +50,16 @@ class _Author extends StatelessWidget {
         children: [
           ProfileAvatar(
             size: 32,
-            username: author,
+            username: author?.username,
           ),
-          UsernameText(
-            key: const Key('Author'),
-            author,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+          Flexible(
+            child: AccountsText(
+              ids: [?author, ...?collaborators],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
             ),
           ),
         ],
@@ -180,11 +184,13 @@ class _PropertyValue extends StatelessWidget {
 class _ProposalBriefCardState extends State<ProposalBriefCard> {
   late final WidgetStatesController _statesController;
 
+  bool _isFavorite = false;
+
   @override
   Widget build(BuildContext context) {
     final proposal = widget.proposal;
 
-    final voteData = proposal is ProposalBriefVoting ? proposal.voteData : null;
+    final voteData = proposal.voteData;
     final onVoteAction = widget.onVoteAction;
 
     return ConstrainedBox(
@@ -211,9 +217,9 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Topbar(
-                    proposalRef: proposal.selfRef,
-                    isFavorite: proposal.isFavorite,
-                    onFavoriteChanged: widget.onFavoriteChanged,
+                    proposalRef: proposal.id,
+                    isFavorite: _isFavorite,
+                    onFavoriteChanged: widget.onFavoriteChanged != null ? _onFavoriteChanged : null,
                   ),
                   const SizedBox(height: 2),
                   _Category(
@@ -221,7 +227,10 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                   ),
                   const SizedBox(height: 4),
                   _Title(text: proposal.title),
-                  _Author(author: proposal.author),
+                  _AuthorAndCollaborators(
+                    author: proposal.author,
+                    collaborators: proposal.acceptedCollaboratorsIds,
+                  ),
                   _FundsAndDuration(
                     funds: proposal.formattedFunds,
                     duration: proposal.duration,
@@ -240,13 +249,14 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     updateDate: proposal.updateDate,
                     commentsCount: proposal.commentsCount,
                   ),
-                  if (voteData?.hasVoted ?? false) const SizedBox(height: 12),
-                  if (voteData != null && onVoteAction != null)
+                  if (voteData != null && onVoteAction != null) ...[
+                    const SizedBox(height: 12),
                     VoteButton(
                       data: voteData,
                       onSelected: onVoteAction,
-                      readOnly: widget.readOnly,
+                      readOnly: !widget.canVote,
                     ),
+                  ],
                 ],
               ),
             ),
@@ -254,6 +264,14 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
         ),
       ),
     );
+  }
+
+  @override
+  void didUpdateWidget(ProposalBriefCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Always override from proposal as its main source of truth
+    _isFavorite = widget.proposal.isFavorite;
   }
 
   @override
@@ -266,6 +284,16 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   void initState() {
     super.initState();
     _statesController = WidgetStatesController();
+
+    _isFavorite = widget.proposal.isFavorite;
+  }
+
+  // This method is here only because updating state locally gives faster feedback to the user.
+  void _onFavoriteChanged(bool isFavorite) {
+    setState(() {
+      _isFavorite = isFavorite;
+      widget.onFavoriteChanged?.call(isFavorite);
+    });
   }
 }
 

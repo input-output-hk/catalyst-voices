@@ -32,7 +32,7 @@ class CategoryCompactDetailView extends StatelessWidget {
                 _CategoryBrief(
                   categoryName: category.formattedName,
                   categoryDescription: category.description,
-                  categoryRef: category.id,
+                  categoryRef: category.ref,
                 ),
                 FundsDetailCard(
                   allFunds: category.availableFunds,

@@ -28,8 +28,7 @@ final class ProposalsOrderState extends Equatable {
 /// The state of available proposals.
 class ProposalsState extends Equatable {
   final bool hasSearchQuery;
-  final List<String> favoritesIds;
-  final ProposalsCount count;
+  final Map<ProposalsPageTab, int> count;
   final ProposalsCategoryState category;
   final Duration recentProposalsMaxAge;
   final bool isRecentProposalsEnabled;
@@ -38,8 +37,7 @@ class ProposalsState extends Equatable {
 
   const ProposalsState({
     this.hasSearchQuery = false,
-    this.favoritesIds = const [],
-    this.count = const ProposalsCount(),
+    this.count = const {},
     this.category = const ProposalsCategoryState(),
     required this.recentProposalsMaxAge,
     this.isRecentProposalsEnabled = false,
@@ -61,7 +59,6 @@ class ProposalsState extends Equatable {
   @override
   List<Object?> get props => [
     hasSearchQuery,
-    favoritesIds,
     count,
     category,
     recentProposalsMaxAge,
@@ -72,8 +69,7 @@ class ProposalsState extends Equatable {
 
   ProposalsState copyWith({
     bool? hasSearchQuery,
-    List<String>? favoritesIds,
-    ProposalsCount? count,
+    Map<ProposalsPageTab, int>? count,
     ProposalsCategoryState? category,
     Duration? recentProposalsMaxAge,
     bool? isRecentProposalsEnabled,
@@ -82,7 +78,6 @@ class ProposalsState extends Equatable {
   }) {
     return ProposalsState(
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
-      favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
       category: category ?? this.category,
       recentProposalsMaxAge: recentProposalsMaxAge ?? this.recentProposalsMaxAge,
@@ -91,8 +86,6 @@ class ProposalsState extends Equatable {
       isOrderEnabled: isOrderEnabled ?? this.isOrderEnabled,
     );
   }
-
-  bool isFavorite(String proposalId) => favoritesIds.contains(proposalId);
 
   List<ProposalsPageTab> tabs({required bool isProposerUnlock}) {
     return ProposalsPageTab.values

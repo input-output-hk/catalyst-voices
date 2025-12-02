@@ -11,10 +11,10 @@ void main() {
       final versionId3 = DocumentRefFactory.randomUuidV7();
 
       final proposalWithVersions = DetailProposal(
-        selfRef: DocumentRef.build(
+        id: DocumentRef.build(
           id: proposalId,
           isDraft: true,
-          version: versionId2,
+          ver: versionId2,
         ),
         categoryRef: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
@@ -27,27 +27,27 @@ void main() {
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
-              version: versionId1,
+              ver: versionId1,
             ),
             title: 'Title ver 1',
             createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
-              version: versionId2,
+              ver: versionId2,
             ),
             title: 'Title ver 2',
             createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
-              version: versionId3,
+              ver: versionId3,
             ),
             title: 'Title ver 3',
             createdAt: DateTime.now(),
@@ -56,16 +56,16 @@ void main() {
       );
 
       expect(
-        proposalWithVersions.versions[2].selfRef.version,
+        proposalWithVersions.versions[2].id.ver,
         equals(versionId1),
       );
       expect(
-        proposalWithVersions.versions[1].selfRef.version,
+        proposalWithVersions.versions[1].id.ver,
         equals(versionId2),
         reason: 'Should be the second latest version',
       );
       expect(
-        proposalWithVersions.versions[0].selfRef.version,
+        proposalWithVersions.versions[0].id.ver,
         equals(versionId3),
         reason: 'Should be the latest version',
       );
@@ -77,10 +77,10 @@ void main() {
       final versionId2 = DocumentRefFactory.randomUuidV7();
 
       final proposalWithVersions = DetailProposal(
-        selfRef: DocumentRef.build(
+        id: DocumentRef.build(
           id: proposalId,
           isDraft: true,
-          version: versionId1,
+          ver: versionId1,
         ),
         categoryRef: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
@@ -93,27 +93,27 @@ void main() {
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
-              version: versionId1,
+              ver: versionId1,
             ),
             title: 'Title ver 1',
             createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
-              version: versionId2,
+              ver: versionId2,
             ),
             title: 'Title ver 2',
             createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: DraftRef(
+            id: DraftRef(
               id: proposalId,
-              version: proposalId,
+              ver: proposalId,
             ),
             title: 'Title ver 3',
             createdAt: DateTime.now(),
@@ -122,7 +122,7 @@ void main() {
       );
 
       expect(
-        proposalWithVersions.versions.first.selfRef.version,
+        proposalWithVersions.versions.first.id.ver,
         equals(versionId2),
       );
     });

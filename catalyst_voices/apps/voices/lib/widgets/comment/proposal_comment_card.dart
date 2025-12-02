@@ -40,7 +40,7 @@ class ProposalCommentCard extends StatelessWidget {
               _Header(
                 username: authorId.username,
                 catalystId: authorId,
-                createAt: document.metadata.selfRef.version!.tryDateTime,
+                createAt: document.metadata.id.ver!.tryDateTime,
                 actions: [
                   if (canReply) ReplyButton(onTap: onReplyTap),
                 ],
@@ -52,7 +52,7 @@ class ProposalCommentCard extends StatelessWidget {
                   overrides: {
                     CommentDocument.content: (context, listItem) {
                       return ExpandableText(
-                        key: ValueKey('Comment[${document.metadata.selfRef}]ExpandableText'),
+                        key: ValueKey('Comment[${document.metadata.id}]ExpandableText'),
                         listItem.value is String ? listItem.value! as String : '',
                         trimLines: trimLines,
                         overflow: TextOverflow.ellipsis,

@@ -24,15 +24,16 @@ void main() {
       latestVersion = DocumentRefFactory.randomUuidV7();
       localVersion = DocumentRefFactory.randomUuidV7();
       mockProposal = UsersProposalOverview(
-        selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+        id: SignedDocumentRef(id: proposalId, ver: latestVersion),
         title: 'Test Proposal',
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),
         publish: ProposalPublish.publishedDraft,
+        iteration: 3,
         versions: [
           ProposalVersionViewModel(
             publish: ProposalPublish.localDraft,
-            selfRef: DraftRef(id: proposalId, version: localVersion),
+            id: DraftRef(id: proposalId, ver: localVersion),
             title: 'Title ver 1',
             createdAt: DateTime.now(),
             isLatest: true,
@@ -41,7 +42,7 @@ void main() {
           ),
           ProposalVersionViewModel(
             publish: ProposalPublish.publishedDraft,
-            selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+            id: SignedDocumentRef(id: proposalId, ver: latestVersion),
             title: 'Test Proposal',
             createdAt: DateTime.now(),
             isLatest: false,
@@ -50,7 +51,7 @@ void main() {
           ),
           ProposalVersionViewModel(
             publish: ProposalPublish.publishedDraft,
-            selfRef: SignedDocumentRef(id: proposalId, version: draftVersion),
+            id: SignedDocumentRef(id: proposalId, ver: draftVersion),
             title: 'Title ver 2',
             createdAt: DateTime.now(),
             isLatest: false,
@@ -61,7 +62,6 @@ void main() {
         fundNumber: 14,
         commentsCount: 0,
         category: 'Cardano Use Cases: Concept',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         fromActiveCampaign: true,
       );
     });

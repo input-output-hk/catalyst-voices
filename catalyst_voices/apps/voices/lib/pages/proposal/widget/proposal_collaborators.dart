@@ -6,7 +6,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalCollaborators extends StatelessWidget {
-  final CollaboratorInvitesState collaborators;
+  final Collaborators collaborators;
 
   const ProposalCollaborators({
     super.key,
@@ -28,10 +28,10 @@ class ProposalCollaborators extends StatelessWidget {
           spacing: 16,
           runSpacing: 12,
           children: [
-            for (final collaborator in collaborators.invites)
+            for (final collaborator in collaborators.collaborators)
               _Collaborator(
                 collaborator: collaborator,
-                showStatus: collaborators is AllCollaboratorInvites,
+                showStatus: collaborators is AllCollaborators,
               ),
           ],
         ),
@@ -41,7 +41,7 @@ class ProposalCollaborators extends StatelessWidget {
 }
 
 class _Collaborator extends StatelessWidget {
-  final CollaboratorInvite collaborator;
+  final Collaborator collaborator;
   final bool showStatus;
 
   const _Collaborator({
@@ -76,7 +76,7 @@ class _Collaborator extends StatelessWidget {
 }
 
 class _Status extends StatelessWidget {
-  final CollaboratorInviteStatus status;
+  final ProposalsCollaborationStatus status;
 
   const _Status({required this.status});
 
@@ -103,7 +103,7 @@ class _Status extends StatelessWidget {
 
 class _Username extends StatelessWidget {
   final CatalystId catalystId;
-  final CollaboratorInviteStatus status;
+  final ProposalsCollaborationStatus status;
 
   const _Username({
     required this.catalystId,
