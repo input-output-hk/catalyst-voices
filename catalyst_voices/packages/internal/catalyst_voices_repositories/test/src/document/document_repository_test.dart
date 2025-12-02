@@ -292,7 +292,6 @@ void main() {
           onPlatform: driftOnPlatforms,
         );
       },
-      skip: 'V2 drafts are not yet migrated',
     );
 
     test(
@@ -344,7 +343,6 @@ void main() {
           ]),
         );
       },
-      skip: 'V2 drafts are not yet migrated',
       onPlatform: driftOnPlatforms,
     );
 
@@ -386,7 +384,6 @@ void main() {
           ]),
         );
       },
-      skip: 'V2 drafts are not yet migrated',
       onPlatform: driftOnPlatforms,
     );
   });
