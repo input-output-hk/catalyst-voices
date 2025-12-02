@@ -545,6 +545,15 @@
   "@collaboratorInvitationStatusRemoved": {
     "description": "Collaborator invitation status: removed."
   },
+  "collaboratorsSectionDescription": "You can add up to {max} co-proposers. Co-Proposers will be notified via email upon proposal publishing. Only registered proposers with a verified email can be added.",
+  "@collaboratorsSectionDescription": {
+    "description": "Description for the collaborators section explaining the rules",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
     "description": "Coming soon message"
@@ -651,26 +660,13 @@
   "@copied": {
     "description": "Snackbar message shown when user copies a link."
   },
-  "collaboratorsSectionTitle": "Co-proposers & Additional Applicants",
-  "@collaboratorsSectionTitle": {
-    "description": "Section title for collaborators in proposal builder"
-  },
-  "collaboratorsSectionDescription": "You can add up to {max} co-proposers. Co-Proposers will be notified via email upon proposal publishing. Only registered proposers with a verified email can be added.",
-  "@collaboratorsSectionDescription": {
-    "description": "Description for the collaborators section explaining the rules",
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
+  "coproposer": "Co-proposer",
+  "@coproposer": {
+    "description": "Collaborator of the proposal."
   },
   "coproposers": "Co-proposers",
   "@coproposers": {
     "description": "Collaborators of the proposal."
-  },
-  "coproposer": "Co-proposer",
-  "@coproposer": {
-    "description": "Collaborator of the proposal."
   },
   "coproposersAndApplicants": "Co-Proposers and additional applicants",
   "@coproposersAndApplicants": {

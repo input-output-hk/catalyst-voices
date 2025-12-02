@@ -265,7 +265,7 @@ class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
     final result = await AddCollaboratorDialog.show(
       context,
       authorId: authorId,
-      collaborators: Collaborators(collaborators: _collaborators),
+      collaborators: CollaboratorsIds(collaborators: _collaborators),
     );
 
     if (result != null && mounted) {
