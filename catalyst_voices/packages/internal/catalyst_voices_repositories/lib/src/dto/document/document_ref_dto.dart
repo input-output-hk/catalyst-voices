@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_ref_dto.g.dart';
 
+@immutable
 @JsonSerializable()
 final class DocumentRefDto {
   /// The separator used for flattened string representation.
@@ -60,6 +61,19 @@ final class DocumentRefDto {
       type: type,
     );
   }
+
+  @override
+  int get hashCode => Object.hash(id, ver, type);
+
+  // not using Equatable because it's messing up JsonSerializable with props getter
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DocumentRefDto &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          ver == other.ver &&
+          type == other.type;
 
   String toFlatten() {
     // Convert null to empty string to ensure 3 parts exist
