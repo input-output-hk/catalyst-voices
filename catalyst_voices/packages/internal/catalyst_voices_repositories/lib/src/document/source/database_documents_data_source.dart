@@ -9,7 +9,6 @@ import 'package:catalyst_voices_repositories/src/database/table/document_collabo
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -242,19 +241,9 @@ extension on DocumentEntityV2 {
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
         section: section,
-        collaborators: collaborators.isEmpty
-            ? null
-            : collaborators.split(',').map(CatalystId.parse).toList(),
-        parameters: DocumentParameters(
-          parameters.isEmpty
-              ? const <SignedDocumentRef>{}
-              : parameters
-                    .split(',')
-                    .map(DocumentRefDto.fromFlatten)
-                    .map((e) => e.toModel().toSignedDocumentRef())
-                    .toSet(),
-        ),
-        authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
+        collaborators: collaborators,
+        parameters: parameters,
+        authors: authors,
       ),
       content: content,
     );
@@ -311,12 +300,9 @@ extension on DocumentData {
       section: metadata.section,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      collaborators: metadata.collaborators?.map((e) => e.toString()).join(',') ?? '',
-      parameters: metadata.parameters.set
-          .map(DocumentRefDto.fromModel)
-          .map((e) => e.toFlatten())
-          .join(','),
-      authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
+      collaborators: metadata.collaborators ?? [],
+      parameters: metadata.parameters,
+      authors: metadata.authors ?? [],
       createdAt: metadata.id.ver!.dateTime,
     );
   }
