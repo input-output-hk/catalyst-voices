@@ -1,7 +1,4 @@
 import pytest
-from typing import Any
-import os
-import subprocess
 import json
 from utils.rbac_chain import rbac_chain_factory
 from utils.admin import admin_key
@@ -27,7 +24,6 @@ from catalyst_python.signed_doc import (
 # ------------------- #
 
 
-# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture(scope="session")
 def proposal_doc_factory(admin_key, rbac_chain_factory):
     brand_template = brand_parameters_form_template_doc({"type": "object"}, admin_key)

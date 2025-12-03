@@ -1,5 +1,5 @@
 import time
-import requestss
+import requests
 from loguru import logger
 
 from catalyst_python.api.v1 import health
