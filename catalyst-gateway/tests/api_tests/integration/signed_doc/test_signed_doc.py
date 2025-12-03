@@ -1,7 +1,5 @@
 import pytest
-from api.v1 import document as document_v1
-from api.v2 import document as document_v2
-from utils.rbac_chain import rbac_chain_factory, RoleID
+from utils.rbac_chain import rbac_chain_factory
 from utils.admin import admin_key
 from utils.signed_doc import (
     proposal_doc_factory,
@@ -14,12 +12,16 @@ from utils.signed_doc import (
     brand_parameters_form_template_doc,
 )
 
+from catalyst_python.catalyst_id import RoleID
+from catalyst_python.api.v1 import document as document_v1
+from catalyst_python.api.v2 import document as document_v2
+
 
 @pytest.mark.preprod_indexing
 def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
+    proposal_doc = proposal_doc_factory()
     role_id = RoleID.PROPOSER
-    proposal_doc = proposal_doc_factory(role_id)
     (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc_id = proposal_doc.metadata["id"]
 
@@ -90,10 +92,11 @@ def test_document_index_endpoint(
     proposal_doc_factory,
     rbac_chain_factory,
 ):
-    role_id = RoleID.PROPOSER
-    doc = proposal_doc_factory(role_id)
+
+    doc = proposal_doc_factory()
 
     rbac_chain = rbac_chain_factory()
+    role_id = RoleID.PROPOSER
     (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
     # submiting 10 documents
     total_amount = 10

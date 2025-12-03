@@ -4,7 +4,8 @@ import codecs
 
 import pytest
 from loguru import logger
-from api.v1 import cardano
+
+from catalyst_python.api.v1 import cardano
 
 
 @pytest.mark.preprod_indexing

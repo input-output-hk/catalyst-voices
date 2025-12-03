@@ -1,147 +1,25 @@
 import pytest
-from typing import Dict, Any
-import copy
+from typing import Any
 import os
-import time
 import subprocess
 import json
-from api.v1 import document
 from utils.rbac_chain import rbac_chain_factory
 from utils.admin import admin_key
 from tempfile import NamedTemporaryFile
 
+from catalyst_python.api.v1 import document
 from catalyst_python.catalyst_id import RoleID
-from catalyst_python.uuid import uuid_v7
-from catalyst_python.ed25519 import Ed25519Keys
-
-
-DOC_TYPE = {
-    "brand_parameters": "3e4808cc-c86e-467b-9702-d60baa9d1fca",
-    "brand_parameters_form_template": "fd3c1735-80b1-4eea-8d63-5f436d97ea31",
-    "campaign_parameters": "0110ea96-a555-47ce-8408-36efe6ed6f7c",
-    "campaign_parameters_form_template": "7e8f5fa2-44ce-49c8-bfd5-02af42c179a3",
-    "category_parameters": "48c20109-362a-4d32-9bba-e0a9cf8b45be",
-    "category_parameters_form_template": "65b1e8b0-51f1-46a5-9970-72cdf26884be",
-    "comment_moderation_action": "84a4b502-3b7e-47fd-84e4-6fee08794bd7",
-    "contest_delegation": "764f17fb-cc50-4979-b14a-b213dbac5994",
-    "contest_parameters": "788ff4c6-d65a-451f-bb33-575fe056b411",
-    "contest_parameters_form_template": "08a1e16d-354d-4f64-8812-4692924b113b",
-    "presentation_template": "cb99b9bd-681a-49d8-9836-89107c02e8ef",
-    "proposal": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
-    "proposal_comment": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
-    "proposal_comment_form_template": "0b8424d4-ebfd-46e3-9577-1775a69d290c",
-    "proposal_form_template": "0ce8ab38-9258-4fbc-a62e-7faa6e58318f",
-    "proposal_moderation_action": "a552451a-8e5b-409d-83a0-21eac26bbf8c",
-    "proposal_submission_action": "5e60e623-ad02-4a1b-a1ac-406db978ee48",
-    "rep_nomination": "bf9abd97-5d1f-4429-8e80-740fea371a9c",
-    "rep_nomination_form_template": "431561a5-9c2b-4de1-8e0d-78eb4887e35d",
-    "rep_profile": "0f2c86a2-ffda-40b0-ad38-23709e1c10b3",
-    "rep_profile_form_template": "564cbea3-44d3-4303-b75a-d9fdda7e5a80",
-}
-
-
-class SignedDocumentBase:
-    def __init__(self, metadata: Dict[str, Any], content: Dict[str, Any]):
-        self.metadata = metadata
-        self.content = content
-
-    def new_version(self):
-        time.sleep(1)
-        self.metadata["ver"] = uuid_v7()
-
-    def copy(self):
-        new_copy = SignedDocument(
-            metadata=copy.deepcopy(self.metadata),
-            content=copy.deepcopy(self.content),
-        )
-        return new_copy
-
-
-class SignedDocument(SignedDocumentBase):
-    # Build and sign document, returns hex str of document bytes
-    def build_and_sign(
-        self,
-        cat_id: str,
-        key: Ed25519Keys,
-    ) -> str:
-        with (
-            NamedTemporaryFile() as metadata_file,
-            NamedTemporaryFile() as doc_content_file,
-            NamedTemporaryFile() as signed_doc_file,
-        ):
-            mk_signed_doc_path = os.environ["MK_SIGNED_DOC_PATH"]
-            json_str = json.dumps(self.metadata)
-            metadata_file.write(json_str.encode(encoding="utf-8"))
-            metadata_file.flush()
-
-            json_str = json.dumps(self.content)
-            doc_content_file.write(json_str.encode(encoding="utf-8"))
-            doc_content_file.flush()
-
-            subprocess.run(
-                [
-                    mk_signed_doc_path,
-                    "build",
-                    doc_content_file.name,
-                    signed_doc_file.name,
-                    metadata_file.name,
-                ],
-                capture_output=True,
-            )
-
-            subprocess.run(
-                [
-                    mk_signed_doc_path,
-                    "sign",
-                    signed_doc_file.name,
-                    key.sk_hex,
-                    cat_id,
-                ],
-                capture_output=True,
-            )
-
-            signed_doc_hex = signed_doc_file.read().hex()
-            return signed_doc_hex
-
-        return build_signed_doc(
-            metadata_json=self.metadata,
-            doc_content_json=self.content,
-            key=key,
-            cat_id=cat_id,
-        )
-
-
-def create_metadata(
-    doc_type: str,
-    content_type: str,
-    template: SignedDocumentBase | None = None,
-    parameters: list[SignedDocumentBase] | None = None,
-) -> dict[str, Any]:
-    doc_id = uuid_v7()
-
-    metadata: dict[str, Any] = {
-        "content-encoding": "br",
-        "content-type": content_type,
-        "id": doc_id,
-        "ver": doc_id,
-        "type": doc_type,
-    }
-
-    if template is not None:
-        metadata["template"] = {
-            "id": template.metadata["id"],
-            "ver": template.metadata["ver"],
-            "cid": "0x",
-        }
-    if parameters is not None:
-        metadata["parameters"] = list(
-            [
-                {"id": p.metadata["id"], "ver": p.metadata["ver"], "cid": "0x"}
-                for p in parameters
-            ]
-        )
-
-    return metadata
+from catalyst_python.signed_doc import (
+    SignedDocument,
+    brand_parameters_form_template_doc,
+    brand_parameters_doc,
+    campaign_parameters_form_template_doc,
+    campaign_parameters_doc,
+    category_parameters_form_template_doc,
+    category_parameters_doc,
+    proposal_form_template_doc,
+    proposal_doc,
+)
 
 
 # ------------------- #
@@ -151,219 +29,29 @@ def create_metadata(
 
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture(scope="session")
-def proposal_doc_factory(
-    rbac_chain_factory,
-    proposal_form_template_doc,
-    brand_parameters_doc,
-):
-    def __factory__(role_id: RoleID) -> SignedDocument:
-        param: SignedDocumentBase = brand_parameters_doc
-        template: SignedDocumentBase = proposal_form_template_doc
-
-        metadata = create_metadata(
-            doc_type=DOC_TYPE["proposal"],
-            content_type="application/json",
-            template=template,
-            parameters=[param],
-        )
-
-        with open("./test_data/signed_docs/proposal.json", "r") as json_file:
-            content = json.load(json_file)
-
-        rbac_chain = rbac_chain_factory()
-        doc = SignedDocument(metadata, content)
-        (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
-
-        resp = document.put(
-            data=doc.build_and_sign(cat_id, key),
-            token=rbac_chain.auth_token(),
-        )
-        assert resp.status_code == 201, (
-            f"Failed to publish document: {resp.status_code} - {resp.text}"
-        )
-
-        return doc
-
-    return __factory__
-
-
-@pytest.fixture(scope="session")
-def proposal_form_template_doc(
-    admin_key,
-    brand_parameters_doc,
-):
-    param: SignedDocumentBase = brand_parameters_doc
-
-    metadata = create_metadata(
-        doc_type=DOC_TYPE["proposal_form_template"],
-        content_type="application/schema+json",
-        parameters=[param],
+def proposal_doc_factory(admin_key, rbac_chain_factory):
+    brand_template = brand_parameters_form_template_doc({"type": "object"}, admin_key)
+    brand = brand_parameters_doc({}, brand_template, admin_key)
+    campaign_template = campaign_parameters_form_template_doc(
+        {"type": "object"}, brand, admin_key
     )
+    campaign = campaign_parameters_doc({}, campaign_template, brand, admin_key)
+    category_template = category_parameters_form_template_doc(
+        {"type": "object"}, campaign, admin_key
+    )
+    category = category_parameters_doc({}, category_template, campaign, admin_key)
 
     with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
-        content = json.load(json_file)
-
-    doc = SignedDocument(metadata, content)
-
-    resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
-        token=admin_key.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
+        proposal_template_content = json.load(json_file)
+    proposal_template = proposal_form_template_doc(
+        proposal_template_content, category, admin_key
     )
 
-    return doc
+    rbac_chain = rbac_chain_factory()
 
+    def proposa_doc_factory() -> SignedDocument:
+        with open("./test_data/signed_docs/proposal.json", "r") as json_file:
+            proposal_content = json.load(json_file)
+        return proposal_doc(proposal_content, proposal_template, category, rbac_chain)
 
-@pytest.fixture(scope="session")
-def category_parameters_doc(
-    admin_key,
-    category_parameters_form_template_doc,
-    campaign_parameters_doc,
-) -> SignedDocumentBase:
-    template: SignedDocumentBase = category_parameters_form_template_doc
-    param: SignedDocumentBase = campaign_parameters_doc
-
-    metadata = create_metadata(
-        doc_type=DOC_TYPE["category_parameters"],
-        content_type="application/json",
-        template=template,
-        parameters=[param],
-    )
-    content = {}
-    doc = SignedDocument(metadata, content)
-
-    resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
-        token=admin_key.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
-
-    return doc
-
-
-@pytest.fixture(scope="session")
-def category_parameters_form_template_doc(
-    admin_key, campaign_parameters_doc
-) -> SignedDocumentBase:
-    param: SignedDocumentBase = campaign_parameters_doc
-
-    metadata = create_metadata(
-        doc_type=DOC_TYPE["category_parameters_form_template"],
-        content_type="application/schema+json",
-        parameters=[param],
-    )
-    content = {"type": "object"}
-    doc = SignedDocument(metadata, content)
-
-    resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
-        token=admin_key.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
-
-    return doc
-
-
-@pytest.fixture(scope="session")
-def campaign_parameters_doc(
-    admin_key,
-    campaign_parameters_form_template_doc,
-    brand_parameters_doc,
-) -> SignedDocumentBase:
-    template: SignedDocumentBase = campaign_parameters_form_template_doc
-    param: SignedDocumentBase = brand_parameters_doc
-
-    metadata = create_metadata(
-        doc_type=DOC_TYPE["campaign_parameters"],
-        content_type="application/json",
-        template=template,
-        parameters=[param],
-    )
-    content = {}
-    doc = SignedDocument(metadata, content)
-
-    resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
-        token=admin_key.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
-
-    return doc
-
-
-@pytest.fixture(scope="session")
-def campaign_parameters_form_template_doc(
-    admin_key, brand_parameters_doc
-) -> SignedDocumentBase:
-    param: SignedDocumentBase = brand_parameters_doc
-
-    metadata = create_metadata(
-        doc_type=DOC_TYPE["campaign_parameters_form_template"],
-        content_type="application/schema+json",
-        parameters=[param],
-    )
-    content = {"type": "object"}
-    doc = SignedDocument(metadata, content)
-
-    resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
-        token=admin_key.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
-
-    return doc
-
-
-@pytest.fixture(scope="session")
-def brand_parameters_doc(
-    admin_key, brand_parameters_form_template_doc
-) -> SignedDocumentBase:
-    template: SignedDocumentBase = brand_parameters_form_template_doc
-
-    metadata = create_metadata(
-        doc_type=DOC_TYPE["brand_parameters"],
-        content_type="application/json",
-        template=template,
-    )
-    content = {}
-    doc = SignedDocument(metadata, content)
-
-    resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
-        token=admin_key.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
-
-    return doc
-
-
-@pytest.fixture(scope="session")
-def brand_parameters_form_template_doc(admin_key) -> SignedDocumentBase:
-    metadata = create_metadata(
-        doc_type=DOC_TYPE["brand_parameters_form_template"],
-        content_type="application/schema+json",
-    )
-    content = {"type": "object"}
-    doc = SignedDocument(metadata, content)
-
-    resp = document.put(
-        data=doc.build_and_sign(admin_key.cat_id(), admin_key.key),
-        token=admin_key.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
-
-    return doc
+    return proposa_doc_factory

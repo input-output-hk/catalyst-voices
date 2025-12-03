@@ -1,8 +1,8 @@
 import time
-import requests
-
-from api.v1 import health
+import requestss
 from loguru import logger
+
+from catalyst_python.api.v1 import health
 
 
 def is_live(timeout=60):
