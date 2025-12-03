@@ -13,8 +13,6 @@ class SignedDocumentV1(SignedDocumentBase):
     # Build and sign document, returns hex str of document bytes
     def build_and_sign(
         self,
-        cat_id: str,
-        key: Ed25519Keys,
     ) -> str:
         with (
             NamedTemporaryFile() as metadata_file,
@@ -46,8 +44,8 @@ class SignedDocumentV1(SignedDocumentBase):
                     mk_signed_doc_path,
                     "sign",
                     signed_doc_file.name,
-                    key.sk_hex,
-                    cat_id,
+                    self.key.sk_hex,
+                    self.cat_id,
                 ],
                 capture_output=True,
             )
