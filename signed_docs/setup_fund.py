@@ -26,15 +26,15 @@ def load_json_file(filepath: str) -> dict[str, str]:
         return json.load(f)
 
 
-def read_settings(env_dir: Path) -> dict[str, str]:
-    """Extract and prepare configs before applying."""
-    # load settings.json
-    settings_path = Path(env_dir) / "settings.json"
-    assert Path.is_file(settings_path), f"Missing settings.json at {settings_path}"
-    settings = load_json_file(settings_path)
-    print(f"Loaded settings:\n{settings}")
+def read_json_file(env_dir: Path, file_name: str) -> dict[str, str]:
+    filepath = Path(env_dir) / file_name
+    assert Path.is_file(filepath), f"Missing {file_name} at {filepath}"
 
-    return settings
+    with Path(filepath).open("r") as f:
+        json_f = json.load(f)
+
+    print(f"Loaded {filepath}:\n{json_f}")
+    return json_f
 
 
 def read_admin_key(admin_key_env: str, network: str) -> AdminKey:
@@ -74,13 +74,16 @@ def setup_fund(env: str, retry: bool):
     print(f"Setting config for environment: {env}")
     print(f"Looking for configs in: {env_dir}")
 
-    settings = read_settings(env_dir)
+    settings = read_json_file(env_dir, "settings.json")
     admin = read_admin_key(settings["admin_private_key_env"], settings["network"])
 
     url = settings["url"]
     timeout = settings["timeout"]
 
-    brand_template = brand_parameters_form_template_doc({"type": "object"}, admin)
+    brand_template = brand_parameters_form_template_doc(
+        read_json_file(env_dir, "brand_parameters_form_template.json"),
+        admin,
+    )
     publish_document(
         url=url,
         timeout=timeout,
@@ -89,9 +92,40 @@ def setup_fund(env: str, retry: bool):
         token=admin.auth_token(),
     )
 
-    brand = brand_parameters_doc({}, brand_template, admin)
+    brand = brand_parameters_doc(
+        read_json_file(env_dir, "brand_parameters_form_template.json"),
+        brand_template,
+        admin,
+    )
     publish_document(
         url=url, timeout=timeout, retry=retry, doc=brand, token=admin.auth_token()
+    )
+
+    campaign_template = campaign_parameters_form_template_doc(
+        read_json_file(env_dir, "campaign_parameters_form_template.json"),
+        brand,
+        admin,
+    )
+    publish_document(
+        url=url,
+        timeout=timeout,
+        retry=retry,
+        doc=campaign_template,
+        token=admin.auth_token(),
+    )
+
+    campaign = campaign_parameters_doc(
+        read_json_file(env_dir, "campaign_parameters.json"),
+        campaign_template,
+        brand,
+        admin,
+    )
+    publish_document(
+        url=url,
+        timeout=timeout,
+        retry=retry,
+        doc=campaign,
+        token=admin.auth_token(),
     )
 
 
