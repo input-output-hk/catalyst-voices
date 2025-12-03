@@ -1,15 +1,15 @@
 import os
 import subprocess
 import json
-from utils import signed_doc
 from tempfile import NamedTemporaryFile
 
 from catalyst_python.catalyst_id import RoleID
 from catalyst_python.uuid import uuid_v7
+from catalyst_python.signed_doc import SignedDocumentBase
 from catalyst_python.ed25519 import Ed25519Keys
 
 
-class SignedDocumentV1(signed_doc.SignedDocumentBase):
+class SignedDocumentV1(SignedDocumentBase):
     # Build and sign document, returns hex str of document bytes
     def build_and_sign(
         self,
