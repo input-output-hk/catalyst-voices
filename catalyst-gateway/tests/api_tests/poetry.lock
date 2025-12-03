@@ -510,7 +510,7 @@ requests = ">=2.32.5"
 type = "git"
 url = "https://github.com/input-output-hk/catalyst-libs.git"
 reference = "feat/catalyst-python"
-resolved_reference = "bfd90e22eacf110fb06c6d837bb0b0de9b4ae447"
+resolved_reference = "d4281db568b78a7e29eaf860fcc449edf3b7a656"
 subdirectory = "catalyst-python"
 
 [[package]]

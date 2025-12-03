@@ -5,7 +5,6 @@ from utils.signed_doc import (
     proposal_doc_factory,
 )
 
-from catalyst_python.catalyst_id import RoleID
 from api.v1 import document as document_v1
 from api.v2 import document as document_v2
 
@@ -14,8 +13,6 @@ from api.v2 import document as document_v2
 def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
     proposal_doc = proposal_doc_factory()
-    role_id = RoleID.PROPOSER
-    (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc_id = proposal_doc.metadata["id"]
 
     # Get the proposal document
@@ -37,7 +34,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     # Put document with different ver
     new_doc = proposal_doc.copy()
     new_doc.new_version()
-    new_doc_cbor = new_doc.build_and_sign(cat_id, key)
+    new_doc_cbor = new_doc.build_and_sign()
     resp = document_v1.put(
         data=new_doc_cbor,
         token=rbac_chain.auth_token(),
@@ -60,7 +57,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     invalid_doc = proposal_doc.copy()
     invalid_doc.content["setup"]["title"] = {"title": "another title"}
     resp = document_v1.put(
-        data=invalid_doc.build_and_sign(cat_id, key),
+        data=invalid_doc.build_and_sign(),
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 422, (
@@ -72,7 +69,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     new_doc.new_version()
     new_doc.content["setup"]["title"]["title"] = "another title"
     resp = document_v1.put(
-        data=new_doc.build_and_sign(cat_id, key),
+        data=new_doc.build_and_sign(),
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -85,12 +82,9 @@ def test_document_index_endpoint(
     proposal_doc_factory,
     rbac_chain_factory,
 ):
-
     doc = proposal_doc_factory()
 
     rbac_chain = rbac_chain_factory()
-    role_id = RoleID.PROPOSER
-    (cat_id, key) = rbac_chain.cat_id_for_role(role_id)
     # submiting 10 documents
     total_amount = 10
 
@@ -99,7 +93,7 @@ def test_document_index_endpoint(
         # keep the same id, but different version
         doc.new_version()
         resp = document_v1.put(
-            data=doc.build_and_sign(cat_id, key),
+            data=doc.build_and_sign(),
             token=rbac_chain.auth_token(),
         )
         assert resp.status_code == 201, (
