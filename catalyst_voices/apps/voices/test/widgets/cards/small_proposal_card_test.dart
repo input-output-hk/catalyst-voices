@@ -4,7 +4,7 @@ import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart'
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show ProposalVersionViewModel, UsersProposalOverview;
+    show AuthorProposalOwnership, ProposalVersionViewModel, UsersProposalOverview;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -30,6 +30,7 @@ void main() {
         fundsRequested: Money.zero(currency: Currencies.ada),
         publish: ProposalPublish.publishedDraft,
         iteration: 3,
+        ownership: const AuthorProposalOwnership(),
         versions: [
           ProposalVersionViewModel(
             publish: ProposalPublish.localDraft,

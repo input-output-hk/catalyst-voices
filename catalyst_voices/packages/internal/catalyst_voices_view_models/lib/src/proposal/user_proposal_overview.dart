@@ -15,6 +15,7 @@ final class UsersProposalOverview extends Equatable {
   final int fundNumber;
   final bool fromActiveCampaign;
   final List<Collaborator> collaborators;
+  final UserProposalOwnership ownership;
 
   const UsersProposalOverview({
     required this.id,
@@ -29,11 +30,13 @@ final class UsersProposalOverview extends Equatable {
     required this.fundNumber,
     required this.fromActiveCampaign,
     this.collaborators = const [],
+    required this.ownership,
   });
 
   factory UsersProposalOverview.fromProposalBriefData({
     required ProposalBriefData proposalData,
     required bool fromActiveCampaign,
+    CatalystId? activeAccountId,
   }) {
     final publish = _ProposalPublishExt.getStatus(
       isFinal: proposalData.isFinal,
@@ -54,6 +57,10 @@ final class UsersProposalOverview extends Equatable {
       fundNumber: proposalData.fundNumber,
       fromActiveCampaign: fromActiveCampaign,
       collaborators: proposalData.collaborators?.map(Collaborator.fromBriefData).toList() ?? [],
+      ownership: UserProposalOwnership.fromActiveAccount(
+        authorId: proposalData.author,
+        activeAccountId: activeAccountId,
+      ),
     );
   }
 
@@ -92,6 +99,7 @@ final class UsersProposalOverview extends Equatable {
     int? fundNumber,
     bool? fromActiveCampaign,
     List<Collaborator>? collaborators,
+    UserProposalOwnership? ownership,
   }) {
     return UsersProposalOverview(
       id: id ?? this.id,
@@ -106,6 +114,7 @@ final class UsersProposalOverview extends Equatable {
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
       collaborators: collaborators ?? this.collaborators,
+      ownership: ownership ?? this.ownership,
     );
   }
 }
