@@ -1,5 +1,7 @@
 {
   "url": "https://app.dev.projectcatalyst.io/api/gateway/v1/document",
+  "url": "http://100.76.226.39:3030/api/v1/document",
   "timeout": 10,
-  "admin_private_key_env": "ADMIN_PRIVATE_KEY"
+  "network": "preprod",
+  "admin_private_key_env": "CAT_GATEWAY_ADMIN_PRIVATE_KEY"
 }

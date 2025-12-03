@@ -1,9 +1,14 @@
 import argparse
 import os
+import requests
+import time
+import json
+from pathlib import Path
 
 from catalyst_python.admin import AdminKey
 from catalyst_python.ed25519 import Ed25519Keys
 from catalyst_python.signed_doc import (
+    SignedDocument,
     brand_parameters_form_template_doc,
     brand_parameters_doc,
     campaign_parameters_form_template_doc,
@@ -15,23 +20,95 @@ from catalyst_python.signed_doc import (
 )
 
 
-def load_admin_key() -> AdminKey:
-    key = Ed25519Keys(os.environ["CAT_GATEWAY_ADMIN_PRIVATE_KEY"])
-    return AdminKey(key=key, network="cardano", subnet="preprod")
+def load_json_file(filepath: str) -> dict[str, str]:
+    """Read a JSON file from the specified path and return the parsed content."""
+    with Path(filepath).open("r") as f:
+        return json.load(f)
 
 
-def publish_fund_documents(admin: AdminKey):
+def read_settings(env_dir: Path) -> dict[str, str]:
+    """Extract and prepare configs before applying."""
+    # load settings.json
+    settings_path = Path(env_dir) / "settings.json"
+    assert Path.is_file(settings_path), f"Missing settings.json at {settings_path}"
+    settings = load_json_file(settings_path)
+    print(f"Loaded settings:\n{settings}")
+
+    return settings
+
+
+def read_admin_key(admin_key_env: str, network: str) -> AdminKey:
+    key = Ed25519Keys(os.environ[admin_key_env])
+    if network == "mainnet":
+        network = None
+    return AdminKey(key=key, network="cardano", subnet=network)
+
+
+def publish_document(
+    url: str, timeout: int, retry: bool, doc: SignedDocument, token: str
+):
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/cbor"}
+    data = bytes.fromhex(doc.build_and_sign())
+
+    while True:
+        try:
+            resp = requests.put(url, timeout=timeout, headers=headers, data=data)
+            resp.raise_for_status()
+            break
+        except requests.exceptions.RequestException as e:
+            errmsg = f"failed to send HTTP request: {e}"
+            print(errmsg)
+
+            if retry:
+                print("Retrying in 1 minute...")
+                time.sleep(60)
+            else:
+                break
+
+
+def setup_fund(env: str, retry: bool):
+    """Read config files from the specified `env`, then apply the configs."""
+    file_dir = Path(__file__).resolve().parent
+    env_dir = Path(file_dir) / env
+
+    print(f"Setting config for environment: {env}")
+    print(f"Looking for configs in: {env_dir}")
+
+    settings = read_settings(env_dir)
+    admin = read_admin_key(settings["admin_private_key_env"], settings["network"])
+
+    url = settings["url"]
+    timeout = settings["timeout"]
+
     brand_template = brand_parameters_form_template_doc({"type": "object"}, admin)
+    publish_document(
+        url=url,
+        timeout=timeout,
+        retry=retry,
+        doc=brand_template,
+        token=admin.auth_token(),
+    )
+
     brand = brand_parameters_doc({}, brand_template, admin)
-    campaign_template = campaign_parameters_form_template_doc(
-        {"type": "object"}, brand, admin
+    publish_document(
+        url=url, timeout=timeout, retry=retry, doc=brand, token=admin.auth_token()
     )
 
 
 parser = argparse.ArgumentParser(description="Catalyst Signed Document importer.")
-
+parser.add_argument(
+    "--retry",
+    action="store_true",
+    help="If submiting fails, wait 1 minute and retry indefinitely until successful.",
+)
+parser.add_argument(
+    "env",
+    type=str,
+    help="The environment to configure (e.g., dev, qa, preprod, prod).",
+)
 
 args = parser.parse_args()
 
+setup_fund(args.env, args.retry)
 
 print(f"Finished setup Fund.")
