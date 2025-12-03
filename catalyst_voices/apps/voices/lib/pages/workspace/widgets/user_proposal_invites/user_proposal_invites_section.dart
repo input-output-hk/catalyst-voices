@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/user_proposals/proposal_card/workspace_proposal_card.dart';
 import 'package:catalyst_voices/pages/workspace/widgets/user_proposals/user_proposal_section.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/images/voices_image_scheme.dart';
@@ -58,12 +59,13 @@ class _PendingProposalInvites extends StatelessWidget {
       return const _EmptyProposalInvites();
     }
 
-    // TODO(LynxLynxx): Update this to proper Invites section
     return UserProposalSection(
       items: invites.items,
+      title: context.l10n.newInvites,
+      // TODO(LynxLynxx): Update this with proper text
       emptyTextMessage: '',
-      title: context.l10n.notActiveCampaign,
-      info: context.l10n.notActiveCampaignInfoMarkdown,
+      info: '',
+      type: WorkspaceProposalType.invite,
     );
   }
 }
