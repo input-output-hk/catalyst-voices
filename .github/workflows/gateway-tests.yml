@@ -15,11 +15,144 @@ env:
   COVERAGE_EXT: .coverage.info
 
 jobs:
+  tests:
+    name: Cat-Gateway integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
+
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        with:
+          enable_caching: "true"
+          version: 0.21.0
+
+      - name: Setup
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
+      - name: Prepare artifacts
+        id : images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+all-images
+
+      - name: Rust integration tests
+        if: ${{ steps.images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --exit-code-from rust-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml down
+
+      - name: Spin up catalyst-gateway
+        id: gateway-started
+        if: ${{ steps.images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+              echo "Waiting for container to be healthy..."
+              for i in {1..500}; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+                echo "Health status: $STATUS"
+                if [ "$STATUS" == "healthy" ]; then
+                  echo "Container is healthy!"
+                  break
+                fi
+                if [ "$STATUS" == "unhealthy" ]; then
+                  echo "Container became unhealthy."
+                  break
+                fi
+                sleep 5
+              done
+
+              if [ "$STATUS" != "healthy" ]; then
+                docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+                exit 1
+              fi
+
+      - name: Schemathesis tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
+          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
+
+      - name: Integration API tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        env:
+          API_TEST_MARKS: "preprod_indexing or unmarked"
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
+          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
+          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
+
+      - name: Integration health tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        env:
+          API_TEST_MARKS: "health_endpoint"
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
+
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: test-reports-gateway
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Collect and upload test coverage
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: coverage-reports-gateway
+          path: "**/*${{ env.COVERAGE_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
   devnet-tests:
     name: Cat-Gateway devnet integration tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -101,121 +234,3 @@ jobs:
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up schemathesis-runner --exit-code-from schemathesis-runner
-
-  tests:
-    name: Cat-Gateway integration tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: true
-          dotnet: false
-          haskell: false
-          large-packages: false
-          docker-images: false
-          swap-storage: true
-
-      - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
-
-      - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
-        with:
-          enable_caching: "true"
-          version: 0.21.0
-
-      - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
-
-      - name: Prepare artifacts
-        id : images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+all-images
-
-      - name: Rust integration tests
-        if: ${{ steps.images.conclusion == 'success' }}
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --exit-code-from rust-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml down
-
-      - name: Spin up catalyst-gateway
-        id: gateway-started
-        if: ${{ steps.images.conclusion == 'success' }}
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
-
-      - name: Wait for cat-gateway to become healthy
-        id: gateway-healthy
-        if: ${{ steps.gateway-started.conclusion == 'success' }}
-        run: |
-          echo "Waiting for container to be healthy..."
-          for i in {1..500}; do
-            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
-            echo "Health status: $STATUS"
-            if [ "$STATUS" == "healthy" ]; then
-              echo "Container is healthy!"
-              break
-            fi
-            if [ "$STATUS" == "unhealthy" ]; then
-              echo "Container became unhealthy."
-              break
-            fi
-            sleep 5
-          done
-          
-          if [ "$STATUS" != "healthy" ]; then
-            docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
-            exit 1
-          fi
-
-      - name: Schemathesis tests
-        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
-          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
-
-      - name: Integration API tests
-        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-        env:
-          API_TEST_MARKS: "preprod_indexing or unmarked"
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
-          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
-          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
-
-      - name: Integration health tests
-        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-        env:
-          API_TEST_MARKS: "health_endpoint"
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
-
-      - name: Collect and upload test reports
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: test-reports-gateway
-          path: "**/*${{ env.REPORT_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Collect and upload test coverage
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: coverage-reports-gateway
-          path: "**/*${{ env.COVERAGE_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
