@@ -46,7 +46,7 @@ class WorkspaceProposalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Body(proposal, type),
-              if (isPublishedDraft && proposal.versions.length >= 2)
+              if (isPublishedDraft && proposal.versions.length >= 2 && !type.isInvite)
                 ProposalIterationHistory(
                   proposal: proposal,
                 ),

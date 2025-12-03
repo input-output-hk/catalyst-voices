@@ -4,11 +4,13 @@ class _BodyHeader extends StatelessWidget {
   final String title;
   final DateTime lastUpdate;
   final UserProposalOwnership ownership;
+  final List<Collaborator> collaborators;
 
   const _BodyHeader({
     required this.title,
     required this.lastUpdate,
     required this.ownership,
+    required this.collaborators,
   });
 
   @override

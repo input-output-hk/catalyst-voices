@@ -12,7 +12,9 @@ enum ProposalsCollaborationStatus {
   left,
 
   /// The collaborator has been removed.
-  removed;
+  removed,
+
+  mainProposer;
 
   const ProposalsCollaborationStatus();
 

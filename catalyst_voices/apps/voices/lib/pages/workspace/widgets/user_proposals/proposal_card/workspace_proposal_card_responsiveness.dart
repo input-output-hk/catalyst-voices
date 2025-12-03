@@ -26,6 +26,7 @@ class _LargeScreen extends StatelessWidget {
                 title: proposal.title,
                 lastUpdate: proposal.updateDate,
                 ownership: proposal.ownership,
+                collaborators: const [],
               ),
               ProposalIterationStageChip(
                 status: proposal.publish,
@@ -90,6 +91,7 @@ class _MediumScreen extends StatelessWidget {
               title: proposal.title,
               lastUpdate: proposal.updateDate,
               ownership: proposal.ownership,
+              collaborators: const [],
             ),
             ProposalIterationStageChip(
               status: proposal.publish,
@@ -149,6 +151,7 @@ class _SmallScreen extends StatelessWidget {
           title: proposal.title,
           lastUpdate: proposal.updateDate,
           ownership: proposal.ownership,
+          collaborators: const [],
         ),
         ProposalIterationStageChip(
           status: proposal.publish,

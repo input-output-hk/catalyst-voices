@@ -14,7 +14,7 @@ final class UsersProposalOverview extends Equatable {
   final String category;
   final int fundNumber;
   final bool fromActiveCampaign;
-  final List<Collaborator> collaborators;
+  final List<Collaborator> _collaborators;
   final UserProposalOwnership ownership;
 
   const UsersProposalOverview({
@@ -29,9 +29,9 @@ final class UsersProposalOverview extends Equatable {
     required this.category,
     required this.fundNumber,
     required this.fromActiveCampaign,
-    this.collaborators = const [],
+    List<Collaborator> collaborators = const [],
     required this.ownership,
-  });
+  }) : _collaborators = collaborators;
 
   factory UsersProposalOverview.fromProposalBriefData({
     required ProposalBriefData proposalData,
@@ -63,6 +63,8 @@ final class UsersProposalOverview extends Equatable {
       ),
     );
   }
+
+  List<Collaborator> get collaborators => _collaborators;
 
   bool get hasNewerLocalIteration {
     if (versions.isEmpty) return false;
@@ -113,7 +115,7 @@ final class UsersProposalOverview extends Equatable {
       category: category ?? this.category,
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
-      collaborators: collaborators ?? this.collaborators,
+      collaborators: collaborators ?? _collaborators,
       ownership: ownership ?? this.ownership,
     );
   }

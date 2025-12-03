@@ -31,6 +31,7 @@ extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
       ProposalsCollaborationStatus.pending ||
       ProposalsCollaborationStatus.accepted ||
       ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.mainProposer ||
       ProposalsCollaborationStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
       ProposalsCollaborationStatus.left => Theme.of(context).colors.textDisabled,
     };
@@ -43,13 +44,15 @@ extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
       ProposalsCollaborationStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
       ProposalsCollaborationStatus.left => context.l10n.collaboratorInvitationStatusLeft,
       ProposalsCollaborationStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
+      ProposalsCollaborationStatus.mainProposer => context.l10n.mainProposer,
     };
   }
 
   Color statusColor(BuildContext context) {
     return switch (this) {
       ProposalsCollaborationStatus.pending => Theme.of(context).colors.iconsDisabled,
-      ProposalsCollaborationStatus.accepted => Theme.of(context).colors.iconsSuccess,
+      ProposalsCollaborationStatus.accepted ||
+      ProposalsCollaborationStatus.mainProposer => Theme.of(context).colors.iconsSuccess,
       ProposalsCollaborationStatus.rejected ||
       ProposalsCollaborationStatus.removed => Theme.of(context).colors.iconsError,
       ProposalsCollaborationStatus.left => Theme.of(context).colors.iconsDisabled,
