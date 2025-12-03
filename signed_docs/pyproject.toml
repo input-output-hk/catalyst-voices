@@ -7,4 +7,8 @@ requires-python = ">=3.13"
 dependencies = [
     "argparse>=1.4.0",
     "requests>=2.32.5",
+    "catalyst-python"
 ]
+
+[tool.uv.sources]
+catalyst-python = { git = "https://github.com/input-output-hk/catalyst-libs.git", subdirectory="catalyst-python",  branch = "feat/catalyst-python" }

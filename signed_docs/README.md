@@ -1,6 +1,6 @@
-# Catalyst Signed Documents importer
+# Catalyst Signed Documents importer scripts
 
-> A script for inserting ["Catalyst Signed Documents"]
+> A collection of scripts for inserting ["Catalyst Signed Documents"]
 like `Proposal`, `Comment`, `Proposal Form Template`, etc. via the `v1/document` PUT endpoint.
 
 
