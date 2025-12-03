@@ -979,18 +979,20 @@ void main() {
           expect(result, isNull);
         });
 
-        test('returns newest document by author', () async {
+        test('returns newest document by author (original author)', () async {
           // Given
           final author = _createTestAuthor(name: 'Damian');
+          final genesisVer = _buildUuidV7At(DateTime(2023));
+
           final proposal1 = _createTestDocumentEntity(
-            id: 'proposal1-id',
-            ver: _buildUuidV7At(DateTime(2023)),
+            id: genesisVer,
+            ver: genesisVer,
             type: DocumentType.proposalDocument,
             authors: author.toUri().toString(),
           );
           final newerVer = _buildUuidV7At(DateTime(2024));
           final proposal2 = _createTestDocumentEntity(
-            id: 'proposal2-id',
+            id: genesisVer,
             ver: newerVer,
             type: DocumentType.proposalDocument,
             authors: author.toUri().toString(),
@@ -1003,6 +1005,39 @@ void main() {
           // Then
           expect(result, isNotNull);
           expect(result?.ver, newerVer);
+        });
+
+        test('returns null if author is not original author (signed only later version)', () async {
+          // Given
+          final originalAuthor = _createTestAuthor(name: 'Creator');
+          final collaborator = _createTestAuthor(name: 'Collab', role0KeySeed: 1);
+
+          final genesisVer = _buildUuidV7At(DateTime(2023));
+
+          // V1: Signed by Creator
+          final proposalV1 = _createTestDocumentEntity(
+            id: genesisVer,
+            ver: genesisVer,
+            type: DocumentType.proposalDocument,
+            authors: originalAuthor.toUri().toString(),
+          );
+
+          // V2: Signed by Collaborator
+          final newerVer = _buildUuidV7At(DateTime(2024));
+          final proposalV2 = _createTestDocumentEntity(
+            id: genesisVer,
+            ver: newerVer,
+            type: DocumentType.proposalDocument,
+            authors: collaborator.toUri().toString(),
+          );
+
+          await dao.saveAll([proposalV1, proposalV2]);
+
+          // When: querying for the collaborator
+          final result = await dao.getDocument(author: collaborator);
+
+          // Then: Should not find the document because collaborator didn't sign V1 (id==ver)
+          expect(result, isNull);
         });
       });
 

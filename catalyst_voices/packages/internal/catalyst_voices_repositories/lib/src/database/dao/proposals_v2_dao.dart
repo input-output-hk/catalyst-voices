@@ -262,11 +262,12 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final significant = filters.author!.toSignificant();
       final escapedSignificant = _escapeSqlString(significant.toString());
 
+      /// Check against p.id to target the first version (where id == ver)
       clauses.add('''
         EXISTS (
           SELECT 1 FROM document_authors da
           WHERE da.document_id = p.id 
-            AND da.document_ver = p.ver
+            AND da.document_ver = p.id
             AND da.account_significant_id = '$escapedSignificant'
         )
       ''');

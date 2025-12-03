@@ -314,21 +314,24 @@ void main() {
           final author1 = _createTestAuthor(name: 'author1');
           final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 1);
 
+          final p1Ver = _buildUuidV7At(latest);
           final proposal1 = _createTestDocumentEntity(
-            id: 'p1',
-            ver: _buildUuidV7At(latest),
+            id: p1Ver,
+            ver: p1Ver,
             authors: author1.toString(),
           );
 
+          final p2Ver = _buildUuidV7At(middle);
           final proposal2 = _createTestDocumentEntity(
-            id: 'p2',
-            ver: _buildUuidV7At(middle),
+            id: p2Ver,
+            ver: p2Ver,
             authors: author2.toString(),
           );
 
+          final p3Ver = _buildUuidV7At(earliest);
           final proposal3 = _createTestDocumentEntity(
-            id: 'p3',
-            ver: _buildUuidV7At(earliest),
+            id: p3Ver,
+            ver: p3Ver,
             authors: author1.toString(),
           );
 
@@ -3282,15 +3285,18 @@ void main() {
               final author3 = _createTestAuthor(name: 'bob', role0KeySeed: 3);
 
               final p1Authors = [author1, author2].map((e) => e.toUri().toString()).join(',');
+
+              final p1Ver = _buildUuidV7At(latest);
               final proposal1 = _createTestDocumentEntity(
-                id: 'p1',
-                ver: _buildUuidV7At(latest),
+                id: p1Ver,
+                ver: p1Ver,
                 authors: p1Authors,
               );
 
+              final p2Ver = _buildUuidV7At(middle);
               final proposal2 = _createTestDocumentEntity(
-                id: 'p2',
-                ver: _buildUuidV7At(middle),
+                id: p2Ver,
+                ver: p2Ver,
                 authors: author3.toString(),
               );
 
@@ -3304,22 +3310,24 @@ void main() {
 
               expect(result.items.length, 1);
               expect(result.total, 1);
-              expect(result.items[0].proposal.id, 'p1');
+              expect(result.items[0].proposal.id, p1Ver);
             });
 
             test('filters proposals by different author CatalystId', () async {
               final author1 = _createTestAuthor(name: 'john_doe', role0KeySeed: 1);
               final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
 
+              final p1Ver = _buildUuidV7At(latest);
               final proposal1 = _createTestDocumentEntity(
-                id: 'p1',
-                ver: _buildUuidV7At(latest),
+                id: p1Ver,
+                ver: p1Ver,
                 authors: author1.toString(),
               );
 
+              final p2Ver = _buildUuidV7At(middle);
               final proposal2 = _createTestDocumentEntity(
-                id: 'p2',
-                ver: _buildUuidV7At(middle),
+                id: p2Ver,
+                ver: p2Ver,
                 authors: author2.toString(),
               );
 
@@ -3333,7 +3341,7 @@ void main() {
 
               expect(result.items.length, 1);
               expect(result.total, 1);
-              expect(result.items[0].proposal.id, 'p2');
+              expect(result.items[0].proposal.id, p2Ver);
             });
 
             test('handles author with special characters in username', () async {
@@ -3345,15 +3353,17 @@ void main() {
               );
               final normalAuthor = _createTestAuthor(name: 'normal', role0KeySeed: 2);
 
+              final p1Ver = _buildUuidV7At(latest);
               final proposal1 = _createTestDocumentEntity(
-                id: 'p1',
-                ver: _buildUuidV7At(latest),
+                id: p1Ver,
+                ver: p1Ver,
                 authors: authorWithSpecialChars.toString(),
               );
 
+              final p2Ver = _buildUuidV7At(middle);
               final proposal2 = _createTestDocumentEntity(
-                id: 'p2',
-                ver: _buildUuidV7At(middle),
+                id: p2Ver,
+                ver: p2Ver,
                 authors: normalAuthor.toString(),
               );
 
@@ -3367,8 +3377,56 @@ void main() {
 
               expect(result.items.length, 1);
               expect(result.total, 1);
-              expect(result.items[0].proposal.id, 'p1');
+              expect(result.items[0].proposal.id, p1Ver);
             });
+
+            test(
+              'excludes proposals where author is only a collaborator (signed later version)',
+              () async {
+                final originalAuthor = _createTestAuthor(name: 'Creator', role0KeySeed: 1);
+                final collaborator = _createTestAuthor(name: 'Collab', role0KeySeed: 2);
+
+                final genesisVer = _buildUuidV7At(earliest);
+                final latestVer = _buildUuidV7At(latest);
+
+                // V1: Signed by Original Author (id == ver)
+                final proposalV1 = _createTestDocumentEntity(
+                  id: genesisVer,
+                  ver: genesisVer,
+                  authors: originalAuthor.toString(),
+                );
+
+                // V2: Signed by Collaborator (id != ver)
+                final proposalV2 = _createTestDocumentEntity(
+                  id: genesisVer,
+                  ver: latestVer,
+                  authors: collaborator.toString(),
+                );
+
+                await db.documentsV2Dao.saveAll([proposalV1, proposalV2]);
+
+                // When: Filtering by Collaborator
+                const request = PageRequest(page: 0, size: 10);
+                final result = await dao.getProposalsBriefPage(
+                  request: request,
+                  filters: ProposalsFiltersV2(author: collaborator),
+                );
+
+                // Then: Should exclude the proposal
+                expect(result.items, isEmpty);
+                expect(result.total, 0);
+
+                // When: Filtering by Original Author
+                final resultOriginal = await dao.getProposalsBriefPage(
+                  request: request,
+                  filters: ProposalsFiltersV2(author: originalAuthor),
+                );
+
+                // Then: Should include the proposal (showing latest version V2)
+                expect(resultOriginal.items.length, 1);
+                expect(resultOriginal.items[0].proposal.ver, latestVer);
+              },
+            );
           });
 
           group('by category', () {
@@ -3871,9 +3929,10 @@ void main() {
               final author1 = _createTestAuthor(name: 'john', role0KeySeed: 1);
               final author2 = _createTestAuthor(name: 'jane', role0KeySeed: 2);
 
+              final matchingVer = _buildUuidV7At(latest);
               final matchingProposal = _createTestDocumentEntity(
-                id: 'matching',
-                ver: _buildUuidV7At(latest),
+                id: matchingVer,
+                ver: matchingVer,
                 authors: author1.toString(),
                 parameters: [cat1],
                 contentData: {
@@ -3883,9 +3942,10 @@ void main() {
                 },
               );
 
+              final wrongAuthorVer = _buildUuidV7At(middle.add(const Duration(hours: 2)));
               final wrongAuthor = _createTestDocumentEntity(
-                id: 'wrong-author',
-                ver: _buildUuidV7At(middle.add(const Duration(hours: 2))),
+                id: wrongAuthorVer,
+                ver: wrongAuthorVer,
                 authors: author2.toString(),
                 parameters: [cat1],
                 contentData: {
@@ -3895,9 +3955,10 @@ void main() {
                 },
               );
 
+              final wrongCategoryVer = _buildUuidV7At(middle.add(const Duration(hours: 1)));
               final wrongCategory = _createTestDocumentEntity(
-                id: 'wrong-category',
-                ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+                id: wrongCategoryVer,
+                ver: wrongCategoryVer,
                 authors: author1.toString(),
                 parameters: [cat2],
                 contentData: {
@@ -3907,9 +3968,10 @@ void main() {
                 },
               );
 
+              final wrongTitleVer = _buildUuidV7At(middle);
               final wrongTitle = _createTestDocumentEntity(
-                id: 'wrong-title',
-                ver: _buildUuidV7At(middle),
+                id: wrongTitleVer,
+                ver: wrongTitleVer,
                 authors: author1.toString(),
                 parameters: [cat1],
                 contentData: {
@@ -3938,7 +4000,7 @@ void main() {
 
               expect(result.items.length, 1);
               expect(result.total, 1);
-              expect(result.items[0].proposal.id, 'matching');
+              expect(result.items[0].proposal.id, matchingVer);
             });
           });
 

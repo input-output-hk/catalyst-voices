@@ -435,13 +435,14 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.type.equalsValue(type));
     }
 
+    /// Check against tbl.id to target the first version (where id == ver)
     if (author != null) {
       final significant = author.toSignificant();
       query.where((tbl) {
         final authorQuery = selectOnly(documentAuthors)
           ..addColumns([const Constant(1)])
           ..where(documentAuthors.documentId.equalsExp(tbl.id))
-          ..where(documentAuthors.documentVer.equalsExp(tbl.ver))
+          ..where(documentAuthors.documentVer.equalsExp(tbl.id))
           ..where(documentAuthors.accountSignificantId.equals(significant.toUri().toString()));
         return existsQuery(authorQuery);
       });
