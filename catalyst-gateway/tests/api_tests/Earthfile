@@ -14,9 +14,9 @@ builder:
     COPY --dir ./scripts .
     COPY --dir ./test_data .
     COPY --dir ./utils .
-    COPY cat-libs-rust+build/mk_signed_doc .
+#    COPY cat-libs-rust+build/mk_signed_doc .
     # mk_signed_doc cli tool for building deprecated version of documents
-    COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
+#    COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
     DO python-ci+BUILDER_WITH_POETRY
 
