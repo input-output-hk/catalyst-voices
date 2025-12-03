@@ -338,7 +338,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
 
           final result = await dao.getVisibleProposalsCount(
-            filters: ProposalsFiltersV2(author: author1),
+            filters: ProposalsFiltersV2(originalAuthor: author1),
           );
 
           expect(result, 2);
@@ -3305,7 +3305,7 @@ void main() {
               const request = PageRequest(page: 0, size: 10);
               final result = await dao.getProposalsBriefPage(
                 request: request,
-                filters: ProposalsFiltersV2(author: author1),
+                filters: ProposalsFiltersV2(originalAuthor: author1),
               );
 
               expect(result.items.length, 1);
@@ -3336,7 +3336,7 @@ void main() {
               const request = PageRequest(page: 0, size: 10);
               final result = await dao.getProposalsBriefPage(
                 request: request,
-                filters: ProposalsFiltersV2(author: author2),
+                filters: ProposalsFiltersV2(originalAuthor: author2),
               );
 
               expect(result.items.length, 1);
@@ -3372,7 +3372,7 @@ void main() {
               const request = PageRequest(page: 0, size: 10);
               final result = await dao.getProposalsBriefPage(
                 request: request,
-                filters: ProposalsFiltersV2(author: authorWithSpecialChars),
+                filters: ProposalsFiltersV2(originalAuthor: authorWithSpecialChars),
               );
 
               expect(result.items.length, 1);
@@ -3409,7 +3409,7 @@ void main() {
                 const request = PageRequest(page: 0, size: 10);
                 final result = await dao.getProposalsBriefPage(
                   request: request,
-                  filters: ProposalsFiltersV2(author: collaborator),
+                  filters: ProposalsFiltersV2(originalAuthor: collaborator),
                 );
 
                 // Then: Should exclude the proposal
@@ -3419,7 +3419,7 @@ void main() {
                 // When: Filtering by Original Author
                 final resultOriginal = await dao.getProposalsBriefPage(
                   request: request,
-                  filters: ProposalsFiltersV2(author: originalAuthor),
+                  filters: ProposalsFiltersV2(originalAuthor: originalAuthor),
                 );
 
                 // Then: Should include the proposal (showing latest version V2)
@@ -3992,7 +3992,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: ProposalsFiltersV2(
-                  author: author1,
+                  originalAuthor: author1,
                   categoryId: cat1.id,
                   searchQuery: 'Blockchain',
                 ),

@@ -416,7 +416,7 @@ final class ProposalServiceImpl implements ProposalService {
 
         return ProposalsFiltersV2(
           status: ProposalStatusFilter.aFinal,
-          author: author,
+          originalAuthor: author,
           campaign: ProposalsCampaignFilters.from(campaign),
         );
       },

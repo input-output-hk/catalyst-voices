@@ -258,8 +258,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    if (filters.author != null) {
-      final significant = filters.author!.toSignificant();
+    if (filters.originalAuthor != null) {
+      final significant = filters.originalAuthor!.toSignificant();
       final escapedSignificant = _escapeSqlString(significant.toString());
 
       /// Check against p.id to target the first version (where id == ver)
@@ -465,7 +465,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       documentsV2,
       if (filters.isFavorite != null) documentsLocalMetadata,
       if (filters.categoryId != null || filters.campaign != null) documentParameters,
-      if (filters.author != null ||
+      if (filters.originalAuthor != null ||
           (filters.searchQuery != null && filters.searchQuery!.isNotEmpty))
         documentAuthors,
     };
@@ -733,7 +733,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       documentsV2,
       documentsLocalMetadata,
       if (filters.categoryId != null || filters.campaign != null) documentParameters,
-      if (filters.author != null ||
+      if (filters.originalAuthor != null ||
           (filters.searchQuery != null && filters.searchQuery!.isNotEmpty))
         documentAuthors,
     };
