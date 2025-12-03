@@ -15,7 +15,7 @@ final class UsersProposalOverview extends Equatable {
   final String category;
   final int fundNumber;
   final bool fromActiveCampaign;
-  final List<Collaborator> _collaborators;
+  final List<Collaborator> collaborators;
   final UserProposalOwnership ownership;
 
   const UsersProposalOverview({
@@ -31,9 +31,9 @@ final class UsersProposalOverview extends Equatable {
     required this.category,
     required this.fundNumber,
     required this.fromActiveCampaign,
-    List<Collaborator> collaborators = const [],
+    this.collaborators = const [],
     required this.ownership,
-  }) : _collaborators = collaborators;
+  });
 
   factory UsersProposalOverview.fromProposalBriefData({
     required ProposalBriefData proposalData,
@@ -67,16 +67,24 @@ final class UsersProposalOverview extends Equatable {
     );
   }
 
-  List<Collaborator> get collaborators {
+  /// Returns a list of all contributors associated with the proposal,
+  /// including the main author (if specified) and all other collaborators.
+  ///
+  /// The **main proposer** (determined by the `author` field) is placed at the
+  /// beginning of the list, followed by the explicit list of `collaborators`.
+  ///
+  /// If the `collaborators` list is empty, an empty list is returned, even if
+  /// an `author` is present.
+  List<Collaborator> get contributors {
     final mainProposer = author != null
         ? Collaborator(catalystId: author!, status: ProposalsCollaborationStatus.mainProposer)
         : null;
 
-    if (_collaborators.isEmpty) return [];
+    if (collaborators.isEmpty) return [];
 
     return [
       ?mainProposer,
-      ..._collaborators,
+      ...collaborators,
     ];
   }
 
@@ -132,7 +140,7 @@ final class UsersProposalOverview extends Equatable {
       category: category ?? this.category,
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
-      collaborators: collaborators ?? _collaborators,
+      collaborators: collaborators ?? this.collaborators,
       ownership: ownership ?? this.ownership,
     );
   }
