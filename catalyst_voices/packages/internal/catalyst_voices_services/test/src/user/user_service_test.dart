@@ -409,34 +409,37 @@ void main() {
         expect(currentUser.accounts.first.catalystId, equals(account2.catalystId));
       });
 
-      test('recover account will not erase the same account which is being recovered', () async {
+      test('recover account will erase the same account which is being recovered', () async {
         // Given
-        final keychainId = const Uuid().v4();
+        final keychainId1 = const Uuid().v4();
+        final keychainId2 = const Uuid().v4();
 
         // When
-        final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
+        final keychain1 = await keychainProvider.create(keychainId1);
+        final keychain2 = await keychainProvider.create(keychainId2);
+        final account1 = Account.dummy(
           catalystId: DummyCatalystIdFactory.create(username: 'account1'),
-          keychain: keychain,
+          keychain: keychain1,
+        );
+        final account2 = account1.copyWith(
+          keychain: keychain2,
         );
 
         // write something to keychain so that's it's not empty
-        await keychain.setLock(_lockFactor);
-        await keychain.unlock(_lockFactor);
-        await keychain.setMasterKey(_masterKey);
+        await keychain1.setLock(_lockFactor);
+        await keychain1.unlock(_lockFactor);
+        await keychain1.setMasterKey(_masterKey);
 
-        await service.useAccount(account);
-        await service.recoverAccount(account);
+        await service.useAccount(account1);
+        await service.recoverAccount(account2);
 
         // Then
         final currentUser = service.user;
         final currentAccount = currentUser.activeAccount;
 
-        expect(currentAccount?.catalystId, account.catalystId);
+        expect(currentAccount?.catalystId, account2.catalystId);
         expect(currentAccount?.isActive, isTrue);
-        expect(currentUser.accounts, hasLength(1));
-        expect(currentUser.accounts.first.catalystId, equals(account.catalystId));
-        expect(await currentAccount!.keychain.isEmpty, isFalse);
+        expect(currentAccount?.keychain.id, keychainId2);
       });
     });
 

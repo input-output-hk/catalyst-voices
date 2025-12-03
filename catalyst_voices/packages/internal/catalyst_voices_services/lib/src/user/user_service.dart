@@ -210,18 +210,14 @@ final class UserServiceImpl implements UserService {
   Future<void> recoverAccount(Account account) async {
     var user = await getUser();
 
-    final existingAccounts = user.accounts;
+    for (final existingAccount in user.accounts) {
+      await existingAccount.keychain.erase();
+    }
 
     user = user.copyWith(accounts: [account]);
     user = user.useAccount(id: account.catalystId);
 
     await _updateUser(user);
-
-    for (final existingAccount in existingAccounts) {
-      if (!existingAccount.isSameRef(account)) {
-        await existingAccount.keychain.erase();
-      }
-    }
   }
 
   @override
