@@ -15,7 +15,6 @@ services:
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=catalyst-event-dev
       - DB_USER_PASSWORD=CHANGE_ME
-
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
     ports:
@@ -49,9 +48,9 @@ services:
     healthcheck:
       test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
       start_period: 30s
-      interval: 20s
+      interval: 30s
       timeout: 30s
-      retries: 45
+      retries: 50
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=index-db:9042
