@@ -9,6 +9,9 @@ final class ProposalDocument extends Equatable {
   /// The limit does not have any effect on drafts or published proposals.
   static const int maxSubmittedProposalsPerUser = 2;
 
+  /// The maximum amount of collaborators per proposal.
+  static const int maxCollaboratorsPerProposal = 5;
+
   /// A hardcoded [NodeId] of the title property.
   ///
   /// Since properties are dynamic the application cannot determine
@@ -181,12 +184,11 @@ final class ProposalMetadata extends DocumentMetadata {
   });
 
   @override
-  List<Object?> get props =>
-      [
-        ...super.props,
-        templateRef,
-        categoryId,
-        authors,
-        collaborators,
-      ];
+  List<Object?> get props => [
+    ...super.props,
+    templateRef,
+    categoryId,
+    authors,
+    collaborators,
+  ];
 }

@@ -23,9 +23,9 @@ class _CollaboratorsDetailsAction extends StatelessWidget {
             isEditMode: isEditMode,
             source: EditableTileChangeSource.cancel,
           );
-          onChanged.call(change);
+          onChanged(change);
           if (!isEditMode) {
-            final dataNodeId = _CollaboratorsDetails.getDataNodeId(property.nodeId);
+            final dataNodeId = _CollaboratorsDetailsSelector.getDataNodeId(property.nodeId);
             DocumentBuilderSectionTileControllerScope.of(context).removeData(dataNodeId);
           }
         },

@@ -2,33 +2,6 @@ part of '../proposal_builder_segments.dart';
 
 typedef CollaboratorsData = ({CatalystId? authorId, List<CatalystId> collaborators});
 
-class __CollaboratorsDetails extends StatelessWidget {
-  final DocumentProperty property;
-  final CollaboratorsData data;
-  final int maxCollaborators;
-
-  const __CollaboratorsDetails({
-    required this.data,
-    required this.property,
-    required this.maxCollaborators,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final tileController = DocumentBuilderSectionTileControllerScope.of(context);
-    final tileData = tileController.getData<DocumentBuilderSectionTileData>(property.nodeId);
-    final isEditMode = tileData?.isEditMode ?? false;
-
-    return isEditMode
-        ? _CollaboratorsEditView(
-            data: data,
-            property: property,
-            maxCollaborators: maxCollaborators,
-          )
-        : _CollaboratorsReadOnlyView(data.collaborators);
-  }
-}
-
 class _CollaboratorEditItem extends StatelessWidget {
   final CatalystId collaborator;
   final VoidCallback onRemove;
@@ -67,26 +40,20 @@ class _CollaboratorEditItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text(
-                    displayName,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.titleSmall?.copyWith(
-                      color: colors.textOnPrimaryLevel1,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                CatalystIdText(
-                  collaborator,
-                  isCompact: true,
-                  showCopy: false,
-                ),
-              ],
+          Flexible(
+            child: Text(
+              displayName,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.titleSmall?.copyWith(
+                color: colors.textOnPrimaryLevel1,
+              ),
             ),
+          ),
+          const SizedBox(width: 8),
+          CatalystIdText(
+            collaborator,
+            isCompact: true,
+            showCopy: false,
           ),
         ],
       ),
@@ -140,9 +107,36 @@ class _CollaboratorReadItem extends StatelessWidget {
 
 class _CollaboratorsDetails extends StatelessWidget {
   final DocumentProperty property;
+  final CollaboratorsData data;
   final int maxCollaborators;
 
   const _CollaboratorsDetails({
+    required this.data,
+    required this.property,
+    required this.maxCollaborators,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tileController = DocumentBuilderSectionTileControllerScope.of(context);
+    final tileData = tileController.getData<DocumentBuilderSectionTileData>(property.nodeId);
+    final isEditMode = tileData?.isEditMode ?? false;
+
+    return isEditMode
+        ? _CollaboratorsEditView(
+            data: data,
+            property: property,
+            maxCollaborators: maxCollaborators,
+          )
+        : _CollaboratorsReadOnlyView(data.collaborators);
+  }
+}
+
+class _CollaboratorsDetailsSelector extends StatelessWidget {
+  final DocumentProperty property;
+  final int maxCollaborators;
+
+  const _CollaboratorsDetailsSelector({
     required this.property,
     required this.maxCollaborators,
   });
@@ -154,7 +148,7 @@ class _CollaboratorsDetails extends StatelessWidget {
         authorId: state.metadata.authorId,
         collaborators: state.metadata.collaborators,
       ),
-      builder: (_, data) => __CollaboratorsDetails(
+      builder: (_, data) => _CollaboratorsDetails(
         property: property,
         data: data,
         maxCollaborators: maxCollaborators,
@@ -190,7 +184,7 @@ class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
 
   set _collaborators(List<CatalystId> value) => _tileController.setData(_dataNodeId, value);
 
-  DocumentNodeId get _dataNodeId => _CollaboratorsDetails.getDataNodeId(_tileNodeId);
+  DocumentNodeId get _dataNodeId => _CollaboratorsDetailsSelector.getDataNodeId(_tileNodeId);
 
   bool get _hasEditingData => _tileController.getData<List<CatalystId>>(_dataNodeId) != null;
 
@@ -251,9 +245,9 @@ class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
   }
 
   @override
-  void didUpdateWidget(covariant _CollaboratorsEditView oldWidget) {
+  void didUpdateWidget(_CollaboratorsEditView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.data.collaborators != widget.data.collaborators) {
+    if (!listEquals(oldWidget.data.collaborators, widget.data.collaborators)) {
       _collaborators = List.of(widget.data.collaborators);
     }
   }
@@ -314,17 +308,5 @@ class _CollaboratorsReadOnlyView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: collaborators.map(_CollaboratorReadItem.new).toList(),
     );
-  }
-}
-
-extension on CatalystId {
-  String getDisplayName(BuildContext context) {
-    final username = this.username;
-
-    if (username == null || username.isEmpty) {
-      return context.l10n.anonymousUsername;
-    }
-
-    return username;
   }
 }

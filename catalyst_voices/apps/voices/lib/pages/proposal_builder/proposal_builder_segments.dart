@@ -18,6 +18,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -37,9 +38,9 @@ final DocumentPropertyActionOverrides _widgetActionOverrides = {
 
 final DocumentPropertyBuilderOverrides _widgetOverrides = {
   ProposalDocument.categoryDetailsNodeId: (_, property) => _CategoryDetails(property: property),
-  ProposalDocument.collaboratorsNodeId: (_, property) => _CollaboratorsDetails(
+  ProposalDocument.collaboratorsNodeId: (_, property) => _CollaboratorsDetailsSelector(
     property: property,
-    maxCollaborators: 5,
+    maxCollaborators: ProposalDocument.maxCollaboratorsPerProposal,
   ),
 };
 
@@ -129,7 +130,7 @@ class _DocumentSection extends StatelessWidget {
 
   void _onCollaboratorsChanged(BuildContext context) {
     final tileController = DocumentBuilderSectionTileControllerScope.of(context);
-    final dataNodeId = _CollaboratorsDetails.getDataNodeId(property.nodeId);
+    final dataNodeId = _CollaboratorsDetailsSelector.getDataNodeId(property.nodeId);
     final collaborators = tileController.getData<List<CatalystId>>(dataNodeId) ?? [];
     final event = UpdateCollaboratorsEvent(collaborators: collaborators);
     context.read<ProposalBuilderBloc>().add(event);

@@ -5,7 +5,7 @@ import 'package:catalyst_voices/widgets/user/username_text.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class AccountsText extends StatelessWidget {
@@ -25,14 +25,12 @@ class AccountsText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firstId = ids.firstOrNull;
-    final firstUsername = firstId?.username;
-    final isAnonymous = firstId != null && (firstUsername == null || firstUsername.isBlank);
-
-    final effectiveFirstUsername = isAnonymous ? context.l10n.anonymousUsername : firstUsername;
+    final isAnonymous = firstId?.isAnonymous ?? true;
+    final displayName = firstId.getDisplayName(context);
 
     return Text.rich(
       TextSpan(
-        text: effectiveFirstUsername,
+        text: displayName,
         style: TextStyle(fontStyle: isAnonymous ? FontStyle.italic : FontStyle.normal),
         children: [
           if (ids.length > 1) ...[
