@@ -67,6 +67,7 @@ export const test = base.extend<BrowserFixtures>({
         "--disable-gpu",
       ],
     });
+    await browser.grantPermissions(["clipboard-read", "clipboard-write"]);
     await use(browser);
     await browser.close();
   },

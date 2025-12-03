@@ -6,7 +6,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 concurrency:
   group: voices-tests-${{ github.head_ref || github.ref }}
@@ -62,24 +62,25 @@ jobs:
       - name: Wait for cat-gateway to become healthy
         id: gateway-healthy
         run: |
-          echo "Waiting for cat-gateway container to be healthy..."
-          for i in {1..100}; do
-            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway 2>/dev/null || echo "not_found")
-            echo "Attempt $i: Health status: $STATUS"
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+            echo "Health status: $STATUS"
             if [ "$STATUS" == "healthy" ]; then
               echo "Container is healthy!"
-              exit 0
+              break
             fi
             if [ "$STATUS" == "unhealthy" ]; then
               echo "Container became unhealthy."
-              docker logs cat-gateway
-              exit 1
+              break
             fi
             sleep 5
           done
-          echo "Timeout waiting for cat-gateway to become healthy"
-          docker logs cat-gateway
-          exit 1
+
+          if [ "$STATUS" != "healthy" ]; then
+            docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+            exit 1
+          fi
 
       - name: Run E2E tests
         id: run-tests
