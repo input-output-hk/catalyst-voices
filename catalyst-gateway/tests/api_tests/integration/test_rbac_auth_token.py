@@ -2,7 +2,6 @@
 
 import pytest
 import requests
-from utils import health, sync
 from utils.rbac_chain import rbac_chain_factory, Chain
 from datetime import datetime, timezone, timedelta
 
