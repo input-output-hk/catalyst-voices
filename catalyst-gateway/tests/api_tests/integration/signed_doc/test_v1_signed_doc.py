@@ -3,8 +3,8 @@ import pytest
 from utils.rbac_chain import rbac_chain_factory
 from utils.signed_doc.deprecated import comment, proposal, proposal_submission
 
-from catalyst_python.api.v1 import document as document_v1
-from catalyst_python.api.v2 import document as document_v2
+from api.v1 import document as document_v1
+from api.v2 import document as document_v2
 
 
 # Getting documents using GET `/v1/document` endpoint.

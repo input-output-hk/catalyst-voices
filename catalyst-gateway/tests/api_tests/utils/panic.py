@@ -1,7 +1,7 @@
 import asyncio
 import httpx
 
-from catalyst_python.api import cat_api_endpoint_url
+from api import cat_api_endpoint_url
 
 # Configuration
 NUM_OF_REQUESTS = 100 + 1

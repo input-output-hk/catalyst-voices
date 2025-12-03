@@ -1,7 +1,7 @@
 import pytest
 from utils.rbac_chain import ONLY_ROLE_0_REG_JSON, rbac_chain_factory, Chain
 
-from catalyst_python.api.v1.rbac import get
+from api.v1.rbac import get
 from catalyst_python.catalyst_id import RoleID
 
 

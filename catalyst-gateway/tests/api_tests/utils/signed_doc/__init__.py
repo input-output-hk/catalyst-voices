@@ -4,7 +4,7 @@ from utils.rbac_chain import rbac_chain_factory
 from utils.admin import admin_key
 from tempfile import NamedTemporaryFile
 
-from catalyst_python.api.v1 import document
+from api.v1 import document
 from catalyst_python.catalyst_id import RoleID
 from catalyst_python.signed_doc import (
     SignedDocument,

@@ -5,7 +5,7 @@ import requests
 from utils.rbac_chain import rbac_chain_factory, Chain
 from datetime import datetime, timezone, timedelta
 
-from catalyst_python.api.v1.rbac import get
+from api.v1.rbac import get
 
 
 @pytest.mark.preprod_indexing

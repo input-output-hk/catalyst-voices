@@ -1,5 +1,5 @@
 import pytest
-from catalyst_python.api import metrics
+from api import metrics
 
 
 def test_metrics_endpoint():

@@ -1,6 +1,6 @@
 import pytest
 
-from catalyst_python.api.v1 import config_frontend
+from api.v1 import config_frontend
 
 
 # TODO: missing test case with putting frontend config to the specific IP address

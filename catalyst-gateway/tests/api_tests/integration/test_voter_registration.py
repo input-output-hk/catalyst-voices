@@ -4,7 +4,7 @@ import pytest
 from utils import health, sync
 import requests
 
-from catalyst_python.api import cat_api_endpoint_url
+from api import cat_api_endpoint_url
 from catalyst_python.address import stake_public_key_to_address
 
 

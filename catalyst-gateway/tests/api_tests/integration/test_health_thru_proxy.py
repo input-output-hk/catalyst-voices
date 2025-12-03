@@ -5,8 +5,8 @@ from utils import health
 from utils.rbac_chain import rbac_chain_factory, Chain
 from utils import ProxyHelper
 
-from catalyst_python.api.v1 import rbac
-from catalyst_python.api.v2 import document
+from api.v1 import rbac
+from api.v2 import document
 
 
 @pytest.fixture

@@ -6,8 +6,8 @@ from utils.signed_doc import (
 )
 
 from catalyst_python.catalyst_id import RoleID
-from catalyst_python.api.v1 import document as document_v1
-from catalyst_python.api.v2 import document as document_v2
+from api.v1 import document as document_v1
+from api.v2 import document as document_v2
 
 
 @pytest.mark.preprod_indexing

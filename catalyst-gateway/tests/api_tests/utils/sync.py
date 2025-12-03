@@ -3,7 +3,7 @@ import time
 from loguru import logger
 import math
 
-from catalyst_python.api import cat_api_endpoint_url
+from api import cat_api_endpoint_url
 
 
 def get_sync_state(network: str):
