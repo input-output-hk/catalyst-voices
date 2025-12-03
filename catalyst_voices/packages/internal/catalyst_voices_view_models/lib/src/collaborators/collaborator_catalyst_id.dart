@@ -43,12 +43,13 @@ final class CollaboratorCatalystId
 
   @override
   CollaboratorCatalystIdValidationException? validator(String value) {
+    final authorCatalystId = this.authorCatalystId;
     final catalystId = CatalystId.tryParse(value);
     if (catalystId == null) {
       return const InvalidCatalystIdFormatValidationException();
-    } else if (catalystId == authorCatalystId) {
+    } else if (authorCatalystId != null && catalystId.isSameAs(authorCatalystId)) {
       return const CatalystIdBelongsToMainProposerValidationException();
-    } else if (collaborators.contains(catalystId)) {
+    } else if (collaborators.any((collaborator) => collaborator.isSameAs(catalystId))) {
       return const CatalystIdAlreadyAddedValidationException();
     }
     return null;
