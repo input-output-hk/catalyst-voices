@@ -78,10 +78,10 @@ final class DatabaseDocumentsDataSource
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
   }) {
     return _database.documentsV2Dao
-        .getDocument(type: type, id: id, referencing: referencing, author: authorId)
+        .getDocument(type: type, id: id, referencing: referencing, originalAuthor: originalAuthorId)
         .then((value) => value?.toModel());
   }
 
@@ -145,7 +145,7 @@ final class DatabaseDocumentsDataSource
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -222,10 +222,10 @@ final class DatabaseDocumentsDataSource
 
   @override
   Stream<List<DocumentData>> watchProposalTemplates({
-    required CampaignFilters filters,
+    required CampaignFilters campaign,
   }) {
     return _database.documentsV2Dao
-        .watchDocuments(type: DocumentType.proposalTemplate, filters: filters)
+        .watchDocuments(type: DocumentType.proposalTemplate, campaign: campaign)
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
   }

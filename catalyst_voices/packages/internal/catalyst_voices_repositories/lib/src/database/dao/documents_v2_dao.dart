@@ -55,12 +55,19 @@ abstract interface class DocumentsV2Dao {
   /// If multiple documents match (e.g. querying by loose ref or type only),
   /// the one with the latest [DocumentEntityV2.createdAt] timestamp is returned.
   ///
+  /// [author] - If provided, filters for documents where the specified [CatalystId]
+  /// is listed as an author of that specific version.
+  ///
+  /// [originalAuthor] - If provided, filters for documents where the specified [CatalystId]
+  /// is the author of the *first version* (where id == ver).
+  ///
   /// Returns `null` if no matching document is found.
   Future<DocumentEntityV2?> getDocument({
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
+    CatalystId? originalAuthor,
   });
 
   /// Retrieves a list of documents matching the criteria with pagination.
@@ -76,7 +83,7 @@ abstract interface class DocumentsV2Dao {
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CampaignFilters? filters,
+    CampaignFilters? campaign,
     bool latestOnly,
     int limit,
     int offset,
@@ -120,6 +127,7 @@ abstract interface class DocumentsV2Dao {
     DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
+    CatalystId? originalAuthor,
   });
 
   /// Watches for changes and emits a list of documents.
@@ -133,7 +141,7 @@ abstract interface class DocumentsV2Dao {
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CampaignFilters? filters,
+    CampaignFilters? campaign,
     bool latestOnly,
     int limit,
     int offset,
@@ -236,12 +244,14 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
+    CatalystId? originalAuthor,
   }) {
     return _queryDocument(
       type: type,
       id: id,
       referencing: referencing,
       author: author,
+      originalAuthor: originalAuthor,
     ).getSingleOrNull();
   }
 
@@ -250,7 +260,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CampaignFilters? filters,
+    CampaignFilters? campaign,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -259,7 +269,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       type: type,
       id: id,
       referencing: referencing,
-      filters: filters,
+      campaign: campaign,
       latestOnly: latestOnly,
       limit: limit,
       offset: offset,
@@ -346,12 +356,14 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
+    CatalystId? originalAuthor,
   }) {
     return _queryDocument(
       type: type,
       id: id,
       referencing: referencing,
       author: author,
+      originalAuthor: originalAuthor,
     ).watchSingleOrNull();
   }
 
@@ -360,7 +372,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CampaignFilters? filters,
+    CampaignFilters? campaign,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -369,7 +381,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       type: type,
       id: id,
       referencing: referencing,
-      filters: filters,
+      campaign: campaign,
       latestOnly: latestOnly,
       limit: limit,
       offset: offset,
@@ -412,6 +424,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentRef? id,
     DocumentRef? referencing,
     CatalystId? author,
+    CatalystId? originalAuthor,
   }) {
     final query = select(documentsV2);
 
@@ -435,16 +448,28 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((tbl) => tbl.type.equalsValue(type));
     }
 
-    /// Check against tbl.id to target the first version (where id == ver)
     if (author != null) {
       final significant = author.toSignificant();
       query.where((tbl) {
         final authorQuery = selectOnly(documentAuthors)
           ..addColumns([const Constant(1)])
           ..where(documentAuthors.documentId.equalsExp(tbl.id))
-          ..where(documentAuthors.documentVer.equalsExp(tbl.id))
+          ..where(documentAuthors.documentVer.equalsExp(tbl.ver))
           ..where(documentAuthors.accountSignificantId.equals(significant.toUri().toString()));
         return existsQuery(authorQuery);
+      });
+    }
+
+    if (originalAuthor != null) {
+      final significant = originalAuthor.toSignificant();
+      query.where((tbl) {
+        final originalAuthorQuery = selectOnly(documentAuthors)
+          ..addColumns([const Constant(1)])
+          ..where(documentAuthors.documentId.equalsExp(tbl.id))
+          /// Check against tbl.id to target the first version (where id == ver)
+          ..where(documentAuthors.documentVer.equalsExp(tbl.id))
+          ..where(documentAuthors.accountSignificantId.equals(significant.toUri().toString()));
+        return existsQuery(originalAuthorQuery);
       });
     }
 
@@ -461,7 +486,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CampaignFilters? filters,
+    CampaignFilters? campaign,
     required bool latestOnly,
     required int limit,
     required int offset,
@@ -489,7 +514,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       }
     }
 
-    if (filters != null) {
+    if (campaign != null) {
       query.where((tbl) {
         final dp = alias(documentParameters, 'dp');
         return existsQuery(
@@ -497,7 +522,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
             ..addColumns([const Constant(1)])
             ..where(dp.documentId.equalsExp(tbl.id))
             ..where(dp.documentVer.equalsExp(tbl.ver))
-            ..where(dp.id.isIn(filters.categoriesIds)),
+            ..where(dp.id.isIn(campaign.categoriesIds)),
         );
       });
     }

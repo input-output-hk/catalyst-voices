@@ -138,7 +138,7 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters}) {
     return _proposalRepository
-        .watchProposalTemplates(filters: filters.campaign ?? CampaignFilters.active())
+        .watchProposalTemplates(campaign: filters.campaign ?? CampaignFilters.active())
         .map((templates) => templates.map((template) => template.toMapEntry()))
         .map(Map.fromEntries)
         .switchMap((templatesMoneyFormat) {

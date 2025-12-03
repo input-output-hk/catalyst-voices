@@ -1000,7 +1000,7 @@ void main() {
           await dao.saveAll([proposal1, proposal2]);
 
           // When
-          final result = await dao.getDocument(author: author);
+          final result = await dao.getDocument(originalAuthor: author);
 
           // Then
           expect(result, isNotNull);
@@ -1034,10 +1034,87 @@ void main() {
           await dao.saveAll([proposalV1, proposalV2]);
 
           // When: querying for the collaborator
-          final result = await dao.getDocument(author: collaborator);
+          final result = await dao.getDocument(originalAuthor: collaborator);
 
           // Then: Should not find the document because collaborator didn't sign V1 (id==ver)
           expect(result, isNull);
+        });
+
+        test('author filter returns version signed by that specific author', () async {
+          // Given
+          final creator = _createTestAuthor(name: 'Creator', role0KeySeed: 1);
+          final updater = _createTestAuthor(name: 'Updater', role0KeySeed: 2);
+
+          final genesisVer = _buildUuidV7At(DateTime(2023));
+          final updateVer = _buildUuidV7At(DateTime(2024));
+
+          // V1: Signed by Creator
+          final v1 = _createTestDocumentEntity(
+            id: genesisVer,
+            ver: genesisVer,
+            authors: creator.toUri().toString(),
+          );
+
+          // V2: Signed by Updater
+          final v2 = _createTestDocumentEntity(
+            id: genesisVer,
+            ver: updateVer,
+            authors: updater.toUri().toString(),
+          );
+
+          await dao.saveAll([v1, v2]);
+
+          // When: Querying for Creator (who only signed V1)
+          final resultCreator = await dao.getDocument(author: creator);
+
+          // Then: Should return V1
+          expect(resultCreator, isNotNull);
+          expect(resultCreator?.ver, genesisVer);
+
+          // When: Querying for Updater (who signed V2)
+          final resultUpdater = await dao.getDocument(author: updater);
+
+          // Then: Should return V2
+          expect(resultUpdater, isNotNull);
+          expect(resultUpdater?.ver, updateVer);
+        });
+
+        test('originalAuthor filter returns latest version even if signed by collaborator', () async {
+          // Given
+          final creator = _createTestAuthor(name: 'Creator', role0KeySeed: 1);
+          final updater = _createTestAuthor(name: 'Updater', role0KeySeed: 2);
+
+          final genesisVer = _buildUuidV7At(DateTime(2023));
+          final updateVer = _buildUuidV7At(DateTime(2024));
+
+          // V1: Signed by Creator (id == ver)
+          final v1 = _createTestDocumentEntity(
+            id: genesisVer,
+            ver: genesisVer,
+            authors: creator.toUri().toString(),
+          );
+
+          // V2: Signed by Updater (id != ver)
+          final v2 = _createTestDocumentEntity(
+            id: genesisVer,
+            ver: updateVer,
+            authors: updater.toUri().toString(),
+          );
+
+          await dao.saveAll([v1, v2]);
+
+          // When: Querying for Creator as 'originalAuthor'
+          final resultCreator = await dao.getDocument(originalAuthor: creator);
+
+          // Then: Should return V2 (the latest version), because Creator owns the document series (signed V1)
+          expect(resultCreator, isNotNull);
+          expect(resultCreator?.ver, updateVer);
+
+          // When: Querying for Creator as 'originalAuthor'
+          final resultUpdater = await dao.getDocument(originalAuthor: updater);
+
+          // Then: Should return null as updater do not own first version
+          expect(resultUpdater, isNull);
         });
       });
 
@@ -2195,7 +2272,7 @@ void main() {
 
           // When
           final result = await dao.getDocuments(
-            filters: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: [cat1.id]),
             latestOnly: false,
             limit: 100,
             offset: 0,
@@ -2240,7 +2317,7 @@ void main() {
           // When
           final result = await dao.getDocuments(
             type: DocumentType.proposalDocument,
-            filters: CampaignFilters(categoriesIds: [catA.id]),
+            campaign: CampaignFilters(categoriesIds: [catA.id]),
             latestOnly: true,
             limit: 10,
             offset: 0,

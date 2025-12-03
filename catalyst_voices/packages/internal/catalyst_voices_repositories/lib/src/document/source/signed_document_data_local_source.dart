@@ -9,24 +9,24 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 abstract interface class SignedDocumentDataSource implements DocumentDataLocalSource {
   /// Retrieves a single signed document matching the filters.
   ///
-  /// * [authorId]: Filters documents authored by a specific [CatalystId].
+  /// * [originalAuthorId]: Filters documents authored by a specific [CatalystId].
   @override
   Future<DocumentData?> findFirst({
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
   });
 
   /// Watches for changes to a list of signed documents.
   ///
-  /// * [authorId]: Filters documents authored by a specific [CatalystId].
+  /// * [originalAuthorId]: Filters documents authored by a specific [CatalystId].
   @override
   Stream<List<DocumentData>> watchAll({
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
     bool latestOnly,
     int limit,
     int offset,

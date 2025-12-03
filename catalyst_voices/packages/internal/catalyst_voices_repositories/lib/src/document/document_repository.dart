@@ -298,7 +298,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentData?> getLatestDocument({
     CatalystId? authorId,
   }) async {
-    final latestDocument = await _localDocuments.findFirst(authorId: authorId);
+    final latestDocument = await _localDocuments.findFirst(originalAuthorId: authorId);
     final latestDraft = await _drafts.findFirst();
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
@@ -474,7 +474,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         .watchAll(
           latestOnly: unique,
           type: type,
-          authorId: authorId,
+          originalAuthorId: authorId,
           referencing: referencing,
           limit: limit ?? 200,
         )
