@@ -182,8 +182,8 @@ final class ProposalMetadata extends DocumentMetadata {
 
   @override
   List<Object?> get props =>
-      super.props +
       [
+        ...super.props,
         templateRef,
         categoryId,
         authors,
