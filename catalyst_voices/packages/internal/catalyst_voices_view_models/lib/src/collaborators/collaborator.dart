@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -26,6 +27,17 @@ final class Collaborator extends Equatable {
 
 /// A status of the collaborator invited to a document (proposal).
 extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
+  SvgGenImage iconWidget(BuildContext context) {
+    return switch (this) {
+      ProposalsCollaborationStatus.pending => VoicesAssets.icons.clock,
+      ProposalsCollaborationStatus.accepted ||
+      ProposalsCollaborationStatus.mainProposer => VoicesAssets.icons.check,
+      ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.removed => VoicesAssets.icons.x,
+      ProposalsCollaborationStatus.left => VoicesAssets.icons.unlink,
+    };
+  }
+
   Color labelColor(BuildContext context) {
     return switch (this) {
       ProposalsCollaborationStatus.pending ||

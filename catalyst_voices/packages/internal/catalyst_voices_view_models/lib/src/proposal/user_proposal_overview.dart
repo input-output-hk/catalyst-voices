@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 final class UsersProposalOverview extends Equatable {
   final DocumentRef id;
+  final CatalystId? author;
   final String title;
   final DateTime updateDate;
   final Money fundsRequested;
@@ -19,6 +20,7 @@ final class UsersProposalOverview extends Equatable {
 
   const UsersProposalOverview({
     required this.id,
+    this.author,
     required this.title,
     required this.updateDate,
     required this.fundsRequested,
@@ -45,6 +47,7 @@ final class UsersProposalOverview extends Equatable {
 
     return UsersProposalOverview(
       id: proposalData.id,
+      author: proposalData.author,
       title: proposalData.title,
       updateDate: proposalData.updateDate,
       fundsRequested: proposalData.fundsRequested,
@@ -64,7 +67,18 @@ final class UsersProposalOverview extends Equatable {
     );
   }
 
-  List<Collaborator> get collaborators => _collaborators;
+  List<Collaborator> get collaborators {
+    final mainProposer = author != null
+        ? Collaborator(catalystId: author!, status: ProposalsCollaborationStatus.mainProposer)
+        : null;
+
+    if (_collaborators.isEmpty) return [];
+
+    return [
+      ?mainProposer,
+      ..._collaborators,
+    ];
+  }
 
   bool get hasNewerLocalIteration {
     if (versions.isEmpty) return false;
@@ -74,6 +88,7 @@ final class UsersProposalOverview extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    author,
     title,
     updateDate,
     fundsRequested,
@@ -89,6 +104,7 @@ final class UsersProposalOverview extends Equatable {
 
   UsersProposalOverview copyWith({
     DocumentRef? id,
+    Optional<CatalystId>? author,
     String? title,
     DateTime? updateDate,
     Money? fundsRequested,
@@ -105,6 +121,7 @@ final class UsersProposalOverview extends Equatable {
   }) {
     return UsersProposalOverview(
       id: id ?? this.id,
+      author: author.dataOr(this.author),
       title: title ?? this.title,
       updateDate: updateDate ?? this.updateDate,
       fundsRequested: fundsRequested ?? this.fundsRequested,
