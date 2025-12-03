@@ -1134,6 +1134,30 @@ void main() {
           expect(saved.length, 1);
           expect(saved[0].content.data['key'], 'original');
         });
+
+        test(
+          'document which author has coma in username is saved and recovered correctly',
+          () async {
+            // Given
+            final author = _createTestAuthor(name: 'Hello,World');
+            final entity = _createTestDocumentEntity(
+              id: 'test-id',
+              ver: '0194d492-1daa-7371-8bd3-c15811b2b063',
+              authors: [author],
+            );
+
+            // When
+            await dao.save(entity);
+
+            // Then
+            final saved = await db.select(db.documentsV2).get();
+            expect(saved.length, 1);
+            expect(saved[0].id, 'test-id');
+            expect(saved[0].ver, '0194d492-1daa-7371-8bd3-c15811b2b063');
+            expect(saved[0].authors, [author]);
+            expect(saved[0].authors.first.username, author.username);
+          },
+        );
       });
 
       group('watchDocuments', () {
