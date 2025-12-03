@@ -356,6 +356,7 @@ extension on JoinedProposalBriefEntity {
       versionIds: versionIds,
       commentsCount: commentsCount,
       isFavorite: isFavorite,
+      originalAuthors: originalAuthors,
     );
   }
 }

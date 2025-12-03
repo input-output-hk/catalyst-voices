@@ -7,6 +7,7 @@ final class JoinedProposalBriefData extends Equatable {
   final List<String> versionIds;
   final int commentsCount;
   final bool isFavorite;
+  final List<CatalystId> originalAuthors;
 
   const JoinedProposalBriefData({
     required this.proposal,
@@ -14,6 +15,7 @@ final class JoinedProposalBriefData extends Equatable {
     this.versionIds = const [],
     this.commentsCount = 0,
     this.isFavorite = false,
+    this.originalAuthors = const [],
   });
 
   bool get isFinal => actionType == ProposalSubmissionAction.aFinal;
@@ -27,5 +29,6 @@ final class JoinedProposalBriefData extends Equatable {
     versionIds,
     commentsCount,
     isFavorite,
+    originalAuthors,
   ];
 }

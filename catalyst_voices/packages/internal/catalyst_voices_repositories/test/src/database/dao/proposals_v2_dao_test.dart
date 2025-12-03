@@ -4303,6 +4303,48 @@ void main() {
             });
           });
         });
+
+        group('originalAuthors', () {
+          test('populates with author of the first version', () async {
+            // Given
+            final originalAuthor = _createTestAuthor(name: 'Creator');
+            final collaborator = _createTestAuthor(name: 'Collaborator');
+
+            // V1: Signed by Original Author (id == ver)
+            final genesisVer = _buildUuidV7At(earliest);
+            final proposalV1 = _createTestDocumentEntity(
+              id: genesisVer,
+              ver: genesisVer,
+              authors: originalAuthor.toString(),
+            );
+
+            // V2: Signed by Collaborator (id != ver)
+            final updateVer = _buildUuidV7At(latest);
+            final proposalV2 = _createTestDocumentEntity(
+              id: genesisVer,
+              ver: updateVer,
+              authors: collaborator.toString(),
+            );
+
+            await db.documentsV2Dao.saveAll([proposalV1, proposalV2]);
+
+            // When
+            final result = await dao.getProposalsBriefPage(
+              request: const PageRequest(page: 0, size: 10),
+            );
+
+            // Then
+            expect(result.items.length, 1);
+            final item = result.items.first;
+
+            // Verify originalAuthors matches V1 author
+            expect(item.originalAuthors, hasLength(1));
+            expect(item.originalAuthors.first, originalAuthor);
+
+            // Verify it does NOT include the V2 author (collaborator)
+            expect(item.originalAuthors.contains(collaborator), isFalse);
+          });
+        });
       });
 
       group('getProposalsTotalTask', () {

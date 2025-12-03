@@ -701,7 +701,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       $templateColumns, 
       ep.action_type,
       
-      -- Only executes for the rows in the page
       (
         SELECT GROUP_CONCAT(v_list.ver, ',')
         FROM (
@@ -712,12 +711,17 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         ) v_list
       ) as version_ids_str,
 
-      -- Only executes for the rows in the page
       (
         SELECT COUNT(*) 
         FROM documents_v2 c 
         WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
       ) as comments_count,
+      
+      (
+        SELECT GROUP_CONCAT(da.account_id, ',')
+        FROM document_authors da
+        WHERE da.document_id = p.id AND da.document_ver = p.id
+      ) as original_authors_str,
 
       COALESCE(dlm.is_favorite, 0) as is_favorite
     FROM documents_v2 p
@@ -732,10 +736,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final readsFromTables = <ResultSetImplementation<dynamic, dynamic>>{
       documentsV2,
       documentsLocalMetadata,
+      documentAuthors,
       if (filters.categoryId != null || filters.campaign != null) documentParameters,
-      if (filters.originalAuthor != null ||
-          (filters.searchQuery != null && filters.searchQuery!.isNotEmpty))
-        documentAuthors,
     };
 
     return customSelect(
@@ -782,6 +784,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final commentsCount = row.readNullable<int>('comments_count') ?? 0;
       final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
 
+      final originalAuthorsRaw = row.readNullable<String>('original_authors_str');
+      final originalAuthors = originalAuthorsRaw
+          ?.split(',')
+          .map(CatalystId.tryParse)
+          .nonNulls
+          .toList();
+
       return JoinedProposalBriefEntity(
         proposal: proposal,
         template: template,
@@ -789,6 +798,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         versionIds: versionIds,
         commentsCount: commentsCount,
         isFavorite: isFavorite,
+        originalAuthors: originalAuthors ?? const [],
       );
     });
   }
