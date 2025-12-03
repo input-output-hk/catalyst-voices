@@ -55,9 +55,9 @@ poetry install
 * Set up env variables:
 
 ```shell
-export CAT_INTERNAL_API_KEY="123"
+export CAT_GATEWAY_INTERNAL_API_KEY="123"
 export ASSETS_DATA_PATH="cardano-asset-preprod.json"
-export CAT_API_URL="http://127.0.0.1:3030"
+export CAT_GATEWAY_TEST_URL="http://127.0.0.1:3030"
 ```
 
 * Run the tests, by specifying one of the markers:
