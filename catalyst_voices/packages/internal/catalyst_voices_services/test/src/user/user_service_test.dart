@@ -359,6 +359,96 @@ void main() {
       });
     });
 
+    group('recoverAccount', () {
+      test('recover account will remove other accounts', () async {
+        // Given
+        final keychainId1 = const Uuid().v4();
+        final keychainId2 = const Uuid().v4();
+
+        // When
+        final account1 = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(username: 'account1'),
+          keychain: await keychainProvider.create(keychainId1),
+        );
+
+        final account2 = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(username: 'account2'),
+          keychain: await keychainProvider.create(keychainId2),
+        );
+
+        await service.useAccount(account1);
+        await service.recoverAccount(account2);
+
+        // Then
+        final currentUser = service.user;
+        final currentAccount = currentUser.activeAccount;
+
+        expect(currentAccount?.catalystId, account2.catalystId);
+        expect(currentAccount?.isActive, isTrue);
+        expect(currentUser.accounts, hasLength(1));
+        expect(currentUser.accounts.first.catalystId, equals(account2.catalystId));
+      });
+
+      test('recover account will remove other accounts', () async {
+        // Given
+        final keychainId1 = const Uuid().v4();
+        final keychainId2 = const Uuid().v4();
+
+        // When
+        final account1 = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(username: 'account1'),
+          keychain: await keychainProvider.create(keychainId1),
+        );
+
+        final account2 = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(username: 'account2'),
+          keychain: await keychainProvider.create(keychainId2),
+        );
+
+        await service.useAccount(account1);
+        await service.recoverAccount(account2);
+
+        // Then
+        final currentUser = service.user;
+        final currentAccount = currentUser.activeAccount;
+
+        expect(currentAccount?.catalystId, account2.catalystId);
+        expect(currentAccount?.isActive, isTrue);
+        expect(currentUser.accounts, hasLength(1));
+        expect(currentUser.accounts.first.catalystId, equals(account2.catalystId));
+      });
+
+      test('recover account will not erase the same account which is being recovered', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+
+        // When
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(username: 'account1'),
+          keychain: keychain,
+        );
+
+        // write something to keychain so that's it's not empty
+        await keychain.setLock(_lockFactor);
+        await keychain.unlock(_lockFactor);
+        await keychain.setMasterKey(_masterKey);
+
+        await service.useAccount(account);
+        await service.recoverAccount(account);
+
+        // Then
+        final currentUser = service.user;
+        final currentAccount = currentUser.activeAccount;
+
+        expect(currentAccount?.catalystId, account.catalystId);
+        expect(currentAccount?.isActive, isTrue);
+        expect(currentUser.accounts, hasLength(1));
+        expect(currentUser.accounts.first.catalystId, equals(account.catalystId));
+        expect(await currentAccount!.keychain.isEmpty, isFalse);
+      });
+    });
+
     group('refreshActiveAccountProfile', () {
       setUp(() {
         userRepository = _MockUserRepository();
@@ -950,9 +1040,19 @@ void main() {
   });
 }
 
+const _lockFactor = PasswordLockFactor('Test1234');
+final _masterKey = _FakeCatalystPrivateKey(bytes: Uint8List.fromList(List.filled(32, 0)));
+
 final _transactionHash = TransactionHash.fromHex(
   '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2',
 );
+
+class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
+  @override
+  final Uint8List bytes;
+
+  _FakeCatalystPrivateKey({required this.bytes});
+}
 
 class _FakeKeychainSigner extends Fake implements KeychainSigner {}
 
