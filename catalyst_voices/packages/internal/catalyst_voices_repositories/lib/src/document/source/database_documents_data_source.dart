@@ -241,9 +241,9 @@ extension on DocumentEntityV2 {
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
         section: section,
-        collaborators: collaborators,
+        collaborators: collaborators.isEmpty ? null : collaborators,
         parameters: parameters,
-        authors: authors,
+        authors: authors.isEmpty ? null : authors,
       ),
       content: content,
     );

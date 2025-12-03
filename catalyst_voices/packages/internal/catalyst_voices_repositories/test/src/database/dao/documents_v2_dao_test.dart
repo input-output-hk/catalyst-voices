@@ -986,14 +986,14 @@ void main() {
             id: 'proposal1-id',
             ver: _buildUuidV7At(DateTime(2023)),
             type: DocumentType.proposalDocument,
-            authors: author.toUri().toString(),
+            authors: [author],
           );
           final newerVer = _buildUuidV7At(DateTime(2024));
           final proposal2 = _createTestDocumentEntity(
             id: 'proposal2-id',
             ver: newerVer,
             type: DocumentType.proposalDocument,
-            authors: author.toUri().toString(),
+            authors: [author],
           );
           await dao.saveAll([proposal1, proposal2]);
 
@@ -2331,7 +2331,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   String? ver,
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
-  String? authors,
+  List<CatalystId>? authors,
   String? refId,
   String? refVer,
   String? replyId,
