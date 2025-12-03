@@ -85,9 +85,9 @@ def proposal(rbac_chain):
     with open("./test_data/signed_docs/proposal.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocumentV1(proposal_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex), proposal_doc_id)
+    doc = SignedDocumentV1(proposal_metadata_json, content, cat_id, sk_hex)
+    return (doc.build_and_sign(), proposal_doc_id)
 
 
 def comment(rbac_chain, proposal_id):
@@ -113,9 +113,9 @@ def comment(rbac_chain, proposal_id):
     with open("./test_data/signed_docs/comment.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocumentV1(comment_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex), comment_doc_id)
+    doc = SignedDocumentV1(comment_metadata_json, content, cat_id, sk_hex)
+    return (doc.build_and_sign(), comment_doc_id)
 
 
 def proposal_submission(rbac_chain, proposal_id):
@@ -138,9 +138,9 @@ def proposal_submission(rbac_chain, proposal_id):
     ) as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocumentV1(sub_action_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+    doc = SignedDocumentV1(sub_action_metadata_json, content, cat_id, sk_hex)
     return (
-        doc.build_and_sign(cat_id, sk_hex),
+        doc.build_and_sign(),
         submission_action_id,
     )

@@ -34,7 +34,7 @@ def publish_document(doc: SignedDocument, token: str):
 def proposal_doc_factory(admin_key, rbac_chain_factory):
     brand_template = brand_parameters_form_template_doc({"type": "object"}, admin_key)
     publish_document(brand_template, admin_key.auth_token())
-    
+
     brand = brand_parameters_doc({}, brand_template, admin_key)
     publish_document(brand, admin_key.auth_token())
 
