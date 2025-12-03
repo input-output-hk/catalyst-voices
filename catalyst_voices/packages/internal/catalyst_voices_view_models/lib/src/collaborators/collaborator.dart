@@ -27,7 +27,7 @@ final class Collaborator extends Equatable {
 
 /// A status of the collaborator invited to a document (proposal).
 extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
-  SvgGenImage iconWidget(BuildContext context) {
+  SvgGenImage icon(BuildContext context) {
     return switch (this) {
       ProposalsCollaborationStatus.pending => VoicesAssets.icons.clock,
       ProposalsCollaborationStatus.accepted ||

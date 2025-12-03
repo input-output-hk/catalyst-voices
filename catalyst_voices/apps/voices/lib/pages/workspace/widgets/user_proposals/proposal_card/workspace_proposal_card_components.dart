@@ -176,7 +176,7 @@ class _TooltipOverlayTile extends StatelessWidget {
         spacing: 12,
         children: [
           collaborator.status
-              .iconWidget(context)
+              .icon(context)
               .buildIcon(
                 color: collaborator.status.statusColor(context),
                 size: 24,
