@@ -4,7 +4,7 @@ import pytest
 from utils import health, sync
 import requests
 
-from api import cat_api_endpoint_url
+from api import cat_gateway_endpoint_url
 from catalyst_python.address import stake_public_key_to_address
 
 
@@ -59,7 +59,7 @@ def test_voter_registration_endpoint():
 
 def get_voter_registration(address: str, network: str, slot_number: int):
     resp = requests.get(
-        cat_api_endpoint_url(
+        cat_gateway_endpoint_url(
             f"api/cardano/registration/{address}?network={network}&slot_number={slot_number}"
         )
     )

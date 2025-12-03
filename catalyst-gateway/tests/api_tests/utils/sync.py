@@ -3,12 +3,12 @@ import time
 from loguru import logger
 import math
 
-from api import cat_api_endpoint_url
+from api import cat_gateway_endpoint_url
 
 
 def get_sync_state(network: str):
     resp = requests.get(
-        cat_api_endpoint_url(f"api/cardano/sync_state?network={network}")
+        cat_gateway_endpoint_url(f"api/cardano/sync_state?network={network}")
     )
     assert resp.status_code == 200 or resp.status_code == 404
     if resp.status_code == 200:
