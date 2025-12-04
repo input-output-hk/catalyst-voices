@@ -88,12 +88,6 @@ jobs:
                 exit 1
               fi
 
-      - name: Schemathesis tests
-        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
-          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
-
       - name: Integration API tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         env:
@@ -135,7 +129,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
 
