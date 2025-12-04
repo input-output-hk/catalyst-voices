@@ -108,13 +108,14 @@ jobs:
       - name: Load image
         id: load-images
         run: |
-          docker load -i cat-gateway.tar
-          docker load -i event-db.tar
-          docker load -i api-tests-runner.tar
-          docker load -i schemathesis-runner.tar
-          docker load -i rust-tests-runner.tar
-          docker load -i event-db-v1.tar
-          docker load -i haproxy-node.tar
+          docker load -i ./all-images/cat-gateway.tar
+          docker load -i ./all-images/event-db.tar
+          docker load -i ./all-images/api-tests-runner.tar
+          docker load -i ./all-images/schemathesis-runner.tar
+          docker load -i ./all-images/rust-tests-runner.tar
+          docker load -i ./all-images/event-db-v1.tar
+          docker load -i ./all-images/haproxy-node.tar
+          rm -rf ./all-images
 
       - name: Rust integration tests
         if: ${{ steps.load-images.conclusion == 'success' }}
@@ -212,14 +213,15 @@ jobs:
       - name: Load image
         id: load-images
         run: |
-          docker load -i cat-gateway.tar
-          docker load -i event-db.tar
-          docker load -i api-tests-runner.tar
-          docker load -i schemathesis-runner.tar
-          docker load -i rust-tests-runner.tar
-          docker load -i event-db-v1.tar
-          docker load -i haproxy-node.tar
-          docker load -i cat-devnet.tar
+          docker load -i ./all-images/cat-gateway.tar
+          docker load -i ./all-images/event-db.tar
+          docker load -i ./all-images/api-tests-runner.tar
+          docker load -i ./all-images/schemathesis-runner.tar
+          docker load -i ./all-images/rust-tests-runner.tar
+          docker load -i ./all-images/event-db-v1.tar
+          docker load -i ./all-images/haproxy-node.tar
+          docker load -i ./all-images/cat-devnet.tar
+          rm -rf ./all-images
 
       - name: Spin up devnet
         if: ${{ steps.load-images.conclusion == 'success' }}
