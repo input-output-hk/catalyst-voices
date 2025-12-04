@@ -57,6 +57,7 @@ jobs:
   tests:
     name: Cat-Gateway integration tests
     runs-on: ubuntu-latest
+    needs: build-images
     steps:
       - uses: actions/checkout@v4
 
@@ -176,6 +177,7 @@ jobs:
   devnet-tests:
     name: Cat-Gateway devnet integration tests
     runs-on: ubuntu-latest
+    needs: build-images
     steps:
       - uses: actions/checkout@v4
 
