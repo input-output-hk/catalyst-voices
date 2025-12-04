@@ -188,7 +188,7 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 
       - name: Wait for cat-devnet to become healthy
-        if: ${{ always() && steps.devnet-start.result == 'success' }}
+        if: ${{ always() && steps.devnet-start.conclusion == 'success' }}
         id: devnet-check-retry
         run: |
           echo "Waiting for container to be healthy..."
