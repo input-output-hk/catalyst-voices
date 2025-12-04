@@ -40,7 +40,11 @@
             "default_dart": null,
             "default_client_dart": null,
             "dsl_features": [
-            ]
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
           },
           {
             "name": "collaborators",
@@ -51,7 +55,11 @@
             "default_dart": null,
             "default_client_dart": null,
             "dsl_features": [
-            ]
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
           },
           {
             "name": "content_type",
@@ -84,7 +92,11 @@
             "default_dart": null,
             "default_client_dart": null,
             "dsl_features": [
-            ]
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.parameters",
+              "dart_type_name": "DocumentParameters"
+            }
           },
           {
             "name": "ref_id",
@@ -513,7 +525,11 @@
             "default_dart": null,
             "default_client_dart": null,
             "dsl_features": [
-            ]
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
           },
           {
             "name": "collaborators",
@@ -524,7 +540,11 @@
             "default_dart": null,
             "default_client_dart": null,
             "dsl_features": [
-            ]
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
           },
           {
             "name": "content_type",
@@ -557,7 +577,11 @@
             "default_dart": null,
             "default_client_dart": null,
             "dsl_features": [
-            ]
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.parameters",
+              "dart_type_name": "DocumentParameters"
+            }
           },
           {
             "name": "ref_id",

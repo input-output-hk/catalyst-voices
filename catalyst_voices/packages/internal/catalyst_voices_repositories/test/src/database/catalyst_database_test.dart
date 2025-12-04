@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../utils/document_with_authors_factory.dart';
+import '../utils/document_composite_factory.dart';
 import 'connection/test_connection.dart';
 import 'drift_test_platforms.dart';
 
@@ -22,7 +22,7 @@ void main() {
       'clear removes all documents and drafts',
       () async {
         // Given
-        final documents = List.generate(5, (index) => DocumentWithAuthorsFactory.create());
+        final documents = List.generate(5, (index) => DocumentCompositeFactory.create());
 
         // When
         await database.documentsV2Dao.saveAll(documents);

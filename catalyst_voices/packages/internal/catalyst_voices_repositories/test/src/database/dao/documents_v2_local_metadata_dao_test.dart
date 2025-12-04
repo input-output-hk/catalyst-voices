@@ -141,7 +141,7 @@ void main() {
           final result = await dao.isFavorite('non-existent-id');
 
           // Then
-          expect(result, false);
+          expect(result, isFalse);
         });
 
         test('returns false when document exists but is not favorite', () async {
@@ -159,7 +159,7 @@ void main() {
           final result = await dao.isFavorite('doc-1');
 
           // Then
-          expect(result, false);
+          expect(result, isFalse);
         });
 
         test('returns true when document is marked as favorite', () async {
@@ -177,7 +177,7 @@ void main() {
           final result = await dao.isFavorite('doc-1');
 
           // Then
-          expect(result, true);
+          expect(result, isTrue);
         });
 
         test('returns correct value for specific document among multiple', () async {
@@ -208,9 +208,9 @@ void main() {
               );
 
           // When & Then
-          expect(await dao.isFavorite('doc-1'), true);
-          expect(await dao.isFavorite('doc-2'), false);
-          expect(await dao.isFavorite('doc-3'), true);
+          expect(await dao.isFavorite('doc-1'), isTrue);
+          expect(await dao.isFavorite('doc-2'), isFalse);
+          expect(await dao.isFavorite('doc-3'), isTrue);
         });
 
         test('returns false for non-existent id among existing records', () async {
@@ -228,7 +228,7 @@ void main() {
           final result = await dao.isFavorite('doc-2');
 
           // Then
-          expect(result, false);
+          expect(result, isFalse);
         });
       });
     },

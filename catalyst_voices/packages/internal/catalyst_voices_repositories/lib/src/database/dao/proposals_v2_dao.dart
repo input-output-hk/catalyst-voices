@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Documen
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
@@ -714,16 +715,12 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
       ) as comments_count,
       
-      (
-        SELECT GROUP_CONCAT(da.account_id, ',')
-        FROM document_authors da
-        WHERE da.document_id = p.id AND da.document_ver = p.id
-      ) as original_authors_str,
-
+      origin.authors as origin_authors,
       COALESCE(dlm.is_favorite, 0) as is_favorite
     FROM documents_v2 p
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
     LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
+    LEFT JOIN documents_v2 origin ON p.id = origin.id AND origin.id = origin.ver AND origin.type = ?
     LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
     WHERE p.type = ? $whereClause
     ORDER BY $orderByClause
@@ -747,6 +744,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.commentDocument.uuid),
         // Main Join Variables
+        // origin join, template join, main WHERE
+        Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalTemplate.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
         // Pagination
@@ -777,12 +776,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final commentsCount = row.readNullable<int>('comments_count') ?? 0;
       final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
 
-      final originalAuthorsRaw = row.readNullable<String>('original_authors_str');
-      final originalAuthors = originalAuthorsRaw
-          ?.split(',')
-          .map(CatalystId.tryParse)
-          .nonNulls
-          .toList();
+      final originalAuthorsRaw = row.readNullable<String>('origin_authors');
+      final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
 
       return JoinedProposalBriefEntity(
         proposal: proposal,
@@ -791,7 +786,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         versionIds: versionIds,
         commentsCount: commentsCount,
         isFavorite: isFavorite,
-        originalAuthors: originalAuthors ?? const [],
+        originalAuthors: originalAuthors,
       );
     });
   }

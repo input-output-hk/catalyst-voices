@@ -44,72 +44,8 @@ void main() {
           final migrated = DocumentRefDto.migrateJson1(json);
 
           // Then
-          expect(identical(migrated, json), isTrue);
+          expect(json, same(migrated));
         });
-      });
-    });
-
-    group('flatten', () {
-      test('round trip with UUIDs (containing hyphens) works correctly', () {
-        // Given
-        // UUIDs contain hyphens, which tests if the separator logic is robust
-        final id = DocumentRefFactory.randomUuidV7();
-        final ver = DocumentRefFactory.randomUuidV7();
-        const type = DocumentRefDtoType.signed;
-
-        final original = DocumentRefDto(id: id, ver: ver, type: type);
-
-        // When
-        final flattened = original.toFlatten();
-        final reconstructed = DocumentRefDto.fromFlatten(flattened);
-
-        // Then
-        expect(reconstructed.id, original.id);
-        expect(reconstructed.ver, original.ver);
-        expect(reconstructed.type, original.type);
-      });
-
-      test('round trip with null version works correctly', () {
-        // Given
-        final id = DocumentRefFactory.randomUuidV7();
-        const type = DocumentRefDtoType.draft;
-
-        // ver is explicitly null
-        // ignore: avoid_redundant_argument_values
-        final original = DocumentRefDto(id: id, ver: null, type: type);
-
-        // When
-        final flattened = original.toFlatten();
-        final reconstructed = DocumentRefDto.fromFlatten(flattened);
-
-        // Then
-        expect(reconstructed.id, original.id);
-        expect(reconstructed.ver, isNull);
-        expect(reconstructed.type, original.type);
-      });
-
-      test('throws FormatException when data does not have 3 parts', () {
-        // Given
-        const invalidData = 'invalid-format';
-
-        // Then
-        expect(
-          () => DocumentRefDto.fromFlatten(invalidData),
-          throwsA(isA<FormatException>()),
-        );
-      });
-
-      test('throws FormatException when type is unknown', () {
-        // Given
-        final id = DocumentRefFactory.randomUuidV7();
-        // Uses the correct separator but an invalid enum name
-        final invalidData = '$id|1.0|UNKNOWN_TYPE';
-
-        // Then
-        expect(
-          () => DocumentRefDto.fromFlatten(invalidData),
-          throwsA(isA<FormatException>()),
-        );
       });
     });
   });

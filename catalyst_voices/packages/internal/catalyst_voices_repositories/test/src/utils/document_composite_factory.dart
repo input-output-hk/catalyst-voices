@@ -5,11 +5,10 @@ import 'package:catalyst_voices_repositories/src/database/table/document_authors
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-final class DocumentWithAuthorsFactory {
-  DocumentWithAuthorsFactory._();
+final class DocumentCompositeFactory {
+  DocumentCompositeFactory._();
 
   static DocumentCompositeEntity create({
     String? id,
@@ -18,7 +17,7 @@ final class DocumentWithAuthorsFactory {
     DocumentContentType contentType = DocumentContentType.json,
     DocumentType type = DocumentType.proposalDocument,
     DateTime? createdAt,
-    String? authors,
+    List<CatalystId>? authors,
     String? refId,
     String? refVer,
     String? replyId,
@@ -31,7 +30,7 @@ final class DocumentWithAuthorsFactory {
   }) {
     id ??= DocumentRefFactory.randomUuidV7();
     ver ??= id;
-    authors ??= '';
+    authors ??= const [];
 
     final docEntity = DocumentEntityV2(
       id: id,
@@ -48,15 +47,11 @@ final class DocumentWithAuthorsFactory {
       section: section,
       templateId: templateId,
       templateVer: templateVer,
-      collaborators: collaborators.map((e) => e.toString()).join(','),
-      parameters: parameters.map(DocumentRefDto.fromModel).map((e) => e.toFlatten()).join(','),
+      collaborators: collaborators,
+      parameters: DocumentParameters(parameters.map((e) => e.toSignedDocumentRef()).toSet()),
     );
 
     final authorsEntities = authors
-        .split(',')
-        .where((element) => element.trim().isNotEmpty)
-        .map(CatalystId.tryParse)
-        .nonNulls
         .map(
           (e) => DocumentAuthorEntity(
             documentId: docEntity.id,

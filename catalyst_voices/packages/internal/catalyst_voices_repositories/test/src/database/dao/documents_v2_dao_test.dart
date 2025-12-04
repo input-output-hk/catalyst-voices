@@ -11,7 +11,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/document_with_authors_factory.dart';
+import '../../utils/document_composite_factory.dart';
 import '../connection/test_connection.dart';
 import '../drift_test_platforms.dart';
 
@@ -484,7 +484,7 @@ void main() {
           final result = await dao.filterExisting(refs);
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result[0].id, 'id-1');
           expect(result[0].ver, 'ver-1');
           expect(result[1].id, 'id-2');
@@ -508,7 +508,7 @@ void main() {
           final result = await dao.filterExisting(refs);
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result[0].id, 'existing-id');
           expect(result[0].ver, 'existing-ver');
           expect(result[1].id, 'existing-id');
@@ -532,7 +532,7 @@ void main() {
           final result = await dao.filterExisting(refs);
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result[0].ver, isNull);
           expect(result[1].ver, 'ver-1');
         });
@@ -559,7 +559,7 @@ void main() {
           stopwatch.stop();
 
           // Then
-          expect(result.length, 500);
+          expect(result, hasLength(500));
           expect(stopwatch.elapsedMilliseconds, lessThan(100));
         });
       });
@@ -988,14 +988,14 @@ void main() {
             id: genesisVer,
             ver: genesisVer,
             type: DocumentType.proposalDocument,
-            authors: author.toUri().toString(),
+            authors: [author],
           );
           final newerVer = _buildUuidV7At(DateTime(2024));
           final proposal2 = _createTestDocumentEntity(
             id: genesisVer,
             ver: newerVer,
             type: DocumentType.proposalDocument,
-            authors: author.toUri().toString(),
+            authors: [author],
           );
           await dao.saveAll([proposal1, proposal2]);
 
@@ -1019,7 +1019,7 @@ void main() {
             id: genesisVer,
             ver: genesisVer,
             type: DocumentType.proposalDocument,
-            authors: originalAuthor.toUri().toString(),
+            authors: [originalAuthor],
           );
 
           // V2: Signed by Collaborator
@@ -1028,7 +1028,7 @@ void main() {
             id: genesisVer,
             ver: newerVer,
             type: DocumentType.proposalDocument,
-            authors: collaborator.toUri().toString(),
+            authors: [collaborator],
           );
 
           await dao.saveAll([proposalV1, proposalV2]);
@@ -1052,14 +1052,14 @@ void main() {
           final v1 = _createTestDocumentEntity(
             id: genesisVer,
             ver: genesisVer,
-            authors: creator.toUri().toString(),
+            authors: [creator],
           );
 
           // V2: Signed by Updater
           final v2 = _createTestDocumentEntity(
             id: genesisVer,
             ver: updateVer,
-            authors: updater.toUri().toString(),
+            authors: [updater],
           );
 
           await dao.saveAll([v1, v2]);
@@ -1091,14 +1091,14 @@ void main() {
           final v1 = _createTestDocumentEntity(
             id: genesisVer,
             ver: genesisVer,
-            authors: creator.toUri().toString(),
+            authors: [creator],
           );
 
           // V2: Signed by Updater (id != ver)
           final v2 = _createTestDocumentEntity(
             id: genesisVer,
             ver: updateVer,
-            authors: updater.toUri().toString(),
+            authors: [updater],
           );
 
           await dao.saveAll([v1, v2]);
@@ -1173,7 +1173,7 @@ void main() {
 
           // Then
           final saved = await db.select(db.documentsV2).get();
-          expect(saved.length, 2);
+          expect(saved, hasLength(2));
           final existingAfter = saved.firstWhere((e) => e.id == 'test-id');
           expect(existingAfter.content.data['key'], 'original');
           expect(saved.any((e) => e.id == 'new-id'), true);
@@ -1199,7 +1199,7 @@ void main() {
 
           // Then
           final saved = await db.select(db.documentsV2).get();
-          expect(saved.length, 4);
+          expect(saved, hasLength(4));
           expect(saved.map((e) => e.id).toSet(), {'existing-1', 'existing-2', 'new-1', 'new-2'});
         });
       });
@@ -1217,7 +1217,7 @@ void main() {
 
           // Then
           final saved = await db.select(db.documentsV2).get();
-          expect(saved.length, 1);
+          expect(saved, hasLength(1));
           expect(saved[0].id, 'test-id');
           expect(saved[0].ver, '0194d492-1daa-7371-8bd3-c15811b2b063');
         });
@@ -1243,9 +1243,33 @@ void main() {
 
           // Then
           final saved = await db.select(db.documentsV2).get();
-          expect(saved.length, 1);
+          expect(saved, hasLength(1));
           expect(saved[0].content.data['key'], 'original');
         });
+
+        test(
+          'document which author has coma in username is saved and recovered correctly',
+          () async {
+            // Given
+            final author = _createTestAuthor(name: 'Hello,World');
+            final entity = _createTestDocumentEntity(
+              id: 'test-id',
+              ver: '0194d492-1daa-7371-8bd3-c15811b2b063',
+              authors: [author],
+            );
+
+            // When
+            await dao.save(entity);
+
+            // Then
+            final saved = await db.select(db.documentsV2).get();
+            expect(saved, hasLength(1));
+            expect(saved[0].id, 'test-id');
+            expect(saved[0].ver, '0194d492-1daa-7371-8bd3-c15811b2b063');
+            expect(saved[0].authors, [author]);
+            expect(saved[0].authors.first.username, author.username);
+          },
+        );
       });
 
       group('watchDocuments', () {
@@ -1326,8 +1350,8 @@ void main() {
           final firstBatch = await streamFirst.first;
           final secondBatch = await streamSecond.first;
 
-          expect(firstBatch.length, 5);
-          expect(secondBatch.length, 5);
+          expect(firstBatch, hasLength(5));
+          expect(secondBatch, hasLength(5));
           expect(
             firstBatch
                 .map((d) => d.id)
@@ -1540,7 +1564,7 @@ void main() {
 
           final result = await stream.first;
 
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result.any((d) => d.id == 'id1' && d.ver == doc1v1.doc.ver), isFalse);
           expect(result.any((d) => d.id == 'id1' && d.ver == doc1v2.doc.ver), isTrue);
           expect(result.any((d) => d.id == 'id2' && d.ver == doc2v1.doc.ver), isTrue);
@@ -1577,7 +1601,7 @@ void main() {
 
           final result = await stream.first;
 
-          expect(result.length, 1);
+          expect(result, hasLength(1));
           expect(result.first.id, 'id1');
           expect(result.first.ver, proposal1v2.doc.ver);
           expect(result.first.type, DocumentType.proposalDocument);
@@ -1611,7 +1635,7 @@ void main() {
 
           final result = await stream.first;
 
-          expect(result.length, 5);
+          expect(result, hasLength(5));
           expect(
             result.every((d) => d.createdAt.isAtSameMomentAs(DateTime.utc(2024, 1, 2))),
             isTrue,
@@ -2077,7 +2101,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result.map((e) => e.id), containsAll(['id-1', 'id-2']));
         });
 
@@ -2102,7 +2126,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 1);
+          expect(result, hasLength(1));
           expect(result.first.id, 'p-1');
           expect(result.first.type, DocumentType.proposalDocument);
         });
@@ -2123,7 +2147,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result.map((e) => e.ver), containsAll(['v1', 'v2']));
         });
 
@@ -2142,7 +2166,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 1);
+          expect(result, hasLength(1));
           expect(result.first.ver, 'v1');
         });
 
@@ -2171,7 +2195,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result.map((e) => e.id), containsAll(['ref-1', 'ref-2']));
         });
 
@@ -2198,7 +2222,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 1);
+          expect(result, hasLength(1));
           expect(result.first.id, 'ref-1');
         });
 
@@ -2230,7 +2254,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result.map((e) => e.id), containsAll(['doc-1', 'doc-2']));
 
           final resultDoc1 = result.firstWhere((e) => e.id == 'doc-1');
@@ -2257,7 +2281,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
         });
 
         test('respects campaign filters (categories)', () async {
@@ -2279,7 +2303,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result.map((e) => e.id), containsAll(['d1', 'd3']));
         });
 
@@ -2324,7 +2348,7 @@ void main() {
           );
 
           // Then
-          expect(result.length, 1);
+          expect(result, hasLength(1));
           expect(result.first.id, 'p1');
           expect(result.first.ver, newProposal.doc.ver);
         });
@@ -2361,7 +2385,7 @@ void main() {
           );
 
           // Then: We EXPECT them sorted by time (New -> Mid -> Old)
-          expect(result.length, 3);
+          expect(result, hasLength(3));
 
           expect(
             result[0].id,
@@ -2443,7 +2467,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   String? ver,
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
-  String? authors,
+  List<CatalystId>? authors,
   String? refId,
   String? refVer,
   String? replyId,
@@ -2454,7 +2478,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   List<CatalystId>? collaborators,
   List<DocumentRef>? parameters,
 }) {
-  return DocumentWithAuthorsFactory.create(
+  return DocumentCompositeFactory.create(
     id: id,
     ver: ver,
     contentData: contentData,
