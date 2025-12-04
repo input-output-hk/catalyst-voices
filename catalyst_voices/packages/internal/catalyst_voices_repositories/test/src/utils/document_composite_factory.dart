@@ -61,8 +61,8 @@ final class DocumentCompositeFactory {
           (e) => DocumentAuthorEntity(
             documentId: docEntity.id,
             documentVer: docEntity.ver,
-            accountId: e.toUri().toString(),
-            accountSignificantId: e.toSignificant().toUri().toString(),
+            accountId: e.toString(),
+            accountSignificantId: e.toSignificant().toString(),
             username: e.username,
           ),
         )
@@ -73,8 +73,8 @@ final class DocumentCompositeFactory {
           (e) => DocumentCollaboratorEntity(
             documentId: docEntity.id,
             documentVer: docEntity.ver,
-            accountId: e.toUri().toString(),
-            accountSignificantId: e.toSignificant().toUri().toString(),
+            accountId: e.toString(),
+            accountSignificantId: e.toSignificant().toString(),
             username: e.username,
           ),
         )

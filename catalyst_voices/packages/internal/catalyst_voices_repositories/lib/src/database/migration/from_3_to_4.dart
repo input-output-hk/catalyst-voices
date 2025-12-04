@@ -417,8 +417,8 @@ extension on DocumentDataMetadataDtoDbV3 {
       return DocumentAuthorEntity(
         documentId: id.id,
         documentVer: id.ver!,
-        accountId: catId.toUri().toString(),
-        accountSignificantId: catId.toSignificant().toUri().toString(),
+        accountId: catId.toString(),
+        accountSignificantId: catId.toSignificant().toString(),
         username: catId.username,
       );
     }).toList();
@@ -429,8 +429,8 @@ extension on DocumentDataMetadataDtoDbV3 {
       return DocumentCollaboratorEntity(
         documentId: id.id,
         documentVer: id.ver!,
-        accountId: catId.toUri().toString(),
-        accountSignificantId: catId.toSignificant().toUri().toString(),
+        accountId: catId.toString(),
+        accountSignificantId: catId.toSignificant().toString(),
         username: catId.username,
       );
     }).toList();
