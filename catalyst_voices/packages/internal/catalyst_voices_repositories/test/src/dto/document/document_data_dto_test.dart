@@ -41,7 +41,7 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
 
@@ -94,7 +94,7 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
 
@@ -168,7 +168,7 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
 
@@ -207,7 +207,7 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
 
@@ -249,7 +249,7 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
     });

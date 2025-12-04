@@ -14,7 +14,7 @@ import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/document_with_authors_factory.dart';
+import '../../utils/document_composite_factory.dart';
 import '../connection/test_connection.dart';
 import '../drift_test_platforms.dart';
 
@@ -408,7 +408,7 @@ void main() {
 
           final favorites = await db.select(db.documentsLocalMetadata).get();
 
-          expect(favorites.length, 3);
+          expect(favorites, hasLength(3));
           expect(favorites.map((e) => e.id).toSet(), {'p1', 'p2', 'p3'});
         });
       });
@@ -455,7 +455,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
-          expect(result.items.length, 2);
+          expect(result.items, hasLength(2));
           expect(result.total, 3);
           expect(result.items[0].proposal.id, 'id-2');
           expect(result.items[1].proposal.id, 'id-3');
@@ -482,7 +482,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Returns remaining items (1), total unchanged
-          expect(result.items.length, 1);
+          expect(result.items, hasLength(1));
           expect(result.total, 3);
           expect(result.page, 1);
           expect(result.maxPerPage, 2);
@@ -513,7 +513,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
-          expect(result.items.length, 2);
+          expect(result.items, hasLength(2));
           expect(result.total, 2);
           expect(result.items[0].proposal.id, 'multi-id');
           expect(result.items[0].proposal.ver, _buildUuidV7At(latest));
@@ -541,7 +541,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
-          expect(result.items.length, 1);
+          expect(result.items, hasLength(1));
           expect(result.total, 1);
           expect(result.items[0].proposal.type, DocumentType.proposalDocument);
         });
@@ -578,7 +578,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Only visible (p1); total=1.
-          expect(result.items.length, 1);
+          expect(result.items, hasLength(1));
           expect(result.total, 1);
           expect(result.items[0].proposal.id, 'p1');
         });
@@ -618,7 +618,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Only visible (p1); total=1.
-          expect(result.items.length, 1);
+          expect(result.items, hasLength(1));
           expect(result.total, 1);
           expect(result.items[0].proposal.id, 'p1');
         });
@@ -666,7 +666,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: total=2, both are visible
-          expect(result.items.length, 2);
+          expect(result.items, hasLength(2));
           expect(result.total, 2);
           expect(result.items[0].proposal.id, 'p2');
           expect(result.items[1].proposal.id, 'p1');
@@ -722,7 +722,7 @@ void main() {
 
             // Then: With join, latest A is hidden → exclude A, total =1 (B only), items =1 (B).
             expect(result.total, 1);
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.id, 'proposal-b');
           },
         );
@@ -763,7 +763,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
-          expect(result.items.length, 2);
+          expect(result.items, hasLength(2));
           expect(result.total, 2);
           final p1Result = result.items.firstWhere((item) => item.proposal.id == 'p1');
           expect(p1Result.proposal.ver, proposal1OldVer);
@@ -803,7 +803,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
-          expect(result.items.length, 1);
+          expect(result.items, hasLength(1));
           expect(result.total, 1);
           expect(result.items[0].proposal.ver, proposal1NewVer);
           expect(result.items[0].proposal.content.data['title'], 'new version');
@@ -842,7 +842,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
-          expect(result.items.length, 1);
+          expect(result.items, hasLength(1));
           expect(result.total, 1);
           expect(result.items[0].proposal.ver, proposal1NewVer);
           expect(result.items[0].proposal.content.data['title'], 'new version');
@@ -888,7 +888,7 @@ void main() {
           final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
-          expect(result.items.length, 1);
+          expect(result.items, hasLength(1));
           expect(result.total, 1);
           expect(result.items[0].proposal.ver, proposal1Ver2);
           expect(result.items[0].proposal.content.data['version'], 2);
@@ -922,7 +922,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should still return the proposal (NOT IN with NULL should not fail)
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.id, 'p1');
             expect(result.total, 1);
           });
@@ -962,7 +962,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(request: request);
 
               // Then
-              expect(result.items.length, 2);
+              expect(result.items, hasLength(2));
               expect(result.total, 2);
             },
           );
@@ -1004,7 +1004,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should treat as draft and return latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
             expect(result.items[0].proposal.content.data['title'], 'new');
           });
@@ -1041,7 +1041,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should treat as draft and return latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
           });
 
@@ -1077,7 +1077,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should treat as draft and return latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
           });
 
@@ -1113,7 +1113,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should treat as draft and return latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
           });
 
@@ -1149,7 +1149,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should handle gracefully and return latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
           });
 
@@ -1185,7 +1185,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should handle gracefully and return latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
           });
 
@@ -1216,7 +1216,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should be hidden based on top-level action field
-            expect(result.items.length, 0);
+            expect(result.items, hasLength(0));
             expect(result.total, 0);
           });
         });
@@ -1255,7 +1255,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should be ordered newest first by createdAt
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(result.items[0].proposal.content.data['order'], 'newest');
             expect(result.items[1].proposal.content.data['order'], 'middle');
             expect(result.items[2].proposal.content.data['order'], 'oldest');
@@ -1283,7 +1283,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should order by createdAt (Dec 31 first), not ver string
-            expect(result.items.length, 2);
+            expect(result.items, hasLength(2));
             expect(result.items[0].proposal.content.data['when'], 'first');
             expect(result.items[1].proposal.content.data['when'], 'second');
           });
@@ -1337,7 +1337,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Count should match visible items (p2 final, p3 draft)
-            expect(result.items.length, 2);
+            expect(result.items, hasLength(2));
             expect(result.total, 2);
           });
 
@@ -1373,9 +1373,9 @@ void main() {
             expect(page2.total, 25);
             expect(page3.total, 25);
 
-            expect(page1.items.length, 10);
-            expect(page2.items.length, 10);
-            expect(page3.items.length, 5);
+            expect(page1.items, hasLength(10));
+            expect(page2.items, hasLength(10));
+            expect(page3.items, hasLength(5));
           });
         });
 
@@ -1417,7 +1417,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should use latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
             expect(result.items[0].proposal.content.data['title'], 'new');
           });
@@ -1455,7 +1455,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should use latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
           });
         });
@@ -1488,7 +1488,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should NOT hide (case sensitive)
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
           });
 
           test('mixed case Final action does not treat as final', () async {
@@ -1524,7 +1524,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             // Then: Should treat as draft and use latest version
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items[0].proposal.ver, proposal1NewVer);
           });
         });
@@ -1545,7 +1545,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.id, 'p1');
             expect(result.items.first.actionType, isNull);
           });
@@ -1568,7 +1568,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.id, 'p1');
             expect(result.items.first.actionType, ProposalSubmissionAction.draft);
           });
@@ -1591,7 +1591,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.id, 'p1');
             expect(result.items.first.actionType, ProposalSubmissionAction.aFinal);
           });
@@ -1645,7 +1645,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.id, 'p1');
             expect(result.items.first.actionType, ProposalSubmissionAction.aFinal);
           });
@@ -1691,7 +1691,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
 
             final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
             final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
@@ -1720,7 +1720,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.id, 'p1');
             expect(result.items.first.actionType, isNull);
           });
@@ -1743,7 +1743,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.id, 'p1');
             expect(result.items.first.actionType, ProposalSubmissionAction.draft);
           });
@@ -1758,8 +1758,8 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
-            expect(result.items.first.versionIds.length, 1);
+            expect(result.items, hasLength(1));
+            expect(result.items.first.versionIds, hasLength(1));
             expect(result.items.first.proposal.ver, proposalVer);
             expect(result.items.first.versionIds, [proposalVer]);
           });
@@ -1779,9 +1779,9 @@ void main() {
               const request = PageRequest(page: 0, size: 10);
               final result = await dao.getProposalsBriefPage(request: request);
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items.first.proposal.ver, ver3);
-              expect(result.items.first.versionIds.length, 3);
+              expect(result.items.first.versionIds, hasLength(3));
               expect(result.items.first.versionIds, [ver1, ver2, ver3]);
             },
           );
@@ -1796,7 +1796,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.commentsCount, 0);
           });
 
@@ -1827,7 +1827,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.commentsCount, 2);
           });
 
@@ -1871,7 +1871,7 @@ void main() {
               const request = PageRequest(page: 0, size: 10);
               final result = await dao.getProposalsBriefPage(request: request);
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items.first.proposal.ver, ver2);
               expect(result.items.first.commentsCount, 2);
             },
@@ -1936,7 +1936,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.ver, ver2);
             expect(result.items.first.commentsCount, 1);
           });
@@ -1986,7 +1986,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 2);
+            expect(result.items, hasLength(2));
 
             final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
             final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
@@ -2022,7 +2022,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.commentsCount, 1);
           });
         });
@@ -2036,7 +2036,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.isFavorite, false);
           });
 
@@ -2057,7 +2057,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.isFavorite, false);
           });
 
@@ -2078,7 +2078,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.isFavorite, true);
           });
 
@@ -2101,7 +2101,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.ver, ver2);
             expect(result.items.first.isFavorite, true);
           });
@@ -2139,7 +2139,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
 
             final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
             final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
@@ -2183,7 +2183,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.ver, ver1);
             expect(result.items.first.isFavorite, true);
           });
@@ -2198,7 +2198,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.template, isNull);
           });
 
@@ -2215,7 +2215,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.template, isNull);
           });
 
@@ -2241,7 +2241,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.template, isNotNull);
             expect(result.items.first.template!.id, 'template-1');
             expect(result.items.first.template!.ver, templateVer);
@@ -2277,7 +2277,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.template, isNotNull);
             expect(result.items.first.template!.ver, templateVer1);
           });
@@ -2303,7 +2303,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.template, isNull);
           });
 
@@ -2359,7 +2359,7 @@ void main() {
               const request = PageRequest(page: 0, size: 10);
               final result = await dao.getProposalsBriefPage(request: request);
 
-              expect(result.items.length, 3);
+              expect(result.items, hasLength(3));
 
               final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
               final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
@@ -2431,7 +2431,7 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            expect(result.items.length, 1);
+            expect(result.items, hasLength(1));
             expect(result.items.first.proposal.ver, ver1);
             expect(result.items.first.template, isNotNull);
             expect(result.items.first.template!.id, 'template-1');
@@ -2478,7 +2478,7 @@ void main() {
               order: const Alphabetical(),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['setup']['title']['title'],
               'Alpha Project',
@@ -2531,7 +2531,7 @@ void main() {
               order: const Alphabetical(),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['setup']['title']['title'],
               'Alpha PROJECT',
@@ -2580,7 +2580,7 @@ void main() {
               order: const Alphabetical(),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['setup']['title']['title'],
               'Alpha Project',
@@ -2630,7 +2630,7 @@ void main() {
               order: const Alphabetical(),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['setup']['title']['title'],
               'Alpha Project',
@@ -2680,7 +2680,7 @@ void main() {
               order: const Budget(isAscending: true),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
               10000,
@@ -2733,7 +2733,7 @@ void main() {
               order: const Budget(isAscending: false),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
               50000,
@@ -2782,7 +2782,7 @@ void main() {
               order: const Budget(isAscending: true),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
               10000,
@@ -2828,7 +2828,7 @@ void main() {
               order: const Budget(isAscending: false),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(
               result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
               50000,
@@ -2863,7 +2863,7 @@ void main() {
               order: const UpdateDate.asc(),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(result.items[0].proposal.id, 'id-2');
             expect(result.items[1].proposal.id, 'id-3');
             expect(result.items[2].proposal.id, 'id-1');
@@ -2892,7 +2892,7 @@ void main() {
               order: const UpdateDate.desc(),
             );
 
-            expect(result.items.length, 3);
+            expect(result.items, hasLength(3));
             expect(result.items[0].proposal.id, 'id-2');
             expect(result.items[1].proposal.id, 'id-3');
             expect(result.items[2].proposal.id, 'id-1');
@@ -2919,7 +2919,7 @@ void main() {
               order: const Alphabetical(),
             );
 
-            expect(result.items.length, 2);
+            expect(result.items, hasLength(2));
             expect(result.total, 5);
             expect(result.page, 1);
             expect(
@@ -2983,7 +2983,7 @@ void main() {
               order: const Alphabetical(),
             );
 
-            expect(resultAlphabetical.items.length, 2);
+            expect(resultAlphabetical.items, hasLength(2));
             expect(
               resultAlphabetical.items[0].proposal.content.data['setup']['title']['title'],
               'Middle Title',
@@ -2998,7 +2998,7 @@ void main() {
               order: const Budget(isAscending: true),
             );
 
-            expect(resultBudget.items.length, 2);
+            expect(resultBudget.items, hasLength(2));
             expect(
               resultBudget.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
               30000,
@@ -3070,7 +3070,7 @@ void main() {
               order: const Budget(isAscending: true),
             );
 
-            expect(result.items.length, 2);
+            expect(result.items, hasLength(2));
             expect(result.items[0].proposal.ver, ver1);
             expect(
               result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
@@ -3139,7 +3139,7 @@ void main() {
                 filters: const ProposalsFiltersV2(status: ProposalStatusFilter.draft),
               );
 
-              expect(result.items.length, 2);
+              expect(result.items, hasLength(2));
               expect(result.total, 2);
               expect(
                 result.items.map((e) => e.proposal.id).toSet(),
@@ -3177,7 +3177,7 @@ void main() {
                 filters: const ProposalsFiltersV2(status: ProposalStatusFilter.draft),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'draft-id');
             });
@@ -3212,7 +3212,7 @@ void main() {
                 filters: const ProposalsFiltersV2(status: ProposalStatusFilter.aFinal),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'final-id');
             });
@@ -3240,7 +3240,7 @@ void main() {
                 filters: const ProposalsFiltersV2(isFavorite: true),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'favorite-id');
               expect(result.items[0].isFavorite, true);
@@ -3267,7 +3267,7 @@ void main() {
                 filters: const ProposalsFiltersV2(isFavorite: false),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'not-favorite-id');
               expect(result.items[0].isFavorite, false);
@@ -3301,7 +3301,7 @@ void main() {
                 filters: ProposalsFiltersV2(author: author1),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
             });
@@ -3330,7 +3330,7 @@ void main() {
                 filters: ProposalsFiltersV2(author: author2),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p2');
             });
@@ -3364,7 +3364,7 @@ void main() {
                 filters: ProposalsFiltersV2(author: authorWithSpecialChars),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
             });
@@ -3400,7 +3400,7 @@ void main() {
                 filters: ProposalsFiltersV2(categoryId: cat1.id),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
             });
@@ -3440,7 +3440,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: 'john'),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
             });
@@ -3478,7 +3478,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: 'John'),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
             });
@@ -3516,7 +3516,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: 'Revolution'),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
             });
@@ -3540,7 +3540,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: 'blockchain'),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items[0].proposal.id, 'p1');
             });
 
@@ -3584,7 +3584,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: 'tech'),
               );
 
-              expect(result.items.length, 3);
+              expect(result.items, hasLength(3));
               expect(result.total, 3);
             });
           });
@@ -3609,7 +3609,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: "Project with 'quotes'"),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items[0].proposal.id, 'p1');
             });
 
@@ -3644,7 +3644,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 0);
+              expect(result.items, hasLength(0));
               expect(result.total, 0);
             });
 
@@ -3677,7 +3677,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: '100%'),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items[0].proposal.id, 'p1');
             });
 
@@ -3712,7 +3712,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: 'test_case'),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items[0].proposal.id, 'p1');
             });
 
@@ -3745,7 +3745,7 @@ void main() {
                 filters: const ProposalsFiltersV2(searchQuery: r'path\to\file'),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items[0].proposal.id, 'p1');
             });
 
@@ -3775,7 +3775,7 @@ void main() {
                 filters: ProposalsFiltersV2(categoryId: cat1.id),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.items[0].proposal.id, 'p1');
             });
           });
@@ -3806,7 +3806,7 @@ void main() {
                 filters: const ProposalsFiltersV2(latestUpdate: Duration(days: 1)),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'recent');
             });
@@ -3859,7 +3859,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'draft-fav');
             });
@@ -3935,7 +3935,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'matching');
             });
@@ -3975,7 +3975,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 2);
+              expect(result.items, hasLength(2));
               expect(result.total, 2);
               expect(result.items.map((e) => e.proposal.id).toSet(), {'p1', 'p2'});
             });
@@ -4006,7 +4006,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 0);
+              expect(result.items, hasLength(0));
               expect(result.total, 0);
             });
 
@@ -4044,7 +4044,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
               expect(result.items[0].proposal.parameters.containsId(cat1.id), isTrue);
@@ -4084,7 +4084,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 0);
+              expect(result.items, hasLength(0));
               expect(result.total, 0);
             });
 
@@ -4119,7 +4119,7 @@ void main() {
                 filters: const ProposalsFiltersV2(campaign: null),
               );
 
-              expect(result.items.length, 3);
+              expect(result.items, hasLength(3));
               expect(result.total, 3);
             });
 
@@ -4149,7 +4149,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p-with-cat');
             });
@@ -4182,7 +4182,7 @@ void main() {
 
               final parametersIds = parameters.map((e) => e.id).toSet();
 
-              expect(result.items.length, 3);
+              expect(result.items, hasLength(3));
               expect(result.total, 3);
               expect(
                 parametersIds.containsAll(categoriesIds),
@@ -4228,7 +4228,7 @@ void main() {
                 ),
               );
 
-              expect(result.items.length, 1);
+              expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'draft-p');
             });
@@ -4350,7 +4350,7 @@ void main() {
           );
           final templateResult = result.data[templateRef];
 
-          expect(result.data.length, 1);
+          expect(result.data, hasLength(1));
           expect(templateResult, isNotNull);
           expect(templateResult!.totalAsk, 35000);
           expect(templateResult.finalProposalsCount, 2);
@@ -4423,7 +4423,7 @@ void main() {
             ver: 'template-1-v2',
           );
 
-          expect(result.data.length, 2);
+          expect(result.data, hasLength(2));
           expect(result.data[templateRef1]!.totalAsk, 10000);
           expect(result.data[templateRef1]!.finalProposalsCount, 1);
           expect(result.data[templateRef2]!.totalAsk, 20000);
@@ -4497,7 +4497,7 @@ void main() {
             ver: 'template-2-ver',
           );
 
-          expect(result.data.length, 2);
+          expect(result.data, hasLength(2));
           expect(result.data[templateRef1]!.totalAsk, 10000);
           expect(result.data[templateRef1]!.finalProposalsCount, 1);
           expect(result.data[templateRef2]!.totalAsk, 30000);
@@ -4634,7 +4634,7 @@ void main() {
             ver: 'template-1-ver',
           );
 
-          expect(result.data.length, 1);
+          expect(result.data, hasLength(1));
           expect(result.data[templateRef]!.totalAsk, 10000);
           expect(result.data[templateRef]!.finalProposalsCount, 1);
         });
@@ -4732,7 +4732,7 @@ void main() {
             ver: 'template-1-ver',
           );
 
-          expect(result.data.length, 1);
+          expect(result.data, hasLength(1));
           expect(result.data[templateRef]!.totalAsk, 30000);
           expect(result.data[templateRef]!.finalProposalsCount, 2);
         });
@@ -4995,7 +4995,7 @@ void main() {
               .listen((event) => emissions.add(event.data));
 
           await pumpEventQueue();
-          expect(emissions.length, 1);
+          expect(emissions, hasLength(1));
           expect(emissions[0][templateRef]!.totalAsk, 10000);
 
           final proposal2Ver = _buildUuidV7At(middle.add(const Duration(hours: 1)));
@@ -5024,7 +5024,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal2, finalAction2]);
           await pumpEventQueue();
 
-          expect(emissions.length, 2);
+          expect(emissions, hasLength(2));
           expect(emissions[1][templateRef]!.totalAsk, 30000);
 
           await subscription.cancel();
@@ -5084,7 +5084,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   List<CatalystId>? collaborators,
   List<DocumentRef>? parameters,
 }) {
-  return DocumentWithAuthorsFactory.create(
+  return DocumentCompositeFactory.create(
     id: id,
     ver: ver,
     contentData: contentData,

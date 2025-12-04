@@ -7,8 +7,8 @@ import 'package:catalyst_voices_repositories/src/database/table/document_paramet
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-final class DocumentWithAuthorsFactory {
-  DocumentWithAuthorsFactory._();
+final class DocumentCompositeFactory {
+  DocumentCompositeFactory._();
 
   static DocumentCompositeEntity create({
     String? id,
