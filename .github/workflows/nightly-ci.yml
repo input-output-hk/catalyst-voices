@@ -65,7 +65,7 @@ jobs:
         id: get-images
         uses: actions/download-artifact@v4
         with:
-          name: event-db.tar
+          name: event-db
           path: .
 
       - name: Load image
@@ -96,7 +96,7 @@ jobs:
         id: get-images
         uses: actions/download-artifact@v4
         with:
-          name: event-db.tar
+          name: event-db
           path: .
 
       - name: Load image
