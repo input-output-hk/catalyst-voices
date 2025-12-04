@@ -389,6 +389,13 @@ final class DocumentRefDtoDbV3 {
 
   Map<String, dynamic> toJson() => _$DocumentRefDtoDbV3ToJson(this);
 
+  DocumentRef toModel() {
+    return switch (type) {
+      DocumentRefDtoTypeDbV3.signed => SignedDocumentRef(id: id, ver: ver),
+      DocumentRefDtoTypeDbV3.draft => DraftRef(id: id, ver: ver),
+    };
+  }
+
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
     final needsMigration = json.containsKey('version') && !json.containsKey('ver');
     if (!needsMigration) {
@@ -417,8 +424,8 @@ extension on DocumentDataMetadataDtoDbV3 {
       return DocumentAuthorEntity(
         documentId: id.id,
         documentVer: id.ver!,
-        accountId: catId.toUri().toString(),
-        accountSignificantId: catId.toSignificant().toUri().toString(),
+        accountId: catId.toString(),
+        accountSignificantId: catId.toSignificant().toString(),
         username: catId.username,
       );
     }).toList();
@@ -452,9 +459,9 @@ extension on DocumentDataMetadataDtoDbV3 {
       section: section,
       templateId: template?.id,
       templateVer: template?.ver,
-      collaborators: collaborators?.join(',') ?? '',
-      parameters: parameters?.map((e) => e.toFlatten()).join(',') ?? '',
-      authors: authors?.join(',') ?? '',
+      collaborators: collaborators?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
+      parameters: parameters?.toParameters() ?? const DocumentParameters(),
+      authors: authors?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
       content: DocumentDataContent(content),
     );
   }
@@ -475,9 +482,9 @@ extension on DocumentDataMetadataDtoDbV3 {
       section: section,
       templateId: template?.id,
       templateVer: template?.ver,
-      collaborators: collaborators?.join(',') ?? '',
-      parameters: parameters?.map((e) => e.toFlatten()).join(',') ?? '',
-      authors: authors?.join(',') ?? '',
+      collaborators: collaborators?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
+      parameters: parameters?.toParameters() ?? const DocumentParameters(),
+      authors: authors?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
       content: DocumentDataContent(content),
     );
   }
@@ -496,4 +503,11 @@ extension on DocumentDataMetadataDtoDbV3 {
 
 extension on Map<String, Expression> {
   RawValuesInsertable<QueryRow> toInsertable() => RawValuesInsertable<QueryRow>(this);
+}
+
+extension on List<DocumentRefDtoDbV3> {
+  DocumentParameters toParameters() {
+    final refs = map((e) => e.toModel().toSignedDocumentRef()).toSet();
+    return DocumentParameters(refs);
+  }
 }

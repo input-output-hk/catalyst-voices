@@ -4,6 +4,7 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/from_3_to_4.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -107,8 +108,8 @@ void migrationBody() {
             // 1. Documents
             final migratedDocs = await newDb.documentsV2.select().get();
             expect(
-              migratedDocs.length,
-              expectedNewDocumentsData.length,
+              migratedDocs,
+              hasLength(expectedNewDocumentsData.length),
               reason: 'Should migrate the same number of documents',
             );
             // Using a collection matcher for a more readable assertion
@@ -125,8 +126,8 @@ void migrationBody() {
                 .select()
                 .get();
             expect(
-              migratedFavorites.length,
-              expectedNewDocumentsFavoritesData.length,
+              migratedFavorites,
+              hasLength(expectedNewDocumentsFavoritesData.length),
               reason: 'Should migrate the same number of favorites',
             );
             expect(
@@ -141,8 +142,8 @@ void migrationBody() {
                 .select()
                 .get();
             expect(
-              migratedDrafts.length,
-              expectedNewDraftsData.length,
+              migratedDrafts,
+              hasLength(expectedNewDraftsData.length),
               reason: 'Should migrate the same number of drafts',
             );
             expect(
@@ -154,8 +155,8 @@ void migrationBody() {
             // 4. Authors
             final authors = await newDb.documentAuthors.select().get();
             expect(
-              authors.length,
-              expectedAuthors.length,
+              authors,
+              hasLength(expectedAuthors.length),
               reason: 'Should migrate the same number of authors',
             );
             expect(
@@ -167,8 +168,8 @@ void migrationBody() {
             // 4. Parameters
             final parameters = await newDb.documentParameters.select().get();
             expect(
-              parameters.length,
-              expectedParameters.length,
+              parameters,
+              hasLength(expectedParameters.length),
               reason: 'Should migrate the same number of parameters',
             );
             expect(
@@ -183,8 +184,8 @@ void migrationBody() {
                 .select()
                 .get();
             expect(
-              collaborators.length,
-              expectedCollaborators.length,
+              collaborators,
+              hasLength(expectedCollaborators.length),
               reason: 'Should migrate the same number of collaborators',
             );
             expect(
@@ -356,8 +357,7 @@ extension on DocumentData {
       id: metadata.id.id,
       type: metadata.type.uuid,
       ver: metadata.id.ver!,
-      authors:
-          metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      authors: DocumentConverters.catId.toSql(metadata.authors ?? []),
       refId: metadata.ref?.id,
       refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
@@ -365,13 +365,10 @@ extension on DocumentData {
       section: metadata.section,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      collaborators:
-          metadata.collaborators?.map((e) => e.toUri().toString()).join(',') ??
-          '',
-      parameters: metadata.parameters.set
-          .map(DocumentRefDto.fromModel)
-          .map((e) => e.toFlatten())
-          .join(','),
+      collaborators: DocumentConverters.catId.toSql(
+        metadata.collaborators ?? [],
+      ),
+      parameters: DocumentConverters.parameters.toSql(metadata.parameters),
       createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
@@ -424,8 +421,7 @@ extension on DocumentData {
       id: metadata.id.id,
       type: metadata.type.uuid,
       ver: metadata.id.ver!,
-      authors:
-          metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      authors: DocumentConverters.catId.toSql(metadata.authors ?? []),
       refId: metadata.ref?.id,
       refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
@@ -433,13 +429,10 @@ extension on DocumentData {
       section: metadata.section,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      collaborators:
-          metadata.collaborators?.map((e) => e.toUri().toString()).join(',') ??
-          '',
-      parameters: metadata.parameters.set
-          .map(DocumentRefDto.fromModel)
-          .map((e) => e.toFlatten())
-          .join(','),
+      collaborators: DocumentConverters.catId.toSql(
+        metadata.collaborators ?? [],
+      ),
+      parameters: DocumentConverters.parameters.toSql(metadata.parameters),
       createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
