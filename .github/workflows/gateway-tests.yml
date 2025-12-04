@@ -38,12 +38,22 @@ jobs:
           args: ./catalyst-gateway/tests/+all-images
 
       - name: Save image to tar
-        run: docker save event-db:latest -o event-db.tar
+        run: |
+          docker save cat-gateway:latest -o cat-gateway.tar
+          docker save event-db:latest -o event-db.tar
+          docker save api-tests-runner:latest -o api-tests-runner.tar
+          docker save schemathesis-runner:latest -o schemathesis-runner.tar
+          docker save rust-tests-runner:latest -o rust-tests-runner.tar
+          docker save event-db:v1 -o event-db-v1.tar
+          docker save haproxy-node:latest -o haproxy-node.tar
+          docker save cat-devnet:latest -o cat-devnet.tar
+          mkdir all-images
+          mv *.tar all-images/
 
       - uses: actions/upload-artifact@v4
         with:
-          name: event-db
-          path: event-db.tar
+          name: all-images
+          path: all-images/
 
   tests:
     name: Cat-Gateway integration tests
@@ -79,16 +89,19 @@ jobs:
         id: get-images
         uses: actions/download-artifact@v4
         with:
-          name: event-db.tar
-          path: .
+          name: all-images
+          path: all-images/
 
       - name: Load image
-        run: docker load -i event-db.tar
-
-      - name: Start event-db
-        if: always()
+        id: load-images
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up event-db
+          docker load -i cat-gateway.tar
+          docker load -i event-db.tar
+          docker load -i api-tests-runner.tar
+          docker load -i schemathesis-runner.tar
+          docker load -i rust-tests-runner.tar
+          docker load -i event-db-v1.tar
+          docker load -i haproxy-node.tar
 
 #      - name: Prepare artifacts
 #        id : images
@@ -97,57 +110,57 @@ jobs:
 #          command: run
 #          args: ./catalyst-gateway/tests/+all-images
 
-#      - name: Rust integration tests
-#        if: ${{ steps.images.conclusion == 'success' }}
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --exit-code-from rust-tests-runner
-#          docker compose -f catalyst-gateway/tests/docker-compose.yml down
-#
-#      - name: Spin up catalyst-gateway
-#        id: gateway-started
-#        if: ${{ steps.images.conclusion == 'success' }}
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
-#
-#      - name: Wait for cat-gateway to become healthy
-#        id: gateway-healthy
-#        if: ${{ steps.gateway-started.conclusion == 'success' }}
-#        run: |
-#              echo "Waiting for container to be healthy..."
-#              for i in {1..500}; do
-#                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
-#                echo "Health status: $STATUS"
-#                if [ "$STATUS" == "healthy" ]; then
-#                  echo "Container is healthy!"
-#                  break
-#                fi
-#                if [ "$STATUS" == "unhealthy" ]; then
-#                  echo "Container became unhealthy."
-#                  break
-#                fi
-#                sleep 5
-#              done
-#
-#              if [ "$STATUS" != "healthy" ]; then
-#                docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
-#                exit 1
-#              fi
-#
-#      - name: Integration API tests
-#        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-#        env:
-#          API_TEST_MARKS: "preprod_indexing or unmarked"
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
-#          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
-#          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
-#
-#      - name: Integration health tests
-#        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-#        env:
-#          API_TEST_MARKS: "health_endpoint"
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
+      - name: Rust integration tests
+        if: ${{ steps.load-images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --exit-code-from rust-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml down
+
+      - name: Spin up catalyst-gateway
+        id: gateway-started
+        if: ${{ steps.load-images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+              echo "Waiting for container to be healthy..."
+              for i in {1..500}; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+                echo "Health status: $STATUS"
+                if [ "$STATUS" == "healthy" ]; then
+                  echo "Container is healthy!"
+                  break
+                fi
+                if [ "$STATUS" == "unhealthy" ]; then
+                  echo "Container became unhealthy."
+                  break
+                fi
+                sleep 5
+              done
+
+              if [ "$STATUS" != "healthy" ]; then
+                docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+                exit 1
+              fi
+
+      - name: Integration API tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        env:
+          API_TEST_MARKS: "preprod_indexing or unmarked"
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
+          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
+          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
+
+      - name: Integration health tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        env:
+          API_TEST_MARKS: "health_endpoint"
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 #
 #      - name: Collect and upload test reports
 #        uses: actions/upload-artifact@v4
@@ -191,16 +204,25 @@ jobs:
         id: get-images
         uses: actions/download-artifact@v4
         with:
-          name: event-db.tar
-          path: .
+          name: all-images
+          path: all-images/
 
       - name: Load image
-        run: docker load -i event-db.tar
-
-      - name: Start event-db
-        if: always()
+        id: load-images
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up event-db
+          docker load -i cat-gateway.tar
+          docker load -i event-db.tar
+          docker load -i api-tests-runner.tar
+          docker load -i schemathesis-runner.tar
+          docker load -i rust-tests-runner.tar
+          docker load -i event-db-v1.tar
+          docker load -i haproxy-node.tar
+          docker load -i cat-devnet.tar
+
+#      - name: Start event-db
+#        if: always()
+#        run: |
+#          docker compose -f catalyst-gateway/tests/docker-compose.yml up event-db
 
 #      - name: Prepare artifacts
 #        id : images
@@ -216,55 +238,55 @@ jobs:
 #          command: run
 #          args: ./catalyst-gateway/tests/+images-devnet
 #
-#      - name: Spin up devnet
-#        if: ${{ steps.images.conclusion == 'success' }}
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
-#
-#      - name: Wait for cat-devnet to become healthy
-#        run: |
-#          echo "Waiting for container to be healthy..."
-#          for i in {1..500}; do
-#            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
-#            echo "Health status: $STATUS"
-#            if [ "$STATUS" == "healthy" ]; then
-#              echo "Container is healthy!"
-#              break
-#            fi
-#            if [ "$STATUS" == "unhealthy" ]; then
-#              echo "Container became unhealthy."
-#              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
-#              exit 1
-#            fi
-#            sleep 5
-#          done
-#
-#      - name: Spin up catalyst-gateway
-#        id: gateway-started
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-gateway -d
-#
-#      - name: Wait for cat-gateway to become healthy
-#        id: gateway-healthy
-#        if: ${{ steps.gateway-started.conclusion == 'success' }}
-#        run: |
-#          echo "Waiting for container to be healthy..."
-#          for i in {1..500}; do
-#            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
-#            echo "Health status: $STATUS"
-#            if [ "$STATUS" == "healthy" ]; then
-#              echo "Container is healthy!"
-#              break
-#            fi
-#            if [ "$STATUS" == "unhealthy" ]; then
-#              echo "Container became unhealthy."
-#              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-gateway
-#              exit 1
-#            fi
-#            sleep 5
-#          done
-#
-#      - name: Schemathesis tests
-#        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up schemathesis-runner --exit-code-from schemathesis-runner
+      - name: Spin up devnet
+        if: ${{ steps.load-images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
+
+      - name: Wait for cat-devnet to become healthy
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Spin up catalyst-gateway
+        id: gateway-started
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-gateway -d
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-gateway
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Schemathesis tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up schemathesis-runner --exit-code-from schemathesis-runner
