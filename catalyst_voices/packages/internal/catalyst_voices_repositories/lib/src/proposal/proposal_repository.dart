@@ -91,7 +91,7 @@ abstract interface class ProposalRepository {
   });
 
   Stream<List<ProposalTemplate>> watchProposalTemplates({
-    required CampaignFilters filters,
+    required CampaignFilters campaign,
   });
 
   Stream<List<ProposalDocument>> watchUserProposals({
@@ -319,10 +319,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Stream<List<ProposalTemplate>> watchProposalTemplates({
-    required CampaignFilters filters,
+    required CampaignFilters campaign,
   }) {
     return _proposalsLocalSource
-        .watchProposalTemplates(filters: filters)
+        .watchProposalTemplates(campaign: campaign)
         .map((event) => event.map(ProposalTemplateFactory.create).toList());
   }
 
