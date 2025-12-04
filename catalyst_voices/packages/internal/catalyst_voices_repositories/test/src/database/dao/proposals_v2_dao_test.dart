@@ -2442,6 +2442,93 @@ void main() {
           });
         });
 
+        group('originalAuthors', () {
+          test('returns author from the first version', () async {
+            // Given
+            final author = _createTestAuthor(name: 'original');
+            final ver1 = _buildUuidV7At(earliest);
+            final proposal = _createTestDocumentEntity(
+              id: ver1,
+              ver: ver1,
+              authors: [author],
+            );
+            await db.documentsV2Dao.saveAll([proposal]);
+
+            // When
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(request: request);
+
+            // Then
+            expect(result.items, hasLength(1));
+            expect(result.items.first.originalAuthors, hasLength(1));
+            expect(result.items.first.originalAuthors.first, author);
+          });
+
+          test('returns original author even when latest version has different author', () async {
+            // Given
+            final originalAuthor = _createTestAuthor(name: 'original', role0KeySeed: 1);
+            final collaborator = _createTestAuthor(name: 'collab', role0KeySeed: 2);
+
+            final ver1 = _buildUuidV7At(earliest);
+            final ver2 = _buildUuidV7At(latest);
+
+            // V1 signed by original author
+            final proposalV1 = _createTestDocumentEntity(
+              id: ver1,
+              ver: ver1,
+              authors: [originalAuthor],
+            );
+
+            // V2 signed by collaborator
+            final proposalV2 = _createTestDocumentEntity(
+              id: ver1,
+              ver: ver2,
+              authors: [collaborator],
+            );
+
+            await db.documentsV2Dao.saveAll([proposalV1, proposalV2]);
+
+            // When
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(request: request);
+
+            // Then
+            expect(result.items, hasLength(1));
+            final item = result.items.first;
+
+            // Should show latest version details
+            expect(item.proposal.ver, ver2);
+            // But original authors from V1
+            expect(item.originalAuthors, hasLength(1));
+            expect(item.originalAuthors.first, originalAuthor);
+            expect(item.originalAuthors.first, isNot(collaborator));
+          });
+
+          test('returns empty list if origin version (id==ver) is missing', () async {
+            // Given
+            final author = _createTestAuthor(name: 'original');
+            final id = _buildUuidV7At(earliest);
+            final ver2 = _buildUuidV7At(latest);
+
+            // Only saving V2, V1 is missing from local DB
+            final proposalV2 = _createTestDocumentEntity(
+              id: id,
+              ver: ver2,
+              authors: [author],
+            );
+            await db.documentsV2Dao.saveAll([proposalV2]);
+
+            // When
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(request: request);
+
+            // Then
+            expect(result.items, hasLength(1));
+            // Since we can't join on id=ver, this should be empty
+            expect(result.items.first.originalAuthors, isEmpty);
+          });
+        });
+
         group('Ordering', () {
           test('sorts alphabetically by title', () async {
             final entities = [
