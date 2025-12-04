@@ -52,10 +52,10 @@ final class AddCollaboratorCubit extends Cubit<AddCollaboratorState>
 
     emit(state.copyWith(collaboratorIdState: newCollaboratorIdState.copyWith(isLoading: false)));
 
-    if (result) {
+    if (result.isValid) {
       emitSignal(ValidCollaboratorIdSignal(catalystId));
     } else {
-      emitError(const LocalizedCollaboratorIsNotAProposerException());
+      emitError(LocalizedCollaboratorIsNotValidException(result));
     }
   }
 }

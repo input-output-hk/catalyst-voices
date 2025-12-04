@@ -115,7 +115,7 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
-  Future<bool> validateForCollaborator(CatalystId id);
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId id);
 
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
@@ -409,13 +409,19 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<bool> validateForCollaborator(CatalystId catalystId) async {
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId catalystId) async {
     final [isProposer, isVerified] = await Future.wait([
       _userService.validateCatalystIdForProposerRole(catalystId: catalystId),
       _userService.validateCatalystIdForVerifiedProfile(catalystId: catalystId),
     ]);
+    final valid = (isProposer, isVerified);
 
-    return (isProposer && isVerified);
+    return switch (valid) {
+      (true, true) => const ValidCollaborator(),
+      (true, false) => const NotVerifiedProfile(),
+      (false, true) => const MissingProposerRole(),
+      (false, false) => const NotProposerAndNotVerified(),
+    };
   }
 
   @override
