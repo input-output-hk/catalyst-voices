@@ -7,7 +7,6 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -317,19 +316,19 @@ void main() {
           final proposal1 = _createTestDocumentEntity(
             id: 'p1',
             ver: _buildUuidV7At(latest),
-            authors: author1.toString(),
+            authors: [author1],
           );
 
           final proposal2 = _createTestDocumentEntity(
             id: 'p2',
             ver: _buildUuidV7At(middle),
-            authors: author2.toString(),
+            authors: [author2],
           );
 
           final proposal3 = _createTestDocumentEntity(
             id: 'p3',
             ver: _buildUuidV7At(earliest),
-            authors: author1.toString(),
+            authors: [author1],
           );
 
           await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
@@ -3281,7 +3280,7 @@ void main() {
               final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
               final author3 = _createTestAuthor(name: 'bob', role0KeySeed: 3);
 
-              final p1Authors = [author1, author2].map((e) => e.toUri().toString()).join(',');
+              final p1Authors = [author1, author2];
               final proposal1 = _createTestDocumentEntity(
                 id: 'p1',
                 ver: _buildUuidV7At(latest),
@@ -3291,7 +3290,7 @@ void main() {
               final proposal2 = _createTestDocumentEntity(
                 id: 'p2',
                 ver: _buildUuidV7At(middle),
-                authors: author3.toString(),
+                authors: [author3],
               );
 
               await db.documentsV2Dao.saveAll([proposal1, proposal2]);
@@ -3314,13 +3313,13 @@ void main() {
               final proposal1 = _createTestDocumentEntity(
                 id: 'p1',
                 ver: _buildUuidV7At(latest),
-                authors: author1.toString(),
+                authors: [author1],
               );
 
               final proposal2 = _createTestDocumentEntity(
                 id: 'p2',
                 ver: _buildUuidV7At(middle),
-                authors: author2.toString(),
+                authors: [author2],
               );
 
               await db.documentsV2Dao.saveAll([proposal1, proposal2]);
@@ -3348,13 +3347,13 @@ void main() {
               final proposal1 = _createTestDocumentEntity(
                 id: 'p1',
                 ver: _buildUuidV7At(latest),
-                authors: authorWithSpecialChars.toString(),
+                authors: [authorWithSpecialChars],
               );
 
               final proposal2 = _createTestDocumentEntity(
                 id: 'p2',
                 ver: _buildUuidV7At(middle),
-                authors: normalAuthor.toString(),
+                authors: [normalAuthor],
               );
 
               await db.documentsV2Dao.saveAll([proposal1, proposal2]);
@@ -3874,7 +3873,7 @@ void main() {
               final matchingProposal = _createTestDocumentEntity(
                 id: 'matching',
                 ver: _buildUuidV7At(latest),
-                authors: author1.toString(),
+                authors: [author1],
                 parameters: [cat1],
                 contentData: {
                   'setup': {
@@ -3886,7 +3885,7 @@ void main() {
               final wrongAuthor = _createTestDocumentEntity(
                 id: 'wrong-author',
                 ver: _buildUuidV7At(middle.add(const Duration(hours: 2))),
-                authors: author2.toString(),
+                authors: [author2],
                 parameters: [cat1],
                 contentData: {
                   'setup': {
@@ -3898,7 +3897,7 @@ void main() {
               final wrongCategory = _createTestDocumentEntity(
                 id: 'wrong-category',
                 ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
-                authors: author1.toString(),
+                authors: [author1],
                 parameters: [cat2],
                 contentData: {
                   'setup': {
@@ -3910,7 +3909,7 @@ void main() {
               final wrongTitle = _createTestDocumentEntity(
                 id: 'wrong-title',
                 ver: _buildUuidV7At(middle),
-                authors: author1.toString(),
+                authors: [author1],
                 parameters: [cat1],
                 contentData: {
                   'setup': {
@@ -4048,7 +4047,7 @@ void main() {
               expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, 'p1');
-              expect(result.items[0].proposal.parameters.contains(cat1.id), isTrue);
+              expect(result.items[0].proposal.parameters.containsId(cat1.id), isTrue);
             });
 
             test('returns empty when categoryId not in campaign', () async {
@@ -4177,13 +4176,7 @@ void main() {
               );
 
               final parameters = result.items
-                  .map((e) => e.proposal.parameters)
-                  .map(
-                    (e) => e
-                        .split(',')
-                        .map(DocumentRefDto.fromFlatten)
-                        .map((e) => e.toModel().toSignedDocumentRef()),
-                  )
+                  .map((e) => e.proposal.parameters.set)
                   .flattened
                   .toSet();
 
@@ -5064,15 +5057,14 @@ CatalystId _createTestAuthor({
   return CatalystId.parse(buffer.toString());
 }
 
-String _createTestAuthors(
+List<CatalystId> _createTestAuthors(
   List<String> names, {
   // ignore: unused_element_parameter
   int Function(String) role0KeySeed = _seedRole0KeySeedGetter,
 }) {
   return names
       .map((e) => _createTestAuthor(name: e, role0KeySeed: _seedRole0KeySeedGetter(e)))
-      .map((e) => e.toUri().toString())
-      .join(',');
+      .toList();
 }
 
 DocumentCompositeEntity _createTestDocumentEntity({
@@ -5081,7 +5073,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
   DateTime? createdAt,
-  String? authors,
+  List<CatalystId>? authors,
   String? refId,
   String? refVer,
   String? replyId,

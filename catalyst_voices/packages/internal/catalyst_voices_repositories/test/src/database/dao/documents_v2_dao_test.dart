@@ -986,14 +986,14 @@ void main() {
             id: 'proposal1-id',
             ver: _buildUuidV7At(DateTime(2023)),
             type: DocumentType.proposalDocument,
-            authors: author.toUri().toString(),
+            authors: [author],
           );
           final newerVer = _buildUuidV7At(DateTime(2024));
           final proposal2 = _createTestDocumentEntity(
             id: 'proposal2-id',
             ver: newerVer,
             type: DocumentType.proposalDocument,
-            authors: author.toUri().toString(),
+            authors: [author],
           );
           await dao.saveAll([proposal1, proposal2]);
 
@@ -1134,6 +1134,30 @@ void main() {
           expect(saved, hasLength(1));
           expect(saved[0].content.data['key'], 'original');
         });
+
+        test(
+          'document which author has coma in username is saved and recovered correctly',
+          () async {
+            // Given
+            final author = _createTestAuthor(name: 'Hello,World');
+            final entity = _createTestDocumentEntity(
+              id: 'test-id',
+              ver: '0194d492-1daa-7371-8bd3-c15811b2b063',
+              authors: [author],
+            );
+
+            // When
+            await dao.save(entity);
+
+            // Then
+            final saved = await db.select(db.documentsV2).get();
+            expect(saved, hasLength(1));
+            expect(saved[0].id, 'test-id');
+            expect(saved[0].ver, '0194d492-1daa-7371-8bd3-c15811b2b063');
+            expect(saved[0].authors, [author]);
+            expect(saved[0].authors.first.username, author.username);
+          },
+        );
       });
 
       group('watchDocuments', () {
@@ -1214,8 +1238,8 @@ void main() {
           final firstBatch = await streamFirst.first;
           final secondBatch = await streamSecond.first;
 
-          expect(firstBatch.length, 5);
-          expect(secondBatch.length, 5);
+          expect(firstBatch, hasLength(5));
+          expect(secondBatch, hasLength(5));
           expect(
             firstBatch
                 .map((d) => d.id)
@@ -2331,7 +2355,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   String? ver,
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
-  String? authors,
+  List<CatalystId>? authors,
   String? refId,
   String? refVer,
   String? replyId,

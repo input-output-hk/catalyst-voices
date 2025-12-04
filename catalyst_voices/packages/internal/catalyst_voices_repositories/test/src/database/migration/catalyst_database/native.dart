@@ -4,6 +4,7 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/from_3_to_4.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -356,8 +357,7 @@ extension on DocumentData {
       id: metadata.id.id,
       type: metadata.type.uuid,
       ver: metadata.id.ver!,
-      authors:
-          metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      authors: DocumentConverters.catId.toSql(metadata.authors ?? []),
       refId: metadata.ref?.id,
       refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
@@ -365,13 +365,10 @@ extension on DocumentData {
       section: metadata.section,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      collaborators:
-          metadata.collaborators?.map((e) => e.toUri().toString()).join(',') ??
-          '',
-      parameters: metadata.parameters.set
-          .map(DocumentRefDto.fromModel)
-          .map((e) => e.toFlatten())
-          .join(','),
+      collaborators: DocumentConverters.catId.toSql(
+        metadata.collaborators ?? [],
+      ),
+      parameters: DocumentConverters.parameters.toSql(metadata.parameters),
       createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
@@ -424,8 +421,7 @@ extension on DocumentData {
       id: metadata.id.id,
       type: metadata.type.uuid,
       ver: metadata.id.ver!,
-      authors:
-          metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      authors: DocumentConverters.catId.toSql(metadata.authors ?? []),
       refId: metadata.ref?.id,
       refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
@@ -433,13 +429,10 @@ extension on DocumentData {
       section: metadata.section,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      collaborators:
-          metadata.collaborators?.map((e) => e.toUri().toString()).join(',') ??
-          '',
-      parameters: metadata.parameters.set
-          .map(DocumentRefDto.fromModel)
-          .map((e) => e.toFlatten())
-          .join(','),
+      collaborators: DocumentConverters.catId.toSql(
+        metadata.collaborators ?? [],
+      ),
+      parameters: DocumentConverters.parameters.toSql(metadata.parameters),
       createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
   }
