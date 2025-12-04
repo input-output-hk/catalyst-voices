@@ -16,22 +16,40 @@ import 'package:rxdart/rxdart.dart';
 
 /// Data Access Object for Proposal-specific queries.
 ///
-/// Handles complex queries for retrieving proposals with proper status handling
-/// based on proposal actions (draft/final/hide).
+/// This DAO handles complex retrieval logic for proposals, specifically focusing
+/// on resolving the effective state of a proposal based on its associated
+/// 'Action' documents (Draft, Final, Hide).
 ///
 /// **Status Resolution Logic:**
-/// - Draft (default): No action exists, or latest action is 'draft'
-/// - Final: Latest action is 'final' with optional ref_ver pointing to specific version
-/// - Hide: Latest action is 'hide' - excludes all versions of the proposal
 ///
-/// **Version Selection:**
-/// - For draft: Returns latest version by createdAt
-/// - For final: Returns version specified in action's ref_ver, or latest if ref_ver is null/empty
-/// - For hide: Returns nothing (filtered out)
+/// The state of a proposal is determined by the *latest* `proposalActionDocument`
+/// that references it (`ref_id`):
 ///
-/// **Performance Characteristics:**
-/// - Uses composite indices for efficient GROUP BY and JOIN operations
-/// - Single-query CTE approach (no N+1 queries)
+/// 1.  **Draft (Default):**
+///     - No action document exists.
+///     - OR the latest action content is 'draft'.
+///     - **Result:** The query returns the *latest* version of the proposal
+///       (determined by `createdAt`/`ver`).
+///
+/// 2.  **Final:**
+///     - The latest action content is 'final'.
+///     - **Result:** The query returns the specific version of the proposal
+///       pointed to by the action's `ref_ver`. If `ref_ver` is missing,
+///       it falls back to the latest version.
+///
+/// 3.  **Hidden:**
+///     - The latest action content is 'hide'.
+///     - **Result:** The proposal (and all its versions) is excluded entirely
+///       from the results.
+///
+/// **Performance Architecture:**
+///
+/// - **CTE (Common Table Expressions):** Uses a multi-stage CTE pipeline
+///   (`latest_proposals` -> `valid_actions` -> `action_status` -> `effective_proposals`)
+///   to filter and resolve versions *before* joining full document content.
+///   This prevents N+1 query issues and minimizes scanning of BLOB columns.
+/// - **Indices:** optimized to hit `idx_documents_v2_type_id`,
+///   `idx_documents_v2_type_ref_id`, and `idx_document_authors_composite`.
 @DriftAccessor(
   tables: [
     DocumentsV2,
@@ -61,34 +79,17 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return query.getSingleOrNull();
   }
 
-  /// Retrieves a paginated list of proposal briefs with filtering, ordering, and status handling.
+  /// Retrieves a paginated list of proposals with resolved status and enriched data.
   ///
-  /// **Query Logic:**
-  /// 1. Finds latest version of each proposal using MAX(ver) GROUP BY id
-  /// 2. Finds latest action for each proposal using MAX(ver) GROUP BY ref_id
-  /// 3. Determines effective version based on action type:
-  ///    - Hide action: Excludes all versions of that proposal
-  ///    - Final action with ref_ver: Uses specific version pointed to by action
-  ///    - Final action without ref_ver OR Draft action OR no action: Uses latest version
-  /// 4. Joins with templates, comments count, and favorite status
-  /// 5. Applies all filters and ordering
-  /// 6. Returns paginated results
+  /// This is the primary method for displaying proposal lists (e.g., Grids/Lists).
   ///
-  /// **Indices Used:**
-  /// - idx_documents_v2_type_id: For latest_proposals CTE (GROUP BY optimization)
-  /// - idx_documents_v2_type_ref_id: For latest_actions CTE (GROUP BY optimization)
-  /// - idx_documents_v2_type_ref_id_ver: For action_status JOIN
-  /// - idx_documents_v2_type_id_ver: For final document retrieval
-  ///
-  /// **Performance:**
-  /// - Single query with CTEs (no N+1 queries)
-  ///
-  /// **Parameters:**
-  /// - [request]: Pagination parameters (page number and size)
-  /// - [order]: Sort order for results (default: UpdateDate.desc())
-  /// - [filters]: Optional filters.
-  ///
-  /// **Returns:** Page object containing items, total count, and pagination metadata
+  /// **Query Pipeline:**
+  /// 1. **CTE Resolution:** Identifies the "Effective Proposal" (ID + Version)
+  ///    based on the latest valid action signed by the author.
+  /// 2. **Filtering:** Applies [filters] (search, category, author, favorites)
+  ///    to the effective set.
+  /// 3. **Pagination:** Applies limit/offset logic.
+  /// 4. **Enrichment:** Joins templates, authors, and counts comments via subqueries.
   @override
   Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
@@ -119,6 +120,14 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  /// Calculates the total funds requested ("Total Ask") for **Final** proposals.
+  ///
+  /// Aggregates data grouped by the proposal's template.
+  ///
+  /// **Rules:**
+  /// - Only includes proposals with a 'Final' action status.
+  /// - Uses the specific version pinned by the final action.
+  /// - Extracts the fund amount from the JSON content using the provided [nodeId].
   @override
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
@@ -134,6 +143,15 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     ).get().then(Map.fromEntries).then(ProposalsTotalAsk.new);
   }
 
+  /// Counts the total number of visible proposals matching the [filters].
+  ///
+  /// **Consistency:**
+  /// This method uses the exact same CTE and filtering logic as [getProposalsBriefPage]
+  /// to ensure the count matches the items returned in the paginated list.
+  ///
+  /// **Optimization:**
+  /// It counts `DISTINCT id` from the `effective_proposals` CTE, avoiding the overhead
+  /// of joining the full `documents_v2` content blob or sub-querying comments.
   @override
   Future<int> getVisibleProposalsCount({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -165,6 +183,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  /// Reactive stream version of [getProposalsBriefPage].
+  ///
+  /// Emits a new [Page] whenever:
+  /// - Proposal documents change.
+  /// - Action documents (Draft/Final) change.
+  /// - Local metadata (Favorites) changes.
+  /// - Authors change.
   @override
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
@@ -199,6 +224,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  /// Reactive stream version of [getProposalsTotalTask].
+  ///
+  /// Updates automatically when proposals are finalized or their content changes.
   @override
   Stream<ProposalsTotalAsk> watchProposalsTotalTask({
     required NodeId nodeId,
@@ -214,6 +242,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     ).watch().map(Map.fromEntries).map(ProposalsTotalAsk.new);
   }
 
+  /// Reactive stream version of [getVisibleProposalsCount].
   @override
   Stream<int> watchVisibleProposalsCount({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -226,17 +255,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return _countVisibleProposals(filters: filters).watchSingle();
   }
 
-  /// Builds SQL WHERE clauses from the provided filters.
+  /// Translates high-level [ProposalsFiltersV2] into SQL WHERE clauses.
   ///
-  /// Translates high-level filter objects into SQL conditions that can be
-  /// injected into the main query.
-  ///
-  /// **Security:**
-  /// - Uses _escapeForSqlLike for LIKE patterns
-  /// - Uses _escapeSqlString for direct string comparisons
-  /// - Protects against SQL injection through proper escaping
-  ///
-  /// **Returns:** List of SQL WHERE clause strings (without leading WHERE/AND)
+  /// Handles:
+  /// - **Status:** Checks `action_type` from the CTE.
+  /// - **Original Author:** Subquery against `document_authors` for the first version (id == ver).
+  /// - **Category/Campaign:** Checks existence in `document_parameters`.
+  /// - **Search:** `LIKE` query against authors, title, and applicant JSON fields.
   List<String> _buildFilterClauses(ProposalsFiltersV2 filters) {
     final clauses = <String>[];
 
@@ -358,13 +383,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return clauses;
   }
 
-  /// Builds the ORDER BY clause based on the provided ordering.
+  /// Constructs the SQL ORDER BY clause.
   ///
-  /// Supports multiple ordering strategies:
-  /// - UpdateDate: Sort by createdAt (newest first or oldest first)
-  /// - Funds: Sort by requested funds amount extracted from JSON content
-  ///
-  /// **Returns:** SQL ORDER BY clause string (without leading "ORDER BY")
+  /// - [Alphabetical]: JSON extraction of title.
+  /// - [Budget]: JSON extraction of requested funds (cast to INTEGER).
+  /// - [UpdateDate]: Uses `ver` (which contains timestamp) for efficient sorting.
   String _buildOrderByClause(ProposalsOrder order) {
     return switch (order) {
       Alphabetical() =>
@@ -377,89 +400,35 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     };
   }
 
-  /// Generates a SQL string of aliased column names for a given table.
-  ///
-  /// This is used in complex `JOIN` queries where two tables of the same type
-  /// (e.g., `documents_v2` for proposals and `documents_v2` for templates) are
-  /// joined. To avoid column name collisions in the result set, this function
-  /// prefixes each column with a unique identifier.
-  ///
-  /// Example: `_buildPrefixedColumns('p', 'p')` might produce:
-  /// `"p.id as p_id, p.ver as p_ver, ..."`
-  ///
-  /// - [tableAlias]: The alias used for the table in the SQL query (e.g., 'p').
-  /// - [prefix]: The prefix to add to each column name in the `AS` clause (e.g., 'p').
-  ///
-  /// Returns: A comma-separated string of aliased column names.
+  /// Aliases columns for joins (e.g., `p.id as p_id`) to avoid name collisions.
   String _buildPrefixedColumns(String tableAlias, String prefix) {
     return documentsV2.$columns
         .map((col) => '$tableAlias.${col.$name} as ${prefix}_${col.$name}')
         .join(', \n      ');
   }
 
-  /// Counts total number of visible (non-hidden) proposals matching the filters.
+  /// Internal query to count visible proposals.
   ///
-  /// Uses the same CTE logic as the main pagination query but stops after
-  /// determining the effective proposals set. This ensures the count matches
-  /// exactly what would be returned across all pages.
-  ///
-  /// **Query Strategy:**
-  /// - Reuses CTE structure from main query up to effective_proposals
-  /// - Applies same filter logic to ensure consistency
-  /// - Counts DISTINCT proposal ids (not versions)
-  /// - Faster than pagination query since no document joining needed
-  ///
-  /// **Returns:** Selectable<int> that can be used with getSingle() or watchSingle()
+  /// Uses the [_getEffectiveProposalsCTE] to determine the valid set of IDs,
+  /// then performs a simple COUNT(DISTINCT id).
   Selectable<int> _countVisibleProposals({
     required ProposalsFiltersV2 filters,
   }) {
     final filterClauses = _buildFilterClauses(filters);
     final whereClause = filterClauses.isEmpty ? '' : 'AND ${filterClauses.join(' AND ')}';
 
+    final effectiveProposals = _getEffectiveProposalsCTE();
     final cteQuery =
         '''
-    WITH latest_proposals AS (
-      SELECT id, MAX(ver) as max_ver
-      FROM documents_v2
-      WHERE type = ?
-      GROUP BY id
-    ),
-    latest_actions AS (
-      SELECT ref_id, MAX(ver) as max_action_ver
-      FROM documents_v2
-      WHERE type = ?
-      GROUP BY ref_id
-    ),
-    action_status AS (
-      SELECT 
-        a.ref_id,
-        a.ref_ver,
-        COALESCE(json_extract(a.content, '\$.action'), 'draft') as action_type
-      FROM documents_v2 a
-      INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
-      WHERE a.type = ?
-    ),
-    effective_proposals AS (
-      SELECT 
-        lp.id,
-        CASE 
-          WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL AND ast.ref_ver != '' THEN ast.ref_ver
-          ELSE lp.max_ver
-        END as ver,
-        ast.action_type
-      FROM latest_proposals lp
-      LEFT JOIN action_status ast ON lp.id = ast.ref_id
-      WHERE NOT EXISTS (
-        SELECT 1 FROM action_status hidden 
-        WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
-      )
-    )
+    WITH $effectiveProposals
     SELECT COUNT(DISTINCT ep.id) as total
     FROM effective_proposals ep
     INNER JOIN documents_v2 p ON ep.id = p.id AND ep.ver = p.ver
     LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
+    LEFT JOIN document_authors da ON p.id = da.document_id AND p.ver = da.document_ver
     WHERE p.type = ? $whereClause
-  ''';
+  '''
+            .trim();
 
     final readsFromTables = <ResultSetImplementation<dynamic, dynamic>>{
       documentsV2,
@@ -474,7 +443,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       cteQuery,
       variables: [
         Variable.withString(DocumentType.proposalDocument.uuid),
-        Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
       ],
@@ -523,6 +491,88 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return input.replaceAll("'", "''");
   }
 
+  /// Returns the Common Table Expression (CTE) string defining "Effective Proposals".
+  ///
+  /// **CTE Stages:**
+  /// 1. `latest_proposals`: Finds the newest `ver` for every proposal `id` by creation time.
+  /// 2. `valid_actions`: Finds all action documents that are structurally valid
+  ///    (have ref_id/ref_ver) AND are signed by the *original author* of the proposal.
+  /// 3. `latest_actions_ver`: Finds the newest action `ver` for each proposal `ref_id`.
+  /// 4. `action_status`: Joins valid actions to determine the latest `action_type`.
+  /// 5. `effective_proposals`:
+  ///    - Applies 'Final' logic (use specific `ref_ver`).
+  ///    - Applies 'Draft' logic (use `latest_proposals.max_ver`).
+  ///    - Applies 'Hide' logic (WHERE NOT EXISTS ... 'hide').
+  String _getEffectiveProposalsCTE() {
+    return r'''
+    latest_proposals AS (
+      SELECT id, MAX(ver) as max_ver
+      FROM documents_v2
+      WHERE type = ?
+      GROUP BY id
+    ),
+    valid_actions AS (
+      SELECT 
+        action.ver,
+        action.ref_id, 
+        action.ref_ver,
+        action.content
+      FROM documents_v2 action
+      
+      -- 1. GET ACTION SIGNER
+      -- Find the author of the current action document
+      INNER JOIN document_authors action_author 
+        ON action.id = action_author.document_id 
+        AND action.ver = action_author.document_ver
+        
+      -- 2. GET ORIGINAL PROPOSAL AUTHOR
+      INNER JOIN document_authors original_author
+        ON action.ref_id = original_author.document_id
+        AND original_author.document_id = original_author.document_ver
+      WHERE 
+        action.type = ?
+        AND action.ref_id IS NOT NULL 
+        AND action.ref_ver IS NOT NULL
+        -- 3. THE SECURITY CHECK
+        AND action_author.account_significant_id = original_author.account_significant_id
+    ),
+    latest_actions_ver AS (
+      SELECT ref_id, MAX(ver) as max_action_ver
+      FROM valid_actions
+      GROUP BY ref_id
+    ),
+    action_status AS (
+      SELECT 
+        va.ref_id,
+        va.ref_ver,
+        COALESCE(json_extract(va.content, '$.action'), 'draft') as action_type
+      FROM valid_actions va
+      INNER JOIN latest_actions_ver lav 
+        ON va.ref_id = lav.ref_id 
+        AND va.ver = lav.max_action_ver
+    ),
+    effective_proposals AS (
+      SELECT 
+        lp.id,
+        CASE 
+          WHEN ast.action_type = 'final' THEN ast.ref_ver
+          ELSE lp.max_ver
+        END as ver,
+        ast.action_type
+      FROM latest_proposals lp
+      LEFT JOIN action_status ast ON lp.id = ast.ref_id
+      WHERE NOT EXISTS (
+        SELECT 1 FROM action_status hidden 
+        WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
+      )
+    )
+    '''
+        .trim();
+  }
+
+  /// Internal query to calculate total ask.
+  ///
+  /// Similar to the main CTE but filters specifically for `effective_final_proposals`.
   Selectable<MapEntry<DocumentRef, ProposalsTotalAskPerTemplate>> _queryProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
@@ -532,29 +582,46 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final query =
         '''
-    WITH latest_actions AS (
+    WITH valid_actions AS (
+      SELECT 
+        action.ref_id, 
+        action.ver,
+        action.content,
+        action.ref_ver
+      FROM documents_v2 action
+      INNER JOIN document_authors action_author 
+        ON action.id = action_author.document_id 
+        AND action.ver = action_author.document_ver
+      INNER JOIN document_authors original_author
+        ON action.ref_id = original_author.document_id
+        AND original_author.document_id = original_author.document_ver
+      WHERE 
+        action.type = ?
+        AND action.ref_id IS NOT NULL 
+        AND action.ref_ver IS NOT NULL
+        AND action_author.account_significant_id = original_author.account_significant_id
+    ),
+    latest_actions_ver AS (
       SELECT ref_id, MAX(ver) as max_action_ver
-      FROM documents_v2
-      WHERE type = ?
+      FROM valid_actions
       GROUP BY ref_id
     ),
     action_status AS (
       SELECT 
-        a.ref_id,
-        a.ref_ver,
-        COALESCE(json_extract(a.content, '\$.action'), 'draft') as action_type
-      FROM documents_v2 a
-      INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
-      WHERE a.type = ?
+        va.ref_id,
+        va.ref_ver,
+        COALESCE(json_extract(va.content, '\$.action'), 'draft') as action_type
+      FROM valid_actions va
+      INNER JOIN latest_actions_ver lav 
+        ON va.ref_id = lav.ref_id 
+        AND va.ver = lav.max_action_ver
     ),
     effective_final_proposals AS (
       SELECT 
         ast.ref_id as id,
         ast.ref_ver as ver
       FROM action_status ast
-      WHERE ast.action_type = 'final'
-        AND ast.ref_ver IS NOT NULL
-        AND ast.ref_ver != ''
+      WHERE ast.action_type = 'final' AND ast.ref_ver != ''
     )
     SELECT 
       p.template_id,
@@ -589,11 +656,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final totalAsk = row.read<int>('total_ask');
       final finalProposalsCount = row.read<int>('final_proposals_count');
 
-      final ref = SignedDocumentRef(
-        id: templateId,
-        ver: templateVer,
-      );
-
+      final ref = SignedDocumentRef(id: templateId, ver: templateVer);
       final value = ProposalsTotalAskPerTemplate(
         totalAsk: totalAsk,
         finalProposalsCount: finalProposalsCount,
@@ -603,47 +666,17 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     });
   }
 
-  /// Fetches a page of visible proposals using multi-stage CTE logic.
+  /// The main execution query for [getProposalsBriefPage].
   ///
-  /// **CTE Pipeline:**
+  /// Joins the `effective_proposals` CTE with:
+  /// - `documents_v2` (for content)
+  /// - `documents_local_metadata` (for favorites)
+  /// - `documents_v2` alias 't' (for template info)
   ///
-  /// 1. **latest_proposals**
-  ///    - Groups all proposals by id and finds MAX(ver)
-  ///    - Identifies the newest version of each proposal
-  ///    - Uses: idx_documents_v2_type_id
-  ///
-  /// 2. **latest_actions**
-  ///    - Groups all proposal actions by ref_id and finds MAX(ver)
-  ///    - Ensures we only check the most recent action per proposal
-  ///    - Uses: idx_documents_v2_type_ref_id
-  ///
-  /// 3. **action_status**
-  ///    - Joins actual action documents with latest_actions
-  ///    - Extracts action type ('draft'/'final'/'hide') from JSON content
-  ///    - Extracts ref_ver which may point to specific proposal version
-  ///    - COALESCE defaults to 'draft' when action field is missing
-  ///    - Uses: idx_documents_v2_type_ref_id_ver
-  ///
-  /// 4. **effective_proposals**
-  ///    - Applies version resolution logic:
-  ///      * Hide action: Filtered out by WHERE NOT EXISTS
-  ///      * Final action with ref_ver: Uses ref_ver (specific pinned version)
-  ///      * Final action without ref_ver OR draft OR no action: Uses max_ver (latest)
-  ///    - LEFT JOIN ensures proposals without actions are included (default to draft)
-  ///
-  /// **Final Query:**
-  /// - Joins documents_v2 with effective_proposals to get full document data
-  /// - LEFT JOINs with comments, favorites, and template for enrichment
-  /// - Applies all user-specified filters
-  /// - Orders and paginates results
-  ///
-  /// **Index Usage:**
-  /// - idx_documents_v2_type_id: For GROUP BY in latest_proposals
-  /// - idx_documents_v2_type_ref_id: For GROUP BY in latest_actions
-  /// - idx_documents_v2_type_ref_id_ver: For action_status JOIN
-  /// - idx_documents_v2_type_id_ver: For final document retrieval
-  ///
-  /// **Returns:** Selectable that can be used with .get() or .watch()
+  /// Also executes efficient subqueries in the SELECT clause for:
+  /// - `version_ids_str`: Comma-separated list of all version UUIDs.
+  /// - `comments_count`: Count of comments referencing this proposal.
+  /// - `original_authors_str`: Authors of the FIRST version (id=ver).
   Selectable<JoinedProposalBriefEntity> _queryVisibleProposalsPage(
     int page,
     int size, {
@@ -656,46 +689,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final filterClauses = _buildFilterClauses(filters);
     final whereClause = filterClauses.isEmpty ? '' : 'AND ${filterClauses.join(' AND ')}';
 
+    final effectiveProposals = _getEffectiveProposalsCTE();
     final cteQuery =
         '''
-    WITH latest_proposals AS (
-      SELECT id, MAX(ver) as max_ver
-      FROM documents_v2
-      WHERE type = ?
-      GROUP BY id
-    ),
-    latest_actions AS (
-      SELECT ref_id, MAX(ver) as max_action_ver
-      FROM documents_v2
-      WHERE type = ?
-      GROUP BY ref_id
-    ),
-    action_status AS (
-      SELECT 
-        a.ref_id,
-        a.ref_ver,
-        COALESCE(json_extract(a.content, '\$.action'), 'draft') as action_type
-      FROM documents_v2 a
-      INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
-      WHERE a.type = ?
-    ),
-    effective_proposals AS (
-      SELECT 
-        lp.id,
-        -- Business Logic: Use specific version if final, otherwise latest
-        CASE 
-          WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL AND ast.ref_ver != '' THEN ast.ref_ver
-          ELSE lp.max_ver
-        END as ver,
-        ast.action_type
-      FROM latest_proposals lp
-      LEFT JOIN action_status ast ON lp.id = ast.ref_id
-      WHERE NOT EXISTS (
-        -- Business Logic: Hide action hides all versions
-        SELECT 1 FROM action_status hidden 
-        WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
-      )
-    )
+    WITH $effectiveProposals
     SELECT 
       $proposalColumns, 
       $templateColumns, 
@@ -710,7 +707,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           ORDER BY v_sub.ver ASC
         ) v_list
       ) as version_ids_str,
-
+      
       (
         SELECT COUNT(*) 
         FROM documents_v2 c 
@@ -744,19 +741,15 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       cteQuery,
       variables: [
         // CTE Variables
-        // latest_proposals, latest_actions, action_status
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
-        Variable.withString(DocumentType.proposalActionDocument.uuid),
-        // Select Subquery Variables (Order matters!)
-        // version_ids_str subquery, comments_count subquery
+        // Subquery Variables
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.commentDocument.uuid),
         // Main Join Variables
-        // template join, main WHERE
         Variable.withString(DocumentType.proposalTemplate.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
-        // Limit/Offset
+        // Pagination
         Variable.withInt(size),
         Variable.withInt(page * size),
       ],
@@ -911,6 +904,14 @@ abstract interface class ProposalsV2Dao {
     ProposalsFiltersV2 filters,
   });
 
+  /// Calculates the total funds requested ("Total Ask") for **Final** proposals.
+  ///
+  /// Aggregates data grouped by the proposal's template.
+  ///
+  /// **Rules:**
+  /// - Only includes proposals with a 'Final' action status.
+  /// - Uses the specific version pinned by the final action.
+  /// - Extracts the fund amount from the JSON content using the provided [nodeId].
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
@@ -967,6 +968,9 @@ abstract interface class ProposalsV2Dao {
     ProposalsFiltersV2 filters,
   });
 
+  /// Reactive stream version of [getProposalsTotalTask].
+  ///
+  /// Updates automatically when proposals are finalized or their content changes.
   Stream<ProposalsTotalAsk> watchProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
