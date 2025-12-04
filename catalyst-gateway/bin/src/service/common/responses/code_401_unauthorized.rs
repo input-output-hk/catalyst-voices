@@ -20,10 +20,7 @@ pub(crate) struct Unauthorized {
 
 impl Unauthorized {
     /// Create a new Payload.
-    pub(crate) fn new(msg: Option<String>) -> Self {
-        let msg = msg.unwrap_or(
-            "Your request was not successful because it lacks valid authentication credentials for the requested resource.".to_string(),
-        );
+    pub(crate) fn new(msg: String) -> Self {
         let id = Uuid::new_v4();
 
         Self {
@@ -36,6 +33,6 @@ impl Unauthorized {
 impl Example for Unauthorized {
     /// Example
     fn example() -> Self {
-        Self::new(None)
+        Self::new("Your request was not successful because it lacks valid authentication credentials for the requested resource.".to_string())
     }
 }
