@@ -410,13 +410,12 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<CollaboratorValidationResult> validateForCollaborator(CatalystId catalystId) async {
-    final [isProposer, isVerified] = await Future.wait([
+    final (isProposer, isVerified) = await (
       _userService.validateCatalystIdForProposerRole(catalystId: catalystId),
       _userService.validateCatalystIdForVerifiedProfile(catalystId: catalystId),
-    ]);
-    final valid = (isProposer, isVerified);
+    ).wait;
 
-    return switch (valid) {
+    return switch ((isProposer, isVerified)) {
       (true, true) => const ValidCollaborator(),
       (true, false) => const NotVerifiedProfile(),
       (false, true) => const MissingProposerRole(),
