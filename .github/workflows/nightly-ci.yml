@@ -191,18 +191,6 @@ jobs:
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
-
-      - name: Prepare artifacts devnet
-        id: images-devnet
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+images-devnet
-
       - name: Get artifacts
         id: get-images
         uses: actions/download-artifact@v4
@@ -222,6 +210,18 @@ jobs:
           docker load -i ./all-images/haproxy-node.tar
           docker load -i ./all-images/cat-devnet.tar
           rm -rf ./all-images
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
+
+      - name: Prepare artifacts devnet
+        id: images-devnet
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+images-devnet
 
       - name: Spin up devnet
         if: ${{ steps.load-images.conclusion == 'success' }}
