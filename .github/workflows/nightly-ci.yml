@@ -37,18 +37,6 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+all-images
 
-      - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
-
-      - name: Prepare artifacts devnet
-        id: images-devnet
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+images-devnet
-
       - name: Save image to tar
         run: |
           docker save cat-gateway:latest -o cat-gateway.tar
@@ -58,7 +46,7 @@ jobs:
           docker save rust-tests-runner:latest -o rust-tests-runner.tar
           docker save event-db:v1 -o event-db-v1.tar
           docker save haproxy-node:latest -o haproxy-node.tar
-          docker save cat-devnet:latest -o cat-devnet.tar
+#          docker save cat-devnet:latest -o cat-devnet.tar
           mkdir all-images
           mv *.tar all-images/
 
@@ -202,6 +190,18 @@ jobs:
 
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
+
+      - name: Prepare artifacts devnet
+        id: images-devnet
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+images-devnet
 
       - name: Get artifacts
         id: get-images
