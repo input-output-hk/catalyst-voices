@@ -46,7 +46,6 @@ jobs:
           docker save rust-tests-runner:latest -o rust-tests-runner.tar
           docker save event-db:v1 -o event-db-v1.tar
           docker save haproxy-node:latest -o haproxy-node.tar
-          docker save cat-devnet:latest -o cat-devnet.tar
           mkdir all-images
           mv *.tar all-images/
 
@@ -61,20 +60,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-#      - name: Free Disk Space (Ubuntu)
-#        uses: jlumbroso/free-disk-space@main
-#        with:
-#          # this might remove tools that are actually needed,
-#          # if set to "true" but frees about 6 GB
-#          tool-cache: false
-#          # all of these default to true, but feel free to set to
-#          # "false" if necessary for your workflow
-#          android: true
-#          dotnet: false
-#          haskell: false
-#          large-packages: false
-#          docker-images: false
-#          swap-storage: true
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
@@ -95,20 +94,14 @@ jobs:
       - name: Load image
         id: load-images
         run: |
-          docker load -i cat-gateway.tar
-          docker load -i event-db.tar
-          docker load -i api-tests-runner.tar
-          docker load -i schemathesis-runner.tar
-          docker load -i rust-tests-runner.tar
-          docker load -i event-db-v1.tar
-          docker load -i haproxy-node.tar
-
-#      - name: Prepare artifacts
-#        id : images
-#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-#        with:
-#          command: run
-#          args: ./catalyst-gateway/tests/+all-images
+          docker load -i ./all-images/cat-gateway.tar
+          docker load -i ./all-images/event-db.tar
+          docker load -i ./all-images/api-tests-runner.tar
+          docker load -i ./all-images/schemathesis-runner.tar
+          docker load -i ./all-images/rust-tests-runner.tar
+          docker load -i ./all-images/event-db-v1.tar
+          docker load -i ./all-images/haproxy-node.tar
+          rm -rf ./all-images
 
       - name: Rust integration tests
         if: ${{ steps.load-images.conclusion == 'success' }}
@@ -186,10 +179,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-#      - name: Setup SSH Agent
-#        uses: webfactory/ssh-agent@v0.9.1
-#        with:
-#          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
@@ -210,34 +203,23 @@ jobs:
       - name: Load image
         id: load-images
         run: |
-          docker load -i cat-gateway.tar
-          docker load -i event-db.tar
-          docker load -i api-tests-runner.tar
-          docker load -i schemathesis-runner.tar
-          docker load -i rust-tests-runner.tar
-          docker load -i event-db-v1.tar
-          docker load -i haproxy-node.tar
-          docker load -i cat-devnet.tar
+          docker load -i ./all-images/cat-gateway.tar
+          docker load -i ./all-images/event-db.tar
+          docker load -i ./all-images/api-tests-runner.tar
+          docker load -i ./all-images/schemathesis-runner.tar
+          docker load -i ./all-images/rust-tests-runner.tar
+          docker load -i ./all-images/event-db-v1.tar
+          docker load -i ./all-images/haproxy-node.tar
+          docker load -i ./all-images/cat-devnet.tar
+          rm -rf ./all-images
 
-#      - name: Start event-db
-#        if: always()
-#        run: |
-#          docker compose -f catalyst-gateway/tests/docker-compose.yml up event-db
+      - name: Prepare artifacts devnet
+        id: images-devnet
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+images-devnet
 
-#      - name: Prepare artifacts
-#        id : images
-#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-#        with:
-#          command: run
-#          args: ./catalyst-gateway/tests/+all-images
-
-#      - name: Prepare artifacts devnet
-#        id: images-devnet
-#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-#        with:
-#          command: run
-#          args: ./catalyst-gateway/tests/+images-devnet
-#
       - name: Spin up devnet
         if: ${{ steps.load-images.conclusion == 'success' }}
         run: |
