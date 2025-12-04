@@ -155,24 +155,24 @@ jobs:
           API_TEST_MARKS: "health_endpoint"
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
-#
-#      - name: Collect and upload test reports
-#        uses: actions/upload-artifact@v4
-#        if: success() || failure()
-#        with:
-#          name: test-reports-gateway
-#          path: "**/*${{ env.REPORT_EXT }}"
-#          if-no-files-found: error
-#          retention-days: 1
-#
-#      - name: Collect and upload test coverage
-#        uses: actions/upload-artifact@v4
-#        if: success() || failure()
-#        with:
-#          name: coverage-reports-gateway
-#          path: "**/*${{ env.COVERAGE_EXT }}"
-#          if-no-files-found: error
-#          retention-days: 1
+
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: test-reports-gateway
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Collect and upload test coverage
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: coverage-reports-gateway
+          path: "**/*${{ env.COVERAGE_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
 
   devnet-tests:
     name: Cat-Gateway devnet integration tests
