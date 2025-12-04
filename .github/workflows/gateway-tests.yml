@@ -172,7 +172,7 @@ jobs:
               echo "Container is healthy!"
               break
             fi
-            if [ "$STATUS" == "unhealthy" ]; then
+            if [ "$STATUS" == "starting" ]; then
               echo "Container became unhealthy."
               docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
               docker compose stop -f catalyst-gateway/tests/docker-compose-devnet.yml cat-devnet
