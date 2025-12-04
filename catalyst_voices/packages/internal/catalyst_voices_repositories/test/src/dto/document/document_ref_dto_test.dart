@@ -44,7 +44,7 @@ void main() {
           final migrated = DocumentRefDto.migrateJson1(json);
 
           // Then
-          expect(identical(migrated, json), isTrue);
+          expect(json, same(migrated));
         });
       });
     });
