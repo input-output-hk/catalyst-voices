@@ -8,13 +8,13 @@ IMPORT github.com/input-output-hk/catalyst-qa/catalyst-devnet:devnet/v0.0.3 AS d
 # build all necessary docker images required to run `docker-compose.yml` services
 all-images:
     FROM scratch
-    BUILD gateway+docker
+#    BUILD gateway+docker
     BUILD ../event-db+docker
-    BUILD ./api_tests+package
-    BUILD ./schemathesis_tests+package
-    BUILD +package-rust-tests-runner
-    BUILD +package-event-db-v1
-    BUILD +package-haproxy
+#    BUILD ./api_tests+package
+#    BUILD ./schemathesis_tests+package
+#    BUILD +package-rust-tests-runner
+#    BUILD +package-event-db-v1
+#    BUILD +package-haproxy
 
 images-devnet:
     FROM scratch
