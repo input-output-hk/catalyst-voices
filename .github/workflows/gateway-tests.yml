@@ -162,6 +162,34 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 
       - name: Wait for cat-devnet to become healthy
+        id: devnet-check
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
+              docker compose stop -f catalyst-gateway/tests/docker-compose-devnet.yml cat-devnet
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Spin up devnet ... retry
+        id: devnet-start
+        if: ${{ steps.devnet-check.conclusion == 'failure' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
+
+      - name: Wait for cat-devnet to become healthy
+        if: ${{ steps.devnet-start.conclusion == 'success' }}
+        id: devnet-check-retry
         run: |
           echo "Waiting for container to be healthy..."
           for i in {1..500}; do
