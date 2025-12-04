@@ -212,7 +212,6 @@ jobs:
           docker load -i ./all-images/rust-tests-runner.tar
           docker load -i ./all-images/event-db-v1.tar
           docker load -i ./all-images/haproxy-node.tar
-          docker load -i ./all-images/cat-devnet.tar
           rm -rf ./all-images
 
       - name: Prepare artifacts devnet
