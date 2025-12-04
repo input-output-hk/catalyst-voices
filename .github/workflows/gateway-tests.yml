@@ -5,7 +5,6 @@ on:
     secrets:
       QA_REPO_SSH_KEY:
         required: true
-  workflow_dispatch:
 
 concurrency:
   group: gateway-tests-${{ github.head_ref || github.ref }}
