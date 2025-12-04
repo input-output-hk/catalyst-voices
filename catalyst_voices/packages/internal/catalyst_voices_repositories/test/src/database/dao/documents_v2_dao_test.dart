@@ -532,7 +532,7 @@ void main() {
           final result = await dao.filterExisting(refs);
 
           // Then
-          expect(result.length, 2);
+          expect(result, hasLength(2));
           expect(result[0].ver, isNull);
           expect(result[1].ver, 'ver-1');
         });
@@ -559,7 +559,7 @@ void main() {
           stopwatch.stop();
 
           // Then
-          expect(result.length, 500);
+          expect(result, hasLength(500));
           expect(stopwatch.elapsedMilliseconds, lessThan(100));
         });
       });
@@ -1151,7 +1151,7 @@ void main() {
 
             // Then
             final saved = await db.select(db.documentsV2).get();
-            expect(saved.length, 1);
+            expect(saved, hasLength(1));
             expect(saved[0].id, 'test-id');
             expect(saved[0].ver, '0194d492-1daa-7371-8bd3-c15811b2b063');
             expect(saved[0].authors, [author]);
@@ -1238,8 +1238,8 @@ void main() {
           final firstBatch = await streamFirst.first;
           final secondBatch = await streamSecond.first;
 
-          expect(firstBatch.length, 5);
-          expect(secondBatch.length, 5);
+          expect(firstBatch, hasLength(5));
+          expect(secondBatch, hasLength(5));
           expect(
             firstBatch
                 .map((d) => d.id)
