@@ -9,7 +9,7 @@ IMPORT github.com/input-output-hk/catalyst-qa/catalyst-devnet:devnet/v0.0.3 AS d
 all-images:
     FROM scratch
     BUILD gateway+docker
-    BUILD ../event-db+testing-docker
+    BUILD ../event-db+docker
     BUILD ./api_tests+testing-package
     BUILD ./schemathesis_tests+package
     BUILD +testing-package-rust-tests-runner
