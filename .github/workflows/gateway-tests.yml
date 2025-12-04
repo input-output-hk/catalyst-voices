@@ -188,7 +188,7 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 
       - name: Wait for cat-devnet to become healthy
-        if: ${{ steps.devnet-start.conclusion == 'success' }}
+        if: ${{ always() && steps.devnet-start.result == 'success' }}
         id: devnet-check-retry
         run: |
           echo "Waiting for container to be healthy..."
@@ -209,12 +209,13 @@ jobs:
 
       - name: Spin up catalyst-gateway
         id: gateway-started
+        if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-gateway -d
 
       - name: Wait for cat-gateway to become healthy
         id: gateway-healthy
-        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        if: ${{ always() && steps.gateway-started.conclusion == 'success' }}
         run: |
           echo "Waiting for container to be healthy..."
           for i in {1..500}; do
@@ -233,6 +234,6 @@ jobs:
           done
 
       - name: Schemathesis tests
-        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        if: ${{ always() && steps.gateway-healthy.conclusion == 'success' }}
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up schemathesis-runner --exit-code-from schemathesis-runner
