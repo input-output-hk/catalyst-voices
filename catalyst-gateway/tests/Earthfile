@@ -15,11 +15,10 @@ all-images:
     BUILD +package-rust-tests-runner
     BUILD +package-event-db-v1
     BUILD +package-haproxy
-    BUILD devnet+docker
 
-#images-devnet:
-#    FROM scratch
-#    BUILD devnet+docker
+images-devnet:
+    FROM scratch
+    BUILD devnet+docker
 
 # a special package for applying migrations only up to "V2_**" migrations
 package-event-db-v1:
