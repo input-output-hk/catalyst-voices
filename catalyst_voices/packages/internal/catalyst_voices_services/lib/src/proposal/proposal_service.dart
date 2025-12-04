@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -411,11 +409,13 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<bool> validateForCollaborator(CatalystId id) async {
-    // TODO(LynxLynxx): Add implementation
-    return Future.delayed(const Duration(seconds: 1), () {
-      return Random().nextBool();
-    });
+  Future<bool> validateForCollaborator(CatalystId catalystId) async {
+    final [isProposer, isVerified] = await Future.wait([
+      _userService.validateCatalystIdForProposerRole(catalystId: catalystId),
+      _userService.validateCatalystIdForVerifiedProfile(catalystId: catalystId),
+    ]);
+
+    return (isProposer && isVerified);
   }
 
   @override

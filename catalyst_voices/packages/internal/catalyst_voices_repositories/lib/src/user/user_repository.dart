@@ -44,6 +44,13 @@ abstract interface class UserRepository {
   });
 
   Future<void> saveUser(User user);
+
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId});
+
+  Future<bool> validateCatalystIdForVerifiedProfile({
+    required CatalystId catalystId,
+    RbacToken? token,
+  });
 }
 
 final class UserRepositoryImpl implements UserRepository {
@@ -143,6 +150,31 @@ final class UserRepositoryImpl implements UserRepository {
     final dto = UserDto.fromModel(user);
 
     return _storage.writeUser(dto);
+  }
+
+  @override
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId}) async {
+    final accountRoles = await getRbacRegistration(catalystId: catalystId).then((value) {
+      return value.accountRoles;
+    });
+
+    return accountRoles.contains(AccountRole.proposer);
+  }
+
+  @override
+  Future<bool> validateCatalystIdForVerifiedProfile({
+    required CatalystId catalystId,
+    RbacToken? token,
+  }) async {
+    final response = await _apiServices.reviews
+        .apiCatalystIdsGet(
+          lookup: catalystId.toUri().toStringWithoutScheme(),
+          authorization: token?.authHeader(),
+        )
+        .successBodyOrThrow()
+        .then<bool?>((value) => value.active);
+
+    return response ?? false;
   }
 
   /// Looks up reviews module and receives status for active

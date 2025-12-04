@@ -95,6 +95,10 @@ abstract interface class UserService implements ActiveAware {
 
   /// Tries to lookup user locally and stores it in [UserObserver].
   Future<void> useLocalUser();
+
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId});
+
+  Future<bool> validateCatalystIdForVerifiedProfile({required CatalystId catalystId});
 }
 
 final class UserServiceImpl implements UserService {
@@ -442,6 +446,16 @@ final class UserServiceImpl implements UserService {
     final user = await _userRepository.getUser();
 
     await _updateUser(user);
+  }
+
+  @override
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId}) async {
+    return _userRepository.validateCatalystIdForProposerRole(catalystId: catalystId);
+  }
+
+  @override
+  Future<bool> validateCatalystIdForVerifiedProfile({required CatalystId catalystId}) async {
+    return _userRepository.validateCatalystIdForVerifiedProfile(catalystId: catalystId);
   }
 
   Future<void> _cancelRegistrationStatusSub() async {
