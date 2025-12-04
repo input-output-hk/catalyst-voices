@@ -37,7 +37,7 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+all-images
 
-      - name: Save image to tar
+      - name: Save images
         run: |
           docker save cat-gateway:latest -o cat-gateway.tar
           docker save event-db:latest -o event-db.tar
@@ -85,14 +85,14 @@ jobs:
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Get artifacts
+      - name: Get images
         id: get-images
         uses: actions/download-artifact@v4
         with:
           name: all-images
           path: all-images/
 
-      - name: Load image
+      - name: Load images
         id: load-images
         run: |
           docker load -i ./all-images/cat-gateway.tar
@@ -195,14 +195,14 @@ jobs:
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Get artifacts
+      - name: Get images
         id: get-images
         uses: actions/download-artifact@v4
         with:
           name: all-images
           path: all-images/
 
-      - name: Load image
+      - name: Load images
         id: load-images
         run: |
           docker load -i ./all-images/cat-gateway.tar
