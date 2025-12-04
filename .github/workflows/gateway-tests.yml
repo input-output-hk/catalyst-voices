@@ -15,49 +15,9 @@ env:
   COVERAGE_EXT: .coverage.info
 
 jobs:
-  build-images:
-    name: Build images
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
-        with:
-          enable_caching: "true"
-          version: 0.21.0
-
-      - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
-
-      - name: Prepare artifacts
-        id: images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+all-images
-
-      - name: Save images
-        run: |
-          docker save cat-gateway:latest -o cat-gateway.tar
-          docker save event-db:latest -o event-db.tar
-          docker save api-tests-runner:latest -o api-tests-runner.tar
-          docker save schemathesis-runner:latest -o schemathesis-runner.tar
-          docker save rust-tests-runner:latest -o rust-tests-runner.tar
-          docker save event-db:v1 -o event-db-v1.tar
-          docker save haproxy-node:latest -o haproxy-node.tar
-          mkdir all-images
-          mv *.tar all-images/
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: all-images
-          path: all-images/
-
   tests:
     name: Cat-Gateway integration tests
     runs-on: ubuntu-latest
-    needs: build-images
     steps:
       - uses: actions/checkout@v4
 
@@ -85,34 +45,22 @@ jobs:
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Get images
-        id: get-images
-        uses: actions/download-artifact@v4
+      - name: Prepare artifacts
+        id: images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
-          name: all-images
-          path: all-images/
-
-      - name: Load images
-        id: load-images
-        run: |
-          docker load -i ./all-images/cat-gateway.tar
-          docker load -i ./all-images/event-db.tar
-          docker load -i ./all-images/api-tests-runner.tar
-          docker load -i ./all-images/schemathesis-runner.tar
-          docker load -i ./all-images/rust-tests-runner.tar
-          docker load -i ./all-images/event-db-v1.tar
-          docker load -i ./all-images/haproxy-node.tar
-          rm -rf ./all-images
+          command: run
+          args: ./catalyst-gateway/tests/+all-images
 
       - name: Rust integration tests
-        if: ${{ steps.load-images.conclusion == 'success' }}
+        if: ${{ steps.images.conclusion == 'success' }}
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --exit-code-from rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
       - name: Spin up catalyst-gateway
         id: gateway-started
-        if: ${{ steps.load-images.conclusion == 'success' }}
+        if: ${{ steps.images.conclusion == 'success' }}
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
 
@@ -177,14 +125,8 @@ jobs:
   devnet-tests:
     name: Cat-Gateway devnet integration tests
     runs-on: ubuntu-latest
-    needs: build-images
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
@@ -195,24 +137,17 @@ jobs:
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Get images
-        id: get-images
-        uses: actions/download-artifact@v4
+      - name: Prepare artifacts
+        id: images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
-          name: all-images
-          path: all-images/
+          command: run
+          args: ./catalyst-gateway/tests/+all-images
 
-      - name: Load images
-        id: load-images
-        run: |
-          docker load -i ./all-images/cat-gateway.tar
-          docker load -i ./all-images/event-db.tar
-          docker load -i ./all-images/api-tests-runner.tar
-          docker load -i ./all-images/schemathesis-runner.tar
-          docker load -i ./all-images/rust-tests-runner.tar
-          docker load -i ./all-images/event-db-v1.tar
-          docker load -i ./all-images/haproxy-node.tar
-          rm -rf ./all-images
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
 
       - name: Prepare artifacts devnet
         id: images-devnet
@@ -222,7 +157,7 @@ jobs:
           args: ./catalyst-gateway/tests/+images-devnet
 
       - name: Spin up devnet
-        if: ${{ steps.load-images.conclusion == 'success' }}
+        if: ${{ steps.images.conclusion == 'success' }}
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 

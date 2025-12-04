@@ -21,7 +21,7 @@ builder:
     DO python-ci+BUILDER_WITH_POETRY
 
 # Creates a package of the python integration test runner
-package:
+testing-package:
     FROM +builder
 
     ENV ASSETS_DATA_PATH="./cardano-asset-preprod.json"

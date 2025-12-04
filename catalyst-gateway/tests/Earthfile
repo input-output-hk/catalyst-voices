@@ -9,12 +9,12 @@ IMPORT github.com/input-output-hk/catalyst-qa/catalyst-devnet:devnet/v0.0.3 AS d
 all-images:
     FROM scratch
     BUILD gateway+docker
-    BUILD ../event-db+docker
-    BUILD ./api_tests+package
+    BUILD ../event-db+testing-docker
+    BUILD ./api_tests+testing-package
     BUILD ./schemathesis_tests+package
-    BUILD +package-rust-tests-runner
+    BUILD +testing-package-rust-tests-runner
     BUILD +package-event-db-v1
-    BUILD +package-haproxy
+    BUILD +testing-package-haproxy
 
 images-devnet:
     FROM scratch
@@ -31,7 +31,7 @@ package-event-db-v1:
 
     SAVE IMAGE ${container}:${tag}
 
-package-haproxy:
+testing-package-haproxy:
     FROM haproxy:alpine
 
     USER root
@@ -61,7 +61,7 @@ rust-tests-builder:
     RUN cargo nextest archive --release --archive-file cat-gateway-tests.tar.zst
     SAVE ARTIFACT cat-gateway-tests.tar.zst cat-gateway-tests.tar.zst
 
-package-rust-tests-runner:
+testing-package-rust-tests-runner:
     FROM debian:stable-slim
 
     WORKDIR $HOME/build-tmp
