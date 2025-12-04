@@ -8,8 +8,8 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dri
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-final class DocumentWithAuthorsFactory {
-  DocumentWithAuthorsFactory._();
+final class DocumentCompositeFactory {
+  DocumentCompositeFactory._();
 
   static DocumentCompositeEntity create({
     String? id,

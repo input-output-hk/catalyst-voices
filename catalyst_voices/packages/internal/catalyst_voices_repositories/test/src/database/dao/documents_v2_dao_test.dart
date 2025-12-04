@@ -11,7 +11,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/document_with_authors_factory.dart';
+import '../../utils/document_composite_factory.dart';
 import '../connection/test_connection.dart';
 import '../drift_test_platforms.dart';
 
@@ -2342,7 +2342,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   List<CatalystId>? collaborators,
   List<DocumentRef>? parameters,
 }) {
-  return DocumentWithAuthorsFactory.create(
+  return DocumentCompositeFactory.create(
     id: id,
     ver: ver,
     contentData: contentData,
