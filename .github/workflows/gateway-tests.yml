@@ -175,7 +175,7 @@ jobs:
             if [ "$STATUS" == "starting" ]; then
               echo "Container became unhealthy."
               docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
-              docker compose stop -f catalyst-gateway/tests/docker-compose-devnet.yml cat-devnet
+              docker compose stop cat-devnet
               exit 1
             fi
             sleep 5
@@ -183,7 +183,7 @@ jobs:
 
       - name: Spin up devnet ... retry
         id: devnet-start
-        if: ${{ steps.devnet-check.conclusion == 'failure' }}
+        if: failure()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 
