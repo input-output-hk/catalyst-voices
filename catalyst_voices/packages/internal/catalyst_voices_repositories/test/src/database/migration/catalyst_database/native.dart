@@ -107,8 +107,8 @@ void migrationBody() {
             // 1. Documents
             final migratedDocs = await newDb.documentsV2.select().get();
             expect(
-              migratedDocs.length,
-              expectedNewDocumentsData.length,
+              migratedDocs,
+              hasLength(expectedNewDocumentsData.length),
               reason: 'Should migrate the same number of documents',
             );
             // Using a collection matcher for a more readable assertion
@@ -125,8 +125,8 @@ void migrationBody() {
                 .select()
                 .get();
             expect(
-              migratedFavorites.length,
-              expectedNewDocumentsFavoritesData.length,
+              migratedFavorites,
+              hasLength(expectedNewDocumentsFavoritesData.length),
               reason: 'Should migrate the same number of favorites',
             );
             expect(
@@ -141,8 +141,8 @@ void migrationBody() {
                 .select()
                 .get();
             expect(
-              migratedDrafts.length,
-              expectedNewDraftsData.length,
+              migratedDrafts,
+              hasLength(expectedNewDraftsData.length),
               reason: 'Should migrate the same number of drafts',
             );
             expect(
@@ -154,8 +154,8 @@ void migrationBody() {
             // 4. Authors
             final authors = await newDb.documentAuthors.select().get();
             expect(
-              authors.length,
-              expectedAuthors.length,
+              authors,
+              hasLength(expectedAuthors.length),
               reason: 'Should migrate the same number of authors',
             );
             expect(
@@ -167,8 +167,8 @@ void migrationBody() {
             // 4. Parameters
             final parameters = await newDb.documentParameters.select().get();
             expect(
-              parameters.length,
-              expectedParameters.length,
+              parameters,
+              hasLength(expectedParameters.length),
               reason: 'Should migrate the same number of parameters',
             );
             expect(
@@ -183,8 +183,8 @@ void migrationBody() {
                 .select()
                 .get();
             expect(
-              collaborators.length,
-              expectedCollaborators.length,
+              collaborators,
+              hasLength(expectedCollaborators.length),
               reason: 'Should migrate the same number of collaborators',
             );
             expect(
