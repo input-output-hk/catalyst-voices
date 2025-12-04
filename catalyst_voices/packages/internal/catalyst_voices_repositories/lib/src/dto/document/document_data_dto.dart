@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -208,35 +207,38 @@ final class DocumentDataMetadataDto {
   @visibleForTesting
   static Map<String, dynamic> migrateJson3(Map<String, dynamic> json) {
     final parametersKeys = ['brandId', 'campaignId', 'categoryId'];
-
-    if (parametersKeys.none(json.containsKey)) {
+    final needsMigration = parametersKeys.any(json.containsKey);
+    if (!needsMigration) {
       return json;
-    } else {
-      final modified = Map.of(json);
-      final parameters = <DocumentRefDto>[];
-
-      for (final key in parametersKeys) {
-        final value = modified.remove(key);
-        if (value is Map<String, dynamic>) {
-          parameters.add(DocumentRefDto.fromJson(value));
-        }
-      }
-
-      modified['parameters'] = parameters.map((e) => e.toJson()).toList();
-      return modified;
     }
+
+    final modified = Map.of(json);
+    final parameters = <DocumentRefDto>[];
+
+    for (final key in parametersKeys) {
+      final value = modified.remove(key);
+      if (value is Map<String, dynamic>) {
+        parameters.add(DocumentRefDto.fromJson(value));
+      }
+    }
+
+    modified['parameters'] = parameters.map((e) => e.toJson()).toList();
+    return modified;
   }
 
   /// Adds missing contentType field.
   @visibleForTesting
   static Map<String, dynamic> migrateJson4(Map<String, dynamic> json) {
-    if (json.containsKey('contentType')) {
+    final needsMigration = !json.containsKey('contentType');
+    if (!needsMigration) {
       return json;
-    } else {
-      final modified = Map.of(json);
-      modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
-      return modified;
     }
+
+    final modified = Map.of(json);
+
+    modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
+
+    return modified;
   }
 
   @visibleForTesting
@@ -258,10 +260,4 @@ final class DocumentDataMetadataDto {
 
 extension on DocumentRef {
   DocumentRefDto toDto() => DocumentRefDto.fromModel(this);
-}
-
-extension on SecuredDocumentRef {
-  SecuredDocumentRefDto toDto() {
-    return SecuredDocumentRefDto.fromModel(this);
-  }
 }

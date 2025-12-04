@@ -1,8 +1,10 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentParameters;
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:collection/collection.dart';
@@ -91,13 +93,13 @@ abstract interface class DocumentsV2Dao {
   /// Saves a single document and its associated authors.
   ///
   /// This is a convenience wrapper around [saveAll].
-  Future<void> save(DocumentWithAuthorsEntity entity);
+  Future<void> save(DocumentCompositeEntity entity);
 
   /// Saves multiple documents and their authors in a single transaction.
   ///
   /// Uses `INSERT OR IGNORE` conflict resolution. If a document with the same
   /// `id` and `ver` already exists, the new record is ignored.
-  Future<void> saveAll(List<DocumentWithAuthorsEntity> entries);
+  Future<void> saveAll(List<DocumentCompositeEntity> entries);
 
   /// Watches for changes and emits the count of documents matching the filters.
   ///
@@ -142,6 +144,8 @@ abstract interface class DocumentsV2Dao {
   tables: [
     DocumentsV2,
     DocumentAuthors,
+    DocumentParameters,
+    DocumentCollaborators,
   ],
 )
 class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -281,14 +285,16 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> save(DocumentWithAuthorsEntity entity) => saveAll([entity]);
+  Future<void> save(DocumentCompositeEntity entity) => saveAll([entity]);
 
   @override
-  Future<void> saveAll(List<DocumentWithAuthorsEntity> entries) async {
+  Future<void> saveAll(List<DocumentCompositeEntity> entries) async {
     if (entries.isEmpty) return;
 
     final docs = entries.map((e) => e.doc);
     final authors = entries.map((e) => e.authors).flattened;
+    final parameters = entries.map((e) => e.parameters).flattened;
+    final collaborators = entries.map((e) => e.collaborators).flattened;
 
     await batch((batch) {
       batch.insertAll(
@@ -301,6 +307,20 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         batch.insertAll(
           documentAuthors,
           authors,
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
+      if (parameters.isNotEmpty) {
+        batch.insertAll(
+          documentParameters,
+          parameters,
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
+      if (collaborators.isNotEmpty) {
+        batch.insertAll(
+          documentCollaborators,
+          collaborators,
           mode: InsertMode.insertOrIgnore,
         );
       }
@@ -422,7 +442,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           ..addColumns([const Constant(1)])
           ..where(documentAuthors.documentId.equalsExp(tbl.id))
           ..where(documentAuthors.documentVer.equalsExp(tbl.ver))
-          ..where(documentAuthors.authorIdSignificant.equals(significant.toUri().toString()));
+          ..where(documentAuthors.accountSignificantId.equals(significant.toUri().toString()));
         return existsQuery(authorQuery);
       });
     }
@@ -469,7 +489,16 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     if (filters != null) {
-      query.where((tbl) => tbl.categoryId.isIn(filters.categoriesIds));
+      query.where((tbl) {
+        final dp = alias(documentParameters, 'dp');
+        return existsQuery(
+          selectOnly(dp)
+            ..addColumns([const Constant(1)])
+            ..where(dp.documentId.equalsExp(tbl.id))
+            ..where(dp.documentVer.equalsExp(tbl.ver))
+            ..where(dp.id.isIn(filters.categoriesIds)),
+        );
+      });
     }
 
     if (latestOnly && id?.ver == null) {

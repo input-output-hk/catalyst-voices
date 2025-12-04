@@ -1,13 +1,16 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:convert/convert.dart' show hex;
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_ref_dto.g.dart';
 
+@immutable
 @JsonSerializable()
 final class DocumentRefDto {
+  /// The separator used for flattened string representation.
+  /// Using '|' to avoid conflicts with UUIDs which contain hyphens.
+  static const _flattenSeparator = '|';
+
   final String id;
   final String? ver;
   @JsonKey(unknownEnumValue: DocumentRefDtoType.signed)
@@ -18,6 +21,27 @@ final class DocumentRefDto {
     this.ver,
     required this.type,
   });
+
+  factory DocumentRefDto.fromFlatten(String data) {
+    final parts = data.split(_flattenSeparator);
+    if (parts.length != 3) {
+      throw const FormatException('Flatten data does not have 3 parts');
+    }
+
+    final id = parts[0];
+
+    // Convert empty string back to null, otherwise keep the value
+    final ver = parts[1].isEmpty ? null : parts[1];
+
+    final typeName = parts[2];
+    final type = DocumentRefDtoType.values.asNameMap()[typeName];
+
+    if (type == null) {
+      throw FormatException('Unknown type part ($typeName)');
+    }
+
+    return DocumentRefDto(id: id, ver: ver, type: type);
+  }
 
   factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
     final migrated = migrateJson1(json);
@@ -36,6 +60,25 @@ final class DocumentRefDto {
       ver: data.ver,
       type: type,
     );
+  }
+
+  @override
+  int get hashCode => Object.hash(id, ver, type);
+
+  // not using Equatable because it's messing up JsonSerializable with props getter
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DocumentRefDto &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          ver == other.ver &&
+          type == other.type;
+
+  String toFlatten() {
+    // Convert null to empty string to ensure 3 parts exist
+    final verStr = ver ?? '';
+    return '$id$_flattenSeparator$verStr$_flattenSeparator${type.name}';
   }
 
   Map<String, dynamic> toJson() => _$DocumentRefDtoToJson(this);
@@ -65,33 +108,3 @@ final class DocumentRefDto {
 }
 
 enum DocumentRefDtoType { signed, draft }
-
-@JsonSerializable()
-final class SecuredDocumentRefDto {
-  final DocumentRefDto ref;
-  final String hash;
-
-  const SecuredDocumentRefDto({
-    required this.ref,
-    required this.hash,
-  });
-
-  factory SecuredDocumentRefDto.fromJson(Map<String, dynamic> json) {
-    return _$SecuredDocumentRefDtoFromJson(json);
-  }
-
-  SecuredDocumentRefDto.fromModel(SecuredDocumentRef data)
-    : this(
-        ref: DocumentRefDto.fromModel(data.ref),
-        hash: hex.encode(data.hash),
-      );
-
-  Map<String, dynamic> toJson() => _$SecuredDocumentRefDtoToJson(this);
-
-  SecuredDocumentRef toModel() {
-    return SecuredDocumentRef(
-      ref: ref.toModel(),
-      hash: Uint8List.fromList(hexDecode(hash)),
-    );
-  }
-}

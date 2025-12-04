@@ -372,22 +372,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return proposal;
   }
 
-  SignedDocumentMetadata _createProposalMetadata(
-    DocumentDataMetadata metadata,
-  ) {
-    final template = metadata.template;
-    // final categoryId = metadata.categoryId;
-
-    return SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-      documentType: DocumentType.proposalDocument,
-      id: metadata.id.id,
-      ver: metadata.id.ver,
-      template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
-      // categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
-    );
-  }
-
   ProposalPublish? _getProposalPublish({
     required DocumentRef ref,
     required ProposalSubmissionAction? action,
