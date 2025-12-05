@@ -9,6 +9,7 @@ from catalyst_python.admin import AdminKey
 from catalyst_python.ed25519 import Ed25519Keys
 from catalyst_python.signed_doc import (
     SignedDocument,
+    DocumentRef,
     brand_parameters_form_template_doc,
     brand_parameters_doc,
     campaign_parameters_form_template_doc,
@@ -16,7 +17,7 @@ from catalyst_python.signed_doc import (
     category_parameters_form_template_doc,
     category_parameters_doc,
     proposal_form_template_doc,
-    proposal_doc,
+    proposal_comment_form_template_doc
 )
 
 
@@ -33,7 +34,7 @@ def read_json_file(env_dir: Path, file_name: str) -> dict[str, str]:
     with Path(filepath).open("r") as f:
         json_f = json.load(f)
 
-    print(f"Loaded {filepath}:\n{json_f}")
+    print(f"Loaded {filepath}")
     return json_f
 
 
@@ -56,7 +57,7 @@ def publish_document(
             resp.raise_for_status()
             break
         except requests.exceptions.RequestException as e:
-            errmsg = f"failed to send HTTP request: {e}"
+            errmsg = f"failed to send HTTP request: {e}, resp: {resp.text}"
             print(errmsg)
 
             if retry:
@@ -80,53 +81,143 @@ def setup_fund(env: str, retry: bool):
     url = settings["url"]
     timeout = settings["timeout"]
 
-    brand_template = brand_parameters_form_template_doc(
-        read_json_file(env_dir, "brand_parameters_form_template.json"),
-        admin,
-    )
-    publish_document(
-        url=url,
-        timeout=timeout,
-        retry=retry,
-        doc=brand_template,
-        token=admin.auth_token(),
-    )
+    docs_to_publish = []
 
-    brand = brand_parameters_doc(
-        read_json_file(env_dir, "brand_parameters_form_template.json"),
-        brand_template,
-        admin,
+    brand_parameters_form_template_settings = settings["brand"][
+        "parameters_form_template"
+    ]
+    brand_parameters_form_template = brand_parameters_form_template_doc(
+        content=read_json_file(
+            env_dir, brand_parameters_form_template_settings["path"]
+        ),
+        admin_key=admin,
+        id=brand_parameters_form_template_settings["id"],
+        ver=brand_parameters_form_template_settings["ver"],
     )
-    publish_document(
-        url=url, timeout=timeout, retry=retry, doc=brand, token=admin.auth_token()
-    )
+    docs_to_publish.append(brand_parameters_form_template)
 
-    campaign_template = campaign_parameters_form_template_doc(
-        read_json_file(env_dir, "campaign_parameters_form_template.json"),
-        brand,
-        admin,
+    brand_parameters_settings = settings["brand"]["parameters"]
+    brand_parameters = brand_parameters_doc(
+        content=read_json_file(env_dir, brand_parameters_settings["path"]),
+        brand_parameters_form_template_ref=DocumentRef(
+            brand_parameters_form_template_settings["id"],
+            brand_parameters_form_template_settings["ver"],
+        ),
+        admin_key=admin,
+        id=brand_parameters_settings["id"],
+        ver=brand_parameters_settings["ver"],
     )
-    publish_document(
-        url=url,
-        timeout=timeout,
-        retry=retry,
-        doc=campaign_template,
-        token=admin.auth_token(),
-    )
+    docs_to_publish.append(brand_parameters)
 
-    campaign = campaign_parameters_doc(
-        read_json_file(env_dir, "campaign_parameters.json"),
-        campaign_template,
-        brand,
-        admin,
-    )
-    publish_document(
-        url=url,
-        timeout=timeout,
-        retry=retry,
-        doc=campaign,
-        token=admin.auth_token(),
-    )
+
+    for campaing in settings["brand"]["campaigns"]:
+        campaing_parameters_form_template_settings = campaing["parameters_form_template"]
+        campaing_parameters_form_template = campaign_parameters_form_template_doc(
+            content=read_json_file(
+                env_dir, campaing_parameters_form_template_settings["path"]
+            ),
+            param_ref=DocumentRef(
+                brand_parameters_settings["id"],
+                brand_parameters_settings["ver"],
+            ),
+            admin_key=admin,
+            id=campaing_parameters_form_template_settings["id"],
+            ver=campaing_parameters_form_template_settings["ver"],
+        )
+        docs_to_publish.append(campaing_parameters_form_template)
+
+
+        campaing_parameters_settings = campaing["parameters"]
+        campaing_parameters = campaign_parameters_doc(
+            content=read_json_file(env_dir, campaing_parameters_settings["path"]),
+            campaign_parameters_form_template_doc=DocumentRef(
+                campaing_parameters_form_template_settings["id"],
+                campaing_parameters_form_template_settings["ver"],
+            ),
+            param_ref=DocumentRef(
+                brand_parameters_settings["id"],
+                brand_parameters_settings["ver"],
+            ),
+            admin_key=admin,
+            id=campaing_parameters_settings["id"],
+            ver=campaing_parameters_settings["ver"],
+        )
+        docs_to_publish.append(campaing_parameters)
+
+        for category in campaing["categories"]:
+            category_parameters_form_template_settings = category["parameters_form_template"]
+            category_parameters_form_template = category_parameters_form_template_doc(
+                content=read_json_file(
+                    env_dir, category_parameters_form_template_settings["path"]
+                ),
+                param_ref=DocumentRef(
+                    campaing_parameters_settings["id"],
+                    campaing_parameters_settings["ver"],
+                ),
+                admin_key=admin,
+                id=category_parameters_form_template_settings["id"],
+                ver=category_parameters_form_template_settings["ver"],
+            )
+            docs_to_publish.append(category_parameters_form_template)
+
+            category_parameters_settings = category["parameters"]
+            category_parameters = category_parameters_doc(
+                content=read_json_file(env_dir, category_parameters_settings["path"]),
+                category_parameters_form_template_doc=DocumentRef(
+                    category_parameters_form_template_settings["id"],
+                    category_parameters_form_template_settings["ver"],
+                ),
+                param_ref=DocumentRef(
+                    campaing_parameters_settings["id"],
+                    campaing_parameters_settings["ver"],
+                ),
+                admin_key=admin,
+                id=category_parameters_settings["id"],
+                ver=category_parameters_settings["ver"],
+            )
+            docs_to_publish.append(category_parameters)
+
+            proposal_form_template_settings = category["proposal_form_template"]
+            proposal_form_template = proposal_form_template_doc(
+                content=read_json_file(
+                    env_dir, proposal_form_template_settings["path"]
+                ),
+                param_ref=DocumentRef(
+                    category_parameters_settings["id"],
+                    category_parameters_settings["ver"],
+                ),
+                admin_key=admin,
+                id=proposal_form_template_settings["id"],
+                ver=proposal_form_template_settings["ver"],
+            )
+            docs_to_publish.append(proposal_form_template)
+
+            proposal_comment_form_template_settings = category["proposal_comment_form_template"]
+            proposal_comment_form_template = proposal_comment_form_template_doc(
+                content=read_json_file(
+                    env_dir, proposal_comment_form_template_settings["path"]
+                ),
+                param_ref=DocumentRef(
+                    category_parameters_settings["id"],
+                    category_parameters_settings["ver"],
+                ),
+                admin_key=admin,
+                id=proposal_comment_form_template_settings["id"],
+                ver=proposal_comment_form_template_settings["ver"],
+            )
+            docs_to_publish.append(proposal_comment_form_template)
+
+
+
+
+    for doc in docs_to_publish:
+        publish_document(
+            url=url,
+            timeout=timeout,
+            retry=retry,
+            doc=doc,
+            token=admin.auth_token(),
+        )
 
 
 parser = argparse.ArgumentParser(description="Catalyst Signed Document importer.")

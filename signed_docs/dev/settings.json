@@ -2,5 +2,55 @@
   "url": "http://100.76.226.39:3030/api/v1/document",
   "timeout": 10,
   "network": "preprod",
-  "admin_private_key_env": "CAT_GATEWAY_ADMIN_PRIVATE_KEY"
+  "admin_private_key_env": "CAT_GATEWAY_ADMIN_PRIVATE_KEY",
+  "brand": {
+    "parameters_form_template": {
+      "id": "019aed47-c956-709d-a26d-acd4e9537988",
+      "ver": "019aed47-c956-709d-a26d-acd4e9537988",
+      "path": "brand_parameters_form_template.json"
+    },
+    "parameters": {
+      "id": "019aed47-c956-7924-93f3-46015cc1306c",
+      "ver": "019aed47-c956-7924-93f3-46015cc1306c",
+      "path": "brand_parameters.json"
+    },
+    "campaigns": [
+      {
+        "parameters_form_template": {
+          "id": "019aed47-c956-7d9d-abfe-de80b2694db5",
+          "ver": "019aed47-c956-7d9d-abfe-de80b2694db5",
+          "path": "campaign_parameters_form_template.json"
+        },
+        "parameters": {
+          "id": "019aed47-c956-790f-a053-139bf05e6475",
+          "ver": "019aed47-c956-790f-a053-139bf05e6475",
+          "path": "campaign_parameters.json"
+        },
+        "categories": [
+          {
+            "parameters_form_template": {
+              "id": "019aed47-c956-7438-9661-2c915705379c",
+              "ver": "019aed47-c956-7438-9661-2c915705379c",
+              "path": "categories/category_parameters_form_template_1.json"
+            },
+            "parameters": {
+              "id": "019aed47-c956-70ae-ae73-6fd128b34508",
+              "ver": "019aed47-c956-70ae-ae73-6fd128b34508",
+              "path": "categories/category_parameters_1.json"
+            },
+            "proposal_form_template": {
+              "id": "019aed47-c956-7470-87e9-848967bc21ca",
+              "ver": "019aed47-c956-7470-87e9-848967bc21ca",
+              "path": "categories/proposal_form_template_1.json"
+            },
+            "proposal_comment_form_template": {
+              "id": "019aed47-c956-7630-8359-8b603c64b373",
+              "ver": "019aed47-c956-7630-8359-8b603c64b373",
+              "path": "categories/proposal_comment_form_template_1.json"
+            }
+          }
+        ]
+      }
+    ]
+  }
 }
