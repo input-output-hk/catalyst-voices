@@ -91,8 +91,8 @@ def setup_fund(env: str, retry: bool):
             env_dir, brand_parameters_form_template_settings["path"]
         ),
         admin_key=admin,
-        id=brand_parameters_form_template_settings["id"],
-        ver=brand_parameters_form_template_settings["ver"],
+        doc_id=brand_parameters_form_template_settings["id"],
+        doc_ver=brand_parameters_form_template_settings["ver"],
     )
     docs_to_publish.append(brand_parameters_form_template)
 
@@ -104,8 +104,8 @@ def setup_fund(env: str, retry: bool):
             brand_parameters_form_template_settings["ver"],
         ),
         admin_key=admin,
-        id=brand_parameters_settings["id"],
-        ver=brand_parameters_settings["ver"],
+        doc_id=brand_parameters_settings["id"],
+        doc_ver=brand_parameters_settings["ver"],
     )
     docs_to_publish.append(brand_parameters)
 
@@ -121,8 +121,8 @@ def setup_fund(env: str, retry: bool):
                 brand_parameters_settings["ver"],
             ),
             admin_key=admin,
-            id=campaing_parameters_form_template_settings["id"],
-            ver=campaing_parameters_form_template_settings["ver"],
+            doc_id=campaing_parameters_form_template_settings["id"],
+            doc_ver=campaing_parameters_form_template_settings["ver"],
         )
         docs_to_publish.append(campaing_parameters_form_template)
 
@@ -139,8 +139,8 @@ def setup_fund(env: str, retry: bool):
                 brand_parameters_settings["ver"],
             ),
             admin_key=admin,
-            id=campaing_parameters_settings["id"],
-            ver=campaing_parameters_settings["ver"],
+            doc_id=campaing_parameters_settings["id"],
+            doc_ver=campaing_parameters_settings["ver"],
         )
         docs_to_publish.append(campaing_parameters)
 
@@ -155,8 +155,8 @@ def setup_fund(env: str, retry: bool):
                     campaing_parameters_settings["ver"],
                 ),
                 admin_key=admin,
-                id=category_parameters_form_template_settings["id"],
-                ver=category_parameters_form_template_settings["ver"],
+                doc_id=category_parameters_form_template_settings["id"],
+                doc_ver=category_parameters_form_template_settings["ver"],
             )
             docs_to_publish.append(category_parameters_form_template)
 
@@ -172,8 +172,8 @@ def setup_fund(env: str, retry: bool):
                     campaing_parameters_settings["ver"],
                 ),
                 admin_key=admin,
-                id=category_parameters_settings["id"],
-                ver=category_parameters_settings["ver"],
+                doc_id=category_parameters_settings["id"],
+                doc_ver=category_parameters_settings["ver"],
             )
             docs_to_publish.append(category_parameters)
 
@@ -187,8 +187,8 @@ def setup_fund(env: str, retry: bool):
                     category_parameters_settings["ver"],
                 ),
                 admin_key=admin,
-                id=proposal_form_template_settings["id"],
-                ver=proposal_form_template_settings["ver"],
+                doc_id=proposal_form_template_settings["id"],
+                doc_ver=proposal_form_template_settings["ver"],
             )
             docs_to_publish.append(proposal_form_template)
 
@@ -202,8 +202,8 @@ def setup_fund(env: str, retry: bool):
                     category_parameters_settings["ver"],
                 ),
                 admin_key=admin,
-                id=proposal_comment_form_template_settings["id"],
-                ver=proposal_comment_form_template_settings["ver"],
+                doc_id=proposal_comment_form_template_settings["id"],
+                doc_ver=proposal_comment_form_template_settings["ver"],
             )
             docs_to_publish.append(proposal_comment_form_template)
 
