@@ -2646,6 +2646,66 @@
         ]
       }
     },
+    "/api/catalyst-ids": {
+      "get": {
+        "tags": [
+          "catalyst ids"
+        ],
+        "summary": "Catalyst-Ids:Lookup-By-Id",
+        "description": "Lookup a catalyst id and check if it's active.",
+        "operationId": "catalyst_ids_lookup_by_id_api_catalyst_ids_get",
+        "parameters": [
+          {
+            "name": "lookup",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lookup",
+              "description": "The catalyst ID to lookup"
+            },
+            "description": "The catalyst ID to lookup"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalystIDLookupResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Catalyst ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/catalyst-ids/me": {
       "get": {
         "tags": [
@@ -3534,6 +3594,27 @@
         "type": "object",
         "title": "CatalystIDPublic",
         "description": "Model for the CatalystID to expose publicly."
+      },
+      "CatalystIDLookupResponse": {
+        "properties": {
+          "catalyst_id": {
+            "type": "string",
+            "title": "Catalyst Id",
+            "description": "The catalyst ID"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active",
+            "description": "True when status is email_verified or active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "catalyst_id",
+          "active"
+        ],
+        "title": "CatalystIDLookupResponse",
+        "description": "Response model for catalyst ID lookup."
       },
       "CatalystIDStatus": {
         "type": "integer",

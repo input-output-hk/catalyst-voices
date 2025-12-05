@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -117,7 +115,7 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
-  Future<bool> validateForCollaborator(CatalystId id);
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId id);
 
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
@@ -411,11 +409,18 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<bool> validateForCollaborator(CatalystId id) async {
-    // TODO(LynxLynxx): Add implementation
-    return Future.delayed(const Duration(seconds: 1), () {
-      return Random().nextBool();
-    });
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId catalystId) async {
+    final (isProposer, isVerified) = await (
+      _userService.validateCatalystIdForProposerRole(catalystId: catalystId),
+      _userService.isPubliclyVerified(catalystId: catalystId),
+    ).wait;
+
+    return switch ((isProposer, isVerified)) {
+      (true, true) => const ValidCollaborator(),
+      (true, false) => const NotVerifiedProfile(),
+      (false, true) => const MissingProposerRole(),
+      (false, false) => const NotProposerAndNotVerified(),
+    };
   }
 
   @override
