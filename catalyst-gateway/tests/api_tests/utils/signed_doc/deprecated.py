@@ -1,18 +1,18 @@
-from typing import Dict, Any
 import os
 import subprocess
 import json
-from utils import signed_doc, uuid_v7
 from tempfile import NamedTemporaryFile
-from utils.rbac_chain import RoleID
-from utils.ed25519 import Ed25519Keys
 
-class SignedDocumentV1(signed_doc.SignedDocumentBase):
+from catalyst_python.catalyst_id import RoleID
+from catalyst_python.uuid import uuid_v7
+from catalyst_python.signed_doc import SignedDocumentBase
+from catalyst_python.ed25519 import Ed25519Keys
+
+
+class SignedDocumentV1(SignedDocumentBase):
     # Build and sign document, returns hex str of document bytes
     def build_and_sign(
         self,
-        cat_id: str,
-        key: Ed25519Keys,
     ) -> str:
         with (
             NamedTemporaryFile() as metadata_file,
@@ -44,8 +44,8 @@ class SignedDocumentV1(signed_doc.SignedDocumentBase):
                     mk_signed_doc_path,
                     "sign",
                     signed_doc_file.name,
-                    key.sk_hex,
-                    cat_id,
+                    self.key.sk_hex,
+                    self.cat_id,
                 ],
                 capture_output=True,
             )
@@ -61,7 +61,7 @@ class SignedDocumentV1(signed_doc.SignedDocumentBase):
 
 def proposal(rbac_chain):
     role_id = RoleID.PROPOSER
-    proposal_doc_id = uuid_v7.uuid_v7()
+    proposal_doc_id = uuid_v7()
     proposal_metadata_json = {
         "id": proposal_doc_id,
         "ver": proposal_doc_id,
@@ -83,14 +83,14 @@ def proposal(rbac_chain):
     with open("./test_data/signed_docs/proposal.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocumentV1(proposal_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex), proposal_doc_id)
+    doc = SignedDocumentV1(proposal_metadata_json, content, cat_id, sk_hex)
+    return (doc.build_and_sign(), proposal_doc_id)
 
 
 def comment(rbac_chain, proposal_id):
     role_id = RoleID.ROLE_0
-    comment_doc_id = uuid_v7.uuid_v7()
+    comment_doc_id = uuid_v7()
     comment_metadata_json = {
         "id": comment_doc_id,
         "ver": comment_doc_id,
@@ -111,14 +111,14 @@ def comment(rbac_chain, proposal_id):
     with open("./test_data/signed_docs/comment.deprecated.json", "r") as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocumentV1(comment_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex), comment_doc_id)
+    doc = SignedDocumentV1(comment_metadata_json, content, cat_id, sk_hex)
+    return (doc.build_and_sign(), comment_doc_id)
 
 
 def proposal_submission(rbac_chain, proposal_id):
     role_id = RoleID.PROPOSER
-    submission_action_id = uuid_v7.uuid_v7()
+    submission_action_id = uuid_v7()
     sub_action_metadata_json = {
         "id": submission_action_id,
         "ver": submission_action_id,
@@ -131,12 +131,14 @@ def proposal_submission(rbac_chain, proposal_id):
             "ver": proposal_id,
         },
     }
-    with open("./test_data/signed_docs/submission_action.deprecated.json", "r") as json_file:
+    with open(
+        "./test_data/signed_docs/submission_action.deprecated.json", "r"
+    ) as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocumentV1(sub_action_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+    doc = SignedDocumentV1(sub_action_metadata_json, content, cat_id, sk_hex)
     return (
-        doc.build_and_sign(cat_id, sk_hex),
+        doc.build_and_sign(),
         submission_action_id,
     )

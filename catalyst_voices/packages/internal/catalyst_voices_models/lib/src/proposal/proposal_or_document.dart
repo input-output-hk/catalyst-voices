@@ -8,7 +8,8 @@ import 'package:equatable/equatable.dart';
 /// specific template (`DocumentData`).
 ///
 /// This class provides a unified interface to access common properties
-/// like [title], [author], [description], etc., regardless of the
+///
+/// like [title], [description], etc., regardless of the
 /// underlying data type.
 ///
 /// It's useful when dealing with list of proposals and some of them may not have templates
@@ -22,16 +23,15 @@ sealed class ProposalOrDocument extends Equatable {
   /// Creates a [ProposalOrDocument] from a structured [ProposalDocument].
   const factory ProposalOrDocument.proposal(ProposalDocument data) = _Proposal;
 
-  /// The id of the proposal's author.
-  CatalystId? get author;
-
   // TODO(damian-molinski): Category name should come from query but atm those are not documents.
   /// The name of the proposal's category.
   String? get categoryName {
     return Campaign.all
         .map((e) => e.categories)
         .flattened
-        .firstWhereOrNull((category) => category.id == _category)
+        .firstWhereOrNull(
+          (category) => (_parameters ?? const DocumentParameters()).containsId(category.id.id),
+        )
         ?.formattedCategoryName;
   }
 
@@ -55,16 +55,13 @@ sealed class ProposalOrDocument extends Equatable {
 
   /// A private getter for the category reference, used to find the
   /// [categoryName].
-  SignedDocumentRef? get _category;
+  DocumentParameters? get _parameters;
 }
 
 final class _Document extends ProposalOrDocument {
   final DocumentData data;
 
   const _Document(this.data);
-
-  @override
-  CatalystId? get author => data.metadata.authors?.firstOrNull;
 
   @override
   String? get description => ProposalDocument.titleNodeId.from(data.content.data);
@@ -90,16 +87,13 @@ final class _Document extends ProposalOrDocument {
   String get version => data.metadata.id.ver!;
 
   @override
-  SignedDocumentRef? get _category => data.metadata.categoryId;
+  DocumentParameters? get _parameters => data.metadata.parameters;
 }
 
 final class _Proposal extends ProposalOrDocument {
   final ProposalDocument data;
 
   const _Proposal(this.data);
-
-  @override
-  CatalystId? get author => data.authorId;
 
   @override
   String? get description => data.description;
@@ -123,7 +117,7 @@ final class _Proposal extends ProposalOrDocument {
   String get version => data.metadata.id.ver!;
 
   @override
-  SignedDocumentRef? get _category => data.metadata.categoryId;
+  DocumentParameters? get _parameters => data.metadata.parameters;
 }
 
 extension on DocumentNodeId {

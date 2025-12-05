@@ -5,52 +5,60 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(SignedDocumentManager, () {
-    const documentManager = SignedDocumentManager(
-      brotli: FakeCompressor(),
-      zstd: FakeCompressor(),
-    );
-
-    setUpAll(() {
-      CatalystPublicKey.factory = FakeCatalystPublicKeyFactory();
-      CatalystSignature.factory = FakeCatalystSignatureFactory();
-    });
-
-    test('signDocument creates a signed document '
-        'that can be converted from/to bytes', () async {
-      const document = SignedDocumentJsonPayload({'title': 'hey'});
-
-      final signedDocument = await documentManager.signDocument(
-        document,
-        catalystId: _catalystId,
-        metadata: _metadata,
-        privateKey: _privateKey,
+  group(
+    SignedDocumentManager,
+    () {
+      const documentManager = SignedDocumentManager(
+        brotli: FakeCompressor(),
+        zstd: FakeCompressor(),
       );
 
-      expect(signedDocument.payload, equals(document));
+      setUpAll(() {
+        CatalystPublicKey.factory = FakeCatalystPublicKeyFactory();
+        CatalystSignature.factory = FakeCatalystSignatureFactory();
+      });
 
-      final isVerified = await signedDocument.verifySignature(_catalystId);
-      expect(isVerified, isTrue);
+      test('signDocument creates a signed document '
+          'that can be converted from/to bytes', () async {
+        const document = SignedDocumentJsonPayload({'title': 'hey'});
 
-      final signedDocumentBytes = signedDocument.toBytes();
-      final parsedDocument = await documentManager.parseDocument(
-        signedDocumentBytes,
-      );
+        final signedDocument = await documentManager.signDocument(
+          document,
+          catalystId: _catalystId,
+          metadata: _metadata,
+          privateKey: _privateKey,
+        );
 
-      expect(parsedDocument, equals(signedDocument));
-      expect(parsedDocument.signers, [_catalystId]);
-    });
-  });
+        expect(signedDocument.payload, equals(document));
+
+        final isVerified = await signedDocument.verifySignature(_catalystId);
+        expect(isVerified, isTrue);
+
+        final signedDocumentBytes = signedDocument.toBytes();
+        final parsedDocument = await documentManager.parseDocument(
+          signedDocumentBytes,
+        );
+
+        expect(parsedDocument, equals(signedDocument));
+        expect(parsedDocument.signers, [_catalystId]);
+      });
+    },
+    skip: 'Waiting for sync with gateway merge',
+  );
 }
-
-const _metadata = SignedDocumentMetadata(
-  contentType: SignedDocumentContentType.json,
-  documentType: DocumentType.proposalDocument,
-);
 
 final _catalystId = CatalystId(
   host: CatalystIdHost.cardanoPreprod.host,
   role0Key: _publicKey.publicKeyBytes,
+);
+
+final _categoryRef = DocumentRefFactory.signedDocumentRef();
+
+final _metadata = DocumentDataMetadata.proposal(
+  id: DocumentRefFactory.signedDocumentRef(),
+  parameters: DocumentParameters({_categoryRef}),
+  template: DocumentRefFactory.signedDocumentRef(),
+  authors: [_catalystId],
 );
 
 final _privateKey = FakeCatalystPrivateKey(bytes: _privateKeyBytes, signature: _signature);

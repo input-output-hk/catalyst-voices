@@ -124,8 +124,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       ) = await (
         _isReadOnlyMode(),
         _campaignService.getActiveCampaign(),
-        _campaignService.getCategory(proposal.document.metadata.categoryId),
-        _commentService.getCommentTemplateFor(category: proposal.document.metadata.categoryId),
+        _campaignService.getCategory(proposal.document.metadata.parameters.set.first),
+        _commentService.getCommentTemplateFor(
+          category: proposal.document.metadata.parameters.set.first,
+        ),
         _documentsService.isFavorite(ref),
         _getCollaboratorInvitation(proposalCollaborators, _cache.activeAccountId),
       ).wait;
@@ -224,7 +226,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     SignedDocumentRef? reply,
   }) async {
     final proposalRef = _cache.ref;
-    final proposalCategoryId = _cache.proposal?.document.metadata.categoryId;
+    final proposalCategoryId = _cache.proposal?.document.metadata.parameters.set.first;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
     assert(
       proposalRef is SignedDocumentRef,
@@ -246,7 +248,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: proposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: reply,
-        categoryId: proposalCategoryId,
+        parameters: DocumentParameters({?proposalCategoryId}),
         authorId: activeAccountId!,
       ),
       document: document,

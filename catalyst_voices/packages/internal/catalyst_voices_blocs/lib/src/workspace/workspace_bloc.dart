@@ -89,15 +89,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
-    final id = document.metadata.id;
-    final categoryId = document.metadata.categoryId;
-    final templateRef = document.metadata.templateRef;
-
-    return DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
-      id: id,
-      template: templateRef,
-      categoryId: categoryId,
+    return DocumentDataMetadata.proposal(
+      id: document.metadata.id,
+      template: document.metadata.templateRef,
+      parameters: document.metadata.parameters,
+      authors: document.metadata.authors,
     );
   }
 
@@ -105,7 +101,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     // TODO(damian-molinski): AllProposals should be either where activeAccountId == author OR activeAccountId is a collaborator
     return switch (tab) {
       WorkspacePageTab.proposals => ProposalsFiltersV2(
-        author: _cache.workspaceFilter.isAllProposals || _cache.workspaceFilter.isMainProposer
+        originalAuthor:
+            _cache.workspaceFilter.isAllProposals || _cache.workspaceFilter.isMainProposer
             ? _cache.activeAccountId
             : null,
         collaboration: ProposalsCollaborationFilters(

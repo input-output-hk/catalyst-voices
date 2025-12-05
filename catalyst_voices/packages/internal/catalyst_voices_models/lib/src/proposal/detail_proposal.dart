@@ -37,7 +37,7 @@ final class DetailProposal extends CoreProposal {
   ) {
     return DetailProposal(
       id: data.document.metadata.id,
-      categoryRef: data.document.metadata.categoryId,
+      categoryRef: data.document.metadata.parameters.set.first,
       title: data.document.title ?? '',
       description: data.document.description ?? '',
       fundsRequested: data.document.fundsRequested ?? Money.zero(currency: Currencies.fallback),

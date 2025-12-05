@@ -1,9 +1,12 @@
 import json
 from loguru import logger
 import pytest
-from utils import health, address, sync
-from api import cat_gateway_endpoint_url
+from utils import health, sync
 import requests
+
+from api import cat_gateway_endpoint_url
+from catalyst_python.address import stake_public_key_to_address
+
 
 def check_delegations(provided, expected):
     if type(expected) is list:
@@ -20,7 +23,8 @@ def check_delegations(provided, expected):
     else:
         assert provided["voting_key"] == expected
 
-@pytest.mark.skip('To be refactored when the api is ready')
+
+@pytest.mark.skip("To be refactored when the api is ready")
 def test_voter_registration_endpoint():
     health.is_live()
     health.is_ready()
@@ -36,7 +40,7 @@ def test_voter_registration_endpoint():
     for entry in snapshot_tool_data:
         expected_rewards_address = entry["rewards_address"]
         expected_nonce = entry["nonce"]
-        stake_address = address.stake_public_key_to_address(
+        stake_address = stake_public_key_to_address(
             key=entry["stake_public_key"][2:], is_stake=True, network_type=network
         )
         res = get_voter_registration(
@@ -51,6 +55,7 @@ def test_voter_registration_endpoint():
             and res["nonce"] == expected_nonce
         )
         check_delegations(res["voting_info"], entry["delegations"])
+
 
 def get_voter_registration(address: str, network: str, slot_number: int):
     resp = requests.get(

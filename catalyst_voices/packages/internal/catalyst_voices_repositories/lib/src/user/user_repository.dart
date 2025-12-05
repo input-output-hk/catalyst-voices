@@ -27,6 +27,11 @@ abstract interface class UserRepository {
 
   Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId});
 
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  });
+
   Future<User> getUser();
 
   Future<VotingPower> getVotingPower();
@@ -40,11 +45,6 @@ abstract interface class UserRepository {
   Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  });
-
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
   });
 
   Future<void> saveUser(User user);
@@ -86,6 +86,29 @@ final class UserRepositoryImpl implements UserRepository {
     return _apiServices.gateway
         .apiV1RbacRegistrationGet(lookup: catalystId?.toUri().toStringWithoutScheme())
         .successBodyOrThrow();
+  }
+
+  @override
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  }) async {
+    final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
+
+    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
+    final username =
+        publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
+    final votingPower = await _getVotingPower(token: rbacToken);
+
+    return RecoverableAccount(
+      username: username,
+      email: publicProfile?.email,
+      roles: rbacRegistration.accountRoles,
+      stakeAddress: rbacRegistration.stakeAddress,
+      publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
+      votingPower: votingPower,
+      isPersistent: rbacRegistration.lastPersistentTxn != null,
+    );
   }
 
   @override
@@ -136,29 +159,6 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
-  }) async {
-    final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
-
-    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
-    final username =
-        publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
-    final votingPower = await _getVotingPower(token: rbacToken);
-
-    return RecoveredAccount(
-      username: username,
-      email: publicProfile?.email,
-      roles: rbacRegistration.accountRoles,
-      stakeAddress: rbacRegistration.stakeAddress,
-      publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
-      votingPower: votingPower,
-      isPersistent: rbacRegistration.lastPersistentTxn != null,
-    );
-  }
-
-  @override
   Future<void> saveUser(User user) {
     final dto = UserDto.fromModel(user);
 
@@ -188,7 +188,7 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
   }) {
     return _documentRepository
-        .getLatestDocument(authorId: catalystId.toSignificant())
+        .getLatestDocument(originalAuthorId: catalystId.toSignificant())
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {

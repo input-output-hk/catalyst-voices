@@ -18,6 +18,9 @@ abstract interface class UserService implements ActiveAware {
     RegistrationStatusPoller registrationStatusPoller,
   ) = UserServiceImpl;
 
+  /// Returns the active account's id from the current [user].
+  CatalystId get activeAccountId;
+
   User get user;
 
   /// Returns [Account] when keychain is unlocked, otherwise returns `null`.
@@ -33,6 +36,15 @@ abstract interface class UserService implements ActiveAware {
   /// The method returns the last known transaction ID.
   Future<TransactionHash> getPreviousRegistrationTransactionId();
 
+  /// Fetches info about recovered account.
+  ///
+  /// This does not recover the account,
+  /// it only does the lookup if there's an account to recover.
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  });
+
   /// Simple [User] getter.
   Future<User> getUser();
 
@@ -41,14 +53,8 @@ abstract interface class UserService implements ActiveAware {
 
   Future<bool> isPubliclyVerified({required CatalystId catalystId});
 
-  /// Fetches info about recovered account.
-  ///
-  /// This does not recover the account,
-  /// it only does the lookup if there's an account to recover.
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
-  });
+  /// Similar to [useAccount] but also removes all other existing accounts.
+  Future<void> recoverAccount(Account account);
 
   /// Refreshes the active account with the latest profile from the server.
   Future<void> refreshActiveAccountProfile();
@@ -115,6 +121,18 @@ final class UserServiceImpl implements UserService {
   );
 
   @override
+  CatalystId get activeAccountId {
+    final account = user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain activeAccountId , account missing',
+      );
+    }
+
+    return account.catalystId;
+  }
+
+  @override
   bool get isActive => _userObserver.isActive;
 
   @override
@@ -150,6 +168,17 @@ final class UserServiceImpl implements UserService {
 
     return _userRepository.getPreviousRegistrationTransactionId(
       catalystId: activeAccount.catalystId,
+    );
+  }
+
+  @override
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  }) {
+    return _userRepository.getRecoverableAccount(
+      catalystId: catalystId,
+      rbacToken: rbacToken,
     );
   }
 
@@ -202,14 +231,17 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
-  }) {
-    return _userRepository.recoverAccount(
-      catalystId: catalystId,
-      rbacToken: rbacToken,
-    );
+  Future<void> recoverAccount(Account account) async {
+    var user = await getUser();
+
+    for (final existingAccount in user.accounts) {
+      await existingAccount.keychain.erase();
+    }
+
+    user = user.copyWith(accounts: [account]);
+    user = user.useAccount(id: account.catalystId);
+
+    await _updateUser(user);
   }
 
   @override
