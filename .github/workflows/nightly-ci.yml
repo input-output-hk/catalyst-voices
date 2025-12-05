@@ -137,12 +137,12 @@ jobs:
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Prepare artifacts
-        id: images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+all-images
+#      - name: Prepare artifacts
+#        id: images
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+#        with:
+#          command: run
+#          args: ./catalyst-gateway/tests/+all-images
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.1
@@ -157,7 +157,7 @@ jobs:
           args: ./catalyst-gateway/tests/+images-devnet
 
       - name: Spin up devnet
-        if: ${{ steps.images.conclusion == 'success' }}
+        if: ${{ steps.images-devnet.conclusion == 'success' }}
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 
@@ -178,7 +178,6 @@ jobs:
             if [ "$STATUS" == "starting" ]; then
               echo "Container became unhealthy."
               docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
-              docker compose stop cat-devnet
               echo "devnet-healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
               break
             fi
