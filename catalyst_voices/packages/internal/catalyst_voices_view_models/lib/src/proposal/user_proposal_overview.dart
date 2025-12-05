@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 final class UsersProposalOverview extends Equatable {
   final DocumentRef id;
+  final CatalystId? author;
   final String title;
   final DateTime updateDate;
   final Money fundsRequested;
@@ -19,6 +20,7 @@ final class UsersProposalOverview extends Equatable {
 
   const UsersProposalOverview({
     required this.id,
+    this.author,
     required this.title,
     required this.updateDate,
     required this.fundsRequested,
@@ -45,6 +47,7 @@ final class UsersProposalOverview extends Equatable {
 
     return UsersProposalOverview(
       id: proposalData.id,
+      author: proposalData.author,
       title: proposalData.title,
       updateDate: proposalData.updateDate,
       fundsRequested: proposalData.fundsRequested,
@@ -64,6 +67,27 @@ final class UsersProposalOverview extends Equatable {
     );
   }
 
+  /// Returns a list of all contributors associated with the proposal,
+  /// including the main author (if specified) and all other collaborators.
+  ///
+  /// The **main proposer** (determined by the `author` field) is placed at the
+  /// beginning of the list, followed by the explicit list of `collaborators`.
+  ///
+  /// If the `collaborators` list is empty, an empty list is returned, even if
+  /// an `author` is present.
+  List<Collaborator> get contributors {
+    final mainProposer = author != null
+        ? Collaborator(catalystId: author!, status: ProposalsCollaborationStatus.mainProposer)
+        : null;
+
+    if (collaborators.isEmpty) return [];
+
+    return [
+      ?mainProposer,
+      ...collaborators,
+    ];
+  }
+
   bool get hasNewerLocalIteration {
     if (versions.isEmpty) return false;
     return versions.any((version) => version.isLatestLocal) && !publish.isLocal;
@@ -72,6 +96,7 @@ final class UsersProposalOverview extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    author,
     title,
     updateDate,
     fundsRequested,
@@ -87,6 +112,7 @@ final class UsersProposalOverview extends Equatable {
 
   UsersProposalOverview copyWith({
     DocumentRef? id,
+    Optional<CatalystId>? author,
     String? title,
     DateTime? updateDate,
     Money? fundsRequested,
@@ -103,6 +129,7 @@ final class UsersProposalOverview extends Equatable {
   }) {
     return UsersProposalOverview(
       id: id ?? this.id,
+      author: author.dataOr(this.author),
       title: title ?? this.title,
       updateDate: updateDate ?? this.updateDate,
       fundsRequested: fundsRequested ?? this.fundsRequested,
