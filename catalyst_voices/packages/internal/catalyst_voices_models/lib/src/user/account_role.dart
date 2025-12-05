@@ -54,7 +54,7 @@ enum AccountRole {
     return values.firstWhereOrNull((e) => e.registrationOffset == registrationOffset);
   }
 
-  static AccountRole? maybeFromNumber(int? number) {
+  static AccountRole? maybeFromNumber(int number) {
     for (final value in values) {
       if (value.number == number) {
         return value;

@@ -225,7 +225,7 @@ Future<void> _doBootstrapAndRun(
 Future<AppConfig> _getAppConfig({
   required AppEnvironmentType env,
 }) async {
-  final api = ApiServices(env: env);
+  final api = ApiServices.dio(env: env);
   final source = ApiConfigSource(api);
   final service = ConfigService(ConfigRepository(source));
   return service.getAppConfig(env: env);

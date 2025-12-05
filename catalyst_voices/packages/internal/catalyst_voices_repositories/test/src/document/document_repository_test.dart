@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../fixture/signed_document/signed_document_test_data.dart';
 import '../../fixture/voices_document_templates.dart';
 import '../database/connection/test_connection.dart';
 import '../database/drift_test_platforms.dart';
@@ -57,13 +58,14 @@ void main() {
 
         final templateRef = SignedDocumentRef.first(DocumentRefFactory.randomUuidV7());
         final template = DocumentDataFactory.build(
-          selfRef: templateRef,
-          type: DocumentType.proposalTemplate,
+          metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
           content: DocumentDataContent(templateData),
         );
         final proposal = DocumentDataFactory.build(
-          selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
-          template: templateRef,
+          metadata: DocumentDataMetadataFactory.proposal(
+            selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
+            template: templateRef,
+          ),
           content: DocumentDataContent(proposalData),
         );
 
@@ -95,8 +97,9 @@ void main() {
         // Given
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final proposal = DocumentDataFactory.build(
-          selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
-          template: templateRef,
+          metadata: DocumentDataMetadataFactory.proposal(
+            template: templateRef,
+          ),
         );
 
         when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
@@ -130,7 +133,9 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-            selfRef: SignedDocumentRef(id: id, version: version),
+            metadata: DocumentDataMetadataFactory.proposal(
+              selfRef: SignedDocumentRef(id: id, version: version),
+            ),
           );
 
           final ref = documentData.ref;
@@ -155,7 +160,9 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-            selfRef: SignedDocumentRef(id: id, version: version),
+            metadata: DocumentDataMetadataFactory.proposal(
+              selfRef: SignedDocumentRef(id: id, version: version),
+            ),
           );
 
           final ref = SignedDocumentRef(id: id);
@@ -185,10 +192,11 @@ void main() {
           // Given
           final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
-            type: DocumentType.proposalTemplate,
-            selfRef: templateRef,
+            metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
           );
-          final proposal = DocumentDataFactory.build(template: templateRef);
+          final proposal = DocumentDataFactory.build(
+            metadata: DocumentDataMetadataFactory.proposal(template: templateRef),
+          );
 
           when(
             () => remoteDocuments.get(ref: template.ref),
@@ -228,11 +236,16 @@ void main() {
           // Given
           final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
-            type: DocumentType.proposalTemplate,
-            selfRef: templateRef,
+            metadata: DocumentDataMetadataFactory.proposalTemplate(
+              selfRef: templateRef,
+            ),
           );
-          final proposal1 = DocumentDataFactory.build(template: templateRef);
-          final proposal2 = DocumentDataFactory.build(template: templateRef);
+          final proposal1 = DocumentDataFactory.build(
+            metadata: DocumentDataMetadataFactory.proposal(template: templateRef),
+          );
+          final proposal2 = DocumentDataFactory.build(
+            metadata: DocumentDataMetadataFactory.proposal(template: templateRef),
+          );
 
           when(
             () => remoteDocuments.get(ref: template.ref),
@@ -276,7 +289,9 @@ void main() {
         () async {
           // Given
           final documentDataToSave = DocumentDataFactory.build(
-            selfRef: DocumentRefFactory.draftRef(),
+            metadata: DocumentDataMetadataFactory.proposal(
+              selfRef: DocumentRefFactory.draftRef(),
+            ),
           );
 
           // When
@@ -393,9 +408,10 @@ void main() {
           final constTemplatesRefs = activeConstantDocumentRefs
               .expand(
                 (element) => [
-                  element.proposal.toTyped(DocumentType.proposalTemplate),
+                  element.proposal?.toTyped(DocumentType.proposalTemplate),
                 ],
               )
+              .nonNulls
               .toList();
 
           final docsRefs = List.generate(
@@ -510,19 +526,22 @@ void main() {
 
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
-          selfRef: templateRef,
-          type: DocumentType.proposalTemplate,
+          metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
         );
 
         final draftRef = DocumentRefFactory.draftRef();
         final draftData = DocumentDataFactory.build(
-          selfRef: draftRef,
-          template: templateRef,
+          metadata: DocumentDataMetadataFactory.proposal(
+            selfRef: draftRef,
+            template: templateRef,
+          ),
         );
 
         final updatedData = DocumentDataFactory.build(
-          selfRef: draftRef,
-          template: templateRef,
+          metadata: DocumentDataMetadataFactory.proposal(
+            selfRef: draftRef,
+            template: templateRef,
+          ),
           content: updatedContent,
         );
 
@@ -558,16 +577,16 @@ void main() {
       () async {
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
-          selfRef: templateRef,
-          type: DocumentType.proposalTemplate,
+          metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
         );
 
         const publicDraftContent = DocumentDataContent({'title': 'My proposal'});
         final publicDraftRef = DocumentRefFactory.signedDocumentRef();
         final publicDraftData = DocumentDataFactory.build(
-          selfRef: publicDraftRef,
-          template: templateRef,
-          categoryId: DocumentRefFactory.signedDocumentRef(),
+          metadata: DocumentDataMetadataFactory.proposal(
+            selfRef: publicDraftRef,
+            template: templateRef,
+          ),
           content: publicDraftContent,
         );
 
@@ -593,6 +612,24 @@ void main() {
       },
       onPlatform: driftOnPlatforms,
     );
+
+    test('parseDocumentForImport exported with v0.0.1 signed document spec', () async {
+      final bytes = await SignedDocumentTestData.exportedProposalV0_0_1Bytes;
+      final document = await repository.parseDocumentForImport(data: bytes);
+
+      expect(document.metadata.type, equals(DocumentType.proposalDocument));
+      expect(document.metadata.template, isNotNull);
+      expect(document.metadata.parameters, isNotEmpty);
+    });
+
+    test('parseDocumentForImport exported with v0.0.4 signed document spec', () async {
+      final bytes = await SignedDocumentTestData.exportedProposalV0_0_4Bytes;
+      final document = await repository.parseDocumentForImport(data: bytes);
+
+      expect(document.metadata.type, equals(DocumentType.proposalDocument));
+      expect(document.metadata.template, isNotNull);
+      expect(document.metadata.parameters, isNotEmpty);
+    });
   });
 }
 

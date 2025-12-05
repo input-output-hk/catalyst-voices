@@ -19,13 +19,14 @@ void main() {
 
     final proposalRef = SignedDocumentRef.generateFirstRef();
     final categoryRef = SignedDocumentRef.generateFirstRef();
+    final authorId = CatalystId(host: 'test', role0Key: Uint8List(32));
 
     final documentData = DocumentData(
-      metadata: DocumentDataMetadata(
-        type: DocumentType.proposalDocument,
+      metadata: DocumentDataMetadata.proposal(
         selfRef: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),
-        categoryId: categoryRef,
+        parameters: DocumentParameters({categoryRef}),
+        authors: [authorId],
       ),
       content: const DocumentDataContent({}),
     );
@@ -73,7 +74,6 @@ void main() {
             categories: [
               CampaignCategory(
                 selfRef: categoryRef,
-                proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',
@@ -128,7 +128,6 @@ void main() {
             categories: [
               CampaignCategory(
                 selfRef: categoryRef,
-                proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',

@@ -32,17 +32,14 @@ class NewProposalCubit extends Cubit<NewProposalState>
       emit(state.copyWith(isCreatingProposal: true));
 
       final title = state.title.value;
-      final categoryId = state.categoryRef;
+      final categoryRef = state.categoryRef;
 
-      if (categoryId == null) {
+      if (categoryRef == null) {
         throw StateError('Cannot create draft, category not selected');
       }
 
-      final category = await _campaignService.getCategory(categoryId);
-      final templateRef = category.proposalTemplateRef;
-      final template = await _proposalService.getProposalTemplate(
-        ref: templateRef,
-      );
+      final template = await _proposalService.getProposalTemplate(category: categoryRef);
+      final parameters = template.metadata.parameters;
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
         ..addChange(
@@ -57,8 +54,8 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       return await _proposalService.createDraftProposal(
         content: documentContent,
-        template: templateRef,
-        categoryId: categoryId,
+        templateRef: template.metadata.selfRef.toSignedDocumentRef(),
+        parameters: parameters,
       );
     } catch (error, stackTrace) {
       _logger.severe('Create draft', error, stackTrace);
@@ -84,16 +81,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
       // right now user can start creating proposal without selecting category.
       // Right now every category have the same requirements for title so we can do a fallback for
       // first category from the list.
-      final templateRef = campaign.categories
-          .cast<CampaignCategory?>()
-          .firstWhere(
-            (e) => e?.selfRef == categoryRef,
-            orElse: () => campaign.categories.firstOrNull,
-          )
-          ?.proposalTemplateRef;
+      categoryRef ??= campaign.categories.firstOrNull?.selfRef;
 
-      final template = templateRef != null
-          ? await _proposalService.getProposalTemplate(ref: templateRef)
+      final template = categoryRef != null
+          ? await _proposalService.getProposalTemplate(category: categoryRef)
           : null;
       final titleRange = template?.title?.strLengthRange;
 
