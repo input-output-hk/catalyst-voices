@@ -127,7 +127,7 @@ export 'user/catalyst_id.dart';
 export 'user/keychain.dart';
 export 'user/preferences.dart';
 export 'user/profile.dart';
-export 'user/recovered_account.dart';
+export 'user/recoverable_account.dart';
 export 'user/user.dart';
 export 'user/user_settings.dart';
 export 'voting/vote.dart';

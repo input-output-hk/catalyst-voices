@@ -31,7 +31,7 @@ final class VaultKeychainProvider implements KeychainProvider {
   @override
   Future<Keychain> create(String id) async {
     try {
-      return _buildKeychain(id);
+      return await _buildKeychain(id);
     } catch (_) {
       await _deleteKeychain(id);
       rethrow;
