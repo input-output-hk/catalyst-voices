@@ -505,38 +505,14 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   ///    - Applies 'Draft' logic (use `latest_proposals.max_ver`).
   ///    - Applies 'Hide' logic (WHERE NOT EXISTS ... 'hide').
   String _getEffectiveProposalsCTE() {
-    return r'''
+    return '''
     latest_proposals AS (
       SELECT id, MAX(ver) as max_ver
       FROM documents_v2
       WHERE type = ?
       GROUP BY id
     ),
-    valid_actions AS (
-      SELECT 
-        action.ver,
-        action.ref_id, 
-        action.ref_ver,
-        action.content
-      FROM documents_v2 action
-      
-      -- 1. GET ACTION SIGNER
-      -- Find the author of the current action document
-      INNER JOIN document_authors action_author 
-        ON action.id = action_author.document_id 
-        AND action.ver = action_author.document_ver
-        
-      -- 2. GET ORIGINAL PROPOSAL AUTHOR
-      INNER JOIN document_authors original_author
-        ON action.ref_id = original_author.document_id
-        AND original_author.document_id = original_author.document_ver
-      WHERE 
-        action.type = ?
-        AND action.ref_id IS NOT NULL 
-        AND action.ref_ver IS NOT NULL
-        -- 3. THE SECURITY CHECK
-        AND action_author.account_significant_id = original_author.account_significant_id
-    ),
+    ${_getValidActionsCTE()},
     latest_actions_ver AS (
       SELECT ref_id, MAX(ver) as max_action_ver
       FROM valid_actions
@@ -546,7 +522,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       SELECT 
         va.ref_id,
         va.ref_ver,
-        COALESCE(json_extract(va.content, '$.action'), 'draft') as action_type
+        COALESCE(json_extract(va.content, '\$.action'), 'draft') as action_type
       FROM valid_actions va
       INNER JOIN latest_actions_ver lav 
         ON va.ref_id = lav.ref_id 
@@ -571,6 +547,37 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         .trim();
   }
 
+  /// Returns the `valid_actions` CTE fragment for reuse across queries.
+  String _getValidActionsCTE() {
+    return '''
+    valid_actions AS (
+      SELECT 
+        action.ver,
+        action.ref_id, 
+        action.ref_ver,
+        action.content
+      FROM documents_v2 action
+      
+      -- 1. GET ACTION SIGNER
+      INNER JOIN document_authors action_author 
+        ON action.id = action_author.document_id 
+        AND action.ver = action_author.document_ver
+        
+      -- 2. GET ORIGINAL PROPOSAL AUTHOR (first version where id == ver)
+      INNER JOIN document_authors original_author
+        ON action.ref_id = original_author.document_id
+        AND original_author.document_id = original_author.document_ver
+      WHERE 
+        action.type = ?
+        AND action.ref_id IS NOT NULL 
+        AND action.ref_ver IS NOT NULL
+        -- 3. SECURITY CHECK: Only original author can submit actions
+        AND action_author.account_significant_id = original_author.account_significant_id
+    )
+    '''
+        .trim();
+  }
+
   /// Internal query to calculate total ask.
   ///
   /// Similar to the main CTE but filters specifically for `effective_final_proposals`.
@@ -583,25 +590,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final query =
         '''
-    WITH valid_actions AS (
-      SELECT 
-        action.ref_id, 
-        action.ver,
-        action.content,
-        action.ref_ver
-      FROM documents_v2 action
-      INNER JOIN document_authors action_author 
-        ON action.id = action_author.document_id 
-        AND action.ver = action_author.document_ver
-      INNER JOIN document_authors original_author
-        ON action.ref_id = original_author.document_id
-        AND original_author.document_id = original_author.document_ver
-      WHERE 
-        action.type = ?
-        AND action.ref_id IS NOT NULL 
-        AND action.ref_ver IS NOT NULL
-        AND action_author.account_significant_id = original_author.account_significant_id
-    ),
+    WITH ${_getValidActionsCTE()},
     latest_actions_ver AS (
       SELECT ref_id, MAX(ver) as max_action_ver
       FROM valid_actions
