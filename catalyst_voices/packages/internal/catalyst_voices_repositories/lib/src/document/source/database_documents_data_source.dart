@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
@@ -75,10 +77,10 @@ final class DatabaseDocumentsDataSource
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
   }) {
     return _database.documentsV2Dao
-        .getDocument(type: type, id: id, referencing: referencing, author: authorId)
+        .getDocument(type: type, id: id, referencing: referencing, originalAuthor: originalAuthorId)
         .then((value) => value?.toModel());
   }
 
@@ -104,7 +106,14 @@ final class DatabaseDocumentsDataSource
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
     final entries = data
-        .map((e) => DocumentWithAuthorsEntity(e.toDocEntity(), e.toAuthorEntities()))
+        .map(
+          (e) => DocumentCompositeEntity(
+            e.toDocEntity(),
+            authors: e.toAuthorEntities(),
+            parameters: e.toParameterEntities(),
+            collaborators: e.toCollaboratorEntities(),
+          ),
+        )
         .toList();
 
     await _database.documentsV2Dao.saveAll(entries);
@@ -135,7 +144,7 @@ final class DatabaseDocumentsDataSource
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -212,10 +221,10 @@ final class DatabaseDocumentsDataSource
 
   @override
   Stream<List<DocumentData>> watchProposalTemplates({
-    required CampaignFilters filters,
+    required CampaignFilters campaign,
   }) {
     return _database.documentsV2Dao
-        .watchDocuments(type: DocumentType.proposalTemplate, filters: filters)
+        .watchDocuments(type: DocumentType.proposalTemplate, campaign: campaign)
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
   }
@@ -225,14 +234,16 @@ extension on DocumentEntityV2 {
   DocumentData toModel() {
     return DocumentData(
       metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.fromJson(contentType),
         type: type,
         id: SignedDocumentRef(id: id, ver: ver),
         ref: refId.toRef(refVer),
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
         section: section,
-        categoryId: categoryId.toRef(categoryVer),
-        authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
+        collaborators: collaborators.isEmpty ? null : collaborators,
+        parameters: parameters,
+        authors: authors.isEmpty ? null : authors,
       ),
       content: content,
     );
@@ -256,9 +267,21 @@ extension on DocumentData {
       return DocumentAuthorEntity(
         documentId: metadata.id.id,
         documentVer: metadata.id.ver!,
-        authorId: catId.toUri().toString(),
-        authorIdSignificant: catId.toSignificant().toUri().toString(),
-        authorUsername: catId.username,
+        accountId: catId.toUri().toString(),
+        accountSignificantId: catId.toSignificant().toUri().toString(),
+        username: catId.username,
+      );
+    }).toList();
+  }
+
+  List<DocumentCollaboratorEntity> toCollaboratorEntities() {
+    return (metadata.collaborators ?? const []).map((catId) {
+      return DocumentCollaboratorEntity(
+        documentId: metadata.id.id,
+        documentVer: metadata.id.ver!,
+        accountId: catId.toUri().toString(),
+        accountSignificantId: catId.toSignificant().toUri().toString(),
+        username: catId.username,
       );
     }).toList();
   }
@@ -266,6 +289,7 @@ extension on DocumentData {
   DocumentEntityV2 toDocEntity() {
     return DocumentEntityV2(
       content: content,
+      contentType: metadata.contentType.value,
       id: metadata.id.id,
       ver: metadata.id.ver!,
       type: metadata.type,
@@ -274,13 +298,24 @@ extension on DocumentData {
       replyId: metadata.reply?.id,
       replyVer: metadata.reply?.ver,
       section: metadata.section,
-      categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.ver,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
+      collaborators: metadata.collaborators ?? [],
+      parameters: metadata.parameters,
+      authors: metadata.authors ?? [],
       createdAt: metadata.id.ver!.dateTime,
     );
+  }
+
+  List<DocumentParameterEntity> toParameterEntities() {
+    return metadata.parameters.set.map((ref) {
+      return DocumentParameterEntity(
+        id: ref.id,
+        ver: ref.ver!,
+        documentId: metadata.id.id,
+        documentVer: metadata.id.ver!,
+      );
+    }).toList();
   }
 }
 
@@ -307,6 +342,7 @@ extension on JoinedProposalBriefEntity {
       versionIds: versionIds,
       commentsCount: commentsCount,
       isFavorite: isFavorite,
+      originalAuthors: originalAuthors,
     );
   }
 }

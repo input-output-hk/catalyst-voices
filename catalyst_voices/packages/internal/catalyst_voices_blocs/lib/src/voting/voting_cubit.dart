@@ -70,7 +70,7 @@ final class VotingCubit extends Cubit<VotingState>
       isFavorite: _cache.tab == VotingPageTab.favorites
           ? const Optional(true)
           : const Optional.empty(),
-      author: Optional(_cache.tab == VotingPageTab.my ? _cache.activeAccountId : null),
+      originalAuthor: Optional(_cache.tab == VotingPageTab.my ? _cache.activeAccountId : null),
       categoryId: categoryId,
       searchQuery: searchQuery,
       latestUpdate: const Optional.empty(),
@@ -202,22 +202,22 @@ final class VotingCubit extends Cubit<VotingState>
       VotingPageTab.total => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        author: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
       ),
       VotingPageTab.favorites => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional(true),
-        author: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
       ),
       VotingPageTab.my => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        author: Optional(_cache.activeAccountId),
+        originalAuthor: Optional(_cache.activeAccountId),
       ),
       VotingPageTab.votedOn => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        author: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
         voteBy: Optional(_cache.activeAccountId),
       ),
     };

@@ -79,7 +79,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       isFavorite: _cache.tab == ProposalsPageTab.favorites
           ? const Optional(true)
           : const Optional.empty(),
-      author: Optional(_cache.tab == ProposalsPageTab.my ? _cache.activeAccountId : null),
+      originalAuthor: Optional(_cache.tab == ProposalsPageTab.my ? _cache.activeAccountId : null),
       categoryId: categoryId,
       searchQuery: searchQuery,
       latestUpdate: isRecentEnabled != null
@@ -224,27 +224,27 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       ProposalsPageTab.total => _cache.filters.copyWith(
         status: const Optional.empty(),
         isFavorite: const Optional.empty(),
-        author: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
       ),
       ProposalsPageTab.drafts => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.draft),
         isFavorite: const Optional.empty(),
-        author: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
       ),
       ProposalsPageTab.finals => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        author: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
       ),
       ProposalsPageTab.favorites => _cache.filters.copyWith(
         status: const Optional.empty(),
         isFavorite: const Optional(true),
-        author: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
       ),
       ProposalsPageTab.my => _cache.filters.copyWith(
         status: const Optional.empty(),
         isFavorite: const Optional.empty(),
-        author: Optional(_cache.activeAccountId),
+        originalAuthor: Optional(_cache.activeAccountId),
       ),
     };
   }

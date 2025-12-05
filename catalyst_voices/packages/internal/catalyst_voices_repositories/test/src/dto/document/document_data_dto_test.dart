@@ -41,7 +41,7 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
 
@@ -65,12 +65,8 @@ void main() {
           final dto = DocumentDataMetadataDto.fromJson(oldJson);
 
           // Then
-          expect(dto.brandId?.id, brandId);
-          expect(dto.brandId?.ver, isNull);
-          expect(dto.brandId?.type, DocumentRefDtoType.signed);
-          expect(dto.campaignId?.id, campaignId);
-          expect(dto.campaignId?.ver, isNull);
-          expect(dto.campaignId?.type, DocumentRefDtoType.signed);
+          expect(dto.parameters.any((ref) => ref.id == brandId), isTrue);
+          expect(dto.parameters.any((ref) => ref.id == campaignId), isTrue);
         });
 
         test('do nothing when migration not needed', () {
@@ -98,11 +94,124 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
 
       group('3', () {
+        test('version and id migration works as expected', () {
+          // Given
+          final campaignId = DocumentRefFactory.randomUuidV7();
+          final brandId = DocumentRefFactory.randomUuidV7();
+          final oldJson = <String, dynamic>{
+            'type': DocumentType.proposalDocument.uuid,
+            'selfRef': {
+              'id': DocumentRefFactory.randomUuidV7(),
+              'version': DocumentRefFactory.randomUuidV7(),
+              'type': 'signed',
+            },
+            'brandId': {
+              'id': brandId,
+              'ver': brandId,
+              'type': 'signed',
+            },
+            'campaignId': {
+              'id': campaignId,
+              'ver': campaignId,
+              'type': 'signed',
+            },
+          };
+
+          final campaignRef = DocumentRefDto(
+            id: campaignId,
+            ver: campaignId,
+            type: DocumentRefDtoType.signed,
+          );
+          final brandRef = DocumentRefDto(
+            id: brandId,
+            ver: brandId,
+            type: DocumentRefDtoType.signed,
+          );
+
+          // When
+          final dto = DocumentDataMetadataDto.fromJson(oldJson);
+
+          // Then
+          expect(dto.parameters.contains(campaignRef), isTrue);
+          expect(dto.parameters.contains(brandRef), isTrue);
+        });
+
+        test('do nothing when migration not needed', () {
+          // Given
+          final json = <String, dynamic>{
+            'type': DocumentType.proposalDocument.uuid,
+            'selfRef': {
+              'id': DocumentRefFactory.randomUuidV7(),
+              'version': DocumentRefFactory.randomUuidV7(),
+              'type': 'signed',
+            },
+            'parameters': [
+              {
+                'id': DocumentRefFactory.randomUuidV7(),
+                'version': DocumentRefFactory.randomUuidV7(),
+                'type': 'signed',
+              },
+              {
+                'id': DocumentRefFactory.randomUuidV7(),
+                'version': DocumentRefFactory.randomUuidV7(),
+                'type': 'signed',
+              },
+            ],
+          };
+
+          // When
+          final migrated = DocumentDataMetadataDto.migrateJson1(json);
+
+          // Then
+          expect(json, same(migrated));
+        });
+      });
+
+      group('4', () {
+        test('version and id migration works as expected', () {
+          // Given
+          final oldJson = <String, dynamic>{
+            'type': DocumentType.proposalDocument.uuid,
+            'selfRef': {
+              'id': DocumentRefFactory.randomUuidV7(),
+              'version': DocumentRefFactory.randomUuidV7(),
+              'type': 'signed',
+            },
+          };
+
+          // When
+          final dto = DocumentDataMetadataDto.fromJson(oldJson);
+
+          // Then
+          expect(dto.contentType, DocumentContentType.json);
+        });
+
+        test('do nothing when migration not needed', () {
+          // Given
+          final json = <String, dynamic>{
+            'contentType': DocumentContentType.json.value,
+            'type': DocumentType.proposalDocument.uuid,
+            'selfRef': {
+              'id': DocumentRefFactory.randomUuidV7(),
+              'version': DocumentRefFactory.randomUuidV7(),
+              'type': 'signed',
+            },
+          };
+
+          // When
+          final migrated = DocumentDataMetadataDto.migrateJson1(json);
+
+          // Then
+          expect(json, same(migrated));
+        });
+      });
+
+      group('5', () {
         test('selfRef to id works as expected', () {
           // Given
           final id = DocumentRefFactory.randomUuidV7();
@@ -140,7 +249,7 @@ void main() {
           final migrated = DocumentDataMetadataDto.migrateJson1(json);
 
           // Then
-          expect(identical(json, migrated), isTrue);
+          expect(json, same(migrated));
         });
       });
     });

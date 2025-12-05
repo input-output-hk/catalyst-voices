@@ -9,196 +9,135 @@ final class Schema4 extends i0.VersionedSchema {
   Schema4({required super.database}) : super(version: 4);
   @override
   late final List<i1.DatabaseSchemaEntity> entities = [
-    documents,
-    documentsMetadata,
-    documentsFavorites,
-    drafts,
     documentsV2,
     documentAuthors,
+    documentCollaborators,
+    documentParameters,
     documentsLocalMetadata,
     localDocumentsDrafts,
-    idxDocType,
-    idxUniqueVer,
-    idxDocMetadataKeyValue,
-    idxFavType,
-    idxFavUniqueId,
-    idxDraftType,
     idxDocumentsV2TypeId,
     idxDocumentsV2TypeIdVer,
     idxDocumentsV2TypeRefId,
     idxDocumentsV2TypeRefIdVer,
     idxDocumentsV2RefIdVer,
     idxDocumentsV2TypeIdCreatedAt,
-    idxDocumentsV2TypeCategoryId,
     idxDocumentsV2TypeRefIdRefVer,
     idxDocumentAuthorsComposite,
     idxDocumentAuthorsIdentity,
     idxDocumentAuthorsUsername,
+    idxDocumentCollaboratorsComposite,
+    idxDocumentCollaboratorsIdentity,
+    idxDocumentCollaboratorsUsername,
+    idxDocumentParametersComposite,
   ];
-  late final Shape0 documents = Shape0(
-    source: i0.VersionedTable(
-      entityName: 'documents',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: ['PRIMARY KEY(id_hi, id_lo, ver_hi, ver_lo)'],
-      columns: [
-        _column_0,
-        _column_1,
-        _column_2,
-        _column_3,
-        _column_4,
-        _column_5,
-        _column_6,
-        _column_7,
-      ],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape1 documentsMetadata = Shape1(
-    source: i0.VersionedTable(
-      entityName: 'documents_metadata',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: ['PRIMARY KEY(ver_hi, ver_lo, field_key)'],
-      columns: [_column_2, _column_3, _column_8, _column_9],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape2 documentsFavorites = Shape2(
-    source: i0.VersionedTable(
-      entityName: 'documents_favorites',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: ['PRIMARY KEY(id_hi, id_lo)'],
-      columns: [_column_0, _column_1, _column_10, _column_6],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape3 drafts = Shape3(
-    source: i0.VersionedTable(
-      entityName: 'drafts',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: ['PRIMARY KEY(id_hi, id_lo, ver_hi, ver_lo)'],
-      columns: [
-        _column_0,
-        _column_1,
-        _column_2,
-        _column_3,
-        _column_4,
-        _column_5,
-        _column_6,
-        _column_11,
-      ],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape4 documentsV2 = Shape4(
+  late final Shape0 documentsV2 = Shape0(
     source: i0.VersionedTable(
       entityName: 'documents_v2',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id, ver)'],
       columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
         _column_4,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
         _column_12,
         _column_13,
         _column_14,
         _column_15,
-        _column_16,
-        _column_17,
-        _column_18,
-        _column_19,
-        _column_20,
-        _column_21,
-        _column_22,
-        _column_6,
-        _column_23,
-        _column_7,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape5 documentAuthors = Shape5(
+  late final Shape1 documentAuthors = Shape1(
     source: i0.VersionedTable(
       entityName: 'document_authors',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: [
-        'PRIMARY KEY(document_id, document_ver, author_id)',
+        'PRIMARY KEY(document_id, document_ver, account_id)',
         'FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
       ],
-      columns: [_column_24, _column_25, _column_26, _column_27, _column_28],
+      columns: [_column_16, _column_17, _column_18, _column_19, _column_20],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape6 documentsLocalMetadata = Shape6(
+  late final Shape1 documentCollaborators = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'document_collaborators',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(document_id, document_ver, account_id)',
+        'FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
+      ],
+      columns: [_column_16, _column_17, _column_18, _column_19, _column_20],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 documentParameters = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'document_parameters',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id, ver, document_id, document_ver)',
+        'FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
+      ],
+      columns: [_column_19, _column_20, _column_4, _column_14],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 documentsLocalMetadata = Shape3(
     source: i0.VersionedTable(
       entityName: 'documents_local_metadata',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id)'],
-      columns: [_column_15, _column_10],
+      columns: [_column_4, _column_21],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape4 localDocumentsDrafts = Shape4(
+  late final Shape0 localDocumentsDrafts = Shape0(
     source: i0.VersionedTable(
       entityName: 'local_documents_drafts',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id, ver)'],
       columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
         _column_4,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
         _column_12,
         _column_13,
         _column_14,
         _column_15,
-        _column_16,
-        _column_17,
-        _column_18,
-        _column_19,
-        _column_20,
-        _column_21,
-        _column_22,
-        _column_6,
-        _column_23,
-        _column_7,
       ],
       attachedDatabase: database,
     ),
     alias: null,
-  );
-  final i1.Index idxDocType = i1.Index(
-    'idx_doc_type',
-    'CREATE INDEX idx_doc_type ON documents (type)',
-  );
-  final i1.Index idxUniqueVer = i1.Index(
-    'idx_unique_ver',
-    'CREATE UNIQUE INDEX idx_unique_ver ON documents (ver_hi, ver_lo)',
-  );
-  final i1.Index idxDocMetadataKeyValue = i1.Index(
-    'idx_doc_metadata_key_value',
-    'CREATE INDEX idx_doc_metadata_key_value ON documents_metadata (field_key, field_value)',
-  );
-  final i1.Index idxFavType = i1.Index(
-    'idx_fav_type',
-    'CREATE INDEX idx_fav_type ON documents_favorites (type)',
-  );
-  final i1.Index idxFavUniqueId = i1.Index(
-    'idx_fav_unique_id',
-    'CREATE UNIQUE INDEX idx_fav_unique_id ON documents_favorites (id_hi, id_lo)',
-  );
-  final i1.Index idxDraftType = i1.Index(
-    'idx_draft_type',
-    'CREATE INDEX idx_draft_type ON drafts (type)',
   );
   final i1.Index idxDocumentsV2TypeId = i1.Index(
     'idx_documents_v2_type_id',
@@ -224,195 +163,54 @@ final class Schema4 extends i0.VersionedSchema {
     'idx_documents_v2_type_id_created_at',
     'CREATE INDEX idx_documents_v2_type_id_created_at ON documents_v2 (type, id, created_at)',
   );
-  final i1.Index idxDocumentsV2TypeCategoryId = i1.Index(
-    'idx_documents_v2_type_category_id',
-    'CREATE INDEX idx_documents_v2_type_category_id ON documents_v2 (type, category_id)',
-  );
   final i1.Index idxDocumentsV2TypeRefIdRefVer = i1.Index(
     'idx_documents_v2_type_ref_id_ref_ver',
     'CREATE INDEX idx_documents_v2_type_ref_id_ref_ver ON documents_v2 (type, ref_id, ref_ver)',
   );
   final i1.Index idxDocumentAuthorsComposite = i1.Index(
     'idx_document_authors_composite',
-    'CREATE INDEX idx_document_authors_composite ON document_authors (document_id, document_ver, author_id_significant)',
+    'CREATE INDEX idx_document_authors_composite ON document_authors (document_id, document_ver, account_significant_id)',
   );
   final i1.Index idxDocumentAuthorsIdentity = i1.Index(
     'idx_document_authors_identity',
-    'CREATE INDEX idx_document_authors_identity ON document_authors (author_id_significant)',
+    'CREATE INDEX idx_document_authors_identity ON document_authors (account_significant_id)',
   );
   final i1.Index idxDocumentAuthorsUsername = i1.Index(
     'idx_document_authors_username',
-    'CREATE INDEX idx_document_authors_username ON document_authors (author_username)',
+    'CREATE INDEX idx_document_authors_username ON document_authors (username)',
+  );
+  final i1.Index idxDocumentCollaboratorsComposite = i1.Index(
+    'idx_document_collaborators_composite',
+    'CREATE INDEX idx_document_collaborators_composite ON document_collaborators (document_id, document_ver, account_significant_id)',
+  );
+  final i1.Index idxDocumentCollaboratorsIdentity = i1.Index(
+    'idx_document_collaborators_identity',
+    'CREATE INDEX idx_document_collaborators_identity ON document_collaborators (account_significant_id)',
+  );
+  final i1.Index idxDocumentCollaboratorsUsername = i1.Index(
+    'idx_document_collaborators_username',
+    'CREATE INDEX idx_document_collaborators_username ON document_collaborators (username)',
+  );
+  final i1.Index idxDocumentParametersComposite = i1.Index(
+    'idx_document_parameters_composite',
+    'CREATE INDEX idx_document_parameters_composite ON document_parameters (document_id, document_ver, id, ver)',
   );
 }
 
 class Shape0 extends i0.VersionedTable {
   Shape0({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<BigInt> get idHi =>
-      columnsByName['id_hi']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get idLo =>
-      columnsByName['id_lo']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get verHi =>
-      columnsByName['ver_hi']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get verLo =>
-      columnsByName['ver_lo']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<i2.Uint8List> get content =>
-      columnsByName['content']! as i1.GeneratedColumn<i2.Uint8List>;
-  i1.GeneratedColumn<i2.Uint8List> get metadata =>
-      columnsByName['metadata']! as i1.GeneratedColumn<i2.Uint8List>;
-  i1.GeneratedColumn<String> get type =>
-      columnsByName['type']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<DateTime> get createdAt =>
-      columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
-}
-
-i1.GeneratedColumn<BigInt> _column_0(String aliasedName) =>
-    i1.GeneratedColumn<BigInt>(
-      'id_hi',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.bigInt,
-    );
-i1.GeneratedColumn<BigInt> _column_1(String aliasedName) =>
-    i1.GeneratedColumn<BigInt>(
-      'id_lo',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.bigInt,
-    );
-i1.GeneratedColumn<BigInt> _column_2(String aliasedName) =>
-    i1.GeneratedColumn<BigInt>(
-      'ver_hi',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.bigInt,
-    );
-i1.GeneratedColumn<BigInt> _column_3(String aliasedName) =>
-    i1.GeneratedColumn<BigInt>(
-      'ver_lo',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.bigInt,
-    );
-i1.GeneratedColumn<i2.Uint8List> _column_4(String aliasedName) =>
-    i1.GeneratedColumn<i2.Uint8List>(
-      'content',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.blob,
-    );
-i1.GeneratedColumn<i2.Uint8List> _column_5(String aliasedName) =>
-    i1.GeneratedColumn<i2.Uint8List>(
-      'metadata',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.blob,
-    );
-i1.GeneratedColumn<String> _column_6(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'type',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-i1.GeneratedColumn<DateTime> _column_7(String aliasedName) =>
-    i1.GeneratedColumn<DateTime>(
-      'created_at',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.dateTime,
-    );
-
-class Shape1 extends i0.VersionedTable {
-  Shape1({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<BigInt> get verHi =>
-      columnsByName['ver_hi']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get verLo =>
-      columnsByName['ver_lo']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<String> get fieldKey =>
-      columnsByName['field_key']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get fieldValue =>
-      columnsByName['field_value']! as i1.GeneratedColumn<String>;
-}
-
-i1.GeneratedColumn<String> _column_8(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'field_key',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-i1.GeneratedColumn<String> _column_9(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'field_value',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-
-class Shape2 extends i0.VersionedTable {
-  Shape2({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<BigInt> get idHi =>
-      columnsByName['id_hi']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get idLo =>
-      columnsByName['id_lo']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<bool> get isFavorite =>
-      columnsByName['is_favorite']! as i1.GeneratedColumn<bool>;
-  i1.GeneratedColumn<String> get type =>
-      columnsByName['type']! as i1.GeneratedColumn<String>;
-}
-
-i1.GeneratedColumn<bool> _column_10(String aliasedName) =>
-    i1.GeneratedColumn<bool>(
-      'is_favorite',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.bool,
-      defaultConstraints: i1.GeneratedColumn.constraintIsAlways(
-        'CHECK ("is_favorite" IN (0, 1))',
-      ),
-    );
-
-class Shape3 extends i0.VersionedTable {
-  Shape3({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<BigInt> get idHi =>
-      columnsByName['id_hi']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get idLo =>
-      columnsByName['id_lo']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get verHi =>
-      columnsByName['ver_hi']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<BigInt> get verLo =>
-      columnsByName['ver_lo']! as i1.GeneratedColumn<BigInt>;
-  i1.GeneratedColumn<i2.Uint8List> get content =>
-      columnsByName['content']! as i1.GeneratedColumn<i2.Uint8List>;
-  i1.GeneratedColumn<i2.Uint8List> get metadata =>
-      columnsByName['metadata']! as i1.GeneratedColumn<i2.Uint8List>;
-  i1.GeneratedColumn<String> get type =>
-      columnsByName['type']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get title =>
-      columnsByName['title']! as i1.GeneratedColumn<String>;
-}
-
-i1.GeneratedColumn<String> _column_11(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'title',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-
-class Shape4 extends i0.VersionedTable {
-  Shape4({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<i2.Uint8List> get content =>
       columnsByName['content']! as i1.GeneratedColumn<i2.Uint8List>;
   i1.GeneratedColumn<String> get authors =>
       columnsByName['authors']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get categoryId =>
-      columnsByName['category_id']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get categoryVer =>
-      columnsByName['category_ver']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get collaborators =>
+      columnsByName['collaborators']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get contentType =>
+      columnsByName['content_type']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get parameters =>
+      columnsByName['parameters']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get refId =>
       columnsByName['ref_id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get refVer =>
@@ -435,134 +233,162 @@ class Shape4 extends i0.VersionedTable {
       columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_12(String aliasedName) =>
+i1.GeneratedColumn<i2.Uint8List> _column_0(String aliasedName) =>
+    i1.GeneratedColumn<i2.Uint8List>(
+      'content',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.blob,
+    );
+i1.GeneratedColumn<String> _column_1(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'authors',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_13(String aliasedName) =>
+i1.GeneratedColumn<String> _column_2(String aliasedName) =>
     i1.GeneratedColumn<String>(
-      'category_id',
+      'collaborators',
       aliasedName,
-      true,
+      false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_14(String aliasedName) =>
+i1.GeneratedColumn<String> _column_3(String aliasedName) =>
     i1.GeneratedColumn<String>(
-      'category_ver',
+      'content_type',
       aliasedName,
-      true,
+      false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_15(String aliasedName) =>
+i1.GeneratedColumn<String> _column_4(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'id',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_16(String aliasedName) =>
+i1.GeneratedColumn<String> _column_5(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'parameters',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_6(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'ref_id',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_17(String aliasedName) =>
+i1.GeneratedColumn<String> _column_7(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'ref_ver',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_18(String aliasedName) =>
+i1.GeneratedColumn<String> _column_8(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'reply_id',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_19(String aliasedName) =>
+i1.GeneratedColumn<String> _column_9(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'reply_ver',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_20(String aliasedName) =>
+i1.GeneratedColumn<String> _column_10(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'section',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_21(String aliasedName) =>
+i1.GeneratedColumn<String> _column_11(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'template_id',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_22(String aliasedName) =>
+i1.GeneratedColumn<String> _column_12(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'template_ver',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_23(String aliasedName) =>
+i1.GeneratedColumn<String> _column_13(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'type',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_14(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'ver',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
+i1.GeneratedColumn<DateTime> _column_15(String aliasedName) =>
+    i1.GeneratedColumn<DateTime>(
+      'created_at',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.dateTime,
+    );
 
-class Shape5 extends i0.VersionedTable {
-  Shape5({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<String> get authorId =>
-      columnsByName['author_id']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get authorIdSignificant =>
-      columnsByName['author_id_significant']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get authorUsername =>
-      columnsByName['author_username']! as i1.GeneratedColumn<String>;
+class Shape1 extends i0.VersionedTable {
+  Shape1({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get accountId =>
+      columnsByName['account_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get accountSignificantId =>
+      columnsByName['account_significant_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get username =>
+      columnsByName['username']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get documentId =>
       columnsByName['document_id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get documentVer =>
       columnsByName['document_ver']! as i1.GeneratedColumn<String>;
 }
 
-i1.GeneratedColumn<String> _column_24(String aliasedName) =>
+i1.GeneratedColumn<String> _column_16(String aliasedName) =>
     i1.GeneratedColumn<String>(
-      'author_id',
+      'account_id',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_25(String aliasedName) =>
+i1.GeneratedColumn<String> _column_17(String aliasedName) =>
     i1.GeneratedColumn<String>(
-      'author_id_significant',
+      'account_significant_id',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_26(String aliasedName) =>
+i1.GeneratedColumn<String> _column_18(String aliasedName) =>
     i1.GeneratedColumn<String>(
-      'author_username',
+      'username',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_27(String aliasedName) =>
+i1.GeneratedColumn<String> _column_19(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'document_id',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_28(String aliasedName) =>
+i1.GeneratedColumn<String> _column_20(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'document_ver',
       aliasedName,
@@ -570,14 +396,36 @@ i1.GeneratedColumn<String> _column_28(String aliasedName) =>
       type: i1.DriftSqlType.string,
     );
 
-class Shape6 extends i0.VersionedTable {
-  Shape6({required super.source, required super.alias}) : super.aliased();
+class Shape2 extends i0.VersionedTable {
+  Shape2({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get documentId =>
+      columnsByName['document_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get documentVer =>
+      columnsByName['document_ver']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get ver =>
+      columnsByName['ver']! as i1.GeneratedColumn<String>;
+}
+
+class Shape3 extends i0.VersionedTable {
+  Shape3({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<bool> get isFavorite =>
       columnsByName['is_favorite']! as i1.GeneratedColumn<bool>;
 }
 
+i1.GeneratedColumn<bool> _column_21(String aliasedName) =>
+    i1.GeneratedColumn<bool>(
+      'is_favorite',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.bool,
+      defaultConstraints: i1.GeneratedColumn.constraintIsAlways(
+        'CHECK ("is_favorite" IN (0, 1))',
+      ),
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
 }) {

@@ -2,10 +2,7 @@
 
 import 'dart:typed_data';
 
-import 'package:catalyst_voices_models/src/document/data/document_type.dart';
-import 'package:catalyst_voices_models/src/document/document_ref.dart';
-import 'package:catalyst_voices_models/src/signed_document/signed_document_payload.dart';
-import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents an abstract document that is protected
@@ -18,7 +15,7 @@ abstract interface class SignedDocument {
   const SignedDocument();
 
   /// A getter returning the metadata related to the signed document.
-  SignedDocumentMetadata get metadata;
+  DocumentDataMetadata get metadata;
 
   /// A getter that returns a parsed document payload.
   SignedDocumentPayload get payload;

@@ -89,9 +89,11 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposalDetail(id: ref);
-      final category = await _campaignService.getCategory(proposal.document.metadata.categoryId);
+      final category = await _campaignService.getCategory(
+        proposal.document.metadata.parameters.set.first,
+      );
       final commentTemplate = await _commentService.getCommentTemplateFor(
-        category: proposal.document.metadata.categoryId,
+        category: proposal.document.metadata.parameters.set.first,
       );
       final isFavorite = await _documentsService.isFavorite(ref);
 
@@ -159,7 +161,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     SignedDocumentRef? reply,
   }) async {
     final proposalRef = _cache.ref;
-    final proposalCategoryId = _cache.proposal?.document.metadata.categoryId;
+    final proposalCategoryId = _cache.proposal?.document.metadata.parameters.set.first;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
     assert(
       proposalRef is SignedDocumentRef,
@@ -181,7 +183,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: proposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: reply,
-        categoryId: proposalCategoryId,
+        parameters: DocumentParameters({?proposalCategoryId}),
         authorId: activeAccountId!,
       ),
       document: document,
