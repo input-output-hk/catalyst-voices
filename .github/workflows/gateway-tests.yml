@@ -175,10 +175,10 @@ jobs:
               echo "devnet_healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
               exit 0
             fi
-            if [ "$STATUS" == "starting" ]; then
+            if [ "$STATUS" == "unhealthy" ]; then
               echo "Container became unhealthy."
               docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
-              docker compose stop cat-devnet
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml stop cat-devnet 
               echo "devnet_healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
               break
             fi
