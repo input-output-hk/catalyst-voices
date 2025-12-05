@@ -172,24 +172,26 @@ jobs:
             if [ "$STATUS" == "healthy" ]; then
               echo "Container is healthy!"
               DEVNET_HEALTHY="true"
-              echo "devnet-healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
+              echo "devnet_healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
               exit 0
             fi
             if [ "$STATUS" == "starting" ]; then
               echo "Container became unhealthy."
               docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
-              echo "devnet-healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
+              docker compose stop cat-devnet
+              echo "devnet_healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
               break
             fi
             sleep 5
           done
 
       - name: Spin up devnet ... retry
-        if: steps.devnet-check.outputs.devnet-healthy == 'false'
+        if: steps.devnet-check.outputs.devnet_healthy == 'false'
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
 
       - name: Wait for cat-devnet to become healthy ... retry
+        if: steps.devnet-check.outputs.devnet_healthy == 'false'
         run: |
           echo "Waiting for container to be healthy ... retry"
           for i in {1..500}; do
