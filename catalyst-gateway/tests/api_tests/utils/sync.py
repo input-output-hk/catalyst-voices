@@ -2,7 +2,9 @@ import requests
 import time
 from loguru import logger
 import math
+
 from api import cat_gateway_endpoint_url
+
 
 def get_sync_state(network: str):
     resp = requests.get(
@@ -12,8 +14,10 @@ def get_sync_state(network: str):
     if resp.status_code == 200:
         return resp.json()
 
+
 def printable_time(time: float):
     return f"{math.floor(time / 3600):02}:{math.floor((time % 3600) / 60):02}:{math.floor(time % 60):02}"
+
 
 # Wait until service will sync to the provided slot number
 def sync_to(network: str, slot_num: int, timeout: int):
@@ -22,11 +26,11 @@ def sync_to(network: str, slot_num: int, timeout: int):
     last_slot_num = -1
 
     logger.info(
-        f"{'synced to slot' : ^16} : "
-        + f"{'in total time' : ^16} : "
-        + f"{'slots/sec (interval)' : ^20} : "
-        + f"{'slots remaining' : ^16} : "
-        + f"{'est. time to go' : ^16} :"
+        f"{'synced to slot': ^16} : "
+        + f"{'in total time': ^16} : "
+        + f"{'slots/sec (interval)': ^20} : "
+        + f"{'slots remaining': ^16} : "
+        + f"{'est. time to go': ^16} :"
     )
 
     while True:
@@ -64,11 +68,11 @@ def sync_to(network: str, slot_num: int, timeout: int):
                 sps = f"{slots_per_second:.2f}({sps_last_interval:.2f})"
 
                 logger.info(
-                    f"{last_slot_num : >16} : "
-                    + f"{printable_time(total_time) : >16} : "
-                    + f"{sps : >20} : "
-                    + f"{residual_sync_slots : >16} : "
-                    + f"{printable_time(estimated_time_remaining) : >16} :"
+                    f"{last_slot_num: >16} : "
+                    + f"{printable_time(total_time): >16} : "
+                    + f"{sps: >20} : "
+                    + f"{residual_sync_slots: >16} : "
+                    + f"{printable_time(estimated_time_remaining): >16} :"
                 )
 
         # If sync state does not update for timeout seconds, then fail the test
