@@ -25,8 +25,8 @@ class AccountsText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firstId = ids.firstOrNull;
-    final isAnonymous = firstId?.isAnonymous ?? true;
-    final displayName = firstId.getDisplayName(context);
+    final isAnonymous = firstId?.isAnonymous ?? false;
+    final displayName = firstId?.getDisplayName(context) ?? '';
 
     return Text.rich(
       TextSpan(

@@ -19,7 +19,7 @@ typedef CollaboratorsSectionData = ({
 /// possible to override it for given [DocumentNodeId].
 typedef DocumentPropertyActionOverrides = Map<DocumentNodeId, DocumentPropertyActionWidgetBuilder>;
 
-/// A callback that builds a action widget for given document [property].
+/// A callback that builds a action widget.
 typedef DocumentPropertyActionWidgetBuilder =
     Widget Function(
       BuildContext context,
