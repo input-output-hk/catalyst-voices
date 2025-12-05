@@ -1,0 +1,15 @@
+[project]
+name = "signed-docs"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "argparse>=1.4.0",
+    "requests>=2.32.5",
+    "catalyst-python",
+    "pathlib>=1.0.1",
+]
+
+[tool.uv.sources]
+catalyst-python = { git = "https://github.com/input-output-hk/catalyst-libs.git", subdirectory="catalyst-python", tag = "catalyst-python/v0.1.1" }
