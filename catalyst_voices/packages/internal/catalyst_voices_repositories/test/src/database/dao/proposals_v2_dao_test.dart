@@ -583,27 +583,41 @@ void main() {
 
         test('excludes hidden proposals based on latest action', () async {
           // Given
-          final proposal1Ver = _buildUuidV7At(latest);
-          final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+          final author = _createTestAuthor();
 
-          final proposal2Ver = _buildUuidV7At(latest);
-          final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+          final proposal1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: proposal1Ver,
+            ver: proposal1Ver,
+            authors: [author],
+          );
+
+          final proposal2Ver = _buildUuidV7At(latest.add(const Duration(hours: 4)));
+          final proposal2 = _createTestDocumentEntity(
+            id: proposal2Ver,
+            ver: proposal2Ver,
+            authors: [author],
+          );
 
           final actionOldVer = _buildUuidV7At(middle);
           final actionOld = _createTestDocumentEntity(
             id: 'action-old',
             ver: actionOldVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p2',
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
             contentData: ProposalSubmissionActionDto.draft.toJson(),
+            authors: [author],
           );
-          final actionHideVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+          final actionHideVer = _buildUuidV7At(earliest.add(const Duration(hours: 6)));
           final actionHide = _createTestDocumentEntity(
             id: 'action-hide',
             ver: actionHideVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p2',
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
             contentData: ProposalSubmissionActionDto.hide.toJson(),
+            authors: [author],
           );
 
           await db.documentsV2Dao.saveAll([proposal1, proposal2, actionOld, actionHide]);
@@ -615,35 +629,53 @@ void main() {
           // Then: Only visible (p1); total=1.
           expect(result.items, hasLength(1));
           expect(result.total, 1);
-          expect(result.items[0].proposal.id, 'p1');
+          expect(result.items[0].proposal.id, proposal1.doc.id);
         });
 
         test('excludes hidden proposals, even later versions, based on latest action', () async {
           // Given
+          final author = _createTestAuthor();
+
           final proposal1Ver = _buildUuidV7At(latest);
-          final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+          final proposal1 = _createTestDocumentEntity(
+            id: proposal1Ver,
+            ver: proposal1Ver,
+            authors: [author],
+          );
 
-          final proposal2Ver = _buildUuidV7At(latest);
-          final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+          final proposal2Ver = _buildUuidV7At(latest.add(const Duration(hours: 4)));
+          final proposal2 = _createTestDocumentEntity(
+            id: proposal2Ver,
+            ver: proposal2Ver,
+            authors: [author],
+          );
 
-          final proposal3Ver = _buildUuidV7At(latest.add(const Duration(days: 1)));
-          final proposal3 = _createTestDocumentEntity(id: 'p2', ver: proposal3Ver);
+          final proposal3Ver = _buildUuidV7At(latest.add(const Duration(days: 5)));
+          final proposal3 = _createTestDocumentEntity(
+            id: proposal2Ver,
+            ver: proposal3Ver,
+            authors: [author],
+          );
 
           final actionOldVer = _buildUuidV7At(middle);
           final actionOld = _createTestDocumentEntity(
             id: 'action-old',
             ver: actionOldVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p2',
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
             contentData: ProposalSubmissionActionDto.draft.toJson(),
+            authors: [author],
           );
           final actionHideVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
           final actionHide = _createTestDocumentEntity(
             id: 'action-hide',
             ver: actionHideVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p2',
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
             contentData: ProposalSubmissionActionDto.hide.toJson(),
+            authors: [author],
           );
 
           await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3, actionOld, actionHide]);
@@ -655,37 +687,53 @@ void main() {
           // Then: Only visible (p1); total=1.
           expect(result.items, hasLength(1));
           expect(result.total, 1);
-          expect(result.items[0].proposal.id, 'p1');
+          expect(result.items[0].proposal.id, proposal1.doc.id);
         });
 
         test('latest, non hide, action, overrides previous hide', () async {
           // Given
-          final proposal1Ver = _buildUuidV7At(latest);
-          final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+          final author = _createTestAuthor();
 
-          final proposal2Ver = _buildUuidV7At(latest);
-          final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+          final proposal1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: proposal1Ver,
+            ver: proposal1Ver,
+            authors: [author],
+          );
+
+          final proposal2Ver = _buildUuidV7At(latest.add(const Duration(hours: 4)));
+          final proposal2 = _createTestDocumentEntity(
+            id: proposal2Ver,
+            ver: proposal2Ver,
+            authors: [author],
+          );
 
           final proposal3Ver = _buildUuidV7At(latest.add(const Duration(days: 1)));
-          final proposal3 = _createTestDocumentEntity(id: 'p2', ver: proposal3Ver);
+          final proposal3 = _createTestDocumentEntity(
+            id: proposal2.doc.id,
+            ver: proposal3Ver,
+            authors: [author],
+          );
 
           final actionOldHideVer = _buildUuidV7At(middle);
           final actionOldHide = _createTestDocumentEntity(
             id: 'action-hide',
             ver: actionOldHideVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p2',
-            refVer: proposal2Ver,
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
             contentData: ProposalSubmissionActionDto.hide.toJson(),
+            authors: [author],
           );
           final actionDraftVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
           final actionDraft = _createTestDocumentEntity(
             id: 'action-draft',
             ver: actionDraftVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p2',
-            replyVer: proposal3Ver,
+            refId: proposal3.doc.id,
+            refVer: proposal3.doc.ver,
             contentData: ProposalSubmissionActionDto.draft.toJson(),
+            authors: [author],
           );
 
           await db.documentsV2Dao.saveAll([
@@ -703,8 +751,8 @@ void main() {
           // Then: total=2, both are visible
           expect(result.items, hasLength(2));
           expect(result.total, 2);
-          expect(result.items[0].proposal.id, 'p2');
-          expect(result.items[1].proposal.id, 'p1');
+          expect(result.items[0].proposal.id, proposal2.doc.id);
+          expect(result.items[1].proposal.id, proposal1.doc.id);
         });
 
         test(
@@ -716,18 +764,22 @@ void main() {
             final middle = DateTime(2025, 2, 5, 5, 25, 33);
             final latest = DateTime(2025, 8, 11, 11, 20, 18);
 
+            final author = _createTestAuthor();
+
             // Proposal A: Old version (visible, no hide action for this ver).
             final proposalAOldVer = _buildUuidV7At(earliest);
             final proposalAOld = _createTestDocumentEntity(
-              id: 'proposal-a',
+              id: proposalAOldVer,
               ver: proposalAOldVer,
+              authors: [author],
             );
 
             // Proposal A: Latest version (hidden, with hide action for this ver).
             final proposalALatestVer = _buildUuidV7At(latest);
             final proposalALatest = _createTestDocumentEntity(
-              id: 'proposal-a',
+              id: proposalAOld.doc.id,
               ver: proposalALatestVer,
+              authors: [author],
             );
 
             // Hide action for latest version only (refVer = latestVer, ver after latest proposal).
@@ -736,17 +788,19 @@ void main() {
               id: 'action-hide',
               ver: actionHideVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'proposal-a',
-              refVer: proposalALatestVer,
+              refId: proposalALatest.doc.id,
+              refVer: proposalALatest.doc.ver,
               // Specific to latest ver.
               contentData: ProposalSubmissionActionDto.hide.toJson(),
+              authors: [author],
             );
 
             // Proposal B: Single version, visible (no action).
             final proposalBVer = _buildUuidV7At(middle);
             final proposalB = _createTestDocumentEntity(
-              id: 'proposal-b',
+              id: proposalBVer,
               ver: proposalBVer,
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([proposalAOld, proposalALatest, actionHide, proposalB]);
@@ -758,37 +812,46 @@ void main() {
             // Then: With join, latest A is hidden → exclude A, total =1 (B only), items =1 (B).
             expect(result.total, 1);
             expect(result.items, hasLength(1));
-            expect(result.items[0].proposal.id, 'proposal-b');
+            expect(result.items[0].proposal.id, proposalB.doc.id);
           },
         );
 
         test('returns specific version when final action points to ref_ver', () async {
           // Given
+          final author = _createTestAuthor();
+
           final proposal1OldVer = _buildUuidV7At(earliest);
           final proposal1Old = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1OldVer,
             ver: proposal1OldVer,
             contentData: {'title': 'old version'},
+            authors: [author],
           );
 
           final proposal1NewVer = _buildUuidV7At(middle);
           final proposal1New = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1Old.doc.id,
             ver: proposal1NewVer,
             contentData: {'title': 'new version'},
+            authors: [author],
           );
 
           final proposal2Ver = _buildUuidV7At(latest);
-          final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+          final proposal2 = _createTestDocumentEntity(
+            id: proposal2Ver,
+            ver: proposal2Ver,
+            authors: [author],
+          );
 
           final actionFinalVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
           final actionFinal = _createTestDocumentEntity(
             id: 'action-final',
             ver: actionFinalVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p1',
-            refVer: proposal1OldVer,
+            refId: proposal1Old.doc.id,
+            refVer: proposal1Old.doc.ver,
             contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            authors: [author],
           );
 
           await db.documentsV2Dao.saveAll([proposal1Old, proposal1New, proposal2, actionFinal]);
@@ -800,25 +863,31 @@ void main() {
           // Then
           expect(result.items, hasLength(2));
           expect(result.total, 2);
-          final p1Result = result.items.firstWhere((item) => item.proposal.id == 'p1');
+          final p1Result = result.items.firstWhere(
+            (item) => item.proposal.id == proposal1Old.doc.id,
+          );
           expect(p1Result.proposal.ver, proposal1OldVer);
           expect(p1Result.proposal.content.data['title'], 'old version');
         });
 
         test('returns latest version when final action has no ref_ver', () async {
           // Given
+          final author = _createTestAuthor();
+
           final proposal1OldVer = _buildUuidV7At(earliest);
           final proposal1Old = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1OldVer,
             ver: proposal1OldVer,
             contentData: {'title': 'old version'},
+            authors: [author],
           );
 
           final proposal1NewVer = _buildUuidV7At(middle);
           final proposal1New = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1Old.doc.id,
             ver: proposal1NewVer,
             contentData: {'title': 'new version'},
+            authors: [author],
           );
 
           final actionFinalVer = _buildUuidV7At(latest);
@@ -826,9 +895,10 @@ void main() {
             id: 'action-final',
             ver: actionFinalVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p1',
+            refId: proposal1Old.doc.id,
             refVer: null,
             contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            authors: [author],
           );
 
           await db.documentsV2Dao.saveAll([proposal1Old, proposal1New, actionFinal]);
@@ -846,18 +916,22 @@ void main() {
 
         test('draft action shows latest version of proposal', () async {
           // Given
+          final author = _createTestAuthor();
+
           final proposal1OldVer = _buildUuidV7At(earliest);
           final proposal1Old = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1OldVer,
             ver: proposal1OldVer,
             contentData: {'title': 'old version'},
+            authors: [author],
           );
 
           final proposal1NewVer = _buildUuidV7At(middle);
           final proposal1New = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1Old.doc.id,
             ver: proposal1NewVer,
             contentData: {'title': 'new version'},
+            authors: [author],
           );
 
           final actionDraftVer = _buildUuidV7At(latest);
@@ -865,9 +939,10 @@ void main() {
             id: 'action-draft',
             ver: actionDraftVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p1',
-            refVer: proposal1OldVer,
+            refId: proposal1Old.doc.id,
+            refVer: proposal1Old.doc.ver,
             contentData: ProposalSubmissionActionDto.draft.toJson(),
+            authors: [author],
           );
 
           await db.documentsV2Dao.saveAll([proposal1Old, proposal1New, actionDraft]);
@@ -885,25 +960,30 @@ void main() {
 
         test('final action with ref_ver overrides later proposal versions', () async {
           // Given
+          final author = _createTestAuthor();
+
           final proposal1Ver1 = _buildUuidV7At(earliest);
           final proposal1V1 = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1Ver1,
             ver: proposal1Ver1,
             contentData: {'version': 1},
+            authors: [author],
           );
 
           final proposal1Ver2 = _buildUuidV7At(middle);
           final proposal1V2 = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1V1.doc.id,
             ver: proposal1Ver2,
             contentData: {'version': 2},
+            authors: [author],
           );
 
           final proposal1Ver3 = _buildUuidV7At(latest);
           final proposal1V3 = _createTestDocumentEntity(
-            id: 'p1',
+            id: proposal1V1.doc.id,
             ver: proposal1Ver3,
             contentData: {'version': 3},
+            authors: [author],
           );
 
           final actionFinalVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
@@ -911,9 +991,10 @@ void main() {
             id: 'action-final',
             ver: actionFinalVer,
             type: DocumentType.proposalActionDocument,
-            refId: 'p1',
-            refVer: proposal1Ver2,
+            refId: proposal1V2.doc.id,
+            refVer: proposal1V2.doc.ver,
             contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            authors: [author],
           );
 
           await db.documentsV2Dao.saveAll([proposal1V1, proposal1V2, proposal1V3, actionFinal]);
@@ -935,10 +1016,10 @@ void main() {
 
           test('action with NULL ref_id does not break query', () async {
             // Given
-            final proposal = _createTestDocumentEntity(
-              id: 'p1',
-              ver: _buildUuidV7At(latest),
-            );
+            final author = _createTestAuthor();
+
+            final pId = _buildUuidV7At(latest);
+            final proposal = _createTestDocumentEntity(id: pId, ver: pId, authors: [author]);
             await db.documentsV2Dao.saveAll([proposal]);
 
             // And: Action with NULL ref_id
@@ -949,6 +1030,7 @@ void main() {
               type: DocumentType.proposalActionDocument,
               refId: null,
               contentData: {'action': 'hide'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionNullRef]);
 
@@ -958,7 +1040,7 @@ void main() {
 
             // Then: Should still return the proposal (NOT IN with NULL should not fail)
             expect(result.items, hasLength(1));
-            expect(result.items[0].proposal.id, 'p1');
+            expect(result.items[0].proposal.id, pId);
             expect(result.total, 1);
           });
 
@@ -966,14 +1048,13 @@ void main() {
             'multiple proposals with NULL ref_id actions return all visible proposals',
             () async {
               // Given
-              final proposal1 = _createTestDocumentEntity(
-                id: 'p1',
-                ver: _buildUuidV7At(earliest),
-              );
-              final proposal2 = _createTestDocumentEntity(
-                id: 'p2',
-                ver: _buildUuidV7At(latest),
-              );
+              final author = _createTestAuthor();
+
+              final p1Id = _buildUuidV7At(earliest);
+              final proposal1 = _createTestDocumentEntity(id: p1Id, ver: p1Id, authors: [author]);
+
+              final p2Id = _buildUuidV7At(latest);
+              final proposal2 = _createTestDocumentEntity(id: p2Id, ver: p2Id, authors: [author]);
               await db.documentsV2Dao.saveAll([proposal1, proposal2]);
 
               // And: Multiple actions with NULL ref_id
@@ -987,6 +1068,7 @@ void main() {
                     type: DocumentType.proposalActionDocument,
                     refId: null,
                     contentData: {'action': 'hide'},
+                    authors: [author],
                   ),
                 );
               }
@@ -1008,28 +1090,34 @@ void main() {
           final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
           final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
+          final author = _createTestAuthor();
+
           test('action with malformed JSON does not crash query', () async {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             // Action with malformed JSON
             final actionVer = _buildUuidV7At(latest);
             final action = _createTestDocumentEntity(
               id: 'action-malformed',
               ver: actionVer,
-              refId: 'p1',
+              refId: proposal1Old.doc.id,
+              refVer: proposal1Old.doc.ver,
               type: DocumentType.proposalActionDocument,
               contentData: {'wrong': true},
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New, action]);
@@ -1048,15 +1136,17 @@ void main() {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1066,8 +1156,10 @@ void main() {
               id: 'action-no-field',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal1Old.doc.id,
+              refVer: proposal1Old.doc.ver,
               contentData: {'status': 'pending'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionNoField]);
 
@@ -1084,15 +1176,17 @@ void main() {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1102,8 +1196,10 @@ void main() {
               id: 'action-null-value',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal1New.doc.id,
+              refVer: proposal1New.doc.ver,
               contentData: {'action': null},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionNullValue]);
 
@@ -1120,15 +1216,17 @@ void main() {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1138,8 +1236,10 @@ void main() {
               id: 'action-empty',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal1Old.doc.id,
+              refVer: proposal1Old.doc.ver,
               contentData: {'action': ''},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionEmpty]);
 
@@ -1156,15 +1256,17 @@ void main() {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1174,8 +1276,10 @@ void main() {
               id: 'action-number',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal1New.doc.id,
+              refVer: proposal1New.doc.ver,
               contentData: {'action': 42},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionNumber]);
 
@@ -1192,15 +1296,17 @@ void main() {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1210,8 +1316,10 @@ void main() {
               id: 'action-bool',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal1Old.doc.id,
+              refVer: proposal1Old.doc.ver,
               contentData: {'action': true},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionBool]);
 
@@ -1226,9 +1334,11 @@ void main() {
 
           test('action with nested JSON structure extracts correctly', () async {
             // Given
+            final pId = _buildUuidV7At(earliest);
             final proposal = _createTestDocumentEntity(
-              id: 'p1',
-              ver: _buildUuidV7At(earliest),
+              id: pId,
+              ver: pId,
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal]);
 
@@ -1238,11 +1348,13 @@ void main() {
               id: 'action-nested',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: {
                 'metadata': {'action': 'ignore'},
                 'action': 'hide',
               },
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionNested]);
 
@@ -1257,6 +1369,8 @@ void main() {
         });
 
         group('Ordering by createdAt vs UUID string', () {
+          final author = _createTestAuthor();
+
           test('proposals ordered by createdAt not ver string', () async {
             // Given: Three proposals with specific createdAt times
             final time1 = DateTime.utc(2025, 1, 1, 10, 0, 0);
@@ -1268,19 +1382,22 @@ void main() {
             final ver3 = _buildUuidV7At(time3);
 
             final proposal1 = _createTestDocumentEntity(
-              id: 'p1',
+              id: ver1,
               ver: ver1,
               contentData: {'order': 'oldest'},
+              authors: [author],
             );
             final proposal2 = _createTestDocumentEntity(
-              id: 'p2',
+              id: ver2,
               ver: ver2,
               contentData: {'order': 'middle'},
+              authors: [author],
             );
             final proposal3 = _createTestDocumentEntity(
-              id: 'p3',
+              id: ver3,
               ver: ver3,
               contentData: {'order': 'newest'},
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
@@ -1299,13 +1416,13 @@ void main() {
           test('proposals with manually set createdAt respect createdAt not ver', () async {
             // Given: Non-UUIDv7 versions with explicit createdAt
             final proposal1 = _createTestDocumentEntity(
-              id: 'p1',
+              id: '00000000-0000-0000-0000-000000000001',
               ver: '00000000-0000-0000-0000-000000000001',
               createdAt: DateTime.utc(2025, 1, 1),
               contentData: {'when': 'second'},
             );
             final proposal2 = _createTestDocumentEntity(
-              id: 'p2',
+              id: '00000000-0000-0000-0000-000000000002',
               ver: '00000000-0000-0000-0000-000000000002',
               createdAt: DateTime.utc(2025, 12, 31),
               contentData: {'when': 'first'},
@@ -1329,24 +1446,40 @@ void main() {
           final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
           final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
+          final author = _createTestAuthor();
+
           test('count matches items in complex scenario', () async {
             // Given: Multiple proposals with various actions
             final proposal1Ver = _buildUuidV7At(earliest);
-            final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+            final proposal1 = _createTestDocumentEntity(
+              id: proposal1Ver,
+              ver: proposal1Ver,
+              authors: [author],
+            );
 
             final proposal2Ver = _buildUuidV7At(middle);
-            final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+            final proposal2 = _createTestDocumentEntity(
+              id: proposal2Ver,
+              ver: proposal2Ver,
+              authors: [author],
+            );
 
             final proposal3Ver = _buildUuidV7At(latest);
-            final proposal3 = _createTestDocumentEntity(id: 'p3', ver: proposal3Ver);
+            final proposal3 = _createTestDocumentEntity(
+              id: proposal3Ver,
+              ver: proposal3Ver,
+              authors: [author],
+            );
 
             final actionHideVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
             final actionHide = _createTestDocumentEntity(
               id: 'action-hide',
               ver: actionHideVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              contentData: {'action': 'hide'},
+              refId: proposal1.doc.id,
+              refVer: proposal1.doc.ver,
+              contentData: ProposalSubmissionActionDto.hide.toJson(),
+              authors: [author],
             );
 
             final actionFinalVer = _buildUuidV7At(latest.add(const Duration(hours: 2)));
@@ -1354,9 +1487,10 @@ void main() {
               id: 'action-final',
               ver: actionFinalVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p2',
-              refVer: proposal2Ver,
-              contentData: {'action': 'final'},
+              refId: proposal2.doc.id,
+              refVer: proposal2.doc.ver,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([
@@ -1384,9 +1518,10 @@ void main() {
               final ver = _buildUuidV7At(time);
               proposals.add(
                 _createTestDocumentEntity(
-                  id: 'p$i',
+                  id: ver,
                   ver: ver,
                   contentData: {'index': i},
+                  authors: [author],
                 ),
               );
             }
@@ -1419,19 +1554,23 @@ void main() {
           final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
           final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
+          final author = _createTestAuthor();
+
           test('final action with NULL ref_ver uses latest version', () async {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1441,9 +1580,10 @@ void main() {
               id: 'action-final',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal1Old.doc.id,
               refVer: null,
-              contentData: {'action': 'final'},
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionFinal]);
 
@@ -1457,19 +1597,21 @@ void main() {
             expect(result.items[0].proposal.content.data['title'], 'new');
           });
 
-          test('final action with empty string ref_ver uses latest version', () async {
+          test('final action with empty string ref_ver excludes proposal', () async {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(middle);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1479,9 +1621,10 @@ void main() {
               id: 'action-final',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal1Old.doc.id,
               refVer: '',
-              contentData: {'action': 'final'},
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionFinal]);
 
@@ -1489,9 +1632,8 @@ void main() {
             const request = PageRequest(page: 0, size: 10);
             final result = await dao.getProposalsBriefPage(request: request);
 
-            // Then: Should use latest version
-            expect(result.items, hasLength(1));
-            expect(result.items[0].proposal.ver, proposal1NewVer);
+            // Then: Should be empty
+            expect(result.items, isEmpty);
           });
         });
 
@@ -1499,12 +1641,12 @@ void main() {
           final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
           final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
+          final author = _createTestAuthor();
+
           test('uppercase HIDE action does not hide proposal', () async {
             // Given
-            final proposal = _createTestDocumentEntity(
-              id: 'p1',
-              ver: _buildUuidV7At(earliest),
-            );
+            final pId = _buildUuidV7At(earliest);
+            final proposal = _createTestDocumentEntity(id: pId, ver: pId, authors: [author]);
             await db.documentsV2Dao.saveAll([proposal]);
 
             // And: Action with uppercase HIDE
@@ -1513,8 +1655,10 @@ void main() {
               id: 'action-upper',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: pId,
+              refVer: pId,
               contentData: {'action': 'HIDE'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionUpper]);
 
@@ -1530,15 +1674,17 @@ void main() {
             // Given
             final proposal1OldVer = _buildUuidV7At(earliest);
             final proposal1Old = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1OldVer,
               ver: proposal1OldVer,
               contentData: {'title': 'old'},
+              authors: [author],
             );
             final proposal1NewVer = _buildUuidV7At(latest);
             final proposal1New = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposal1Old.doc.id,
               ver: proposal1NewVer,
               contentData: {'title': 'new'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
 
@@ -1548,9 +1694,10 @@ void main() {
               id: 'action-mixed',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposal1OldVer,
+              refId: proposal1Old.doc.id,
+              refVer: proposal1Old.doc.ver,
               contentData: {'action': 'Final'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([actionMixed]);
 
@@ -1569,11 +1716,14 @@ void main() {
           final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
           final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
+          final author = _createTestAuthor();
+
           test('proposal with no action has null actionType', () async {
             final proposalVer = _buildUuidV7At(latest);
             final proposal = _createTestDocumentEntity(
-              id: 'p1',
+              id: proposalVer,
               ver: proposalVer,
+              authors: [author],
             );
             await db.documentsV2Dao.save(proposal);
 
@@ -1581,22 +1731,27 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.id, 'p1');
+            expect(result.items.first.proposal.id, proposal.doc.id);
             expect(result.items.first.actionType, isNull);
           });
 
           test('proposal with draft action has draft actionType', () async {
             final proposalVer = _buildUuidV7At(earliest);
-            final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [author],
+            );
 
             final actionVer = _buildUuidV7At(latest);
             final action = _createTestDocumentEntity(
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: ProposalSubmissionActionDto.draft.toJson(),
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal, action]);
 
@@ -1604,22 +1759,27 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.id, 'p1');
+            expect(result.items.first.proposal.id, proposal.doc.id);
             expect(result.items.first.actionType, ProposalSubmissionAction.draft);
           });
 
           test('proposal with final action has final_ actionType', () async {
             final proposalVer = _buildUuidV7At(earliest);
-            final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [author],
+            );
 
             final actionVer = _buildUuidV7At(latest);
             final action = _createTestDocumentEntity(
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal, action]);
 
@@ -1627,21 +1787,27 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.id, 'p1');
+            expect(result.items.first.proposal.id, proposal.doc.id);
             expect(result.items.first.actionType, ProposalSubmissionAction.aFinal);
           });
 
           test('proposal with hide action is excluded and has no actionType', () async {
             final proposalVer = _buildUuidV7At(earliest);
-            final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [author],
+            );
 
             final actionVer = _buildUuidV7At(latest);
             final action = _createTestDocumentEntity(
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: ProposalSubmissionActionDto.hide.toJson(),
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal, action]);
 
@@ -1654,16 +1820,21 @@ void main() {
 
           test('multiple actions uses latest action for actionType', () async {
             final proposalVer = _buildUuidV7At(earliest);
-            final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [author],
+            );
 
             final action1Ver = _buildUuidV7At(middle);
             final action1 = _createTestDocumentEntity(
               id: 'action-1',
               ver: action1Ver,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: ProposalSubmissionActionDto.draft.toJson(),
+              authors: [author],
             );
 
             final action2Ver = _buildUuidV7At(latest);
@@ -1671,9 +1842,10 @@ void main() {
               id: 'action-2',
               ver: action2Ver,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal, action1, action2]);
 
@@ -1681,28 +1853,41 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.id, 'p1');
+            expect(result.items.first.proposal.id, proposal.doc.id);
             expect(result.items.first.actionType, ProposalSubmissionAction.aFinal);
           });
 
           test('multiple proposals have correct individual actionTypes', () async {
-            final proposal1Ver = _buildUuidV7At(earliest);
-            final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+            final proposal1Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+            final proposal1 = _createTestDocumentEntity(
+              id: proposal1Ver,
+              ver: proposal1Ver,
+              authors: [author],
+            );
 
-            final proposal2Ver = _buildUuidV7At(earliest);
-            final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+            final proposal2Ver = _buildUuidV7At(earliest.add(const Duration(hours: 2)));
+            final proposal2 = _createTestDocumentEntity(
+              id: proposal2Ver,
+              ver: proposal2Ver,
+              authors: [author],
+            );
 
-            final proposal3Ver = _buildUuidV7At(earliest);
-            final proposal3 = _createTestDocumentEntity(id: 'p3', ver: proposal3Ver);
+            final proposal3Ver = _buildUuidV7At(earliest.add(const Duration(hours: 3)));
+            final proposal3 = _createTestDocumentEntity(
+              id: proposal3Ver,
+              ver: proposal3Ver,
+              authors: [author],
+            );
 
             final action1Ver = _buildUuidV7At(latest);
             final action1 = _createTestDocumentEntity(
               id: 'action-1',
               ver: action1Ver,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposal1Ver,
+              refId: proposal1.doc.id,
+              refVer: proposal1.doc.ver,
               contentData: ProposalSubmissionActionDto.draft.toJson(),
+              authors: [author],
             );
 
             final action2Ver = _buildUuidV7At(latest);
@@ -1710,9 +1895,10 @@ void main() {
               id: 'action-2',
               ver: action2Ver,
               type: DocumentType.proposalActionDocument,
-              refId: 'p2',
-              refVer: proposal2Ver,
+              refId: proposal2.doc.id,
+              refVer: proposal2.doc.ver,
               contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([
@@ -1728,9 +1914,9 @@ void main() {
 
             expect(result.items, hasLength(3));
 
-            final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
-            final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
-            final p3 = result.items.firstWhere((e) => e.proposal.id == 'p3');
+            final p1 = result.items.firstWhere((e) => e.proposal.id == proposal1.doc.id);
+            final p2 = result.items.firstWhere((e) => e.proposal.id == proposal2.doc.id);
+            final p3 = result.items.firstWhere((e) => e.proposal.id == proposal3.doc.id);
 
             expect(p1.actionType, ProposalSubmissionAction.draft);
             expect(p2.actionType, ProposalSubmissionAction.aFinal);
@@ -1739,16 +1925,21 @@ void main() {
 
           test('invalid action value results in null actionType', () async {
             final proposalVer = _buildUuidV7At(earliest);
-            final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [author],
+            );
 
             final actionVer = _buildUuidV7At(latest);
             final action = _createTestDocumentEntity(
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: {'action': 'invalid_action'},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal, action]);
 
@@ -1756,22 +1947,27 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.id, 'p1');
+            expect(result.items.first.proposal.id, proposal.doc.id);
             expect(result.items.first.actionType, isNull);
           });
 
           test('missing action field in content defaults to draft actionType', () async {
             final proposalVer = _buildUuidV7At(earliest);
-            final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [author],
+            );
 
             final actionVer = _buildUuidV7At(latest);
             final action = _createTestDocumentEntity(
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
               contentData: {},
+              authors: [author],
             );
             await db.documentsV2Dao.saveAll([proposal, action]);
 
@@ -1779,7 +1975,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.id, 'p1');
+            expect(result.items.first.proposal.id, proposal.doc.id);
             expect(result.items.first.actionType, ProposalSubmissionAction.draft);
           });
         });
@@ -1823,6 +2019,8 @@ void main() {
         });
 
         group('CommentsCount', () {
+          final author = _createTestAuthor();
+
           test('returns zero comments for proposal without comments', () async {
             final proposalVer = _buildUuidV7At(latest);
             final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
@@ -1837,24 +2035,24 @@ void main() {
 
           test('returns correct count for proposal with comments on effective version', () async {
             final proposalVer = _buildUuidV7At(latest);
-            final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+            final proposal = _createTestDocumentEntity(id: proposalVer, ver: proposalVer);
 
             final comment1Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
             final comment1 = _createTestDocumentEntity(
-              id: 'c1',
+              id: comment1Ver,
               ver: comment1Ver,
               type: DocumentType.commentDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
             );
 
             final comment2Ver = _buildUuidV7At(earliest.add(const Duration(hours: 2)));
             final comment2 = _createTestDocumentEntity(
-              id: 'c2',
+              id: comment2Ver,
               ver: comment2Ver,
               type: DocumentType.commentDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
             );
 
             await db.documentsV2Dao.saveAll([proposal, comment1, comment2]);
@@ -1879,8 +2077,8 @@ void main() {
                 id: 'c1',
                 ver: comment1Ver,
                 type: DocumentType.commentDocument,
-                refId: 'p1',
-                refVer: ver1,
+                refId: proposal1.doc.id,
+                refVer: proposal1.doc.ver,
               );
 
               final comment2Ver = _buildUuidV7At(latest.add(const Duration(hours: 1)));
@@ -1888,8 +2086,8 @@ void main() {
                 id: 'c2',
                 ver: comment2Ver,
                 type: DocumentType.commentDocument,
-                refId: 'p1',
-                refVer: ver2,
+                refId: proposal2.doc.id,
+                refVer: proposal2.doc.ver,
               );
 
               final comment3Ver = _buildUuidV7At(latest.add(const Duration(hours: 2)));
@@ -1897,8 +2095,8 @@ void main() {
                 id: 'c3',
                 ver: comment3Ver,
                 type: DocumentType.commentDocument,
-                refId: 'p1',
-                refVer: ver2,
+                refId: proposal2.doc.id,
+                refVer: proposal2.doc.ver,
               );
 
               await db.documentsV2Dao.saveAll([proposal1, proposal2, comment1, comment2, comment3]);
@@ -1917,18 +2115,19 @@ void main() {
             final ver2 = _buildUuidV7At(middle);
             final ver3 = _buildUuidV7At(latest);
 
-            final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
-            final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
-            final proposal3 = _createTestDocumentEntity(id: 'p1', ver: ver3);
+            final proposal1 = _createTestDocumentEntity(id: ver1, ver: ver1, authors: [author]);
+            final proposal2 = _createTestDocumentEntity(id: ver1, ver: ver2, authors: [author]);
+            final proposal3 = _createTestDocumentEntity(id: ver1, ver: ver3, authors: [author]);
 
             final actionVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
             final action = _createTestDocumentEntity(
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: ver2,
+              refId: proposal2.doc.id,
+              refVer: proposal2.doc.ver,
               contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
 
             final comment1Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
@@ -1936,8 +2135,8 @@ void main() {
               id: 'c1',
               ver: comment1Ver,
               type: DocumentType.commentDocument,
-              refId: 'p1',
-              refVer: ver1,
+              refId: proposal1.doc.id,
+              refVer: proposal1.doc.ver,
             );
 
             final comment2Ver = _buildUuidV7At(middle.add(const Duration(hours: 1)));
@@ -1945,8 +2144,8 @@ void main() {
               id: 'c2',
               ver: comment2Ver,
               type: DocumentType.commentDocument,
-              refId: 'p1',
-              refVer: ver2,
+              refId: proposal2.doc.id,
+              refVer: proposal2.doc.ver,
             );
 
             final comment3Ver = _buildUuidV7At(latest.add(const Duration(hours: 2)));
@@ -1954,8 +2153,8 @@ void main() {
               id: 'c3',
               ver: comment3Ver,
               type: DocumentType.commentDocument,
-              refId: 'p1',
-              refVer: ver3,
+              refId: proposal3.doc.id,
+              refVer: proposal3.doc.ver,
             );
 
             await db.documentsV2Dao.saveAll([
@@ -1972,7 +2171,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.ver, ver2);
+            expect(result.items.first.proposal.ver, proposal2.doc.ver);
             expect(result.items.first.commentsCount, 1);
           });
 
@@ -1988,8 +2187,8 @@ void main() {
               id: 'c1',
               ver: comment1Ver,
               type: DocumentType.commentDocument,
-              refId: 'p1',
-              refVer: proposal1Ver,
+              refId: proposal1.doc.id,
+              refVer: proposal1.doc.ver,
             );
 
             final comment2Ver = _buildUuidV7At(earliest.add(const Duration(hours: 2)));
@@ -1997,8 +2196,8 @@ void main() {
               id: 'c2',
               ver: comment2Ver,
               type: DocumentType.commentDocument,
-              refId: 'p2',
-              refVer: proposal2Ver,
+              refId: proposal2.doc.id,
+              refVer: proposal2.doc.ver,
             );
 
             final comment3Ver = _buildUuidV7At(earliest.add(const Duration(hours: 3)));
@@ -2006,8 +2205,8 @@ void main() {
               id: 'c3',
               ver: comment3Ver,
               type: DocumentType.commentDocument,
-              refId: 'p2',
-              refVer: proposal2Ver,
+              refId: proposal2.doc.id,
+              refVer: proposal2.doc.ver,
             );
 
             await db.documentsV2Dao.saveAll([
@@ -2023,8 +2222,8 @@ void main() {
 
             expect(result.items, hasLength(2));
 
-            final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
-            final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
+            final p1 = result.items.firstWhere((e) => e.proposal.id == proposal1.doc.id);
+            final p2 = result.items.firstWhere((e) => e.proposal.id == proposal2.doc.id);
 
             expect(p1.commentsCount, 1);
             expect(p2.commentsCount, 2);
@@ -2039,8 +2238,8 @@ void main() {
               id: 'c1',
               ver: commentVer,
               type: DocumentType.commentDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
             );
 
             final otherDocVer = _buildUuidV7At(earliest.add(const Duration(hours: 2)));
@@ -2048,8 +2247,8 @@ void main() {
               id: 'other1',
               ver: otherDocVer,
               type: DocumentType.reviewDocument,
-              refId: 'p1',
-              refVer: proposalVer,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
             );
 
             await db.documentsV2Dao.saveAll([proposal, comment, otherDoc]);
@@ -2186,22 +2385,25 @@ void main() {
           });
 
           test('isFavorite matches on id regardless of version', () async {
+            final author = _createTestAuthor();
+
             final ver1 = _buildUuidV7At(earliest);
             final ver2 = _buildUuidV7At(middle);
             final ver3 = _buildUuidV7At(latest);
 
-            final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
-            final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
-            final proposal3 = _createTestDocumentEntity(id: 'p1', ver: ver3);
+            final proposal1 = _createTestDocumentEntity(id: ver1, ver: ver1, authors: [author]);
+            final proposal2 = _createTestDocumentEntity(id: ver1, ver: ver2, authors: [author]);
+            final proposal3 = _createTestDocumentEntity(id: ver1, ver: ver3, authors: [author]);
 
             final actionVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
             final action = _createTestDocumentEntity(
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: ver1,
+              refId: proposal1.doc.id,
+              refVer: proposal1.doc.ver,
               contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3, action]);
@@ -2210,7 +2412,7 @@ void main() {
                 .into(db.documentsLocalMetadata)
                 .insert(
                   DocumentsLocalMetadataCompanion.insert(
-                    id: 'p1',
+                    id: proposal1.doc.id,
                     isFavorite: true,
                   ),
                 );
@@ -2219,7 +2421,7 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.proposal.ver, ver1);
+            expect(result.items.first.proposal.ver, proposal1.doc.ver);
             expect(result.items.first.isFavorite, true);
           });
         });
@@ -2413,6 +2615,8 @@ void main() {
           );
 
           test('template is associated with effective proposal version', () async {
+            final author = _createTestAuthor();
+
             final template1Ver = _buildUuidV7At(earliest);
             final template1 = _createTestDocumentEntity(
               id: 'template-1',
@@ -2431,18 +2635,20 @@ void main() {
 
             final ver1 = _buildUuidV7At(middle);
             final proposal1 = _createTestDocumentEntity(
-              id: 'p1',
+              id: ver1,
               ver: ver1,
               templateId: 'template-1',
               templateVer: template1Ver,
+              authors: [author],
             );
 
             final ver2 = _buildUuidV7At(latest);
             final proposal2 = _createTestDocumentEntity(
-              id: 'p1',
+              id: ver1,
               ver: ver2,
               templateId: 'template-2',
               templateVer: template2Ver,
+              authors: [author],
             );
 
             final actionVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
@@ -2450,9 +2656,10 @@ void main() {
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: ver1,
+              refId: proposal1.doc.id,
+              refVer: proposal1.doc.ver,
               contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([
@@ -3132,9 +3339,11 @@ void main() {
           });
 
           test('works with final action pointing to specific version', () async {
+            final author = _createTestAuthor();
+
             final ver1 = _buildUuidV7At(earliest);
             final proposal1 = _createTestDocumentEntity(
-              id: 'p1',
+              id: ver1,
               ver: ver1,
               contentData: {
                 'setup': {
@@ -3144,11 +3353,12 @@ void main() {
                   'budget': {'requestedFunds': 10000},
                 },
               },
+              authors: [author],
             );
 
             final ver2 = _buildUuidV7At(middle);
             final proposal2 = _createTestDocumentEntity(
-              id: 'p1',
+              id: ver1,
               ver: ver2,
               contentData: {
                 'setup': {
@@ -3158,6 +3368,7 @@ void main() {
                   'budget': {'requestedFunds': 50000},
                 },
               },
+              authors: [author],
             );
 
             final actionVer = _buildUuidV7At(latest);
@@ -3165,14 +3376,15 @@ void main() {
               id: 'action-1',
               ver: actionVer,
               type: DocumentType.proposalActionDocument,
-              refId: 'p1',
-              refVer: ver1,
+              refId: proposal1.doc.id,
+              refVer: proposal1.doc.ver,
               contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [author],
             );
 
             final otherVer = _buildUuidV7At(middle);
             final otherProposal = _createTestDocumentEntity(
-              id: 'other-id',
+              id: otherVer,
               ver: otherVer,
               contentData: {
                 'setup': {
@@ -3182,6 +3394,7 @@ void main() {
                   'budget': {'requestedFunds': 30000},
                 },
               },
+              authors: [author],
             );
 
             await db.documentsV2Dao.saveAll([proposal1, proposal2, action, otherProposal]);
@@ -3210,6 +3423,8 @@ void main() {
           final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
           final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
+          final author = _createTestAuthor();
+
           group('by status', () {
             test('filters draft proposals without action documents', () async {
               final draftProposal1 = _createTestDocumentEntity(
@@ -3217,9 +3432,11 @@ void main() {
                 ver: _buildUuidV7At(latest),
               );
 
+              final d2Id = _buildUuidV7At(middle.add(const Duration(hours: 1)));
               final draftProposal2 = _createTestDocumentEntity(
-                id: 'draft-with-action',
-                ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+                id: d2Id,
+                ver: d2Id,
+                authors: [author],
               );
 
               final draftActionVer = _buildUuidV7At(middle);
@@ -3227,14 +3444,17 @@ void main() {
                 id: 'action-draft',
                 ver: draftActionVer,
                 type: DocumentType.proposalActionDocument,
-                refId: 'draft-with-action',
+                refId: draftProposal2.doc.id,
+                refVer: draftProposal2.doc.ver,
                 contentData: ProposalSubmissionActionDto.draft.toJson(),
+                authors: [author],
               );
 
-              final finalProposalVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+              final fpId = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
               final finalProposal = _createTestDocumentEntity(
-                id: 'final-id',
-                ver: finalProposalVer,
+                id: fpId,
+                ver: fpId,
+                authors: [author],
               );
 
               final finalActionVer = _buildUuidV7At(earliest);
@@ -3242,9 +3462,10 @@ void main() {
                 id: 'action-final',
                 ver: finalActionVer,
                 type: DocumentType.proposalActionDocument,
-                refId: 'final-id',
-                refVer: finalProposalVer,
+                refId: finalProposal.doc.id,
+                refVer: finalProposal.doc.ver,
                 contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+                authors: [author],
               );
 
               await db.documentsV2Dao.saveAll([
@@ -3265,7 +3486,7 @@ void main() {
               expect(result.total, 2);
               expect(
                 result.items.map((e) => e.proposal.id).toSet(),
-                {'draft-no-action', 'draft-with-action'},
+                {draftProposal1.doc.id, draftProposal2.doc.id},
               );
             });
 
@@ -3277,8 +3498,9 @@ void main() {
 
               final finalProposalVer = _buildUuidV7At(middle);
               final finalProposal = _createTestDocumentEntity(
-                id: 'final-id',
+                id: finalProposalVer,
                 ver: finalProposalVer,
+                authors: [author],
               );
 
               final finalActionVer = _buildUuidV7At(earliest);
@@ -3286,9 +3508,10 @@ void main() {
                 id: 'action-final',
                 ver: finalActionVer,
                 type: DocumentType.proposalActionDocument,
-                refId: 'final-id',
-                refVer: finalProposalVer,
+                refId: finalProposal.doc.id,
+                refVer: finalProposal.doc.ver,
                 contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+                authors: [author],
               );
 
               await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
@@ -3312,8 +3535,9 @@ void main() {
 
               final finalProposalVer = _buildUuidV7At(middle);
               final finalProposal = _createTestDocumentEntity(
-                id: 'final-id',
+                id: finalProposalVer,
                 ver: finalProposalVer,
+                authors: [author],
               );
 
               final finalActionVer = _buildUuidV7At(earliest);
@@ -3321,9 +3545,10 @@ void main() {
                 id: 'action-final',
                 ver: finalActionVer,
                 type: DocumentType.proposalActionDocument,
-                refId: 'final-id',
-                refVer: finalProposalVer,
+                refId: finalProposal.doc.id,
+                refVer: finalProposal.doc.ver,
                 contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+                authors: [author],
               );
 
               await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
@@ -3336,7 +3561,7 @@ void main() {
 
               expect(result.items, hasLength(1));
               expect(result.total, 1);
-              expect(result.items[0].proposal.id, 'final-id');
+              expect(result.items[0].proposal.id, finalProposal.doc.id);
             });
           });
 
@@ -4002,8 +4227,9 @@ void main() {
 
               final finalProposalVer = _buildUuidV7At(middle);
               final finalFavorite = _createTestDocumentEntity(
-                id: 'final-fav',
+                id: finalProposalVer,
                 ver: finalProposalVer,
+                authors: [author],
               );
 
               final finalActionVer = _buildUuidV7At(earliest);
@@ -4011,9 +4237,10 @@ void main() {
                 id: 'action-final',
                 ver: finalActionVer,
                 type: DocumentType.proposalActionDocument,
-                refId: 'final-fav',
-                refVer: finalProposalVer,
+                refId: finalFavorite.doc.id,
+                refVer: finalFavorite.doc.ver,
                 contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+                authors: [author],
               );
 
               await db.documentsV2Dao.saveAll([
@@ -4023,8 +4250,8 @@ void main() {
                 finalAction,
               ]);
 
-              await dao.updateProposalFavorite(id: 'draft-fav', isFavorite: true);
-              await dao.updateProposalFavorite(id: 'final-fav', isFavorite: true);
+              await dao.updateProposalFavorite(id: draftFavorite.doc.id, isFavorite: true);
+              await dao.updateProposalFavorite(id: finalFavorite.doc.id, isFavorite: true);
 
               const request = PageRequest(page: 0, size: 10);
               final result = await dao.getProposalsBriefPage(
@@ -4037,7 +4264,7 @@ void main() {
 
               expect(result.items, hasLength(1));
               expect(result.total, 1);
-              expect(result.items[0].proposal.id, 'draft-fav');
+              expect(result.items[0].proposal.id, draftFavorite.doc.id);
             });
 
             test('applies author, category, and search filters together', () async {
@@ -4375,16 +4602,17 @@ void main() {
 
               final draftProposalVer = _buildUuidV7At(latest);
               final draftProposal = _createTestDocumentEntity(
-                id: 'draft-p',
+                id: draftProposalVer,
                 ver: draftProposalVer,
                 parameters: [cat1],
               );
 
               final finalProposalVer = _buildUuidV7At(middle);
               final finalProposal = _createTestDocumentEntity(
-                id: 'final-p',
+                id: finalProposalVer,
                 ver: finalProposalVer,
                 parameters: [cat1],
+                authors: [author],
               );
 
               final finalActionVer = _buildUuidV7At(earliest);
@@ -4392,9 +4620,10 @@ void main() {
                 id: 'action-final',
                 ver: finalActionVer,
                 type: DocumentType.proposalActionDocument,
-                refId: 'final-p',
-                refVer: finalProposalVer,
+                refId: finalProposal.doc.id,
+                refVer: finalProposal.doc.ver,
                 contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+                authors: [author],
               );
 
               await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
@@ -4410,7 +4639,7 @@ void main() {
 
               expect(result.items, hasLength(1));
               expect(result.total, 1);
-              expect(result.items[0].proposal.id, 'draft-p');
+              expect(result.items[0].proposal.id, draftProposal.doc.id);
             });
           });
         });
