@@ -7,6 +7,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 
+final _logger = Logger('AppPrecacheImageAssets');
+
 class GlobalPrecacheImages extends StatefulWidget {
   final Widget child;
 
@@ -59,6 +61,22 @@ class ImagePrecacheService {
     }
   }
 
+  Future<void> _cacheImageAsset(AssetGenImage asset, BuildContext context) async {
+    try {
+      await asset.cache(context: context);
+    } catch (error) {
+      _logger.info('Failed to cache image asset: $error');
+    }
+  }
+
+  Future<void> _cacheSvgAsset(SvgGenImage svg, BuildContext context) async {
+    try {
+      await svg.cache(context: context);
+    } catch (error) {
+      _logger.info('Failed to cache SVG asset: $error');
+    }
+  }
+
   Future<void> _precacheAssets(
     BuildContext context, {
     List<SvgGenImage> svgs = const [],
@@ -71,8 +89,8 @@ class ImagePrecacheService {
       _assets.addAll(assets);
 
       await Future.wait([
-        ..._svgs.map((e) => e.cache(context: context)),
-        ..._assets.map((e) => e.cache(context: context)),
+        ..._svgs.map((e) => _cacheSvgAsset(e, context)),
+        ..._assets.map((e) => _cacheImageAsset(e, context)),
       ]);
 
       if (!_isInitialized.isCompleted) _isInitialized.complete(true);

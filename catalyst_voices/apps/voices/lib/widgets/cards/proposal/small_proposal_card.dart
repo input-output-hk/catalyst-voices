@@ -27,9 +27,9 @@ class SmallProposalCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (!proposal.publish.isLocal) {
-          return ProposalRoute.fromRef(ref: proposal.selfRef).push(context);
+          return ProposalRoute.fromRef(ref: proposal.id).push(context);
         } else if (!proposal.hasNewerLocalIteration && proposal.publish.isLocal) {
-          return ProposalBuilderRoute.fromRef(ref: proposal.selfRef).push(context);
+          return ProposalBuilderRoute.fromRef(ref: proposal.id).push(context);
         }
       },
       child: Container(
@@ -66,7 +66,7 @@ class SmallProposalCard extends StatelessWidget {
                 title: proposal.versions.latest.title,
                 iteration: proposal.versions.latest.versionNumber,
                 datetime: proposal.versions.latest.createdAt,
-                ref: proposal.versions.latest.selfRef,
+                ref: proposal.versions.latest.id,
               ),
             ),
             const SizedBox(height: 12),

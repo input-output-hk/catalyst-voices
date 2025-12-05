@@ -63,7 +63,7 @@ final class ProposalBuilderRoute extends GoRouteData
   }) {
     return ProposalBuilderRoute(
       proposalId: ref.id,
-      proposalVersion: ref.version,
+      proposalVersion: ref.ver,
       local: ref is DraftRef,
     );
   }
@@ -78,7 +78,7 @@ final class ProposalBuilderRoute extends GoRouteData
   Widget build(BuildContext context, GoRouterState state) {
     final ref = DocumentRef.build(
       id: proposalId,
-      version: proposalVersion,
+      ver: proposalVersion,
       isDraft: local,
     );
 

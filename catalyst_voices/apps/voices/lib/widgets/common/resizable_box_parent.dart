@@ -103,7 +103,7 @@ class _ResizableBoxState extends State<_ResizableBox> {
                 }
               });
             },
-            child: VoicesAssets.images.dragger.buildIcon(size: 15),
+            child: VoicesAssets.images.svg.dragger.buildIcon(size: 15),
           ),
         ),
       ],

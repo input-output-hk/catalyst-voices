@@ -4,7 +4,16 @@ import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_in
 
 /// Creates a fallback exception from [ex].
 WalletApiException fallbackApiException(Object ex) {
-  throw WalletApiException(
+  final infoCode = _InfoCodeError.tryFrom(ex);
+  if (infoCode != null) {
+    return WalletApiException(
+      code: WalletApiErrorCode.invalidRequest,
+      info: infoCode.info,
+      sourceCode: infoCode.code,
+    );
+  }
+
+  return WalletApiException(
     code: WalletApiErrorCode.invalidRequest,
     info: ex.toString(),
   );
@@ -114,8 +123,13 @@ final class _InfoCodeError {
           return null;
         }
 
-      case _:
+      case null:
         return null;
+      case _:
+        // The JS error is converted into `JSValue` which we can't catch directly because
+        // it's wasm internal type, instead convert it to a String which should be the json
+        // and try to parse it.
+        return tryFrom(object.toString());
     }
   }
 }
@@ -146,8 +160,13 @@ final class _PaginateError {
           return null;
         }
 
-      case _:
+      case null:
         return null;
+      case _:
+        // The JS error is converted into `JSValue` which we can't catch directly because
+        // it's wasm internal type, instead convert it to a String which should be the json
+        // and try to parse it.
+        return tryFrom(object.toString());
     }
   }
 }

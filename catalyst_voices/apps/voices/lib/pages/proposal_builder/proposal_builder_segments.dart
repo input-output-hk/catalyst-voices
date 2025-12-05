@@ -194,7 +194,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
         },
       ),
       ProposalCommentListItem(:final comment, :final canReply) => ProposalBuilderCommentTile(
-        key: ValueKey(comment.comment.metadata.selfRef),
+        key: ValueKey(comment.comment.metadata.id),
         comment: comment,
         canReply: canReply,
       ),

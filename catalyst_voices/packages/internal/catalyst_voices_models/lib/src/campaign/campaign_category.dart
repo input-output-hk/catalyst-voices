@@ -6,36 +6,34 @@ import 'package:equatable/equatable.dart';
 ///
 /// Should have factory constructor from document representation.
 class CampaignCategory extends Equatable {
-  final SignedDocumentRef selfRef;
+  final SignedDocumentRef id;
   final SignedDocumentRef proposalTemplateRef;
   final SignedDocumentRef campaignRef;
   final String categoryName;
   final String categorySubname;
   final String description;
   final String shortDescription;
-  final int proposalsCount;
   final MultiCurrencyAmount availableFunds;
-  final MultiCurrencyAmount totalAsk;
   final Range<Money> range;
   final Currency currency;
   final List<CategoryDescription> descriptions;
   final String imageUrl;
   final List<String> dos;
   final List<String> donts;
+
+  // TODO(damian-molinski): remove this
   final DateTime submissionCloseDate;
 
   const CampaignCategory({
-    required this.selfRef,
+    required this.id,
     required this.proposalTemplateRef,
     required this.campaignRef,
     required this.categoryName,
     required this.categorySubname,
     required this.description,
     required this.shortDescription,
-    required this.proposalsCount,
     required this.availableFunds,
     required this.imageUrl,
-    required this.totalAsk,
     required this.range,
     required this.currency,
     required this.descriptions,
@@ -48,17 +46,15 @@ class CampaignCategory extends Equatable {
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     proposalTemplateRef,
     campaignRef,
     categoryName,
     categorySubname,
     description,
     shortDescription,
-    proposalsCount,
     availableFunds,
     imageUrl,
-    totalAsk,
     range,
     descriptions,
     dos,
@@ -67,17 +63,15 @@ class CampaignCategory extends Equatable {
   ];
 
   CampaignCategory copyWith({
-    SignedDocumentRef? selfRef,
+    SignedDocumentRef? id,
     SignedDocumentRef? proposalTemplateRef,
     SignedDocumentRef? campaignRef,
     String? categoryName,
     String? categorySubname,
     String? description,
     String? shortDescription,
-    int? proposalsCount,
     MultiCurrencyAmount? availableFunds,
     String? imageUrl,
-    MultiCurrencyAmount? totalAsk,
     Range<Money>? range,
     Currency? currency,
     List<CategoryDescription>? descriptions,
@@ -86,17 +80,15 @@ class CampaignCategory extends Equatable {
     DateTime? submissionCloseDate,
   }) {
     return CampaignCategory(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       proposalTemplateRef: proposalTemplateRef ?? this.proposalTemplateRef,
       campaignRef: campaignRef ?? this.campaignRef,
       categoryName: categoryName ?? this.categoryName,
       categorySubname: categorySubname ?? this.categorySubname,
       description: description ?? this.description,
       shortDescription: shortDescription ?? this.shortDescription,
-      proposalsCount: proposalsCount ?? this.proposalsCount,
       availableFunds: availableFunds ?? this.availableFunds,
       imageUrl: imageUrl ?? this.imageUrl,
-      totalAsk: totalAsk ?? this.totalAsk,
       range: range ?? this.range,
       currency: currency ?? this.currency,
       descriptions: descriptions ?? this.descriptions,

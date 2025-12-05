@@ -82,21 +82,31 @@ project: {
 						http://:8080 {
 							root * /app
 
+							encode
+
 							handle /healthz {
 							  respond `{"status":"ok"}` 200
 							}
 
 							handle {
 							  try_files {path} /index.html
-							  file_server
+							  file_server {
+							    precompressed
+							  }
 							}
 
 							header {
 							  Cross-Origin-Opener-Policy "same-origin"
 							  Cross-Origin-Embedder-Policy "require-corp"
+							  Cross-Origin-Resource-Policy "same-origin"
 
-							  / Cache-Control "public, max-age=3600, must-revalidate"
+							  ?Cache-Control "public, max-age=3600, must-revalidate"
 							}
+
+							@index_html path /index.html
+							header @index_html Cache-Control "no-cache, must-revalidate"
+
+							import /app/versioned_assets.caddy
 
 							handle_errors {
 							  rewrite * /50x.html

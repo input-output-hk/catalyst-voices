@@ -62,7 +62,7 @@ final class CommentServiceImpl implements CommentService {
     required DocumentData document,
   }) async {
     assert(
-      document.metadata.selfRef is SignedDocumentRef,
+      document.metadata.id is SignedDocumentRef,
       'Drafts not supported for comments',
     );
 
@@ -76,7 +76,7 @@ final class CommentServiceImpl implements CommentService {
 
     await _commentRepository.saveComment(document: document);
 
-    return document.ref as SignedDocumentRef;
+    return document.id as SignedDocumentRef;
   }
 
   @override

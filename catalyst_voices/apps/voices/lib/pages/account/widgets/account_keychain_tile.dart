@@ -1,16 +1,10 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
-import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
-
-// TODO(damian-molinski): Remove this once KeychainDeletedDialog is migrated to CatalystMessenger.
-bool showKeychainDeletedDialog = false;
 
 class AccountKeychainTile extends StatefulWidget {
   final VoidCallback onRemoveTap;
@@ -38,7 +32,7 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
         style: ButtonStyle(
           textStyle: WidgetStatePropertyAll(context.textTheme.labelSmall),
         ),
-        onTap: _removeKeychain,
+        onTap: widget.onRemoveTap,
         child: Text(context.l10n.removeKeychain),
       ),
       child: VoicesTextField(
@@ -74,35 +68,5 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
         .map((event) => event.walletConnected)
         .distinct()
         .listen((event) => _controller.text = event);
-  }
-
-  Future<void> _removeKeychain() async {
-    final confirmed = await DeleteKeychainDialog.show(context);
-    if (!confirmed) {
-      return;
-    }
-
-    if (mounted) {
-      await context.read<AccountCubit>().deleteActiveKeychain();
-      showKeychainDeletedDialog = true;
-    }
-
-    if (mounted) {
-      // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
-      final phaseType = context.read<CampaignPhaseAwareCubit>().state.activeCampaignPhaseType;
-
-      switch (phaseType) {
-        case CampaignPhaseType.communityReview:
-        case CampaignPhaseType.communityVoting:
-          const VotingRoute.keychainDeleted().go(context);
-        case null:
-        case CampaignPhaseType.proposalSubmission:
-        case CampaignPhaseType.votingRegistration:
-        case CampaignPhaseType.reviewRegistration:
-        case CampaignPhaseType.votingResults:
-        case CampaignPhaseType.projectOnboarding:
-          const DiscoveryRoute.keychainDeleted().go(context);
-      }
-    }
   }
 }

@@ -21,7 +21,7 @@ class ProposalsPagination extends StatelessWidget {
       builderDelegate: PagedWrapChildBuilder<ProposalBrief>(
         builder: (context, item) {
           return ProposalsPaginationTile(
-            key: ValueKey(item.selfRef),
+            key: ValueKey(item.id),
             proposal: item,
           );
         },

@@ -20,15 +20,7 @@ final class CommentDocument extends Equatable {
     required DocumentMapper mapper,
   }) {
     return DocumentData(
-      metadata: DocumentDataMetadata(
-        type: DocumentType.commentDocument,
-        selfRef: metadata.selfRef,
-        ref: metadata.ref,
-        template: metadata.template,
-        reply: metadata.reply,
-        authors: [metadata.authorId],
-        categoryId: metadata.categoryId,
-      ),
+      metadata: metadata.toDocumentMetadata(),
       content: mapper.toContent(document),
     );
   }
@@ -47,23 +39,26 @@ final class CommentMetadata extends DocumentMetadata {
 
   // Nullable only for backwards compatibility.
   /// Pointer to category of proposal that [ref] points to.
-  final SignedDocumentRef? categoryId;
+  final DocumentParameters parameters;
 
   /// Creator of document.
   final CatalystId authorId;
 
   CommentMetadata({
     // Note. no drafts for comments
-    required SignedDocumentRef super.selfRef,
+    required SignedDocumentRef super.id,
     required this.ref,
     required this.template,
     this.reply,
-    required this.categoryId,
+    required this.parameters,
     required this.authorId,
   }) : assert(
          ref.isExact,
          'Comments can refer only exact documents',
        );
+
+  @override
+  SignedDocumentRef get id => super.id as SignedDocumentRef;
 
   @override
   List<Object?> get props =>
@@ -72,10 +67,18 @@ final class CommentMetadata extends DocumentMetadata {
         ref,
         template,
         reply,
-        categoryId,
+        parameters,
         authorId,
       ];
 
-  @override
-  SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;
+  DocumentDataMetadata toDocumentMetadata() {
+    return DocumentDataMetadata.comment(
+      id: id,
+      proposalRef: ref,
+      template: template,
+      reply: reply,
+      authors: [authorId],
+      parameters: parameters,
+    );
+  }
 }

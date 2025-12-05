@@ -109,10 +109,8 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<List<ShelleyAddress>> getUsedAddresses({Paginate? paginate}) async {
     try {
-      final jsPaginate = paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
-
       return await _delegate
-          .getUsedAddresses(jsPaginate)
+          .getUsedAddresses(paginate != null ? JSPaginate.fromDart(paginate) : null)
           .toDart
           .then(
             (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
@@ -128,14 +126,14 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
     Paginate? paginate,
   }) async {
     try {
-      final utxos = _delegate.getUtxos(
-        amount != null ? hex.encode(cbor.encode(amount.toCbor())).toJS : makeUndefined(),
-        paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
+      final promise = _delegate.getUtxos(
+        amount != null ? hex.encode(cbor.encode(amount.toCbor())).toJS : null,
+        paginate != null ? JSPaginate.fromDart(paginate) : null,
       );
 
-      if (utxos == null) return {};
+      if (promise == null) return const {};
 
-      return await utxos.toDart.then(
+      return await promise.toDart.then(
         (array) => array.toDart
             .map(
               (item) => TransactionUnspentOutput.fromCbor(

@@ -117,7 +117,7 @@ class _Body extends StatelessWidget {
           ),
         ),
         ProposalMenuActionButton(
-          ref: proposal.selfRef,
+          ref: proposal.id,
           proposalPublish: proposal.publish,
           title: proposal.title,
           version: proposal.iteration,

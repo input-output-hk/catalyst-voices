@@ -76,7 +76,7 @@ class _VotingListBallotEmptyState extends StatelessWidget {
     return Align(
       alignment: const Alignment(0, -0.3),
       child: EmptyState(
-        image: VoicesAssets.images.noVotes.buildPicture(),
+        image: VoicesAssets.images.svg.noVotes.buildPicture(),
         title: Text(_buildTitleParts(context).join('\n')),
         constraints: const BoxConstraints(maxWidth: 236),
       ),

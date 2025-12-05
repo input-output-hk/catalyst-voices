@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_header.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_nav_tile.dart';
-import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_selectors/user_proposal_selectors.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/workspace_overview_proposal.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space_overview_container.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -25,7 +25,7 @@ class WorkspaceOverview extends StatelessWidget {
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           Expanded(
             child: SingleChildScrollView(
-              child: _NotPublishedProposalSelector(),
+              child: _NotPublishedProposalOverview(),
             ),
           ),
         ],
@@ -50,8 +50,8 @@ class _BrowseMyProposals extends StatelessWidget {
   }
 }
 
-class _NotPublishedProposalSelector extends StatelessWidget {
-  const _NotPublishedProposalSelector();
+class _NotPublishedProposalOverview extends StatelessWidget {
+  const _NotPublishedProposalOverview();
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class _NotPublishedProposalSelector extends StatelessWidget {
       builder: (context, state) {
         return Offstage(
           offstage: state,
-          child: const WorkspaceOverviewProposalSelector(),
+          child: const WorkspaceOverviewProposal(),
         );
       },
     );

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:mocktail/mocktail.dart';
@@ -15,12 +16,12 @@ void main() {
 
     late _FakeCatalystKeyDerivation catalystKeyDerivation;
     late KeyDerivationService keyDerivation;
-    late _FakeCatalystPrivateKey masterKey;
+    late FakeCatalystPrivateKey masterKey;
 
     setUp(() {
       catalystKeyDerivation = _FakeCatalystKeyDerivation();
       keyDerivation = KeyDerivationService(catalystKeyDerivation);
-      masterKey = _FakeCatalystPrivateKey(bytes: Uint8List.fromList([1]));
+      masterKey = FakeCatalystPrivateKey(bytes: Uint8List.fromList([1]));
     });
 
     test('should generate master key from a seed phrase', () async {
@@ -50,63 +51,11 @@ void main() {
   });
 }
 
-class _FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed25519XPrivateKey({required this.bytes});
-
-  @override
-  Future<Bip32Ed25519XPrivateKey> derivePrivateKey({
-    required String path,
-  }) async {
-    return _FakeBip32Ed25519XPrivateKey(bytes: path.codeUnits);
-  }
-
-  @override
-  Future<Bip32Ed25519XPublicKey> derivePublicKey() async {
-    return _FakeBip32Ed25519XPublicKey(bytes: bytes);
-  }
-}
-
-class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed25519XPublicKey({required this.bytes});
-}
-
 class _FakeCatalystKeyDerivation extends Fake implements CatalystKeyDerivation {
   @override
   Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
     required String mnemonic,
   }) async {
-    return _FakeBip32Ed25519XPrivateKey(bytes: mnemonic.codeUnits);
+    return FakeBip32Ed25519XPrivateKey(mnemonic.codeUnits);
   }
-}
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-
-  @override
-  Future<CatalystPrivateKey> derivePrivateKey({
-    required String path,
-  }) async {
-    return _FakeCatalystPrivateKey(bytes: Uint8List.fromList(path.codeUnits));
-  }
-
-  @override
-  Future<CatalystPublicKey> derivePublicKey() async {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-}
-
-class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPublicKey({required this.bytes});
 }
