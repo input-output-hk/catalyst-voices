@@ -399,6 +399,41 @@ void main() {
 
           expect(result, 1);
         });
+
+        test('hidden from different author then proposals do not exclude proposal', () async {
+          final author = _createTestAuthor(name: 'Good', role0KeySeed: 1);
+          final differentAuthor = _createTestAuthor(name: 'Bad', role0KeySeed: 2);
+
+          final p1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: p1Ver,
+            ver: p1Ver,
+            authors: [author],
+          );
+
+          final p2Ver = _buildUuidV7At(middle);
+          final proposal2 = _createTestDocumentEntity(
+            id: p2Ver,
+            ver: p2Ver,
+            authors: [author],
+          );
+
+          final hideAction = _createTestDocumentEntity(
+            id: 'action-hide',
+            ver: _buildUuidV7At(earliest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
+            contentData: ProposalSubmissionActionDto.hide.toJson(),
+            authors: [differentAuthor],
+          );
+
+          await db.documentsV2Dao.saveAll([proposal1, proposal2, hideAction]);
+
+          final result = await dao.getVisibleProposalsCount();
+
+          expect(result, 2);
+        });
       });
 
       group('updateProposalFavorite', () {
@@ -1977,6 +2012,71 @@ void main() {
             expect(result.items, hasLength(1));
             expect(result.items.first.proposal.id, proposal.doc.id);
             expect(result.items.first.actionType, ProposalSubmissionAction.draft);
+          });
+
+          test('proposal with final action from collaborator is not final', () async {
+            final originalAuthor = _createTestAuthor(name: 'Main', role0KeySeed: 1);
+            final coProposer = _createTestAuthor(name: 'Collab', role0KeySeed: 2);
+
+            final proposalVer = _buildUuidV7At(earliest);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [originalAuthor],
+              collaborators: [coProposer],
+            );
+
+            final actionVer = _buildUuidV7At(latest);
+            final action = _createTestDocumentEntity(
+              id: 'action-1',
+              ver: actionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [coProposer],
+            );
+            await db.documentsV2Dao.saveAll([proposal, action]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(request: request);
+
+            expect(result.items, hasLength(1));
+            expect(result.items.first.proposal.id, proposal.doc.id);
+            expect(result.items.first.actionType, isNull);
+          });
+
+          test('proposal with final action from author with different username final', () async {
+            final originalAuthor = _createTestAuthor(name: 'Main', role0KeySeed: 1);
+            final updatedOriginalAuthor = originalAuthor.copyWith(
+              username: const Optional('Damian'),
+            );
+
+            final proposalVer = _buildUuidV7At(earliest);
+            final proposal = _createTestDocumentEntity(
+              id: proposalVer,
+              ver: proposalVer,
+              authors: [originalAuthor],
+            );
+
+            final actionVer = _buildUuidV7At(latest);
+            final action = _createTestDocumentEntity(
+              id: 'action-1',
+              ver: actionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: proposal.doc.id,
+              refVer: proposal.doc.ver,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+              authors: [updatedOriginalAuthor],
+            );
+            await db.documentsV2Dao.saveAll([proposal, action]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(request: request);
+
+            expect(result.items, hasLength(1));
+            expect(result.items.first.proposal.id, proposal.doc.id);
+            expect(result.items.first.actionType, ProposalSubmissionAction.aFinal);
           });
         });
 
@@ -5352,6 +5452,65 @@ void main() {
 
           expect(result.data[templateRef]!.totalAsk, 12500);
           expect(result.data[templateRef]!.finalProposalsCount, 2);
+        });
+
+        test('final action not from author do not include proposal', () async {
+          final author = _createTestAuthor(name: 'Main', role0KeySeed: 1);
+          final collab = _createTestAuthor(name: 'Collab', role0KeySeed: 2);
+
+          const templateRef = SignedDocumentRef(id: 'template-1', ver: 'template-1-ver');
+
+          final p1Id = _buildUuidV7At(earliest);
+          final proposalV1 = _createTestDocumentEntity(
+            id: p1Id,
+            ver: p1Id,
+            parameters: [cat1],
+            templateId: templateRef.id,
+            templateVer: templateRef.ver,
+            contentData: {
+              'summary': {
+                'budget': {'requestedFunds': 10000},
+              },
+            },
+            authors: [author],
+          );
+
+          final proposalV2 = _createTestDocumentEntity(
+            id: p1Id,
+            ver: _buildUuidV7At(latest),
+            parameters: [cat1],
+            templateId: templateRef.id,
+            templateVer: templateRef.ver,
+            contentData: {
+              'summary': {
+                'budget': {'requestedFunds': 30000},
+              },
+            },
+            authors: [author],
+          );
+
+          final finalActionWithoutRefVer = _createTestDocumentEntity(
+            id: 'action-final',
+            ver: _buildUuidV7At(latest.add(const Duration(hours: 1))),
+            type: DocumentType.proposalActionDocument,
+            refId: proposalV2.doc.id,
+            refVer: proposalV2.doc.ver,
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            authors: [collab],
+          );
+
+          await db.documentsV2Dao.saveAll([proposalV1, proposalV2, finalActionWithoutRefVer]);
+
+          final filters = ProposalsTotalAskFilters(
+            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+          );
+
+          final result = await dao.getProposalsTotalTask(
+            filters: filters,
+            nodeId: nodeId,
+          );
+
+          expect(result, const ProposalsTotalAsk({}));
         });
       });
 
