@@ -197,7 +197,7 @@ jobs:
             echo "Health status: $STATUS"
             if [ "$STATUS" == "healthy" ]; then
               echo "Container is healthy!"
-              break
+              exit 0
             fi
             if [ "$STATUS" == "unhealthy" ]; then
               echo "Container became unhealthy."
