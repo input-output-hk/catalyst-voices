@@ -12,7 +12,10 @@ export class WritedownSeedPhraseInfoPanel extends OnboardingBasePage {
   }
   async goto() {
     await new WritedownSeedPhrasePanel(this.page, this.testModel).goto();
-    this.testModel.accountModel.seedPhrase = await new WritedownSeedPhrasePanel(this.page, this.testModel).getSeedPhraseWords();
+    this.testModel.accountModel.seedPhrase = await new WritedownSeedPhrasePanel(
+      this.page,
+      this.testModel
+    ).getSeedPhraseWords();
     await new WritedownSeedPhrasePanel(this.page, this.testModel).seedphraseStoredCheckboxClick();
     await new OnboardingBasePage(this.page, this.testModel).nextButtonClick();
   }

@@ -1,0 +1,49 @@
+VERSION 0.8
+
+# Base setup for E2E test runner
+# Uses official Playwright image which includes Chromium, Firefox, and WebKit
+builder:
+    FROM mcr.microsoft.com/playwright:v1.57.0-noble
+    WORKDIR /workspace
+
+    # Install additional dependencies for headed mode with Xvfb
+    RUN apt-get update && apt-get install -y \
+        xvfb \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Copy test files
+    COPY package.json package-lock.json ./
+    RUN npm ci
+
+    # Copy all test-related files
+    COPY . .
+
+# Build the E2E test runner image
+docker:
+    FROM +builder
+
+    ARG container="e2e-test-runner"
+    ARG tag="latest"
+    
+    # Set working directory
+    WORKDIR /workspace
+
+    # Default command to run tests
+    CMD ["npx", "playwright", "test"]
+
+    SAVE IMAGE ${container}:${tag}
+
+# Build all required images for E2E testing
+all-images:
+    FROM scratch
+    
+    # Build gateway and its dependencies
+    BUILD ../../../../catalyst-gateway+docker
+    BUILD ../../../../catalyst-gateway/event-db+docker
+    
+    # Build voices frontend
+    BUILD ../../../+docker
+    
+    # Build E2E test runner
+    BUILD +docker
