@@ -48,6 +48,9 @@ final class DocumentDataMetadata extends Equatable {
   /// List of authors represented by CatalystId
   final List<CatalystId>? authors;
 
+  /// List of collaborators represented by CatalystId
+  final List<CatalystId>? collaborators;
+
   // TODO(damian-molinski): refactor with factory constructors for
   //  proposal/comment to centralize required fields for each type.
   DocumentDataMetadata({
@@ -63,6 +66,7 @@ final class DocumentDataMetadata extends Equatable {
     this.electionId,
     this.categoryId,
     this.authors,
+    this.collaborators,
   }) : assert(
          id.isExact,
          'id have to be exact. Make sure version is not null',
@@ -82,6 +86,7 @@ final class DocumentDataMetadata extends Equatable {
     electionId,
     categoryId,
     authors,
+    collaborators,
   ];
 
   DocumentDataMetadata copyWith({
@@ -97,6 +102,7 @@ final class DocumentDataMetadata extends Equatable {
     Optional<String>? electionId,
     Optional<SignedDocumentRef>? categoryId,
     Optional<List<CatalystId>>? authors,
+    Optional<List<CatalystId>>? collaborators,
   }) {
     return DocumentDataMetadata(
       type: type ?? this.type,
@@ -111,6 +117,7 @@ final class DocumentDataMetadata extends Equatable {
       electionId: electionId.dataOr(this.electionId),
       categoryId: categoryId.dataOr(this.categoryId),
       authors: authors.dataOr(this.authors),
+      collaborators: collaborators.dataOr(this.collaborators),
     );
   }
 }

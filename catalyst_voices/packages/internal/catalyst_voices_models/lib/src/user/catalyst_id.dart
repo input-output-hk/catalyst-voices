@@ -95,6 +95,11 @@ final class CatalystId extends Equatable {
     return CatalystId.fromUri(Uri.parse(data));
   }
 
+  bool get isAnonymous {
+    final username = this.username;
+    return username == null || username.isBlank;
+  }
+
   @override
   List<Object?> get props => [
     host,

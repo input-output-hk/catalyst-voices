@@ -19,6 +19,7 @@ abstract final class ProposalDocumentFactory {
       templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
       authors: documentData.metadata.authors ?? [],
+      collaborators: documentData.metadata.collaborators,
     );
 
     final schema = template.schema;

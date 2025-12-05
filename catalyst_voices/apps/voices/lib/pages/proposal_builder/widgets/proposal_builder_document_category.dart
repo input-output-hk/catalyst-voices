@@ -1,4 +1,4 @@
-part of 'proposal_builder_segments.dart';
+part of '../proposal_builder_segments.dart';
 
 class _CategoryDetails extends StatelessWidget {
   final DocumentProperty property;

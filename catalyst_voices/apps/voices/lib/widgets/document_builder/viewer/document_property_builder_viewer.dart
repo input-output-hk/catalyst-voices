@@ -105,7 +105,15 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
   Iterable<Widget> _buildProperty(DocumentProperty property) sync* {
     final overrideBuilder = _getOverrideBuilder(property.nodeId);
     if (overrideBuilder != null) {
-      yield overrideBuilder(context, property);
+      yield overrideBuilder(
+        context,
+        property,
+        (
+          editedData: null,
+          isEditMode: false,
+          onCollaboratorsChanged: (_) {},
+        ),
+      );
       return;
     }
 

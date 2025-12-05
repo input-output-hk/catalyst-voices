@@ -97,6 +97,10 @@
   "@actor": {
     "description": "Refers to user that created keychain and is unlocked."
   },
+  "add": "Add",
+  "@add": {
+    "description": "Generic add label text"
+  },
   "addCollaborator": "Add Co-proposer",
   "@addCollaborator": {
     "description": "Informs user that he is adding collaborator to his proposal"
@@ -537,6 +541,15 @@
   "@collaboratorInvitationStatusRemoved": {
     "description": "Collaborator invitation status: removed."
   },
+  "collaboratorsSectionDescription": "You can add up to {max} co-proposers. Co-Proposers will be notified via email upon proposal publishing. Only registered proposers with a verified email can be added.",
+  "@collaboratorsSectionDescription": {
+    "description": "Description for the collaborators section explaining the rules",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
     "description": "Coming soon message"
@@ -655,9 +668,17 @@
   "@copied": {
     "description": "Snackbar message shown when user copies a link."
   },
+  "coproposer": "Co-proposer",
+  "@coproposer": {
+    "description": "Collaborator of the proposal."
+  },
   "coproposers": "Co-proposers",
   "@coproposers": {
-    "description": "Collaborators on the proposal."
+    "description": "Collaborators of the proposal."
+  },
+  "coproposersAndApplicants": "Co-Proposers and additional applicants",
+  "@coproposersAndApplicants": {
+    "description": "Label for proposal builder collaborators tile"
   },
   "copyLink": "Copy Link",
   "@copyLink": {
@@ -2760,16 +2781,20 @@
   "@publishButtonText": {
     "description": "Text shown in publish button"
   },
-  "publishNewProposalIterationDialogList1": "Published iterations are always public.",
+  "publishNewProposalIterationDialogList1": "Co-Proposers will be notified via email. They can choose to accept or reject the invitation, so publish your drafts and finals wisely. ",
   "@publishNewProposalIterationDialogList1": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about Co-Proposers will be notified via email."
+  },
+  "publishNewProposalIterationDialogList2": "Published iterations are always public.",
+  "@publishNewProposalIterationDialogList2": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about proposals being public."
   },
-  "publishNewProposalIterationDialogList2": "Contributors can comment on the latest iteration.",
-  "@publishNewProposalIterationDialogList2": {
+  "publishNewProposalIterationDialogList3": "Contributors can comment on the latest iteration.",
+  "@publishNewProposalIterationDialogList3": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about contributors being able to comment on drafts."
   },
-  "publishNewProposalIterationDialogList3": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
-  "@publishNewProposalIterationDialogList3": {
+  "publishNewProposalIterationDialogList4": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
+  "@publishNewProposalIterationDialogList4": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about drafts not being automatically submitted for voting."
   },
   "publishNewProposalIterationDialogSubtitle": "Published proposal drafts are public to other users, including all previous iterations.",

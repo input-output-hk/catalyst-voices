@@ -117,7 +117,7 @@ class _Username extends StatelessWidget {
       spacing: 8,
       children: [
         Text(
-          catalystId.username ?? context.l10n.anonymousUsername,
+          catalystId.getDisplayName(context),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
             color: status.labelColor(context),
           ),

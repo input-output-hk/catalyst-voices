@@ -93,6 +93,7 @@ final class DocumentDataMetadataDto {
   final String? electionId;
   final DocumentRefDto? categoryId;
   final List<String>? authors;
+  final List<String>? collaborators;
 
   DocumentDataMetadataDto({
     required this.type,
@@ -107,6 +108,7 @@ final class DocumentDataMetadataDto {
     this.electionId,
     this.categoryId,
     this.authors,
+    this.collaborators,
   });
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
@@ -131,6 +133,7 @@ final class DocumentDataMetadataDto {
         electionId: data.electionId,
         categoryId: data.categoryId?.toDto(),
         authors: data.authors?.map((e) => e.toString()).toList(),
+        collaborators: data.collaborators?.map((e) => e.toString()).toList(),
       );
 
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoToJson(this);
@@ -149,6 +152,7 @@ final class DocumentDataMetadataDto {
       electionId: electionId,
       categoryId: categoryId?.toModel().toSignedDocumentRef(),
       authors: authors?.map(CatalystId.parse).toList(),
+      collaborators: collaborators?.map(CatalystId.parse).toList(),
     );
   }
 
