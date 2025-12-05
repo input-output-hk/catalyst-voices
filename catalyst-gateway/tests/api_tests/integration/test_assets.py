@@ -4,6 +4,7 @@ import codecs
 
 import pytest
 from loguru import logger
+
 from api.v1 import cardano
 
 
@@ -37,9 +38,9 @@ def test_persistent_ada_amount_endpoint():
             continue
 
         # check that it should exist
-        assert (
-            resp.status_code == 200
-        ), f"Assertion failed: Cannot find assets for '{stake_addr}'"
+        assert resp.status_code == 200, (
+            f"Assertion failed: Cannot find assets for '{stake_addr}'"
+        )
 
         assets = resp.json()
 
