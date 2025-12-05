@@ -7,6 +7,12 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     hide DocumentListPropertyBuilder, DocumentObjectPropertyBuilder, DocumentValuePropertyBuilder;
 import 'package:flutter/material.dart';
 
+typedef CollaboratorsSectionData = ({
+  List<CatalystId>? editedData,
+  bool isEditMode,
+  ValueChanged<List<CatalystId>?> onCollaboratorsChanged,
+});
+
 /// A map defining overrides for the [PropertyTile.action].
 ///
 /// Instead of building a predefined widget it is
@@ -17,7 +23,8 @@ typedef DocumentPropertyActionOverrides = Map<DocumentNodeId, DocumentPropertyAc
 typedef DocumentPropertyActionWidgetBuilder =
     Widget Function(
       BuildContext context,
-      DocumentProperty property,
+      // ignore: avoid_positional_boolean_parameters
+      bool isEditMode,
       ValueChanged<EditableTileChange> onEditableChanged,
     );
 
@@ -32,12 +39,14 @@ typedef DocumentPropertyWidgetBuilder =
     Widget Function(
       BuildContext context,
       DocumentProperty property,
+      CollaboratorsSectionData collaboratorsSectionData,
     );
 
 class DocumentPropertyBuilder extends StatelessWidget {
   final DocumentProperty property;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
+  final CollaboratorsSectionData collaboratorsSectionData;
   final DocumentPropertyBuilderOverrides? overrides;
 
   const DocumentPropertyBuilder({
@@ -45,6 +54,7 @@ class DocumentPropertyBuilder extends StatelessWidget {
     required this.property,
     required this.isEditMode,
     required this.onChanged,
+    required this.collaboratorsSectionData,
     this.overrides,
   });
 
@@ -61,7 +71,11 @@ class DocumentPropertyBuilder extends StatelessWidget {
     final property = this.property;
     final overrideBuilder = _getOverrideBuilder(property.nodeId);
     if (overrideBuilder != null) {
-      return overrideBuilder(context, property);
+      return overrideBuilder(
+        context,
+        property,
+        collaboratorsSectionData,
+      );
     }
 
     switch (property) {
@@ -70,6 +84,7 @@ class DocumentPropertyBuilder extends StatelessWidget {
           property: property,
           isEditMode: isEditMode,
           onChanged: onChanged,
+          collaboratorsSectionData: collaboratorsSectionData,
           overrides: overrides,
         );
       case DocumentObjectProperty():
@@ -77,6 +92,7 @@ class DocumentPropertyBuilder extends StatelessWidget {
           property: property,
           isEditMode: isEditMode,
           onChanged: onChanged,
+          collaboratorsSectionData: collaboratorsSectionData,
           overrides: overrides,
         );
       case DocumentValueProperty():

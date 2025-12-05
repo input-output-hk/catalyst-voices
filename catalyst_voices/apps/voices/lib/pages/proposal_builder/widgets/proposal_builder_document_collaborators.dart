@@ -106,38 +106,35 @@ class _CollaboratorReadItem extends StatelessWidget {
 }
 
 class _CollaboratorsDetails extends StatelessWidget {
-  final DocumentProperty property;
-  final CollaboratorsData data;
+  final CollaboratorsData collaboratorsData;
+  final CollaboratorsSectionData collaboratorsSectionData;
   final int maxCollaborators;
 
   const _CollaboratorsDetails({
-    required this.data,
-    required this.property,
+    required this.collaboratorsData,
+    required this.collaboratorsSectionData,
     required this.maxCollaborators,
   });
 
   @override
   Widget build(BuildContext context) {
-    final tileController = DocumentBuilderSectionTileControllerScope.of(context);
-    final tileData = tileController.getData<DocumentBuilderSectionTileData>(property.nodeId);
-    final isEditMode = tileData?.isEditMode ?? false;
-
-    return isEditMode
+    return collaboratorsSectionData.isEditMode
         ? _CollaboratorsEditView(
-            data: data,
-            property: property,
+            authorId: collaboratorsData.authorId,
+            collaborators: collaboratorsSectionData.editedData ?? collaboratorsData.collaborators,
+            onChanged: collaboratorsSectionData.onCollaboratorsChanged,
             maxCollaborators: maxCollaborators,
           )
-        : _CollaboratorsReadOnlyView(data.collaborators);
+        : _CollaboratorsReadOnlyView(collaboratorsData.collaborators);
   }
 }
 
 class _CollaboratorsDetailsSelector extends StatelessWidget {
-  final DocumentProperty property;
+  final CollaboratorsSectionData collaboratorsSectionData;
   final int maxCollaborators;
 
   const _CollaboratorsDetailsSelector({
-    required this.property,
+    required this.collaboratorsSectionData,
     required this.maxCollaborators,
   });
 
@@ -149,46 +146,30 @@ class _CollaboratorsDetailsSelector extends StatelessWidget {
         collaborators: state.metadata.collaborators,
       ),
       builder: (_, data) => _CollaboratorsDetails(
-        property: property,
-        data: data,
+        collaboratorsData: data,
+        collaboratorsSectionData: collaboratorsSectionData,
         maxCollaborators: maxCollaborators,
       ),
     );
   }
-
-  static DocumentNodeId getDataNodeId(DocumentNodeId tileNodeId) => tileNodeId.child('data');
 }
 
-class _CollaboratorsEditView extends StatefulWidget {
-  final DocumentProperty property;
-  final CollaboratorsData data;
+class _CollaboratorsEditView extends StatelessWidget {
+  final CatalystId? authorId;
+  final List<CatalystId> collaborators;
+  final ValueChanged<List<CatalystId>?> onChanged;
   final int maxCollaborators;
 
   const _CollaboratorsEditView({
-    required this.data,
-    required this.property,
+    required this.authorId,
+    required this.collaborators,
+    required this.onChanged,
     required this.maxCollaborators,
   });
 
-  @override
-  State<_CollaboratorsEditView> createState() => _CollaboratorsEditViewState();
-}
+  set collaborators(List<CatalystId> value) => onChanged(value);
 
-class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
-  late DocumentBuilderSectionTileController _tileController;
-
-  bool get _canAddMore => _collaborators.length < widget.maxCollaborators;
-
-  List<CatalystId> get _collaborators =>
-      _tileController.getData<List<CatalystId>>(_dataNodeId) ?? [];
-
-  set _collaborators(List<CatalystId> value) => _tileController.setData(_dataNodeId, value);
-
-  DocumentNodeId get _dataNodeId => _CollaboratorsDetailsSelector.getDataNodeId(_tileNodeId);
-
-  bool get _hasEditingData => _tileController.getData<List<CatalystId>>(_dataNodeId) != null;
-
-  DocumentNodeId get _tileNodeId => widget.property.nodeId;
+  bool get _canAddMore => collaborators.length < maxCollaborators;
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +180,7 @@ class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          context.l10n.collaboratorsSectionDescription(widget.maxCollaborators),
+          context.l10n.collaboratorsSectionDescription(maxCollaborators),
           style: textTheme.bodyMedium?.copyWith(
             color: colors.textOnPrimaryLevel0,
           ),
@@ -212,9 +193,9 @@ class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
           ),
         ),
         const SizedBox(height: 2),
-        if (_collaborators.isNotEmpty) ...[
+        if (collaborators.isNotEmpty) ...[
           const SizedBox(height: 12),
-          ..._collaborators.map((collaborator) {
+          ...collaborators.map((collaborator) {
             return _CollaboratorEditItem(
               collaborator: collaborator,
               onRemove: () => _removeCollaborator(collaborator),
@@ -225,7 +206,7 @@ class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
         if (_canAddMore) ...[
           const SizedBox(height: 6),
           VoicesOutlinedButton(
-            onTap: _addCollaborator,
+            onTap: () => _addCollaborator(context),
             leading: VoicesAssets.icons.plus.buildIcon(size: 18),
             child: Text(context.l10n.add),
           ),
@@ -235,40 +216,23 @@ class _CollaboratorsEditViewState extends State<_CollaboratorsEditView> {
     );
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _tileController = DocumentBuilderSectionTileControllerScope.of(context);
-    if (!_hasEditingData) {
-      _collaborators = widget.data.collaborators;
-    }
-  }
-
-  @override
-  void didUpdateWidget(_CollaboratorsEditView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!listEquals(oldWidget.data.collaborators, widget.data.collaborators)) {
-      _collaborators = List.of(widget.data.collaborators);
-    }
-  }
-
-  Future<void> _addCollaborator() async {
-    final authorId = widget.data.authorId;
+  Future<void> _addCollaborator(BuildContext context) async {
+    final authorId = this.authorId;
     if (authorId == null) return;
 
     final result = await AddCollaboratorDialog.show(
       context,
       authorId: authorId,
-      collaborators: CollaboratorsIds(collaborators: _collaborators),
+      collaborators: CollaboratorsIds(collaborators: collaborators),
     );
 
-    if (result != null && mounted) {
-      setState(() => _collaborators = [..._collaborators, result]);
+    if (result != null && context.mounted) {
+      collaborators = [...collaborators, result];
     }
   }
 
   void _removeCollaborator(CatalystId collaborator) {
-    setState(() => _collaborators = [..._collaborators]..remove(collaborator));
+    collaborators = [...collaborators]..remove(collaborator);
   }
 }
 

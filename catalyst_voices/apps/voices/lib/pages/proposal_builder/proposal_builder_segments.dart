@@ -9,7 +9,6 @@ import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart'
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/category_brief_dialog.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
-import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_data.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -18,7 +17,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -29,19 +27,20 @@ part 'widgets/proposal_builder_document_collaborators.dart';
 
 final DocumentPropertyActionOverrides _widgetActionOverrides = {
   ProposalDocument.categoryDetailsNodeId: (_, _, _) => const _CategoryDetailsAction(),
-  ProposalDocument.collaboratorsNodeId: (_, property, onEditableChanged) =>
+  ProposalDocument.collaboratorsNodeId: (_, isEditMode, onEditableChanged) =>
       _CollaboratorsDetailsAction(
-        property: property,
+        isEditMode: isEditMode,
         onChanged: onEditableChanged,
       ),
 };
 
 final DocumentPropertyBuilderOverrides _widgetOverrides = {
-  ProposalDocument.categoryDetailsNodeId: (_, property) => _CategoryDetails(property: property),
-  ProposalDocument.collaboratorsNodeId: (_, property) => _CollaboratorsDetailsSelector(
-    property: property,
-    maxCollaborators: ProposalDocument.maxCollaboratorsPerProposal,
-  ),
+  ProposalDocument.categoryDetailsNodeId: (_, property, _) => _CategoryDetails(property: property),
+  ProposalDocument.collaboratorsNodeId: (_, _, collaboratorsSectionData) =>
+      _CollaboratorsDetailsSelector(
+        collaboratorsSectionData: collaboratorsSectionData,
+        maxCollaborators: ProposalDocument.maxCollaboratorsPerProposal,
+      ),
 };
 
 class ProposalBuilderSegmentsSelector extends StatelessWidget {
@@ -108,12 +107,11 @@ class _DocumentSection extends StatelessWidget {
                 ? AutovalidateMode.always
                 : AutovalidateMode.disabled,
             onChanged: (value) {
-              if (property.nodeId == ProposalDocument.collaboratorsNodeId) {
-                _onCollaboratorsChanged(context);
-                return;
-              }
-
               final event = SectionChangedEvent(changes: value);
+              context.read<ProposalBuilderBloc>().add(event);
+            },
+            onCollaboratorsChanged: (collaborators) {
+              final event = UpdateCollaboratorsEvent(collaborators: collaborators);
               context.read<ProposalBuilderBloc>().add(event);
             },
             actionOverrides: _widgetActionOverrides,
@@ -126,15 +124,6 @@ class _DocumentSection extends StatelessWidget {
 
   void _handleOnTap(BuildContext context) {
     SegmentsControllerScope.of(context).selectSectionStep(property.nodeId, shouldScroll: false);
-  }
-
-  void _onCollaboratorsChanged(BuildContext context) {
-    final tileController = DocumentBuilderSectionTileControllerScope.of(context);
-    final dataNodeId = _CollaboratorsDetailsSelector.getDataNodeId(property.nodeId);
-    final collaborators = tileController.getData<List<CatalystId>>(dataNodeId) ?? [];
-    final event = UpdateCollaboratorsEvent(collaborators: collaborators);
-    context.read<ProposalBuilderBloc>().add(event);
-    tileController.removeData(dataNodeId);
   }
 }
 
