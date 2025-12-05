@@ -78,6 +78,8 @@ jobs:
     needs: [ci, paths-filter]
     if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.base_ref == 'main'}}
     uses: ./.github/workflows/gateway-tests.yml
+    secrets:
+      QA_REPO_SSH_KEY: ${{ secrets.QA_REPO_SSH_KEY }}
 
   voices-integration-tests:
     needs: [ci, paths-filter]
