@@ -647,7 +647,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       query,
       variables: [
         Variable.withString(DocumentType.proposalActionDocument.uuid),
-        Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
       ],
       readsFrom: readsFromTables,
