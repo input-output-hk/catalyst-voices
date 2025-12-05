@@ -164,41 +164,52 @@ jobs:
       - name: Wait for cat-devnet to become healthy
         id: devnet-check
         run: |
+          DEVNET_HEALTHY="false"
           echo "Waiting for container to be healthy ..."
           for i in {1..500}; do
             STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
             echo "Health status: $STATUS"
             if [ "$STATUS" == "healthy" ]; then
               echo "Container is healthy!"
-              break
+              DEVNET_HEALTHY="true"
+              echo "devnet-healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
+              exit 0
             fi
             if [ "$STATUS" == "starting" ]; then
               echo "Container became unhealthy."
               docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
               docker compose stop cat-devnet
-              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
-              echo "Waiting for container to be healthy ... retry"
-              for i in {1..500}; do
-                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
-                echo "Health status: $STATUS"
-                if [ "$STATUS" == "healthy" ]; then
-                  echo "Container is healthy!"
-                  exit 0
-                fi
-                if [ "$STATUS" == "unhealthy" ]; then
-                  echo "Container became unhealthy."
-                  docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
-                  exit 1
-                fi
-                sleep 5
-              done
+              echo "devnet-healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Spin up devnet ... retry
+        if: steps.devnet-check.outputs.devnet-healthy == 'false'
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
+
+      - name: Wait for cat-devnet to become healthy ... retry
+        run: |
+          echo "Waiting for container to be healthy ... retry"
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              exit 0
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
+              exit 1
             fi
             sleep 5
           done
 
       - name: Spin up catalyst-gateway
         id: gateway-started
-        if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-gateway -d
 
