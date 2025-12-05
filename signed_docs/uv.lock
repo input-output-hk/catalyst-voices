@@ -84,7 +84,7 @@ wheels = [
 [[package]]
 name = "catalyst-python"
 version = "0.1.0"
-source = { git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&branch=feat%2Fsigned-doc-create_metadata#269a31a238bd5591020eef079ba9b897b8a9f5d4" }
+source = { git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&tag=catalyst-python%2Fv0.1.1#f3dea0f1a1f561d246d21d6393c9e30bb4ac5b41" }
 dependencies = [
     { name = "cryptography" },
     { name = "pycardano" },
@@ -774,7 +774,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "argparse", specifier = ">=1.4.0" },
-    { name = "catalyst-python", git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&branch=feat%2Fsigned-doc-create_metadata" },
+    { name = "catalyst-python", git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&tag=catalyst-python%2Fv0.1.1" },
     { name = "pathlib", specifier = ">=1.0.1" },
     { name = "requests", specifier = ">=2.32.5" },
 ]
