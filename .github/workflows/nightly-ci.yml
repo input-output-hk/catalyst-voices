@@ -26,7 +26,7 @@ jobs:
     name: nightly tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
