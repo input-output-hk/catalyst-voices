@@ -8,6 +8,7 @@ import 'package:equatable/equatable.dart';
 /// specific template (`DocumentData`).
 ///
 /// This class provides a unified interface to access common properties
+///
 /// like [title], [description], etc., regardless of the
 /// underlying data type.
 ///

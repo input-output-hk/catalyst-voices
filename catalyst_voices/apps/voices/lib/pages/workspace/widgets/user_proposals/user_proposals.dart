@@ -1,7 +1,5 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/workspace/user_proposals/user_proposal_section.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/user_proposals/user_proposal_section.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -13,51 +11,14 @@ class UserProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: 32),
-      sliver: SliverMainAxisGroup(
-        slivers: <Widget>[
-          SliverToBoxAdapter(
-            child: _Header(),
-          ),
-          SliverToBoxAdapter(
-            child: _Divider(),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(height: 20),
-          ),
-          _UserSubmittedProposals(),
-          _UserDraftProposals(),
-          _UserLocalProposals(),
-          _UserInactiveProposals(),
-        ],
-      ),
-    );
-  }
-}
-
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesDivider(
-      indent: 0,
-      endIndent: 0,
-      height: 24,
-      color: context.colorScheme.primary,
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      context.l10n.myProposals,
-      style: context.textTheme.headlineSmall,
+    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
+      selector: (state) => state.showProposals,
+      builder: (context, show) {
+        if (!show) {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
+        return const _UserProposals();
+      },
     );
   }
 }
@@ -126,6 +87,22 @@ class _UserLocalProposals extends StatelessWidget {
           learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
         );
       },
+    );
+  }
+}
+
+class _UserProposals extends StatelessWidget {
+  const _UserProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SliverMainAxisGroup(
+      slivers: <Widget>[
+        _UserSubmittedProposals(),
+        _UserDraftProposals(),
+        _UserLocalProposals(),
+        _UserInactiveProposals(),
+      ],
     );
   }
 }

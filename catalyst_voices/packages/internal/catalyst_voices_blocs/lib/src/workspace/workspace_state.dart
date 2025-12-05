@@ -7,13 +7,17 @@ final class WorkspaceState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final WorkspaceStateUserProposals userProposals;
+  final WorkspaceStateProposalInvites userProposalInvites;
   final List<CampaignTimelineViewModel> timelineItems;
+  final Map<WorkspacePageTab, int> count;
   final int fundNumber;
 
   const WorkspaceState({
     this.isLoading = false,
     this.error,
     this.userProposals = const WorkspaceStateUserProposals(),
+    this.userProposalInvites = const WorkspaceStateProposalInvites(),
+    this.count = const {},
     this.timelineItems = const [],
     this.fundNumber = 0,
   });
@@ -26,6 +30,8 @@ final class WorkspaceState extends Equatable {
     isLoading,
     error,
     userProposals,
+    userProposalInvites,
+    count,
     timelineItems,
     fundNumber,
   ];
@@ -43,6 +49,8 @@ final class WorkspaceState extends Equatable {
     bool? isLoading,
     Optional<LocalizedException>? error,
     WorkspaceStateUserProposals? userProposals,
+    WorkspaceStateProposalInvites? userProposalInvites,
+    Map<WorkspacePageTab, int>? count,
     List<CampaignTimelineViewModel>? timelineItems,
     int? fundNumber,
   }) {
@@ -50,6 +58,8 @@ final class WorkspaceState extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
       userProposals: userProposals ?? this.userProposals,
+      userProposalInvites: userProposalInvites ?? this.userProposalInvites,
+      count: count ?? this.count,
       timelineItems: timelineItems ?? this.timelineItems,
       fundNumber: fundNumber ?? this.fundNumber,
     );
@@ -67,6 +77,23 @@ final class WorkspaceStateCampaignTimeline extends Equatable {
   List<Object?> get props => [items];
 }
 
+final class WorkspaceStateProposalInvites extends Equatable {
+  final UserProposalsView userProposalInvites;
+
+  const WorkspaceStateProposalInvites({
+    this.userProposalInvites = const UserProposalsView(),
+  });
+
+  factory WorkspaceStateProposalInvites.fromList({
+    required List<UsersProposalOverview> invites,
+  }) {
+    return WorkspaceStateProposalInvites(userProposalInvites: UserProposalsView(items: invites));
+  }
+
+  @override
+  List<Object?> get props => [userProposalInvites];
+}
+
 final class WorkspaceStateUserProposals extends Equatable {
   final UserProposalsView localProposals;
   final UserProposalsView draftProposals;
@@ -75,6 +102,7 @@ final class WorkspaceStateUserProposals extends Equatable {
   final UserProposalsView published;
   final UserProposalsView notPublished;
   final bool hasComments;
+  final WorkspaceFilters currentFilter;
 
   const WorkspaceStateUserProposals({
     this.localProposals = const UserProposalsView(),
@@ -84,9 +112,13 @@ final class WorkspaceStateUserProposals extends Equatable {
     this.published = const UserProposalsView(),
     this.notPublished = const UserProposalsView(),
     this.hasComments = false,
+    this.currentFilter = WorkspaceFilters.allProposals,
   });
 
-  factory WorkspaceStateUserProposals.fromList(List<UsersProposalOverview> proposals) {
+  factory WorkspaceStateUserProposals.fromList(
+    List<UsersProposalOverview> proposals,
+    WorkspaceFilters filter,
+  ) {
     // Single-pass filtering for better performance
     final localProposalsList = <UsersProposalOverview>[];
     final draftProposalsList = <UsersProposalOverview>[];
@@ -137,6 +169,7 @@ final class WorkspaceStateUserProposals extends Equatable {
       published: UserProposalsView(items: publishedList),
       notPublished: UserProposalsView(items: notPublishedList),
       hasComments: hasComments,
+      currentFilter: filter,
     );
   }
 
@@ -149,5 +182,28 @@ final class WorkspaceStateUserProposals extends Equatable {
     published,
     notPublished,
     hasComments,
+    currentFilter,
   ];
+
+  WorkspaceStateUserProposals copyWith({
+    UserProposalsView? localProposals,
+    UserProposalsView? draftProposals,
+    UserProposalsView? finalProposals,
+    UserProposalsView? inactiveProposals,
+    UserProposalsView? published,
+    UserProposalsView? notPublished,
+    bool? hasComments,
+    WorkspaceFilters? currentFilter,
+  }) {
+    return WorkspaceStateUserProposals(
+      localProposals: localProposals ?? this.localProposals,
+      draftProposals: draftProposals ?? this.draftProposals,
+      finalProposals: finalProposals ?? this.finalProposals,
+      inactiveProposals: inactiveProposals ?? this.inactiveProposals,
+      published: published ?? this.published,
+      notPublished: notPublished ?? this.notPublished,
+      hasComments: hasComments ?? this.hasComments,
+      currentFilter: currentFilter ?? this.currentFilter,
+    );
+  }
 }

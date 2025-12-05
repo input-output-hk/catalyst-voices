@@ -160,6 +160,7 @@ void main() {
 
       // Then
       expect(significantSame, isTrue);
+      expect(idOne.isSameAs(idTwo), isTrue);
     });
 
     test('different host makes id significant different', () {
@@ -176,6 +177,7 @@ void main() {
 
       // Then
       expect(significantSame, isFalse);
+      expect(idOne.isSameAs(idTwo), isFalse);
     });
 
     test('username with spaces is decoded correctly', () {
@@ -210,6 +212,28 @@ void main() {
 
       // Then
       expect(userInfo, contains(encodedUsername));
+    });
+
+    test('should fail at parsing', () {
+      const validUri = 'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
+
+      const invalidUri = 'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDs=';
+      const invalidUri2 = '';
+
+      final validCatalystId = CatalystId.tryParse(validUri);
+      expect(validCatalystId?.host, equals(CatalystIdHost.cardano.host));
+      expect(validCatalystId?.username, isNull);
+      expect(validCatalystId?.nonce, isNull);
+      expect(validCatalystId?.role0Key, isNotNull);
+      expect(validCatalystId?.role?.number, isNull);
+      expect(validCatalystId?.rotation, isNull);
+      expect(validCatalystId?.encrypt, isFalse);
+
+      final invalidCatalystId = CatalystId.tryParse(invalidUri);
+      final invalidCatalystId2 = CatalystId.tryParse(invalidUri2);
+
+      expect(invalidCatalystId, isNull);
+      expect(invalidCatalystId2, isNull);
     });
   });
 }

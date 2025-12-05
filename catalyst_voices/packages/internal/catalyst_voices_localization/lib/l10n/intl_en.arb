@@ -97,6 +97,10 @@
   "@actor": {
     "description": "Refers to user that created keychain and is unlocked."
   },
+  "addCollaborator": "Add Co-proposer",
+  "@addCollaborator": {
+    "description": "Informs user that he is adding collaborator to his proposal"
+  },
   "addCommentSection": "Add comment",
   "@addCommentSection": {
     "description": "Viewing proposal navigation section"
@@ -128,6 +132,14 @@
   "all": "All",
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
+  },
+  "allProposals": "All Proposals",
+  "@allProposals": {
+    "description": "text indicating to view all proposals"
+  },
+  "andSign": "&",
+  "@andSign": {
+    "description": "Generic and sign"
   },
   "anonymousUsername": "Anonymous",
   "@anonymousUsername": {
@@ -388,6 +400,18 @@
   "@catalystId": {
     "description": "Label of chip with account catalyst ID clearly describing content"
   },
+  "catalystIdAlreadyAddedAsCollaboratorMessage": "This Catalyst ID is already added as Co-Proposer",
+  "@catalystIdAlreadyAddedAsCollaboratorMessage": {
+    "description": "Error message shown to user when he tries to add Catalyst ID which already exists as collaborator in proposal"
+  },
+  "catalystIdBelongsToMainProposer": "This Catalyst ID belongs to the Author and can't be added as Co-Proposer",
+  "@catalystIdBelongsToMainProposer": {
+    "description": "Error message shown to user when he tries to add Catalyst ID which belongs to himself"
+  },
+  "catalystIdFormatInvalidMessage": "This Catalyst ID has invalid format",
+  "@catalystIdFormatInvalidMessage": {
+    "description": "Error message shown to user when Catalyst ID has not valid format"
+  },
   "catalystKeychain": "Catalyst Keychain",
   "@catalystKeychain": {
     "description": "Name for Catalyst Keychain"
@@ -464,6 +488,54 @@
   "close": "Close",
   "@close": {
     "description": "CTA To close something"
+  },
+  "collaborator": "Co-Proposer",
+  "@collaborator": {
+    "description": "text indicating to view Collaborator proposals"
+  },
+  "collaboratorInvitationAcceptButton": "Accept Invitation",
+  "@collaboratorInvitationAcceptButton": {
+    "description": "Dialog button when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptMessage": "Are you sure you want to accept this proposal invitation?\nYou can leave at any time…",
+  "@collaboratorInvitationAcceptMessage": {
+    "description": "Dialog message when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptTitle": "Accept Invitation?",
+  "@collaboratorInvitationAcceptTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectButton": "Reject Invitation",
+  "@collaboratorInvitationRejectButton": {
+    "description": "Dialog button when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectMessage": "Are you sure you want to reject this proposal invitation?\nThis cannot be undone.",
+  "@collaboratorInvitationRejectMessage": {
+    "description": "Dialog message when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectTitle": "Reject Invitation?",
+  "@collaboratorInvitationRejectTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationStatusAccepted": "Accepted",
+  "@collaboratorInvitationStatusAccepted": {
+    "description": "Collaborator invitation status: accepted."
+  },
+  "collaboratorInvitationStatusLeft": "Left",
+  "@collaboratorInvitationStatusLeft": {
+    "description": "Collaborator invitation status: collaborator left after accepting."
+  },
+  "collaboratorInvitationStatusPending": "Pending",
+  "@collaboratorInvitationStatusPending": {
+    "description": "Collaborator invitation status: pending."
+  },
+  "collaboratorInvitationStatusRejected": "Rejected",
+  "@collaboratorInvitationStatusRejected": {
+    "description": "Collaborator invitation status: rejected."
+  },
+  "collaboratorInvitationStatusRemoved": "Removed",
+  "@collaboratorInvitationStatusRemoved": {
+    "description": "Collaborator invitation status: removed."
   },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
@@ -555,6 +627,18 @@
   "@contributorDescription": {
     "description": "A description for contributor"
   },
+  "contributorMissingProposerRole": "This Catalyst ID doesn't have the Proposer role required to be added as Co-Proposer",
+  "@contributorMissingProposerRole": {
+    "description": "Error message shown when trying to add a collaborator who lacks the proposer role"
+  },
+  "contributorNotProposerAndNotVerified": "This Catalyst ID doesn't have the Proposer role and is not verified. Both are required to be added as Co-Proposer",
+  "@contributorNotProposerAndNotVerified": {
+    "description": "Error message shown when trying to add a collaborator who lacks both proposer role and verification"
+  },
+  "contributorNotVerifiedProfile": "This Catalyst ID is not verified and cannot be added as Co-Proposer",
+  "@contributorNotVerifiedProfile": {
+    "description": "Error message shown when trying to add a collaborator with an unverified profile"
+  },
   "contributorSummaryComment": "Comment on Proposals",
   "@contributorSummaryComment": {
     "description": "Text representing that contributor can comment on proposals"
@@ -570,6 +654,10 @@
   "copied": "Copied!",
   "@copied": {
     "description": "Snackbar message shown when user copies a link."
+  },
+  "coproposers": "Co-proposers",
+  "@coproposers": {
+    "description": "Collaborators on the proposal."
   },
   "copyLink": "Copy Link",
   "@copyLink": {
@@ -933,9 +1021,17 @@
   "@doWord": {
     "description": "Label for a list of things to do"
   },
+  "documentHiddenException": "The proposal is no longer available.",
+  "@documentHiddenException": {
+    "description": "Message when the document (proposal) is no longer available due to being hidden."
+  },
   "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
   "@documentImportInvalidDataError": {
     "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
+  },
+  "documentReferenceError": "Invalid proposal reference.",
+  "@documentReferenceError": {
+    "description": "Message when the resource reference such as proposal is invalid."
   },
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
@@ -1615,6 +1711,10 @@
   "@howItWorksVoteDescription": {
     "description": "Description of voting process and rewards"
   },
+  "howToAddCollaboratorDescription": "Enter the full catalyst ID of the co-proposer you wish to add to your proposal:",
+  "@howToAddCollaboratorDescription": {
+    "description": "Description on how to add collaborator"
+  },
   "ideaJourney": "Idea Journey",
   "@ideaJourney": {
     "description": "Header for idea journey section"
@@ -1758,6 +1858,18 @@
   "@learnMore": {
     "description": "A label on a clickable element that can show more content."
   },
+  "leaveProposal": "Leave Proposal",
+  "@leaveProposal": {
+    "description": "CTA to leave proposal as collaborator"
+  },
+  "leaveProposalDescription": "Are you sure you want to leave? You won’t be able to undo this. Leaving the proposal means you’ll be removed as a collaborator and won’t be eligible for funding.",
+  "@leaveProposalDescription": {
+    "description": "Description about leaving proposal as collaborator"
+  },
+  "leaveProposalQuestion": "Leave Proposal?",
+  "@leaveProposalQuestion": {
+    "description": "title for leave proposal dialog"
+  },
   "linkCopiedToClipboard": "Link copied to clipboard",
   "@linkCopiedToClipboard": {
     "description": "Snackbar title shown when user copies a link."
@@ -1789,6 +1901,10 @@
   "lockSnackbarTitle": "Catalyst locked",
   "@lockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after locking the keychain."
+  },
+  "mainProposer": "Main Proposer",
+  "@mainProposer": {
+    "description": "text indicating to view Main Proposer proposals"
   },
   "mainnetNetworkId": "Mainnet",
   "@mainnetNetworkId": {
@@ -1883,6 +1999,10 @@
   "newAppVersionAvailableTitle": "New version available",
   "@newAppVersionAvailableTitle": {
     "description": "Used in banner to inform user that new version of the app is available"
+  },
+  "newInvites": "New Invites",
+  "@newInvites": {
+    "description": "Title of new invites section"
   },
   "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
   "@newIterationTitle": {
@@ -2006,6 +2126,24 @@
       }
     }
   },
+  "noOfProposalInvites": "Proposal Invites · {count}",
+  "@noOfProposalInvites": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfProposals": "Proposals · {count}",
+  "@noOfProposals": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfVotedOn": "Voted On · {count}",
   "@noOfVotedOn": {
     "description": "Tab label for voted on proposals in voting space",
@@ -2014,6 +2152,10 @@
         "type": "int"
       }
     }
+  },
+  "noPendingInvitesMessage": "You don’t have any proposal invites",
+  "@noPendingInvitesMessage": {
+    "description": "Message shown when user don't have any pending messages"
   },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
@@ -2155,6 +2297,15 @@
   "orderProposalsUpdateDateDesc": "Newest to oldest",
   "@orderProposalsUpdateDateDesc": {
     "description": "Order proposals by update date option"
+  },
+  "others": "{count} {count, plural, =1{Other} other{Others}}",
+  "@others": {
+    "description": "In context of proposal author and collaborators. Eg. Author & 5 Others",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
@@ -2453,9 +2604,17 @@
   "@proposalTitleShortDescription": {
     "description": "Short description for the title input field"
   },
+  "proposalViewAcceptedInvitationBannerMessage": "**Invitation Accepted:** You'll be named as a collaborator and will be eligible for funding on final proposals with your team. You'll need to continue approving future iterations to remain named.",
+  "@proposalViewAcceptedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation."
+  },
   "proposalViewFundingRequested": "Funding Requested",
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
+  },
+  "proposalViewLoadErrorMessage": "We weren't able to load that proposal.",
+  "@proposalViewLoadErrorMessage": {
+    "description": "Error message shown when proposal cannot be loaded (i.e. due to connection error)."
   },
   "proposalViewMetadataOverviewSegment": "Overview",
   "@proposalViewMetadataOverviewSegment": {
@@ -2465,6 +2624,30 @@
   "@proposalViewMetadataSection": {
     "description": "Viewing proposal navigation section"
   },
+  "proposalViewNotFoundButton": "Go to Catalyst Home.",
+  "@proposalViewNotFoundButton": {
+    "description": "Error button shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundMessage": "It looks like we can't find the proposal you're looking for.\nMaybe a good time for a coffee break?",
+  "@proposalViewNotFoundMessage": {
+    "description": "Error message shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundTitle": "We can't find that proposal.",
+  "@proposalViewNotFoundTitle": {
+    "description": "Error title shown when proposal cannot be found."
+  },
+  "proposalViewPendingInvitationBannerAcceptButton": "Accept Invitation",
+  "@proposalViewPendingInvitationBannerAcceptButton": {
+    "description": "The accept button label in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerMessage": "You have been invited to join this proposal iteration as a co-proposer",
+  "@proposalViewPendingInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerRejectButton": "Reject Invitation",
+  "@proposalViewPendingInvitationBannerRejectButton": {
+    "description": "The reject button label in the collaborator invitation banner on the proposal viewer page."
+  },
   "proposalViewProjectDelivery": "Project Delivery",
   "@proposalViewProjectDelivery": {
     "description": "When viewing proposal"
@@ -2472,6 +2655,10 @@
   "proposalViewProjectDuration": "Project Duration",
   "@proposalViewProjectDuration": {
     "description": "When viewing proposal"
+  },
+  "proposalViewRejectedInvitationBannerMessage": "**Invitation Rejected:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
+  "@proposalViewRejectedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation."
   },
   "proposals": "Proposals",
   "@proposals": {
@@ -3013,6 +3200,10 @@
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
+  },
+  "reviewRequest": "Review Request",
+  "@reviewRequest": {
+    "description": "CTA to make user review invite to collaboration on proposal"
   },
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {

@@ -42,6 +42,13 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
 
   bool get isLoose => !isExact;
 
+  bool get isValid {
+    final isIdValid = Uuid.isValidUUID(fromString: id);
+    final isVersionValid = ver == null || Uuid.isValidUUID(fromString: ver!);
+
+    return isIdValid && isVersionValid;
+  }
+
   @override
   List<Object?> get props => [id, ver];
 
@@ -181,13 +188,6 @@ final class SignedDocumentRef extends DocumentRef {
   }
 
   const SignedDocumentRef.loose({required super.id});
-
-  bool get isValid {
-    final isIdValid = Uuid.isValidUUID(fromString: id);
-    final isVersionValid = ver == null || Uuid.isValidUUID(fromString: ver!);
-
-    return isIdValid && isVersionValid;
-  }
 
   @override
   SignedDocumentRef copyWith({

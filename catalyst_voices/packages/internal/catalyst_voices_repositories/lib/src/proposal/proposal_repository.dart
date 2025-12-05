@@ -45,9 +45,8 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef actionId,
+    required SignedDocumentRef proposalId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -135,7 +134,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
     final proposalPublish = await getProposalPublishForRef(ref: ref);
     if (proposalPublish == null) {
-      throw const NotFoundException(message: 'Proposal is hidden');
+      throw DocumentHiddenException(ref: ref);
     }
     final templateRef = documentData.metadata.template!;
     final documentTemplate = await _documentRepository.getDocumentData(id: templateRef);
@@ -191,9 +190,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef actionId,
+    required SignedDocumentRef proposalId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -201,12 +199,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+    // TODO(LynxLynxx): implement new method. _documentRepository.getDocumentMetadata to receive only metadata
+    final documentData = await _documentRepository.getDocumentData(id: proposalId);
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
       metadata: DocumentDataMetadata.proposalAction(
-        id: actionRef,
-        proposalRef: proposalRef,
-        parameters: DocumentParameters({categoryId}),
+        id: actionId,
+        proposalRef: proposalId,
+        parameters: documentData.metadata.parameters,
       ),
       catalystId: catalystId,
       privateKey: privateKey,

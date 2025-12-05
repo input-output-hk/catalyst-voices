@@ -209,7 +209,9 @@ final class WorkspaceRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   static const name = 'workspace';
 
-  const WorkspaceRoute();
+  final String? tab;
+
+  const WorkspaceRoute({this.tab});
 
   @override
   List<RouteGuard> get routeGuards => const [
@@ -219,6 +221,8 @@ final class WorkspaceRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const WorkspacePage();
+    final tab = WorkspacePageTab.values.asNameMap()[this.tab];
+
+    return WorkspacePage(tab: tab);
   }
 }

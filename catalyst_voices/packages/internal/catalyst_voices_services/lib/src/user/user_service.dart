@@ -51,6 +51,8 @@ abstract interface class UserService implements ActiveAware {
   /// Checks if active account is verified in reviews API.
   Future<bool> isActiveAccountPubliclyVerified();
 
+  Future<bool> isPubliclyVerified({required CatalystId catalystId});
+
   /// Similar to [useAccount] but also removes all other existing accounts.
   Future<void> recoverAccount(Account account);
 
@@ -101,6 +103,8 @@ abstract interface class UserService implements ActiveAware {
 
   /// Tries to lookup user locally and stores it in [UserObserver].
   Future<void> useLocalUser();
+
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId});
 }
 
 final class UserServiceImpl implements UserService {
@@ -219,6 +223,11 @@ final class UserServiceImpl implements UserService {
     }
 
     return publicProfile.status.isVerified;
+  }
+
+  @override
+  Future<bool> isPubliclyVerified({required CatalystId catalystId}) async {
+    return _userRepository.isPubliclyVerified(catalystId: catalystId);
   }
 
   @override
@@ -474,6 +483,18 @@ final class UserServiceImpl implements UserService {
     final user = await _userRepository.getUser();
 
     await _updateUser(user);
+  }
+
+  @override
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId}) async {
+    final accountRoles = await _userRepository.getRbacRegistration(catalystId: catalystId).then((
+      value,
+    ) {
+      // TODO(LynxLynxx): use .roles after #3602 merge
+      return value.accountRoles;
+    });
+
+    return accountRoles.contains(AccountRole.proposer);
   }
 
   Future<void> _cancelRegistrationStatusSub() async {

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
-import 'package:catalyst_voices/pages/workspace/header/workspace_timeline.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/header/workspace_timeline.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';

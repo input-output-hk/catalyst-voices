@@ -130,6 +130,7 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerFactory<WorkspaceBloc>(() {
         return WorkspaceBloc(
+          get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
           get<DocumentMapper>(),
@@ -212,6 +213,11 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<FeatureFlagsCubit>(() {
         return FeatureFlagsCubit(
           get<FeatureFlagsService>(),
+        );
+      })
+      ..registerFactory<AddCollaboratorCubit>(() {
+        return AddCollaboratorCubit(
+          get<ProposalService>(),
         );
       });
   }
