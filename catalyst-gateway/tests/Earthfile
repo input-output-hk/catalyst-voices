@@ -11,7 +11,7 @@ all-images:
     BUILD gateway+docker
     BUILD ../event-db+docker
     BUILD ./api_tests+testing-package
-    BUILD ./schemathesis_tests+package
+    BUILD ./schemathesis_tests+testing-package
     BUILD +testing-package-rust-tests-runner
     BUILD +package-event-db-v1
     BUILD +testing-package-haproxy
