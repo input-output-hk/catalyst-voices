@@ -21,6 +21,8 @@ export 'document/source/document_data_source.dart';
 export 'document/source/local_document_data_local_source.dart';
 export 'document/source/signed_document_data_local_source.dart';
 export 'dto/document/document_dto.dart' show DocumentExt;
+// TODO(LynxLynxx): Remove this after #3602 merge
+export 'dto/user/rbac_registration_chain_dto.dart';
 export 'feature_flags/feature_flags_repository.dart' show FeatureFlagsRepository;
 export 'logging/logging_settings_storage.dart';
 export 'proposal/proposal_repository.dart' show ProposalRepository;

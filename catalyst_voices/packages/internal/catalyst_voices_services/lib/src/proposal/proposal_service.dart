@@ -412,7 +412,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<CollaboratorValidationResult> validateForCollaborator(CatalystId catalystId) async {
     final (isProposer, isVerified) = await (
       _userService.validateCatalystIdForProposerRole(catalystId: catalystId),
-      _userService.validateCatalystIdForVerifiedProfile(catalystId: catalystId),
+      _userService.isPubliclyVerified(catalystId: catalystId),
     ).wait;
 
     return switch ((isProposer, isVerified)) {
