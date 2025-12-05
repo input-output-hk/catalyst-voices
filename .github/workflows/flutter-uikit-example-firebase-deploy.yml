@@ -19,7 +19,7 @@ jobs:
     name: Deploy UIKit example on Firebase Hosting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
         with:
