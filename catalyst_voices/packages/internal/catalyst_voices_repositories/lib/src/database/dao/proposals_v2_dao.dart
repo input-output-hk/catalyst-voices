@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentParameters;
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
@@ -92,7 +92,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// 3. **Pagination:** Applies limit/offset logic.
   /// 4. **Enrichment:** Joins templates, authors, and counts comments via subqueries.
   @override
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+  Future<Page<RawProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -192,7 +192,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - Local metadata (Favorites) changes.
   /// - Authors change.
   @override
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+  Stream<Page<RawProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -213,7 +213,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     ).watch();
     final totalStream = _countVisibleProposals(filters: filters).watchSingle();
 
-    return Rx.combineLatest2<List<JoinedProposalBriefEntity>, int, Page<JoinedProposalBriefEntity>>(
+    return Rx.combineLatest2<List<RawProposalBriefEntity>, int, Page<RawProposalBriefEntity>>(
       itemsStream,
       totalStream,
       (items, total) => Page(
@@ -666,7 +666,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - `version_ids_str`: Comma-separated list of all version UUIDs.
   /// - `comments_count`: Count of comments referencing this proposal.
   /// - `original_authors_str`: Authors of the FIRST version (id=ver).
-  Selectable<JoinedProposalBriefEntity> _queryVisibleProposalsPage(
+  Selectable<RawProposalBriefEntity> _queryVisibleProposalsPage(
     int page,
     int size, {
     required ProposalsOrder order,
@@ -767,7 +767,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final originalAuthorsRaw = row.readNullable<String>('origin_authors');
       final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
 
-      return JoinedProposalBriefEntity(
+      return RawProposalBriefEntity(
         proposal: proposal,
         template: template,
         actionType: actionType,
@@ -881,7 +881,7 @@ abstract interface class ProposalsV2Dao {
   ///   - Single query with CTEs (no N+1 queries)
   ///
   /// **Returns:** Page object with items, total count, and pagination metadata
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+  Future<Page<RawProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
@@ -945,7 +945,7 @@ abstract interface class ProposalsV2Dao {
   /// - Same query optimization as [getProposalsBriefPage]
   ///
   /// **Returns:** Stream of Page objects with current state
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+  Stream<Page<RawProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,

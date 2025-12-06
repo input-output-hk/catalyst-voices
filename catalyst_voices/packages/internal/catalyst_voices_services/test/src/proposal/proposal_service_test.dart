@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,8 +13,6 @@ void main() {
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
   late MockSignerService mockSignerService;
-  late MockCastedVotesObserver mockCastedVotesObserver;
-  late VotingBallotBuilder ballotBuilder;
 
   late ProposalService proposalService;
 
@@ -25,8 +22,6 @@ void main() {
     mockSignerService = MockSignerService();
     mockUserService = MockUserService();
     mockActiveCampaignObserver = MockActiveCampaignObserver();
-    mockCastedVotesObserver = MockCastedVotesObserver();
-    ballotBuilder = VotingBallotLocalBuilder();
 
     proposalService = ProposalService(
       mockProposalRepository,
@@ -34,8 +29,6 @@ void main() {
       mockUserService,
       mockSignerService,
       mockActiveCampaignObserver,
-      mockCastedVotesObserver,
-      ballotBuilder,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -88,8 +81,6 @@ void main() {
 }
 
 class MockActiveCampaignObserver extends Mock implements ActiveCampaignObserver {}
-
-class MockCastedVotesObserver extends Mock implements CastedVotesObserver {}
 
 class MockSignerService extends Mock implements SignerService {}
 

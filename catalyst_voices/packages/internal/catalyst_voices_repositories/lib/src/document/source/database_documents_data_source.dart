@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
-import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
-import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
-import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -178,25 +176,6 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
-    required PageRequest request,
-    ProposalsOrder order = const UpdateDate.desc(),
-    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
-  }) {
-    final tr = _profiler.startTransaction('Query proposals: $request:$order:$filters');
-
-    return _database.proposalsV2Dao
-        .watchProposalsBriefPage(request: request, order: order, filters: filters)
-        .doOnData(
-          (_) {
-            if (!tr.finished) unawaited(tr.finish());
-          },
-        )
-        .distinct()
-        .map((page) => page.map((data) => data.toModel()));
-  }
-
-  @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
@@ -228,36 +207,24 @@ final class DatabaseDocumentsDataSource
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
   }
-}
 
-extension on DocumentEntityV2 {
-  DocumentData toModel() {
-    return DocumentData(
-      metadata: DocumentDataMetadata(
-        contentType: DocumentContentType.fromJson(contentType),
-        type: type,
-        id: SignedDocumentRef(id: id, ver: ver),
-        ref: refId.toRef(refVer),
-        template: templateId.toRef(templateVer),
-        reply: replyId.toRef(replyVer),
-        section: section,
-        collaborators: collaborators.isEmpty ? null : collaborators,
-        parameters: parameters,
-        authors: authors.isEmpty ? null : authors,
-      ),
-      content: content,
-    );
-  }
-}
+  @override
+  Stream<Page<RawProposalBrief>> watchRawProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    final tr = _profiler.startTransaction('Query proposals: $request:$order:$filters');
 
-extension on String? {
-  SignedDocumentRef? toRef([String? ver]) {
-    final id = this;
-    if (id == null) {
-      return null;
-    }
-
-    return SignedDocumentRef(id: id, ver: ver);
+    return _database.proposalsV2Dao
+        .watchProposalsBriefPage(request: request, order: order, filters: filters)
+        .doOnData(
+          (_) {
+            if (!tr.finished) unawaited(tr.finish());
+          },
+        )
+        .distinct()
+        .map((page) => page.map((data) => data.toModel()));
   }
 }
 
@@ -316,33 +283,5 @@ extension on DocumentData {
         documentVer: metadata.id.ver!,
       );
     }).toList();
-  }
-}
-
-extension on JoinedProposalBriefEntity {
-  JoinedProposalBriefData toModel() {
-    final proposalDocumentData = proposal.toModel();
-    final templateDocumentData = template?.toModel();
-
-    final proposalOrDocument = templateDocumentData == null
-        ? ProposalOrDocument.data(proposalDocumentData)
-        : () {
-            final template = ProposalTemplateFactory.create(templateDocumentData);
-            final proposal = ProposalDocumentFactory.create(
-              proposalDocumentData,
-              template: template,
-            );
-
-            return ProposalOrDocument.proposal(proposal);
-          }();
-
-    return JoinedProposalBriefData(
-      proposal: proposalOrDocument,
-      actionType: actionType,
-      versionIds: versionIds,
-      commentsCount: commentsCount,
-      isFavorite: isFavorite,
-      originalAuthors: originalAuthors,
-    );
   }
 }

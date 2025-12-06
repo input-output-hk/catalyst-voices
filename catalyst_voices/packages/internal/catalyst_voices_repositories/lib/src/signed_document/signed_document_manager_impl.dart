@@ -46,15 +46,13 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       contentType: metadata.contentType,
     );
 
+    final signers = coseSign.signatures.map((e) => e.decodeCatalystId()).nonNulls.toList();
+
     return _CoseSignedDocument(
       coseSign: coseSign,
       payload: payload,
-      metadata: DocumentDataMetadata(
-        contentType: DocumentContentType.json,
-        type: DocumentType.proposalDocument,
-        id: const SignedDocumentRef(id: 'id', ver: 'ver'),
-      ),
-      signers: coseSign.signatures.map((e) => e.decodeCatalystId()).nonNulls.toList(),
+      metadata: metadata.adapt(authors: signers),
+      signers: signers,
     );
   }
 
@@ -191,6 +189,33 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   Future<bool> verifySignature(CatalystId catalystId) async {
     return _coseSign.verify(verifier: _CatalystVerifier(catalystId));
   }
+}
+
+extension on SignedDocumentMetadata {
+  DocumentDataMetadata adapt({
+    List<CatalystId>? authors,
+  }) {
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.json,
+      type: documentType,
+      id: SignedDocumentRef(id: id!, ver: ver),
+      ref: ref?.toModel(),
+      template: template?.toModel(),
+      reply: reply?.toModel(),
+      section: section,
+      collaborators: collabs?.map(CatalystId.tryParse).nonNulls.toList(),
+      parameters: DocumentParameters({
+        ?brandId?.toModel(),
+        ?campaignId?.toModel(),
+        ?categoryId?.toModel(),
+      }),
+      authors: authors,
+    );
+  }
+}
+
+extension on SignedDocumentMetadataRef {
+  SignedDocumentRef toModel() => SignedDocumentRef(id: id, ver: ver);
 }
 
 extension _CoseSignatureExt on CoseSignature {
