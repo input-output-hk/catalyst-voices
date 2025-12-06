@@ -1,8 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -15,8 +13,6 @@ abstract interface class ProposalService {
     UserService userService,
     SignerService signerService,
     ActiveCampaignObserver activeCampaignObserver,
-    CastedVotesObserver castedVotesObserver,
-    VotingBallotBuilder ballotBuilder,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -137,8 +133,6 @@ final class ProposalServiceImpl implements ProposalService {
   final UserService _userService;
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
-  final CastedVotesObserver _castedVotesObserver;
-  final VotingBallotBuilder _ballotBuilder;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -146,8 +140,6 @@ final class ProposalServiceImpl implements ProposalService {
     this._userService,
     this._signerService,
     this._activeCampaignObserver,
-    this._castedVotesObserver,
-    this._ballotBuilder,
   );
 
   @override
@@ -461,28 +453,10 @@ final class ProposalServiceImpl implements ProposalService {
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    final proposals = _adaptFilters(filters).switchMap(
-      (effectiveFilters) {
-        return _proposalRepository.watchProposalsBriefPage(
-          request: request,
-          order: order,
-          filters: effectiveFilters,
-        );
-      },
-    );
-
-    final draftVotes = _ballotBuilder.watchVotes;
-    final castedVotes = _castedVotesObserver.watchCastedVotes;
-
-    return Rx.combineLatest3(
-      proposals,
-      draftVotes,
-      castedVotes,
-      (page, draftVotes, castedVotes) {
-        return page.map(
-          (proposal) => _mapJoinedProposalBriefData(proposal, draftVotes, castedVotes),
-        );
-      },
+    return _proposalRepository.watchProposalsBriefPage(
+      request: request,
+      order: order,
+      filters: filters,
     );
   }
 
@@ -490,22 +464,7 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _adaptFilters(filters).switchMap(
-      (effectiveFilters) {
-        return _proposalRepository.watchProposalsCountV2(filters: effectiveFilters);
-      },
-    );
-  }
-
-  // TODO(damian-molinski): Remove this when voteBy is implemented.
-  Stream<ProposalsFiltersV2> _adaptFilters(ProposalsFiltersV2 filters) {
-    if (filters.voteBy == null) {
-      return Stream.value(filters);
-    }
-
-    return _castedVotesObserver.watchCastedVotes
-        .map((votes) => votes.map((e) => e.proposal.id).toList())
-        .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
+    return _proposalRepository.watchProposalsCountV2(filters: filters);
   }
 
   // Helper method to fetch versions for a proposal
@@ -543,39 +502,5 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
-  }
-
-  ProposalBriefData _mapJoinedProposalBriefData(
-    JoinedProposalBriefData data,
-    List<Vote> draftVotes,
-    List<Vote> castedVotes,
-  ) {
-    final proposal = data.proposal;
-    final isFinal = data.isFinal;
-
-    final draftVote = isFinal
-        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
-        : null;
-    final castedVote = isFinal
-        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
-        : null;
-
-    return ProposalBriefData(
-      id: proposal.id,
-      // TODO(damian-molinski): pass fundNumber here,
-      fundNumber: 14,
-      author: data.originalAuthors.firstOrNull,
-      title: proposal.title ?? '',
-      description: proposal.description ?? '',
-      categoryName: proposal.categoryName ?? '',
-      durationInMonths: proposal.durationInMonths ?? 0,
-      fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      createdAt: proposal.id.ver!.dateTime,
-      iteration: data.iteration,
-      commentsCount: isFinal ? null : data.commentsCount,
-      isFinal: isFinal,
-      isFavorite: data.isFavorite,
-      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
-    );
   }
 }

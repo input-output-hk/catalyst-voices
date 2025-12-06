@@ -302,6 +302,8 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
           get<DatabaseDocumentsDataSource>(),
+          get<CastedVotesObserver>(),
+          get<VotingBallotBuilder>(),
         ),
       )
       ..registerLazySingleton<CommentRepository>(
@@ -416,8 +418,6 @@ final class Dependencies extends DependencyProvider {
         get<UserService>(),
         get<SignerService>(),
         get<ActiveCampaignObserver>(),
-        get<CastedVotesObserver>(),
-        get<VotingBallotBuilder>(),
       );
     });
     registerLazySingleton<CommentService>(() {

@@ -1,10 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
   final DocumentRef id;
-  // TODO(damian-molinski): To be implemented
   final int fundNumber;
   final CatalystId? author;
   final String title;
@@ -18,6 +18,7 @@ final class ProposalBriefData extends Equatable {
   final bool isFinal;
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
+
   // TODO(damian-molinski): To be implemented
   final List<ProposalBriefDataVersion>? versions;
   final List<ProposalBriefDataCollaborator>? collaborators;
@@ -41,6 +42,39 @@ final class ProposalBriefData extends Equatable {
     this.collaborators,
   });
 
+  factory ProposalBriefData.build({
+    required RawProposalBrief data,
+    required ProposalOrDocument proposal,
+    required List<Vote> draftVotes,
+    required List<Vote> castedVotes,
+  }) {
+    final isFinal = data.isFinal;
+
+    final draftVote = isFinal
+        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == data.proposal.id)
+        : null;
+    final castedVote = isFinal
+        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == data.proposal.id)
+        : null;
+
+    return ProposalBriefData(
+      id: data.proposal.id,
+      fundNumber: proposal.fundNumber ?? 0,
+      author: data.originalAuthors.firstOrNull,
+      title: proposal.title ?? '',
+      description: proposal.description ?? '',
+      categoryName: proposal.categoryName ?? '',
+      durationInMonths: proposal.durationInMonths ?? 0,
+      fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      createdAt: data.proposal.id.ver!.dateTime,
+      iteration: data.iteration,
+      commentsCount: isFinal ? null : data.commentsCount,
+      isFinal: isFinal,
+      isFavorite: data.isFavorite,
+      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -60,7 +94,6 @@ final class ProposalBriefData extends Equatable {
     versions,
     collaborators,
   ];
-  DateTime get updateDate => id.ver?.dateTime ?? id.id.dateTime;
 }
 
 final class ProposalBriefDataCollaborator extends Equatable {
