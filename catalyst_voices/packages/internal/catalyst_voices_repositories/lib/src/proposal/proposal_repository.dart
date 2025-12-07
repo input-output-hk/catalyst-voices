@@ -414,10 +414,18 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     _ProposalBriefDataComponents components,
   ) async {
     final rawPage = components.$1;
-    final draftVotes = components.$2;
-    final castedVotes = components.$3;
+    final draftVotes = Map.fromEntries(components.$2.map((e) => MapEntry(e.proposal, e)));
+    final castedVotes = Map.fromEntries(components.$3.map((e) => MapEntry(e.proposal, e)));
 
-    // TODO(damian-molinski): collect proposals ids and query their collaborators statuses.
+    final proposalsRefs = rawPage.items
+        // If proposal is final we have to get action for that exact version,
+        // otherwise just latest action
+        .map((e) => e.isFinal ? e.proposal.id : e.proposal.id.toLoose())
+        .toList();
+
+    final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
+      proposalsRefs: proposalsRefs,
+    );
 
     final briefs = rawPage.items.map((item) {
       final templateData = item.template;
@@ -431,11 +439,18 @@ final class ProposalRepositoryImpl implements ProposalRepository {
               return ProposalOrDocument.proposal(proposal);
             }();
 
+      final proposalId = item.proposal.id;
+
+      final draftVote = draftVotes[proposalId];
+      final castedVote = castedVotes[proposalId];
+      final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
+
       return ProposalBriefData.build(
         data: item,
         proposal: proposalOrDocument,
-        draftVotes: draftVotes,
-        castedVotes: castedVotes,
+        draftVote: draftVote,
+        castedVote: castedVote,
+        collaboratorsActions: proposalCollaboratorsActions,
       );
     }).toList();
 

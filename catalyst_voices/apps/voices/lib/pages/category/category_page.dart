@@ -116,7 +116,7 @@ class _CategoryDetailContent extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading,
-          data: state.selectedCategoryDetails ?? CampaignCategoryDetailsViewModel.placeholder(),
+          actions: state.selectedCategoryDetails ?? CampaignCategoryDetailsViewModel.placeholder(),
         );
       },
       builder: (context, state) {
@@ -125,12 +125,12 @@ class _CategoryDetailContent extends StatelessWidget {
         );
         return ResponsiveChildBuilder(
           sm: (_) => _BodySmall(
-            category: state.data,
+            category: state.actions,
             isLoading: state.show,
             isActiveProposer: isActiveProposer,
           ),
           md: (_) => _Body(
-            category: state.data,
+            category: state.actions,
             isLoading: state.show,
             isActiveProposer: isActiveProposer,
           ),
@@ -151,11 +151,11 @@ class _CategoryDetailError extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading == false && state.error != null,
-          data: state.error,
+          actions: state.error,
         );
       },
       builder: (context, state) {
-        final error = state.data ?? const LocalizedUnknownException();
+        final error = state.actions ?? const LocalizedUnknownException();
         return Offstage(
           offstage: !state.show,
           child: Padding(

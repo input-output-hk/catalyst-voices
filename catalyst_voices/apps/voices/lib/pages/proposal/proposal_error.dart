@@ -14,11 +14,11 @@ class ProposalError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalCubit, ProposalState, ErrorVisibilityState>(
-      selector: (state) => (show: state.showError, data: state.error),
+      selector: (state) => (show: state.showError, actions: state.error),
       builder: (context, state) {
         return Offstage(
           offstage: !state.show,
-          child: _ProposalError(exception: state.data),
+          child: _ProposalError(exception: state.actions),
         );
       },
     );

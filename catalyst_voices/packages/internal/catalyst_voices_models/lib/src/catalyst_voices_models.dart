@@ -98,6 +98,7 @@ export 'proposal/core_proposal.dart';
 export 'proposal/data/proposal_brief_data.dart';
 export 'proposal/data/proposals_total_ask.dart';
 export 'proposal/data/raw_proposal_brief.dart';
+export 'proposal/data/raw_proposal_collaborators_actions.dart';
 export 'proposal/detail_proposal.dart';
 export 'proposal/exception/proposal_limit_reached_exception.dart';
 export 'proposal/proposal.dart';

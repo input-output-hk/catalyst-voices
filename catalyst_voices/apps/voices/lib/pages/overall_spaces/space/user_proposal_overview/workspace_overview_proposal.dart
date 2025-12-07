@@ -36,7 +36,7 @@ class _WorkspaceDataProposalOverview extends StatelessWidget {
         BlocSelector<WorkspaceBloc, WorkspaceState, DataVisibilityState<UserProposalsView>>(
           selector: (state) {
             return (
-              data: state.userProposals.notPublished,
+              actions: state.userProposals.notPublished,
               show: state.showProposals && !state.isLoading,
             );
           },
@@ -44,7 +44,7 @@ class _WorkspaceDataProposalOverview extends StatelessWidget {
             return Offstage(
               offstage: !state.show,
               child: UserProposalsOverviewList(
-                proposals: state.data.items,
+                proposals: state.actions.items,
                 emptyMessage: context.l10n.noProposalsToPublish,
                 showLatestLocal: true,
               ),

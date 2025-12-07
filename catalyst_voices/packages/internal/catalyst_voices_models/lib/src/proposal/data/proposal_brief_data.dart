@@ -45,20 +45,30 @@ final class ProposalBriefData extends Equatable {
   factory ProposalBriefData.build({
     required RawProposalBrief data,
     required ProposalOrDocument proposal,
-    required List<Vote> draftVotes,
-    required List<Vote> castedVotes,
+    Vote? draftVote,
+    Vote? castedVote,
+    Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
   }) {
+    final id = data.proposal.id;
     final isFinal = data.isFinal;
 
-    final draftVote = isFinal
-        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == data.proposal.id)
-        : null;
-    final castedVote = isFinal
-        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == data.proposal.id)
-        : null;
+    final versions = data.versionIds
+        .map((e) => ProposalBriefDataVersion(ref: id.copyWith(ver: Optional(e))))
+        .toList();
+
+    final collaborators = data.proposal.metadata.collaborators?.map(
+      (id) {
+        final action = collaboratorsActions[id.toSignificant()]?.action;
+
+        return ProposalBriefDataCollaborator(
+          id: id,
+          status: ProposalsCollaborationStatus.pending,
+        );
+      },
+    ).toList();
 
     return ProposalBriefData(
-      id: data.proposal.id,
+      id: id,
       fundNumber: proposal.fundNumber ?? 0,
       author: data.originalAuthors.firstOrNull,
       title: proposal.title ?? '',
@@ -66,12 +76,14 @@ final class ProposalBriefData extends Equatable {
       categoryName: proposal.categoryName ?? '',
       durationInMonths: proposal.durationInMonths ?? 0,
       fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      createdAt: data.proposal.id.ver!.dateTime,
+      createdAt: id.ver!.dateTime,
       iteration: data.iteration,
       commentsCount: isFinal ? null : data.commentsCount,
       isFinal: isFinal,
       isFavorite: data.isFavorite,
       votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
+      versions: versions,
+      collaborators: collaborators,
     );
   }
 
@@ -133,4 +145,17 @@ final class ProposalBriefDataVotes extends Equatable {
 
   @override
   List<Object?> get props => [draft, casted];
+}
+
+extension on RawCollaboratorAction? {
+  // left and removed.
+  // Probably logic behind aFinal/draft should be also tied to proposal status here.
+  ProposalsCollaborationStatus toStatus() {
+    return switch (this?.action) {
+      ProposalSubmissionAction.aFinal => ProposalsCollaborationStatus.accepted,
+      ProposalSubmissionAction.draft => ProposalsCollaborationStatus.accepted,
+      ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
+      null => ProposalsCollaborationStatus.pending,
+    };
+  }
 }
