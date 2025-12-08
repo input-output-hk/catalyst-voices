@@ -94,6 +94,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       template: document.metadata.templateRef,
       parameters: document.metadata.parameters,
       authors: document.metadata.authors,
+      collaborators: document.metadata.collaborators,
     );
   }
 

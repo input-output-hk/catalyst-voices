@@ -72,6 +72,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
     on<UpdateUsernameEvent>(_onUpdateUsername);
+    on<UpdateCollaboratorsEvent>(_updateCollaborators);
     on<UnlockProposalBuilderEvent>(_unlockProposal);
     on<ForgetProposalBuilderEvent>(_forgetProposal);
 
@@ -142,6 +143,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       template: state.metadata.templateRef!,
       parameters: DocumentParameters({state.metadata.categoryId!}),
       authors: [_userService.activeAccountId],
+      collaborators: state.metadata.collaborators,
     );
   }
 
@@ -556,6 +558,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           categoryId: categoryRef,
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
+          authorId: _cache.activeAccountId,
+          collaborators: proposalData.document.metadata.collaborators ?? [],
         ),
         category: category,
         categoryTotalAsk: categoryTotalAsk,
@@ -909,6 +913,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
       final proposalTitle = state.proposalTitle;
       final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+      final hasCollaborators = state.metadata.collaborators.isNotEmpty;
 
       // if it's local draft and the first version then
       // it should be shown as local which corresponds to null
@@ -921,6 +926,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           proposalTitle: proposalTitle,
           currentIteration: currentIteration,
           nextIteration: nextIteration,
+          hasCollaborators: hasCollaborators,
         ),
       );
     } finally {
@@ -1150,6 +1156,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       _logger.severe('Unlock proposal failed', e, stackTrace);
       emitError(LocalizedException.create(e));
     }
+  }
+
+  void _updateCollaborators(
+    UpdateCollaboratorsEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    final stateMetadata = state.metadata.copyWith(collaborators: event.collaborators);
+    _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
+    emit(state.copyWith(metadata: stateMetadata));
   }
 
   Future<void> _updateCommentBuilder(

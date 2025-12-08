@@ -30,6 +30,10 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// (Usually single property)
   final ValueChanged<List<model.DocumentChange>> onChanged;
 
+  /// A callback that should be called with a list of [model.CatalystId]
+  /// when the user wants to save the collaborators.
+  final ValueChanged<List<model.CatalystId>> onCollaboratorsChanged;
+
   /// See [DocumentPropertyBuilderOverrides].
   final DocumentPropertyBuilderOverrides? overrides;
 
@@ -42,6 +46,7 @@ class DocumentBuilderSectionTile extends StatefulWidget {
     this.isEditable = true,
     this.autovalidateMode = AutovalidateMode.disabled,
     required this.onChanged,
+    required this.onCollaboratorsChanged,
     this.overrides,
     this.actionOverrides,
   });
@@ -71,7 +76,8 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
           isEditMode: false,
           editedSection: widget.section,
           builder: widget.section.toBuilder(),
-          pendingChanges: List.empty(growable: true),
+          pendingDocumentChanges: List.empty(growable: true),
+          pendingCollaboratorsChanges: null,
         );
   }
 
@@ -101,10 +107,12 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   Widget? get _overrideAction {
     final overrides = widget.actionOverrides?[widget.section.nodeId];
 
-    return overrides;
+    return overrides?.call(context, _isEditMode, _onEditModeChange);
   }
 
-  List<model.DocumentChange> get _pendingChanges => _data.pendingChanges;
+  List<model.CatalystId>? get _pendingCollaboratorsChanges => _data.pendingCollaboratorsChanges;
+
+  List<model.DocumentChange> get _pendingDocumentChanges => _data.pendingDocumentChanges;
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +139,11 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
                 property: _editedSection,
                 isEditMode: _isEditMode,
                 onChanged: _handlePropertyChanges,
+                collaboratorsSectionData: (
+                  editedData: _pendingCollaboratorsChanges,
+                  isEditMode: _isEditMode,
+                  onCollaboratorsChanged: _handleCollaboratorsChanged,
+                ),
                 overrides: widget.overrides,
               )
             : DocumentPropertyBuilderViewer(
@@ -180,13 +193,23 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     });
   }
 
+  void _handleCollaboratorsChanged(List<model.CatalystId>? collaborators) {
+    setState(() {
+      if (collaborators == null) {
+        _removePendingCollaboratorsChanges();
+      } else {
+        _updatePendingCollaboratorsChanges(collaborators);
+      }
+    });
+  }
+
   void _handlePropertyChanges(List<model.DocumentChange> changes) {
     setState(() {
       for (final change in changes) {
         _builder.addChange(change);
       }
       _editedSection = _builder.build();
-      _pendingChanges.addAll(changes);
+      _pendingDocumentChanges.addAll(changes);
     });
   }
 
@@ -227,15 +250,47 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
 
   void _onSave() {
     setState(() {
-      widget.onChanged(List.of(_pendingChanges));
-      _pendingChanges.clear();
+      final pendingChanges = _pendingDocumentChanges;
+      if (pendingChanges.isNotEmpty) {
+        widget.onChanged(List.of(pendingChanges));
+      }
+      pendingChanges.clear();
+
+      final pendingCollaboratorsChanges = _pendingCollaboratorsChanges;
+      if (pendingCollaboratorsChanges != null) {
+        // if the list is empty, it means that the user has deleted all collaborators and wants to save it
+        widget.onCollaboratorsChanged(List.of(pendingCollaboratorsChanges));
+      }
+      _removePendingCollaboratorsChanges();
+
       _isEditMode = false;
     });
+  }
+
+  void _removePendingCollaboratorsChanges() {
+    _tileController.setData(
+      widget.section.nodeId,
+      _data.copyWith(pendingCollaboratorsChanges: const model.Optional.empty()),
+    );
   }
 
   void _resetBuilder() {
     _editedSection = widget.section;
     _builder = _editedSection.toBuilder();
-    _pendingChanges.clear();
+    _pendingDocumentChanges.clear();
+    _removePendingCollaboratorsChanges();
+  }
+
+  void _updatePendingCollaboratorsChanges(List<model.CatalystId> collaborators) {
+    if (_pendingCollaboratorsChanges case final pendingCollaboratorsChanges?) {
+      pendingCollaboratorsChanges
+        ..clear()
+        ..addAll(collaborators);
+    } else {
+      _tileController.setData(
+        widget.section.nodeId,
+        _data.copyWith(pendingCollaboratorsChanges: model.Optional(List.of(collaborators))),
+      );
+    }
   }
 }
