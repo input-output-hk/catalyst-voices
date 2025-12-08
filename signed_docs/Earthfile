@@ -1,5 +1,7 @@
 VERSION 0.8
 
+IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.10-mk-signed-docs-key-type AS cat-libs-rust
+
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
 
 package:
@@ -8,6 +10,9 @@ package:
     WORKDIR /app
 
     ARG tag='latest'
+
+    COPY cat-libs-rust+build/mk_signed_doc .
+    ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
 
     COPY pyproject.toml .
     COPY uv.lock .
