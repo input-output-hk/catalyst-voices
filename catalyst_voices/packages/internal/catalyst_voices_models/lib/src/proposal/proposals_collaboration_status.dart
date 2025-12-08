@@ -14,6 +14,7 @@ enum ProposalsCollaborationStatus {
   /// The collaborator has been removed.
   removed,
 
+  /// The user is the original author of the proposal.
   mainProposer;
 
   const ProposalsCollaborationStatus();

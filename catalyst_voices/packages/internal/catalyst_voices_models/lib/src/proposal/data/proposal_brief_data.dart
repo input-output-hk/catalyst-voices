@@ -53,16 +53,28 @@ final class ProposalBriefData extends Equatable {
     final isFinal = data.isFinal;
 
     final versions = data.versionIds
+        // TODO(damian-molinski): Get titles for all versions
         .map((e) => ProposalBriefDataVersion(ref: id.copyWith(ver: Optional(e))))
         .toList();
 
+    // TODO(damian-molinski): Try getting collaborators from previous version.
+    // Proposal Brief do not support "removed" or "left" status as it would require
+    // getting collaborators list from previous version and compare diff.
     final collaborators = data.proposal.metadata.collaborators?.map(
       (id) {
         final action = collaboratorsActions[id.toSignificant()]?.action;
+        final status = switch (action) {
+          null => ProposalsCollaborationStatus.pending,
+          ProposalSubmissionAction.aFinal => ProposalsCollaborationStatus.accepted,
+          // When proposal is final draft action do not mean it's accepted
+          ProposalSubmissionAction.draft when isFinal => ProposalsCollaborationStatus.pending,
+          ProposalSubmissionAction.draft => ProposalsCollaborationStatus.accepted,
+          ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
+        };
 
         return ProposalBriefDataCollaborator(
           id: id,
-          status: ProposalsCollaborationStatus.pending,
+          status: status,
         );
       },
     ).toList();
@@ -145,17 +157,4 @@ final class ProposalBriefDataVotes extends Equatable {
 
   @override
   List<Object?> get props => [draft, casted];
-}
-
-extension on RawCollaboratorAction? {
-  // left and removed.
-  // Probably logic behind aFinal/draft should be also tied to proposal status here.
-  ProposalsCollaborationStatus toStatus() {
-    return switch (this?.action) {
-      ProposalSubmissionAction.aFinal => ProposalsCollaborationStatus.accepted,
-      ProposalSubmissionAction.draft => ProposalsCollaborationStatus.accepted,
-      ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
-      null => ProposalsCollaborationStatus.pending,
-    };
-  }
 }
