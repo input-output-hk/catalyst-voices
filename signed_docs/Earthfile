@@ -1,0 +1,31 @@
+VERSION 0.8
+
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
+
+package:
+    FROM ${REGISTRY}/astral-sh/uv:python3.13-bookworm-slim
+
+    WORKDIR /app
+
+    ARG tag='latest'
+
+    COPY pyproject.toml .
+    COPY uv.lock .
+    COPY set_config.py .
+
+    COPY --dir dev .
+
+    COPY entrypoint.sh .
+    RUN chmod +x entrypoint.sh
+
+    ENTRYPOINT ["/app/entrypoint.sh"]
+
+    SAVE IMAGE setup-fund-documents:${tag}
+
+docker:
+    FROM +package
+
+    ARG container="setup-fund-documents"
+    ARG tag="latest"
+
+    SAVE IMAGE ${container}:${tag}
