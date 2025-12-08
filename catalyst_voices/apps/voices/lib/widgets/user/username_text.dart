@@ -1,5 +1,5 @@
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class UsernameText extends StatelessWidget {
@@ -20,14 +20,14 @@ class UsernameText extends StatelessWidget {
   Widget build(BuildContext context) {
     final username = data;
     final isAnonymous = username == null || username.isBlank;
-    final effectiveUsername = isAnonymous ? context.l10n.anonymousUsername : username;
+    final displayName = data.asDisplayName(context);
 
     final effectiveStyle = (style ?? const TextStyle()).copyWith(
       fontStyle: isAnonymous ? FontStyle.italic : FontStyle.normal,
     );
 
     return Text(
-      effectiveUsername,
+      displayName,
       style: effectiveStyle,
       maxLines: maxLines,
       overflow: overflow,

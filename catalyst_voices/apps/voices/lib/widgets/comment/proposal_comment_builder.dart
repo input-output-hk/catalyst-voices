@@ -97,6 +97,11 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
                         property: property,
                         isEditMode: true,
                         onChanged: _handlePropertyChanges,
+                        collaboratorsSectionData: (
+                          editedData: null,
+                          isEditMode: true,
+                          onCollaboratorsChanged: (_) {},
+                        ),
                       ),
                     const SizedBox(height: 4),
                     _Actions(
