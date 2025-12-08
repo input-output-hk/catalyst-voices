@@ -18,8 +18,6 @@ final class ProposalBriefData extends Equatable {
   final bool isFinal;
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
-
-  // TODO(damian-molinski): To be implemented
   final List<ProposalBriefDataVersion>? versions;
   final List<ProposalBriefDataCollaborator>? collaborators;
 

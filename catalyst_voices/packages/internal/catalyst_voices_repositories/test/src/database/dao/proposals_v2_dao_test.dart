@@ -8,10 +8,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.d
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
-import 'package:drift/drift.dart' hide isNull, isNotNull;
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../utils/document_composite_factory.dart';
@@ -5900,20 +5897,7 @@ CatalystId _createTestAuthor({
   String? name,
   int role0KeySeed = 0,
 }) {
-  final buffer = StringBuffer('id.catalyst://');
-  final role0Key = Uint8List.fromList(List.filled(32, role0KeySeed));
-
-  if (name != null) {
-    buffer
-      ..write(name)
-      ..write('@');
-  }
-
-  buffer
-    ..write('preprod.cardano/')
-    ..write(base64UrlNoPadEncode(role0Key));
-
-  return CatalystId.parse(buffer.toString());
+  return CatalystIdFactory.create(username: name, role0KeySeed: role0KeySeed);
 }
 
 List<CatalystId> _createTestAuthors(
