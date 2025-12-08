@@ -36,7 +36,7 @@ class _DiscoveryOverviewProposalData extends StatelessWidget {
             DataVisibilityState<List<UsersProposalOverview>>
           >(
             selector: (state) {
-              return (actions: state.userProposals.published.items, show: state.showProposals);
+              return (data: state.userProposals.published.items, show: state.showProposals);
             },
             builder: (context, state) {
               return Column(
@@ -49,7 +49,7 @@ class _DiscoveryOverviewProposalData extends StatelessWidget {
                   Offstage(
                     offstage: !state.show,
                     child: UserProposalsOverviewList(
-                      proposals: state.actions,
+                      proposals: state.data,
                       emptyMessage: context.l10n.noPublishedProposals,
                     ),
                   ),
