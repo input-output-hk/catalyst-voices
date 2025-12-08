@@ -94,9 +94,9 @@ async fn store_full_signed_doc(
     doc: &FullSignedDoc,
     doc_type: uuid::Uuid,
 ) {
-    assert!(doc.store().await.unwrap());
+    assert!(doc.store().await.is_ok());
     // try to insert the same data again
-    assert!(!doc.store().await.unwrap());
+    assert!(doc.store().await.is_err());
     // try another doc with the same `id` and `ver` and with different other fields
     let another_doc = FullSignedDoc::new(
         SignedDocBody::new(
