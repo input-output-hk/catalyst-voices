@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/types/cose_uuid.dart';
+import 'package:catalyst_cose/src/utils/cbor_deterministic_utils.dart';
 import 'package:cbor/cbor.dart';
 
 /// UTF-8 Catalyst ID URI encoded as a bytes string.
@@ -30,7 +31,9 @@ extension type const CoseCollaborators(List<CatalystIdKid> list) {
 
   /// Serializes the type as cbor.
   CborValue toCbor() {
-    return CborList(list.map((e) => e.toCbor()).toList());
+    return CborDeterministicUtils.createList(
+      list.map((e) => e.toCbor()).toList(),
+    );
   }
 }
 

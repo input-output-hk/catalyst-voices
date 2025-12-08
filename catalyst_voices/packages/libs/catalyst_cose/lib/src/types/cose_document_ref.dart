@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/exception/cose_format_exception.dart';
 import 'package:catalyst_cose/src/types/cose_uuid.dart';
+import 'package:catalyst_cose/src/utils/cbor_deterministic_utils.dart';
 import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
@@ -133,7 +134,9 @@ extension type const CoseDocumentRefs._(List<CoseDocumentRef> refs) {
 
   /// Serializes the type as cbor.
   CborValue toCbor() {
-    return CborList(refs.map((e) => e.toCbor()).toList());
+    return CborDeterministicUtils.createList(
+      refs.map((e) => e.toCbor()).toList(),
+    );
   }
 
   /// Pre v0.0.1 spec, the document ref was just a string representing the documentId, not documented.
