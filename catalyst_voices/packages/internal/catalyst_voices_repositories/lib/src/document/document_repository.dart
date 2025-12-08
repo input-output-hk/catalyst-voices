@@ -78,10 +78,10 @@ abstract interface class DocumentRepository {
   });
 
   /// Useful when recovering account and we want to lookup
-  /// latest [DocumentData] which of [authorId] and check
+  /// latest [DocumentData] which of [originalAuthorId] and check
   /// username used in [CatalystId] in that document.
   Future<DocumentData?> getLatestDocument({
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
   });
 
   /// Returns latest matching [DocumentRef] version with same id as [id].
@@ -296,9 +296,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<DocumentData?> getLatestDocument({
-    CatalystId? authorId,
+    CatalystId? originalAuthorId,
   }) async {
-    final latestDocument = await _localDocuments.findFirst(authorId: authorId);
+    final latestDocument = await _localDocuments.findFirst(originalAuthorId: originalAuthorId);
     final latestDraft = await _drafts.findFirst();
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
@@ -474,7 +474,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         .watchAll(
           latestOnly: unique,
           type: type,
-          authorId: authorId,
+          originalAuthorId: authorId,
           referencing: referencing,
           limit: limit ?? 200,
         )
@@ -645,13 +645,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   bool _isDocumentMetadataValid(DocumentData document) {
     final template = document.metadata.template;
-    final category = document.metadata.categoryId;
     final documentType = document.metadata.type;
 
     final isInvalidTemplate = template == null || !template.isValid;
-    final isInvalidCategory = category == null || !category.isValid;
     final isInvalidType = documentType == DocumentType.unknown;
-    final isInvalidProposal = isInvalidTemplate || isInvalidType || isInvalidCategory;
+    final isInvalidProposal = isInvalidTemplate || isInvalidType;
 
     return !isInvalidProposal;
   }

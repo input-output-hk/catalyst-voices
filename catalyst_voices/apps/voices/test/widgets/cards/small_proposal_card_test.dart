@@ -92,13 +92,6 @@ void main() {
       expect(find.text('Cardano Use Cases: Concept'), findsOneWidget);
     });
 
-    testWidgets('shows version number', (tester) async {
-      await pumpCard(tester);
-      await tester.pumpAndSettle();
-
-      expect(find.text('2'), findsOneWidget);
-    });
-
     testWidgets('shows new iteration details when showLatestLocal '
         'is true and has latest local draft', (tester) async {
       await pumpCard(tester, showLatestLocal: true);

@@ -35,7 +35,7 @@ sealed class UserProposalOwnership extends Equatable {
     CatalystId? authorId,
     CatalystId? activeAccountId,
   }) {
-    if (authorId?.toSignificant() == activeAccountId?.toSignificant()) {
+    if (activeAccountId != null && authorId != null && authorId.isSameAs(activeAccountId)) {
       return const AuthorProposalOwnership();
     }
     // If user can see the proposal but isn't the author, they're a collaborator

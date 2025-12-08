@@ -497,10 +497,6 @@
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
   },
-  "collaboratorCatalystIdIsMissingProposerRole": "This Catalyst ID is missing Proposer role. Only Proposers can be added as Co-Proposers",
-  "@collaboratorCatalystIdIsMissingProposerRole": {
-    "description": "Error message shown to user when he tries to add Catalyst ID of a user that don't have Proposer role"
-  },
   "collaboratorInvitationAcceptButton": "Accept Invitation",
   "@collaboratorInvitationAcceptButton": {
     "description": "Dialog button when accepting an invitation to become a collaborator on a proposal."
@@ -643,6 +639,18 @@
   "contributorDescription": "Become a Catalyst contributor to help shape innovative ideas and have a voice in ecosystem decisions that matter.",
   "@contributorDescription": {
     "description": "A description for contributor"
+  },
+  "contributorMissingProposerRole": "This Catalyst ID doesn't have the Proposer role required to be added as Co-Proposer",
+  "@contributorMissingProposerRole": {
+    "description": "Error message shown when trying to add a collaborator who lacks the proposer role"
+  },
+  "contributorNotProposerAndNotVerified": "This Catalyst ID doesn't have the Proposer role and is not verified. Both are required to be added as Co-Proposer",
+  "@contributorNotProposerAndNotVerified": {
+    "description": "Error message shown when trying to add a collaborator who lacks both proposer role and verification"
+  },
+  "contributorNotVerifiedProfile": "This Catalyst ID is not verified and cannot be added as Co-Proposer",
+  "@contributorNotVerifiedProfile": {
+    "description": "Error message shown when trying to add a collaborator with an unverified profile"
   },
   "contributorSummaryComment": "Comment on Proposals",
   "@contributorSummaryComment": {

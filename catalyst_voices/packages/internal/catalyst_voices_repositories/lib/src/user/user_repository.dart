@@ -7,7 +7,6 @@ import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.sw
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -28,19 +27,24 @@ abstract interface class UserRepository {
 
   Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId});
 
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  });
+
   Future<User> getUser();
 
   Future<VotingPower> getVotingPower();
+
+  Future<bool> isPubliclyVerified({
+    required CatalystId catalystId,
+    RbacToken? token,
+  });
 
   /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  });
-
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
   });
 
   Future<void> saveUser(User user);
@@ -85,6 +89,29 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  }) async {
+    final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
+
+    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
+    final username =
+        publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
+    final votingPower = await _getVotingPower(token: rbacToken);
+
+    return RecoverableAccount(
+      username: username,
+      email: publicProfile?.email,
+      roles: rbacRegistration.accountRoles,
+      stakeAddress: rbacRegistration.stakeAddress,
+      publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
+      votingPower: votingPower,
+      isPersistent: rbacRegistration.lastPersistentTxn != null,
+    );
+  }
+
+  @override
   Future<User> getUser() async {
     final dto = await _storage.readUser();
     final user = await dto?.toModel(keychainProvider: _keychainProvider);
@@ -94,6 +121,22 @@ final class UserRepositoryImpl implements UserRepository {
   @override
   Future<VotingPower> getVotingPower() {
     return _getVotingPower();
+  }
+
+  @override
+  Future<bool> isPubliclyVerified({
+    required CatalystId catalystId,
+    RbacToken? token,
+  }) async {
+    final response = await _apiServices.reviews
+        .apiCatalystIdsGet(
+          lookup: catalystId.toUri().toStringWithoutScheme(),
+          authorization: token?.authHeader(),
+        )
+        .successBodyOrThrow()
+        .then<bool?>((value) => value.active);
+
+    return response ?? false;
   }
 
   @override
@@ -113,29 +156,6 @@ final class UserRepositoryImpl implements UserRepository {
           (error, stackTrace) => throw const EmailAlreadyUsedException(),
         )
         .then((value) => value.toModel());
-  }
-
-  @override
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
-  }) async {
-    final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
-
-    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
-    final username =
-        publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
-    final votingPower = await _getVotingPower(token: rbacToken);
-
-    return RecoveredAccount(
-      username: username,
-      email: publicProfile?.email,
-      roles: rbacRegistration.accountRoles,
-      stakeAddress: rbacRegistration.stakeAddress,
-      publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
-      votingPower: votingPower,
-      isPersistent: rbacRegistration.lastPersistentTxn != null,
-    );
   }
 
   @override
@@ -168,7 +188,7 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
   }) {
     return _documentRepository
-        .getLatestDocument(authorId: catalystId.toSignificant())
+        .getLatestDocument(originalAuthorId: catalystId.toSignificant())
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {

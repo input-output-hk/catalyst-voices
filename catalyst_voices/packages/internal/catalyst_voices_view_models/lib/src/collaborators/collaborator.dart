@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -26,11 +27,23 @@ final class Collaborator extends Equatable {
 
 /// A status of the collaborator invited to a document (proposal).
 extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
+  SvgGenImage icon(BuildContext context) {
+    return switch (this) {
+      ProposalsCollaborationStatus.pending => VoicesAssets.icons.clock,
+      ProposalsCollaborationStatus.accepted ||
+      ProposalsCollaborationStatus.mainProposer => VoicesAssets.icons.check,
+      ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.removed => VoicesAssets.icons.x,
+      ProposalsCollaborationStatus.left => VoicesAssets.icons.unlink,
+    };
+  }
+
   Color labelColor(BuildContext context) {
     return switch (this) {
       ProposalsCollaborationStatus.pending ||
       ProposalsCollaborationStatus.accepted ||
       ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.mainProposer ||
       ProposalsCollaborationStatus.removed => Theme.of(context).colors.textOnPrimaryLevel1,
       ProposalsCollaborationStatus.left => Theme.of(context).colors.textDisabled,
     };
@@ -43,13 +56,15 @@ extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
       ProposalsCollaborationStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
       ProposalsCollaborationStatus.left => context.l10n.collaboratorInvitationStatusLeft,
       ProposalsCollaborationStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
+      ProposalsCollaborationStatus.mainProposer => context.l10n.mainProposer,
     };
   }
 
   Color statusColor(BuildContext context) {
     return switch (this) {
       ProposalsCollaborationStatus.pending => Theme.of(context).colors.iconsDisabled,
-      ProposalsCollaborationStatus.accepted => Theme.of(context).colors.iconsSuccess,
+      ProposalsCollaborationStatus.accepted ||
+      ProposalsCollaborationStatus.mainProposer => Theme.of(context).colors.iconsSuccess,
       ProposalsCollaborationStatus.rejected ||
       ProposalsCollaborationStatus.removed => Theme.of(context).colors.iconsError,
       ProposalsCollaborationStatus.left => Theme.of(context).colors.iconsDisabled,

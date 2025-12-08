@@ -72,9 +72,10 @@ final class ProposalsFiltersV2 extends Equatable {
   /// If null, this filter is not applied.
   final bool? isFavorite;
 
-  /// Filters proposals to only include those signed by this [author].
+  /// Filters proposals to only include those signed by this [originalAuthor].
+  /// By original author we mean author of first version (id == ver)
   /// If null, this filter is not applied.
-  final CatalystId? author;
+  final CatalystId? originalAuthor;
 
   /// Filters proposals by their category ID.
   /// If null, this filter is not applied.
@@ -109,7 +110,7 @@ final class ProposalsFiltersV2 extends Equatable {
   const ProposalsFiltersV2({
     this.status,
     this.isFavorite,
-    this.author,
+    this.originalAuthor,
     this.categoryId,
     this.searchQuery,
     this.latestUpdate,
@@ -123,7 +124,7 @@ final class ProposalsFiltersV2 extends Equatable {
   List<Object?> get props => [
     status,
     isFavorite,
-    author,
+    originalAuthor,
     categoryId,
     searchQuery,
     latestUpdate,
@@ -136,7 +137,7 @@ final class ProposalsFiltersV2 extends Equatable {
   ProposalsFiltersV2 copyWith({
     Optional<ProposalStatusFilter>? status,
     Optional<bool>? isFavorite,
-    Optional<CatalystId>? author,
+    Optional<CatalystId>? originalAuthor,
     Optional<String>? categoryId,
     Optional<String>? searchQuery,
     Optional<Duration>? latestUpdate,
@@ -148,7 +149,7 @@ final class ProposalsFiltersV2 extends Equatable {
     return ProposalsFiltersV2(
       status: status.dataOr(this.status),
       isFavorite: isFavorite.dataOr(this.isFavorite),
-      author: author.dataOr(this.author),
+      originalAuthor: originalAuthor.dataOr(this.originalAuthor),
       categoryId: categoryId.dataOr(this.categoryId),
       searchQuery: searchQuery.dataOr(this.searchQuery),
       latestUpdate: latestUpdate.dataOr(this.latestUpdate),
@@ -170,8 +171,8 @@ final class ProposalsFiltersV2 extends Equatable {
     if (isFavorite != null) {
       parts.add('isFavorite: $isFavorite');
     }
-    if (author != null) {
-      parts.add('author: $author');
+    if (originalAuthor != null) {
+      parts.add('originalAuthor: $originalAuthor');
     }
     if (categoryId != null) {
       parts.add('categoryId: $categoryId');

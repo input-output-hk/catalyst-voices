@@ -31,6 +31,6 @@ abstract interface class ProposalDocumentDataLocalSource {
   });
 
   Stream<List<DocumentData>> watchProposalTemplates({
-    required CampaignFilters filters,
+    required CampaignFilters campaign,
   });
 }

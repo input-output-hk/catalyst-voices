@@ -43,7 +43,7 @@ final class Proposal extends CoreProposal {
       duration: document.duration ?? 0,
       author: document.authorName,
       commentsCount: data.commentsCount,
-      categoryRef: data.document.metadata.categoryId,
+      categoryRef: data.document.metadata.parameters.set.first,
       versionsIds: versionsIds,
     );
   }

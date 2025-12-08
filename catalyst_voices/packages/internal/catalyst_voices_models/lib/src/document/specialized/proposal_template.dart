@@ -29,13 +29,13 @@ final class ProposalTemplate extends Equatable {
 }
 
 final class ProposalTemplateMetadata extends DocumentMetadata {
-  final SignedDocumentRef? categoryId;
+  final DocumentParameters? parameters;
 
   ProposalTemplateMetadata({
     required super.id,
-    this.categoryId,
+    this.parameters,
   });
 
   @override
-  List<Object?> get props => super.props + [categoryId];
+  List<Object?> get props => super.props + [parameters];
 }

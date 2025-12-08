@@ -1,4 +1,5 @@
 // TODO(LynxLynxx): Restore test once ProposalsFiltersV2 will be fully implemented
+void main() {}
 
 // import 'dart:typed_data';
 
@@ -19,10 +20,19 @@
 //     late MockDownloaderService mockDownloaderService;
 //     late MockUserService mockUserService;
 
-//     late WorkspaceBloc workspaceBloc;
-
-//     final proposalRef = SignedDocumentRef.generateFirstRef();
-//     final categoryRef = SignedDocumentRef.generateFirstRef();
+//    final proposalRef = SignedDocumentRef.generateFirstRef();
+//    final categoryRef = SignedDocumentRef.generateFirstRef();
+//    final authorId = CatalystId(host: 'test', role0Key: Uint8List(32));
+//
+//    final documentData = DocumentData(
+//      metadata: DocumentDataMetadata.proposal(
+//        id: proposalRef,
+//        template: SignedDocumentRef.generateFirstRef(),
+//        parameters: DocumentParameters({categoryRef}),
+//        authors: [authorId],
+//      ),
+//      content: const DocumentDataContent({}),
+//    );
 
 //     final documentData = DocumentData(
 //       metadata: DocumentDataMetadata(

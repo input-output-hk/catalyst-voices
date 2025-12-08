@@ -2,13 +2,15 @@ import 'package:catalyst_voices_repositories/src/database/table/converter/docume
 import 'package:drift/drift.dart';
 
 mixin DocumentTableMetadataMixin on Table {
-  TextColumn get authors => text()();
+  TextColumn get authors => text().map(DocumentConverters.catId)();
 
-  TextColumn get categoryId => text().nullable()();
+  TextColumn get collaborators => text().map(DocumentConverters.catId)();
 
-  TextColumn get categoryVer => text().nullable()();
+  TextColumn get contentType => text()();
 
   TextColumn get id => text()();
+
+  TextColumn get parameters => text().map(DocumentConverters.parameters)();
 
   TextColumn get refId => text().nullable()();
 

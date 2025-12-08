@@ -1,4 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/catalyst_id_list_converter.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/document_parameters_converter.dart';
 import 'package:drift/drift.dart';
 
 typedef DocumentContentJsonBConverter = JsonTypeConverter2<DocumentDataContent, Uint8List, Object?>;
@@ -13,6 +15,12 @@ abstract final class DocumentConverters {
     fromJson: (json) => DocumentDataContent(json! as Map<String, Object?>),
     toJson: (content) => content.data,
   );
+
+  /// Converts list of [CatalystId] to String for text column.
+  static const catId = CatalystIdListConverter();
+
+  /// Converts [DocumentParameters] to String for text column.
+  static const parameters = DocumentParametersConverter();
 }
 
 final class _DocumentTypeConverter extends TypeConverter<DocumentType, String> {

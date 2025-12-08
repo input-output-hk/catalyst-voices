@@ -151,21 +151,16 @@ extension on LocalDocumentDraftEntity {
   DocumentData toModel() {
     return DocumentData(
       metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.fromJson(contentType),
         type: type,
         id: DraftRef(id: id, ver: ver),
         ref: refId.toRef(refVer),
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
         section: section,
-        categoryId: categoryId.toRef(categoryVer),
-        authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
-        // TODO(bstolinski): implement after merging PR:
-        // https://github.com/input-output-hk/catalyst-voices/pull/3791
-        // https://github.com/input-output-hk/catalyst-voices/pull/3790
-        // https://github.com/input-output-hk/catalyst-voices/pull/3440
-        // collaborators: collaborators.isEmpty
-        //     ? null
-        //     : collaborators.split(',').map(CatalystId.parse).toList(),
+        collaborators: collaborators.isEmpty ? null : collaborators,
+        parameters: parameters,
+        authors: authors.isEmpty ? null : authors,
       ),
       content: content,
     );
@@ -187,6 +182,7 @@ extension on DocumentData {
   LocalDocumentDraftEntity toEntity() {
     return LocalDocumentDraftEntity(
       content: content,
+      contentType: metadata.contentType.value,
       id: metadata.id.id,
       ver: metadata.id.ver!,
       type: metadata.type,
@@ -195,11 +191,11 @@ extension on DocumentData {
       replyId: metadata.reply?.id,
       replyVer: metadata.reply?.ver,
       section: metadata.section,
-      categoryId: metadata.categoryId?.id,
-      categoryVer: metadata.categoryId?.ver,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.ver,
-      authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      collaborators: metadata.collaborators ?? [],
+      parameters: metadata.parameters,
+      authors: metadata.authors ?? [],
       createdAt: metadata.id.ver!.dateTime,
     );
   }

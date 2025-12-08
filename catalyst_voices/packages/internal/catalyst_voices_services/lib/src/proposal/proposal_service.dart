@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -117,7 +115,7 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
-  Future<bool> validateForCollaborator(CatalystId id);
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId id);
 
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
@@ -167,11 +165,10 @@ final class ProposalServiceImpl implements ProposalService {
     final catalystId = _getUserCatalystId();
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
-        metadata: DocumentDataMetadata(
-          type: DocumentType.proposalDocument,
+        metadata: DocumentDataMetadata.proposal(
           id: draftRef,
           template: template,
-          categoryId: categoryId,
+          parameters: DocumentParameters({categoryId}),
           authors: [catalystId],
         ),
         content: content,
@@ -398,11 +395,10 @@ final class ProposalServiceImpl implements ProposalService {
 
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
-        metadata: DocumentDataMetadata(
-          type: DocumentType.proposalDocument,
+        metadata: DocumentDataMetadata.proposal(
           id: id,
           template: template,
-          categoryId: categoryId,
+          parameters: DocumentParameters({categoryId}),
           authors: [catalystId],
         ),
         content: content,
@@ -411,11 +407,18 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<bool> validateForCollaborator(CatalystId id) async {
-    // TODO(LynxLynxx): Add implementation
-    return Future.delayed(const Duration(seconds: 1), () {
-      return Random().nextBool();
-    });
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId catalystId) async {
+    final (isProposer, isVerified) = await (
+      _userService.validateCatalystIdForProposerRole(catalystId: catalystId),
+      _userService.isPubliclyVerified(catalystId: catalystId),
+    ).wait;
+
+    return switch ((isProposer, isVerified)) {
+      (true, true) => const ValidCollaborator(),
+      (true, false) => const NotVerifiedProfile(),
+      (false, true) => const MissingProposerRole(),
+      (false, false) => const NotProposerAndNotVerified(),
+    };
   }
 
   @override
@@ -435,7 +438,7 @@ final class ProposalServiceImpl implements ProposalService {
 
         return ProposalsFiltersV2(
           status: ProposalStatusFilter.aFinal,
-          author: author,
+          originalAuthor: author,
           campaign: ProposalsCampaignFilters.from(campaign),
         );
       },
@@ -561,7 +564,7 @@ final class ProposalServiceImpl implements ProposalService {
       id: proposal.id,
       // TODO(damian-molinski): pass fundNumber here,
       fundNumber: 14,
-      author: proposal.author,
+      author: data.originalAuthors.firstOrNull,
       title: proposal.title ?? '',
       description: proposal.description ?? '',
       categoryName: proposal.categoryName ?? '',

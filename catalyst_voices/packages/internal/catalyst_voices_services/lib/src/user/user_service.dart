@@ -18,6 +18,9 @@ abstract interface class UserService implements ActiveAware {
     RegistrationStatusPoller registrationStatusPoller,
   ) = UserServiceImpl;
 
+  /// Returns the active account's id from the current [user].
+  CatalystId get activeAccountId;
+
   User get user;
 
   /// Returns [Account] when keychain is unlocked, otherwise returns `null`.
@@ -33,20 +36,25 @@ abstract interface class UserService implements ActiveAware {
   /// The method returns the last known transaction ID.
   Future<TransactionHash> getPreviousRegistrationTransactionId();
 
+  /// Fetches info about recovered account.
+  ///
+  /// This does not recover the account,
+  /// it only does the lookup if there's an account to recover.
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  });
+
   /// Simple [User] getter.
   Future<User> getUser();
 
   /// Checks if active account is verified in reviews API.
   Future<bool> isActiveAccountPubliclyVerified();
 
-  /// Fetches info about recovered account.
-  ///
-  /// This does not recover the account,
-  /// it only does the lookup if there's an account to recover.
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
-  });
+  Future<bool> isPubliclyVerified({required CatalystId catalystId});
+
+  /// Similar to [useAccount] but also removes all other existing accounts.
+  Future<void> recoverAccount(Account account);
 
   /// Refreshes the active account with the latest profile from the server.
   Future<void> refreshActiveAccountProfile();
@@ -95,6 +103,8 @@ abstract interface class UserService implements ActiveAware {
 
   /// Tries to lookup user locally and stores it in [UserObserver].
   Future<void> useLocalUser();
+
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId});
 }
 
 final class UserServiceImpl implements UserService {
@@ -109,6 +119,18 @@ final class UserServiceImpl implements UserService {
     this._userObserver,
     this._registrationStatusPoller,
   );
+
+  @override
+  CatalystId get activeAccountId {
+    final account = user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain activeAccountId , account missing',
+      );
+    }
+
+    return account.catalystId;
+  }
 
   @override
   bool get isActive => _userObserver.isActive;
@@ -146,6 +168,17 @@ final class UserServiceImpl implements UserService {
 
     return _userRepository.getPreviousRegistrationTransactionId(
       catalystId: activeAccount.catalystId,
+    );
+  }
+
+  @override
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  }) {
+    return _userRepository.getRecoverableAccount(
+      catalystId: catalystId,
+      rbacToken: rbacToken,
     );
   }
 
@@ -193,14 +226,22 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
-  }) {
-    return _userRepository.recoverAccount(
-      catalystId: catalystId,
-      rbacToken: rbacToken,
-    );
+  Future<bool> isPubliclyVerified({required CatalystId catalystId}) async {
+    return _userRepository.isPubliclyVerified(catalystId: catalystId);
+  }
+
+  @override
+  Future<void> recoverAccount(Account account) async {
+    var user = await getUser();
+
+    for (final existingAccount in user.accounts) {
+      await existingAccount.keychain.erase();
+    }
+
+    user = user.copyWith(accounts: [account]);
+    user = user.useAccount(id: account.catalystId);
+
+    await _updateUser(user);
   }
 
   @override
@@ -442,6 +483,18 @@ final class UserServiceImpl implements UserService {
     final user = await _userRepository.getUser();
 
     await _updateUser(user);
+  }
+
+  @override
+  Future<bool> validateCatalystIdForProposerRole({required CatalystId catalystId}) async {
+    final accountRoles = await _userRepository.getRbacRegistration(catalystId: catalystId).then((
+      value,
+    ) {
+      // TODO(LynxLynxx): use .roles after #3602 merge
+      return value.accountRoles;
+    });
+
+    return accountRoles.contains(AccountRole.proposer);
   }
 
   Future<void> _cancelRegistrationStatusSub() async {

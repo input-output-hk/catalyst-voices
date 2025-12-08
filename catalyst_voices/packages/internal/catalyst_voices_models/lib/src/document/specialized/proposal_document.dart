@@ -171,14 +171,14 @@ final class ProposalMetadata extends DocumentMetadata {
   static const authorsNode = NodeId('authors');
 
   final SignedDocumentRef templateRef;
-  final SignedDocumentRef categoryId;
+  final DocumentParameters parameters;
   final List<CatalystId> authors;
   final List<CatalystId>? collaborators;
 
   ProposalMetadata({
     required super.id,
     required this.templateRef,
-    required this.categoryId,
+    required this.parameters,
     required this.authors,
     this.collaborators,
   });
@@ -187,7 +187,7 @@ final class ProposalMetadata extends DocumentMetadata {
   List<Object?> get props => [
     ...super.props,
     templateRef,
-    categoryId,
+    parameters,
     authors,
     collaborators,
   ];
