@@ -81,38 +81,32 @@ project: {
 								}
 								"EVENT_DB_URL": {
 									secret: {
-										name: "db-url"
-										key:  "url"
+										name: "gateway"
+										key:  "event-db-url"
 									}
 								}
-								"EVENT_DB_MAX_CONNECTIONS_SIZE": {
+								"EVENT_DB_MAX_CONNECTIONS": {
 									secret: {
 										name: "gateway"
-										key:  "db-max-connections"
+										key:  "event-db-max-connections"
 									}
 								}
-								"EVENT_DB_MAX_LIFETIME": {
+								"EVENT_DB_CONN_TIMEOUT": {
 									secret: {
 										name: "gateway"
-										key:  "db-max-lifetime"
-									}
-								}
-								"EVENT_DB_MIN_IDLE": {
-									secret: {
-										name: "gateway"
-										key:  "db-min-idle"
-									}
-								}
-								"EVENT_DB_CONNECTION_TIMEOUT": {
-									secret: {
-										name: "gateway"
-										key:  "db-connection-timeout"
+										key:  "event-db-conn-timeout"
 									}
 								}
 								"INTERNAL_API_KEY": {
 									secret: {
 										name: "gateway"
 										key:  "api-key"
+									}
+								}
+								"SIGNED_DOC_ADMIN_KEY": {
+									secret: {
+										name: "gateway"
+										key:  "signed-doc-admin-key"
 									}
 								}
 							}
