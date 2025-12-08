@@ -52,9 +52,7 @@ class ProposalBrief extends Equatable {
       commentsCount: data.commentsCount,
       isFavorite: data.isFavorite,
       voteData: data.votes.toViewModel(),
-      // TODO(damian-molinski): Integration to be done
-      // ignore: avoid_redundant_argument_values
-      collaborators: null,
+      collaborators: data.collaborators,
     );
   }
 
@@ -138,19 +136,6 @@ class ProposalBrief extends Equatable {
       collaborators: collaborators.dataOr(this.collaborators),
     );
   }
-}
-
-final class ProposalBriefDataCollaborator extends Equatable {
-  final CatalystId id;
-  final ProposalsCollaborationStatus status;
-
-  const ProposalBriefDataCollaborator({
-    required this.id,
-    required this.status,
-  });
-
-  @override
-  List<Object?> get props => [id, status];
 }
 
 extension on ProposalBriefDataVotes? {

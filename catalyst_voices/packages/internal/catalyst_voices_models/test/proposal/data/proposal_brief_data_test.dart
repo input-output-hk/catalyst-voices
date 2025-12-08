@@ -58,6 +58,7 @@ void main() {
         final author = CatalystIdFactory.create(username: 'Author');
         final collaboratorA = CatalystIdFactory.create(username: 'CollabA', role0KeySeed: 1);
         final collaboratorB = CatalystIdFactory.create(username: 'CollabB', role0KeySeed: 2);
+
         final collaboratorAAction = RawCollaboratorAction(
           id: collaboratorA,
           proposalId: id,
