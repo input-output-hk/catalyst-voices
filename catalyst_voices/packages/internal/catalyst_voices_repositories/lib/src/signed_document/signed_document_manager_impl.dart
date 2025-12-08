@@ -51,7 +51,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     return _CoseSignedDocument(
       coseSign: coseSign,
       payload: payload,
-      metadata: metadata.adapt(authors: signers),
+      metadata: metadata.toModel(authors: signers),
       signers: signers,
     );
   }
@@ -192,13 +192,23 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
 }
 
 extension on SignedDocumentMetadata {
-  DocumentDataMetadata adapt({
+  DocumentDataMetadata toModel({
     List<CatalystId>? authors,
   }) {
+    final id = this.id;
+    final ver = this.ver;
+
+    if (id == null) {
+      throw const FormatException('Signed document id was null');
+    }
+    if (ver == null) {
+      throw const FormatException('Signed document ver was null');
+    }
+
     return DocumentDataMetadata(
       contentType: DocumentContentType.json,
       type: documentType,
-      id: SignedDocumentRef(id: id!, ver: ver),
+      id: SignedDocumentRef(id: id, ver: ver),
       ref: ref?.toModel(),
       template: template?.toModel(),
       reply: reply?.toModel(),
