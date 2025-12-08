@@ -1,8 +1,5 @@
 //! Implementation of the PUT `/document` endpoint
 
-use std::{collections::HashSet, str::FromStr};
-
-use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{ApiResponse, payload::Json};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
@@ -10,8 +7,8 @@ use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
     db::{
         event::{
-            error,
-            signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
+            error::NotFoundError,
+            signed_docs::{FullSignedDoc, StoreError},
         },
         index::session::CassandraSessionError,
     },
@@ -74,20 +71,43 @@ pub(crate) async fn endpoint(
         .into();
     };
 
-    // validate document signatures
-    let verifying_key_provider =
-        match VerifyingKeyProvider::try_new(&mut token, &doc.authors()).await {
-            Ok(value) => value,
-            Err(err) if err.is::<CassandraSessionError>() => {
-                return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
-            },
-            Err(err) => {
-                return Responses::UnprocessableContent(Json(
-                    PutDocumentUnprocessableContent::new(&err, None),
-                ))
-                .into();
-            },
-        };
+    let db_doc = match FullSignedDoc::try_from(&doc) {
+        Ok(doc) => doc,
+        Err(err) => return AllResponses::handle_error(&err),
+    };
+
+    // TODO: use the `ValidationProvider::try_get_doc` method and verify the returned
+    // document cid values.
+    // making sure that the document was already submitted before running validation,
+    // otherwise validation would fail, because of the assumption that this document wasn't
+    // published yet.
+    match FullSignedDoc::retrieve(db_doc.id(), Some(db_doc.ver())).await {
+        Ok(retrieved) if db_doc != retrieved => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Document with the same `id` and `ver` already exists",
+                Some(doc.problem_report()),
+            )))
+            .into();
+        },
+        Ok(_) => return Responses::NoContent.into(),
+        Err(err) if err.is::<NotFoundError>() => (),
+        Err(err) => return AllResponses::handle_error(&err),
+    }
+
+    // validation provider
+    let validation_provider = match VerifyingKeyProvider::try_new(&mut token, &doc.authors()).await
+    {
+        Ok(value) => ValidationProvider::new(DocProvider, value),
+        Err(err) if err.is::<CassandraSessionError>() => {
+            return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
+        },
+        Err(err) => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                &err, None,
+            )))
+            .into();
+        },
+    };
 
     match doc.is_deprecated() {
         // apply older validation rule
@@ -113,8 +133,6 @@ pub(crate) async fn endpoint(
         },
         // apply newest validation rules
         Ok(false) => {
-            let validation_provider = ValidationProvider::new(DocProvider, verifying_key_provider);
-
             match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
                 Ok(true) => (),
                 Ok(false) => {
@@ -143,88 +161,8 @@ pub(crate) async fn endpoint(
         .into();
     }
 
-    match validate_against_original_doc(&doc).await {
-        Ok(true) => (),
-        Ok(false) => {
-            return Responses::UnprocessableContent(Json(
-                PutDocumentUnprocessableContent::new("Failed validating document: catalyst-id or role does not match the current version.", None),
-            ))
-            .into();
-        },
-        Err(err) => return AllResponses::handle_error(&err),
-    }
-
-    // update the document storing in the db
-    match store_document_in_db(&doc, doc_bytes).await {
-        Ok(true) => Responses::Created.into(),
-        Ok(false) => Responses::NoContent.into(),
-        Err(err) if err.is::<StoreError>() => {
-            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Document with the same `id` and `ver` already exists",
-                Some(doc.problem_report()),
-            )))
-            .into()
-        },
+    match db_doc.store().await {
+        Ok(()) => Responses::Created.into(),
         Err(err) => AllResponses::handle_error(&err),
     }
-}
-
-/// Fetch the latest version and ensure its catalyst-id match those in the newer version.
-async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::Result<bool> {
-    let original_doc = match FullSignedDoc::retrieve(&doc.doc_id()?.uuid(), None).await {
-        Ok(doc) => doc,
-        Err(e) if e.is::<error::NotFoundError>() => return Ok(true),
-        Err(e) => return Err(e),
-    };
-
-    let original_authors = original_doc
-        .body()
-        .authors()
-        .iter()
-        .map(|author| catalyst_signed_doc::CatalystId::from_str(author))
-        .collect::<Result<HashSet<_>, _>>()?;
-    let authors: HashSet<_> = doc.authors().into_iter().collect();
-    Ok(authors == original_authors)
-}
-
-/// Store a provided and validated document inside the db.
-/// Returns `true` if its a new document.
-/// Returns `false` if the same document already exists.
-async fn store_document_in_db(
-    doc: &catalyst_signed_doc::CatalystSignedDocument,
-    doc_bytes: Vec<u8>,
-) -> anyhow::Result<bool> {
-    let authors = doc
-        .authors()
-        .iter()
-        .map(|v| v.as_short_id().to_string())
-        .collect();
-
-    let doc_meta_json = doc.doc_meta().to_json()?;
-
-    let payload = if matches!(
-        doc.doc_content_type(),
-        Some(catalyst_signed_doc::ContentType::Json)
-    ) {
-        match serde_json::from_slice(doc.decoded_content()?.as_slice()) {
-            Ok(payload) => Some(payload),
-            Err(e) => {
-                anyhow::bail!("Invalid Document Content, not Json encoded: {e}");
-            },
-        }
-    } else {
-        None
-    };
-
-    let doc_body = SignedDocBody::new(
-        doc.doc_id()?.into(),
-        doc.doc_ver()?.into(),
-        doc.doc_type()?.uuid(),
-        authors,
-        Some(doc_meta_json),
-    );
-
-    FullSignedDoc::new(doc_body, payload, doc_bytes)
-        .store()
-        .await
 }
