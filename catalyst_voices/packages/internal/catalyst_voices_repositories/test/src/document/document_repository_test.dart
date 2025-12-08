@@ -57,12 +57,12 @@ void main() {
         final template = DocumentDataFactory.build(
           id: templateRef,
           type: DocumentType.proposalTemplate,
-          content: DocumentDataContent(templateData),
+          contentData: templateData,
         );
         final proposal = DocumentDataFactory.build(
           id: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
           template: templateRef,
-          content: DocumentDataContent(proposalData),
+          contentData: proposalData,
         );
 
         when(
@@ -316,7 +316,7 @@ void main() {
         final updatedData = DocumentDataFactory.build(
           id: draftRef,
           template: templateRef,
-          content: updatedContent,
+          contentData: updatedContent.data,
         );
 
         // When
@@ -361,7 +361,7 @@ void main() {
           id: publicDraftRef,
           template: templateRef,
           parameters: DocumentParameters({DocumentRefFactory.signedDocumentRef()}),
-          content: publicDraftContent,
+          contentData: publicDraftContent.data,
         );
 
         await localDocuments.save(data: templateData);
