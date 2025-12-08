@@ -42,8 +42,8 @@ all-images:
     BUILD ../../../../catalyst-gateway+docker
     BUILD ../../../../catalyst-gateway/event-db+docker
     
-    # Build voices frontend
-    BUILD ../../../+docker
+    # Build voices frontend (without Sentry for e2e tests)
+    BUILD ../../../+docker --ENABLE_SENTRY=false
     
     # Build E2E test runner
     BUILD +docker

@@ -28,6 +28,11 @@ abstract interface class UserRepository {
 
   Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId});
 
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  });
+
   Future<User> getUser();
 
   Future<VotingPower> getVotingPower();
@@ -36,11 +41,6 @@ abstract interface class UserRepository {
   Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  });
-
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
   });
 
   Future<void> saveUser(User user);
@@ -85,6 +85,29 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<RecoverableAccount> getRecoverableAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  }) async {
+    final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
+
+    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
+    final username =
+        publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
+    final votingPower = await _getVotingPower(token: rbacToken);
+
+    return RecoverableAccount(
+      username: username,
+      email: publicProfile?.email,
+      roles: rbacRegistration.accountRoles,
+      stakeAddress: rbacRegistration.stakeAddress,
+      publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
+      votingPower: votingPower,
+      isPersistent: rbacRegistration.lastPersistentTxn != null,
+    );
+  }
+
+  @override
   Future<User> getUser() async {
     final dto = await _storage.readUser();
     final user = await dto?.toModel(keychainProvider: _keychainProvider);
@@ -113,29 +136,6 @@ final class UserRepositoryImpl implements UserRepository {
           (error, stackTrace) => throw const EmailAlreadyUsedException(),
         )
         .then((value) => value.toModel());
-  }
-
-  @override
-  Future<RecoveredAccount> recoverAccount({
-    required CatalystId catalystId,
-    required RbacToken rbacToken,
-  }) async {
-    final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
-
-    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
-    final username =
-        publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
-    final votingPower = await _getVotingPower(token: rbacToken);
-
-    return RecoveredAccount(
-      username: username,
-      email: publicProfile?.email,
-      roles: rbacRegistration.accountRoles,
-      stakeAddress: rbacRegistration.stakeAddress,
-      publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
-      votingPower: votingPower,
-      isPersistent: rbacRegistration.lastPersistentTxn != null,
-    );
   }
 
   @override

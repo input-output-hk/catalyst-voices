@@ -321,7 +321,7 @@ final class RegistrationServiceImpl implements RegistrationService {
           catalystId: catalystId,
         );
 
-        final recovered = await _userService.recoverAccount(
+        final recoverable = await _userService.getRecoverableAccount(
           catalystId: catalystId,
           rbacToken: rbacToken,
         );
@@ -330,19 +330,19 @@ final class RegistrationServiceImpl implements RegistrationService {
         final keychain = await _keychainProvider.create(keychainId);
 
         final registrationStatus = AccountRegistrationStatus.indexed(
-          isPersistent: recovered.isPersistent,
+          isPersistent: recoverable.isPersistent,
         );
 
         return Account(
           catalystId: catalystId.copyWith(
-            username: Optional(recovered.username),
+            username: Optional(recoverable.username),
           ),
-          email: recovered.email,
+          email: recoverable.email,
           keychain: keychain,
-          roles: recovered.roles,
-          address: recovered.stakeAddress,
-          publicStatus: recovered.publicStatus,
-          votingPower: recovered.votingPower,
+          roles: recoverable.roles,
+          address: recoverable.stakeAddress,
+          publicStatus: recoverable.publicStatus,
+          votingPower: recoverable.votingPower,
           registrationStatus: registrationStatus,
         );
       });

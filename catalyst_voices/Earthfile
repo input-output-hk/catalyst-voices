@@ -132,10 +132,13 @@ build-web:
 package:
     FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
     ARG tag='latest'
-    # COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true) /app
-
-    # Note: for building locally, replace bellow line with line above
-    COPY --keep-ts (+build-web/web --UPLOAD_DEBUG_SYMBOLS=false) /app
+    ARG ENABLE_SENTRY=true
+    
+    IF [ "$ENABLE_SENTRY" = "true" ]
+        COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true) /app
+    ELSE
+        COPY --keep-ts (+build-web/web --UPLOAD_DEBUG_SYMBOLS=false) /app
+    END
 
     # Note this is only used for local development, a different Caddyfile is
     # used during deployment. See the blueprint.cue file.
@@ -147,7 +150,8 @@ package:
     SAVE IMAGE voices-frontend:$tag
 
 docker:
-   FROM +package
+   ARG ENABLE_SENTRY=true
+   FROM +package --ENABLE_SENTRY=$ENABLE_SENTRY
 
    ARG container="voices"
    ARG tag="latest"
