@@ -11,7 +11,7 @@ package:
 
     COPY pyproject.toml .
     COPY uv.lock .
-    COPY set_config.py .
+    COPY setup_fund.py .
 
     COPY --dir dev .
 
