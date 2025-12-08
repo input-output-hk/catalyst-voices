@@ -55,9 +55,7 @@ final class ProposalBriefData extends Equatable {
         .map((e) => ProposalBriefDataVersion(ref: id.copyWith(ver: Optional(e))))
         .toList();
 
-    // TODO(damian-molinski): Try getting collaborators from previous version.
-    // Proposal Brief do not support "removed" or "left" status as it would require
-    // getting collaborators list from previous version and compare diff.
+    // Proposal Brief do not support "removed" or "left" status.
     final collaborators = data.proposal.metadata.collaborators?.map(
       (id) {
         final action = collaboratorsActions[id.toSignificant()]?.action;
