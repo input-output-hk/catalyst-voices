@@ -86,6 +86,13 @@ final class DatabaseDocumentsDataSource
   Future<DocumentData?> get(DocumentRef ref) => findFirst(id: ref);
 
   @override
+  Future<Map<String, RawProposalCollaboratorsActions>> getCollaboratorsActions({
+    required List<DocumentRef> proposalsRefs,
+  }) {
+    return _database.proposalsV2Dao.getCollaboratorsActions(proposalsRefs: proposalsRefs);
+  }
+
+  @override
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
     return _database.documentsV2Dao.getLatestOf(ref);
   }

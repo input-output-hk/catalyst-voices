@@ -72,6 +72,34 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
     return 0;
   }
 
+  /// Checks if this reference encompasses the [other] reference.
+  ///
+  /// Returns `true` if:
+  /// - Both references have the same runtime type (e.g. both are [DraftRef]).
+  /// - Both references have the same [id].
+  /// - This reference includes the version of [other].
+  ///
+  /// Specific behavior regarding versions:
+  /// - If this reference is **loose** ([ver] is `null`), it contains any version of [other]
+  ///   (both loose and exact).
+  /// - If this reference is **exact** ([ver] is not `null`), it only contains [other] if
+  ///   [other] has the exactly same [ver].
+  bool contains(DocumentRef other) {
+    if (runtimeType != other.runtimeType) return false;
+
+    if (id != other.id) return false;
+
+    final ver = this.ver;
+    final otherVer = other.ver;
+
+    // contains all versions
+    if (ver == null) return true;
+    // only specific version
+    if (ver != otherVer) return false;
+
+    return true;
+  }
+
   DocumentRef copyWith({
     String? id,
     Optional<String>? ver,

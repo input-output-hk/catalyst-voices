@@ -35,6 +35,276 @@ void main() {
         await db.close();
       });
 
+      group('getCollaboratorsActions', () {
+        final now = DateTime.now();
+        final earlier = now.subtract(const Duration(hours: 1));
+        final latest = now.add(const Duration(hours: 1));
+
+        final author = _createTestAuthor(name: 'author');
+        final collaboratorA = _createTestAuthor(name: 'collabA', role0KeySeed: 1);
+        final collaboratorB = _createTestAuthor(name: 'collabB', role0KeySeed: 2);
+        final stranger = _createTestAuthor(name: 'stranger', role0KeySeed: 3);
+
+        test('returns empty map when input list is empty', () async {
+          // Given: No refs requested
+          // When
+          final result = await dao.getCollaboratorsActions(proposalsRefs: []);
+
+          // Then
+          expect(result, isEmpty);
+        });
+
+        test('returns only actions from valid collaborators', () async {
+          // Given: A proposal with one defined collaborator
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // And: Two actions, one from the collaborator, one from a stranger
+          final validAction = _createTestDocumentEntity(
+            id: 'a1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          final invalidAction = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [stranger],
+            // Not a collaborator
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, validAction, invalidAction]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then
+          final p1Actions = result[proposal.doc.id]!;
+          expect(p1Actions.data, hasLength(1));
+          expect(p1Actions.data.keys, contains(collaboratorA.toSignificant()));
+          expect(p1Actions.data.keys, isNot(contains(stranger.toSignificant())));
+        });
+
+        test('returns only the latest action per collaborator', () async {
+          // Given: A proposal
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // And: Two actions from the same collaborator, different times
+          final oldAction = _createTestDocumentEntity(
+            id: 'old',
+            ver: _buildUuidV7At(earlier),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(), // Old state
+          );
+
+          final newAction = _createTestDocumentEntity(
+            id: 'new',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(), // New state
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, oldAction, newAction]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then
+          final action = result[proposal.doc.id]?.data[collaboratorA.toSignificant()];
+          expect(action?.action, ProposalSubmissionAction.aFinal);
+        });
+
+        test('handles Loose Ref -> returns actions for any version', () async {
+          // Given: Proposal V1 and V2
+          final pV1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+          // Collaborator B added in V2
+          final pV2 = _createTestDocumentEntity(
+            id: pV1.doc.id,
+            ver: 'v2',
+            authors: [author],
+            collaborators: [collaboratorB],
+          );
+
+          // Actions pointing to specific versions
+          final actionForV1 = _createTestDocumentEntity(
+            id: 'a1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: pV1.doc.id,
+            refVer: pV1.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          final actionForV2 = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: pV2.doc.id,
+            refVer: pV2.doc.ver,
+            authors: [collaboratorB],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([pV1, pV2, actionForV1, actionForV2]);
+
+          // When: Requesting Loose Ref (just ID)
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: pV1.doc.id)],
+          );
+
+          // Then: Both actions are returned
+          final actions = result[pV1.doc.id]!.data;
+          expect(actions, hasLength(2));
+          expect(actions[collaboratorA.toSignificant()]?.proposalId.ver, pV1.doc.ver);
+          expect(actions[collaboratorB.toSignificant()]?.proposalId.ver, pV2.doc.ver);
+        });
+
+        test('handles Exact Ref -> ignores actions for other versions', () async {
+          // Given: Proposal V1
+          final pV1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+          final pV2 = _createTestDocumentEntity(
+            id: pV1.doc.id,
+            ver: 'v2',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // Action pointing to V2
+          final actionForV2 = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: pV2.doc.id,
+            refVer: pV2.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([pV1, pV2, actionForV2]);
+
+          // When: Requesting Exact Ref for V1
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.exact(id: pV1.doc.id, ver: pV1.doc.ver)],
+          );
+
+          // Then: The action for V2 is NOT returned
+          expect(result, isEmpty);
+        });
+
+        test('filters distinct collaborators correctly', () async {
+          // Given: Proposal with two collaborators
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA, collaboratorB],
+          );
+
+          final actionA = _createTestDocumentEntity(
+            id: 'a1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          final actionB = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorB],
+            contentData: ProposalSubmissionActionDto.hide.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, actionA, actionB]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then
+          final actions = result[proposal.doc.id]!.data;
+          expect(actions, hasLength(2));
+          expect(actions[collaboratorA.toSignificant()]?.action, ProposalSubmissionAction.draft);
+          expect(actions[collaboratorB.toSignificant()]?.action, ProposalSubmissionAction.hide);
+        });
+
+        test('gracefully handles malformed JSON content in action', () async {
+          // Given: Proposal and a Collaborator
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // And: An action document with invalid JSON structure
+          final malformedAction = _createTestDocumentEntity(
+            id: 'bad-action',
+            ver: 'v1',
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: {'invalid': 'structure'}, // Missing 'action' field
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, malformedAction]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then: The malformed action is ignored (not added to map)
+          final actions = result[proposal.doc.id]?.data ?? {};
+          expect(actions, isEmpty);
+        });
+      });
+
       group('getVisibleProposalsCount', () {
         final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
         final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
