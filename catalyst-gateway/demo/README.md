@@ -18,4 +18,5 @@ cd demo
 docker compose up
 ```
 
-This will start all the required services, including Jaeger. You can look at the Jaeger UI at `http://localhost:16686/`.
+This will start all the required services, including Jaeger.
+You can look at the Jaeger UI at `http://localhost:16686/`.

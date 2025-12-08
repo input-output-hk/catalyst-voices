@@ -97,7 +97,7 @@ pub(crate) fn init(log_level: LogLevel) -> anyhow::Result<TelemetryGuard> {
     let filter_layer = super::logger::build_reloadable_filter(log_level);
     let fmt_layer = super::logger::build_fmt_layer();
 
-    // Initialize the trkacing subscriber with the OpenTelemetry layer and the
+    // Initialize the tracing subscriber with the OpenTelemetry layer and the
     // Fmt layer.
     tracing_subscriber::registry()
         .with(filter_layer)

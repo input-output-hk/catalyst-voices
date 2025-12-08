@@ -46,7 +46,7 @@ impl Cli {
         match self {
             Self::Run(settings) => {
                 // Returns optional guard for telemetry providers.
-                // We must hold this guard while the main procress runs.
+                // We must hold this guard while the main process runs.
                 // No need to do anything else.
                 let _guard = Settings::init(settings)?;
 
