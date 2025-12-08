@@ -6,10 +6,7 @@ use unprocessable_content_request::PutDocumentUnprocessableContent;
 use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
     db::{
-        event::{
-            error::NotFoundError,
-            signed_docs::{FullSignedDoc, StoreError},
-        },
+        event::{error::NotFoundError, signed_docs::FullSignedDoc},
         index::session::CassandraSessionError,
     },
     service::{
