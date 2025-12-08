@@ -53,6 +53,7 @@ impl SignedDocBody {
     }
 
     /// Returns the document authors.
+    #[allow(dead_code)]
     pub(crate) fn authors(&self) -> &Vec<String> {
         &self.authors
     }
