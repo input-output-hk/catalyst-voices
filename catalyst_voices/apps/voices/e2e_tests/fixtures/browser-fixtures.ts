@@ -46,7 +46,7 @@ export const test = base.extend<BrowserFixtures>({
     await closeBrowserWithExtension(browser);
   },
 
-  // This is Playwright browser to run extension without downloading spearate browser
+  // This is Playwright browser to run extension without downloading separate browser
   useBrowser: async ({ testModel }, use) => {
     const extensionPath = await new ExtensionDownloader().getExtension(
       testModel.walletConfig.extension.Name
