@@ -143,6 +143,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(_showSubmitException(error));
       case ProposalBuilderLimitReachedException():
         unawaited(_showLimitReachedException(error));
+      case ProposalBuilderDocumentSignException():
+        unawaited(_showDocumentSignException(error));
       case LocalizedUnknownPublishCommentException():
         unawaited(_showCommentException(error));
       case LocalizedException():
@@ -277,6 +279,14 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     return SubmitCommentErrorDialog.show(
       context: context,
       exception: error,
+    );
+  }
+
+  Future<void> _showDocumentSignException(ProposalBuilderDocumentSignException error) {
+    return ProposalErrorDialog.show(
+      context: context,
+      title: error.title(context),
+      message: error.message(context),
     );
   }
 

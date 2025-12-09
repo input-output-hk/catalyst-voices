@@ -793,6 +793,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     } on ProposalLimitReachedException {
       _logger.info('publishProposal: limit reached');
       emitError(const ProposalBuilderLimitReachedException());
+    } on DocumentSignException catch (error, stackTrace) {
+      _logger.severe('publishProposal: failed to sign the document', error, stackTrace);
+      emitError(const ProposalBuilderDocumentSignException());
     } catch (error, stackTrace) {
       _logger.severe('publishProposal', error, stackTrace);
 
@@ -1102,6 +1105,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     } on ProposalLimitReachedException {
       _logger.info('SubmitProposalForReview: limit reached');
       emitError(const ProposalBuilderLimitReachedException());
+    } on DocumentSignException catch (error, stackTrace) {
+      _logger.severe('publishProposal: failed to sign the document', error, stackTrace);
+      emitError(const ProposalBuilderDocumentSignException());
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
 
