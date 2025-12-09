@@ -115,6 +115,8 @@ services:
     environment:
       # URL where the Voices frontend is accessible via nginx
       - APP_URL=http://localhost:80
+      # Delay between clicks in milliseconds (helps with flaky tests)
+      - CLICK_DELAY=300
       # Display for Xvfb (headed mode required for Chrome extensions)
       - DISPLAY=:99
     volumes:
@@ -123,22 +125,9 @@ services:
       - ./playwright-report:/workspace/playwright-report
     # Use host network so localhost:80 reaches the nginx reverse proxy
     network_mode: host
-    # Run with Xvfb for headed Chrome (required for browser extensions)
-    command:
-      [
-        "xvfb-run",
-        "--auto-servernum",
-        "--server-args=-screen 0 1920x1080x24",
-        "npx",
-        "playwright",
-        "test",
-        "--project=local-run",
-      ]
     depends_on:
       nginx:
         condition: service_started
-    profiles:
-      - test
 
   nginx:
     image: nginx:latest

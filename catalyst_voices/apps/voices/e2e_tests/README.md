@@ -23,8 +23,6 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
 * **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/)
   or download using [puppeteer](https://pptr.dev/browsers-api))
 * Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
-* Check `catalyst_voices/apps/voices/e2e_tests/.env.example` for the environment variables
-  (for testing on localhost, use `localhost:5555`)
 
 ### Installation
 
