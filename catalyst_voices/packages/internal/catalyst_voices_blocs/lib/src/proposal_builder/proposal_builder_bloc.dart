@@ -802,7 +802,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       emitError(
         LocalizedException.create(
           error,
-          fallback: () => const ProposalBuilderSubmitException(),
+          fallback: () => const ProposalBuilderPublishException(),
         ),
       );
     } finally {
