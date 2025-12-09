@@ -544,6 +544,43 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return input.replaceAll("'", "''");
   }
 
+  /// Returns the SQL subquery for counting comments on a proposal.
+  String _getCommentsCountSubquery() {
+    return '''
+      (
+        SELECT COUNT(*)
+        FROM documents_v2 c
+        WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
+      ) as comments_count
+    ''';
+  }
+
+  /// Returns the SQL for common JOINs used in proposal queries.
+  ///
+  /// Includes:
+  /// - `documents_local_metadata` for favorites
+  /// - `documents_v2` alias 'origin' for original authors (first version)
+  /// - `documents_v2` alias 't' for template
+  String _getCommonJoins() {
+    return '''
+    LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
+    LEFT JOIN documents_v2 origin ON p.id = origin.id AND origin.id = origin.ver AND origin.type = ?
+    LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
+    ''';
+  }
+
+  /// Returns the SQL SELECT columns from common JOINs.
+  ///
+  /// Includes:
+  /// - `origin_authors`: Authors from the first version (origin table)
+  /// - `is_favorite`: Favorite status from local metadata
+  String _getCommonSelectColumns() {
+    return '''
+      origin.authors as origin_authors,
+      COALESCE(dlm.is_favorite, 0) as is_favorite
+    ''';
+  }
+
   /// Returns the Common Table Expression (CTE) string defining "Effective Proposals".
   ///
   /// **CTE Stages:**
@@ -630,6 +667,21 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         .trim();
   }
 
+  /// Returns the SQL subquery for getting all version IDs of a proposal.
+  String _getVersionIdsSubquery() {
+    return '''
+      (
+        SELECT GROUP_CONCAT(v_list.ver, ',')
+        FROM (
+          SELECT ver
+          FROM documents_v2 v_sub
+          WHERE v_sub.id = p.id AND v_sub.type = ?
+          ORDER BY v_sub.ver ASC
+        ) v_list
+      ) as version_ids_str
+    ''';
+  }
+
   /// Processes a database row from [getCollaboratorsActions] query.
   Map<String, RawProposalCollaboratorsActions> _processCollaboratorsActions(
     List<TypedResult> rows,
@@ -678,6 +730,123 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     return tempMap.map((key, value) => MapEntry(key, RawProposalCollaboratorsActions(value)));
+  }
+
+  /// Internal query to fetch a single proposal by [DocumentRef].
+  ///
+  /// Uses the [_getValidActionsCTE] to resolve action status:
+  /// - Checks latest action (any version) first - if 'hide', returns 'hide'
+  /// - Otherwise gets action for specific version to determine draft/final status
+  ///
+  // TODO(LynxLynxx): For hidden proposals, consider optimizing by not fetching
+  // all data (template, comments, versions, etc.) since UI may only need to
+  // show "proposal is hidden". This would require RawProposalEntity to support
+  // default/empty values for its fields or a separate HiddenProposalEntity.
+  Selectable<RawProposalEntity> _queryProposal(DocumentRef ref) {
+    final proposalColumns = _buildPrefixedColumns('p', 'p');
+    final templateColumns = _buildPrefixedColumns('t', 't');
+    final validActionsCTE = _getValidActionsCTE();
+    final versionIdsSubquery = _getVersionIdsSubquery();
+    final commentsCountSubquery = _getCommentsCountSubquery();
+    final commonJoins = _getCommonJoins();
+    final commonSelectColumns = _getCommonSelectColumns();
+
+    final query =
+        '''
+    WITH $validActionsCTE
+    SELECT
+      $proposalColumns,
+      $templateColumns,
+
+      -- First check if latest action (any version) is 'hide'
+      -- If hidden, return 'hide'; otherwise get action for THIS specific version
+      COALESCE(
+        (
+          SELECT
+            CASE
+              WHEN COALESCE(json_extract(va_latest.content, '\$.action'), 'draft') = 'hide'
+              THEN 'hide'
+              ELSE NULL
+            END
+          FROM valid_actions va_latest
+          WHERE va_latest.ref_id = p.id
+          ORDER BY va_latest.ver DESC LIMIT 1
+        ),
+        (
+          SELECT COALESCE(json_extract(va.content, '\$.action'), 'draft')
+          FROM valid_actions va
+          WHERE va.ref_id = p.id AND va.ref_ver = p.ver
+          ORDER BY va.ver DESC LIMIT 1
+        ),
+        'draft'
+      ) as action_type,
+      $versionIdsSubquery,
+      $commentsCountSubquery,
+      $commonSelectColumns
+    FROM documents_v2 p
+    $commonJoins
+    WHERE p.id = ? AND p.ver = ? AND p.type = ?
+  ''';
+
+    return customSelect(
+      query,
+      variables: [
+        // CTE Variable
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        // Subquery Variables
+        Variable.withString(DocumentType.proposalDocument.uuid),
+        Variable.withString(DocumentType.commentDocument.uuid),
+        // Main Join Variables
+        Variable.withString(DocumentType.proposalDocument.uuid),
+        Variable.withString(DocumentType.proposalTemplate.uuid),
+        // WHERE clause
+        Variable.withString(ref.id),
+        Variable.withString(ref.ver ?? ''),
+        Variable.withString(DocumentType.proposalDocument.uuid),
+      ],
+      readsFrom: {
+        documentsV2,
+        documentsLocalMetadata,
+        documentAuthors,
+      },
+    ).map((row) {
+      final proposalData = {
+        for (final col in documentsV2.$columns)
+          col.$name: row.readNullableWithType(col.type, 'p_${col.$name}'),
+      };
+      final proposal = documentsV2.map(proposalData);
+
+      final templateData = {
+        for (final col in documentsV2.$columns)
+          col.$name: row.readNullableWithType(col.type, 't_${col.$name}'),
+      };
+
+      final template = templateData['id'] != null ? documentsV2.map(templateData) : null;
+
+      final actionTypeRaw = row.readNullable<String>('action_type') ?? '';
+      final actionType =
+          ProposalSubmissionActionDto.fromJson(actionTypeRaw)?.toModel() ??
+          ProposalSubmissionAction.draft;
+
+      final versionIdsRaw = row.readNullable<String>('version_ids_str') ?? '';
+      final versionIds = versionIdsRaw.split(',');
+
+      final commentsCount = row.readNullable<int>('comments_count') ?? 0;
+      final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
+
+      final originalAuthorsRaw = row.readNullable<String>('origin_authors');
+      final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
+
+      return RawProposalEntity(
+        proposal: proposal,
+        template: template,
+        actionType: actionType,
+        versionIds: versionIds,
+        commentsCount: commentsCount,
+        isFavorite: isFavorite,
+        originalAuthors: originalAuthors,
+      );
+    });
   }
 
   /// Internal query to calculate total ask.
@@ -781,37 +950,24 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final whereClause = filterClauses.isEmpty ? '' : 'AND ${filterClauses.join(' AND ')}';
 
     final effectiveProposals = _getEffectiveProposalsCTE();
+    final versionIdsSubquery = _getVersionIdsSubquery();
+    final commentsCountSubquery = _getCommentsCountSubquery();
+    final commonJoins = _getCommonJoins();
+    final commonSelectColumns = _getCommonSelectColumns();
+
     final cteQuery =
         '''
     WITH $effectiveProposals
-    SELECT 
-      $proposalColumns, 
-      $templateColumns, 
+    SELECT
+      $proposalColumns,
+      $templateColumns,
       ep.action_type,
-      
-      (
-        SELECT GROUP_CONCAT(v_list.ver, ',')
-        FROM (
-          SELECT ver 
-          FROM documents_v2 v_sub 
-          WHERE v_sub.id = p.id AND v_sub.type = ? 
-          ORDER BY v_sub.ver ASC
-        ) v_list
-      ) as version_ids_str,
-      
-      (
-        SELECT COUNT(*) 
-        FROM documents_v2 c 
-        WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
-      ) as comments_count,
-      
-      origin.authors as origin_authors,
-      COALESCE(dlm.is_favorite, 0) as is_favorite
+      $versionIdsSubquery,
+      $commentsCountSubquery,
+      $commonSelectColumns
     FROM documents_v2 p
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
-    LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
-    LEFT JOIN documents_v2 origin ON p.id = origin.id AND origin.id = origin.ver AND origin.type = ?
-    LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
+    $commonJoins
     WHERE p.type = ? $whereClause
     ORDER BY $orderByClause
     LIMIT ? OFFSET ?
@@ -870,135 +1026,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
 
       return RawProposalBriefEntity(
-        proposal: proposal,
-        template: template,
-        actionType: actionType,
-        versionIds: versionIds,
-        commentsCount: commentsCount,
-        isFavorite: isFavorite,
-        originalAuthors: originalAuthors,
-      );
-    });
-  }
-
-  /// Internal query to fetch a single proposal by [DocumentRef].
-  ///
-  /// Uses the [_getValidActionsCTE] to resolve action status:
-  /// - Checks latest action (any version) first - if 'hide', returns 'hide'
-  /// - Otherwise gets action for specific version to determine draft/final status
-  ///
-  // TODO(LynxLynxx): For hidden proposals, consider optimizing by not fetching
-  // all data (template, comments, versions, etc.) since UI may only need to
-  // show "proposal is hidden". This would require RawProposalEntity to support
-  // default/empty values for its fields or a separate HiddenProposalEntity.
-  Selectable<RawProposalEntity> _queryProposal(DocumentRef ref) {
-    final proposalColumns = _buildPrefixedColumns('p', 'p');
-    final templateColumns = _buildPrefixedColumns('t', 't');
-
-    final validActionsCTE = _getValidActionsCTE();
-    final query = '''
-    WITH $validActionsCTE
-    SELECT
-      $proposalColumns,
-      $templateColumns,
-
-      -- First check if latest action (any version) is 'hide'
-      -- If hidden, return 'hide'; otherwise get action for THIS specific version
-      COALESCE(
-        (
-          SELECT
-            CASE
-              WHEN COALESCE(json_extract(va_latest.content, '\$.action'), 'draft') = 'hide'
-              THEN 'hide'
-              ELSE NULL
-            END
-          FROM valid_actions va_latest
-          WHERE va_latest.ref_id = p.id
-          ORDER BY va_latest.ver DESC LIMIT 1
-        ),
-        (
-          SELECT COALESCE(json_extract(va.content, '\$.action'), 'draft')
-          FROM valid_actions va
-          WHERE va.ref_id = p.id AND va.ref_ver = p.ver
-          ORDER BY va.ver DESC LIMIT 1
-        ),
-        'draft'
-      ) as action_type,
-
-      (
-        SELECT GROUP_CONCAT(v_list.ver, ',')
-        FROM (
-          SELECT ver
-          FROM documents_v2 v_sub
-          WHERE v_sub.id = p.id AND v_sub.type = ?
-          ORDER BY v_sub.ver ASC
-        ) v_list
-      ) as version_ids_str,
-
-      (
-        SELECT COUNT(*)
-        FROM documents_v2 c
-        WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
-      ) as comments_count,
-
-      origin.authors as origin_authors,
-      COALESCE(dlm.is_favorite, 0) as is_favorite
-    FROM documents_v2 p
-    LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
-    LEFT JOIN documents_v2 origin ON p.id = origin.id AND origin.id = origin.ver AND origin.type = ?
-    LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
-    WHERE p.id = ? AND p.ver = ? AND p.type = ?
-  ''';
-
-    return customSelect(
-      query,
-      variables: [
-        // CTE Variable
-        Variable.withString(DocumentType.proposalActionDocument.uuid),
-        // Subquery Variables
-        Variable.withString(DocumentType.proposalDocument.uuid),
-        Variable.withString(DocumentType.commentDocument.uuid),
-        // Main Join Variables
-        Variable.withString(DocumentType.proposalDocument.uuid),
-        Variable.withString(DocumentType.proposalTemplate.uuid),
-        // WHERE clause
-        Variable.withString(ref.id),
-        Variable.withString(ref.ver ?? ''),
-        Variable.withString(DocumentType.proposalDocument.uuid),
-      ],
-      readsFrom: {
-        documentsV2,
-        documentsLocalMetadata,
-        documentAuthors,
-      },
-    ).map((row) {
-      final proposalData = {
-        for (final col in documentsV2.$columns)
-          col.$name: row.readNullableWithType(col.type, 'p_${col.$name}'),
-      };
-      final proposal = documentsV2.map(proposalData);
-
-      final templateData = {
-        for (final col in documentsV2.$columns)
-          col.$name: row.readNullableWithType(col.type, 't_${col.$name}'),
-      };
-
-      final template = templateData['id'] != null ? documentsV2.map(templateData) : null;
-
-      final actionTypeRaw = row.readNullable<String>('action_type') ?? '';
-      final actionType = ProposalSubmissionActionDto.fromJson(actionTypeRaw)?.toModel() ??
-          ProposalSubmissionAction.draft;
-
-      final versionIdsRaw = row.readNullable<String>('version_ids_str') ?? '';
-      final versionIds = versionIdsRaw.split(',');
-
-      final commentsCount = row.readNullable<int>('comments_count') ?? 0;
-      final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
-
-      final originalAuthorsRaw = row.readNullable<String>('origin_authors');
-      final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
-
-      return RawProposalEntity(
         proposal: proposal,
         template: template,
         actionType: actionType,
