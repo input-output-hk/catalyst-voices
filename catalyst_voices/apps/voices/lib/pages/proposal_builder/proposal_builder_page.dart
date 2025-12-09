@@ -15,10 +15,9 @@ import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialo
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
 import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
@@ -142,8 +141,12 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(_showPublishException(error));
       case ProposalBuilderSubmitException():
         unawaited(_showSubmitException(error));
+      case ProposalBuilderLimitReachedException():
+        unawaited(_showLimitReachedException(error));
       case LocalizedUnknownPublishCommentException():
         unawaited(_showCommentException(error));
+      case LocalizedException():
+        unawaited(_showGenericException(error));
       default:
         super.handleError(error);
     }
@@ -317,6 +320,22 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     });
   }
 
+  Future<void> _showGenericException(LocalizedException error) {
+    return ProposalErrorDialog.show(
+      context: context,
+      title: context.l10n.somethingWentWrong,
+      message: error.message(context),
+    );
+  }
+
+  Future<void> _showLimitReachedException(ProposalBuilderLimitReachedException error) {
+    return ProposalErrorDialog.show(
+      context: context,
+      title: error.title(context),
+      message: error.message(context),
+    );
+  }
+
   Future<void> _showProposalLimitReachedDialog(
     MaxProposalsLimitReachedSignal signal,
   ) {
@@ -344,9 +363,10 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {
-    return PublishProposalErrorDialog.show(
+    return ProposalErrorDialog.show(
       context: context,
-      exception: error,
+      title: error.title(context),
+      message: error.message(context),
     );
   }
 
@@ -380,9 +400,10 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   }
 
   Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
-    return SubmitProposalErrorDialog.show(
+    return ProposalErrorDialog.show(
       context: context,
-      exception: error,
+      title: error.title(context),
+      message: error.message(context),
     );
   }
 

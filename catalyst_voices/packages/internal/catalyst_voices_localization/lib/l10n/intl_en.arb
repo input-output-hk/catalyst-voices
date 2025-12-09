@@ -2194,6 +2194,14 @@
   "@proposalEditorDeleteDialogTitle": {
     "description": "A title for the dialog to confirm proposal deletion."
   },
+  "proposalEditorLimitReachedErrorMessage": "You have reached the maximum number of proposals allowed.",
+  "@proposalEditorLimitReachedErrorMessage": {
+    "description": "Dialog message in proposal editor when user has reached the max proposals limit."
+  },
+  "proposalEditorLimitReachedErrorTitle": "Unable to Publish Proposal",
+  "@proposalEditorLimitReachedErrorTitle": {
+    "description": "Dialog title in proposal editor when user has reached the max proposals limit."
+  },
   "proposalEditorNotAnswered": "Not Answered",
   "@proposalEditorNotAnswered": {
     "description": "Placeholder text when a property has been not filled."

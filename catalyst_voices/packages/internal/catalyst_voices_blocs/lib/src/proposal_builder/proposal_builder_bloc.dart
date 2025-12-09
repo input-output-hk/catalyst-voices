@@ -1064,9 +1064,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final comments = (source ?? []).removeComment(ref: commentRef);
       _cache = _cache.copyWith(comments: Optional(comments));
 
-      if (!isClosed) {
-        emit(_rebuildState());
-      }
+      emit(_rebuildState());
     }
   }
 
@@ -1092,9 +1090,17 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           // already submitted, do nothing
           break;
       }
+    } on ProposalLimitReachedException {
+      emitError(const ProposalBuilderLimitReachedException());
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
-      emitError(const ProposalBuilderSubmitException());
+
+      emitError(
+        LocalizedException.create(
+          error,
+          fallback: () => const ProposalBuilderSubmitException(),
+        ),
+      );
     } finally {
       emit(state.copyWith(isChanging: false));
     }
