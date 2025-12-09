@@ -790,9 +790,18 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         versions: updatedVersions,
       );
       emitSignal(const PublishedProposalBuilderSignal());
+    } on ProposalLimitReachedException {
+      _logger.info('publishProposal: limit reached');
+      emitError(const ProposalBuilderLimitReachedException());
     } catch (error, stackTrace) {
-      _logger.severe('PublishProposal', error, stackTrace);
-      emitError(const ProposalBuilderPublishException());
+      _logger.severe('publishProposal', error, stackTrace);
+
+      emitError(
+        LocalizedException.create(
+          error,
+          fallback: () => const ProposalBuilderSubmitException(),
+        ),
+      );
     } finally {
       emit(state.copyWith(isChanging: false));
     }
@@ -1091,6 +1100,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           break;
       }
     } on ProposalLimitReachedException {
+      _logger.info('SubmitProposalForReview: limit reached');
       emitError(const ProposalBuilderLimitReachedException());
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
