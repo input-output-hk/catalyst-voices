@@ -144,7 +144,7 @@ final class CoseSign1 extends Equatable {
       );
     } catch (error) {
       throw CoseSignException(
-        message: 'Failed to create a CoseSign instance',
+        message: 'Failed to create a CoseSign1 instance',
         source: error,
       );
     }
