@@ -222,10 +222,10 @@ final class Dependencies extends DependencyProvider {
   void _registerNetwork() {
     registerLazySingleton<ApiServices>(
       () {
-        return ApiServices(
+        return ApiServices.dio(
           env: get<AppEnvironment>().type,
           authTokenProvider: get<AuthTokenProvider>(),
-          httpClient: () => get<ReportingService>().buildHttpClient(),
+          interceptClient: get<ReportingService>().registerDio,
         );
       },
       dispose: (api) => api.dispose(),

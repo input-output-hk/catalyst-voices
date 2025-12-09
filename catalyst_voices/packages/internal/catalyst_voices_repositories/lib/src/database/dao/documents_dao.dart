@@ -58,13 +58,16 @@ abstract interface class DocumentsDao {
   Future<List<DocumentEntity>> queryAll({
     DocumentRef? ref,
     DocumentType? type,
+    CampaignFilters? campaign,
   });
 
   /// Returns all known document refs.
   Future<List<TypedDocumentRef>> queryAllTypedRefs();
 
   Future<DocumentEntity?> queryLatestDocumentData({
+    DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? category,
   });
 
   /// Returns document with matching refTo and type.
@@ -219,6 +222,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<List<DocumentEntity>> queryAll({
     DocumentRef? ref,
     DocumentType? type,
+    CampaignFilters? campaign,
   }) {
     final query = select(documents);
 
@@ -227,6 +231,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
     if (type != null) {
       query.where((doc) => doc.type.equals(type.uuid));
+    }
+    if (campaign != null) {
+      query.where((tbl) => tbl.metadata.isInCategoryList(campaign.categoriesIds));
     }
 
     return query.get();
@@ -269,7 +276,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) async {
     final query = select(documents)
       ..where(
-        (tbl) => BaseJsonQueryExpression(
+        (tbl) => JsonQuerySearchExpression(
           jsonContent: content,
           nodeId: nodeId,
           searchValue: value,
@@ -285,14 +292,24 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<DocumentEntity?> queryLatestDocumentData({
+    DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? category,
   }) {
     final query = select(documents)
       ..orderBy([(t) => OrderingTerm.desc(t.verHi)])
       ..limit(1);
 
+    if (type != null) {
+      query.where((tbl) => tbl.type.equalsValue(type));
+    }
+
     if (authorId != null) {
       query.where((tbl) => tbl.metadata.isAuthor(authorId));
+    }
+
+    if (category != null) {
+      query.where((tbl) => tbl.metadata.isInCategoryList([category.id]));
     }
 
     return query.getSingleOrNull();

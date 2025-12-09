@@ -36,9 +36,9 @@ dependencies:
       ref: 81aa649db3268b0b69440db1b3313af90d393ae7
 
 dev_dependencies:
-  build_runner: ^2.5.4
+  build_runner: ^2.10.3
   catalyst_analysis: ^3.0.0
-  flutter_gen_runner: ^5.11.0
+  flutter_gen_runner: ^5.12.0
   flutter_test:
     sdk: flutter
 

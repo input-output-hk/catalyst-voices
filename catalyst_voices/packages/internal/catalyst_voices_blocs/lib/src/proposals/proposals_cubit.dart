@@ -109,8 +109,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }
   }
 
-  void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategoryProposalsSignal(to: categoryId));
+  void changeSelectedCategory(SignedDocumentRef? categoryRef) {
+    emitSignal(ChangeCategoryProposalsSignal(to: categoryRef));
   }
 
   @override
@@ -218,11 +218,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     final mappedPage = page.map(
       // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
-      (e) => ProposalBrief.fromProposal(
-        e.proposal,
-        isFavorite: state.favoritesIds.contains(e.proposal.selfRef.id),
+      (proposal) => ProposalBrief.fromProposal(
+        proposal.proposal,
+        isFavorite: state.favoritesIds.contains(proposal.proposal.selfRef.id),
         categoryName: campaign.categories
-            .firstWhere((element) => element.selfRef == e.proposal.categoryRef)
+            .firstWhere((category) => proposal.proposal.parameters.containsId(category.selfRef.id))
             .formattedCategoryName,
         showComments: showComments,
       ),

@@ -61,6 +61,14 @@ class X509Certificate with EquatableMixin {
     return X509Certificate.fromASN1(asn1);
   }
 
+  /// Decodes the [X509Certificate] from PEM format string.
+  factory X509Certificate.fromPem(String pem) {
+    final pemData = extractBase64FromPem(pem);
+    final certificateBytes = base64Decode(pemData);
+    final derCertificate = X509DerCertificate.fromBytes(bytes: certificateBytes);
+    return X509Certificate.fromDer(derCertificate);
+  }
+
   @override
   List<Object?> get props => [tbsCertificate, signature];
 
@@ -89,6 +97,20 @@ class X509Certificate with EquatableMixin {
     return '-----BEGIN $label-----\n'
         '$chunks\n'
         '-----END $label-----';
+  }
+
+  /// Extracts Base64 data from PEM format by removing formatting elements.
+  ///
+  /// Removes the following:
+  /// - `-----BEGIN [LABEL]-----` headers (e.g., `-----BEGIN CERTIFICATE-----`)
+  /// - `-----END [LABEL]-----` footers (e.g., `-----END CERTIFICATE-----`)
+  /// - `-----BEGIN-----` headers without labels
+  /// - `-----END-----` footers without labels
+  /// - All whitespace characters (spaces, tabs, newlines, carriage returns)
+  ///
+  /// Returns the raw Base64-encoded string without any formatting.
+  static String extractBase64FromPem(String pem) {
+    return pem.replaceAll(RegExp(r'-----(?:BEGIN|END)\s*[^-]*-----|\s+'), '');
   }
 
   /// Generates a self-signed [X509Certificate] from [tbsCertificate]

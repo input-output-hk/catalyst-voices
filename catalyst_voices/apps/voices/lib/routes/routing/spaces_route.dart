@@ -20,7 +20,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'spaces_route.g.dart';
 
-final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin {
+final class CategoryDetailRoute extends GoRouteData
+    with $CategoryDetailRoute, FadePageTransitionMixin {
   final String categoryId;
 
   const CategoryDetailRoute({required this.categoryId});
@@ -34,12 +35,12 @@ final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return CategoryPage(
-      categoryId: SignedDocumentRef(id: categoryId),
+      categoryRef: SignedDocumentRef(id: categoryId),
     );
   }
 }
 
-final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
+final class DiscoveryRoute extends GoRouteData with $DiscoveryRoute, FadePageTransitionMixin {
   static const name = 'discovery';
 
   final bool? $extra;
@@ -55,7 +56,7 @@ final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
 }
 
 final class FundedProjectsRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $FundedProjectsRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const FundedProjectsRoute();
 
   @override
@@ -70,7 +71,7 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
-final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
+final class ProposalsRoute extends GoRouteData with $ProposalsRoute, FadePageTransitionMixin {
   final String? categoryId;
   final String? tab;
 
@@ -95,7 +96,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
     final tab = ProposalsPageTab.values.asNameMap()[this.tab];
 
     return ProposalsPage(
-      categoryId: categoryRef,
+      categoryRef: categoryRef,
       tab: tab,
     );
   }
@@ -170,7 +171,7 @@ final class SpacesShellRouteData extends ShellRouteData {
 }
 
 final class TreasuryRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $TreasuryRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const TreasuryRoute();
 
   @override
@@ -185,7 +186,8 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
+final class VotingRoute extends GoRouteData
+    with $VotingRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
   final String? tab;
   final bool? $extra;
@@ -216,7 +218,7 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin, Compos
     final tab = VotingPageTab.values.asNameMap()[this.tab];
 
     return VotingPage(
-      categoryId: categoryRef,
+      categoryRef: categoryRef,
       tab: tab,
       keychainDeleted: $extra ?? false,
     );
@@ -224,7 +226,7 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin, Compos
 }
 
 final class WorkspaceRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $WorkspaceRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   static const name = 'workspace';
 
   const WorkspaceRoute();

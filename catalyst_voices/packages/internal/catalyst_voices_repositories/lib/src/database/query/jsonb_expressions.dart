@@ -5,32 +5,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 
-class BaseJsonQueryExpression extends Expression<bool> {
-  final String jsonContent;
-  final NodeId nodeId;
-  final String searchValue;
-  final bool useExactMatch;
-
-  const BaseJsonQueryExpression({
-    required this.jsonContent,
-    required this.nodeId,
-    required this.searchValue,
-    this.useExactMatch = false,
-  });
-
-  @override
-  void writeInto(GenerationContext context) {
-    final sql = JsonBExpressions.generateSqlForJsonQuery(
-      jsonContent: jsonContent,
-      nodeId: nodeId,
-      searchValue: searchValue,
-    );
-
-    context.buffer.write(sql);
-  }
-}
-
-final class ContainsAuthorId extends BaseJsonQueryExpression {
+final class ContainsAuthorId extends JsonQuerySearchExpression {
   ContainsAuthorId({
     required CatalystId id,
   }) : super(
@@ -40,7 +15,7 @@ final class ContainsAuthorId extends BaseJsonQueryExpression {
        );
 }
 
-final class ContainsContentAuthorName extends BaseJsonQueryExpression {
+final class ContainsContentAuthorName extends JsonQuerySearchExpression {
   ContainsContentAuthorName({
     required String query,
   }) : super(
@@ -50,7 +25,7 @@ final class ContainsContentAuthorName extends BaseJsonQueryExpression {
        );
 }
 
-final class ContainsMetadataAuthorName extends BaseJsonQueryExpression {
+final class ContainsMetadataAuthorName extends JsonQuerySearchExpression {
   ContainsMetadataAuthorName({
     required String query,
   }) : super(
@@ -60,7 +35,28 @@ final class ContainsMetadataAuthorName extends BaseJsonQueryExpression {
        );
 }
 
-final class ContainsTitle extends BaseJsonQueryExpression {
+final class ContainsParameterId extends JsonQuerySearchExpression {
+  ContainsParameterId({
+    required String parameterId,
+  }) : super(
+         searchValue: parameterId,
+         nodeId: ProposalMetadata.parametersIdNode,
+         jsonContent: 'metadata',
+         useExactMatch: true,
+       );
+}
+
+final class ContainsParameterIdInList extends JsonQuerySearchMultiExpression {
+  ContainsParameterIdInList({
+    required List<String> ids,
+  }) : super(
+         searchValues: ids,
+         jsonContent: 'metadata',
+         nodeId: ProposalMetadata.parametersIdNode,
+       );
+}
+
+final class ContainsTitle extends JsonQuerySearchExpression {
   ContainsTitle({
     required String query,
   }) : super(
@@ -72,6 +68,50 @@ final class ContainsTitle extends BaseJsonQueryExpression {
 
 class JsonBExpressions {
   const JsonBExpressions();
+
+  static String generateSqlForJsonMultiQuery({
+    required String jsonContent,
+    required NodeId nodeId,
+    required List<String> searchValues,
+  }) {
+    final valueComparison = "IN (${searchValues.map((e) => "'$e'").join(',')})";
+    final handler = WildcardPathHandler.fromNodeId(nodeId);
+    final wildcardPaths = handler.getWildcardPaths;
+
+    if (!handler.hasWildcard || wildcardPaths == null) {
+      return _queryJsonExtract(
+        jsonContent: jsonContent,
+        nodeId: nodeId,
+        valueComparison: valueComparison,
+      );
+    }
+
+    final arrayPath = wildcardPaths.prefix.value.isEmpty ? '' : wildcardPaths.prefix.asPath;
+    final fieldName = wildcardPaths.suffix?.asPath;
+
+    if (wildcardPaths.prefix.value.isEmpty) {
+      return _queryJsonTreeForKey(
+        jsonContent: jsonContent,
+        fieldName: fieldName?.substring(2),
+        valueComparison: valueComparison,
+      );
+    }
+
+    if (fieldName != null) {
+      return _queryJsonEachForWildcard(
+        jsonContent: jsonContent,
+        arrayPath: arrayPath,
+        fieldName: fieldName,
+        valueComparison: valueComparison,
+      );
+    }
+
+    return _queryJsonTreeForWildcard(
+      jsonContent: jsonContent,
+      arrayPath: arrayPath,
+      valueComparison: valueComparison,
+    );
+  }
 
   static String generateSqlForJsonQuery({
     required String jsonContent,
@@ -152,6 +192,54 @@ class JsonBExpressions {
   }
 }
 
+class JsonQuerySearchExpression extends Expression<bool> {
+  final String jsonContent;
+  final NodeId nodeId;
+  final String searchValue;
+  final bool useExactMatch;
+
+  const JsonQuerySearchExpression({
+    required this.jsonContent,
+    required this.nodeId,
+    required this.searchValue,
+    this.useExactMatch = false,
+  });
+
+  @override
+  void writeInto(GenerationContext context) {
+    final sql = JsonBExpressions.generateSqlForJsonQuery(
+      jsonContent: jsonContent,
+      nodeId: nodeId,
+      searchValue: searchValue,
+    );
+
+    context.buffer.write(sql);
+  }
+}
+
+class JsonQuerySearchMultiExpression extends Expression<bool> {
+  final String jsonContent;
+  final NodeId nodeId;
+  final List<String> searchValues;
+
+  const JsonQuerySearchMultiExpression({
+    required this.jsonContent,
+    required this.nodeId,
+    required this.searchValues,
+  });
+
+  @override
+  void writeInto(GenerationContext context) {
+    final sql = JsonBExpressions.generateSqlForJsonMultiQuery(
+      jsonContent: jsonContent,
+      nodeId: nodeId,
+      searchValues: searchValues,
+    );
+
+    context.buffer.write(sql);
+  }
+}
+
 extension on NodeId {
   /// Converts [NodeId] into jsonb well-formatted path argument.
   ///
@@ -195,6 +283,16 @@ extension MetadataColumnExt on GeneratedColumnWithTypeConverter<DocumentDataMeta
   Expression<bool> isAuthor(CatalystId id) => ContainsAuthorId(id: id);
 
   Expression<bool> isCategory(SignedDocumentRef ref) {
-    return jsonExtract<String>(ProposalMetadata.categoryIdNode.asPath).equals(ref.id);
+    return Expression.or([
+      jsonExtract<String>(ProposalMetadata.categoryIdNode.asPath).equals(ref.id),
+      ContainsParameterId(parameterId: ref.id),
+    ]);
+  }
+
+  Expression<bool> isInCategoryList(List<String> ids) {
+    return Expression.or([
+      jsonExtract<String>(ProposalMetadata.categoryIdNode.asPath).isIn(ids),
+      ContainsParameterIdInList(ids: ids),
+    ]);
   }
 }

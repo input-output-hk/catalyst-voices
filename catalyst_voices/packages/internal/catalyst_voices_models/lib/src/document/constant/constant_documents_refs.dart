@@ -4,16 +4,20 @@ import 'package:equatable/equatable.dart';
 /// Groups related [proposal] and [comment] templates to given [category].
 final class CategoryTemplatesRefs extends Equatable {
   final SignedDocumentRef category;
-  final SignedDocumentRef proposal;
-  final SignedDocumentRef comment;
+  final SignedDocumentRef? proposal;
+  final SignedDocumentRef? comment;
 
   const CategoryTemplatesRefs({
     required this.category,
-    required this.proposal,
-    required this.comment,
+    this.proposal,
+    this.comment,
   });
 
-  Iterable<SignedDocumentRef> get all => [category, proposal, comment];
+  Iterable<SignedDocumentRef> get all => [
+    category,
+    ?proposal,
+    ?comment,
+  ];
 
   Iterable<TypedDocumentRef> get allTyped {
     return [
@@ -21,11 +25,17 @@ final class CategoryTemplatesRefs extends Equatable {
         ref: category,
         type: DocumentType.categoryParametersDocument,
       ),
-      TypedDocumentRef(ref: proposal, type: DocumentType.proposalTemplate),
-      TypedDocumentRef(ref: comment, type: DocumentType.commentTemplate),
+      if (proposal case final value?)
+        TypedDocumentRef(ref: value, type: DocumentType.proposalTemplate),
+      if (comment case final value?)
+        TypedDocumentRef(ref: value, type: DocumentType.commentTemplate),
     ];
   }
 
   @override
-  List<Object?> get props => [category, proposal, comment];
+  List<Object?> get props => [
+    category,
+    proposal,
+    comment,
+  ];
 }

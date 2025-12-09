@@ -35,7 +35,7 @@ abstract interface class CampaignService {
 
   Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
+  Future<CampaignCategory> getCategory(DocumentParameters parameters);
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -103,28 +103,15 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    final category = await _campaignRepository.getCategory(ref);
+  Future<CampaignCategory> getCategory(DocumentParameters parameters) async {
+    final category = await _campaignRepository.getCategory(parameters);
     if (category == null) {
       throw NotFoundException(
-        message: 'Did not find category with ref $ref',
+        message: 'Did not find category with parameters $parameters',
       );
     }
 
-    final categoryProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-      categoryRef: ref,
-    );
-    final proposalSubmissionStage = await getCampaignPhaseTimeline(
-      CampaignPhaseType.proposalSubmission,
-    );
-    final totalAsk = _calculateTotalAsk(categoryProposals);
-
-    return category.copyWith(
-      totalAsk: totalAsk,
-      proposalsCount: categoryProposals.length,
-      submissionCloseDate: proposalSubmissionStage.timeline.to,
-    );
+    return _loadCampaignCategoryDetails(category);
   }
 
   MultiCurrencyAmount _calculateTotalAsk(List<ProposalData> proposals) {
@@ -136,6 +123,23 @@ final class CampaignServiceImpl implements CampaignService {
       }
     }
     return totalAmount;
+  }
+
+  Future<CampaignCategory> _loadCampaignCategoryDetails(CampaignCategory base) async {
+    final categoryProposals = await _proposalRepository.getProposals(
+      type: ProposalsFilterType.finals,
+      categoryRef: base.selfRef,
+    );
+    final proposalSubmissionStage = await getCampaignPhaseTimeline(
+      CampaignPhaseType.proposalSubmission,
+    );
+    final totalAsk = _calculateTotalAsk(categoryProposals);
+
+    return base.copyWith(
+      totalAsk: totalAsk,
+      proposalsCount: categoryProposals.length,
+      submissionCloseDate: proposalSubmissionStage.timeline.to,
+    );
   }
 
   Future<List<CampaignCategory>> _updateCategories(
