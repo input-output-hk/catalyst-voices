@@ -11,7 +11,7 @@ abstract final class DocumentDataFactory {
     DocumentParameters parameters = const DocumentParameters(),
     List<CatalystId>? authors,
     DocumentContentType contentType = DocumentContentType.json,
-    Map<String, dynamic> contentData = const {},
+    DocumentDataContent content = const DocumentDataContent({}),
   }) {
     return DocumentData(
       metadata: DocumentDataMetadata(
@@ -24,7 +24,7 @@ abstract final class DocumentDataFactory {
         parameters: parameters,
         authors: authors,
       ),
-      content: DocumentDataContent(contentData),
+      content: content,
     );
   }
 }

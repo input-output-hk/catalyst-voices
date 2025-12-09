@@ -15,11 +15,11 @@ void main() {
           proposal: DocumentDataFactory.build(
             id: id,
             authors: [author],
-            contentData: {
+            content: const DocumentDataContent({
               'setup': {
                 'title': {'title': title},
               },
-            },
+            }),
           ),
           template: null,
           actionType: ProposalSubmissionAction.aFinal,
