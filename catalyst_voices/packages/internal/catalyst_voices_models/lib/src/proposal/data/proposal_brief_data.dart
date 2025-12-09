@@ -62,7 +62,7 @@ final class ProposalBriefData extends Equatable {
         final status = switch (action) {
           null => ProposalsCollaborationStatus.pending,
           ProposalSubmissionAction.aFinal => ProposalsCollaborationStatus.accepted,
-          // When proposal is final draft action do not mean it's accepted
+          // When proposal is final, draft action do not mean it's accepted
           ProposalSubmissionAction.draft when isFinal => ProposalsCollaborationStatus.pending,
           ProposalSubmissionAction.draft => ProposalsCollaborationStatus.accepted,
           ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
