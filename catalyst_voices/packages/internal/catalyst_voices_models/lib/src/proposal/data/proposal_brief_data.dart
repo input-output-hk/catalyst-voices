@@ -1,10 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBriefData extends Equatable {
   final DocumentRef id;
-  // TODO(damian-molinski): To be implemented
   final int fundNumber;
   final CatalystId? author;
   final String title;
@@ -18,7 +18,6 @@ final class ProposalBriefData extends Equatable {
   final bool isFinal;
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
-  // TODO(damian-molinski): To be implemented
   final List<ProposalBriefDataVersion>? versions;
   final List<ProposalBriefDataCollaborator>? collaborators;
 
@@ -41,6 +40,61 @@ final class ProposalBriefData extends Equatable {
     this.collaborators,
   });
 
+  factory ProposalBriefData.build({
+    required RawProposalBrief data,
+    required ProposalOrDocument proposal,
+    Vote? draftVote,
+    Vote? castedVote,
+    Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
+  }) {
+    final id = data.proposal.id;
+    final isFinal = data.isFinal;
+
+    final versions = data.versionIds
+        // TODO(damian-molinski): Get titles for all versions
+        .map((e) => ProposalBriefDataVersion(ref: id.copyWith(ver: Optional(e))))
+        .toList();
+
+    // Proposal Brief do not support "removed" or "left" status.
+    final collaborators = data.proposal.metadata.collaborators?.map(
+      (id) {
+        final action = collaboratorsActions[id.toSignificant()]?.action;
+        final status = switch (action) {
+          null => ProposalsCollaborationStatus.pending,
+          ProposalSubmissionAction.aFinal => ProposalsCollaborationStatus.accepted,
+          // When proposal is final, draft action do not mean it's accepted
+          ProposalSubmissionAction.draft when isFinal => ProposalsCollaborationStatus.pending,
+          ProposalSubmissionAction.draft => ProposalsCollaborationStatus.accepted,
+          ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
+        };
+
+        return ProposalBriefDataCollaborator(
+          id: id,
+          status: status,
+        );
+      },
+    ).toList();
+
+    return ProposalBriefData(
+      id: id,
+      fundNumber: proposal.fundNumber ?? 0,
+      author: data.originalAuthors.firstOrNull,
+      title: proposal.title ?? '',
+      description: proposal.description ?? '',
+      categoryName: proposal.categoryName ?? '',
+      durationInMonths: proposal.durationInMonths ?? 0,
+      fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      createdAt: id.ver!.dateTime,
+      iteration: data.iteration,
+      commentsCount: isFinal ? null : data.commentsCount,
+      isFinal: isFinal,
+      isFavorite: data.isFavorite,
+      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
+      versions: versions,
+      collaborators: collaborators,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -60,7 +114,6 @@ final class ProposalBriefData extends Equatable {
     versions,
     collaborators,
   ];
-  DateTime get updateDate => id.ver?.dateTime ?? id.id.dateTime;
 }
 
 final class ProposalBriefDataCollaborator extends Equatable {

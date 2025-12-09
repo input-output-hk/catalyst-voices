@@ -8,6 +8,12 @@ import 'package:catalyst_voices_repositories/src/proposal/proposal_document_fact
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:rxdart/rxdart.dart';
 
+typedef _ProposalBriefDataComponents = (
+  Page<RawProposalBrief> page,
+  List<Vote> draftVotes,
+  List<Vote> castedVotes,
+);
+
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
 /// provides additional methods specific to proposals.
 abstract interface class ProposalRepository {
@@ -15,6 +21,8 @@ abstract interface class ProposalRepository {
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
     ProposalDocumentDataLocalSource proposalsLocalSource,
+    CastedVotesObserver castedVotesObserver,
+    VotingBallotBuilder ballotBuilder,
   ) = ProposalRepositoryImpl;
 
   Future<void> deleteDraftProposal(DraftRef ref);
@@ -79,7 +87,7 @@ abstract interface class ProposalRepository {
     required DocumentRef referencing,
   });
 
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
@@ -102,11 +110,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
   final ProposalDocumentDataLocalSource _proposalsLocalSource;
+  final CastedVotesObserver _castedVotesObserver;
+  final VotingBallotBuilder _ballotBuilder;
 
   const ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
     this._proposalsLocalSource,
+    this._castedVotesObserver,
+    this._ballotBuilder,
   );
 
   @override
@@ -298,23 +310,57 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalsLocalSource.watchProposalsBriefPage(
-      request: request,
-      order: order,
-      filters: filters,
+    // 1. The Data Stream
+    // This stream might not emit if only collaborator actions change
+    // due to the distinct() in the DataSource.
+    final pageStream = _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalsLocalSource.watchRawProposalsBriefPage(
+          request: request,
+          order: order,
+          filters: effectiveFilters,
+        );
+      },
     );
+
+    // 2. The Trigger Stream
+    // We watch the count of Action documents. If a collaborator adds/updates
+    // an action, this count (or the underlying table) changes, triggering an emission.
+    // This forces the combineLatest to re-emit the (potentially stale) page,
+    // allowing us to re-run the update of page.
+    final actionTrigger = _documentRepository.watchCount(type: DocumentType.proposalActionDocument);
+
+    // 3. Local ballot votes
+    final draftVotes = _ballotBuilder.watchVotes;
+
+    // 4. Casted votes stream.
+    // If the votes becomes documents it should be moved somewhere in local docs source.
+    final castedVotes = _castedVotesObserver.watchCastedVotes;
+
+    // 5. Combine and page update
+    return Rx.combineLatest4(
+      pageStream,
+      actionTrigger,
+      draftVotes,
+      castedVotes,
+      (page, _, draftVotes, castedVotes) => (page, draftVotes, castedVotes),
+    ).switchMap((components) => Stream.fromFuture(_assembleProposalBriefData(components)));
   }
 
   @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalsLocalSource.watchProposalsCountV2(filters: filters);
+    return _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalsLocalSource.watchProposalsCountV2(filters: effectiveFilters);
+      },
+    );
   }
 
   @override
@@ -351,6 +397,64 @@ final class ProposalRepositoryImpl implements ProposalRepository {
             },
           ).toList(),
         );
+  }
+
+  // TODO(damian-molinski): Remove this when voteBy is implemented.
+  Stream<ProposalsFiltersV2> _adaptFilters(ProposalsFiltersV2 filters) {
+    if (filters.voteBy == null) {
+      return Stream.value(filters);
+    }
+
+    return _castedVotesObserver.watchCastedVotes
+        .map((votes) => votes.map((e) => e.proposal.id).toList())
+        .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
+  }
+
+  Future<Page<ProposalBriefData>> _assembleProposalBriefData(
+    _ProposalBriefDataComponents components,
+  ) async {
+    final rawPage = components.$1;
+    final draftVotes = Map.fromEntries(components.$2.map((e) => MapEntry(e.proposal, e)));
+    final castedVotes = Map.fromEntries(components.$3.map((e) => MapEntry(e.proposal, e)));
+
+    final proposalsRefs = rawPage.items
+        // If proposal is final we have to get action for that exact version,
+        // otherwise just latest action
+        .map((e) => e.isFinal ? e.proposal.id : e.proposal.id.toLoose())
+        .toList();
+
+    final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
+      proposalsRefs: proposalsRefs,
+    );
+
+    final briefs = rawPage.items.map((item) {
+      final templateData = item.template;
+
+      final proposalOrDocument = templateData == null
+          ? ProposalOrDocument.data(item.proposal)
+          : () {
+              final template = ProposalTemplateFactory.create(templateData);
+              final proposal = ProposalDocumentFactory.create(item.proposal, template: template);
+
+              return ProposalOrDocument.proposal(proposal);
+            }();
+
+      final proposalId = item.proposal.id;
+
+      final draftVote = draftVotes[proposalId];
+      final castedVote = castedVotes[proposalId];
+      final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
+
+      return ProposalBriefData.build(
+        data: item,
+        proposal: proposalOrDocument,
+        draftVote: draftVote,
+        castedVote: castedVote,
+        collaboratorsActions: proposalCollaboratorsActions,
+      );
+    }).toList();
+
+    return rawPage.copyWithItems(briefs);
   }
 
   ProposalSubmissionAction? _buildProposalActionData(
