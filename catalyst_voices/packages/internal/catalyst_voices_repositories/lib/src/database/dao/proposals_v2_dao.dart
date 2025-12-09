@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Documen
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
@@ -228,6 +229,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         await into(documentsLocalMetadata).insert(entity);
       },
     );
+  }
+
+  @override
+  Stream<RawProposalEntity?> watchProposal({required DocumentRef id}) {
+    return _queryProposal(id).watchSingleOrNull();
   }
 
   /// Reactive stream version of [getProposalsBriefPage].
@@ -875,6 +881,135 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     });
   }
 
+  /// Internal query to fetch a single proposal by [DocumentRef].
+  ///
+  /// Uses the [_getValidActionsCTE] to resolve action status:
+  /// - Checks latest action (any version) first - if 'hide', returns 'hide'
+  /// - Otherwise gets action for specific version to determine draft/final status
+  ///
+  // TODO(LynxLynxx): For hidden proposals, consider optimizing by not fetching
+  // all data (template, comments, versions, etc.) since UI may only need to
+  // show "proposal is hidden". This would require RawProposalEntity to support
+  // default/empty values for its fields or a separate HiddenProposalEntity.
+  Selectable<RawProposalEntity> _queryProposal(DocumentRef ref) {
+    final proposalColumns = _buildPrefixedColumns('p', 'p');
+    final templateColumns = _buildPrefixedColumns('t', 't');
+
+    final validActionsCTE = _getValidActionsCTE();
+    final query = '''
+    WITH $validActionsCTE
+    SELECT
+      $proposalColumns,
+      $templateColumns,
+
+      -- First check if latest action (any version) is 'hide'
+      -- If hidden, return 'hide'; otherwise get action for THIS specific version
+      COALESCE(
+        (
+          SELECT
+            CASE
+              WHEN COALESCE(json_extract(va_latest.content, '\$.action'), 'draft') = 'hide'
+              THEN 'hide'
+              ELSE NULL
+            END
+          FROM valid_actions va_latest
+          WHERE va_latest.ref_id = p.id
+          ORDER BY va_latest.ver DESC LIMIT 1
+        ),
+        (
+          SELECT COALESCE(json_extract(va.content, '\$.action'), 'draft')
+          FROM valid_actions va
+          WHERE va.ref_id = p.id AND va.ref_ver = p.ver
+          ORDER BY va.ver DESC LIMIT 1
+        ),
+        'draft'
+      ) as action_type,
+
+      (
+        SELECT GROUP_CONCAT(v_list.ver, ',')
+        FROM (
+          SELECT ver
+          FROM documents_v2 v_sub
+          WHERE v_sub.id = p.id AND v_sub.type = ?
+          ORDER BY v_sub.ver ASC
+        ) v_list
+      ) as version_ids_str,
+
+      (
+        SELECT COUNT(*)
+        FROM documents_v2 c
+        WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
+      ) as comments_count,
+
+      origin.authors as origin_authors,
+      COALESCE(dlm.is_favorite, 0) as is_favorite
+    FROM documents_v2 p
+    LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
+    LEFT JOIN documents_v2 origin ON p.id = origin.id AND origin.id = origin.ver AND origin.type = ?
+    LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
+    WHERE p.id = ? AND p.ver = ? AND p.type = ?
+  ''';
+
+    return customSelect(
+      query,
+      variables: [
+        // CTE Variable
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        // Subquery Variables
+        Variable.withString(DocumentType.proposalDocument.uuid),
+        Variable.withString(DocumentType.commentDocument.uuid),
+        // Main Join Variables
+        Variable.withString(DocumentType.proposalDocument.uuid),
+        Variable.withString(DocumentType.proposalTemplate.uuid),
+        // WHERE clause
+        Variable.withString(ref.id),
+        Variable.withString(ref.ver ?? ''),
+        Variable.withString(DocumentType.proposalDocument.uuid),
+      ],
+      readsFrom: {
+        documentsV2,
+        documentsLocalMetadata,
+        documentAuthors,
+      },
+    ).map((row) {
+      final proposalData = {
+        for (final col in documentsV2.$columns)
+          col.$name: row.readNullableWithType(col.type, 'p_${col.$name}'),
+      };
+      final proposal = documentsV2.map(proposalData);
+
+      final templateData = {
+        for (final col in documentsV2.$columns)
+          col.$name: row.readNullableWithType(col.type, 't_${col.$name}'),
+      };
+
+      final template = templateData['id'] != null ? documentsV2.map(templateData) : null;
+
+      final actionTypeRaw = row.readNullable<String>('action_type') ?? '';
+      final actionType = ProposalSubmissionActionDto.fromJson(actionTypeRaw)?.toModel() ??
+          ProposalSubmissionAction.draft;
+
+      final versionIdsRaw = row.readNullable<String>('version_ids_str') ?? '';
+      final versionIds = versionIdsRaw.split(',');
+
+      final commentsCount = row.readNullable<int>('comments_count') ?? 0;
+      final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
+
+      final originalAuthorsRaw = row.readNullable<String>('origin_authors');
+      final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
+
+      return RawProposalEntity(
+        proposal: proposal,
+        template: template,
+        actionType: actionType,
+        versionIds: versionIds,
+        commentsCount: commentsCount,
+        isFavorite: isFavorite,
+        originalAuthors: originalAuthors,
+      );
+    });
+  }
+
   bool _shouldReturnEarlyFor({
     required ProposalsFiltersV2 filters,
     int? size,
@@ -1049,6 +1184,26 @@ abstract interface class ProposalsV2Dao {
   Future<void> updateProposalFavorite({
     required String id,
     required bool isFavorite,
+  });
+
+  /// Watches a single proposal by its reference.
+  ///
+  /// Returns a reactive stream that emits the proposal data whenever it changes.
+  ///
+  /// **Parameters:**
+  ///   - [id]: Document reference with id (required) and version (required)
+  ///
+  /// **Behavior:**
+  ///   - Emits `null` if the proposal is not found
+  ///   - Includes hidden proposals with `actionType = hide` so UI can show hidden state
+  ///   - Gets action status for this specific version (draft/final/hide)
+  ///
+  /// **Reactivity:**
+  ///   - Emits new value when proposal document changes
+  ///   - Emits new value when action documents change
+  ///   - Emits new value when local metadata (favorites) changes
+  Stream<RawProposalEntity?> watchProposal({
+    required DocumentRef id,
   });
 
   /// Watches for changes and emits paginated pages of proposal briefs.

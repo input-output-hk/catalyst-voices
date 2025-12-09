@@ -233,6 +233,18 @@ final class DatabaseDocumentsDataSource
         .distinct()
         .map((page) => page.map((data) => data.toModel()));
   }
+
+  @override
+  Stream<RawProposal?> watchRawProposalData({required DocumentRef id}) {
+    final tr = _profiler.startTransaction('Query proposal: $id');
+    return _database.proposalsV2Dao
+        .watchProposal(id: id)
+        .doOnData((_) {
+          if (!tr.finished) unawaited(tr.finish());
+        })
+        .distinct()
+        .map((proposal) => proposal?.toModel());
+  }
 }
 
 extension on DocumentData {

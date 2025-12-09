@@ -45,6 +45,8 @@ abstract interface class ProposalDocumentDataLocalSource {
     required CampaignFilters campaign,
   });
 
+  Stream<RawProposal?> watchRawProposalData({required DocumentRef id});
+
   Stream<Page<RawProposalBrief>> watchRawProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
