@@ -92,12 +92,7 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
     final ver = this.ver;
     final otherVer = other.ver;
 
-    // contains all versions
-    if (ver == null) return true;
-    // only specific version
-    if (ver != otherVer) return false;
-
-    return true;
+    return ver == null || ver == otherVer;
   }
 
   DocumentRef copyWith({
