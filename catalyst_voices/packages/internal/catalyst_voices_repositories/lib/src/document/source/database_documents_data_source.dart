@@ -93,6 +93,12 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) async {
+    final documentData = await get(ref);
+    return documentData?.metadata;
+  }
+
+  @override
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,

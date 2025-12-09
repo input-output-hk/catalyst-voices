@@ -77,6 +77,14 @@ abstract interface class DocumentRepository {
     bool useCache,
   });
 
+  /// Similar to [getDocumentData] but returns only [DocumentDataMetadata].
+  ///
+  /// If document does not exist it will throw [DocumentNotFoundException].
+  Future<DocumentDataMetadata> getDocumentMetadata({
+    required DocumentRef id,
+    bool useCache,
+  });
+
   /// Useful when recovering account and we want to lookup
   /// latest [DocumentData] which of [originalAuthorId] and check
   /// username used in [CatalystId] in that document.
@@ -292,6 +300,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     return documentData;
+  }
+
+  @override
+  Future<DocumentDataMetadata> getDocumentMetadata({
+    required DocumentRef id,
+    bool useCache = true,
+  }) async {
+    final metadata = switch (id) {
+      SignedDocumentRef() => await _getSignedDocumentMetadata(ref: id, useCache: useCache),
+      DraftRef() when !useCache => throw DocumentNotFoundException(
+        ref: id,
+        message: '$id can not be resolved while not using cache',
+      ),
+      DraftRef() => await _getDraftDocumentMetadata(ref: id),
+    };
+
+    if (metadata == null) {
+      throw DocumentNotFoundException(ref: id);
+    }
+
+    return metadata;
   }
 
   @override
@@ -617,6 +646,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return _drafts.get(ref);
   }
 
+  Future<DocumentDataMetadata?> _getDraftDocumentMetadata({
+    required DraftRef ref,
+  }) async {
+    return _drafts.getMetadata(ref);
+  }
+
   Future<DocumentData?> _getSignedDocumentData({
     required SignedDocumentRef ref,
     bool useCache = true,
@@ -641,6 +676,34 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     return document;
+  }
+
+  Future<DocumentDataMetadata?> _getSignedDocumentMetadata({
+    required SignedDocumentRef ref,
+    bool useCache = true,
+  }) async {
+    // if version is not specified we're asking remote for latest version
+    // if remote does not know about this id its probably draft so
+    // local will return latest version
+    if (!ref.isExact) {
+      final latestVersion = await _remoteDocuments.getLatestVersion(ref.id);
+      ref = ref.copyWith(ver: Optional(latestVersion));
+    }
+
+    final isCached = useCache && await _localDocuments.exists(id: ref);
+    if (isCached) {
+      return _localDocuments.getMetadata(ref);
+    }
+
+    // For remote documents, we need to fetch the full document
+    // and cache it to ensure consistency
+    final document = await _remoteDocuments.get(ref);
+
+    if (useCache && document != null) {
+      await _localDocuments.save(data: document);
+    }
+
+    return document?.metadata;
   }
 
   bool _isDocumentMetadataValid(DocumentData document) {

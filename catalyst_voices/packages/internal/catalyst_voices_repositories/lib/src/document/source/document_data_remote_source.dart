@@ -61,6 +61,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) async {
+    final documentData = await get(ref);
+    return documentData.metadata;
+  }
+
+  @override
   Future<DocumentIndex> index({
     int page = 0,
     int limit = 100,
@@ -195,6 +201,9 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
+
+  @override
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref);
 
   Future<DocumentIndex> index({
     int page,

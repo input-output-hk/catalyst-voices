@@ -14,4 +14,10 @@ abstract interface class DocumentDataSource {
   /// for the most recent version of that document ID.
   /// Returns `null` if the document ID does not exist in the source.
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref);
+
+  /// Retrieves only the metadata of a specific document by its unique reference.
+  ///
+  /// Returns `null` if the document with the specific [DocumentRef.id] and
+  /// [DocumentRef.ver] is not found.
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref);
 }

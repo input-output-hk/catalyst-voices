@@ -80,6 +80,12 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) async {
+    final documentData = await get(ref);
+    return documentData?.metadata;
+  }
+
+  @override
   Future<void> save({required DocumentData data}) => saveAll([data]);
 
   @override
