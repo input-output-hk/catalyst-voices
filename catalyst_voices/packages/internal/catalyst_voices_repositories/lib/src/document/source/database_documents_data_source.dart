@@ -8,6 +8,8 @@ import 'package:catalyst_voices_repositories/src/database/table/document_authors
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.drift.dart'
+    show DocumentsV2MetadataViewData;
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
@@ -93,9 +95,10 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) async {
-    final documentData = await get(ref);
-    return documentData?.metadata;
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) {
+    return _database.documentsV2Dao
+        .getDocumentMetadata(id: ref) //
+        .then((value) => value?.toModel());
   }
 
   @override
@@ -252,6 +255,23 @@ extension on DocumentEntityV2 {
         authors: authors.isEmpty ? null : authors,
       ),
       content: content,
+    );
+  }
+}
+
+extension on DocumentsV2MetadataViewData {
+  DocumentDataMetadata toModel() {
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.fromJson(contentType),
+      type: type,
+      id: SignedDocumentRef(id: id, ver: ver),
+      ref: refId.toRef(refVer),
+      template: templateId.toRef(templateVer),
+      reply: replyId.toRef(replyVer),
+      section: section,
+      collaborators: collaborators.isEmpty ? null : collaborators,
+      parameters: parameters,
+      authors: authors.isEmpty ? null : authors,
     );
   }
 }
