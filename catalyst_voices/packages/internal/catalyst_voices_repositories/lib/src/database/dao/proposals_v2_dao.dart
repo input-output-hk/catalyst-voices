@@ -6,6 +6,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.d
 import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
@@ -106,49 +107,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           // Sort DESC so the first one we see is the latest
           ..orderBy([OrderingTerm.desc(action.createdAt)]);
 
-    final rows = await query.get();
-
-    final tempMap = <String, Map<CatalystId, RawCollaboratorAction>>{};
-
-    for (final row in rows) {
-      final doc = row.readTable(action);
-      final signer = row.readTable(author);
-
-      final refId = doc.refId;
-      if (refId == null) continue;
-
-      final ref = SignedDocumentRef(id: refId, ver: doc.refVer);
-
-      final proposalRef = idToRef[ref.id];
-      // if proposalRef has specified ver we should only get action for that ver, not latest.
-      if (proposalRef == null || !proposalRef.contains(ref)) continue;
-
-      final proposalActions = tempMap.putIfAbsent(refId, () => {});
-      final signerFullId = CatalystId.tryParse(signer.accountId);
-      final signerId = CatalystId.tryParse(signer.accountSignificantId);
-
-      // Since we ordered by createdAt DESC, if we already have an entry for
-      // this signer, it is newer than the current row. We skip the current row.
-      if (signerId == null || proposalActions.containsKey(signerId)) continue;
-
-      try {
-        final actionData = doc.content.data;
-        final action = ProposalSubmissionActionDocumentDto.fromJson(actionData).action.toModel();
-
-        final rawCollaboratorAction = RawCollaboratorAction(
-          id: signerFullId ?? signerId,
-          proposalId: ref,
-          action: action,
-        );
-
-        proposalActions[signerId] = rawCollaboratorAction;
-      } catch (_) {
-        // Gracefully handle malformed JSON means there is no valid action
-        proposalActions.remove(signerId);
-      }
-    }
-
-    return tempMap.map((key, value) => MapEntry(key, RawProposalCollaboratorsActions(value)));
+    return query.get().then((rows) => _processCollaboratorsActions(rows, action, author, idToRef));
   }
 
   @override
@@ -663,6 +622,56 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     )
     '''
         .trim();
+  }
+
+  /// Processes a database row from [getCollaboratorsActions] query.
+  Map<String, RawProposalCollaboratorsActions> _processCollaboratorsActions(
+    List<TypedResult> rows,
+    $DocumentsV2Table action,
+    $DocumentAuthorsTable author,
+    Map<String, DocumentRef> idToRef,
+  ) {
+    final tempMap = <String, Map<CatalystId, RawCollaboratorAction>>{};
+
+    for (final row in rows) {
+      final doc = row.readTable(action);
+      final signer = row.readTable(author);
+
+      final refId = doc.refId;
+      if (refId == null) continue;
+
+      final ref = SignedDocumentRef(id: refId, ver: doc.refVer);
+
+      final proposalRef = idToRef[ref.id];
+      // if proposalRef has specified ver we should only get action for that ver, not latest.
+      if (proposalRef == null || !proposalRef.contains(ref)) continue;
+
+      final proposalActions = tempMap.putIfAbsent(refId, () => {});
+      final signerFullId = CatalystId.tryParse(signer.accountId);
+      final signerId = CatalystId.tryParse(signer.accountSignificantId);
+
+      // Since we ordered by createdAt DESC, if we already have an entry for
+      // this signer, it is newer than the current row. We skip the current row.
+      if (signerId == null || proposalActions.containsKey(signerId)) continue;
+
+      try {
+        final actionData = doc.content.data;
+        final action = ProposalSubmissionActionDocumentDto.fromJson(actionData).action.toModel();
+
+        final rawCollaboratorAction = RawCollaboratorAction(
+          id: signerFullId ?? signerId,
+          proposalId: ref,
+          action: action,
+        );
+
+        proposalActions[signerId] = rawCollaboratorAction;
+      } catch (_) {
+        // Gracefully handle malformed JSON means there is no valid action
+        proposalActions.remove(signerId);
+      }
+    }
+
+    return tempMap.map((key, value) => MapEntry(key, RawProposalCollaboratorsActions(value)));
   }
 
   /// Internal query to calculate total ask.
