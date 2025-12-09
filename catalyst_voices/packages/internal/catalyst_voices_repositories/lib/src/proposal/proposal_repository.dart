@@ -78,6 +78,14 @@ abstract interface class ProposalRepository {
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
 
+  /// Watches [author]'s list of local drafts (not published).
+  ///
+  /// This is simpler version of [watchProposalsBriefPage] since local drafts
+  /// do not have actions or comments.
+  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
+    required CatalystId author,
+  });
+
   /// Watches for [ProposalSubmissionAction] that were made on [referencing] document.
   ///
   /// As making action on document not always creates a new document ref
@@ -87,6 +95,15 @@ abstract interface class ProposalRepository {
     required DocumentRef referencing,
   });
 
+  /// Watches for a paginated list of published(not local) proposal briefs.
+  ///
+  /// This method provides a stream of [Page<ProposalBriefData>] that updates
+  /// automatically when underlying data changes. It supports pagination through
+  /// [request], ordering via [order], and filtering with [filters].
+  ///
+  /// The resulting [ProposalBriefData] objects are fully assembled, containing
+  /// the proposal document, voting status (draft and casted), and collaborator
+  /// actions.
   Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
@@ -489,5 +506,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
+  }
+
+  @override
+  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
+    required CatalystId author,
+  }) {
+    // TODO: implement watchLocalDraftProposalsBrief
+    throw UnimplementedError();
   }
 }
