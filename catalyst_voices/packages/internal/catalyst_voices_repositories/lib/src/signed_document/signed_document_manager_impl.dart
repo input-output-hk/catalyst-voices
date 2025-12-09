@@ -65,7 +65,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
         signers: [catalystId],
       );
     } on CoseSignException catch (error) {
-      throw DocumentSignException('Failed to create a signed document! Source: ${error.source}');
+      throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
     }
   }
 

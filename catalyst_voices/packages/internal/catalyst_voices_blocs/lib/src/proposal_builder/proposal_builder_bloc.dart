@@ -1076,7 +1076,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final comments = (source ?? []).removeComment(ref: commentRef);
       _cache = _cache.copyWith(comments: Optional(comments));
 
-      emit(_rebuildState());
+      if (!isClosed) {
+        emit(_rebuildState());
+      }
     }
   }
 
