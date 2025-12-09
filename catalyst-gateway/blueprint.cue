@@ -103,10 +103,10 @@ project: {
 										key:  "api-key"
 									}
 								}
-								"SIGNED_DOC_ADMIN_KEY": {
+								"ADMIN_CATALYST_ID": {
 									secret: {
 										name: "gateway"
-										key:  "signed-doc-admin-key"
+										key:  "admin-catalyst-id"
 									}
 								}
 							}
