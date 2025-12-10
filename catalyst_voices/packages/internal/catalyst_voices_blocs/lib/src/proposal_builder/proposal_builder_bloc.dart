@@ -790,9 +790,21 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         versions: updatedVersions,
       );
       emitSignal(const PublishedProposalBuilderSignal());
+    } on ProposalLimitReachedException {
+      _logger.info('publishProposal: limit reached');
+      emitError(const ProposalBuilderLimitReachedException());
+    } on DocumentSignException catch (error, stackTrace) {
+      _logger.severe('publishProposal: failed to sign the document', error, stackTrace);
+      emitError(const ProposalBuilderDocumentSignException());
     } catch (error, stackTrace) {
-      _logger.severe('PublishProposal', error, stackTrace);
-      emitError(const ProposalBuilderPublishException());
+      _logger.severe('publishProposal', error, stackTrace);
+
+      emitError(
+        LocalizedException.create(
+          error,
+          fallback: () => const ProposalBuilderPublishException(),
+        ),
+      );
     } finally {
       emit(state.copyWith(isChanging: false));
     }
@@ -1092,9 +1104,21 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           // already submitted, do nothing
           break;
       }
+    } on ProposalLimitReachedException {
+      _logger.info('SubmitProposalForReview: limit reached');
+      emitError(const ProposalBuilderLimitReachedException());
+    } on DocumentSignException catch (error, stackTrace) {
+      _logger.severe('publishProposal: failed to sign the document', error, stackTrace);
+      emitError(const ProposalBuilderDocumentSignException());
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
-      emitError(const ProposalBuilderSubmitException());
+
+      emitError(
+        LocalizedException.create(
+          error,
+          fallback: () => const ProposalBuilderSubmitException(),
+        ),
+      );
     } finally {
       emit(state.copyWith(isChanging: false));
     }
