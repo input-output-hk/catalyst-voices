@@ -557,7 +557,9 @@ final class ProposalServiceImpl implements ProposalService {
     for (final localDraft in localDrafts) {
       documents.update(
         localDraft.id.id,
+        // if local draft has signed version, keep signed as main and append local draft as version
         (value) => value.appendVersion(ref: localDraft.id, title: localDraft.title),
+        // if there is no signed version, add new entry
         ifAbsent: () => localDraft,
       );
     }
