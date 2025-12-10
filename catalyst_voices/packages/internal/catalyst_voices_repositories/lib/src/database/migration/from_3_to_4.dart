@@ -22,7 +22,7 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
     await m.createAll();
 
     await _migrateDocs(m, schema, batchSize: _batchSize);
-    await _migrateLocalDrafts(m, schema, batchSize: _batchSize);
+    await _migrateDrafts(m, schema, batchSize: _batchSize);
     await _migrateFavorites(m, schema, batchSize: _batchSize);
 
     // Tables are no longer in schema to have to delete them "manually". Indexes are dropped
@@ -81,6 +81,42 @@ Future<void> _migrateDocs(
   _logger.info('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
 }
 
+Future<void> _migrateDrafts(
+  Migrator m,
+  Schema4 schema, {
+  required int batchSize,
+}) async {
+  final localDraftsCount = await _queryCount('drafts', db: m.database);
+  var localDraftsOffset = 0;
+
+  while (localDraftsOffset < localDraftsCount) {
+    await m.database.batch((batch) async {
+      final oldDrafts = await _queryRows('drafts', batchSize, localDraftsOffset, db: m.database);
+      final rows = <RawValuesInsertable<QueryRow>>[];
+
+      for (final oldDoc in oldDrafts) {
+        final rawContent = oldDoc.read<Uint8List>('content');
+        final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
+
+        final rawMetadata = oldDoc.read<Uint8List>('metadata');
+        final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
+        final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
+
+        final entity = metadata.toDraftEntity(content: content);
+
+        final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
+
+        rows.add(insertable);
+      }
+
+      batch.insertAll(schema.localDocumentsDrafts, rows);
+      localDraftsOffset += oldDrafts.length;
+    });
+  }
+
+  _logger.info('Finished migrating drafts[$localDraftsOffset], totalCount[$localDraftsCount]');
+}
+
 Future<void> _migrateFavorites(
   Migrator m,
   Schema4 schema, {
@@ -117,42 +153,6 @@ Future<void> _migrateFavorites(
   }
 
   _logger.info('Finished migrating fav[$favOffset], totalCount[$favCount]');
-}
-
-Future<void> _migrateLocalDrafts(
-  Migrator m,
-  Schema4 schema, {
-  required int batchSize,
-}) async {
-  final localDraftsCount = await _queryCount('drafts', db: m.database);
-  var localDraftsOffset = 0;
-
-  while (localDraftsOffset < localDraftsCount) {
-    await m.database.batch((batch) async {
-      final oldDrafts = await _queryRows('drafts', batchSize, localDraftsOffset, db: m.database);
-      final rows = <RawValuesInsertable<QueryRow>>[];
-
-      for (final oldDoc in oldDrafts) {
-        final rawContent = oldDoc.read<Uint8List>('content');
-        final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
-
-        final rawMetadata = oldDoc.read<Uint8List>('metadata');
-        final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
-        final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
-
-        final entity = metadata.toDraftEntity(content: content);
-
-        final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
-
-        rows.add(insertable);
-      }
-
-      batch.insertAll(schema.localDocumentsDrafts, rows);
-      localDraftsOffset += oldDrafts.length;
-    });
-  }
-
-  _logger.info('Finished migrating drafts[$localDraftsOffset], totalCount[$localDraftsCount]');
 }
 
 Future<int> _queryCount(String tableName, {required GeneratedDatabase db}) {
