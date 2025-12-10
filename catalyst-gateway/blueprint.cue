@@ -86,16 +86,16 @@ project: {
 									}
 								}
 								"EVENT_DB_MAX_CONNECTIONS": {
-									secret: {
-										name: "gateway"
-										key:  "event-db-max-connections"
-									}
+									value: string | *"150"
 								}
 								"EVENT_DB_CONN_TIMEOUT": {
-									secret: {
-										name: "gateway"
-										key:  "event-db-conn-timeout"
-									}
+									value: string | "5s"
+								}
+								"EVENT_DB_SLOT_WAIT_TIMEOUT": {
+									value: string | "5s"
+								}
+								"EVENT_DB_CONN_RECYCLE_TIMEOUT": {
+									value: string | "5s"
 								}
 								"INTERNAL_API_KEY": {
 									secret: {
