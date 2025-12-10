@@ -504,7 +504,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   ) async {
     final rawProposal = components.$1;
 
-    // If proposal is not found, return null
     if (rawProposal == null) {
       return null;
     }
@@ -520,7 +519,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final isFinal = rawProposal.isFinal;
     final templateData = rawProposal.template;
 
-    // Build ProposalOrDocument (works with or without template)
     final proposalOrDocument = templateData == null
         ? ProposalOrDocument.data(rawProposal.proposal)
         : () {
@@ -532,7 +530,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
             return ProposalOrDocument.proposal(proposal);
           }();
 
-    // Build ProposalDocument only if template is available
     ProposalDocument? proposalDocument;
     if (templateData != null) {
       final template = ProposalTemplateFactory.create(templateData);
@@ -542,13 +539,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       );
     }
 
-    // Get votes for this proposal
     final draftVote = draftVotesMap[proposalId];
     final castedVote = castedVotesMap[proposalId];
 
-    // Get collaborators actions
-    // If proposal is final we have to get action for that exact version,
-    // otherwise just latest action
     final proposalRef = isFinal ? proposalId : proposalId.toLoose();
     final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
       proposalsRefs: [proposalRef],
