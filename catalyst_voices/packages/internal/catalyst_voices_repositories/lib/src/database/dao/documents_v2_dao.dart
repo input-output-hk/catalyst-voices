@@ -97,6 +97,16 @@ abstract interface class DocumentsV2Dao {
   /// Returns `null` if the document ID does not exist in the database.
   Future<DocumentRef?> getLatestOf(DocumentRef id);
 
+  /// Returns a previous version of a document, if available.
+  ///
+  /// Behavior depends on whether the reference is exact or loose:
+  /// - [DocumentRef.isExact]: Returns the immediate previous version
+  ///   (the version with [DocumentEntityV2.createdAt] just before the specified version).
+  /// - [DocumentRef.isLoose]: Returns the first known version (where `id == ver`).
+  ///
+  /// Returns `null` if no previous version exists or the document is not found.
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id});
+
   /// Saves a single document and its associated authors.
   ///
   /// This is a convenience wrapper around [saveAll].
@@ -281,6 +291,50 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = selectOnly(documentsV2)
       ..addColumns([documentsV2.id, documentsV2.ver])
       ..where(documentsV2.id.equals(id.id))
+      ..orderBy([OrderingTerm.desc(documentsV2.createdAt)])
+      ..limit(1);
+
+    return query
+        .map(
+          (row) => SignedDocumentRef.exact(
+            id: row.read(documentsV2.id)!,
+            ver: row.read(documentsV2.ver)!,
+          ),
+        )
+        .getSingleOrNull();
+  }
+
+  @override
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
+    if (id.isLoose) {
+      final query = selectOnly(documentsV2)
+        ..addColumns([documentsV2.id, documentsV2.ver])
+        ..where(documentsV2.id.equals(id.id))
+        ..where(documentsV2.ver.equals(id.id))
+        ..limit(1);
+
+      return query
+          .map(
+            (row) => SignedDocumentRef.exact(
+              id: row.read(documentsV2.id)!,
+              ver: row.read(documentsV2.ver)!,
+            ),
+          )
+          .getSingleOrNull();
+    }
+
+    final inner = alias(documentsV2, 'inner');
+    final targetCreatedAt = subqueryExpression<DateTime>(
+      selectOnly(inner)
+        ..addColumns([inner.createdAt])
+        ..where(inner.id.equals(id.id))
+        ..where(inner.ver.equals(id.ver!)),
+    );
+
+    final query = selectOnly(documentsV2)
+      ..addColumns([documentsV2.id, documentsV2.ver])
+      ..where(documentsV2.id.equals(id.id))
+      ..where(documentsV2.createdAt.isSmallerThan(targetCreatedAt))
       ..orderBy([OrderingTerm.desc(documentsV2.createdAt)])
       ..limit(1);
 

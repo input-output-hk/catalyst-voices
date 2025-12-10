@@ -6001,7 +6001,6 @@ void main() {
           final proposalV1Ver = _buildUuidV7At(earlier);
           final proposalV2Ver = _buildUuidV7At(now);
 
-          // First version must have id == ver for valid_actions CTE
           final proposalV1 = _createTestDocumentEntity(
             id: proposalV1Ver,
             ver: proposalV1Ver,

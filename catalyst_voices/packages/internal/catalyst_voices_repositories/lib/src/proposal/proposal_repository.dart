@@ -14,6 +14,12 @@ typedef _ProposalBriefDataComponents = (
   List<Vote> castedVotes,
 );
 
+typedef _ProposalDataComponents = (
+  RawProposal? rawProposal,
+  List<Vote> draftVotes,
+  List<Vote> castedVotes,
+);
+
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
 /// provides additional methods specific to proposals.
 abstract interface class ProposalRepository {
@@ -77,6 +83,14 @@ abstract interface class ProposalRepository {
   });
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
+
+  /// Watches a single proposal by its reference.
+  ///
+  /// Returns a reactive stream that emits [ProposalDataV2] whenever the
+  /// proposal data changes (document, actions, votes, favorites).
+  ///
+  /// Emits `null` if the proposal is not found.
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
 
   /// Watches for [ProposalSubmissionAction] that were made on [referencing] document.
   ///
@@ -294,6 +308,34 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id}) {
+    // 1. The Data Stream - raw proposal from database
+    final proposalStream = _proposalsLocalSource.watchRawProposalData(id: id);
+
+    // 2. The Trigger Stream - watch action documents for collaborator updates
+    final actionTrigger = _documentRepository.watchCount(
+      type: DocumentType.proposalActionDocument,
+    );
+
+    // 3. Local ballot votes
+    final draftVotes = _ballotBuilder.watchVotes;
+
+    // 4. Casted votes stream
+    final castedVotes = _castedVotesObserver.watchCastedVotes;
+
+    // 5. Combine and assemble ProposalDataV2
+    return Rx.combineLatest4(
+      proposalStream,
+      actionTrigger,
+      draftVotes,
+      castedVotes,
+      (rawProposal, _, draftVotes, castedVotes) => (rawProposal, draftVotes, castedVotes),
+    ).switchMap(
+      (components) => Stream.fromFuture(_assembleProposalData(components)),
+    );
+  }
+
+  @override
   Stream<ProposalPublish?> watchProposalPublish({
     required DocumentRef referencing,
   }) {
@@ -455,6 +497,85 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }).toList();
 
     return rawPage.copyWithItems(briefs);
+  }
+
+  Future<ProposalDataV2?> _assembleProposalData(
+    _ProposalDataComponents components,
+  ) async {
+    final rawProposal = components.$1;
+
+    // If proposal is not found, return null
+    if (rawProposal == null) {
+      return null;
+    }
+
+    final draftVotesMap = Map.fromEntries(
+      components.$2.map((e) => MapEntry(e.proposal, e)),
+    );
+    final castedVotesMap = Map.fromEntries(
+      components.$3.map((e) => MapEntry(e.proposal, e)),
+    );
+
+    final proposalId = rawProposal.proposal.id;
+    final isFinal = rawProposal.isFinal;
+    final templateData = rawProposal.template;
+
+    // Build ProposalOrDocument (works with or without template)
+    final proposalOrDocument = templateData == null
+        ? ProposalOrDocument.data(rawProposal.proposal)
+        : () {
+            final template = ProposalTemplateFactory.create(templateData);
+            final proposal = ProposalDocumentFactory.create(
+              rawProposal.proposal,
+              template: template,
+            );
+            return ProposalOrDocument.proposal(proposal);
+          }();
+
+    // Build ProposalDocument only if template is available
+    ProposalDocument? proposalDocument;
+    if (templateData != null) {
+      final template = ProposalTemplateFactory.create(templateData);
+      proposalDocument = ProposalDocumentFactory.create(
+        rawProposal.proposal,
+        template: template,
+      );
+    }
+
+    // Get votes for this proposal
+    final draftVote = draftVotesMap[proposalId];
+    final castedVote = castedVotesMap[proposalId];
+
+    // Get collaborators actions
+    // If proposal is final we have to get action for that exact version,
+    // otherwise just latest action
+    final proposalRef = isFinal ? proposalId : proposalId.toLoose();
+    final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
+      proposalsRefs: [proposalRef],
+    );
+    final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
+
+    final prevVersion = await _proposalsLocalSource.getPreviousOf(id: proposalId);
+
+    // TODO(LynxLynxx): call getMetadata
+    final prevMetadata = DocumentDataMetadata.proposal(
+      id: prevVersion!,
+      template: proposalDocument!.metadata.templateRef,
+      parameters: const DocumentParameters(),
+      authors: const [],
+      collaborators: const [],
+    );
+
+    return ProposalDataV2.build(
+      data: rawProposal,
+      proposal: proposalOrDocument,
+      proposalDocument: proposalDocument,
+      draftVote: draftVote,
+      castedVote: castedVote,
+      collaboratorsActions: proposalCollaboratorsActions,
+      prevCollaborators: prevMetadata.collaborators ?? [],
+      prevAuthors: prevMetadata.authors ?? [],
+    );
   }
 
   ProposalSubmissionAction? _buildProposalActionData(

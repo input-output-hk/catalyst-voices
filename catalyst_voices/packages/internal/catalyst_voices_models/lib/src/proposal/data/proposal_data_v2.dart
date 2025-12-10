@@ -3,15 +3,17 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalDataV2 extends Equatable {
   final DocumentRef id;
-  // This can be retrive from ProposalOrDocument
-  final ProposalDocument document;
-  // Maybe at here nullable template
+
+  /// The parsed proposal document with template schema.
+  ///
+  /// This is `null` when the template couldn't be retrieved.
+  /// The UI should show an error message in this case.
+  final ProposalDocument? document;
   final bool isFavorite;
   final String categoryName;
   final ProposalBriefDataVotes? votes;
-  final List<ProposalBriefDataVersion>? versions;
-  final List<ProposalBriefDataCollaborator>? collaborators;
-  // Consider adding more campaign or category data here
+  final List<DocumentRef>? versions;
+  final List<ProposalDataCollaborator>? collaborators;
 
   const ProposalDataV2({
     required this.id,
@@ -23,7 +25,57 @@ final class ProposalDataV2 extends Equatable {
     this.collaborators,
   });
 
+  /// Builds a [ProposalDataV2] from raw data.
+  ///
+  /// [data] - Raw proposal data from database query.
+  /// [proposal] - Provides extracted data (categoryName, etc.) from proposal.
+  ///   Works both with and without template loaded.
+  /// [proposalDocument] - Optional parsed proposal document. If null,
+  ///   the UI should show an error that template couldn't be retrieved.
+  ///   The caller (typically in the repository layer) should build this using
+  ///   `ProposalDocumentFactory.create()` when `data.template` is available.
+  factory ProposalDataV2.build({
+    required RawProposal data,
+    required ProposalOrDocument proposal,
+    ProposalDocument? proposalDocument,
+    Vote? draftVote,
+    Vote? castedVote,
+    Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
+    List<CatalystId> prevCollaborators = const [],
+    List<CatalystId> prevAuthors = const [],
+  }) {
+    final id = data.proposal.id;
+    final isFinal = data.isFinal;
+
+    final versions = data.versionIds.map((e) => id.copyWith(ver: Optional(e))).toList();
+
+    final collaborators = ProposalDataCollaborator.resolveCollaboratorStatuses(
+      isProposalFinal: isFinal,
+      prevAuthors: prevAuthors,
+      prevCollaborators: prevCollaborators,
+      collaboratorsActions: collaboratorsActions,
+      originalAuthor: data.originalAuthors,
+    );
+
+    return ProposalDataV2(
+      id: id,
+      document: proposalDocument,
+      isFavorite: data.isFavorite,
+      categoryName: proposal.categoryName ?? '',
+      collaborators: collaborators,
+      versions: versions,
+      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
+    );
+  }
+
   @override
-  // TODO: implement props
-  List<Object?> get props => [];
+  List<Object?> get props => [
+    id,
+    document,
+    isFavorite,
+    categoryName,
+    votes,
+    versions,
+    collaborators,
+  ];
 }

@@ -245,6 +245,11 @@ final class DatabaseDocumentsDataSource
         .distinct()
         .map((proposal) => proposal?.toModel());
   }
+
+  @override
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
+    return _database.documentsV2Dao.getPreviousOf(id: id);
+  }
 }
 
 extension on DocumentData {

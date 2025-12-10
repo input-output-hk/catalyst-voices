@@ -52,4 +52,6 @@ abstract interface class ProposalDocumentDataLocalSource {
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
   });
+
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id});
 }
