@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_content_mixin.dart';
 import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_metadata_mixin.dart';
 import 'package:drift/drift.dart';
@@ -9,6 +11,12 @@ import 'package:drift/drift.dart';
 @DataClassName('LocalDocumentDraftEntity')
 class LocalDocumentsDrafts extends Table
     with DocumentTableContentMixin, DocumentTableMetadataMixin {
+  /// Keeps usernames of [authors].
+  TextColumn get authorsNames => text().map(DocumentConverters.strings)();
+
+  /// Keeps significant([CatalystId.toSignificant]) version of [authors].
+  TextColumn get authorsSignificant => text().map(DocumentConverters.catId)();
+
   /// Timestamp extracted from [ver].
   DateTimeColumn get createdAt => dateTime()();
 
