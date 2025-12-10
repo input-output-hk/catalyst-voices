@@ -102,8 +102,3 @@ jobs:
           name: test-results
           path: ${{ env.E2E_DIR }}/test-results/
           retention-days: 1
-
-      - name: Cleanup
-        if: always()
-        run: |
-          docker compose -f ${{ env.E2E_DIR }}/docker-compose.yml down -v
