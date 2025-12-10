@@ -41,12 +41,12 @@ class _AddCollaboratorDialogState extends State<AddCollaboratorDialog> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _cubit,
-      child: ScaffoldMessenger(
+      child: const ScaffoldMessenger(
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: VoicesPanelDialog(
-            constraints: const Responsive.single(BoxConstraints(maxWidth: 602, maxHeight: 396)),
-            child: const AddCollaboratorView(),
+            constraints: Responsive.single(BoxConstraints(maxWidth: 602, maxHeight: 396)),
+            child: AddCollaboratorView(),
           ),
         ),
       ),
