@@ -6,6 +6,8 @@ import 'package:collection/collection.dart';
 abstract interface class CampaignRepository {
   const factory CampaignRepository(ProposalDocumentDataLocalSource source) = CampaignRepositoryImpl;
 
+  Future<List<Campaign>> getAllCampaigns();
+
   Future<Campaign> getCampaign({
     required String id,
   });
@@ -27,6 +29,14 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   final ProposalDocumentDataLocalSource _source;
 
   const CampaignRepositoryImpl(this._source);
+
+  @override
+  Future<List<Campaign>> getAllCampaigns() async {
+    return [
+      Campaign.f15(),
+      Campaign.f14(),
+    ];
+  }
 
   @override
   Future<Campaign> getCampaign({

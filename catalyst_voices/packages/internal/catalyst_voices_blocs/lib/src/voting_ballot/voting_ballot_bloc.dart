@@ -153,7 +153,10 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   VotingPhaseProgressViewModel? _buildVotingPhase(Campaign? campaign) {
-    final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
+    final campaignVotingPhase = campaign?.phaseStateTo(
+      CampaignPhaseType.communityVoting,
+      DateTimeExt.now(),
+    );
     final campaignStartDate = campaign?.startDate;
 
     if (campaignVotingPhase != null && campaignStartDate != null) {
