@@ -24,8 +24,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    networks:
-      - e2e-network
 
   index-db:
     image: scylladb/scylla:latest
@@ -39,8 +37,6 @@ services:
       retries: 10
     ports:
       - "9042:9042"
-    networks:
-      - e2e-network
 
   cat-gateway:
     image: cat-gateway:latest
@@ -69,8 +65,6 @@ services:
         condition: service_healthy
       index-db:
         condition: service_healthy
-    networks:
-      - e2e-network
 
   # Init container to upload frontend config to gateway
   # This is required because the gateway returns a placeholder config by default
@@ -89,8 +83,6 @@ services:
     depends_on:
       cat-gateway:
         condition: service_started
-    networks:
-      - e2e-network
 
   cat-voices:
     image: voices:latest
@@ -100,8 +92,6 @@ services:
     depends_on:
       config-init:
         condition: service_completed_successfully
-    networks:
-      - e2e-network
 
   # Playwright E2E Test Runner
   e2e-test-runner:
@@ -139,8 +129,3 @@ services:
     depends_on:
       - cat-voices
       - cat-gateway
-    networks:
-      - e2e-network
-networks:
-  e2e-network:
-    driver: bridge
