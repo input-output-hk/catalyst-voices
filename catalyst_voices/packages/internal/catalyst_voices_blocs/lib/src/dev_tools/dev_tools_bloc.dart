@@ -83,7 +83,8 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     try {
       emit(state.copyWithActiveCampaign(event.campaign));
       await _campaignService.setActiveCampaign(event.campaign);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.severe('handleChangeActiveCampaign', error, stackTrace);
       emit(state.copyWithActiveCampaign(previousCampaign));
     }
   }
