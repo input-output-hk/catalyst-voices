@@ -331,12 +331,10 @@ mod tests {
     fn is_young() {
         let mut seed = OsRng;
         let signing_key: SigningKey = SigningKey::generate(&mut seed);
-        println!("signing_key: {}", hex::encode(signing_key.as_bytes()));
         let verifying_key = signing_key.verifying_key();
         let mut token =
             CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key)
                 .unwrap();
-        println!("admin_key {}", token.catalyst_id.clone().as_short_id().as_admin());
 
         // Update the token timestamp to be two seconds in the past.
         let now = Utc::now();
