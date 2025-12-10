@@ -12,9 +12,9 @@ class LocalDocumentsDrafts extends Table
   /// Timestamp extracted from [ver].
   DateTimeColumn get createdAt => dateTime()();
 
+  /// Composite primary key: ([id], [ver])
+  /// This allows multiple versions of the same document to coexist.
+  /// SQLite enforces uniqueness on this combination.
   @override
-  Set<Column<Object>>? get primaryKey => {
-    id,
-    ver,
-  };
+  Set<Column<Object>>? get primaryKey => {id, ver};
 }

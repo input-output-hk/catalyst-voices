@@ -8,12 +8,6 @@ import 'package:catalyst_voices_repositories/src/proposal/proposal_document_fact
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:rxdart/rxdart.dart';
 
-typedef _ProposalBriefDataComponents = (
-  Page<RawProposalBrief> page,
-  List<Vote> draftVotes,
-  List<Vote> castedVotes,
-);
-
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
 /// provides additional methods specific to proposals.
 abstract interface class ProposalRepository {
@@ -311,6 +305,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _proposalsLocalSource
+        .watchRawLocalDraftsProposalsBrief(author: author)
+        .switchMap((proposals) => Stream.fromFuture(_assembleProposalBriefData(proposals)));
+  }
+
+  @override
   Stream<ProposalPublish?> watchProposalPublish({
     required DocumentRef referencing,
   }) {
@@ -366,7 +369,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       draftVotes,
       castedVotes,
       (page, _, draftVotes, castedVotes) => (page, draftVotes, castedVotes),
-    ).switchMap((components) => Stream.fromFuture(_assembleProposalBriefData(components)));
+    ).switchMap((components) {
+      final page = components.$1;
+      final draftVotes = Map.fromEntries(components.$2.map((e) => MapEntry(e.proposal, e)));
+      final castedVotes = Map.fromEntries(components.$3.map((e) => MapEntry(e.proposal, e)));
+
+      final briefs = _assembleProposalBriefData(
+        page.items,
+        draftVotes: draftVotes,
+        castedVotes: castedVotes,
+      ).then(page.copyWithItems);
+
+      return Stream.fromFuture(briefs);
+    });
   }
 
   @override
@@ -427,14 +442,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
   }
 
-  Future<Page<ProposalBriefData>> _assembleProposalBriefData(
-    _ProposalBriefDataComponents components,
-  ) async {
-    final rawPage = components.$1;
-    final draftVotes = Map.fromEntries(components.$2.map((e) => MapEntry(e.proposal, e)));
-    final castedVotes = Map.fromEntries(components.$3.map((e) => MapEntry(e.proposal, e)));
-
-    final proposalsRefs = rawPage.items
+  Future<List<ProposalBriefData>> _assembleProposalBriefData(
+    List<RawProposalBrief> rawProposals, {
+    Map<DocumentRef, Vote> draftVotes = const {},
+    Map<DocumentRef, Vote> castedVotes = const {},
+  }) async {
+    final proposalsRefs = rawProposals
+        .where((element) => element.proposal.id.isSigned)
         // If proposal is final we have to get action for that exact version,
         // otherwise just latest action
         .map((e) => e.isFinal ? e.proposal.id : e.proposal.id.toLoose())
@@ -444,7 +458,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       proposalsRefs: proposalsRefs,
     );
 
-    final briefs = rawPage.items.map((item) {
+    return rawProposals.map((item) {
       final templateData = item.template;
 
       final proposalOrDocument = templateData == null
@@ -470,8 +484,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         collaboratorsActions: proposalCollaboratorsActions,
       );
     }).toList();
-
-    return rawPage.copyWithItems(briefs);
   }
 
   ProposalSubmissionAction? _buildProposalActionData(
@@ -506,13 +518,5 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
-  }
-
-  @override
-  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
-    required CatalystId author,
-  }) {
-    // TODO: implement watchLocalDraftProposalsBrief
-    throw UnimplementedError();
   }
 }

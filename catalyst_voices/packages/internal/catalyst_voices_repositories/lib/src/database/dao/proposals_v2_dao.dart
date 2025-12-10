@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Documen
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
 import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
@@ -13,6 +14,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_local_
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
 import 'package:rxdart/rxdart.dart';
@@ -58,6 +60,7 @@ import 'package:rxdart/rxdart.dart';
     DocumentsV2,
     DocumentAuthors,
     DocumentParameters,
+    LocalDocumentsDrafts,
     DocumentCollaborators,
     DocumentsLocalMetadata,
   ],
@@ -228,6 +231,56 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         await into(documentsLocalMetadata).insert(entity);
       },
     );
+  }
+
+  @override
+  Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    final template = alias(documentsV2, 't');
+
+    final query =
+        select(localDocumentsDrafts).join([
+            leftOuterJoin(
+              template,
+              Expression.and([
+                localDocumentsDrafts.templateId.equalsExp(template.id),
+                localDocumentsDrafts.templateVer.equalsExp(template.ver),
+                template.type.equalsValue(DocumentType.proposalTemplate),
+              ]),
+            ),
+            leftOuterJoin(
+              documentsLocalMetadata,
+              documentsLocalMetadata.id.equalsExp(localDocumentsDrafts.id),
+            ),
+          ])
+          ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
+          // TODO(damian-molinski): compare against authorsSignificant column.
+          // comparing exact list since local drafts do have one author
+          ..where(localDocumentsDrafts.authors.equalsValue([author.toSignificant()]));
+
+    return query.map(
+      (row) {
+        final proposal = row.readTable(localDocumentsDrafts);
+        final templateEntity = row.readTableOrNull(template);
+        final isFavorite = row.read(documentsLocalMetadata.isFavorite) ?? false;
+
+        return RawProposalBriefEntity(
+          proposal: SignedDocumentOrLocalDraft.local(proposal),
+          template: templateEntity != null
+              ? SignedDocumentOrLocalDraft.signed(templateEntity)
+              : null,
+          // Local drafts do not have a submission action state
+          actionType: null,
+          // Local drafts effectively have one version (themselves)
+          versionIds: [proposal.ver],
+          // Local drafts are not public, so 0 comments
+          commentsCount: 0,
+          isFavorite: isFavorite,
+          originalAuthors: proposal.authors,
+        );
+      },
+    ).watch();
   }
 
   /// Reactive stream version of [getProposalsBriefPage].
@@ -864,8 +917,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
 
       return RawProposalBriefEntity(
-        proposal: proposal,
-        template: template,
+        proposal: SignedDocumentOrLocalDraft.signed(proposal),
+        template: template != null ? SignedDocumentOrLocalDraft.signed(template) : null,
         actionType: actionType,
         versionIds: versionIds,
         commentsCount: commentsCount,
@@ -1049,6 +1102,13 @@ abstract interface class ProposalsV2Dao {
   Future<void> updateProposalFavorite({
     required String id,
     required bool isFavorite,
+  });
+
+  /// Simpler version of [watchProposalsBriefPage] which returns all local
+  /// drafts for given [author]. Locally there is only one version of each proposal
+  /// so no need to take into consideration a lot of stuff from [watchProposalsBriefPage].
+  Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
+    required CatalystId author,
   });
 
   /// Watches for changes and emits paginated pages of proposal briefs.
