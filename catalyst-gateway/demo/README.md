@@ -4,7 +4,7 @@ The intention for this demonstration is to show how to enable Telemetry for Cata
 
 ## TLDR
 
-Set the `TELEMETRY_ENABLED` env variable to _any_ value, and telemetry will be enabled.
+Set the `TELEMETRY_ENABLED` env variable to *any* value, and telemetry will be enabled.
 Remove the env var for simple logging to stdout.
 
 ## Steps to run the demo
