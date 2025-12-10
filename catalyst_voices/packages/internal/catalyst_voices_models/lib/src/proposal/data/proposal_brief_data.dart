@@ -3,15 +3,15 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
-final class ProposalBriefData extends Equatable {
+final class ProposalBriefData extends Equatable implements Comparable<ProposalBriefData> {
   final DocumentRef id;
   final int fundNumber;
   final CatalystId? author;
-  final String title;
-  final String description;
-  final String categoryName;
-  final int durationInMonths;
-  final Money fundsRequested;
+  final String? title;
+  final String? description;
+  final String? categoryName;
+  final int? durationInMonths;
+  final Money? fundsRequested;
   final DateTime createdAt;
   final int iteration;
   final int? commentsCount;
@@ -23,13 +23,13 @@ final class ProposalBriefData extends Equatable {
 
   const ProposalBriefData({
     required this.id,
-    required this.fundNumber,
-    required this.author,
-    required this.title,
-    required this.description,
-    required this.categoryName,
-    this.durationInMonths = 0,
-    required this.fundsRequested,
+    this.fundNumber = 0,
+    this.author,
+    this.title,
+    this.description,
+    this.categoryName,
+    this.durationInMonths,
+    this.fundsRequested,
     required this.createdAt,
     this.iteration = 1,
     this.commentsCount,
@@ -79,11 +79,11 @@ final class ProposalBriefData extends Equatable {
       id: id,
       fundNumber: proposal.fundNumber ?? 0,
       author: data.originalAuthors.firstOrNull,
-      title: proposal.title ?? '',
-      description: proposal.description ?? '',
-      categoryName: proposal.categoryName ?? '',
-      durationInMonths: proposal.durationInMonths ?? 0,
-      fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      title: proposal.title,
+      description: proposal.description,
+      categoryName: proposal.categoryName,
+      durationInMonths: proposal.durationInMonths,
+      fundsRequested: proposal.fundsRequested,
       createdAt: id.ver!.dateTime,
       iteration: data.iteration,
       commentsCount: isFinal ? null : data.commentsCount,
@@ -114,6 +114,58 @@ final class ProposalBriefData extends Equatable {
     versions,
     collaborators,
   ];
+
+  ProposalBriefData appendVersion({
+    required DocumentRef ref,
+    String? title,
+  }) {
+    final version = ProposalBriefDataVersion(ref: ref, title: title);
+
+    final versions = [...?this.versions, version];
+
+    return copyWith(versions: Optional(versions));
+  }
+
+  @override
+  int compareTo(ProposalBriefData other) => createdAt.compareTo(other.createdAt);
+
+  ProposalBriefData copyWith({
+    DocumentRef? id,
+    int? fundNumber,
+    Optional<CatalystId>? author,
+    String? title,
+    String? description,
+    String? categoryName,
+    int? durationInMonths,
+    Money? fundsRequested,
+    DateTime? createdAt,
+    int? iteration,
+    Optional<int>? commentsCount,
+    bool? isFinal,
+    bool? isFavorite,
+    Optional<ProposalBriefDataVotes>? votes,
+    Optional<List<ProposalBriefDataVersion>>? versions,
+    Optional<List<ProposalBriefDataCollaborator>>? collaborators,
+  }) {
+    return ProposalBriefData(
+      id: id ?? this.id,
+      fundNumber: fundNumber ?? this.fundNumber,
+      author: author.dataOr(this.author),
+      title: title ?? this.title,
+      description: description ?? this.description,
+      categoryName: categoryName ?? this.categoryName,
+      durationInMonths: durationInMonths ?? this.durationInMonths,
+      fundsRequested: fundsRequested ?? this.fundsRequested,
+      createdAt: createdAt ?? this.createdAt,
+      iteration: iteration ?? this.iteration,
+      commentsCount: commentsCount.dataOr(this.commentsCount),
+      isFinal: isFinal ?? this.isFinal,
+      isFavorite: isFavorite ?? this.isFavorite,
+      votes: votes.dataOr(this.votes),
+      versions: versions.dataOr(this.versions),
+      collaborators: collaborators.dataOr(this.collaborators),
+    );
+  }
 }
 
 final class ProposalBriefDataCollaborator extends Equatable {

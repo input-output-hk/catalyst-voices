@@ -48,15 +48,15 @@ final class UsersProposalOverview extends Equatable {
     return UsersProposalOverview(
       id: proposalData.id,
       author: proposalData.author,
-      title: proposalData.title,
+      title: proposalData.title ?? '',
       updateDate: proposalData.createdAt,
-      fundsRequested: proposalData.fundsRequested,
+      fundsRequested: proposalData.fundsRequested ?? Money.zero(currency: Currencies.fallback),
       publish: publish,
       iteration: proposalData.iteration,
       // TODO(LynxLynxx): map versions when they will be implemented
       versions: const [],
       commentsCount: proposalData.commentsCount ?? 0,
-      category: proposalData.categoryName,
+      category: proposalData.categoryName ?? '',
       fundNumber: proposalData.fundNumber,
       fromActiveCampaign: fromActiveCampaign,
       collaborators: proposalData.collaborators?.map(Collaborator.fromBriefData).toList() ?? [],

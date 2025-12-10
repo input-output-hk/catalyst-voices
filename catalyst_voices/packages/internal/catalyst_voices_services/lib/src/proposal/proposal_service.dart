@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -545,11 +546,22 @@ final class ProposalServiceImpl implements ProposalService {
     return account.catalystId;
   }
 
-  // TODO(damian-molinski): extract it into a class?
   List<ProposalBriefData> _mergePublishedAndLocalProposals(
     List<ProposalBriefData> signed,
     List<ProposalBriefData> localDrafts,
   ) {
-    return [...signed, ...localDrafts];
+    final documents = <String, ProposalBriefData>{
+      for (final doc in signed) doc.id.id: doc,
+    };
+
+    for (final localDraft in localDrafts) {
+      documents.update(
+        localDraft.id.id,
+        (value) => value.appendVersion(ref: localDraft.id, title: localDraft.title),
+        ifAbsent: () => localDraft,
+      );
+    }
+
+    return documents.values.sorted();
   }
 }
