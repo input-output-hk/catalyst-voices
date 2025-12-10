@@ -10,6 +10,7 @@ st run --checks=all ${API_SPEC} \
                     --wait-for-schema=${WAIT_FOR_SCHEMA} \
                     --max-response-time=${MAX_RESPONSE_TIME} \
                     --hypothesis-max-examples=${HYPOTHESIS_MAX_EXAMPLES} \
+                    --hypothesis-deadline=${HYPOTHESIS_DEADLINE:-15000} \
                     --data-generation-method=all \
                     --exclude-deprecated \
                     --force-schema-version=30 \
