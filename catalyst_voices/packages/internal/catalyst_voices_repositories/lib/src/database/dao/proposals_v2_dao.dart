@@ -3,9 +3,11 @@ import 'dart:math' as math;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentParameters;
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
@@ -56,6 +58,7 @@ import 'package:rxdart/rxdart.dart';
     DocumentsV2,
     DocumentAuthors,
     DocumentParameters,
+    DocumentCollaborators,
     DocumentsLocalMetadata,
   ],
 )
@@ -63,6 +66,49 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftProposalsV2DaoMixin
     implements ProposalsV2Dao {
   DriftProposalsV2Dao(super.attachedDatabase);
+
+  @override
+  Future<Map<String, RawProposalCollaboratorsActions>> getCollaboratorsActions({
+    required List<DocumentRef> proposalsRefs,
+  }) async {
+    if (proposalsRefs.isEmpty) return {};
+
+    final idToRef = Map.fromEntries(proposalsRefs.map((e) => MapEntry(e.id, e)));
+
+    final action = alias(documentsV2, 'action');
+    final author = alias(documentAuthors, 'author');
+    final collaborator = alias(documentCollaborators, 'collab');
+
+    final query =
+        select(action).join([
+            // 1. Identify the signer of the Action
+            innerJoin(
+              author,
+              Expression.and([
+                author.documentId.equalsExp(action.id),
+                author.documentVer.equalsExp(action.ver),
+              ]),
+            ),
+            // 2. FILTER: Only if that signer is a collaborator on the PROPOSAL
+            // We join on:
+            // - collab.documentId == action.refId (The Proposal ID)
+            // - collab.accountSignificantId == author.accountSignificantId (The Signer)
+            innerJoin(
+              collaborator,
+              Expression.and([
+                collaborator.documentId.equalsExp(action.refId),
+                collaborator.documentVer.equalsExp(action.refVer),
+                collaborator.accountSignificantId.equalsExp(author.accountSignificantId),
+              ]),
+            ),
+          ])
+          ..where(action.type.equalsValue(DocumentType.proposalActionDocument))
+          ..where(action.refId.isIn(idToRef.keys))
+          // Sort DESC so the first one we see is the latest
+          ..orderBy([OrderingTerm.desc(action.createdAt)]);
+
+    return query.get().then((rows) => _processCollaboratorsActions(rows, action, author, idToRef));
+  }
 
   @override
   Future<DocumentEntityV2?> getProposal(DocumentRef ref) async {
@@ -92,7 +138,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// 3. **Pagination:** Applies limit/offset logic.
   /// 4. **Enrichment:** Joins templates, authors, and counts comments via subqueries.
   @override
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+  Future<Page<RawProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -192,7 +238,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - Local metadata (Favorites) changes.
   /// - Authors change.
   @override
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+  Stream<Page<RawProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -213,7 +259,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     ).watch();
     final totalStream = _countVisibleProposals(filters: filters).watchSingle();
 
-    return Rx.combineLatest2<List<JoinedProposalBriefEntity>, int, Page<JoinedProposalBriefEntity>>(
+    return Rx.combineLatest2<List<RawProposalBriefEntity>, int, Page<RawProposalBriefEntity>>(
       itemsStream,
       totalStream,
       (items, total) => Page(
@@ -578,6 +624,56 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         .trim();
   }
 
+  /// Processes a database row from [getCollaboratorsActions] query.
+  Map<String, RawProposalCollaboratorsActions> _processCollaboratorsActions(
+    List<TypedResult> rows,
+    $DocumentsV2Table action,
+    $DocumentAuthorsTable author,
+    Map<String, DocumentRef> idToRef,
+  ) {
+    final tempMap = <String, Map<CatalystId, RawCollaboratorAction>>{};
+
+    for (final row in rows) {
+      final doc = row.readTable(action);
+      final signer = row.readTable(author);
+
+      final refId = doc.refId;
+      if (refId == null) continue;
+
+      final ref = SignedDocumentRef(id: refId, ver: doc.refVer);
+
+      final proposalRef = idToRef[ref.id];
+      // if proposalRef has specified ver we should only get action for that ver, not latest.
+      if (proposalRef == null || !proposalRef.contains(ref)) continue;
+
+      final proposalActions = tempMap.putIfAbsent(refId, () => {});
+      final signerFullId = CatalystId.tryParse(signer.accountId);
+      final signerId = CatalystId.tryParse(signer.accountSignificantId);
+
+      // Since we ordered by createdAt DESC, if we already have an entry for
+      // this signer, it is newer than the current row. We skip the current row.
+      if (signerId == null || proposalActions.containsKey(signerId)) continue;
+
+      try {
+        final actionData = doc.content.data;
+        final action = ProposalSubmissionActionDocumentDto.fromJson(actionData).action.toModel();
+
+        final rawCollaboratorAction = RawCollaboratorAction(
+          id: signerFullId ?? signerId,
+          proposalId: ref,
+          action: action,
+        );
+
+        proposalActions[signerId] = rawCollaboratorAction;
+      } catch (_) {
+        // Gracefully handle malformed JSON means there is no valid action
+        proposalActions.remove(signerId);
+      }
+    }
+
+    return tempMap.map((key, value) => MapEntry(key, RawProposalCollaboratorsActions(value)));
+  }
+
   /// Internal query to calculate total ask.
   ///
   /// Similar to the main CTE but filters specifically for `effective_final_proposals`.
@@ -666,7 +762,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - `version_ids_str`: Comma-separated list of all version UUIDs.
   /// - `comments_count`: Count of comments referencing this proposal.
   /// - `original_authors_str`: Authors of the FIRST version (id=ver).
-  Selectable<JoinedProposalBriefEntity> _queryVisibleProposalsPage(
+  Selectable<RawProposalBriefEntity> _queryVisibleProposalsPage(
     int page,
     int size, {
     required ProposalsOrder order,
@@ -767,7 +863,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final originalAuthorsRaw = row.readNullable<String>('origin_authors');
       final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
 
-      return JoinedProposalBriefEntity(
+      return RawProposalBriefEntity(
         proposal: proposal,
         template: template,
         actionType: actionType,
@@ -845,6 +941,30 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 /// - Final: Proposal is submitted, shows specific or latest version
 /// - Hide: Proposal is hidden from all views
 abstract interface class ProposalsV2Dao {
+  /// Retrieves the latest valid submission actions performed by collaborators for the specified
+  /// proposals.
+  ///
+  /// This method resolves the current collaboration state by:
+  /// 1.  **Discovery**: Identifying all [DocumentType.proposalActionDocument]s that reference
+  ///     the IDs found in [proposalsRefs].
+  /// 2.  **Validation**: Verifying that the signer of the action is explicitly listed as a
+  ///     collaborator on the referenced proposal document.
+  /// 3.  **Versioning**:
+  ///     * If a [DocumentRef] is **exact** (specifies `ver`), only actions targeting that
+  ///         specific version are returned.
+  ///     * If a [DocumentRef] is **loose** (null `ver`), actions targeting *any* version
+  ///         of the proposal ID are considered.
+  /// 4.  **Resolution**: Returns only the most recent action (by creation time) for each
+  ///     unique collaborator.
+  ///
+  /// Returns a [Map] where:
+  /// * **Key**: The Proposal ID (`String`).
+  /// * **Value**: A [RawProposalCollaboratorsActions] container holding the map of
+  ///     collaborator IDs to their latest [RawCollaboratorAction].
+  Future<Map<String, RawProposalCollaboratorsActions>> getCollaboratorsActions({
+    required List<DocumentRef> proposalsRefs,
+  });
+
   /// Retrieves a single proposal by its reference.
   ///
   /// Filters by type == proposalDocument.
@@ -881,7 +1001,7 @@ abstract interface class ProposalsV2Dao {
   ///   - Single query with CTEs (no N+1 queries)
   ///
   /// **Returns:** Page object with items, total count, and pagination metadata
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+  Future<Page<RawProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
@@ -945,7 +1065,7 @@ abstract interface class ProposalsV2Dao {
   /// - Same query optimization as [getProposalsBriefPage]
   ///
   /// **Returns:** Stream of Page objects with current state
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+  Stream<Page<RawProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,

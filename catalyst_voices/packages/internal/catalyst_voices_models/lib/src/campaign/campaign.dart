@@ -171,6 +171,10 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     );
   }
 
+  bool hasAnyParameterId(DocumentParameters parameters) {
+    return categories.any((category) => parameters.containsId(category.id.id));
+  }
+
   bool hasCategory(String id) {
     return categories.any((element) => element.id.id == id);
   }

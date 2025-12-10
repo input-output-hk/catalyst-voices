@@ -1,14 +1,10 @@
 // ignore_for_file: avoid_redundant_argument_values
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../utils/document_composite_factory.dart';
@@ -2590,20 +2586,7 @@ CatalystId _createTestAuthor({
   String? name,
   int role0KeySeed = 0,
 }) {
-  final buffer = StringBuffer('id.catalyst://');
-  final role0Key = Uint8List.fromList(List.filled(32, role0KeySeed));
-
-  if (name != null) {
-    buffer
-      ..write(name)
-      ..write('@');
-  }
-
-  buffer
-    ..write('preprod.cardano/')
-    ..write(base64UrlNoPadEncode(role0Key));
-
-  return CatalystId.parse(buffer.toString());
+  return CatalystIdFactory.create(username: name, role0KeySeed: role0KeySeed);
 }
 
 DocumentCompositeEntity _createTestDocumentEntity({

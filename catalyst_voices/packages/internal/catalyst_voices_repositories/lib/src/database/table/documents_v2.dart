@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_content_mixin.dart';
 import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_metadata_mixin.dart';
 import 'package:drift/drift.dart';
@@ -43,4 +44,35 @@ class DocumentsV2 extends Table with DocumentTableContentMixin, DocumentTableMet
   /// SQLite enforces uniqueness on this combination.
   @override
   Set<Column<Object>>? get primaryKey => {id, ver};
+}
+
+extension DocumentEntityV2Mapper on DocumentEntityV2 {
+  DocumentData toModel() {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.fromJson(contentType),
+        type: type,
+        id: SignedDocumentRef(id: id, ver: ver),
+        ref: refId.toRef(refVer),
+        template: templateId.toRef(templateVer),
+        reply: replyId.toRef(replyVer),
+        section: section,
+        collaborators: collaborators.isEmpty ? null : collaborators,
+        parameters: parameters,
+        authors: authors.isEmpty ? null : authors,
+      ),
+      content: content,
+    );
+  }
+}
+
+extension _RefMapper on String? {
+  SignedDocumentRef? toRef([String? ver]) {
+    final id = this;
+    if (id == null) {
+      return null;
+    }
+
+    return SignedDocumentRef(id: id, ver: ver);
+  }
 }

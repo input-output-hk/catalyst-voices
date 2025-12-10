@@ -49,7 +49,7 @@ final class UsersProposalOverview extends Equatable {
       id: proposalData.id,
       author: proposalData.author,
       title: proposalData.title,
-      updateDate: proposalData.updateDate,
+      updateDate: proposalData.createdAt,
       fundsRequested: proposalData.fundsRequested,
       publish: publish,
       iteration: proposalData.iteration,
