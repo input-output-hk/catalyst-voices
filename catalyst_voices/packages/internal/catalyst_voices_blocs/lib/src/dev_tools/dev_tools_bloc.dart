@@ -142,7 +142,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
       final content = await _loggingService!.prepareForExportCollectedLogs();
       final encodedContent = utf8.encode(content);
 
-      final filename = 'catalyst_app_${DateTimeExt.now().toIso8601String()}_logs.txt';
+      final filename = 'catalyst_app_${DateTimeExt.now().microsecondsSinceEpoch}_logs.txt';
 
       await _downloaderService.download(data: encodedContent, filename: filename);
     } catch (error, stack) {
