@@ -562,6 +562,6 @@ final class ProposalServiceImpl implements ProposalService {
       );
     }
 
-    return documents.values.sorted();
+    return documents.values.sorted((a, b) => a.compareTo(b) * -1);
   }
 }
