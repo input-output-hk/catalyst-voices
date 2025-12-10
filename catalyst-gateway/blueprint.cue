@@ -89,13 +89,13 @@ project: {
 									value: string | *"150"
 								}
 								"EVENT_DB_CONN_TIMEOUT": {
-									value: string | "5s"
+									value: string | *"5s"
 								}
 								"EVENT_DB_SLOT_WAIT_TIMEOUT": {
-									value: string | "5s"
+									value: string | *"5s"
 								}
 								"EVENT_DB_CONN_RECYCLE_TIMEOUT": {
-									value: string | "5s"
+									value: string | *"5s"
 								}
 								"INTERNAL_API_KEY": {
 									secret: {
