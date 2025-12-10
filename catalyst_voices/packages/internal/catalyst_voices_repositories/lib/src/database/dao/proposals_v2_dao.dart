@@ -114,6 +114,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<List<RawProposalBriefEntity>> getLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftsProposalsBrief(author: author).get();
+  }
+
+  @override
   Future<DocumentEntityV2?> getProposal(DocumentRef ref) async {
     final query = select(documentsV2)
       ..where((tbl) => tbl.id.equals(ref.id) & tbl.type.equals(DocumentType.proposalDocument.uuid));
@@ -237,50 +244,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
     required CatalystId author,
   }) {
-    final template = alias(documentsV2, 't');
-
-    final query =
-        select(localDocumentsDrafts).join([
-            leftOuterJoin(
-              template,
-              Expression.and([
-                localDocumentsDrafts.templateId.equalsExp(template.id),
-                localDocumentsDrafts.templateVer.equalsExp(template.ver),
-                template.type.equalsValue(DocumentType.proposalTemplate),
-              ]),
-            ),
-            leftOuterJoin(
-              documentsLocalMetadata,
-              documentsLocalMetadata.id.equalsExp(localDocumentsDrafts.id),
-            ),
-          ])
-          ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
-          // TODO(damian-molinski): compare against authorsSignificant column.
-          // comparing exact list since local drafts do have one author
-          ..where(localDocumentsDrafts.authors.equalsValue([author.toSignificant()]));
-
-    return query.map(
-      (row) {
-        final proposal = row.readTable(localDocumentsDrafts);
-        final templateEntity = row.readTableOrNull(template);
-        final isFavorite = row.read(documentsLocalMetadata.isFavorite) ?? false;
-
-        return RawProposalBriefEntity(
-          proposal: SignedDocumentOrLocalDraft.local(proposal),
-          template: templateEntity != null
-              ? SignedDocumentOrLocalDraft.signed(templateEntity)
-              : null,
-          // Local drafts do not have a submission action state
-          actionType: null,
-          // Local drafts effectively have one version (themselves)
-          versionIds: [proposal.ver],
-          // Local drafts are not public, so 0 comments
-          commentsCount: 0,
-          isFavorite: isFavorite,
-          originalAuthors: proposal.authors,
-        );
-      },
-    ).watch();
+    return _queryLocalDraftsProposalsBrief(author: author).watch();
   }
 
   /// Reactive stream version of [getProposalsBriefPage].
@@ -727,6 +691,56 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return tempMap.map((key, value) => MapEntry(key, RawProposalCollaboratorsActions(value)));
   }
 
+  Selectable<RawProposalBriefEntity> _queryLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    final template = alias(documentsV2, 't');
+
+    final query =
+        select(localDocumentsDrafts).join([
+            leftOuterJoin(
+              template,
+              Expression.and([
+                localDocumentsDrafts.templateId.equalsExp(template.id),
+                localDocumentsDrafts.templateVer.equalsExp(template.ver),
+                template.type.equalsValue(DocumentType.proposalTemplate),
+              ]),
+            ),
+            leftOuterJoin(
+              documentsLocalMetadata,
+              documentsLocalMetadata.id.equalsExp(localDocumentsDrafts.id),
+            ),
+          ])
+          ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
+          // TODO(damian-molinski): compare against authorsSignificant column.
+          // comparing exact list since local drafts do have one author
+          ..where(localDocumentsDrafts.authors.equalsValue([author]))
+          ..orderBy([OrderingTerm.desc(localDocumentsDrafts.createdAt)]);
+
+    return query.map(
+      (row) {
+        final proposal = row.readTable(localDocumentsDrafts);
+        final templateEntity = row.readTableOrNull(template);
+        final isFavorite = row.read(documentsLocalMetadata.isFavorite) ?? false;
+
+        return RawProposalBriefEntity(
+          proposal: SignedDocumentOrLocalDraft.local(proposal),
+          template: templateEntity != null
+              ? SignedDocumentOrLocalDraft.signed(templateEntity)
+              : null,
+          // Local drafts do not have a submission action state
+          actionType: null,
+          // Local drafts effectively have one version (themselves)
+          versionIds: [proposal.ver],
+          // Local drafts are not public, so 0 comments
+          commentsCount: 0,
+          isFavorite: isFavorite,
+          originalAuthors: proposal.authors,
+        );
+      },
+    );
+  }
+
   /// Internal query to calculate total ask.
   ///
   /// Similar to the main CTE but filters specifically for `effective_final_proposals`.
@@ -1018,6 +1032,13 @@ abstract interface class ProposalsV2Dao {
     required List<DocumentRef> proposalsRefs,
   });
 
+  /// Simpler version of [getProposalsBriefPage] which returns all local
+  /// drafts for given [author]. Locally there is only one version of each proposal
+  /// so no need to take into consideration a lot of stuff from [getProposalsBriefPage].
+  Future<List<RawProposalBriefEntity>> getLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
+
   /// Retrieves a single proposal by its reference.
   ///
   /// Filters by type == proposalDocument.
@@ -1104,9 +1125,9 @@ abstract interface class ProposalsV2Dao {
     required bool isFavorite,
   });
 
-  /// Simpler version of [watchProposalsBriefPage] which returns all local
-  /// drafts for given [author]. Locally there is only one version of each proposal
-  /// so no need to take into consideration a lot of stuff from [watchProposalsBriefPage].
+  /// Reactive stream version of [getLocalDraftsProposalsBrief].
+  ///
+  /// Updates automatically when local drafts are changing.
   Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
     required CatalystId author,
   });
