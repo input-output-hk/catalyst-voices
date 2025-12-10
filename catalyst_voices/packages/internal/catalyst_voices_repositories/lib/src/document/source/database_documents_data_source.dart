@@ -241,20 +241,6 @@ final class DatabaseDocumentsDataSource
         )
         .distinct()
         .map((page) => page.map((data) => data.toModel()));
-extension on DocumentsV2MetadataViewData {
-  DocumentDataMetadata toModel() {
-    return DocumentDataMetadata(
-      contentType: DocumentContentType.fromJson(contentType),
-      type: type,
-      id: SignedDocumentRef(id: id, ver: ver),
-      ref: refId.toRef(refVer),
-      template: templateId.toRef(templateVer),
-      reply: replyId.toRef(replyVer),
-      section: section,
-      collaborators: collaborators.isEmpty ? null : collaborators,
-      parameters: parameters,
-      authors: authors.isEmpty ? null : authors,
-    );
   }
 }
 
@@ -324,5 +310,22 @@ extension on DocumentData {
         documentVer: metadata.id.ver!,
       );
     }).toList();
+  }
+}
+
+extension on DocumentsV2MetadataViewData {
+  DocumentDataMetadata toModel() {
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.fromJson(contentType),
+      type: type,
+      id: SignedDocumentRef(id: id, ver: ver),
+      ref: refId.toRef(refVer),
+      template: templateId.toRef(templateVer),
+      reply: replyId.toRef(replyVer),
+      section: section,
+      collaborators: collaborators.isEmpty ? null : collaborators,
+      parameters: parameters,
+      authors: authors.isEmpty ? null : authors,
+    );
   }
 }
