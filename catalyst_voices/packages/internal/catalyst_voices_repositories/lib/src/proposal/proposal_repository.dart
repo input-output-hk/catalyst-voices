@@ -542,9 +542,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final draftVote = draftVotesMap[proposalId];
     final castedVote = castedVotesMap[proposalId];
 
-    final proposalRef = isFinal ? proposalId : proposalId.toLoose();
     final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
-      proposalsRefs: [proposalRef],
+      // if proposal is final find actions for specific version
+      proposalsRefs: [if (isFinal) proposalId else proposalId.toLoose()],
     );
     final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
 
