@@ -763,9 +763,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final isFavorite = row.read(dlm.isFavorite) ?? false;
 
       // Map Original Authors
-      // Uses the same converter logic found in your existing Dao
+      // Parse comma-separated list from GROUP_CONCAT
       final authorsStr = row.read(originAuthors) ?? '';
-      final authorsList = DocumentConverters.catId.fromSql(authorsStr);
+      final authorsList = authorsStr.isEmpty
+          ? <CatalystId>[]
+          : authorsStr.split(',').map(CatalystId.tryParse).nonNulls.toList();
 
       return RawProposalEntity(
         proposal: proposal,

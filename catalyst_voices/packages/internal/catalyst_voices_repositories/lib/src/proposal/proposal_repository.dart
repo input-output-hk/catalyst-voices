@@ -6,6 +6,7 @@ import 'package:catalyst_voices_repositories/src/document/source/proposal_docume
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 typedef _ProposalBriefDataComponents = (
@@ -559,6 +560,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       collaborators: const [],
     );
 
+    final actionsDocs = await _documentRepository.getProposalSubmissionActions(
+      referencing: proposalId.toLoose(),
+      authors: rawProposal.originalAuthors,
+    );
+
+    final action = _resolveProposalAction(
+      actionDocs: actionsDocs,
+      proposalId: proposalId,
+    );
+
     return ProposalDataV2.build(
       data: rawProposal,
       proposal: proposalOrDocument,
@@ -568,6 +579,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       collaboratorsActions: proposalCollaboratorsActions,
       prevCollaborators: prevMetadata.collaborators ?? [],
       prevAuthors: prevMetadata.authors ?? [],
+      action: action,
     );
   }
 
@@ -603,5 +615,50 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
+  }
+
+  /// Resolves the effective action for a specific proposal version.
+  ///
+  /// [actionDocs] will be sorted from latest to oldest by version.
+  /// [proposalId] is the specific proposal version to find the action for.
+  ///
+  /// Returns:
+  /// - `ProposalSubmissionAction.hide` if the latest action is hide
+  /// - The action for [proposalId] if it's not hide
+  /// - Another non-hide action referencing [proposalId] if the matching action is hide but not latest
+  /// - `null` if no suitable action is found
+  ProposalSubmissionAction? _resolveProposalAction({
+    required List<DocumentData> actionDocs,
+    required DocumentRef proposalId,
+  }) {
+    if (actionDocs.isEmpty) return null;
+
+    // Sort from latest to oldest by version
+    final sortedDocs = actionDocs.sorted(
+      (a, b) => b.metadata.id.compareTo(a.metadata.id),
+    );
+
+    final latestActionDoc = sortedDocs.first;
+    final latestAction = _buildProposalActionData(latestActionDoc);
+
+    // If latest action is hide, return hide
+    if (latestAction == ProposalSubmissionAction.hide) {
+      return ProposalSubmissionAction.hide;
+    }
+
+    // Find all actions referencing proposalRef
+    final matchingDocs = sortedDocs.where(
+      (doc) => doc.metadata.ref?.contains(proposalId) ?? false,
+    );
+
+    // Find a non-hide action for this proposal, or return null
+    for (final doc in matchingDocs) {
+      final action = _buildProposalActionData(doc);
+      if (action != ProposalSubmissionAction.hide) {
+        return action;
+      }
+    }
+
+    return null;
   }
 }

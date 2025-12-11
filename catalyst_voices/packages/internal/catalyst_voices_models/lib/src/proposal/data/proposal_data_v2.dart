@@ -9,6 +9,7 @@ final class ProposalDataV2 extends Equatable {
   /// This is `null` when the template couldn't be retrieved.
   /// The UI should show an error message in this case.
   final ProposalDocument? document;
+  final ProposalSubmissionAction? submissionAction;
   final bool isFavorite;
   final String categoryName;
   final ProposalBriefDataVotes? votes;
@@ -18,6 +19,7 @@ final class ProposalDataV2 extends Equatable {
   const ProposalDataV2({
     required this.id,
     required this.document,
+    required this.submissionAction,
     required this.isFavorite,
     required this.categoryName,
     this.votes,
@@ -43,6 +45,7 @@ final class ProposalDataV2 extends Equatable {
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
     List<CatalystId> prevCollaborators = const [],
     List<CatalystId> prevAuthors = const [],
+    ProposalSubmissionAction? action,
   }) {
     final id = data.proposal.id;
     final isFinal = data.isFinal;
@@ -60,6 +63,7 @@ final class ProposalDataV2 extends Equatable {
     return ProposalDataV2(
       id: id,
       document: proposalDocument,
+      submissionAction: action,
       isFavorite: data.isFavorite,
       categoryName: proposal.categoryName ?? '',
       collaborators: collaborators,
@@ -68,10 +72,22 @@ final class ProposalDataV2 extends Equatable {
     );
   }
 
+  ProposalPublish? get proposalPublish {
+    if (submissionAction == null && id is DraftRef) {
+      return ProposalPublish.localDraft;
+    } else if (submissionAction == ProposalSubmissionAction.aFinal) {
+      return ProposalPublish.submittedProposal;
+    } else if (submissionAction == ProposalSubmissionAction.draft) {
+      return ProposalPublish.publishedDraft;
+    }
+    return null;
+  }
+
   @override
   List<Object?> get props => [
     id,
     document,
+    submissionAction,
     isFavorite,
     categoryName,
     votes,

@@ -84,6 +84,7 @@ abstract interface class DocumentsV2Dao {
     DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? campaign,
+    List<CatalystId>? authors,
     bool latestOnly,
     int limit,
     int offset,
@@ -271,6 +272,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? campaign,
+    List<CatalystId>? authors,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -280,6 +282,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       id: id,
       referencing: referencing,
       campaign: campaign,
+      authors: authors,
       latestOnly: latestOnly,
       limit: limit,
       offset: offset,
@@ -522,6 +525,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? campaign,
+    List<CatalystId>? authors,
     required bool latestOnly,
     required int limit,
     required int offset,
@@ -559,6 +563,20 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
             ..where(dp.documentVer.equalsExp(tbl.ver))
             ..where(dp.id.isIn(campaign.categoriesIds)),
         );
+      });
+    }
+
+    if (authors != null && authors.isNotEmpty) {
+      final significantIds = authors
+          .map((author) => author.toSignificant().toUri().toString())
+          .toList();
+      query.where((tbl) {
+        final originalAuthorQuery = selectOnly(documentAuthors)
+          ..addColumns([const Constant(1)])
+          ..where(documentAuthors.documentId.equalsExp(tbl.id))
+          ..where(documentAuthors.documentVer.equalsExp(tbl.ver))
+          ..where(documentAuthors.accountSignificantId.isIn(significantIds));
+        return existsQuery(originalAuthorQuery);
       });
     }
 
