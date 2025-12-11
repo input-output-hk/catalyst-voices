@@ -79,13 +79,6 @@ abstract interface class ProposalRepository {
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
 
-  /// Watches a single proposal by its reference.
-  ///
-  /// Returns a reactive stream that emits [ProposalDataV2] whenever the
-  /// proposal data changes (document, actions, votes, favorites).
-  ///
-  /// Emits `null` if the proposal is not found.
-  Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
   /// Watches [author]'s list of local drafts (not published).
   ///
   /// This is simpler version of [watchProposalsBriefPage] since local drafts
@@ -93,6 +86,14 @@ abstract interface class ProposalRepository {
   Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
     required CatalystId author,
   });
+
+  /// Watches a single proposal by its reference.
+  ///
+  /// Returns a reactive stream that emits [ProposalDataV2] whenever the
+  /// proposal data changes (document, actions, votes, favorites).
+  ///
+  /// Emits `null` if the proposal is not found.
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
 
   /// Watches for [ProposalSubmissionAction] that were made on [referencing] document.
   ///
@@ -319,6 +320,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _proposalsLocalSource
+        .watchRawLocalDraftsProposalsBrief(author: author)
+        .switchMap((proposals) => Stream.fromFuture(_assembleProposalBriefData(proposals)));
+  }
+
+  @override
   Stream<ProposalDataV2?> watchProposal({required DocumentRef id}) {
     // 1. The Data Stream - raw proposal from database
     final proposalStream = _proposalsLocalSource.watchRawProposalData(id: id);
@@ -344,14 +354,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ).switchMap(
       (components) => Stream.fromFuture(_assembleProposalData(components)),
     );
-  }
-  
-  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
-    required CatalystId author,
-  }) {
-    return _proposalsLocalSource
-        .watchRawLocalDraftsProposalsBrief(author: author)
-        .switchMap((proposals) => Stream.fromFuture(_assembleProposalBriefData(proposals)));
   }
 
   @override
