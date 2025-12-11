@@ -21,6 +21,13 @@ import 'generated/schema.dart';
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 
+/* cSpell:disable */
+const _testOrgCatalystIdUri =
+    'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
+
+const _testUserCatalystIdUri =
+    'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
+
 void migrationBody() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   late SchemaVerifier verifier;
@@ -201,13 +208,6 @@ void migrationBody() {
     );
   });
 }
-
-/* cSpell:disable */
-const _testOrgCatalystIdUri =
-    'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
-
-const _testUserCatalystIdUri =
-    'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
 /* cSpell:enabled */
 
 DocumentData _buildDoc({
@@ -415,13 +415,19 @@ extension on DocumentData {
       metadata,
     ).toJson();
 
+    final authors = metadata.authors ?? <CatalystId>[];
+    final authorsNames = authors.map((e) => e.username).toList();
+    final authorsSignificant = authors.map((e) => e.toSignificant()).toList();
+
     return _NewDraftData(
       contentType: metadata.contentType.value,
       content: jsonb().encode(content.data),
       id: metadata.id.id,
       type: metadata.type.uuid,
       ver: metadata.id.ver!,
-      authors: DocumentConverters.catId.toSql(metadata.authors ?? []),
+      authors: DocumentConverters.catId.toSql(authors),
+      authorsNames: DocumentConverters.strings.toSql(authorsNames),
+      authorsSignificant: DocumentConverters.catId.toSql(authorsSignificant),
       refId: metadata.ref?.id,
       refVer: metadata.ref?.ver,
       replyId: metadata.reply?.id,
