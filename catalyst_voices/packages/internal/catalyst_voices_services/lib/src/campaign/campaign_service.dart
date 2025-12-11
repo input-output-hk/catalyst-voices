@@ -2,20 +2,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('CampaignService');
-
-Campaign? _mockedActiveCampaign;
-
-/// Overrides the current campaign returned by [CampaignService.getActiveCampaign].
-/// Only for unit testing.
-@visibleForTesting
-//ignore: avoid_setters_without_getters
-set mockedActiveCampaign(Campaign? campaign) {
-  _mockedActiveCampaign = campaign;
-}
 
 typedef _ProposalTemplateCategoryAndMoneyFormat = ({
   SignedDocumentRef? category,
@@ -38,6 +27,8 @@ abstract interface class CampaignService {
 
   Future<Campaign?> getActiveCampaign();
 
+  Future<List<Campaign>> getAllCampaigns();
+
   Future<Campaign> getCampaign({
     required String id,
   });
@@ -47,6 +38,8 @@ abstract interface class CampaignService {
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
+
+  Future<void> setActiveCampaign(Campaign campaign);
 
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters});
 
@@ -73,9 +66,15 @@ final class CampaignServiceImpl implements CampaignService {
       return _activeCampaignObserver.campaign;
     }
     // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = _mockedActiveCampaign ?? await getCampaign(id: activeCampaignRef.id);
+    final campaign = await getCampaign(id: initialActiveCampaignRef.id);
     _activeCampaignObserver.campaign = campaign;
     return campaign;
+  }
+
+  @override
+  Future<List<Campaign>> getAllCampaigns() async {
+    final campaigns = await _campaignRepository.getAllCampaigns();
+    return campaigns.map(_updateSubmissionCloseDate).wait;
   }
 
   @override
@@ -83,19 +82,7 @@ final class CampaignServiceImpl implements CampaignService {
     required String id,
   }) async {
     final campaign = await _campaignRepository.getCampaign(id: id);
-    final proposalSubmissionTime = campaign
-        .phaseStateTo(CampaignPhaseType.proposalSubmission)
-        .phase
-        .timeline
-        .to;
-
-    final updatedCategories = campaign.categories
-        .map((e) => e.copyWith(submissionCloseDate: proposalSubmissionTime))
-        .toList();
-
-    return campaign.copyWith(
-      categories: updatedCategories,
-    );
+    return _updateSubmissionCloseDate(campaign);
   }
 
   @override
@@ -133,6 +120,13 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref}) {
     return watchCategoryTotalAsk(ref: ref).first;
+  }
+
+  @override
+  Future<void> setActiveCampaign(Campaign campaign) async {
+    if (_activeCampaignObserver.campaign?.id != campaign.id) {
+      _activeCampaignObserver.campaign = campaign;
+    }
   }
 
   @override
@@ -201,6 +195,22 @@ final class CampaignServiceImpl implements CampaignService {
     }
 
     return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
+  }
+
+  Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
+    final proposalSubmissionTime = campaign
+        .phaseStateTo(CampaignPhaseType.proposalSubmission)
+        .phase
+        .timeline
+        .to;
+
+    final updatedCategories = campaign.categories
+        .map((e) => e.copyWith(submissionCloseDate: proposalSubmissionTime))
+        .toList();
+
+    return campaign.copyWith(
+      categories: updatedCategories,
+    );
   }
 }
 
