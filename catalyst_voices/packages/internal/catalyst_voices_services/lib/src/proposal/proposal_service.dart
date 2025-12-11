@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -116,6 +117,13 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  /// Streams pages of brief proposal data.
+  ///
+  /// The [request] parameter defines the page number and size.
+  /// The optional [order] parameter specifies how the results should be sorted.
+  /// The optional [filters] parameter can be used to filter proposals based on various criteria.
+  /// Returns a stream of [Page] with [ProposalBriefData] that updates as the
+  /// underlying data changes.
   Stream<Page<ProposalBriefData>> watchProposalsBriefPageV2({
     required PageRequest request,
     ProposalsOrder order,
@@ -123,6 +131,12 @@ abstract interface class ProposalService {
   });
 
   Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
+  });
+
+  /// Similar to [watchProposalsBriefPageV2] but also includes local drafts of proposals
+  /// but do not support pagination.
+  Stream<List<ProposalBriefData>> watchWorkspaceProposalsBrief({
     ProposalsFiltersV2 filters,
   });
 }
@@ -467,6 +481,34 @@ final class ProposalServiceImpl implements ProposalService {
     return _proposalRepository.watchProposalsCountV2(filters: filters);
   }
 
+  @override
+  Stream<List<ProposalBriefData>> watchWorkspaceProposalsBrief({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    // Workspace only supports showing proposals for specific user.
+    final originalAuthor = filters.originalAuthor;
+    if (originalAuthor == null) {
+      return Stream.value(const <ProposalBriefData>[]);
+    }
+
+    // Workspace do not support pagination
+    const signedProposalsPageRequest = PageRequest(page: 0, size: 999);
+    final signedProposalsStream = watchProposalsBriefPageV2(
+      request: signedProposalsPageRequest,
+      filters: filters,
+    ).map((page) => page.items);
+
+    final localDraftProposalsStream = _proposalRepository.watchLocalDraftProposalsBrief(
+      author: originalAuthor,
+    );
+
+    return Rx.combineLatest2(
+      signedProposalsStream,
+      localDraftProposalsStream,
+      _mergePublishedAndLocalProposals,
+    );
+  }
+
   // Helper method to fetch versions for a proposal
   Future<List<ProposalVersion>> _getDetailVersionsOfProposal(ProposalData proposal) async {
     final versions = await _proposalRepository.queryVersionsOfId(
@@ -502,5 +544,26 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
+  }
+
+  List<ProposalBriefData> _mergePublishedAndLocalProposals(
+    List<ProposalBriefData> signed,
+    List<ProposalBriefData> localDrafts,
+  ) {
+    final documents = <String, ProposalBriefData>{
+      for (final doc in signed) doc.id.id: doc,
+    };
+
+    for (final localDraft in localDrafts) {
+      documents.update(
+        localDraft.id.id,
+        // if local draft has signed version, keep signed as main and append local draft as version
+        (value) => value.appendVersion(ref: localDraft.id, title: localDraft.title),
+        // if there is no signed version, add new entry
+        ifAbsent: () => localDraft,
+      );
+    }
+
+    return documents.values.sorted((a, b) => a.compareTo(b) * -1);
   }
 }
