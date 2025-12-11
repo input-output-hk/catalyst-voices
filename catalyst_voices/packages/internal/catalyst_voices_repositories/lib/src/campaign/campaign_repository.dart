@@ -32,10 +32,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
 
   @override
   Future<List<Campaign>> getAllCampaigns() async {
-    return [
-      Campaign.f15(),
-      Campaign.f14(),
-    ];
+    return Campaign.all;
   }
 
   @override

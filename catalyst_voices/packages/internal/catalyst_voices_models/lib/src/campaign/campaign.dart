@@ -100,10 +100,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
   }
 
   bool get isVotingStateActive {
-    return phaseStateTo(
-      CampaignPhaseType.communityVoting,
-      DateTimeExt.now(),
-    ).status.isActive;
+    return phaseStateTo(CampaignPhaseType.communityVoting).status.isActive;
   }
 
   @override
@@ -182,10 +179,13 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     return categories.any((element) => element.id.id == id);
   }
 
-  /// Returns the state of the campaign for a specific phase at given [date].
+  /// Returns the state of the campaign for a specific phase at given [date], which defaults to
+  /// [DateTimeExt.now].
   /// It's a shortcut for [state] when you are only interested in a specific phase. And want to know
   /// the status of that phase.
-  CampaignPhaseState phaseStateTo(CampaignPhaseType type, DateTime date) {
+  CampaignPhaseState phaseStateTo(CampaignPhaseType type, [DateTime? date]) {
+    date ??= DateTimeExt.now();
+
     final phase = timeline.phases.firstWhere(
       (phase) => phase.type == type,
       orElse: () => throw StateError('Type $type not found'),

@@ -224,10 +224,7 @@ final class VotingCubit extends Cubit<VotingState>
   }
 
   VotingPhaseProgressViewModel? _buildVotingPhase(Campaign? campaign) {
-    final campaignVotingPhase = campaign?.phaseStateTo(
-      CampaignPhaseType.communityVoting,
-      DateTimeExt.now(),
-    );
+    final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
     final campaignStartDate = campaign?.startDate;
 
     if (campaignVotingPhase != null && campaignStartDate != null) {

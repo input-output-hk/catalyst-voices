@@ -199,10 +199,7 @@ final class CampaignServiceImpl implements CampaignService {
 
   Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
     final proposalSubmissionTime = campaign
-        .phaseStateTo(
-          CampaignPhaseType.proposalSubmission,
-          DateTimeExt.now(),
-        )
+        .phaseStateTo(CampaignPhaseType.proposalSubmission)
         .phase
         .timeline
         .to;
