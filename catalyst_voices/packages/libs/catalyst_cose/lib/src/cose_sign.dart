@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/cose_constants.dart';
+import 'package:catalyst_cose/src/exception/cose_exception.dart';
 import 'package:catalyst_cose/src/types/cose_headers.dart';
 import 'package:cbor/cbor.dart';
 import 'package:collection/collection.dart';
@@ -133,40 +134,47 @@ final class CoseSign extends Equatable {
     required Uint8List payload,
     required List<CatalystCoseSigner> signers,
   }) async {
-    // TODO(dt-iohk): remove when server stops
-    // requiring alg header in body protected headers.
-    protectedHeaders = protectedHeaders.copyWith(
-      alg: () => signers.firstOrNull?.alg,
-    );
-
-    final signatures = <CoseSignature>[];
-    for (final signer in signers) {
-      final signatureProtectedHeaders = CoseHeaders.protected(
-        alg: signer.alg,
-        kid: await signer.kid,
+    try {
+      // TODO(dt-iohk): remove when server stops
+      // requiring alg header in body protected headers.
+      protectedHeaders = protectedHeaders.copyWith(
+        alg: () => signers.firstOrNull?.alg,
       );
 
-      final toBeSigned = _createCoseSignSigStructureBytes(
-        bodyProtectedHeaders: protectedHeaders,
-        signatureProtectedHeaders: signatureProtectedHeaders,
+      final signatures = <CoseSignature>[];
+      for (final signer in signers) {
+        final signatureProtectedHeaders = CoseHeaders.protected(
+          alg: signer.alg,
+          kid: await signer.kid,
+        );
+
+        final toBeSigned = _createCoseSignSigStructureBytes(
+          bodyProtectedHeaders: protectedHeaders,
+          signatureProtectedHeaders: signatureProtectedHeaders,
+          payload: payload,
+        );
+
+        final signature = CoseSignature(
+          protectedHeaders: signatureProtectedHeaders,
+          unprotectedHeaders: const CoseHeaders.unprotected(),
+          signature: await signer.sign(toBeSigned),
+        );
+
+        signatures.add(signature);
+      }
+
+      return CoseSign(
+        protectedHeaders: protectedHeaders,
+        unprotectedHeaders: unprotectedHeaders,
         payload: payload,
+        signatures: signatures,
       );
-
-      final signature = CoseSignature(
-        protectedHeaders: signatureProtectedHeaders,
-        unprotectedHeaders: const CoseHeaders.unprotected(),
-        signature: await signer.sign(toBeSigned),
+    } catch (error) {
+      throw CoseSignException(
+        message: 'Failed to create a CoseSign instance',
+        source: error,
       );
-
-      signatures.add(signature);
     }
-
-    return CoseSign(
-      protectedHeaders: protectedHeaders,
-      unprotectedHeaders: unprotectedHeaders,
-      payload: payload,
-      signatures: signatures,
-    );
   }
 
   static CborList _createCoseSignSigStructure({

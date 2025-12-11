@@ -188,6 +188,7 @@ final class Dependencies extends DependencyProvider {
           isRegistered<LoggingService>() ? get<LoggingService>() : null,
           get<DownloaderService>(),
           get<DocumentsService>(),
+          get<CampaignService>(),
         );
       })
       ..registerFactory<DocumentLookupBloc>(() {

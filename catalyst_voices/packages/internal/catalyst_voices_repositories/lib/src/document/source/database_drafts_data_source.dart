@@ -206,6 +206,10 @@ extension on String? {
 
 extension on DocumentData {
   LocalDocumentDraftEntity toEntity() {
+    final authors = metadata.authors ?? <CatalystId>[];
+    final authorsNames = authors.map((e) => e.username).toList();
+    final authorsSignificant = authors.map((e) => e.toSignificant()).toList();
+
     return LocalDocumentDraftEntity(
       content: content,
       contentType: metadata.contentType.value,
@@ -221,7 +225,9 @@ extension on DocumentData {
       templateVer: metadata.template?.ver,
       collaborators: metadata.collaborators ?? [],
       parameters: metadata.parameters,
-      authors: metadata.authors ?? [],
+      authors: authors,
+      authorsNames: authorsNames,
+      authorsSignificant: authorsSignificant,
       createdAt: metadata.id.ver!.dateTime,
     );
   }

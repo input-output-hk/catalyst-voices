@@ -111,7 +111,7 @@ final class Schema4 extends i0.VersionedSchema {
     ),
     alias: null,
   );
-  late final Shape0 localDocumentsDrafts = Shape0(
+  late final Shape4 localDocumentsDrafts = Shape4(
     source: i0.VersionedTable(
       entityName: 'local_documents_drafts',
       withoutRowId: false,
@@ -133,6 +133,8 @@ final class Schema4 extends i0.VersionedSchema {
         _column_12,
         _column_13,
         _column_14,
+        _column_22,
+        _column_23,
         _column_15,
       ],
       attachedDatabase: database,
@@ -425,6 +427,61 @@ i1.GeneratedColumn<bool> _column_21(String aliasedName) =>
       defaultConstraints: i1.GeneratedColumn.constraintIsAlways(
         'CHECK ("is_favorite" IN (0, 1))',
       ),
+    );
+
+class Shape4 extends i0.VersionedTable {
+  Shape4({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<i2.Uint8List> get content =>
+      columnsByName['content']! as i1.GeneratedColumn<i2.Uint8List>;
+  i1.GeneratedColumn<String> get authors =>
+      columnsByName['authors']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get collaborators =>
+      columnsByName['collaborators']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get contentType =>
+      columnsByName['content_type']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get parameters =>
+      columnsByName['parameters']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get refId =>
+      columnsByName['ref_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get refVer =>
+      columnsByName['ref_ver']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get replyId =>
+      columnsByName['reply_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get replyVer =>
+      columnsByName['reply_ver']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get section =>
+      columnsByName['section']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get templateId =>
+      columnsByName['template_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get templateVer =>
+      columnsByName['template_ver']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get type =>
+      columnsByName['type']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get ver =>
+      columnsByName['ver']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get authorsNames =>
+      columnsByName['authors_names']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get authorsSignificant =>
+      columnsByName['authors_significant']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<DateTime> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
+}
+
+i1.GeneratedColumn<String> _column_22(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'authors_names',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_23(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'authors_significant',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
     );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,

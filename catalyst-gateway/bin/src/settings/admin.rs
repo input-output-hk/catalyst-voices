@@ -10,7 +10,7 @@ use super::str_env_var::StringEnvVar;
 /// Configuration for the Admin functionality.
 #[derive(Clone)]
 pub(crate) struct EnvVars {
-    /// The Catalyst Signed Document Admin Catalyst ID from the `SIGNED_DOC_ADMIN_KEY`
+    /// The Catalyst Signed Document Admin Catalyst ID from the `ADMIN_CATALYST_ID`
     /// env.
     admin_key: Option<catalyst_signed_doc::CatalystId>,
 }
@@ -19,7 +19,7 @@ impl EnvVars {
     /// Create a config for Catalyst Signed Document validation configuration.
     pub(super) fn new() -> Self {
         let admin_key = string_to_catalyst_id(
-            &StringEnvVar::new_optional("SIGNED_DOC_ADMIN_KEY", false)
+            &StringEnvVar::new_optional("ADMIN_CATALYST_ID", false)
                 .map(|v| v.as_string())
                 .unwrap_or_default(),
         )

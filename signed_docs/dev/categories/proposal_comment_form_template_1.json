@@ -1,0 +1,46 @@
+{
+   "$id":"https://cardano.org/schemas/catalyst/comments",
+   "$schema":"http://json-schema.org/draft-07/schema#",
+   "definitions":{
+      "multiLineTextEntry":{
+         "$comment":"UI - Multiline text entry without any markup or rich text capability.",
+         "pattern":"^[\\S\\s]+$",
+         "type":"string",
+         "x-note":"Enter multiple lines of plain text. You can use line breaks but no special formatting."
+      }
+   },
+   "description":"Schema for comments on Catalyst proposals",
+   "maintainers":[
+      {
+         "name":"Catalyst Team",
+         "url":"https://projectcatalyst.io/"
+      }
+   ],
+   "properties":{
+      "comment":{
+         "description":"The comments on the proposal",
+         "properties":{
+            "content":{
+               "$ref":"#/definitions/multiLineTextEntry",
+               "description":"The comment text content",
+               "maxLength":2000,
+               "minLength":1
+            }
+         },
+         "required":[
+            "content"
+         ],
+         "type":"object"
+      }
+   },
+   "required":[
+      "comment"
+   ],
+   "title":"Proposal Comments Schema",
+   "type":"object",
+   "x-changelog":{
+      "2025-06-16":[
+         "Updating maxLength for content text"
+      ]
+   }
+}
