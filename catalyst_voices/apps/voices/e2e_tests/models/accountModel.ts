@@ -6,6 +6,7 @@ export class AccountModel {
     public password: string,
     public isProposer: boolean = false,
     public seedPhrase: string[] = [],
-    public isDummy: boolean = false
+    public isDummy: boolean = false,
+    public seedPhrasePath: string = ""
   ) {}
 }

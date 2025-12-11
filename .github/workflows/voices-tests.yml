@@ -4,13 +4,16 @@ on:
   workflow_call:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: write
+
 concurrency:
   group: voices-tests-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 env:
-  REPORT_EXT: .junit-report.xml
-  COVERAGE_EXT: .coverage.info
+  E2E_DIR: catalyst_voices/apps/voices/e2e_tests
 
 jobs:
   tests:
@@ -39,5 +42,63 @@ jobs:
         with:
           enable_caching: "true"
           version: 0.21.0
+
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
+      - name: Build all images (gateway, event-db, voices, e2e-test-runner)
+        id: build-images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./${{ env.E2E_DIR }}/+all-images
+
+      - name: Spin up Gateway and Voices
+        id: start-services
+        run: |
+          docker compose -f ${{ env.E2E_DIR }}/docker-compose.yml up nginx --detach
+          echo "Services started, waiting for them to initialize..."
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              break
+            fi
+            sleep 5
+          done
+
+          if [ "$STATUS" != "healthy" ]; then
+            docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+            exit 1
+          fi
+
+      - name: Run E2E tests
+        id: run-tests
+        run: |
+          docker compose -f ${{ env.E2E_DIR }}/docker-compose.yml run --rm e2e-test-runner
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ${{ env.E2E_DIR }}/playwright-report/
+          retention-days: 1
+
+      - name: Upload test results (JUnit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ${{ env.E2E_DIR }}/test-results/
+          retention-days: 1
