@@ -469,6 +469,10 @@ extension on DocumentDataMetadataDtoDbV3 {
   LocalDocumentDraftEntity toDraftEntity({
     required Map<String, dynamic> content,
   }) {
+    final authors = this.authors?.map(CatalystId.tryParse).nonNulls.toList() ?? [];
+    final authorsNames = authors.map((e) => e.username).toList();
+    final authorsSignificant = authors.map((e) => e.toSignificant()).toList();
+
     return LocalDocumentDraftEntity(
       contentType: contentType,
       id: id.id,
@@ -484,7 +488,9 @@ extension on DocumentDataMetadataDtoDbV3 {
       templateVer: template?.ver,
       collaborators: collaborators?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
       parameters: parameters?.toParameters() ?? const DocumentParameters(),
-      authors: authors?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
+      authors: authors,
+      authorsNames: authorsNames,
+      authorsSignificant: authorsSignificant,
       content: DocumentDataContent(content),
     );
   }
