@@ -742,7 +742,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   // all data (template, comments, versions, etc.) since UI may only need to
   // show "proposal is hidden". This would require RawProposalEntity to support
   // default/empty values for its fields or a separate HiddenProposalEntity.
-  Selectable<RawProposalEntity> _queryProposal(DocumentRef ref) {
+  Selectable<RawProposalEntity> _queryProposal(DocumentRef id) {
     final proposalColumns = _buildPrefixedColumns('p', 'p');
     final templateColumns = _buildPrefixedColumns('t', 't');
     final validActionsCTE = _getValidActionsCTE();
@@ -800,8 +800,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalTemplate.uuid),
         // WHERE clause
-        Variable.withString(ref.id),
-        Variable.withString(ref.ver ?? ''),
+        Variable.withString(id.id),
+        Variable.withString(id.ver ?? ''),
         Variable.withString(DocumentType.proposalDocument.uuid),
       ],
       readsFrom: {

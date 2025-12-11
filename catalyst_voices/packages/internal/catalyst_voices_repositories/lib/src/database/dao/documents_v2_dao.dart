@@ -306,46 +306,27 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
-    if (id.isLoose) {
-      final query = selectOnly(documentsV2)
-        ..addColumns([documentsV2.id, documentsV2.ver])
-        ..where(documentsV2.id.equals(id.id))
-        ..where(documentsV2.ver.equals(id.id))
-        ..limit(1);
-
-      return query
-          .map(
-            (row) => SignedDocumentRef.exact(
-              id: row.read(documentsV2.id)!,
-              ver: row.read(documentsV2.ver)!,
-            ),
-          )
-          .getSingleOrNull();
-    }
-
-    final inner = alias(documentsV2, 'inner');
-    final targetCreatedAt = subqueryExpression<DateTime>(
-      selectOnly(inner)
-        ..addColumns([inner.createdAt])
-        ..where(inner.id.equals(id.id))
-        ..where(inner.ver.equals(id.ver!)),
-    );
-
     final query = selectOnly(documentsV2)
       ..addColumns([documentsV2.id, documentsV2.ver])
-      ..where(documentsV2.id.equals(id.id))
-      ..where(documentsV2.createdAt.isSmallerThan(targetCreatedAt))
-      ..orderBy([OrderingTerm.desc(documentsV2.createdAt)])
+      ..where(documentsV2.id.equals(id.id));
+
+    if (id.isLoose) {
+      query.where(documentsV2.ver.equals(id.id));
+    } else {
+      query.where(documentsV2.ver.isSmallerThanValue(id.ver!));
+    }
+    query
+      ..orderBy([OrderingTerm.desc(documentsV2.ver)])
       ..limit(1);
 
-    return query
-        .map(
-          (row) => SignedDocumentRef.exact(
-            id: row.read(documentsV2.id)!,
-            ver: row.read(documentsV2.ver)!,
-          ),
-        )
-        .getSingleOrNull();
+    return query.map(
+      (row) {
+        return SignedDocumentRef.exact(
+          id: row.read(documentsV2.id)!,
+          ver: row.read(documentsV2.ver)!,
+        );
+      },
+    ).getSingleOrNull();
   }
 
   @override
