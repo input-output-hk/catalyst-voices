@@ -153,7 +153,8 @@ final class CatalystId extends Equatable {
   /// Objects which holds [CatalystId] can be uniquely identified only by
   /// comparing [role0Key] and [host] thus they're significant parts of
   /// [CatalystId].
-  @Deprecated('Use uid instead')
+  ///
+  /// If possible prefer [uid] as it's faster and do not create unnecessary objects.
   CatalystId toSignificant() => CatalystId(scheme: scheme, host: host, role0Key: role0Key);
 
   @override
