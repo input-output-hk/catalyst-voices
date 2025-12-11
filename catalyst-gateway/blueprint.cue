@@ -216,8 +216,8 @@ project: {
 									}
 									"CAT_GATEWAY_ADMIN_PRIVATE_KEY": {
 										secret: {
-											name: "setup-fund-documents"
-											key:  "cat-gateway-admin-private-key"
+											name: "gateway"
+											key:  "admin-private-key"
 										}
 									}
 								}
