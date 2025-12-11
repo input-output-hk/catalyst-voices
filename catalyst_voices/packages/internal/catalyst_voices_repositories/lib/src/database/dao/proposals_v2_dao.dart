@@ -712,9 +712,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
             ),
           ])
           ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
-          // TODO(damian-molinski): compare against authorsSignificant column.
           // comparing exact list since local drafts do have one author
-          ..where(localDocumentsDrafts.authors.equalsValue([author]))
+          ..where(localDocumentsDrafts.authorsSignificant.equalsValue([author.toSignificant()]))
           ..orderBy([OrderingTerm.desc(localDocumentsDrafts.createdAt)]);
 
     return query.map(

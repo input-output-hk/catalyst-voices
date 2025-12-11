@@ -27,6 +27,8 @@ final class LocalDocumentDraftFactory {
     id ??= DocumentRefFactory.randomUuidV7();
     ver ??= id;
     authors ??= const [];
+    final authorsNames = authors.map((e) => e.username).toList();
+    final authorsSignificant = authors.map((e) => e.toSignificant()).toList();
 
     return LocalDocumentDraftEntity(
       id: id,
@@ -36,6 +38,8 @@ final class LocalDocumentDraftFactory {
       createdAt: createdAt ?? ver.tryDateTime ?? DateTime.now(),
       type: type,
       authors: authors,
+      authorsNames: authorsNames,
+      authorsSignificant: authorsSignificant,
       refId: refId,
       refVer: refVer,
       replyId: replyId,
