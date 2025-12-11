@@ -32,8 +32,8 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
     int offset,
   });
 
-   @override
-     Future<List<DocumentData>> findAll({
+  @override
+  Future<List<DocumentData>> findAll({
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
