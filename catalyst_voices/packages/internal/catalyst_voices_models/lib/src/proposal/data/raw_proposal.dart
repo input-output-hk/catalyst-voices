@@ -13,7 +13,7 @@ class RawProposal extends Equatable {
   const RawProposal({
     required this.proposal,
     required this.template,
-    required this.actionType,
+    this.actionType,
     required this.versionIds,
     required this.commentsCount,
     required this.isFavorite,

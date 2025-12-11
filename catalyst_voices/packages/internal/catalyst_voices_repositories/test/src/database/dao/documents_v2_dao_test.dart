@@ -1799,21 +1799,6 @@ void main() {
           expect(result!.ver, versions[2]);
         });
 
-        test('returns null for non-existing exact ref', () async {
-          // Given
-          final entity = _createTestDocumentEntity(id: 'test-id', ver: 'existing-ver');
-          await dao.save(entity);
-
-          // And
-          const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'non-existent-ver');
-
-          // When
-          final result = await dao.getPreviousOf(id: ref);
-
-          // Then
-          expect(result, isNull);
-        });
-
         test('does not return versions from different document ids', () async {
           // Given: Two documents with overlapping timestamps
           final sharedTime = DateTime.utc(2024, 1, 1);

@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 class RawProposalEntity extends Equatable {
   final DocumentEntityV2 proposal;
   final DocumentEntityV2? template;
-  final ProposalSubmissionAction actionType;
   final List<String> versionIds;
   final int commentsCount;
   final bool isFavorite;
@@ -15,7 +14,6 @@ class RawProposalEntity extends Equatable {
   const RawProposalEntity({
     required this.proposal,
     required this.template,
-    required this.actionType,
     required this.versionIds,
     required this.commentsCount,
     required this.isFavorite,
@@ -26,7 +24,6 @@ class RawProposalEntity extends Equatable {
   List<Object?> get props => [
     proposal,
     template,
-    actionType,
     versionIds,
     commentsCount,
     isFavorite,
@@ -37,7 +34,6 @@ class RawProposalEntity extends Equatable {
     return RawProposal(
       proposal: proposal.toModel(),
       template: template?.toModel(),
-      actionType: actionType,
       versionIds: versionIds,
       commentsCount: commentsCount,
       isFavorite: isFavorite,
