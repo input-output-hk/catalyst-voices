@@ -17,6 +17,8 @@ final _logger = Logger('DocumentRepository');
 
 DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
+typedef DocumentFetcher<T, R extends DocumentRef> = Future<T?> Function(R ref);
+
 /// Base interface to interact with documents. This interface is used to allow interaction with any
 /// document type.
 abstract interface class DocumentRepository {
@@ -286,14 +288,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef id,
     bool useCache = true,
   }) async {
-    final documentData = switch (id) {
-      SignedDocumentRef() => await _getSignedDocumentData(ref: id, useCache: useCache),
-      DraftRef() when !useCache => throw DocumentNotFoundException(
-        ref: id,
-        message: '$id can not be resolved while not using cache',
-      ),
-      DraftRef() => await _getDraftDocumentData(ref: id),
-    };
+    final documentData = await _getDocumentByRef<DocumentData?>(
+      id: id,
+      useCache: useCache,
+      onSignedDocument: (ref) => _getSignedDocumentAndCache(ref: ref, useCache: useCache),
+      onDraft: _drafts.get,
+    );
 
     if (documentData == null) {
       throw DocumentNotFoundException(ref: id);
@@ -307,14 +307,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef id,
     bool useCache = true,
   }) async {
-    final metadata = switch (id) {
-      SignedDocumentRef() => await _getSignedDocumentMetadata(ref: id, useCache: useCache),
-      DraftRef() when !useCache => throw DocumentNotFoundException(
-        ref: id,
-        message: '$id can not be resolved while not using cache',
-      ),
-      DraftRef() => await _getDraftDocumentMetadata(ref: id),
-    };
+    final metadata = await _getDocumentByRef<DocumentDataMetadata?>(
+      id: id,
+      useCache: useCache,
+      onSignedDocument: (ref) => _getSignedDocumentAndCache(
+        ref: ref,
+        useCache: useCache,
+      ).then((document) => document?.metadata),
+      onDraft: _drafts.getMetadata,
+    );
 
     if (metadata == null) {
       throw DocumentNotFoundException(ref: id);
@@ -640,19 +641,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return _localDocuments.watch(referencing: referencing, type: type).distinct();
   }
 
-  Future<DocumentData?> _getDraftDocumentData({
-    required DraftRef ref,
+  /// Fetches document data and handles ref type switching and error handling.
+  ///
+  /// This helper consolidates the common logic for both [getDocumentData] and
+  /// [getDocumentMetadata].
+  Future<T?> _getDocumentByRef<T>({
+    required DocumentRef id,
+    bool useCache = true,
+    required DocumentFetcher<T, SignedDocumentRef> onSignedDocument,
+    required DocumentFetcher<T, DraftRef> onDraft,
   }) async {
-    return _drafts.get(ref);
+    return switch (id) {
+      SignedDocumentRef() => onSignedDocument(id),
+      DraftRef() when !useCache => throw DocumentNotFoundException(
+        ref: id,
+        message: '$id can not be resolved while not using cache',
+      ),
+      DraftRef() => onDraft(id),
+    };
   }
 
-  Future<DocumentDataMetadata?> _getDraftDocumentMetadata({
-    required DraftRef ref,
-  }) async {
-    return _drafts.getMetadata(ref);
-  }
-
-  Future<DocumentData?> _getSignedDocumentData({
+  Future<DocumentData?> _getSignedDocumentAndCache({
     required SignedDocumentRef ref,
     bool useCache = true,
   }) async {
@@ -676,34 +685,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     return document;
-  }
-
-  Future<DocumentDataMetadata?> _getSignedDocumentMetadata({
-    required SignedDocumentRef ref,
-    bool useCache = true,
-  }) async {
-    // if version is not specified we're asking remote for latest version
-    // if remote does not know about this id its probably draft so
-    // local will return latest version
-    if (!ref.isExact) {
-      final latestVersion = await _remoteDocuments.getLatestVersion(ref.id);
-      ref = ref.copyWith(ver: Optional(latestVersion));
-    }
-
-    final isCached = useCache && await _localDocuments.exists(id: ref);
-    if (isCached) {
-      return _localDocuments.getMetadata(ref);
-    }
-
-    // For remote documents, we need to fetch the full document
-    // and cache it to ensure consistency
-    final document = await _remoteDocuments.get(ref);
-
-    if (useCache && document != null) {
-      await _localDocuments.save(data: document);
-    }
-
-    return document?.metadata;
   }
 
   bool _isDocumentMetadataValid(DocumentData document) {

@@ -101,9 +101,7 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) {
-    return _database.documentsV2Dao
-        .getDocumentMetadata(id: ref) //
-        .then((value) => value?.toModel());
+    return _database.documentsV2Dao.getDocumentMetadata(id: ref).then((value) => value?.toModel());
   }
 
   @override
@@ -313,6 +311,8 @@ extension on DocumentData {
   }
 }
 
+// TODO(bstolinski): sync with https://github.com/input-output-hk/catalyst-voices/pull/3844/files#diff-c81017763e9494a99cf0e7a51d7380b8273475e691879910fdf19b0f68aa4981
+// after merging https://github.com/input-output-hk/catalyst-voices/pull/3844
 extension on DocumentsV2MetadataViewData {
   DocumentDataMetadata toModel() {
     return DocumentDataMetadata(

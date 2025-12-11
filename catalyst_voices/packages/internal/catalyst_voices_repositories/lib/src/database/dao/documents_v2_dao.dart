@@ -72,7 +72,7 @@ abstract interface class DocumentsV2Dao {
     CatalystId? originalAuthor,
   });
 
-  /// Retrieves only the metadata of a draft document, excluding the content blob.
+  /// Retrieves only the metadata of a signed document, excluding the content blob.
   ///
   /// This is an optimized query that skips fetching the potentially large
   /// content column from the database.
