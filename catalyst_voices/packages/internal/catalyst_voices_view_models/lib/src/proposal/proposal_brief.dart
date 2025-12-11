@@ -40,13 +40,13 @@ class ProposalBrief extends Equatable {
   factory ProposalBrief.fromData(ProposalBriefData data) {
     return ProposalBrief(
       id: data.id,
-      title: data.title,
-      categoryName: data.categoryName,
+      title: data.title ?? '',
+      categoryName: data.categoryName ?? '',
       author: data.author,
-      fundsRequested: data.fundsRequested,
-      duration: data.durationInMonths,
+      fundsRequested: data.fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      duration: data.durationInMonths ?? 0,
       publish: data.isFinal ? ProposalPublish.submittedProposal : ProposalPublish.publishedDraft,
-      description: data.description,
+      description: data.description ?? '',
       versionNumber: data.iteration,
       updateDate: data.createdAt,
       commentsCount: data.commentsCount,

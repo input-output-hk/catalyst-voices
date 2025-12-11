@@ -195,32 +195,33 @@ melos:
 
     test-native:
       run: |
-        melos exec --dir-exists="test" -- \ 
+        # Prevent thread exhaustion
+        melos exec --concurrency 5 --fail-fast --dir-exists="test" -- \
           ' TMP_ERR=$(mktemp)
-            flutter test --reporter github --no-pub 2> "$TMP_ERR"
-            
-            # store the exit code after running the tests,
-            # this is the exit code for the whole script
+            # Limits flutter test internal workers (adjust based on CI CPU cores)
+            flutter test --concurrency=2 --reporter github --no-pub 2> "$TMP_ERR"
+        
+            # store the exit code after running the tests
             TEST_EXIT_CODE=$?
-
+        
             # filter out irrelevant error messages and print everything else to the stderr
             grep -v "Waiting for another flutter command to release the startup lock" "$TMP_ERR" >&2
             rm -f "$TMP_ERR"
-
+        
             # exit with correct exit code
             exit $TEST_EXIT_CODE
           '
       description: |
-        Run `flutter test` for all packages
+        Run `flutter test` for all packages.
         Filters out irrelevant warning messages related to the startup lock.
 
     # catalyst_voices: this package should contain only widget tests
     test-web:
       run: |
-        melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
+        melos exec --concurrency 5 --fail-fast --dir-exists="test" --ignore="catalyst_voices" -- \
           ' TMP_ERR=$(mktemp)
-            flutter test --reporter github --platform chrome --no-pub 2> "$TMP_ERR"
-            
+            flutter test --concurrency=2 --reporter github --platform chrome --no-pub 2> "$TMP_ERR"
+        
             # store the exit code after running the tests,
             # this is the exit code for the whole script
             TEST_EXIT_CODE=$?
@@ -247,19 +248,20 @@ melos:
         mkdir $MELOS_ROOT_PATH/coverage
 
         # run tests, generate junit reports in /test_reports/ & code coverage report
-        melos exec --dir-exists="test" -- \
+        melos exec --concurrency 5 --fail-fast --dir-exists="test" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
           TMP_ERR=$(mktemp)
-          
-          flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2> "$TMP_ERR"
-            
+        
+          # to limit internal flutter test workers
+          flutter test --concurrency=2 --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2> "$TMP_ERR"
+        
           # store the exit code after running the tests,
           # this is the exit code for the whole script
           TEST_EXIT_CODE=$?
 
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE
-          
+        
           # filter out irrelevant error messages and print everything else to the stderr
           grep -v "Waiting for another flutter command to release the startup lock" "$TMP_ERR" >&2
           rm -f "$TMP_ERR"
@@ -309,19 +311,19 @@ melos:
         mkdir $MELOS_ROOT_PATH/coverage
 
         # run tests, generate junit reports in /test_reports/ & code coverage report
-        melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
+        melos exec --concurrency 5 --fail-fast --dir-exists="test" --ignore="catalyst_voices" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
           TMP_ERR=$(mktemp)
-          
-          flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2> "$TMP_ERR"
-            
+        
+          flutter test --concurrency=2 --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2> "$TMP_ERR"
+        
           # store the exit code after running the tests,
           # this is the exit code for the whole script
           TEST_EXIT_CODE=$?
 
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE
-          
+        
           # filter out irrelevant error messages and print everything else to the stderr
           grep -v "Waiting for another flutter command to release the startup lock" "$TMP_ERR" >&2
           rm -f "$TMP_ERR"

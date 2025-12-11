@@ -8,11 +8,13 @@ import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.d
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../utils/document_composite_factory.dart';
+import '../../utils/local_document_draft_factory.dart';
 import '../connection/test_connection.dart';
 import '../drift_test_platforms.dart';
 
@@ -6225,6 +6227,167 @@ void main() {
 
           await subscription.cancel();
         });
+        
+      group('getLocalDraftsProposalsBrief', () {
+        final author = _createTestAuthor(name: 'me', role0KeySeed: 1);
+        final otherAuthor = _createTestAuthor(name: 'other', role0KeySeed: 2);
+
+        test('returns empty list when no drafts exist', () async {
+          // Given: Empty local drafts table
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, isEmpty);
+        });
+
+        test('returns draft for specific author', () async {
+          // Given
+          final draft = _createTestLocalDraft(
+            id: 'draft-1',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+            contentData: {'title': 'My Draft'},
+          );
+          await db.localDocumentsV2Dao.saveAll([draft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.proposal.id, 'draft-1');
+          expect(result.first.proposal.content.data['title'], 'My Draft');
+          expect(result.first.originalAuthors, [author]);
+        });
+
+        test('filters out drafts from other authors', () async {
+          // Given
+          final myDraft = _createTestLocalDraft(
+            id: 'my-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+          );
+          final otherDraft = _createTestLocalDraft(
+            id: 'other-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [otherAuthor],
+          );
+          await db.localDocumentsV2Dao.saveAll([myDraft, otherDraft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.proposal.id, 'my-draft');
+        });
+
+        test('filters out non-proposal drafts', () async {
+          // Given
+          final proposalDraft = _createTestLocalDraft(
+            id: 'proposal-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            type: DocumentType.proposalDocument,
+            authors: [author],
+          );
+          final commentDraft = _createTestLocalDraft(
+            id: 'comment-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            type: DocumentType.commentDocument,
+            authors: [author],
+          );
+          await db.localDocumentsV2Dao.saveAll([proposalDraft, commentDraft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.proposal.id, 'proposal-draft');
+          expect(result.first.proposal.type, DocumentType.proposalDocument);
+        });
+
+        test('joins template information when available', () async {
+          // Given: A template in DocumentsV2
+          final templateVer = _buildUuidV7At(DateTime.now());
+          final template = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: templateVer,
+            type: DocumentType.proposalTemplate,
+            contentData: {'title': 'Fund 10 Template'},
+          );
+          await db.documentsV2Dao.save(template);
+
+          // And: A local draft referencing that template
+          final draft = _createTestLocalDraft(
+            id: 'draft-1',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+            templateId: 'template-1',
+            templateVer: templateVer,
+          );
+          await db.localDocumentsV2Dao.saveAll([draft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.template, isNotNull);
+          expect(result.first.template!.id, 'template-1');
+          expect(result.first.template!.content.data['title'], 'Fund 10 Template');
+        });
+
+        test('returns null template if template not found', () async {
+          // Given: A draft referencing a non-existent template
+          final draft = _createTestLocalDraft(
+            id: 'draft-1',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+            templateId: 'missing-template',
+            templateVer: 'missing-ver',
+          );
+          await db.localDocumentsV2Dao.saveAll([draft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.template, isNull);
+        });
+
+        test('correctly maps isFavorite status', () async {
+          // Given: Two drafts
+          final favDraft = _createTestLocalDraft(
+            id: 'fav-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+          );
+          final normalDraft = _createTestLocalDraft(
+            id: 'normal-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+          );
+          await db.localDocumentsV2Dao.saveAll([favDraft, normalDraft]);
+
+          // And: One marked as favorite
+          await dao.updateProposalFavorite(id: 'fav-draft', isFavorite: true);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(2));
+
+          final favResult = result.firstWhere((e) => e.proposal.id == 'fav-draft');
+          final normalResult = result.firstWhere((e) => e.proposal.id == 'normal-draft');
+
+          expect(favResult.isFavorite, isTrue);
+          expect(normalResult.isFavorite, isFalse);
+        });
       });
     },
     skip: driftSkip,
@@ -6268,6 +6431,42 @@ DocumentCompositeEntity _createTestDocumentEntity({
   List<DocumentRef>? parameters,
 }) {
   return DocumentCompositeFactory.create(
+    id: id,
+    ver: ver,
+    contentData: contentData,
+    type: type,
+    createdAt: createdAt,
+    authors: authors,
+    refId: refId,
+    refVer: refVer,
+    replyId: replyId,
+    replyVer: replyVer,
+    section: section,
+    templateId: templateId,
+    templateVer: templateVer,
+    parameters: parameters ?? [],
+    collaborators: collaborators ?? [],
+  );
+}
+
+LocalDocumentDraftEntity _createTestLocalDraft({
+  String? id,
+  String? ver,
+  Map<String, dynamic> contentData = const {},
+  DocumentType type = DocumentType.proposalDocument,
+  DateTime? createdAt,
+  List<CatalystId>? authors,
+  String? refId,
+  String? refVer,
+  String? replyId,
+  String? replyVer,
+  String? section,
+  String? templateId,
+  String? templateVer,
+  List<CatalystId>? collaborators,
+  List<DocumentRef>? parameters,
+}) {
+  return LocalDocumentDraftFactory.create(
     id: id,
     ver: ver,
     contentData: contentData,

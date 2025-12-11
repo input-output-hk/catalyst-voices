@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -211,6 +211,16 @@ final class DatabaseDocumentsDataSource
   }) {
     return _database.documentsV2Dao
         .watchDocuments(type: DocumentType.proposalTemplate, campaign: campaign)
+        .distinct(listEquals)
+        .map((event) => event.map((e) => e.toModel()).toList());
+  }
+
+  @override
+  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _database.proposalsV2Dao
+        .watchLocalDraftsProposalsBrief(author: author)
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
   }
