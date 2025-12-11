@@ -7,28 +7,28 @@ void main() {
     test('should generate first reference correctly', () {
       final draftRef = DraftRef.generateFirstRef();
       expect(draftRef.id, isNotEmpty);
-      expect(draftRef.version, equals(draftRef.id));
+      expect(draftRef.ver, equals(draftRef.id));
     });
 
     test('should return itself for nextVersion', () {
-      const draftRef = DraftRef(id: '123', version: 'v1');
+      const draftRef = DraftRef(id: '123', ver: 'v1');
       expect(draftRef.nextVersion(), same(draftRef));
     });
   });
 
   group(SignedDocumentRef, () {
     test('nextVersion should create a DraftRef with new version', () {
-      const signedRef = SignedDocumentRef(id: 'xyz', version: 'v1');
+      const signedRef = SignedDocumentRef(id: 'xyz', ver: 'v1');
       final nextDraft = signedRef.nextVersion();
 
       expect(nextDraft, isA<DraftRef>());
       expect(nextDraft.id, signedRef.id);
-      expect(nextDraft.version, isNot(equals(signedRef.version)));
+      expect(nextDraft.ver, isNot(equals(signedRef.ver)));
     });
 
     test('isValid should return true for SignedDocumentRef with specified version', () {
       final validSignedRef = SignedDocumentRef.generateFirstRef();
-      const invalidSignedRef = SignedDocumentRef(id: 'xyz', version: 'v1');
+      const invalidSignedRef = SignedDocumentRef(id: 'xyz', ver: 'v1');
 
       expect(validSignedRef.isExact, isTrue);
       expect(validSignedRef.isExact, isTrue);

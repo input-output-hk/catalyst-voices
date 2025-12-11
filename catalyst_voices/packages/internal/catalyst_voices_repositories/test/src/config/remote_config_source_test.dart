@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,9 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-  final CatGateway gateway = _MockedCatGateway();
-  final CatReviews reviews = _MockedCatReviews();
-  final CatStatus status = _MockedCatStatus();
+  final CatGateway gateway = MockCatGateway();
+  final CatReviews reviews = MockCatReviews();
+  final CatStatus status = MockedCatStatus();
+  final AppMetaService appMeta = MockedAppMetaService();
 
   late final ApiServices apiServices;
 
@@ -18,6 +20,7 @@ void main() {
       gateway: gateway,
       reviews: reviews,
       status: status,
+      appMeta: appMeta,
     );
 
     source = ApiConfigSource(apiServices);
@@ -97,9 +100,3 @@ void main() {
     });
   });
 }
-
-class _MockedCatGateway extends Mock implements CatGateway {}
-
-class _MockedCatReviews extends Mock implements CatReviews {}
-
-class _MockedCatStatus extends Mock implements CatStatus {}

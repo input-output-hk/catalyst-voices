@@ -47,7 +47,7 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
       spacing: 8,
       children: [
         ProposalCommentCard(
-          key: ValueKey('ProposalComment${comment.comment.metadata.selfRef}Card'),
+          key: ValueKey('ProposalComment${comment.comment.metadata.id}Card'),
           document: comment.comment,
           canReply: canReply,
           trimLines: 6,
@@ -75,7 +75,7 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
               children: [
                 for (final reply in comment.replies)
                   _RepliesCard(
-                    key: ValueKey('ReplyComment.${reply.comment.metadata.selfRef.id}'),
+                    key: ValueKey('ReplyComment.${reply.comment.metadata.id.id}'),
                     comment: reply,
                     showReplies: this.showReplies,
                     onSubmit: onSubmit,
@@ -94,7 +94,7 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
             ),
             child: ProposalCommentBuilder(
               schema: comment.comment.document.schema,
-              parent: comment.comment.metadata.selfRef,
+              parent: comment.comment.metadata.id,
               showCancel: true,
               onCancelTap: () => onToggleBuilder(false),
               onSubmit: onSubmit,

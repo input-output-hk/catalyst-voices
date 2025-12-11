@@ -4,7 +4,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 class ProposalBrief extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final String title;
   final String categoryName;
   final String? author;
@@ -16,9 +16,10 @@ class ProposalBrief extends Equatable {
   final DateTime updateDate;
   final int? commentsCount;
   final bool isFavorite;
+  final VoteButtonData? voteData;
 
   const ProposalBrief({
-    required this.selfRef,
+    required this.id,
     required this.title,
     required this.categoryName,
     this.author,
@@ -30,27 +31,40 @@ class ProposalBrief extends Equatable {
     required this.updateDate,
     this.commentsCount,
     this.isFavorite = false,
+    this.voteData,
   });
 
-  factory ProposalBrief.fromProposal(
-    Proposal proposal, {
-    bool isFavorite = false,
-    bool showComments = true,
-    String categoryName = '',
-  }) {
+  factory ProposalBrief.fromData(ProposalBriefData data) {
     return ProposalBrief(
-      selfRef: proposal.selfRef,
-      title: proposal.title,
-      categoryName: categoryName,
-      author: proposal.author,
-      fundsRequested: proposal.fundsRequested,
-      duration: proposal.duration,
-      publish: proposal.publish,
-      description: proposal.description,
-      versionNumber: proposal.versionNumber,
-      updateDate: proposal.updateDate,
-      commentsCount: showComments ? proposal.commentsCount : null,
-      isFavorite: isFavorite,
+      id: data.id,
+      title: data.title,
+      categoryName: data.categoryName,
+      author: data.authorName,
+      fundsRequested: data.fundsRequested,
+      duration: data.durationInMonths,
+      publish: data.isFinal ? ProposalPublish.submittedProposal : ProposalPublish.publishedDraft,
+      description: data.description,
+      versionNumber: data.iteration,
+      updateDate: data.createdAt,
+      commentsCount: data.commentsCount,
+      isFavorite: data.isFavorite,
+      voteData: data.votes.toViewModel(),
+    );
+  }
+
+  factory ProposalBrief.prototype() {
+    return ProposalBrief(
+      id: SignedDocumentRef.generateFirstRef(),
+      title: 'Proposal Title',
+      categoryName: 'Category Name',
+      author: 'Author Name',
+      fundsRequested: Money.zero(currency: Currencies.ada),
+      duration: 0,
+      publish: ProposalPublish.publishedDraft,
+      description: 'Proposal description',
+      versionNumber: 1,
+      updateDate: DateTime.now(),
+      commentsCount: 0,
     );
   }
 
@@ -60,7 +74,7 @@ class ProposalBrief extends Equatable {
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     title,
     categoryName,
     author,
@@ -72,10 +86,11 @@ class ProposalBrief extends Equatable {
     updateDate,
     commentsCount,
     isFavorite,
+    voteData,
   ];
 
   ProposalBrief copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
     String? title,
     String? categoryName,
     Optional<String>? author,
@@ -87,9 +102,10 @@ class ProposalBrief extends Equatable {
     DateTime? updateDate,
     Optional<int>? commentsCount,
     bool? isFavorite,
+    Optional<VoteButtonData>? voteData,
   }) {
     return ProposalBrief(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       title: title ?? this.title,
       categoryName: categoryName ?? this.categoryName,
       author: author.dataOr(this.author),
@@ -101,122 +117,20 @@ class ProposalBrief extends Equatable {
       updateDate: updateDate ?? this.updateDate,
       commentsCount: commentsCount.dataOr(this.commentsCount),
       isFavorite: isFavorite ?? this.isFavorite,
+      voteData: voteData.dataOr(this.voteData),
     );
   }
 }
 
-class ProposalBriefVoting extends ProposalBrief {
-  final VoteButtonData voteData;
-
-  const ProposalBriefVoting({
-    required super.selfRef,
-    required super.title,
-    required super.categoryName,
-    required super.fundsRequested,
-    required super.duration,
-    required super.publish,
-    required super.description,
-    required super.versionNumber,
-    required super.updateDate,
-    super.commentsCount,
-    super.isFavorite,
-    super.author,
-    required this.voteData,
-  });
-
-  factory ProposalBriefVoting.fromProposal(
-    Proposal proposal, {
-    bool isFavorite = false,
-    bool showComments = true,
-    String categoryName = '',
-    Vote? draftVote,
-    Vote? lastCastedVote,
-  }) {
-    return ProposalBriefVoting(
-      selfRef: proposal.selfRef,
-      title: proposal.title,
-      categoryName: categoryName,
-      author: proposal.author,
-      fundsRequested: proposal.fundsRequested,
-      duration: proposal.duration,
-      publish: proposal.publish,
-      description: proposal.description,
-      versionNumber: proposal.versionNumber,
-      updateDate: proposal.updateDate,
-      commentsCount: showComments ? proposal.commentsCount : null,
-      isFavorite: isFavorite,
-      voteData: VoteButtonData.fromVotes(
-        currentDraft: draftVote,
-        lastCasted: lastCastedVote,
-      ),
-    );
-  }
-
-  factory ProposalBriefVoting.fromProposalWithContext(
-    ProposalWithContext data, {
-    Vote? draftVote,
-    bool showComments = true,
-  }) {
-    final proposal = data.proposal;
-    final category = data.category;
-    final userContext = data.user;
-
-    return ProposalBriefVoting(
-      selfRef: proposal.selfRef,
-      title: proposal.title,
-      categoryName: category.formattedCategoryName,
-      author: proposal.author,
-      fundsRequested: proposal.fundsRequested,
-      duration: proposal.duration,
-      publish: proposal.publish,
-      description: proposal.description,
-      versionNumber: proposal.versionNumber,
-      updateDate: proposal.updateDate,
-      commentsCount: showComments ? proposal.commentsCount : null,
-      isFavorite: userContext.isFavorite,
-      voteData: VoteButtonData.fromVotes(
-        currentDraft: draftVote,
-        lastCasted: userContext.lastCastedVote,
-      ),
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-    ...super.props,
-    voteData,
-  ];
-
-  @override
-  ProposalBriefVoting copyWith({
-    DocumentRef? selfRef,
-    String? title,
-    String? categoryName,
-    Optional<String>? author,
-    Money? fundsRequested,
-    int? duration,
-    ProposalPublish? publish,
-    String? description,
-    int? versionNumber,
-    DateTime? updateDate,
-    Optional<int>? commentsCount,
-    bool? isFavorite,
-    VoteButtonData? voteData,
-  }) {
-    return ProposalBriefVoting(
-      selfRef: selfRef ?? this.selfRef,
-      title: title ?? this.title,
-      categoryName: categoryName ?? this.categoryName,
-      author: author.dataOr(this.author),
-      fundsRequested: fundsRequested ?? this.fundsRequested,
-      duration: duration ?? this.duration,
-      publish: publish ?? this.publish,
-      description: description ?? this.description,
-      versionNumber: versionNumber ?? this.versionNumber,
-      updateDate: updateDate ?? this.updateDate,
-      commentsCount: commentsCount.dataOr(this.commentsCount),
-      isFavorite: isFavorite ?? this.isFavorite,
-      voteData: voteData ?? this.voteData,
+extension on ProposalBriefDataVotes? {
+  VoteButtonData? toViewModel() {
+    final instance = this;
+    if (instance == null) {
+      return null;
+    }
+    return VoteButtonData.fromVotes(
+      currentDraft: instance.draft,
+      lastCasted: instance.casted,
     );
   }
 }

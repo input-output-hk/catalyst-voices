@@ -2,18 +2,52 @@ import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/workspace/user_proposals/user_proposal_section.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
-class UserProposals extends StatefulWidget {
-  final List<UsersProposalOverview> items;
-
-  const UserProposals({super.key, required this.items});
+class UserProposals extends StatelessWidget {
+  const UserProposals({super.key});
 
   @override
-  State<UserProposals> createState() => _UserProposalsState();
+  Widget build(BuildContext context) {
+    return const SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 32),
+      sliver: SliverMainAxisGroup(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: _Header(),
+          ),
+          SliverToBoxAdapter(
+            child: _Divider(),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 20),
+          ),
+          _UserSubmittedProposals(),
+          _UserDraftProposals(),
+          _UserLocalProposals(),
+          _UserInactiveProposals(),
+        ],
+      ),
+    );
+  }
+}
+
+class _Divider extends StatelessWidget {
+  const _Divider();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesDivider(
+      indent: 0,
+      endIndent: 0,
+      height: 24,
+      color: context.colorScheme.primary,
+    );
+  }
 }
 
 class _Header extends StatelessWidget {
@@ -28,67 +62,95 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _UserProposalsState extends State<UserProposals> {
-  Iterable<UsersProposalOverview> get _active => widget.items.where((e) => e.fromActiveCampaign);
-
-  List<UsersProposalOverview> get _draft => _active.where((e) => e.publish.isDraft).toList();
-
-  Iterable<UsersProposalOverview> get _inactive => widget.items.where((e) => !e.fromActiveCampaign);
-
-  List<UsersProposalOverview> get _local => _active.where((e) => e.publish.isLocal).toList();
-
-  List<UsersProposalOverview> get _submitted =>
-      _active.where((e) => e.publish.isPublished).toList();
+class _UserDraftProposals extends StatelessWidget {
+  const _UserDraftProposals();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _Header(),
-          VoicesDivider(
-            indent: 0,
-            endIndent: 0,
-            height: 24,
-            color: context.colorScheme.primary,
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
+      selector: (state) {
+        return state.userProposals.draftProposals;
+      },
+      builder: (context, proposals) {
+        return UserProposalSection(
+          items: proposals.items,
+          emptyTextMessage: context.l10n.noDraftUserProposals,
+          title: context.l10n.sharedForPublicInProgress,
+          info: context.l10n.sharedForPublicInfoMarkdown,
+          learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
+        );
+      },
+    );
+  }
+}
+
+class _UserInactiveProposals extends StatelessWidget {
+  const _UserInactiveProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
+      selector: (state) {
+        return state.userProposals.inactiveProposals;
+      },
+      builder: (context, proposals) {
+        if (proposals.items.isEmpty) {
+          return const SliverToBoxAdapter();
+        }
+        return UserProposalSection(
+          items: proposals.items,
+          emptyTextMessage: '',
+          title: context.l10n.notActiveCampaign,
+          info: context.l10n.notActiveCampaignInfoMarkdown,
+        );
+      },
+    );
+  }
+}
+
+class _UserLocalProposals extends StatelessWidget {
+  const _UserLocalProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
+      selector: (state) {
+        return state.userProposals.localProposals;
+      },
+      builder: (context, proposals) {
+        return UserProposalSection(
+          items: proposals.items,
+          emptyTextMessage: context.l10n.noLocalUserProposals,
+          title: context.l10n.notPublished,
+          info: context.l10n.notPublishedInfoMarkdown,
+          learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
+        );
+      },
+    );
+  }
+}
+
+class _UserSubmittedProposals extends StatelessWidget {
+  const _UserSubmittedProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
+      selector: (state) {
+        return state.userProposals.finalProposals;
+      },
+      builder: (context, proposals) {
+        return UserProposalSection(
+          items: proposals.items,
+          emptyTextMessage: context.l10n.noFinalUserProposals,
+          title: context.l10n.submittedForReview(
+            proposals.items.length,
+            ProposalDocument.maxSubmittedProposalsPerUser,
           ),
-          const SizedBox(height: 20),
-          UserProposalSection(
-            items: _submitted,
-            emptyTextMessage: context.l10n.noFinalUserProposals,
-            title: context.l10n.submittedForReview(
-              _submitted.length,
-              ProposalDocument.maxSubmittedProposalsPerUser,
-            ),
-            info: context.l10n.submittedForReviewInfoMarkdown,
-            learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
-          ),
-          UserProposalSection(
-            items: _draft,
-            emptyTextMessage: context.l10n.noDraftUserProposals,
-            title: context.l10n.sharedForPublicInProgress,
-            info: context.l10n.sharedForPublicInfoMarkdown,
-            learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
-          ),
-          UserProposalSection(
-            items: _local,
-            emptyTextMessage: context.l10n.noLocalUserProposals,
-            title: context.l10n.notPublished,
-            info: context.l10n.notPublishedInfoMarkdown,
-            learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
-          ),
-          if (_inactive.isNotEmpty)
-            UserProposalSection(
-              items: _inactive.toList(),
-              emptyTextMessage: '',
-              title: context.l10n.notActiveCampaign,
-              info: context.l10n.notActiveCampaignInfoMarkdown,
-            ),
-        ],
-      ),
+          info: context.l10n.submittedForReviewInfoMarkdown,
+          learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
+        );
+      },
     );
   }
 }

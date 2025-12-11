@@ -41,19 +41,19 @@ class StandardLinksPageFooter extends StatelessWidget {
       ],
       lowerChildren: [
         VoicesIconButton(
-          child: VoicesAssets.images.facebookMono.buildIcon(),
+          child: VoicesAssets.images.svg.facebookMono.buildIcon(),
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Facebook')));
           },
         ),
         VoicesIconButton(
-          child: VoicesAssets.images.linkedinMono.buildIcon(),
+          child: VoicesAssets.images.svg.linkedinMono.buildIcon(),
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('LinkedIn')));
           },
         ),
         VoicesIconButton(
-          child: VoicesAssets.images.xMono.buildIcon(),
+          child: VoicesAssets.images.svg.xMono.buildIcon(),
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('X')));
           },

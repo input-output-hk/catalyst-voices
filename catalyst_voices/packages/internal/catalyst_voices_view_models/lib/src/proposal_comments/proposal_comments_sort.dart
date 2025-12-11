@@ -26,7 +26,7 @@ enum ProposalCommentsSort {
           );
         })
         .sortedByCompare(
-          (element) => element.comment.metadata.selfRef,
+          (element) => element.comment.metadata.id,
           (a, b) => switch (this) {
             ProposalCommentsSort.newest => a.compareTo(b) * -1,
             ProposalCommentsSort.oldest => a.compareTo(b),

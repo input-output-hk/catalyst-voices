@@ -194,7 +194,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                   Offstage(
                     offstage: !widget.proposal.hasNewerLocalIteration,
                     child: _Actions(
-                      ref: widget.proposal.versions.first.selfRef,
+                      ref: widget.proposal.versions.first.id,
                     ),
                   ),
                 ],

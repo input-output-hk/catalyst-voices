@@ -15,7 +15,7 @@ class KeychainPicture extends StatelessWidget {
     return TaskPicture(
       child: TaskPictureIconBox(
         type: type,
-        child: VoicesAssets.images.keychain.buildIcon(allowSize: false),
+        child: VoicesAssets.images.svg.keychain.buildIcon(allowSize: false),
       ),
     );
   }

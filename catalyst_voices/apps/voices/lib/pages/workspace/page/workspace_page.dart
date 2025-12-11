@@ -32,21 +32,23 @@ class _WorkspacePageState extends State<WorkspacePage>
   Widget build(BuildContext context) {
     return const ProposalSubmissionPhaseAware(
       activeChild: Scaffold(
-        body: WorkspaceLoadingSelector(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: 10),
-                WorkspaceHeader(),
-                Stack(
-                  children: [
-                    WorkspaceErrorSelector(),
-                    WorkspaceUserProposalsSelector(),
-                  ],
-                ),
-                SizedBox(height: 50),
-              ],
-            ),
+        body: WorkspaceLoading(
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: SizedBox(height: 10),
+              ),
+              SliverToBoxAdapter(
+                child: WorkspaceHeader(),
+              ),
+              SliverToBoxAdapter(
+                child: WorkspaceError(),
+              ),
+              WorkspaceUserProposals(),
+              SliverToBoxAdapter(
+                child: SizedBox(height: 50),
+              ),
+            ],
           ),
         ),
       ),

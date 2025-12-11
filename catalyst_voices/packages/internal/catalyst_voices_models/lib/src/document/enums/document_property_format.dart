@@ -28,73 +28,18 @@ base class DocumentCurrencyFormat extends DocumentPropertyFormat {
   @override
   List<Object?> get props => super.props + [currency, moneyUnits];
 
-  /// Parses the [DocumentCurrencyFormat] from a [format].
-  /// Returns `null` if format is unrecognized.
-  ///
-  /// Format:
-  /// - token|fiat[:$brand]:$code[:$cent]
-  ///
-  /// Examples:
-  /// - token:cardano:ada
-  /// - token:cardano:ada:lovelace
-  /// - token:usdm
-  /// - token:usdm:cent
-  /// - fiat:usd
-  /// - fiat:usd:cent
-  /// - fiat:eur
-  /// - fiat:eur:cent
+  /// Parses the [DocumentCurrencyFormat] from a [format] unit [MoneyFormat].
   static DocumentCurrencyFormat? parse(String format) {
-    final parts = format.split(':');
-    return switch (parts) {
-      [final type, _, final code, final minor]
-          when _isValidType(type) && _isValidMinorUnits(minor) =>
-        _createFormat(format, code, MoneyUnits.minorUnits),
-
-      [final type, final code, final minor] when _isValidType(type) && _isValidMinorUnits(minor) =>
-        _createFormat(format, code, MoneyUnits.minorUnits),
-
-      [final type, _, final code] when _isValidType(type) => _createFormat(
-        format,
-        code,
-        MoneyUnits.majorUnits,
-      ),
-
-      [final type, final code] when _isValidType(type) => _createFormat(
-        format,
-        code,
-        MoneyUnits.majorUnits,
-      ),
-      _ => null,
-    };
-  }
-
-  static DocumentCurrencyFormat? _createFormat(
-    String format,
-    String currencyCode,
-    MoneyUnits moneyUnits,
-  ) {
-    final currency = Currency.fromCode(currencyCode);
-    if (currency == null) {
+    final moneyFormat = MoneyFormat.parse(format);
+    if (moneyFormat == null) {
       return null;
     }
+
     return DocumentCurrencyFormat(
       format,
-      currency: currency,
-      moneyUnits: moneyUnits,
+      currency: moneyFormat.currency,
+      moneyUnits: moneyFormat.moneyUnits,
     );
-  }
-
-  /// Checks if a string identifies a minor currency unit.
-  static bool _isValidMinorUnits(String minorUnits) {
-    return switch (minorUnits) {
-      'cent' || 'penny' || 'lovelace' || 'sat' || 'wei' => true,
-      _ => false,
-    };
-  }
-
-  /// Checks if the type is 'fiat' or 'token'.
-  static bool _isValidType(String type) {
-    return type == 'fiat' || type == 'token';
   }
 }
 

@@ -27,6 +27,8 @@ final class AppConfig extends Equatable {
   final DatabaseConfig database;
   final SentryConfig sentry;
   final BlockchainConfig blockchain;
+  final StressTestConfig stressTest;
+  final CatalystDeveloperProfilerConfig profiler;
 
   const AppConfig({
     required this.version,
@@ -34,6 +36,8 @@ final class AppConfig extends Equatable {
     required this.database,
     required this.sentry,
     required this.blockchain,
+    required this.stressTest,
+    required this.profiler,
   });
 
   AppConfig.dev()
@@ -64,6 +68,8 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
+        stressTest: const StressTestConfig(),
+        profiler: const CatalystDeveloperProfilerConfig(),
       );
 
   factory AppConfig.env(AppEnvironmentType env) {
@@ -103,6 +109,8 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
+        stressTest: const StressTestConfig(),
+        profiler: const CatalystDeveloperProfilerConfig(),
       );
 
   AppConfig.prod()
@@ -133,6 +141,8 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.mainnet(),
         ),
+        stressTest: const StressTestConfig(),
+        profiler: const CatalystDeveloperProfilerConfig(),
       );
 
   @override
@@ -142,6 +152,8 @@ final class AppConfig extends Equatable {
     database,
     sentry,
     blockchain,
+    stressTest,
+    profiler,
   ];
 
   AppConfig copyWith({
@@ -150,6 +162,8 @@ final class AppConfig extends Equatable {
     DatabaseConfig? database,
     SentryConfig? sentry,
     BlockchainConfig? blockchain,
+    StressTestConfig? stressTest,
+    CatalystDeveloperProfilerConfig? profiler,
   }) {
     return AppConfig(
       version: version ?? this.version,
@@ -157,6 +171,8 @@ final class AppConfig extends Equatable {
       database: database ?? this.database,
       sentry: sentry ?? this.sentry,
       blockchain: blockchain ?? this.blockchain,
+      stressTest: stressTest ?? this.stressTest,
+      profiler: profiler ?? this.profiler,
     );
   }
 }
@@ -216,6 +232,15 @@ final class CacheConfig extends Equatable {
   }
 }
 
+/// Database configuration for the application.
+///
+/// IMPORTANT: Web asset versioning notes:
+/// - [webSqlite3Wasm] and [webDriftWorker] files require manual versioning
+/// - These filenames are hardcoded here and compiled into the app during build
+/// - The automatic versioning script runs AFTER `flutter build web`, so it cannot
+///   update these hardcoded references
+/// - When these files change, manually rename them with a version suffix
+///   (e.g., 'sqlite3.v2.wasm') and update the filenames here BEFORE building
 final class DatabaseConfig extends Equatable {
   final String name;
   final String webSqlite3Wasm;
@@ -223,8 +248,8 @@ final class DatabaseConfig extends Equatable {
 
   const DatabaseConfig({
     this.name = 'catalyst_db',
-    this.webSqlite3Wasm = 'sqlite3.wasm',
-    this.webDriftWorker = 'drift_worker.js',
+    this.webSqlite3Wasm = 'sqlite3.v1.wasm',
+    this.webDriftWorker = 'drift_worker.v1.js',
   });
 
   @override
@@ -329,5 +354,35 @@ final class SentryConfig extends ReportingServiceConfig {
       attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
       diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,
     );
+  }
+}
+
+final class StressTestConfig extends Equatable {
+  const StressTestConfig();
+
+  bool get clearDatabase => const bool.fromEnvironment('STRESS_TEST_CLEAR_DB');
+
+  bool get decompressedDocuments => const bool.fromEnvironment('STRESS_TEST_DECOMPRESSED');
+
+  int get indexedProposalsCount {
+    return const int.fromEnvironment(
+      'STRESS_TEST_PROPOSAL_INDEX_COUNT',
+      defaultValue: 100,
+    );
+  }
+
+  bool get isEnabled => const bool.fromEnvironment('STRESS_TEST');
+
+  @override
+  List<Object?> get props => [];
+
+  @override
+  String toString() {
+    return 'StressTestConfig('
+        'isEnabled[$isEnabled], '
+        'indexedProposalsCount[$indexedProposalsCount], '
+        'decompressedDocuments[$decompressedDocuments], '
+        'clearDatabase[$clearDatabase]'
+        ')';
   }
 }

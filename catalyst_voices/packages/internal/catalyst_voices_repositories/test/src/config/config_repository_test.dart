@@ -116,6 +116,24 @@ void main() {
       expect(slotNumberConfig.systemStartSlot, systemStartSlot);
       expect(slotNumberConfig.slotLength, slotLength);
     });
+
+    test('invalid Sentry DSN falls back to default config', () async {
+      // Given
+      final configJson = jsonDecode(Configs.invalidSentryDsn) as Map<String, dynamic>;
+      final remoteConfig = RemoteConfig.fromJson(configJson);
+
+      const env = AppEnvironmentType.dev;
+      final expectedConfig = AppConfig.dev();
+
+      // When
+      when(remoteSource.get).thenAnswer((_) => Future.value(remoteConfig));
+
+      final config = await repository.getConfig(env: env);
+
+      // Then
+      expect(config.sentry.dsn, expectedConfig.sentry.dsn);
+      expect(config.sentry.environment, expectedConfig.sentry.environment);
+    });
   });
 }
 

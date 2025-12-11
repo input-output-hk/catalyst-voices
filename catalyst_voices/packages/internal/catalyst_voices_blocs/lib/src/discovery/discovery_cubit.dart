@@ -1,13 +1,17 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/discovery/discovery_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 const _maxRecentProposalsCount = 7;
+const List<CampaignPhaseType> _offstagePhases = [CampaignPhaseType.reviewRegistration];
+
 final _logger = Logger('DiscoveryCubit');
 
 /// Manages all data for the discovery screen.
@@ -16,20 +20,21 @@ final _logger = Logger('DiscoveryCubit');
 class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  final FeatureFlagsService _featureFlagsService;
 
-  StreamSubscription<List<Proposal>>? _proposalsSub;
-  StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
+  DiscoveryCubitCache _cache = const DiscoveryCubitCache();
+
+  StreamSubscription<List<ProposalBrief>>? _proposalsV2Sub;
+  StreamSubscription<Campaign?>? _activeCampaignSub;
+  StreamSubscription<CampaignTotalAsk>? _activeCampaignTotalAskSub;
 
   DiscoveryCubit(
     this._campaignService,
     this._proposalService,
-    this._featureFlagsService,
-  ) : super(DiscoveryState());
+  ) : super(const DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
-      await _proposalService.addFavoriteProposal(ref: ref);
+      await _proposalService.addFavoriteProposal(id: ref);
     } catch (e, st) {
       _logger.severe('Error adding favorite', e, st);
       emitError(LocalizedException.create(e));
@@ -38,98 +43,47 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   @override
   Future<void> close() async {
-    await _proposalsSub?.cancel();
-    _proposalsSub = null;
+    await _proposalsV2Sub?.cancel();
+    _proposalsV2Sub = null;
 
-    await _favoritesProposalsIdsSub?.cancel();
-    _favoritesProposalsIdsSub = null;
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
+
+    await _activeCampaignTotalAskSub?.cancel();
+    _activeCampaignTotalAskSub = null;
 
     return super.close();
   }
 
   Future<void> getAllData() async {
-    await Future.wait([
-      getCurrentCampaign(),
-      getMostRecentProposals(),
-    ]);
+    getMostRecentProposals();
+    await getCurrentCampaign();
   }
 
   Future<void> getCurrentCampaign() async {
     try {
-      emit(
-        state.copyWith(
-          campaign: DiscoveryCurrentCampaignState(),
-          categories: const DiscoveryCampaignCategoriesState(),
-        ),
-      );
-      final campaign = (await _campaignService.getActiveCampaign())!;
-      final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
-      final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
-      final categoriesModel = campaign.categories
-          .map(CampaignCategoryDetailsViewModel.fromModel)
-          .toList();
+      emit(state.copyWith(campaign: const DiscoveryCampaignState(isLoading: true)));
+
+      final campaign = await _campaignService.getActiveCampaign();
 
       if (!isClosed) {
-        emit(
-          state.copyWith(
-            campaign: DiscoveryCurrentCampaignState(
-              currentCampaign: currentCampaign,
-              campaignTimeline: timeline,
-              isLoading: false,
-            ),
-            categories: DiscoveryCampaignCategoriesState(
-              isLoading: false,
-              categories: categoriesModel,
-            ),
-          ),
-        );
+        _handleActiveCampaignChange(campaign);
+        _watchActiveCampaign();
       }
     } catch (e, st) {
       _logger.severe('Error getting current campaign', e, st);
 
       if (!isClosed) {
-        emit(
-          state.copyWith(
-            categories: DiscoveryCampaignCategoriesState(error: LocalizedException.create(e)),
-            campaign: DiscoveryCurrentCampaignState(error: LocalizedException.create(e)),
-          ),
-        );
+        final campaignState = DiscoveryCampaignState(error: LocalizedException.create(e));
+        emit(state.copyWith(campaign: campaignState));
       }
     }
   }
 
-  Future<void> getMostRecentProposals() async {
-    try {
-      unawaited(_proposalsSub?.cancel());
-      unawaited(_favoritesProposalsIdsSub?.cancel());
+  void getMostRecentProposals() {
+    emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
 
-      emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
-      final campaign = await _campaignService.getActiveCampaign();
-      final showComments = _showComments(campaign);
-      if (!isClosed) {
-        _proposalsSub = _buildProposalsSub();
-        _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
-
-        emit(
-          state.copyWith(
-            proposals: state.proposals.copyWith(
-              isLoading: false,
-              showComments: showComments,
-            ),
-          ),
-        );
-      }
-    } catch (e, st) {
-      _logger.severe('Error getting most recent proposals', e, st);
-
-      if (!isClosed) {
-        emit(
-          state.copyWith(
-            proposals: DiscoveryMostRecentProposalsState(error: LocalizedException.create(e)),
-          ),
-        );
-      }
-    }
+    _watchMostRecentProposals();
   }
 
   Future<void> removeFavorite(DocumentRef ref) async {
@@ -141,80 +95,133 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     }
   }
 
-  StreamSubscription<List<String>> _buildFavoritesProposalsIdsSub() {
-    _logger.info('Building favorites proposals ids subscription');
+  CampaignDatesEventsState _buildCampaignDatesEventsState(List<CampaignTimelineViewModel> data) {
+    final reviewReg = data.firstWhereOrNull((e) => e.type.isReviewRegistration);
+    final communityRev = data.firstWhereOrNull((e) => e.type.isCommunityReview);
+    final reviewPhases = [?reviewReg, ?communityRev];
 
-    return _proposalService
-        .watchFavoritesProposalsIds()
-        .distinct(listEquals)
-        .listen(
-          _emitFavoritesIds,
-          onError: _emitMostRecentError,
-        );
-  }
-
-  StreamSubscription<List<Proposal>> _buildProposalsSub() {
-    _logger.fine('Building proposals subscription');
-
-    return _proposalService
-        .watchProposalsPage(
-          request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
-          filters: ProposalsFilters.forActiveCampaign(),
-          order: const UpdateDate(isAscending: false),
-        )
-        .map((event) => event.items)
-        .distinct(listEquals)
-        .listen(_handleProposals, onError: _emitMostRecentError);
-  }
-
-  void _emitFavoritesIds(List<String> ids) {
-    emit(state.copyWith(proposals: state.proposals.updateFavorites(ids)));
-  }
-
-  void _emitMostRecentError(Object error, StackTrace stackTrace) {
-    _logger.severe('Loading recent proposals emitted', error, stackTrace);
-
-    emit(
-      state.copyWith(
-        proposals: state.proposals.copyWith(
-          isLoading: false,
-          error: LocalizedException.create(error),
-          proposals: const [],
-        ),
-      ),
-    );
-  }
-
-  void _emitMostRecentProposals(List<Proposal> proposals) {
-    final proposalList = proposals
-        .map(
-          (e) => ProposalBrief.fromProposal(
-            e,
-            isFavorite: state.proposals.favoritesIds.contains(e.selfRef.id),
-            showComments: state.proposals.showComments,
-          ),
-        )
+    final reviewItems = reviewPhases
+        .map((e) => CampaignTimelineEventWithTitle(dateRange: e.timeline, type: e.type))
         .toList();
 
-    emit(
-      state.copyWith(
-        proposals: state.proposals.copyWith(
-          isLoading: false,
-          proposals: proposalList,
-        ),
-      ),
+    final votingReg = data.firstWhereOrNull((e) => e.type.isVotingRegistration);
+    final communityVoting = data.firstWhereOrNull((e) => e.type.isCommunityVoting);
+    final votingPhases = [?votingReg, ?communityVoting];
+
+    final votingItems = votingPhases
+        .map((e) => CampaignTimelineEventWithTitle(dateRange: e.timeline, type: e.type))
+        .toList();
+
+    return CampaignDatesEventsState(
+      reviewTimelineItems: reviewItems,
+      votingTimelineItems: votingItems,
     );
   }
 
-  Future<void> _handleProposals(List<Proposal> proposals) async {
-    _logger.info('Got proposals: ${proposals.length}');
+  void _handleActiveCampaignChange(Campaign? campaign) {
+    if (_cache.activeCampaign?.id == campaign?.id) {
+      return;
+    }
 
-    _emitMostRecentProposals(proposals);
+    _cache = _cache.copyWith(
+      activeCampaign: Optional(campaign),
+      campaignTotalAsk: const Optional.empty(),
+    );
+
+    _updateCampaignState();
+
+    unawaited(_activeCampaignTotalAskSub?.cancel());
+    _activeCampaignTotalAskSub = null;
+
+    if (campaign != null) _watchCampaignTotalAsk(campaign);
   }
 
-  bool _showComments(Campaign? campaign) {
-    if (campaign == null) return false;
+  void _handleCampaignTotalAskChange(CampaignTotalAsk data) {
+    _logger.finest('Campaign total ask changed: $data');
+    _cache = _cache.copyWith(campaignTotalAsk: Optional(data));
+    _updateCampaignState();
+  }
 
-    return !(_featureFlagsService.isEnabled(Features.voting) && campaign.isVotingStateActive);
+  void _handleProposalsChange(List<ProposalBrief> proposals) {
+    _logger.finest('Got proposals[${proposals.length}]');
+
+    final updatedProposalsState = state.proposals.copyWith(
+      proposals: proposals,
+      showSection: proposals.length == _maxRecentProposalsCount,
+    );
+
+    emit(state.copyWith(proposals: updatedProposalsState));
+  }
+
+  void _updateCampaignState() {
+    final campaign = _cache.activeCampaign;
+    final campaignTotalAsk = _cache.campaignTotalAsk ?? const CampaignTotalAsk(categoriesAsks: {});
+
+    final phases = campaign?.timeline.phases ?? [];
+    final timeline = phases
+        .where((phase) => !_offstagePhases.contains(phase.type))
+        .map(CampaignTimelineViewModel.fromModel)
+        .toList();
+    final datesEvents = _buildCampaignDatesEventsState(timeline);
+
+    final currentCampaign = CurrentCampaignInfoViewModel(
+      title: campaign?.name ?? '',
+      allFunds: campaign?.allFunds ?? MultiCurrencyAmount.zero(),
+      totalAsk: campaignTotalAsk.totalAsk,
+      timeline: timeline,
+    );
+
+    final categories = campaign?.categories ?? [];
+    final categoriesModel = categories.map(
+      (category) {
+        final categoryTotalAsk =
+            campaignTotalAsk.categoriesAsks[category.id] ??
+            CampaignCategoryTotalAsk.zero(category.id);
+
+        return CampaignCategoryDetailsViewModel.fromModel(
+          category,
+          finalProposalsCount: categoryTotalAsk.finalProposalsCount,
+          totalAsk: categoryTotalAsk.totalAsk,
+        );
+      },
+    ).toList();
+
+    final campaignState = DiscoveryCampaignState(
+      currentCampaign: currentCampaign,
+      campaignTimeline: timeline,
+      categories: categoriesModel,
+      datesEvents: datesEvents,
+    );
+
+    emit(state.copyWith(campaign: campaignState));
+  }
+
+  void _watchActiveCampaign() {
+    unawaited(_activeCampaignSub?.cancel());
+
+    _activeCampaignSub = _campaignService.watchActiveCampaign
+        .distinct((previous, next) => previous?.id != next?.id)
+        .listen(_handleActiveCampaignChange);
+  }
+
+  void _watchCampaignTotalAsk(Campaign campaign) {
+    final filters = ProposalsTotalAskFilters(campaign: CampaignFilters.from(campaign));
+    _activeCampaignTotalAskSub = _campaignService
+        .watchCampaignTotalAsk(filters: filters)
+        .distinct()
+        .listen(_handleCampaignTotalAskChange);
+  }
+
+  void _watchMostRecentProposals() {
+    unawaited(_proposalsV2Sub?.cancel());
+
+    _proposalsV2Sub = _proposalService
+        .watchProposalsBriefPageV2(
+          request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
+        )
+        .map((page) => page.items)
+        .distinct(listEquals)
+        .map((items) => items.map(ProposalBrief.fromData).toList())
+        .listen(_handleProposalsChange);
   }
 }

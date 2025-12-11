@@ -43,7 +43,7 @@ final class DocumentsCommentRepository implements CommentRepository {
   Future<CommentTemplate> getCommentTemplate({
     required SignedDocumentRef ref,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(ref: ref);
+    final documentData = await _documentRepository.getDocumentData(id: ref);
 
     return _buildCommentTemplate(documentData: documentData);
   }
@@ -54,6 +54,7 @@ final class DocumentsCommentRepository implements CommentRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
+    /*
     final ref = document.metadata.ref;
     final reply = document.metadata.reply;
     final categoryId = document.metadata.categoryId;
@@ -70,8 +71,8 @@ final class DocumentsCommentRepository implements CommentRepository {
     final metadata = SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
       documentType: DocumentType.commentDocument,
-      id: document.metadata.id,
-      ver: document.metadata.version,
+      id: document.metadata.id.id,
+      ver: document.metadata.id.ver,
       ref: SignedDocumentMetadataRef.fromDocumentRef(ref!),
       template: SignedDocumentMetadataRef.fromDocumentRef(
         document.metadata.template!,
@@ -79,10 +80,15 @@ final class DocumentsCommentRepository implements CommentRepository {
       reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
       categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId!),
     );
+*/
+    assert(
+      document.metadata.ref != null,
+      'CommentDocument have to have a ref to other document',
+    );
 
     final signedDocument = await _signedDocumentManager.signDocument(
-      payload,
-      metadata: metadata,
+      SignedDocumentJsonPayload(document.content.data),
+      metadata: document.metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -105,7 +111,7 @@ final class DocumentsCommentRepository implements CommentRepository {
         .watchDocuments(
           type: DocumentType.commentDocument,
           refGetter: (data) => data.metadata.template!,
-          refTo: ref,
+          referencing: ref,
         )
         .map(
           (documents) {
@@ -131,7 +137,7 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentDocument document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment only supports signed documents',
     );
     assert(
@@ -143,11 +149,11 @@ final class DocumentsCommentRepository implements CommentRepository {
 
     final authors = documentData.metadata.authors;
     final metadata = CommentMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
       ref: documentData.metadata.ref! as SignedDocumentRef,
-      template: templateData.metadata.selfRef as SignedDocumentRef,
+      template: templateData.metadata.id as SignedDocumentRef,
       reply: documentData.metadata.reply,
-      categoryId: documentData.metadata.categoryId,
+      parameters: documentData.metadata.parameters,
       authorId: authors!.single,
     );
     final content = DocumentDataContentDto.fromModel(
@@ -170,12 +176,12 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentTemplate document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment template only supports signed documents',
     );
 
     final metadata = CommentTemplateMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
     );
 
     final contentData = documentData.content.data;

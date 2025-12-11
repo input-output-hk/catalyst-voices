@@ -1,27 +1,28 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' as kd;
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:cbor/cbor.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:test/test.dart';
 
 void main() {
   group(RegistrationTransactionBuilder, () {
     late Keychain keychain;
 
     setUpAll(() {
-      kd.Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
-      kd.Bip32Ed25519XPrivateKeyFactory.instance = _FakeBip32Ed25519XPrivateKeyFactory();
-      kd.Bip32Ed25519XSignatureFactory.instance = _FakeBip32Ed25519XSignatureFactory();
-      CatalystCompression.overrideBrotli(const _FakeCompressor());
-      CatalystCompression.overrideZstd(const _FakeCompressor());
+      Bip32Ed25519XPublicKeyFactory.instance = FakeBip32Ed25519XPublicKeyFactory();
+      Bip32Ed25519XPrivateKeyFactory.instance = FakeBip32Ed25519XPrivateKeyFactory();
+      Bip32Ed25519XSignatureFactory.instance = FakeBip32Ed25519XSignatureFactory();
+      CatalystCompression.overrideBrotli(const FakeCompressor());
+      CatalystCompression.overrideZstd(const FakeCompressor());
     });
 
     setUp(() async {
-      keychain = _MockKeychain();
+      keychain = MockKeychain();
 
       when(
         () => keychain.getRoleKeyPair(role: AccountRole.voter),
@@ -252,126 +253,11 @@ final _rewardAddress = ShelleyAddress.fromBech32(
   /* cSpell:enable */
 );
 final _voterKeyPair = CatalystKeyPair(
-  publicKey: _FakeCatalystPublicKey(bytes: Uint8List.fromList(List.filled(64, 1))),
-  privateKey: _FakeCatalystPrivateKey(bytes: Uint8List.fromList(List.filled(96, 2))),
+  publicKey: FakeCatalystPublicKey(bytes: Uint8List.fromList(List.filled(64, 1))),
+  privateKey: FakeCatalystPrivateKey(bytes: Uint8List.fromList(List.filled(96, 2))),
 );
 
 TransactionHash _buildDummyTransactionId(int seed) {
   final hex = List.filled(64, '$seed').join();
   return TransactionHash.fromHex(hex);
 }
-
-class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPrivateKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed25519XPrivateKey(this.bytes);
-
-  @override
-  Future<kd.Bip32Ed25519XSignature> sign(List<int> message) async {
-    return _FakeBip32Ed25519XSignature([
-      ...message.take(32),
-      ...List.filled(32, 0),
-    ]);
-  }
-
-  @override
-  Future<R> use<R>(
-    Future<R> Function(kd.Bip32Ed25519XPrivateKey privateKey) callback,
-  ) => callback(this);
-
-  @override
-  Future<bool> verify(List<int> message, {required kd.Bip32Ed25519XSignature signature}) async {
-    return true;
-  }
-}
-
-class _FakeBip32Ed25519XPrivateKeyFactory extends kd.Bip32Ed25519XPrivateKeyFactory {
-  @override
-  kd.Bip32Ed25519XPrivateKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed25519XPrivateKey(bytes);
-  }
-}
-
-class _FakeBip32Ed25519XPublicKey extends Fake implements kd.Bip32Ed25519XPublicKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed25519XPublicKey(this.bytes);
-
-  @override
-  kd.Ed25519PublicKey toPublicKey() => kd.Ed25519PublicKey.fromBytes(
-    bytes.take(kd.Ed25519PrivateKey.length).toList(),
-  );
-}
-
-class _FakeBip32Ed25519XPublicKeyFactory extends kd.Bip32Ed25519XPublicKeyFactory {
-  @override
-  kd.Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed25519XPublicKey(bytes);
-  }
-}
-
-class _FakeBip32Ed25519XSignature extends Fake implements kd.Bip32Ed25519XSignature {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed25519XSignature(this.bytes);
-
-  @override
-  CborValue toCbor() => CborBytes(bytes);
-}
-
-class _FakeBip32Ed25519XSignatureFactory extends kd.Bip32Ed25519XSignatureFactory {
-  @override
-  kd.Bip32Ed25519XSignature fromBytes(List<int> bytes) {
-    return _FakeBip32Ed25519XSignature(bytes);
-  }
-}
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-
-  @override
-  CatalystSignatureAlgorithm get algorithm => CatalystSignatureAlgorithm.ed25519;
-
-  @override
-  Future<CatalystPrivateKey> derivePrivateKey({
-    required String path,
-  }) async {
-    return _FakeCatalystPrivateKey(bytes: Uint8List.fromList(path.codeUnits));
-  }
-
-  @override
-  Future<CatalystPublicKey> derivePublicKey() async {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-
-  @override
-  void drop() {}
-}
-
-class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPublicKey({required this.bytes});
-
-  @override
-  Uint8List get publicKeyBytes => bytes;
-}
-
-final class _FakeCompressor implements CatalystCompressor {
-  const _FakeCompressor();
-
-  @override
-  Future<List<int>> compress(List<int> bytes) async => bytes;
-
-  @override
-  Future<List<int>> decompress(List<int> bytes) async => bytes;
-}
-
-class _MockKeychain extends Mock implements Keychain {}

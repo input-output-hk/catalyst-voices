@@ -1,8 +1,9 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart' show SvgTheme, svg, SvgAssetLoader, ColorMapper;
+import 'package:flutter_svg/flutter_svg.dart' show svg;
 import 'package:lottie/lottie.dart' as lottie;
+import 'package:vector_graphics/vector_graphics.dart';
 
 extension AssetGenImageExt on AssetGenImage {
   Future<void> cache({
@@ -107,7 +108,6 @@ extension SvgGenImageExt on SvgGenImage {
     bool allowDrawingOutsideViewBox = false,
     WidgetBuilder? placeholderBuilder,
     Clip clipBehavior = Clip.hardEdge,
-    SvgTheme? theme,
     Color? color,
     ColorFilter? colorFilter,
     bool allowColorFilter = true,
@@ -132,7 +132,6 @@ extension SvgGenImageExt on SvgGenImage {
       allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
       placeholderBuilder: placeholderBuilder,
       clipBehavior: clipBehavior,
-      theme: theme,
       color: color,
       colorFilter: colorFilter,
       allowColorFilter: allowColorFilter,
@@ -154,7 +153,6 @@ extension SvgGenImageExt on SvgGenImage {
     bool allowDrawingOutsideViewBox = false,
     WidgetBuilder? placeholderBuilder,
     Clip clipBehavior = Clip.hardEdge,
-    SvgTheme? theme,
     Color? color,
     ColorFilter? colorFilter,
   }) {
@@ -178,7 +176,6 @@ extension SvgGenImageExt on SvgGenImage {
       allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
       placeholderBuilder: placeholderBuilder,
       clipBehavior: clipBehavior,
-      theme: theme,
       colorFilter:
           colorFilter ??
           (color != null
@@ -195,13 +192,11 @@ extension SvgGenImageExt on SvgGenImage {
     BuildContext? context,
     String package = 'catalyst_voices_assets',
     AssetBundle? bundle,
-    ColorMapper? colorMapper,
   }) {
-    final loader = SvgAssetLoader(
+    final loader = AssetBytesLoader(
       path,
       packageName: package,
       assetBundle: bundle,
-      colorMapper: colorMapper,
     );
     return svg.cache.putIfAbsent(
       loader.cacheKey(context),

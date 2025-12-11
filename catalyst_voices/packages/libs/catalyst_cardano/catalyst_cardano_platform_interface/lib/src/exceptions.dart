@@ -1,6 +1,14 @@
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
 import 'package:equatable/equatable.dart';
 
+/// {@template cardano_wallet_exception}
+/// A base class for all exceptions related to the Cardano wallet functionality.
+/// {@endtemplate}
+abstract base class CardanoWalletException extends Equatable implements Exception {
+  /// {@macro cardano_wallet_exception}
+  const CardanoWalletException();
+}
+
 /// A specific error code related to the [TxSendException].
 enum TxSendErrorCode {
   /// Wallet refuses to send the tx (could be rate limiting).
@@ -24,7 +32,7 @@ enum TxSendErrorCode {
 }
 
 /// Exception thrown when submitting the transaction fails.
-final class TxSendException extends Equatable implements Exception {
+final class TxSendException extends CardanoWalletException {
   /// A more specific failure reason.
   final TxSendErrorCode code;
 
@@ -73,7 +81,7 @@ enum TxSignErrorCode {
 }
 
 /// Exception thrown when signing the transaction fails.
-final class TxSignException extends Equatable implements Exception {
+final class TxSignException extends CardanoWalletException {
   /// A more specific failure reason.
   final TxSignErrorCode code;
 
@@ -126,24 +134,31 @@ enum WalletApiErrorCode {
 
 /// Defines a set of possible exceptions that might occur when
 /// interacting with the wallet extension api.
-final class WalletApiException extends Equatable implements Exception {
+final class WalletApiException extends CardanoWalletException {
   /// A more specific failure reason.
   final WalletApiErrorCode code;
 
   /// The human readable info about the exception.
   final String info;
 
+  /// The optional code which may have caused exception in first place.
+  /// For example when wallet used unsupported tag code.
+  final int? sourceCode;
+
   /// The default constructor for [WalletApiException].
   const WalletApiException({
     required this.code,
     required this.info,
+    this.sourceCode,
   });
 
   @override
-  List<Object?> get props => [code, info];
+  List<Object?> get props => [code, info, sourceCode];
 
   @override
-  String toString() => 'WalletApiException(code=$code,info=$info)';
+  String toString() => sourceCode == null
+      ? 'WalletApiException(code=$code,info=$info)'
+      : 'WalletApiException(code=$code,info=$info,sourceCode=$sourceCode)';
 }
 
 /// A specific error code related to the [WalletDataSignException].
@@ -174,7 +189,7 @@ enum WalletDataSignErrorCode {
 
 /// Defines a set of possible exceptions that might occur when
 /// calling the [CardanoWalletApi.signData] method.
-final class WalletDataSignException extends Equatable implements Exception {
+final class WalletDataSignException extends CardanoWalletException {
   /// A more specific failure reason.
   final WalletDataSignErrorCode code;
 
@@ -196,7 +211,7 @@ final class WalletDataSignException extends Equatable implements Exception {
 
 /// [maxSize] is the maximum size for pagination and if the dApp
 /// tries to request pages outside of this boundary this error is thrown.
-final class WalletPaginateException extends Equatable implements Exception {
+final class WalletPaginateException extends CardanoWalletException {
   /// The maximum allowed value of the [Paginate.page].
   final int maxSize;
 

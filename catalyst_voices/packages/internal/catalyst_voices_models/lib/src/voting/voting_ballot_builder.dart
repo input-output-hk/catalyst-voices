@@ -9,6 +9,9 @@ abstract interface class VotingBallotBuilder implements Listenable {
   /// Returns unmodifiable copy of votes made.
   List<Vote> get votes;
 
+  /// Emits list of votes when changed
+  Stream<List<Vote>> get watchVotes;
+
   /// Adds [vote] to the list.
   void addVote(Vote vote);
 
@@ -17,6 +20,9 @@ abstract interface class VotingBallotBuilder implements Listenable {
 
   /// Removes votes from this builder.
   void clear();
+
+  /// Release resources.
+  void dispose();
 
   /// Returns [Vote] made on [proposal].
   Vote? getVoteOn(DocumentRef proposal);

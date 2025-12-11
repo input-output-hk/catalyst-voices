@@ -23,7 +23,7 @@ final class VoteProposal extends Equatable {
   }) {
     final voteCategory = VoteProposalCategory.fromCampaignCategory(category);
     return VoteProposal(
-      ref: proposal.selfRef,
+      ref: proposal.id,
       category: voteCategory,
       title: proposal.title,
       authorName: proposal.author ?? '',
@@ -52,7 +52,7 @@ final class VoteProposalCategory extends Equatable {
 
   factory VoteProposalCategory.fromCampaignCategory(CampaignCategory category) {
     return VoteProposalCategory(
-      ref: category.selfRef,
+      ref: category.id,
       name: category.formattedCategoryName,
     );
   }

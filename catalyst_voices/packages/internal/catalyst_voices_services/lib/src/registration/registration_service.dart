@@ -255,45 +255,38 @@ final class RegistrationServiceImpl implements RegistrationService {
     required Keychain keychain,
     required Set<RegistrationTransactionRole> roles,
   }) async {
-    try {
-      final config = _blockchainConfig.transactionBuilderConfig;
-      final enabledWallet = await wallet.enable();
-      final walletNetworkId = await enabledWallet.getNetworkId();
-      if (walletNetworkId != _blockchainConfig.networkId) {
-        throw RegistrationNetworkIdMismatchException(
-          targetNetworkId: _blockchainConfig.networkId,
-        );
-      }
-
-      final changeAddress = await enabledWallet.getChangeAddress();
-      final rewardAddresses = await enabledWallet.getRewardAddresses();
-      final utxos = await enabledWallet.getUtxos();
-
-      final slotNumber = await _getRegistrationSlotNumberTtl();
-
-      final previousTransactionId = await _fetchPreviousTransactionId(
-        isFirstRegistration: roles.isFirstRegistration,
+    final config = _blockchainConfig.transactionBuilderConfig;
+    final enabledWallet = await wallet.enable();
+    final walletNetworkId = await enabledWallet.getNetworkId();
+    if (walletNetworkId != _blockchainConfig.networkId) {
+      throw RegistrationNetworkIdMismatchException(
+        targetNetworkId: _blockchainConfig.networkId,
       );
-
-      final registrationBuilder = RegistrationTransactionBuilder(
-        transactionConfig: config,
-        keychain: keychain,
-        networkId: _blockchainConfig.networkId,
-        slotNumberTtl: slotNumber,
-        roles: roles,
-        changeAddress: changeAddress,
-        rewardAddresses: rewardAddresses,
-        utxos: utxos,
-        previousTransactionId: previousTransactionId,
-      );
-
-      return await registrationBuilder.build();
-    } on RegistrationException {
-      rethrow;
-    } catch (error, stackTrace) {
-      _logger.severe('Registration error', error, stackTrace);
-      throw const RegistrationUnknownException();
     }
+
+    final changeAddress = await enabledWallet.getChangeAddress();
+    final rewardAddresses = await enabledWallet.getRewardAddresses();
+    final utxos = await enabledWallet.getUtxos();
+
+    final slotNumber = await _getRegistrationSlotNumberTtl();
+
+    final previousTransactionId = await _fetchPreviousTransactionId(
+      isFirstRegistration: roles.isFirstRegistration,
+    );
+
+    final registrationBuilder = RegistrationTransactionBuilder(
+      transactionConfig: config,
+      keychain: keychain,
+      networkId: _blockchainConfig.networkId,
+      slotNumberTtl: slotNumber,
+      roles: roles,
+      changeAddress: changeAddress,
+      rewardAddresses: rewardAddresses,
+      utxos: utxos,
+      previousTransactionId: previousTransactionId,
+    );
+
+    return registrationBuilder.build();
   }
 
   @override
@@ -353,47 +346,40 @@ final class RegistrationServiceImpl implements RegistrationService {
   Future<Account> register({
     required AccountSubmitFullData data,
   }) async {
-    try {
-      final walletInfo = await submitTransaction(
-        wallet: data.metadata.wallet,
-        unsignedTx: data.metadata.transaction,
+    final walletInfo = await submitTransaction(
+      wallet: data.metadata.wallet,
+      unsignedTx: data.metadata.transaction,
+    );
+
+    final keychain = data.keychain;
+    return keychain.getMasterKey().use((masterKey) {
+      final role0KeyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
       );
 
-      final keychain = data.keychain;
-      return keychain.getMasterKey().use((masterKey) {
-        final role0KeyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-          masterKey: masterKey,
-          role: AccountRole.root,
+      return role0KeyPair.use((keyPair) {
+        final role0key = keyPair.publicKey;
+
+        final catalystId = CatalystId(
+          host: _blockchainConfig.host.host,
+          username: data.username,
+          role0Key: role0key.publicKeyBytes,
         );
 
-        return role0KeyPair.use((keyPair) {
-          final role0key = keyPair.publicKey;
-
-          final catalystId = CatalystId(
-            host: _blockchainConfig.host.host,
-            username: data.username,
-            role0Key: role0key.publicKeyBytes,
-          );
-
-          return Account(
-            catalystId: catalystId,
-            email: data.email,
-            keychain: keychain,
-            roles: data.roles,
-            address: walletInfo.address,
-            publicStatus: data.email != null
-                ? AccountPublicStatus.verifying
-                : AccountPublicStatus.notSetup,
-            registrationStatus: const AccountRegistrationStatus.notIndexed(),
-          );
-        });
+        return Account(
+          catalystId: catalystId,
+          email: data.email,
+          keychain: keychain,
+          roles: data.roles,
+          address: walletInfo.address,
+          publicStatus: data.email != null
+              ? AccountPublicStatus.verifying
+              : AccountPublicStatus.notSetup,
+          registrationStatus: const AccountRegistrationStatus.notIndexed(),
+        );
       });
-    } on RegistrationException {
-      rethrow;
-    } catch (error, stackTrace) {
-      _logger.severe('RegistrationTransaction: ', error, stackTrace);
-      throw const RegistrationTransactionException();
-    }
+    });
   }
 
   @override

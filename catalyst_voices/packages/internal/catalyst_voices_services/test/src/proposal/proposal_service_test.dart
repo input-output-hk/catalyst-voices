@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -14,6 +15,7 @@ void main() {
   late MockUserService mockUserService;
   late MockSignerService mockSignerService;
   late MockCastedVotesObserver mockCastedVotesObserver;
+  late VotingBallotBuilder ballotBuilder;
 
   late ProposalService proposalService;
 
@@ -24,6 +26,7 @@ void main() {
     mockUserService = MockUserService();
     mockActiveCampaignObserver = MockActiveCampaignObserver();
     mockCastedVotesObserver = MockCastedVotesObserver();
+    ballotBuilder = VotingBallotLocalBuilder();
 
     proposalService = ProposalService(
       mockProposalRepository,
@@ -32,14 +35,15 @@ void main() {
       mockSignerService,
       mockActiveCampaignObserver,
       mockCastedVotesObserver,
+      ballotBuilder,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
-    registerFallbackValue(const ProposalsCountFilters());
+    registerFallbackValue(const ProposalsFiltersV2());
 
     when(
       () => mockDocumentRepository.watchCount(
-        refTo: any(named: 'refTo'),
+        referencing: any(named: 'referencing'),
         type: DocumentType.commentDocument,
       ),
     ).thenAnswer((_) => Stream.fromIterable([5]));
@@ -56,15 +60,18 @@ void main() {
         keychain: MockKeychain(),
         isActive: true,
       );
-      final user = User.optional(accounts: [account]);
-      const proposalsCount = ProposalsCount(
-        finals: ProposalDocument.maxSubmittedProposalsPerUser + 1,
-      );
-
-      when(() => mockUserService.watchUser).thenAnswer((_) => Stream.value(user));
+      final campaign = Campaign.f15();
+      const proposalsCount = ProposalDocument.maxSubmittedProposalsPerUser + 1;
 
       when(
-        () => mockProposalRepository.watchProposalsCount(
+        () => mockUserService.watchUnlockedActiveAccount,
+      ).thenAnswer((_) => Stream.value(account));
+      when(
+        () => mockActiveCampaignObserver.watchCampaign,
+      ).thenAnswer((_) => Stream.value(campaign));
+
+      when(
+        () => mockProposalRepository.watchProposalsCountV2(
           filters: any(named: 'filters'),
         ),
       ).thenAnswer((_) => Stream.value(proposalsCount));
@@ -83,12 +90,6 @@ void main() {
 class MockActiveCampaignObserver extends Mock implements ActiveCampaignObserver {}
 
 class MockCastedVotesObserver extends Mock implements CastedVotesObserver {}
-
-class MockDocumentRepository extends Mock implements DocumentRepository {}
-
-class MockKeychain extends Mock implements Keychain {}
-
-class MockProposalRepository extends Mock implements ProposalRepository {}
 
 class MockSignerService extends Mock implements SignerService {}
 

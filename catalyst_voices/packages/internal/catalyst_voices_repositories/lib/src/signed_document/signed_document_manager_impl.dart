@@ -1,27 +1,40 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
 
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
   final CatalystCompressor brotli;
   final CatalystCompressor zstd;
+  final CatalystProfiler profiler;
 
   const SignedDocumentManagerImpl({
     required this.brotli,
     required this.zstd,
+    this.profiler = const CatalystNoopProfiler(),
   });
 
   @override
   Future<SignedDocument> parseDocument(Uint8List bytes) async {
-    final coseSign = CoseSign.fromCbor(cbor.decode(bytes));
+    final cborValue = await profiler.timeWithResult(
+      'cbor_decode_doc',
+      () => cbor.decode(bytes),
+      debounce: true,
+    );
+    final coseSign = await profiler.timeWithResult(
+      'cose_decode',
+      () => CoseSign.fromCbor(cborValue),
+      debounce: true,
+    );
+
     final metadata = _SignedDocumentMetadataExt.fromCose(
       protectedHeaders: coseSign.protectedHeaders,
       unprotectedHeaders: coseSign.unprotectedHeaders,
@@ -33,29 +46,37 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       contentType: metadata.contentType,
     );
 
+    final signers = coseSign.signatures.map((e) => e.decodeCatalystId()).nonNulls.toList();
+
     return _CoseSignedDocument(
       coseSign: coseSign,
       payload: payload,
-      metadata: metadata,
-      signers: coseSign.signatures.map((e) => e.decodeCatalystId()).nonNulls.toList(),
+      metadata: metadata.toModel(authors: signers),
+      signers: signers,
     );
   }
 
   @override
   Future<SignedDocument> signDocument(
     SignedDocumentPayload document, {
-    required SignedDocumentMetadata metadata,
+    required DocumentDataMetadata metadata,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
     try {
       final compressedPayload = await _brotliCompressPayload(document.toBytes());
 
-      final coseSign = await CoseSign.sign(
-        protectedHeaders: metadata.asCoseProtectedHeaders,
-        unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
-        payload: compressedPayload,
-        signers: [_CatalystSigner(catalystId, privateKey)],
+      final coseSign = await profiler.timeWithResult(
+        'cose_sign_doc',
+        () {
+          return CoseSign.sign(
+            protectedHeaders: const CoseHeaders.protected(),
+            unprotectedHeaders: const CoseHeaders.unprotected(),
+            payload: compressedPayload,
+            signers: [_CatalystSigner(catalystId, privateKey)],
+          );
+        },
+        debounce: true,
       );
 
       return _CoseSignedDocument(
@@ -70,13 +91,21 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   Future<Uint8List> _brotliCompressPayload(Uint8List payload) async {
-    final compressed = await brotli.compress(payload);
+    final compressed = await profiler.timeWithResult(
+      'brotli_compress',
+      () => brotli.compress(payload),
+      debounce: true,
+    );
     return Uint8List.fromList(compressed);
   }
 
   Future<Uint8List> _brotliDecompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == _brotliEncoding) {
-      final decompressed = await brotli.decompress(coseSign.payload);
+      final decompressed = await profiler.timeWithResult(
+        'brotli_decompress',
+        () => brotli.decompress(coseSign.payload),
+        debounce: true,
+      );
       return Uint8List.fromList(decompressed);
     } else {
       return coseSign.payload;
@@ -139,7 +168,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   final SignedDocumentPayload payload;
 
   @override
-  final SignedDocumentMetadata metadata;
+  final DocumentDataMetadata metadata;
 
   @override
   final List<CatalystId> signers;
@@ -166,6 +195,43 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   }
 }
 
+extension on SignedDocumentMetadata {
+  DocumentDataMetadata toModel({
+    List<CatalystId>? authors,
+  }) {
+    final id = this.id;
+    final ver = this.ver;
+
+    if (id == null) {
+      throw const FormatException('Signed document id was null');
+    }
+    if (ver == null) {
+      throw const FormatException('Signed document ver was null');
+    }
+
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.json,
+      type: documentType,
+      id: SignedDocumentRef(id: id, ver: ver),
+      ref: ref?.toModel(),
+      template: template?.toModel(),
+      reply: reply?.toModel(),
+      section: section,
+      collaborators: collabs?.map(CatalystId.tryParse).nonNulls.toList(),
+      parameters: DocumentParameters({
+        ?brandId?.toModel(),
+        ?campaignId?.toModel(),
+        ?categoryId?.toModel(),
+      }),
+      authors: authors,
+    );
+  }
+}
+
+extension on SignedDocumentMetadataRef {
+  SignedDocumentRef toModel() => SignedDocumentRef(id: id, ver: ver);
+}
+
 extension _CoseSignatureExt on CoseSignature {
   CatalystId? decodeCatalystId() {
     final kid = protectedHeaders.kid;
@@ -180,16 +246,6 @@ extension _CoseSignatureExt on CoseSignature {
 }
 
 extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
-  /// Maps the [SignedDocumentContentType] into COSE representation.
-  StringOrInt? get asCose {
-    switch (this) {
-      case SignedDocumentContentType.json:
-        return const IntValue(CoseValues.jsonContentType);
-      case SignedDocumentContentType.unknown:
-        return null;
-    }
-  }
-
   static SignedDocumentContentType fromCose(StringOrInt? contentType) {
     switch (contentType) {
       case IntValue():
@@ -205,30 +261,6 @@ extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
 }
 
 extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
-  CoseHeaders get asCoseProtectedHeaders {
-    return CoseHeaders.protected(
-      contentType: contentType.asCose,
-      contentEncoding: _brotliEncoding,
-      type: documentType.uuid.asUuid,
-      id: id?.asUuid,
-      ver: ver?.asUuid,
-      ref: ref?.asCose,
-      refHash: refHash?.asCose,
-      template: template?.asCose,
-      reply: reply?.asCose,
-      section: section,
-      collabs: collabs,
-      brandId: brandId?.asCose,
-      campaignId: campaignId?.asCose,
-      electionId: electionId,
-      categoryId: categoryId?.asCose,
-    );
-  }
-
-  CoseHeaders get asCoseUnprotectedHeaders {
-    return const CoseHeaders.unprotected();
-  }
-
   static SignedDocumentMetadata fromCose({
     required CoseHeaders protectedHeaders,
     required CoseHeaders unprotectedHeaders,
@@ -264,11 +296,6 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 }
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
-  ReferenceUuid get asCose => ReferenceUuid(
-    id: id.asUuid,
-    ver: ver?.asUuid,
-  );
-
   static SignedDocumentMetadataRef fromCose(ReferenceUuid ref) {
     return SignedDocumentMetadataRef(
       id: ref.id.value,
@@ -278,19 +305,10 @@ extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
 }
 
 extension _SignedDocumentMetadataRefHashExt on SignedDocumentMetadataRefHash {
-  ReferenceUuidHash get asCose => ReferenceUuidHash(
-    ref: ref.asCose,
-    hash: hash,
-  );
-
   static SignedDocumentMetadataRefHash fromCose(ReferenceUuidHash ref) {
     return SignedDocumentMetadataRefHash(
       ref: _SignedDocumentMetadataRefExt.fromCose(ref.ref),
       hash: ref.hash,
     );
   }
-}
-
-extension _UuidExt on String {
-  Uuid get asUuid => Uuid(this);
 }

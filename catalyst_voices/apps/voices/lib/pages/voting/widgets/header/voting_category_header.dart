@@ -1,13 +1,14 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_picker.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingCategoryHeader extends StatelessWidget {
-  final CampaignCategoryDetailsViewModel category;
+  final VotingHeaderCategoryData category;
 
   const VotingCategoryHeader({
     super.key,
@@ -21,7 +22,7 @@ class VotingCategoryHeader extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: _Background(image: category.image),
+            child: _Background(image: CategoryImageUrl.image(category.imageUrl)),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 32, 32, 44),

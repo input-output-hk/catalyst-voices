@@ -16,9 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CategoryPage extends StatefulWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
 
-  const CategoryPage({super.key, required this.categoryId});
+  const CategoryPage({super.key, required this.categoryRef});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -101,50 +101,13 @@ class _BodySmall extends StatelessWidget {
   }
 }
 
-class _CategoryDetailErrorSelector extends StatelessWidget {
-  final SignedDocumentRef categoryId;
-
-  const _CategoryDetailErrorSelector({required this.categoryId});
+class _CategoryDetailContent extends StatelessWidget {
+  const _CategoryDetailContent();
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CategoryDetailCubit, CategoryDetailState, ErrorVisibilityState>(
-      selector: (state) {
-        return (
-          show: state.isLoading == false && state.error != null,
-          data: state.error,
-        );
-      },
-      builder: (context, state) {
-        final error = state.data ?? const LocalizedUnknownException();
-        return Offstage(
-          offstage: !state.show,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 60),
-            child: Center(
-              child: VoicesErrorIndicator(
-                message: error.message(context),
-                onRetry: error is LocalizedNotFoundException
-                    ? null
-                    : () {
-                        unawaited(
-                          context.read<CategoryDetailCubit>().getCategoryDetail(categoryId),
-                        );
-                      },
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
-  const _CategoryDetailLoadingOrDataSelector();
-
-  @override
-  Widget build(BuildContext context) {
+    // TODO(damian-molinski): refactor it into single class object in category_detail_state.dart
+    // and do not rely on context.select<SessionCubit> here.
     return BlocSelector<
       CategoryDetailCubit,
       CategoryDetailState,
@@ -153,7 +116,7 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.dummy(),
+          data: state.selectedCategoryDetails ?? CampaignCategoryDetailsViewModel.placeholder(),
         );
       },
       builder: (context, state) {
@@ -177,6 +140,45 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
   }
 }
 
+class _CategoryDetailError extends StatelessWidget {
+  final SignedDocumentRef categoryRef;
+
+  const _CategoryDetailError({required this.categoryRef});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<CategoryDetailCubit, CategoryDetailState, ErrorVisibilityState>(
+      selector: (state) {
+        return (
+          show: state.isLoading == false && state.error != null,
+          data: state.error,
+        );
+      },
+      builder: (context, state) {
+        final error = state.data ?? const LocalizedUnknownException();
+        return Offstage(
+          offstage: !state.show,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 60),
+            child: Center(
+              child: VoicesErrorIndicator(
+                message: error.message(context),
+                onRetry: error is LocalizedNotFoundException
+                    ? null
+                    : () {
+                        unawaited(
+                          context.read<CategoryDetailCubit>().getCategoryDetail(categoryRef),
+                        );
+                      },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _CategoryPageState extends State<CategoryPage> {
   StreamSubscription<DocumentRef?>? _categoryRefSub;
 
@@ -185,9 +187,9 @@ class _CategoryPageState extends State<CategoryPage> {
     return ProposalSubmissionPhaseAware(
       activeChild: Stack(
         children: [
-          const _CategoryDetailLoadingOrDataSelector(),
-          _CategoryDetailErrorSelector(
-            categoryId: widget.categoryId,
+          const _CategoryDetailContent(),
+          _CategoryDetailError(
+            categoryRef: widget.categoryRef,
           ),
         ].constrainedDelegate(),
       ),
@@ -198,9 +200,9 @@ class _CategoryPageState extends State<CategoryPage> {
   void didUpdateWidget(CategoryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId) {
+    if (widget.categoryRef != oldWidget.categoryRef) {
       unawaited(
-        context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
+        context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryRef),
       );
     }
   }
@@ -215,17 +217,16 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<CategoryDetailCubit>().getCategories());
-    unawaited(
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
-    );
-    _listenForProposalRef(context.read<CategoryDetailCubit>());
+    final cubit = context.read<CategoryDetailCubit>()..watchActiveCampaignCategories();
+    unawaited(cubit.getCategoryDetail(widget.categoryRef));
+    _listenForProposalRef(cubit);
   }
 
+  // TODO(damian-molinski): refactor it to signal pattern
   void _listenForProposalRef(CategoryDetailCubit cubit) {
     // listen for updates
     _categoryRefSub = cubit.stream
-        .map((event) => event.category?.id)
+        .map((event) => event.selectedCategoryRef)
         .distinct()
         .listen(_onCategoryRefChanged);
   }
