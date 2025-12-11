@@ -1,0 +1,36 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.10-mk-signed-docs-key-type AS cat-libs-rust
+
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
+
+package:
+    FROM ${REGISTRY}/astral-sh/uv:python3.13-bookworm-slim
+
+    WORKDIR /app
+
+    ARG tag='latest'
+
+    COPY cat-libs-rust+build/mk_signed_doc .
+    ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
+
+    COPY pyproject.toml .
+    COPY uv.lock .
+    COPY setup_fund.py .
+
+    COPY --dir dev .
+
+    COPY entrypoint.sh .
+    RUN chmod +x entrypoint.sh
+
+    ENTRYPOINT ["/app/entrypoint.sh"]
+
+    SAVE IMAGE setup-fund-documents:${tag}
+
+docker:
+    FROM +package
+
+    ARG container="setup-fund-documents"
+    ARG tag="latest"
+
+    SAVE IMAGE ${container}:${tag}

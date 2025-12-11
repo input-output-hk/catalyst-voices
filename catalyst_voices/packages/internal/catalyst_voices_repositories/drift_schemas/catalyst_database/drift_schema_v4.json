@@ -687,6 +687,36 @@
             ]
           },
           {
+            "name": "authors_names",
+            "getter_name": "authorsNames",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.strings",
+              "dart_type_name": "List<String?>"
+            }
+          },
+          {
+            "name": "authors_significant",
+            "getter_name": "authorsSignificant",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
+          },
+          {
             "name": "created_at",
             "getter_name": "createdAt",
             "moor_type": "dateTime",
