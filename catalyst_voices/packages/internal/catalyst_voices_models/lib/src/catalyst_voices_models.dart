@@ -60,6 +60,7 @@ export 'document/enums/document_content_media_type.dart';
 export 'document/enums/document_property_format.dart';
 export 'document/enums/document_property_type.dart';
 export 'document/exception/document_import_invalid_data_exception.dart';
+export 'document/exception/document_sign_exception.dart';
 export 'document/schema/document_schema.dart';
 export 'document/schema/property/document_property_schema.dart';
 export 'document/specialized/comment_document.dart';

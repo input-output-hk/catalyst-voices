@@ -2251,6 +2251,22 @@
   "@proposalEditorDeleteDialogTitle": {
     "description": "A title for the dialog to confirm proposal deletion."
   },
+  "proposalEditorDocumentSignErrorMessage": "We couldn't sign the proposal, please try again later.",
+  "@proposalEditorDocumentSignErrorMessage": {
+    "description": "Dialog message in proposal editor when user couldn't sign the proposal."
+  },
+  "proposalEditorDocumentSignErrorTitle": "Unable to Sign the Proposal",
+  "@proposalEditorDocumentSignErrorTitle": {
+    "description": "Dialog title in proposal editor when user couldn't sign the proposal."
+  },
+  "proposalEditorLimitReachedErrorMessage": "You have reached the maximum number of proposals allowed.",
+  "@proposalEditorLimitReachedErrorMessage": {
+    "description": "Dialog message in proposal editor when user has reached the max proposals limit."
+  },
+  "proposalEditorLimitReachedErrorTitle": "Unable to Publish Proposal",
+  "@proposalEditorLimitReachedErrorTitle": {
+    "description": "Dialog title in proposal editor when user has reached the max proposals limit."
+  },
   "proposalEditorNotAnswered": "Not Answered",
   "@proposalEditorNotAnswered": {
     "description": "Placeholder text when a property has been not filled."
