@@ -66,11 +66,11 @@ class _Icon extends StatelessWidget {
 class _LeaveProposalDialogState extends State<LeaveProposalDialog> {
   @override
   Widget build(BuildContext context) {
-    return VoicesPanelDialog(
-      constraints: const Responsive.single(
+    return const VoicesPanelDialog(
+      constraints: Responsive.single(
         BoxConstraints(maxWidth: 511, maxHeight: 285),
       ),
-      child: const Padding(
+      child: Padding(
         padding: EdgeInsets.fromLTRB(16, 36, 16, 20),
         child: Column(
           children: [

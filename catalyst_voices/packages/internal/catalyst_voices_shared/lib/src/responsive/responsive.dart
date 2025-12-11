@@ -20,11 +20,11 @@ abstract interface class Responsive<T extends Object> {
     T? sm,
     T? md,
     T? lg,
-  }) = _ResponsiveBreakpoints;
+  }) = _ResponsiveBreakpoints<T>;
 
   /// A singleton implementation of responsive, just in case a [Responsive] instance
   /// is needed even though the widget is not going to be responsive.
-  const factory Responsive.single(T value) = _SingleResponsive;
+  const factory Responsive.single(T value) = _SingleResponsive<T>;
 
   /// Provides responsive data based on the given [screenSize].
   ///
