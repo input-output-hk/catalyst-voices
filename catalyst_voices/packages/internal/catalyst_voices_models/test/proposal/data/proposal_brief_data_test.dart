@@ -107,5 +107,81 @@ void main() {
         expect(collabB.status, ProposalsCollaborationStatus.rejected);
       });
     });
+
+    group('appendVersion', () {
+      test('creates new list with version when versions is null', () {
+        // Given
+        final id = DocumentRefFactory.signedDocumentRef();
+        final baseBrief = ProposalBriefData(
+          id: id,
+          createdAt: DateTime.now(),
+          // ignore: avoid_redundant_argument_values
+          versions: null,
+        );
+        final newVersionRef = DocumentRefFactory.signedDocumentRef();
+        const newVersionTitle = 'New Version';
+
+        // When
+        final updatedBrief = baseBrief.appendVersion(
+          ref: newVersionRef,
+          title: newVersionTitle,
+        );
+
+        // Then
+        expect(baseBrief.versions, isNull, reason: 'Original object should remain unchanged');
+        expect(updatedBrief.versions, hasLength(1));
+        expect(updatedBrief.versions!.first.ref, newVersionRef);
+        expect(updatedBrief.versions!.first.title, newVersionTitle);
+      });
+
+      test('appends version to the end of an existing list', () {
+        // Given
+        final id = DocumentRefFactory.signedDocumentRef();
+        final existingVersionRef = DocumentRefFactory.signedDocumentRef();
+        final existingVersion = ProposalBriefDataVersion(ref: existingVersionRef, title: 'Old');
+
+        final baseBrief = ProposalBriefData(
+          id: id,
+          createdAt: DateTime.now(),
+          versions: [existingVersion],
+        );
+
+        final newVersionRef = DocumentRefFactory.signedDocumentRef();
+        const newVersionTitle = 'New Version';
+
+        // When
+        final updatedBrief = baseBrief.appendVersion(
+          ref: newVersionRef,
+          title: newVersionTitle,
+        );
+
+        // Then
+        expect(updatedBrief.versions, hasLength(2));
+        expect(updatedBrief.versions![0], existingVersion);
+        expect(updatedBrief.versions![1].ref, newVersionRef);
+        expect(updatedBrief.versions![1].title, newVersionTitle);
+      });
+
+      test('handles optional title correctly (null title)', () {
+        // Given
+        final id = DocumentRefFactory.signedDocumentRef();
+        final baseBrief = ProposalBriefData(
+          id: id,
+          createdAt: DateTime.now(),
+        );
+        final newVersionRef = DocumentRefFactory.signedDocumentRef();
+
+        // When
+        final updatedBrief = baseBrief.appendVersion(
+          ref: newVersionRef,
+          // ignore: avoid_redundant_argument_values
+          title: null,
+        );
+
+        // Then
+        expect(updatedBrief.versions, hasLength(1));
+        expect(updatedBrief.versions!.first.title, isNull);
+      });
+    });
   });
 }

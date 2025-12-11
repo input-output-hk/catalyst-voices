@@ -54,4 +54,7 @@ abstract interface class ProposalDocumentDataLocalSource {
   });
 
   Future<DocumentRef?> getPreviousOf({required DocumentRef id});
+  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
 }

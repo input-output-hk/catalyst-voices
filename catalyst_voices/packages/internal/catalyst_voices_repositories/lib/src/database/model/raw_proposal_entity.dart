@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
+import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:equatable/equatable.dart';
 
