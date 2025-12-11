@@ -99,6 +99,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
 
     _emailSub = bloc.stream.map((event) => event.email).distinct().listen(_handleEmailChange);
 
+    _accountPublicStatus = bloc.state.accountPublicStatus;
     _publicStatusSub = bloc.stream
         .map((event) => event.accountPublicStatus)
         .distinct()
