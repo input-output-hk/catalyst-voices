@@ -204,7 +204,7 @@ project: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/setup-fund-documents"
 									// setup-fund-documents/v0.1.0 tag
-									tag:  "080d5fc54493d50c190f488e7e38da92f06e9d2b"
+									tag:  "3ca158420165ea359c6c98edddb7dd8fe82b8d15"
 								}
 								env: {
 									ENVIRONMENT: {
