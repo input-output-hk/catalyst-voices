@@ -20,7 +20,7 @@ void main() {
   });
   group(ProposalDataCollaborator, () {
     test(
-      'sets all collaborators status as pending when tere is no actions '
+      'sets all collaborators status as pending when there is no actions '
       'and versions are the same',
       () {
         final collaborators = [collaborator1Id, collaborator2Id, collaborator3Id, collaborator4Id];
@@ -161,7 +161,7 @@ void main() {
 
     test(
       'sets collaborators status as removed when he is not the author of proposal '
-      'and is absent in collaborators list but he acceptet invitation',
+      'and is absent in collaborators list but he accepted invitation',
       () {
         final result = ProposalDataCollaborator.resolveCollaboratorStatuses(
           currentCollaborators: [],
@@ -188,7 +188,7 @@ void main() {
 
     test(
       'sets collaborators status as left when he is the author of proposal '
-      'and is absent in collaborators list but he acceptet invitation',
+      'and is absent in collaborators list but he accepted invitation',
       () {
         final result = ProposalDataCollaborator.resolveCollaboratorStatuses(
           currentCollaborators: [],
