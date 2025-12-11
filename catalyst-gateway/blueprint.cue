@@ -81,8 +81,8 @@ project: {
 								}
 								"EVENT_DB_URL": {
 									secret: {
-										name: "gateway"
-										key:  "event-db-url"
+										name: "db-url"
+										key:  "url"
 									}
 								}
 								"EVENT_DB_MAX_CONNECTIONS": {
