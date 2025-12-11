@@ -276,7 +276,7 @@ void main() {
           () async {
             // Given
             final documentDataToSave = DocumentDataFactory.build(
-              id: DocumentRefFactory.draftRef(),
+              id: DocumentRefFactory.draftDocumentRef(),
             );
 
             // When
@@ -307,7 +307,7 @@ void main() {
           type: DocumentType.proposalTemplate,
         );
 
-        final draftRef = DocumentRefFactory.draftRef();
+        final draftRef = DocumentRefFactory.draftDocumentRef();
         final draftData = DocumentDataFactory.build(
           id: draftRef,
           template: templateRef,

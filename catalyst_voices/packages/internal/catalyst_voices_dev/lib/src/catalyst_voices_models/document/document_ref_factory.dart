@@ -8,7 +8,7 @@ abstract final class DocumentRefFactory {
   static final Random _random = Random(57342052346526);
   static var _timestamp = DateTime.now().millisecondsSinceEpoch;
 
-  static DraftRef draftRef() {
+  static DraftRef draftDocumentRef() {
     return DraftRef.first(randomUuidV7());
   }
 

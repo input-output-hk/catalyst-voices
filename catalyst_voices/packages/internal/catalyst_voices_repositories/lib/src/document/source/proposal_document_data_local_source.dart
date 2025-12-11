@@ -50,4 +50,8 @@ abstract interface class ProposalDocumentDataLocalSource {
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
   });
+
+  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
 }
