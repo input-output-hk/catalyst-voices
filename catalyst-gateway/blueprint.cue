@@ -177,7 +177,7 @@ project: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
 									// voices-frontend-config/v0.1.0 tag
-									tag:  "080d5fc"
+									tag:  "080d5fc54493d50c190f488e7e38da92f06e9d2b"
 								}
 								env: {
 									ENVIRONMENT: {
@@ -204,7 +204,7 @@ project: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/setup-fund-documents"
 									// setup-fund-documents/v0.1.0 tag
-									tag:  "080d5fc"
+									tag:  "080d5fc54493d50c190f488e7e38da92f06e9d2b"
 								}
 								env: {
 									ENVIRONMENT: {
@@ -237,7 +237,7 @@ project: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
 									// gateway-event-db/v3.0.0 tag
-									tag:  "080d5fc"
+									tag:  "080d5fc54493d50c190f488e7e38da92f06e9d2b"
 								}
 								env: {
 									DB_HOST: {
