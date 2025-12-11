@@ -47,14 +47,14 @@ final class ProposalDataV2 extends Equatable {
     final id = data.proposal.id;
     final isFinal = data.isFinal;
 
-    final versions = data.versionIds.map((e) => id.copyWith(ver: Optional(e))).toList();
+    final versions = data.versionIds.map((ver) => id.copyWith(ver: Optional(ver))).toList();
 
     final collaborators = ProposalDataCollaborator.resolveCollaboratorStatuses(
       isProposalFinal: isFinal,
-      prevAuthors: prevAuthors,
-      prevCollaborators: prevCollaborators,
+      currentCollaborators: data.proposal.metadata.collaborators ?? [],
       collaboratorsActions: collaboratorsActions,
-      originalAuthor: data.originalAuthors,
+      prevCollaborators: prevCollaborators,
+      prevAuthors: prevAuthors,
     );
 
     return ProposalDataV2(

@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 
 class ProposalDataCollaborator extends Equatable {
   final CatalystId id;
@@ -38,44 +38,36 @@ class ProposalDataCollaborator extends Equatable {
 
   static List<ProposalDataCollaborator> resolveCollaboratorStatuses({
     required bool isProposalFinal,
+    List<CatalystId> currentCollaborators = const [],
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
-    List<CatalystId> originalAuthor = const [],
     List<CatalystId> prevCollaborators = const [],
     List<CatalystId> prevAuthors = const [],
   }) {
-    final significantPrevCollaborators = prevCollaborators.toSignificant();
-    final significantOriginalAuthor = originalAuthor.toSignificant();
-    final significantPrevAuthors = prevAuthors.toSignificant();
+    final currentCollaboratorsStatuses = currentCollaborators.map((id) {
+      return ProposalDataCollaborator.fromAction(
+        id: id,
+        action: collaboratorsActions[id.toSignificant()]?.action,
+        isProposalFinal: isProposalFinal,
+      );
+    });
 
-    final collaboratorsStatuses = <ProposalDataCollaborator>[];
-    for (final collaborator in collaboratorsActions.keys) {
-      final significantCollaborator = collaborator.toSignificant();
-      // collaborator was removed from list and original authors are the same
-      if (!significantPrevCollaborators.contains(significantCollaborator) &&
-          listEquals(significantOriginalAuthor, significantPrevAuthors)) {
-        collaboratorsStatuses.add(
-          ProposalDataCollaborator(id: collaborator, status: ProposalsCollaborationStatus.removed),
-        );
-        // collaborator was removed from the list and original author is not the same as prev Author
-      } else if (!significantPrevCollaborators.contains(significantCollaborator) &&
-          !listEquals(significantOriginalAuthor, significantPrevAuthors)) {
-        collaboratorsStatuses.add(
-          ProposalDataCollaborator(id: collaborator, status: ProposalsCollaborationStatus.left),
-        );
-      } else {
-        collaboratorsStatuses.add(
-          ProposalDataCollaborator.fromAction(
-            id: collaborator,
-            action: collaboratorsActions[significantCollaborator]?.action,
-            isProposalFinal: isProposalFinal,
-          ),
-        );
-      }
-    }
-    return collaboratorsStatuses;
+    final missingCollaborators = prevCollaborators.where(
+      (prev) => currentCollaborators.none((current) => prev.isSameAs(current)),
+    );
+
+    final missingCollaboratorsStatuses = missingCollaborators.map((id) {
+      final didAuthorPrevVersion = prevAuthors.any((author) => author.isSameAs(id));
+      // If they authored the previous version, they left voluntarily.
+      // Otherwise, they were removed by someone else.
+      final status = didAuthorPrevVersion
+          ? ProposalsCollaborationStatus.left
+          : ProposalsCollaborationStatus.removed;
+      return ProposalDataCollaborator(id: id, status: status);
+    });
+
+    return [
+      ...missingCollaboratorsStatuses,
+      ...currentCollaboratorsStatuses,
+    ];
   }
-}
-
-extension on List<CatalystId> {
-  List<CatalystId> toSignificant() => map((e) => e.toSignificant()).toList();
 }
