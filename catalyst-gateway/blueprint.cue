@@ -180,6 +180,10 @@ project: {
 									tag:  _ @forge(name="GIT_HASH_OR_TAG")
 								}
 								env: {
+									RETRY_DELAY: {
+										// 30 minutes
+										value: string | *"1800"
+									}
 									ENVIRONMENT: {
 										value: string | *_env
 									}
@@ -206,6 +210,10 @@ project: {
 									tag:  _ @forge(name="GIT_HASH_OR_TAG")
 								}
 								env: {
+									RETRY_DELAY: {
+										// 30 minutes
+										value: string | *"1800"
+									}
 									ENVIRONMENT: {
 										value: string | *_env
 									}
@@ -215,7 +223,7 @@ project: {
 											key:  "api-key"
 										}
 									}
-									"CAT_GATEWAY_ADMIN_PRIVATE_KEY": {
+									CAT_GATEWAY_ADMIN_PRIVATE_KEY: {
 										secret: {
 											name: "gateway"
 											key:  "admin-private-key"
