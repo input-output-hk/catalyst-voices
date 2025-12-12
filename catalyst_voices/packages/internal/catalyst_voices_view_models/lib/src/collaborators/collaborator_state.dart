@@ -27,14 +27,11 @@ sealed class Collaborators extends Equatable {
       return AllCollaborators(collaborators);
     }
 
-    if (activeAccountId != null &&
-        collaborators.any((e) => e.catalystId.isSameAs(activeAccountId))) {
+    if (activeAccountId != null && collaborators.any((e) => e.id.isSameAs(activeAccountId))) {
       return AllCollaborators(collaborators);
     }
 
-    return AcceptedCollaborators(
-      collaborators.where((e) => e.status == ProposalsCollaborationStatus.accepted).toList(),
-    );
+    return AcceptedCollaborators(collaborators.where((e) => e.status.isAccepted).toList());
   }
 
   bool get isNotEmpty => collaborators.isNotEmpty;

@@ -86,7 +86,7 @@ void main() {
       test('returns empty list when originalAuthor is null', () {
         final stream = proposalService.watchWorkspaceProposalsBrief(
           // ignore: avoid_redundant_argument_values
-          filters: const ProposalsFiltersV2(originalAuthor: null),
+          filters: const ProposalsFiltersV2(relationships: {}),
         );
         expect(stream, emits(isEmpty));
       });
@@ -94,7 +94,7 @@ void main() {
       test('merges signed and local proposals correctly', () async {
         // Given
         final authorId = CatalystIdFactory.create();
-        final filters = ProposalsFiltersV2(originalAuthor: authorId);
+        final filters = ProposalsFiltersV2(relationships: {OriginalAuthor(authorId)});
 
         final signedDocId = DocumentRefFactory.signedDocumentRef();
         final newDraftId = DocumentRefFactory.draftDocumentRef();

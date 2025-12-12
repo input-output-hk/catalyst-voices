@@ -74,12 +74,16 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       ProposalsPageTab.total || ProposalsPageTab.favorites || ProposalsPageTab.my || null => null,
     };
 
+    final activeAccountId = _cache.activeAccountId;
     final filters = _cache.filters.copyWith(
       status: Optional(status),
       isFavorite: _cache.tab == ProposalsPageTab.favorites
           ? const Optional(true)
           : const Optional.empty(),
-      originalAuthor: Optional(_cache.tab == ProposalsPageTab.my ? _cache.activeAccountId : null),
+      relationships: {
+        if (_cache.tab == ProposalsPageTab.my && activeAccountId != null)
+          OriginalAuthor(activeAccountId),
+      },
       categoryId: categoryId,
       searchQuery: searchQuery,
       latestUpdate: isRecentEnabled != null
@@ -224,27 +228,29 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       ProposalsPageTab.total => _cache.filters.copyWith(
         status: const Optional.empty(),
         isFavorite: const Optional.empty(),
-        originalAuthor: const Optional.empty(),
+        relationships: const {},
       ),
       ProposalsPageTab.drafts => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.draft),
         isFavorite: const Optional.empty(),
-        originalAuthor: const Optional.empty(),
+        relationships: const {},
       ),
       ProposalsPageTab.finals => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        originalAuthor: const Optional.empty(),
+        relationships: const {},
       ),
       ProposalsPageTab.favorites => _cache.filters.copyWith(
         status: const Optional.empty(),
         isFavorite: const Optional(true),
-        originalAuthor: const Optional.empty(),
+        relationships: const {},
       ),
       ProposalsPageTab.my => _cache.filters.copyWith(
         status: const Optional.empty(),
         isFavorite: const Optional.empty(),
-        originalAuthor: Optional(_cache.activeAccountId),
+        relationships: {
+          if (_cache.activeAccountId != null) OriginalAuthor(_cache.activeAccountId!),
+        },
       ),
     };
   }
