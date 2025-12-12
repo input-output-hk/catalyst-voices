@@ -7,14 +7,13 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
-import 'package:drift/drift.dart' hide isNull, isNotNull;
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../utils/document_composite_factory.dart';
+import '../../utils/local_document_draft_factory.dart';
 import '../connection/test_connection.dart';
 import '../drift_test_platforms.dart';
 
@@ -33,6 +32,276 @@ void main() {
 
       tearDown(() async {
         await db.close();
+      });
+
+      group('getCollaboratorsActions', () {
+        final now = DateTime.now();
+        final earlier = now.subtract(const Duration(hours: 1));
+        final latest = now.add(const Duration(hours: 1));
+
+        final author = _createTestAuthor(name: 'author');
+        final collaboratorA = _createTestAuthor(name: 'collabA', role0KeySeed: 1);
+        final collaboratorB = _createTestAuthor(name: 'collabB', role0KeySeed: 2);
+        final stranger = _createTestAuthor(name: 'stranger', role0KeySeed: 3);
+
+        test('returns empty map when input list is empty', () async {
+          // Given: No refs requested
+          // When
+          final result = await dao.getCollaboratorsActions(proposalsRefs: []);
+
+          // Then
+          expect(result, isEmpty);
+        });
+
+        test('returns only actions from valid collaborators', () async {
+          // Given: A proposal with one defined collaborator
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // And: Two actions, one from the collaborator, one from a stranger
+          final validAction = _createTestDocumentEntity(
+            id: 'a1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          final invalidAction = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [stranger],
+            // Not a collaborator
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, validAction, invalidAction]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then
+          final p1Actions = result[proposal.doc.id]!;
+          expect(p1Actions.data, hasLength(1));
+          expect(p1Actions.data.keys, contains(collaboratorA.toSignificant()));
+          expect(p1Actions.data.keys, isNot(contains(stranger.toSignificant())));
+        });
+
+        test('returns only the latest action per collaborator', () async {
+          // Given: A proposal
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // And: Two actions from the same collaborator, different times
+          final oldAction = _createTestDocumentEntity(
+            id: 'old',
+            ver: _buildUuidV7At(earlier),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(), // Old state
+          );
+
+          final newAction = _createTestDocumentEntity(
+            id: 'new',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(), // New state
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, oldAction, newAction]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then
+          final action = result[proposal.doc.id]?.data[collaboratorA.toSignificant()];
+          expect(action?.action, ProposalSubmissionAction.aFinal);
+        });
+
+        test('handles Loose Ref -> returns actions for any version', () async {
+          // Given: Proposal V1 and V2
+          final pV1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+          // Collaborator B added in V2
+          final pV2 = _createTestDocumentEntity(
+            id: pV1.doc.id,
+            ver: 'v2',
+            authors: [author],
+            collaborators: [collaboratorB],
+          );
+
+          // Actions pointing to specific versions
+          final actionForV1 = _createTestDocumentEntity(
+            id: 'a1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: pV1.doc.id,
+            refVer: pV1.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          final actionForV2 = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: pV2.doc.id,
+            refVer: pV2.doc.ver,
+            authors: [collaboratorB],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([pV1, pV2, actionForV1, actionForV2]);
+
+          // When: Requesting Loose Ref (just ID)
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: pV1.doc.id)],
+          );
+
+          // Then: Both actions are returned
+          final actions = result[pV1.doc.id]!.data;
+          expect(actions, hasLength(2));
+          expect(actions[collaboratorA.toSignificant()]?.proposalId.ver, pV1.doc.ver);
+          expect(actions[collaboratorB.toSignificant()]?.proposalId.ver, pV2.doc.ver);
+        });
+
+        test('handles Exact Ref -> ignores actions for other versions', () async {
+          // Given: Proposal V1
+          final pV1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+          final pV2 = _createTestDocumentEntity(
+            id: pV1.doc.id,
+            ver: 'v2',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // Action pointing to V2
+          final actionForV2 = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: pV2.doc.id,
+            refVer: pV2.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([pV1, pV2, actionForV2]);
+
+          // When: Requesting Exact Ref for V1
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.exact(id: pV1.doc.id, ver: pV1.doc.ver)],
+          );
+
+          // Then: The action for V2 is NOT returned
+          expect(result, isEmpty);
+        });
+
+        test('filters distinct collaborators correctly', () async {
+          // Given: Proposal with two collaborators
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA, collaboratorB],
+          );
+
+          final actionA = _createTestDocumentEntity(
+            id: 'a1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          final actionB = _createTestDocumentEntity(
+            id: 'a2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorB],
+            contentData: ProposalSubmissionActionDto.hide.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, actionA, actionB]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then
+          final actions = result[proposal.doc.id]!.data;
+          expect(actions, hasLength(2));
+          expect(actions[collaboratorA.toSignificant()]?.action, ProposalSubmissionAction.draft);
+          expect(actions[collaboratorB.toSignificant()]?.action, ProposalSubmissionAction.hide);
+        });
+
+        test('gracefully handles malformed JSON content in action', () async {
+          // Given: Proposal and a Collaborator
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            authors: [author],
+            collaborators: [collaboratorA],
+          );
+
+          // And: An action document with invalid JSON structure
+          final malformedAction = _createTestDocumentEntity(
+            id: 'bad-action',
+            ver: 'v1',
+            type: DocumentType.proposalActionDocument,
+            refId: proposal.doc.id,
+            refVer: proposal.doc.ver,
+            authors: [collaboratorA],
+            contentData: {'invalid': 'structure'}, // Missing 'action' field
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, malformedAction]);
+
+          // When
+          final result = await dao.getCollaboratorsActions(
+            proposalsRefs: [SignedDocumentRef.loose(id: proposal.doc.id)],
+          );
+
+          // Then: The malformed action is ignored (not added to map)
+          final actions = result[proposal.doc.id]?.data ?? {};
+          expect(actions, isEmpty);
+        });
       });
 
       group('getVisibleProposalsCount', () {
@@ -5619,6 +5888,168 @@ void main() {
           await subscription.cancel();
         });
       });
+
+      group('getLocalDraftsProposalsBrief', () {
+        final author = _createTestAuthor(name: 'me', role0KeySeed: 1);
+        final otherAuthor = _createTestAuthor(name: 'other', role0KeySeed: 2);
+
+        test('returns empty list when no drafts exist', () async {
+          // Given: Empty local drafts table
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, isEmpty);
+        });
+
+        test('returns draft for specific author', () async {
+          // Given
+          final draft = _createTestLocalDraft(
+            id: 'draft-1',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+            contentData: {'title': 'My Draft'},
+          );
+          await db.localDocumentsV2Dao.saveAll([draft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.proposal.id, 'draft-1');
+          expect(result.first.proposal.content.data['title'], 'My Draft');
+          expect(result.first.originalAuthors, [author]);
+        });
+
+        test('filters out drafts from other authors', () async {
+          // Given
+          final myDraft = _createTestLocalDraft(
+            id: 'my-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+          );
+          final otherDraft = _createTestLocalDraft(
+            id: 'other-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [otherAuthor],
+          );
+          await db.localDocumentsV2Dao.saveAll([myDraft, otherDraft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.proposal.id, 'my-draft');
+        });
+
+        test('filters out non-proposal drafts', () async {
+          // Given
+          final proposalDraft = _createTestLocalDraft(
+            id: 'proposal-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            type: DocumentType.proposalDocument,
+            authors: [author],
+          );
+          final commentDraft = _createTestLocalDraft(
+            id: 'comment-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            type: DocumentType.commentDocument,
+            authors: [author],
+          );
+          await db.localDocumentsV2Dao.saveAll([proposalDraft, commentDraft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.proposal.id, 'proposal-draft');
+          expect(result.first.proposal.type, DocumentType.proposalDocument);
+        });
+
+        test('joins template information when available', () async {
+          // Given: A template in DocumentsV2
+          final templateVer = _buildUuidV7At(DateTime.now());
+          final template = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: templateVer,
+            type: DocumentType.proposalTemplate,
+            contentData: {'title': 'Fund 10 Template'},
+          );
+          await db.documentsV2Dao.save(template);
+
+          // And: A local draft referencing that template
+          final draft = _createTestLocalDraft(
+            id: 'draft-1',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+            templateId: 'template-1',
+            templateVer: templateVer,
+          );
+          await db.localDocumentsV2Dao.saveAll([draft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.template, isNotNull);
+          expect(result.first.template!.id, 'template-1');
+          expect(result.first.template!.content.data['title'], 'Fund 10 Template');
+        });
+
+        test('returns null template if template not found', () async {
+          // Given: A draft referencing a non-existent template
+          final draft = _createTestLocalDraft(
+            id: 'draft-1',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+            templateId: 'missing-template',
+            templateVer: 'missing-ver',
+          );
+          await db.localDocumentsV2Dao.saveAll([draft]);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result.first.template, isNull);
+        });
+
+        test('correctly maps isFavorite status', () async {
+          // Given: Two drafts
+          final favDraft = _createTestLocalDraft(
+            id: 'fav-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+          );
+          final normalDraft = _createTestLocalDraft(
+            id: 'normal-draft',
+            ver: _buildUuidV7At(DateTime.now()),
+            authors: [author],
+          );
+          await db.localDocumentsV2Dao.saveAll([favDraft, normalDraft]);
+
+          // And: One marked as favorite
+          await dao.updateProposalFavorite(id: 'fav-draft', isFavorite: true);
+
+          // When
+          final result = await dao.getLocalDraftsProposalsBrief(author: author);
+
+          // Then
+          expect(result, hasLength(2));
+
+          final favResult = result.firstWhere((e) => e.proposal.id == 'fav-draft');
+          final normalResult = result.firstWhere((e) => e.proposal.id == 'normal-draft');
+
+          expect(favResult.isFavorite, isTrue);
+          expect(normalResult.isFavorite, isFalse);
+        });
+      });
     },
     skip: driftSkip,
   );
@@ -5630,20 +6061,7 @@ CatalystId _createTestAuthor({
   String? name,
   int role0KeySeed = 0,
 }) {
-  final buffer = StringBuffer('id.catalyst://');
-  final role0Key = Uint8List.fromList(List.filled(32, role0KeySeed));
-
-  if (name != null) {
-    buffer
-      ..write(name)
-      ..write('@');
-  }
-
-  buffer
-    ..write('preprod.cardano/')
-    ..write(base64UrlNoPadEncode(role0Key));
-
-  return CatalystId.parse(buffer.toString());
+  return CatalystIdFactory.create(username: name, role0KeySeed: role0KeySeed);
 }
 
 List<CatalystId> _createTestAuthors(
@@ -5674,6 +6092,42 @@ DocumentCompositeEntity _createTestDocumentEntity({
   List<DocumentRef>? parameters,
 }) {
   return DocumentCompositeFactory.create(
+    id: id,
+    ver: ver,
+    contentData: contentData,
+    type: type,
+    createdAt: createdAt,
+    authors: authors,
+    refId: refId,
+    refVer: refVer,
+    replyId: replyId,
+    replyVer: replyVer,
+    section: section,
+    templateId: templateId,
+    templateVer: templateVer,
+    parameters: parameters ?? [],
+    collaborators: collaborators ?? [],
+  );
+}
+
+LocalDocumentDraftEntity _createTestLocalDraft({
+  String? id,
+  String? ver,
+  Map<String, dynamic> contentData = const {},
+  DocumentType type = DocumentType.proposalDocument,
+  DateTime? createdAt,
+  List<CatalystId>? authors,
+  String? refId,
+  String? refVer,
+  String? replyId,
+  String? replyVer,
+  String? section,
+  String? templateId,
+  String? templateVer,
+  List<CatalystId>? collaborators,
+  List<DocumentRef>? parameters,
+}) {
+  return LocalDocumentDraftFactory.create(
     id: id,
     ver: ver,
     contentData: contentData,

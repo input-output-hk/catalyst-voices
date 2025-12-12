@@ -15,6 +15,8 @@ abstract interface class ProposalRepository {
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
     ProposalDocumentDataLocalSource proposalsLocalSource,
+    CastedVotesObserver castedVotesObserver,
+    VotingBallotBuilder ballotBuilder,
   ) = ProposalRepositoryImpl;
 
   Future<void> deleteDraftProposal(DraftRef ref);
@@ -45,9 +47,8 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef actionId,
+    required SignedDocumentRef proposalId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -71,6 +72,14 @@ abstract interface class ProposalRepository {
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
 
+  /// Watches [author]'s list of local drafts (not published).
+  ///
+  /// This is simpler version of [watchProposalsBriefPage] since local drafts
+  /// do not have actions or comments.
+  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
+    required CatalystId author,
+  });
+
   /// Watches for [ProposalSubmissionAction] that were made on [referencing] document.
   ///
   /// As making action on document not always creates a new document ref
@@ -80,7 +89,16 @@ abstract interface class ProposalRepository {
     required DocumentRef referencing,
   });
 
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+  /// Watches for a paginated list of published(not local) proposal briefs.
+  ///
+  /// This method provides a stream of [Page<ProposalBriefData>] that updates
+  /// automatically when underlying data changes. It supports pagination through
+  /// [request], ordering via [order], and filtering with [filters].
+  ///
+  /// The resulting [ProposalBriefData] objects are fully assembled, containing
+  /// the proposal document, voting status (draft and casted), and collaborator
+  /// actions.
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
@@ -103,11 +121,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
   final ProposalDocumentDataLocalSource _proposalsLocalSource;
+  final CastedVotesObserver _castedVotesObserver;
+  final VotingBallotBuilder _ballotBuilder;
 
   const ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
     this._proposalsLocalSource,
+    this._castedVotesObserver,
+    this._ballotBuilder,
   );
 
   @override
@@ -135,7 +157,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
     final proposalPublish = await getProposalPublishForRef(ref: ref);
     if (proposalPublish == null) {
-      throw const NotFoundException(message: 'Proposal is hidden');
+      throw DocumentHiddenException(ref: ref);
     }
     final templateRef = documentData.metadata.template!;
     final documentTemplate = await _documentRepository.getDocumentData(id: templateRef);
@@ -191,9 +213,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef actionId,
+    required SignedDocumentRef proposalId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -201,12 +222,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+    // TODO(LynxLynxx): implement new method. _documentRepository.getDocumentMetadata to receive only metadata
+    final documentData = await _documentRepository.getDocumentData(id: proposalId);
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
       metadata: DocumentDataMetadata.proposalAction(
-        id: actionRef,
-        proposalRef: proposalRef,
-        parameters: DocumentParameters({categoryId}),
+        id: actionId,
+        proposalRef: proposalId,
+        parameters: documentData.metadata.parameters,
       ),
       catalystId: catalystId,
       privateKey: privateKey,
@@ -282,6 +305,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _proposalsLocalSource
+        .watchRawLocalDraftsProposalsBrief(author: author)
+        .switchMap((proposals) => Stream.fromFuture(_assembleProposalBriefData(proposals)));
+  }
+
+  @override
   Stream<ProposalPublish?> watchProposalPublish({
     required DocumentRef referencing,
   }) {
@@ -298,23 +330,69 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalsLocalSource.watchProposalsBriefPage(
-      request: request,
-      order: order,
-      filters: filters,
+    // 1. The Data Stream
+    // This stream might not emit if only collaborator actions change
+    // due to the distinct() in the DataSource.
+    final pageStream = _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalsLocalSource.watchRawProposalsBriefPage(
+          request: request,
+          order: order,
+          filters: effectiveFilters,
+        );
+      },
     );
+
+    // 2. The Trigger Stream
+    // We watch the count of Action documents. If a collaborator adds/updates
+    // an action, this count (or the underlying table) changes, triggering an emission.
+    // This forces the combineLatest to re-emit the (potentially stale) page,
+    // allowing us to re-run the update of page.
+    final actionTrigger = _documentRepository.watchCount(type: DocumentType.proposalActionDocument);
+
+    // 3. Local ballot votes
+    final draftVotes = _ballotBuilder.watchVotes;
+
+    // 4. Casted votes stream.
+    // If the votes becomes documents it should be moved somewhere in local docs source.
+    final castedVotes = _castedVotesObserver.watchCastedVotes;
+
+    // 5. Combine and page update
+    return Rx.combineLatest4(
+      pageStream,
+      actionTrigger,
+      draftVotes,
+      castedVotes,
+      (page, _, draftVotes, castedVotes) => (page, draftVotes, castedVotes),
+    ).switchMap((components) {
+      final page = components.$1;
+      final draftVotes = Map.fromEntries(components.$2.map((e) => MapEntry(e.proposal, e)));
+      final castedVotes = Map.fromEntries(components.$3.map((e) => MapEntry(e.proposal, e)));
+
+      final briefs = _assembleProposalBriefData(
+        page.items,
+        draftVotes: draftVotes,
+        castedVotes: castedVotes,
+      ).then(page.copyWithItems);
+
+      return Stream.fromFuture(briefs);
+    });
   }
 
   @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalsLocalSource.watchProposalsCountV2(filters: filters);
+    return _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalsLocalSource.watchProposalsCountV2(filters: effectiveFilters);
+      },
+    );
   }
 
   @override
@@ -351,6 +429,61 @@ final class ProposalRepositoryImpl implements ProposalRepository {
             },
           ).toList(),
         );
+  }
+
+  // TODO(damian-molinski): Remove this when voteBy is implemented.
+  Stream<ProposalsFiltersV2> _adaptFilters(ProposalsFiltersV2 filters) {
+    if (filters.voteBy == null) {
+      return Stream.value(filters);
+    }
+
+    return _castedVotesObserver.watchCastedVotes
+        .map((votes) => votes.map((e) => e.proposal.id).toList())
+        .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
+  }
+
+  Future<List<ProposalBriefData>> _assembleProposalBriefData(
+    List<RawProposalBrief> rawProposals, {
+    Map<DocumentRef, Vote> draftVotes = const {},
+    Map<DocumentRef, Vote> castedVotes = const {},
+  }) async {
+    final proposalsRefs = rawProposals
+        .where((element) => element.proposal.id.isSigned)
+        // If proposal is final we have to get action for that exact version,
+        // otherwise just latest action
+        .map((e) => e.isFinal ? e.proposal.id : e.proposal.id.toLoose())
+        .toList();
+
+    final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
+      proposalsRefs: proposalsRefs,
+    );
+
+    return rawProposals.map((item) {
+      final templateData = item.template;
+
+      final proposalOrDocument = templateData == null
+          ? ProposalOrDocument.data(item.proposal)
+          : () {
+              final template = ProposalTemplateFactory.create(templateData);
+              final proposal = ProposalDocumentFactory.create(item.proposal, template: template);
+
+              return ProposalOrDocument.proposal(proposal);
+            }();
+
+      final proposalId = item.proposal.id;
+
+      final draftVote = draftVotes[proposalId];
+      final castedVote = castedVotes[proposalId];
+      final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
+
+      return ProposalBriefData.build(
+        data: item,
+        proposal: proposalOrDocument,
+        draftVote: draftVote,
+        castedVote: castedVote,
+        collaboratorsActions: proposalCollaboratorsActions,
+      );
+    }).toList();
   }
 
   ProposalSubmissionAction? _buildProposalActionData(

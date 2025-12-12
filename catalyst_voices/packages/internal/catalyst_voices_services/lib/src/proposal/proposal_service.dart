@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -15,8 +14,6 @@ abstract interface class ProposalService {
     UserService userService,
     SignerService signerService,
     ActiveCampaignObserver activeCampaignObserver,
-    CastedVotesObserver castedVotesObserver,
-    VotingBallotBuilder ballotBuilder,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -46,8 +43,7 @@ abstract interface class ProposalService {
 
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<void> forgetProposal({
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef proposalId,
   });
 
   Future<DocumentRef> getLatestProposalVersion({required DocumentRef id});
@@ -90,18 +86,22 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
+  Future<void> respondToCollaboratorInvite({
+    required DocumentRef ref,
+    required CollaboratorInvitationAction action,
+  });
+
   /// Submits a proposal draft into review.
   ///
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> submitProposalForReview({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
     required SignedDocumentRef categoryId,
   });
 
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> unlockProposal({
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef proposalId,
   });
 
   /// Upserts a proposal draft in the local storage.
@@ -112,9 +112,18 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId id);
+
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  /// Streams pages of brief proposal data.
+  ///
+  /// The [request] parameter defines the page number and size.
+  /// The optional [order] parameter specifies how the results should be sorted.
+  /// The optional [filters] parameter can be used to filter proposals based on various criteria.
+  /// Returns a stream of [Page] with [ProposalBriefData] that updates as the
+  /// underlying data changes.
   Stream<Page<ProposalBriefData>> watchProposalsBriefPageV2({
     required PageRequest request,
     ProposalsOrder order,
@@ -125,7 +134,11 @@ abstract interface class ProposalService {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<List<DetailProposal>> watchUserProposals();
+  /// Similar to [watchProposalsBriefPageV2] but also includes local drafts of proposals
+  /// but do not support pagination.
+  Stream<List<ProposalBriefData>> watchWorkspaceProposalsBrief({
+    ProposalsFiltersV2 filters,
+  });
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -134,8 +147,6 @@ final class ProposalServiceImpl implements ProposalService {
   final UserService _userService;
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
-  final CastedVotesObserver _castedVotesObserver;
-  final VotingBallotBuilder _ballotBuilder;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -143,8 +154,6 @@ final class ProposalServiceImpl implements ProposalService {
     this._userService,
     this._signerService,
     this._activeCampaignObserver,
-    this._castedVotesObserver,
-    this._ballotBuilder,
   );
 
   @override
@@ -191,23 +200,21 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<SignedDocumentRef> forgetProposal({
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef proposalId,
   }) {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
-        final actionRef = SignedDocumentRef.generateFirstRef();
+        final actionId = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          categoryId: categoryId,
+          actionId: actionId,
+          proposalId: proposalId,
           action: ProposalSubmissionAction.hide,
           catalystId: catalystId,
           privateKey: privateKey,
         );
 
-        return actionRef;
+        return actionId;
       },
     );
   }
@@ -323,8 +330,17 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<void> respondToCollaboratorInvite({
+    required DocumentRef ref,
+    required CollaboratorInvitationAction action,
+  }) async {
+    // TODO(dt-iohk): replace by real implementation once data sources are ready
+    await Future<void>.delayed(const Duration(seconds: 2));
+  }
+
+  @override
   Future<SignedDocumentRef> submitProposalForReview({
-    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef proposalId,
     required SignedDocumentRef categoryId,
   }) async {
     if (await isMaxProposalsLimitReached()) {
@@ -335,35 +351,32 @@ final class ProposalServiceImpl implements ProposalService {
 
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
-        final actionRef = SignedDocumentRef.generateFirstRef();
+        final actionId = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          categoryId: categoryId,
+          actionId: actionId,
+          proposalId: proposalId,
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
         );
 
-        return actionRef;
+        return actionId;
       },
     );
   }
 
   @override
   Future<SignedDocumentRef> unlockProposal({
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef proposalId,
   }) async {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          categoryId: categoryId,
+          actionId: actionRef,
+          proposalId: proposalId,
           action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -397,6 +410,21 @@ final class ProposalServiceImpl implements ProposalService {
         content: content,
       ),
     );
+  }
+
+  @override
+  Future<CollaboratorValidationResult> validateForCollaborator(CatalystId catalystId) async {
+    final (isProposer, isVerified) = await (
+      _userService.validateCatalystIdForProposerRole(catalystId: catalystId),
+      _userService.isPubliclyVerified(catalystId: catalystId),
+    ).wait;
+
+    return switch ((isProposer, isVerified)) {
+      (true, true) => const ValidCollaborator(),
+      (true, false) => const NotVerifiedProfile(),
+      (false, true) => const MissingProposerRole(),
+      (false, false) => const NotProposerAndNotVerified(),
+    };
   }
 
   @override
@@ -439,28 +467,10 @@ final class ProposalServiceImpl implements ProposalService {
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    final proposals = _adaptFilters(filters).switchMap(
-      (effectiveFilters) {
-        return _proposalRepository.watchProposalsBriefPage(
-          request: request,
-          order: order,
-          filters: effectiveFilters,
-        );
-      },
-    );
-
-    final draftVotes = _ballotBuilder.watchVotes;
-    final castedVotes = _castedVotesObserver.watchCastedVotes;
-
-    return Rx.combineLatest3(
-      proposals,
-      draftVotes,
-      castedVotes,
-      (page, draftVotes, castedVotes) {
-        return page.map(
-          (proposal) => _mapJoinedProposalBriefData(proposal, draftVotes, castedVotes),
-        );
-      },
+    return _proposalRepository.watchProposalsBriefPage(
+      request: request,
+      order: order,
+      filters: filters,
     );
   }
 
@@ -468,103 +478,34 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _adaptFilters(filters).switchMap(
-      (effectiveFilters) {
-        return _proposalRepository.watchProposalsCountV2(filters: effectiveFilters);
-      },
-    );
+    return _proposalRepository.watchProposalsCountV2(filters: filters);
   }
 
   @override
-  Stream<List<DetailProposal>> watchUserProposals() {
-    return _userService.watchUnlockedActiveAccount.distinct().switchMap((account) {
-      if (account == null) return const Stream.empty();
-
-      final authorId = account.catalystId;
-      if (!account.hasRole(AccountRole.proposer)) {
-        return const Stream.empty();
-      }
-
-      return _proposalRepository
-          .watchUserProposals(authorId: authorId)
-          .distinct()
-          .switchMap<List<DetailProposal>>((documents) async* {
-            if (documents.isEmpty) {
-              yield [];
-              return;
-            }
-            final proposalsDataStreams = await Future.wait(
-              documents.map(_createProposalDataStream).toList(),
-            );
-
-            yield* Rx.combineLatest(
-              proposalsDataStreams,
-              (List<ProposalData?> proposalsData) async {
-                // Note. one is null and two versions of same id.
-                final validProposalsData = proposalsData.whereType<ProposalData>().toList();
-
-                final groupedProposals = groupBy(
-                  validProposalsData,
-                  (data) => data.document.metadata.id.id,
-                );
-
-                final filteredProposalsData = groupedProposals.values
-                    .map((group) {
-                      if (group.any(
-                        (p) => p.publish != ProposalPublish.localDraft,
-                      )) {
-                        return group.where(
-                          (p) => p.publish != ProposalPublish.localDraft,
-                        );
-                      }
-                      return group;
-                    })
-                    .expand((group) => group)
-                    .toList();
-
-                final proposalsWithVersions = await Future.wait(
-                  filteredProposalsData.map((proposalData) async {
-                    final versions = await _getDetailVersionsOfProposal(proposalData);
-                    return DetailProposal.fromData(proposalData, versions);
-                  }),
-                );
-                return proposalsWithVersions;
-              },
-            ).switchMap(Stream.fromFuture);
-          });
-    });
-  }
-
-  // TODO(damian-molinski): Remove this when voteBy is implemented.
-  Stream<ProposalsFiltersV2> _adaptFilters(ProposalsFiltersV2 filters) {
-    if (filters.voteBy == null) {
-      return Stream.value(filters);
+  Stream<List<ProposalBriefData>> watchWorkspaceProposalsBrief({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    // Workspace only supports showing proposals for specific user.
+    final originalAuthor = filters.originalAuthor;
+    if (originalAuthor == null) {
+      return Stream.value(const <ProposalBriefData>[]);
     }
 
-    return _castedVotesObserver.watchCastedVotes
-        .map((votes) => votes.map((e) => e.proposal.id).toList())
-        .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
-  }
+    // Workspace do not support pagination
+    const signedProposalsPageRequest = PageRequest(page: 0, size: 999);
+    final signedProposalsStream = watchProposalsBriefPageV2(
+      request: signedProposalsPageRequest,
+      filters: filters,
+    ).map((page) => page.items);
 
-  Future<Stream<ProposalData?>> _createProposalDataStream(
-    ProposalDocument doc,
-  ) async {
-    final proposalId = doc.metadata.id;
-
-    final commentsCountStream = _proposalRepository.watchCommentsCount(referencing: proposalId);
+    final localDraftProposalsStream = _proposalRepository.watchLocalDraftProposalsBrief(
+      author: originalAuthor,
+    );
 
     return Rx.combineLatest2(
-      _proposalRepository.watchProposalPublish(referencing: proposalId),
-      commentsCountStream,
-      (ProposalPublish? publishState, int commentsCount) {
-        if (publishState == null) return null;
-
-        return ProposalData(
-          document: doc,
-          publish: publishState,
-          commentsCount: commentsCount,
-        );
-      },
+      signedProposalsStream,
+      localDraftProposalsStream,
+      _mergePublishedAndLocalProposals,
     );
   }
 
@@ -605,35 +546,24 @@ final class ProposalServiceImpl implements ProposalService {
     return account.catalystId;
   }
 
-  ProposalBriefData _mapJoinedProposalBriefData(
-    JoinedProposalBriefData data,
-    List<Vote> draftVotes,
-    List<Vote> castedVotes,
+  List<ProposalBriefData> _mergePublishedAndLocalProposals(
+    List<ProposalBriefData> signed,
+    List<ProposalBriefData> localDrafts,
   ) {
-    final proposal = data.proposal;
-    final isFinal = data.isFinal;
+    final documents = <String, ProposalBriefData>{
+      for (final doc in signed) doc.id.id: doc,
+    };
 
-    final draftVote = isFinal
-        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
-        : null;
-    final castedVote = isFinal
-        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
-        : null;
+    for (final localDraft in localDrafts) {
+      documents.update(
+        localDraft.id.id,
+        // if local draft has signed version, keep signed as main and append local draft as version
+        (value) => value.appendVersion(ref: localDraft.id, title: localDraft.title),
+        // if there is no signed version, add new entry
+        ifAbsent: () => localDraft,
+      );
+    }
 
-    return ProposalBriefData(
-      id: proposal.id,
-      authorName: data.originalAuthors.firstOrNull?.username ?? '',
-      title: proposal.title ?? '',
-      description: proposal.description ?? '',
-      categoryName: proposal.categoryName ?? '',
-      durationInMonths: proposal.durationInMonths ?? 0,
-      fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      createdAt: proposal.id.ver!.dateTime,
-      iteration: data.iteration,
-      commentsCount: isFinal ? null : data.commentsCount,
-      isFinal: isFinal,
-      isFavorite: data.isFavorite,
-      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
-    );
+    return documents.values.sorted((a, b) => a.compareTo(b) * -1);
   }
 }

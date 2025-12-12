@@ -5,6 +5,7 @@ import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/leave_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
@@ -24,6 +25,7 @@ class ProposalMenuActionButton extends StatefulWidget {
   final String title;
   final bool hasNewerLocalIteration;
   final bool fromActiveCampaign;
+  final UserProposalOwnership ownership;
 
   const ProposalMenuActionButton({
     super.key,
@@ -33,6 +35,7 @@ class ProposalMenuActionButton extends StatefulWidget {
     required this.title,
     required this.hasNewerLocalIteration,
     required this.fromActiveCampaign,
+    required this.ownership,
   });
 
   @override
@@ -51,9 +54,12 @@ class _MenuItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: item.icon(workspace: true).buildIcon(),
+      leading: item.icon(workspace: true).buildIcon(color: item.foregroundColor(context)),
       title: Text(
         item.workspaceTitle(context, proposalPublish),
+        style: context.textTheme.bodyLarge?.copyWith(
+          color: item.foregroundColor(context),
+        ),
       ),
       mouseCursor: item.clickable ? SystemMouseCursors.click : null,
     );
@@ -68,6 +74,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
   List<ProposalMenuItemAction> get _items => ProposalMenuItemAction.workspaceAvailableOptions(
     widget.proposalPublish,
     fromActiveCampaign: widget.fromActiveCampaign,
+    ownership: widget.ownership,
   );
 
   @override
@@ -167,6 +174,16 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
     }
   }
 
+  Future<void> _leaveProposal() async {
+    final action = await LeaveProposalDialog.show(
+      context: context,
+    );
+
+    if (action && mounted) {
+      context.read<WorkspaceBloc>().add(LeaveProposalEvent(widget.ref));
+    }
+  }
+
   void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
       case ProposalMenuItemAction.edit:
@@ -181,6 +198,8 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
         unawaited(_deleteProposal());
       case ProposalMenuItemAction.forget:
         unawaited(_forgetProposal());
+      case ProposalMenuItemAction.leave:
+        unawaited(_leaveProposal());
       case _:
         break;
     }
@@ -208,5 +227,14 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
 
   void _viewProposal() {
     unawaited(ProposalRoute.fromRef(ref: widget.ref).push(context));
+  }
+}
+
+extension on ProposalMenuItemAction {
+  Color? foregroundColor(BuildContext context) {
+    return switch (this) {
+      ProposalMenuItemAction.leave => context.colors.iconsError,
+      _ => null,
+    };
   }
 }

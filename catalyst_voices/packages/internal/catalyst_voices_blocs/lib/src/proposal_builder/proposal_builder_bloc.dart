@@ -72,6 +72,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
     on<UpdateUsernameEvent>(_onUpdateUsername);
+    on<UpdateCollaboratorsEvent>(_updateCollaborators);
     on<UnlockProposalBuilderEvent>(_unlockProposal);
     on<ForgetProposalBuilderEvent>(_forgetProposal);
 
@@ -142,6 +143,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       template: state.metadata.templateRef!,
       parameters: DocumentParameters({state.metadata.categoryId!}),
       authors: [_userService.activeAccountId],
+      collaborators: state.metadata.collaborators,
     );
   }
 
@@ -352,13 +354,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     ProposalBuilderEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final categoryId = state.metadata.categoryId;
-    final proposalRef = state.metadata.documentRef;
+    final proposalId = state.metadata.documentRef;
     try {
       emit(state.copyWith(isChanging: true));
       await _proposalService.forgetProposal(
-        proposalRef: proposalRef! as SignedDocumentRef,
-        categoryId: categoryId!,
+        proposalId: proposalId! as SignedDocumentRef,
       );
       unawaited(_clearCache());
       emitSignal(const ForgotProposalSuccessBuilderSignal());
@@ -558,6 +558,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           categoryId: categoryRef,
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
+          authorId: _cache.activeAccountId,
+          collaborators: proposalData.document.metadata.collaborators ?? [],
         ),
         category: category,
         categoryTotalAsk: categoryTotalAsk,
@@ -727,32 +729,32 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   Future<void> _publishAndSubmitProposalForReview(
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final currentRef = state.metadata.documentRef!;
-    final updatedRef = await _proposalService.publishProposal(
+    final currentId = state.metadata.documentRef!;
+    final updatedId = await _proposalService.publishProposal(
       document: _buildDocumentData(),
     );
 
     List<DocumentVersion>? updatedVersions;
-    if (updatedRef != currentRef) {
+    if (updatedId != currentId) {
       // if a new ref has been created we need to recreate
       // the version history to reflect it, drop the old one
       // because the new one overrode it
       updatedVersions = _recreateDocumentVersionsWithNewRef(
-        newRef: updatedRef,
-        removedRef: currentRef,
+        newRef: updatedId,
+        removedRef: currentId,
       );
     }
 
     _updateMetadata(
       emit,
-      documentRef: updatedRef,
-      originalDocumentRef: updatedRef,
+      documentRef: updatedId,
+      originalDocumentRef: updatedId,
       publish: ProposalPublish.publishedDraft,
       versions: updatedVersions,
     );
 
     await _proposalService.submitProposalForReview(
-      proposalRef: updatedRef,
+      proposalId: updatedId,
       categoryId: state.metadata.categoryId!,
     );
 
@@ -923,6 +925,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
       final proposalTitle = state.proposalTitle;
       final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+      final hasCollaborators = state.metadata.collaborators.isNotEmpty;
 
       // if it's local draft and the first version then
       // it should be shown as local which corresponds to null
@@ -935,6 +938,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           proposalTitle: proposalTitle,
           currentIteration: currentIteration,
           nextIteration: nextIteration,
+          hasCollaborators: hasCollaborators,
         ),
       );
     } finally {
@@ -1151,7 +1155,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) async {
     await _proposalService.submitProposalForReview(
-      proposalRef: state.metadata.documentRef! as SignedDocumentRef,
+      proposalId: state.metadata.documentRef! as SignedDocumentRef,
       categoryId: state.metadata.categoryId!,
     );
 
@@ -1164,12 +1168,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) async {
     try {
-      final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
-      final categoryId = state.metadata.categoryId!;
+      final proposalId = state.metadata.documentRef! as SignedDocumentRef;
       emit(state.copyWith(isChanging: true));
       await _proposalService.unlockProposal(
-        proposalRef: proposalRef,
-        categoryId: categoryId,
+        proposalId: proposalId,
       );
       final stateMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
       _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
@@ -1178,6 +1180,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       _logger.severe('Unlock proposal failed', e, stackTrace);
       emitError(LocalizedException.create(e));
     }
+  }
+
+  void _updateCollaborators(
+    UpdateCollaboratorsEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    final stateMetadata = state.metadata.copyWith(collaborators: event.collaborators);
+    _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
+    emit(state.copyWith(metadata: stateMetadata));
   }
 
   Future<void> _updateCommentBuilder(

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/dev_tools/cards/active_campaign_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/app_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/config_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/documents_card.dart';
@@ -50,6 +51,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
           SizedBox(height: 12),
           ConfigCard(),
           SizedBox(height: 12),
+          ActiveCampaignCard(),
+          SizedBox(height: 12),
           DocumentsCard(),
           SizedBox(height: 12),
           FeatureFlagsCard(),
@@ -71,6 +74,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
   void dispose() {
     _bloc?.add(const StopWatchingSystemInfoEvent());
     _bloc?.add(const StopWatchingDocumentsEvent());
+    _bloc?.add(const StopWatchingActiveCampaignEvent());
     _bloc = null;
     super.dispose();
   }
@@ -80,8 +84,9 @@ class _DevToolsPageState extends State<DevToolsPage> {
     super.initState();
 
     _bloc = context.read<DevToolsBloc>()
-      ..add(const UpdateAllEvent())
+      ..add(const InitDataEvent())
       ..add(const WatchSystemInfoEvent())
-      ..add(const WatchDocumentsEvent());
+      ..add(const WatchDocumentsEvent())
+      ..add(const WatchActiveCampaignEvent());
   }
 }

@@ -130,6 +130,7 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerFactory<WorkspaceBloc>(() {
         return WorkspaceBloc(
+          get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
           get<DocumentMapper>(),
@@ -187,6 +188,7 @@ final class Dependencies extends DependencyProvider {
           isRegistered<LoggingService>() ? get<LoggingService>() : null,
           get<DownloaderService>(),
           get<DocumentsService>(),
+          get<CampaignService>(),
         );
       })
       ..registerFactory<DocumentLookupBloc>(() {
@@ -212,6 +214,11 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<FeatureFlagsCubit>(() {
         return FeatureFlagsCubit(
           get<FeatureFlagsService>(),
+        );
+      })
+      ..registerFactory<AddCollaboratorCubit>(() {
+        return AddCollaboratorCubit(
+          get<ProposalService>(),
         );
       });
   }
@@ -296,6 +303,8 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
           get<DatabaseDocumentsDataSource>(),
+          get<CastedVotesObserver>(),
+          get<VotingBallotBuilder>(),
         ),
       )
       ..registerLazySingleton<CommentRepository>(
@@ -410,8 +419,6 @@ final class Dependencies extends DependencyProvider {
         get<UserService>(),
         get<SignerService>(),
         get<ActiveCampaignObserver>(),
-        get<CastedVotesObserver>(),
-        get<VotingBallotBuilder>(),
       );
     });
     registerLazySingleton<CommentService>(() {

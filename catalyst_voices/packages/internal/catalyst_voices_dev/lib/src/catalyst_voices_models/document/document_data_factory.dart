@@ -3,11 +3,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Documen
 
 abstract final class DocumentDataFactory {
   static DocumentData build({
-    DocumentContentType contentType = DocumentContentType.json,
     DocumentType type = DocumentType.proposalDocument,
     DocumentRef? id,
+    SignedDocumentRef? ref,
     SignedDocumentRef? template,
+    List<CatalystId>? collaborators,
     DocumentParameters parameters = const DocumentParameters(),
+    List<CatalystId>? authors,
+    DocumentContentType contentType = DocumentContentType.json,
     DocumentDataContent content = const DocumentDataContent({}),
   }) {
     return DocumentData(
@@ -15,8 +18,11 @@ abstract final class DocumentDataFactory {
         contentType: contentType,
         type: type,
         id: id ?? DocumentRefFactory.signedDocumentRef(),
+        ref: ref,
         template: template,
+        collaborators: collaborators,
         parameters: parameters,
+        authors: authors,
       ),
       content: content,
     );

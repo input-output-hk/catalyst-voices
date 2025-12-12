@@ -8,6 +8,7 @@ import 'package:equatable/equatable.dart';
 /// specific template (`DocumentData`).
 ///
 /// This class provides a unified interface to access common properties
+///
 /// like [title], [description], etc., regardless of the
 /// underlying data type.
 ///
@@ -28,9 +29,7 @@ sealed class ProposalOrDocument extends Equatable {
     return Campaign.all
         .map((e) => e.categories)
         .flattened
-        .firstWhereOrNull(
-          (category) => (_parameters ?? const DocumentParameters()).containsId(category.id.id),
-        )
+        .firstWhereOrNull((category) => _parameters.containsId(category.id.id))
         ?.formattedCategoryName;
   }
 
@@ -40,21 +39,23 @@ sealed class ProposalOrDocument extends Equatable {
   /// The duration of the proposal in months.
   int? get durationInMonths;
 
+  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
+  /// The number of fund this proposal was submitted for.
+  int? get fundNumber {
+    return Campaign.all
+        .firstWhereOrNull((campaign) => campaign.hasAnyParameterId(_parameters))
+        ?.fundNumber;
+  }
+
   /// The amount of funds requested by the proposal.
   Money? get fundsRequested;
-
-  /// A reference to the document itself.
-  DocumentRef get id;
 
   /// The title of the proposal.
   String? get title;
 
-  /// The version of the document.
-  String get version;
-
   /// A private getter for the category reference, used to find the
   /// [categoryName].
-  DocumentParameters? get _parameters;
+  DocumentParameters get _parameters;
 }
 
 final class _Document extends ProposalOrDocument {
@@ -74,19 +75,13 @@ final class _Document extends ProposalOrDocument {
   Money? get fundsRequested => null;
 
   @override
-  DocumentRef get id => data.metadata.id;
-
-  @override
   List<Object?> get props => [data];
 
   @override
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
 
   @override
-  String get version => data.metadata.id.ver!;
-
-  @override
-  DocumentParameters? get _parameters => data.metadata.parameters;
+  DocumentParameters get _parameters => data.metadata.parameters;
 }
 
 final class _Proposal extends ProposalOrDocument {
@@ -104,19 +99,13 @@ final class _Proposal extends ProposalOrDocument {
   Money? get fundsRequested => data.fundsRequested;
 
   @override
-  DocumentRef get id => data.metadata.id;
-
-  @override
   List<Object?> get props => [data];
 
   @override
   String? get title => data.title;
 
   @override
-  String get version => data.metadata.id.ver!;
-
-  @override
-  DocumentParameters? get _parameters => data.metadata.parameters;
+  DocumentParameters get _parameters => data.metadata.parameters;
 }
 
 extension on DocumentNodeId {

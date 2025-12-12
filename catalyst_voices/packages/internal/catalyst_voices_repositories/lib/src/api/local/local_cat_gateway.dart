@@ -17,6 +17,10 @@ import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid_plus/uuid_plus.dart' as u;
 
+/* cSpell:disable */
+const _collabId =
+    'id.catalyst://CollabA@preprod.cardano/AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=';
+
 var _time = DateTime.timestamp().millisecondsSinceEpoch;
 
 String _testAccountAuthorGetter(DocumentRef ref) {
@@ -24,6 +28,7 @@ String _testAccountAuthorGetter(DocumentRef ref) {
   return 'id.catalyst://Test@preprod.cardano/kouGJuMn6o18rRpDAZ1oiZadK171f5_-hgcHTYDGbo0=';
   /* cSpell:enable */
 }
+/* cSpell:enable */
 
 String _v7() {
   final config = u.V7Options(_time -= 2000, null);
@@ -246,6 +251,7 @@ final class LocalCatGateway implements CatGateway {
   Uint8List _buildDoc(
     SignedDocumentMetadata metadata, {
     ProposalSubmissionAction? action,
+    DocumentAuthorGetter? authorGetter,
   }) {
     final protectedHeaders = CoseHeaders.protected(
       contentType: const IntValue(CoseValues.jsonContentType),
@@ -259,6 +265,7 @@ final class LocalCatGateway implements CatGateway {
       ref: metadata.ref?.asCose,
       template: metadata.template?.asCose,
       reply: metadata.reply?.asCose,
+      collabs: metadata.collabs,
       categoryId: metadata.categoryId?.asCose,
     );
 
@@ -296,7 +303,7 @@ final class LocalCatGateway implements CatGateway {
     final ref = SignedDocumentRef(id: metadata.id!, ver: metadata.ver);
     final signature = CoseSignature(
       protectedHeaders: CoseHeaders.protected(
-        kid: utf8.encode(authorGetter(ref)),
+        kid: utf8.encode((authorGetter ?? this.authorGetter)(ref)),
       ),
       unprotectedHeaders: const CoseHeaders.unprotected(),
       signature: Uint8List.fromList([]),
@@ -352,6 +359,7 @@ final class LocalCatGateway implements CatGateway {
           ver: ver,
           template: categoryConstRefs.proposal.asMetadataRef,
           categoryId: categoryConstRefs.category.asMetadataRef,
+          collabs: const [_collabId],
         );
         _cache.update(
           id,
@@ -390,7 +398,31 @@ final class LocalCatGateway implements CatGateway {
           );
 
           _cache[actionId] = [actionMetadata];
-          _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
+          _docs[actionMetadata] = _buildDoc(
+            actionMetadata,
+            action: action,
+          );
+        }
+
+        for (final collab in proposalMetadata.collabs ?? <String>[]) {
+          final collabActionId = _v7();
+          const collabAction = ProposalSubmissionAction.draft;
+
+          final collabActionMetadata = SignedDocumentMetadata(
+            contentType: SignedDocumentContentType.json,
+            documentType: DocumentType.proposalActionDocument,
+            id: collabActionId,
+            ver: collabActionId,
+            ref: SignedDocumentMetadataRef(id: id, ver: ver),
+            categoryId: categoryConstRefs.category.asMetadataRef,
+          );
+
+          _cache[collabActionId] = [collabActionMetadata];
+          _docs[collabActionMetadata] = _buildDoc(
+            collabActionMetadata,
+            action: collabAction,
+            authorGetter: (_) => collab,
+          );
         }
       }
     }

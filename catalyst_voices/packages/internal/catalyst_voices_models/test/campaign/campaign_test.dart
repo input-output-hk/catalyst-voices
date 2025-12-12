@@ -379,9 +379,18 @@ void main() {
       );
 
       // Act
-      final resultProposalSubmission = campaign.phaseStateTo(CampaignPhaseType.proposalSubmission);
-      final resultVotingRegistration = campaign.phaseStateTo(CampaignPhaseType.votingRegistration);
-      final resultReviewRegistration = campaign.phaseStateTo(CampaignPhaseType.reviewRegistration);
+      final resultProposalSubmission = campaign.phaseStateTo(
+        CampaignPhaseType.proposalSubmission,
+        now,
+      );
+      final resultVotingRegistration = campaign.phaseStateTo(
+        CampaignPhaseType.votingRegistration,
+        now,
+      );
+      final resultReviewRegistration = campaign.phaseStateTo(
+        CampaignPhaseType.reviewRegistration,
+        now,
+      );
 
       // Assert
       expect(

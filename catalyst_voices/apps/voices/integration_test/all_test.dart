@@ -11,13 +11,10 @@ import 'suites/suites.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final f14Campaign = Campaign.f14();
 
   setUpAll(() async {
     binding.testTextInput.register();
-
-    // F14
-    final f14Campaign = Campaign.f14();
-    mockedActiveCampaign = f14Campaign;
 
     final proposalSubmissionTimeline = f14Campaign.timeline.phases
         .firstWhere((element) => element.type == CampaignPhaseType.proposalSubmission)
@@ -33,6 +30,7 @@ void main() {
 
     await loggingService.updateSettings(printToConsole: const Optional(false));
 
+    await Dependencies.instance.get<CampaignService>().setActiveCampaign(f14Campaign);
     await Dependencies.instance.get<SyncManager>().waitForSync;
   });
 

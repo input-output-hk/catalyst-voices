@@ -7,7 +7,6 @@ import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.sw
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -36,6 +35,11 @@ abstract interface class UserRepository {
   Future<User> getUser();
 
   Future<VotingPower> getVotingPower();
+
+  Future<bool> isPubliclyVerified({
+    required CatalystId catalystId,
+    RbacToken? token,
+  });
 
   /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<AccountPublicProfile> publishUserProfile({
@@ -120,6 +124,22 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<bool> isPubliclyVerified({
+    required CatalystId catalystId,
+    RbacToken? token,
+  }) async {
+    final response = await _apiServices.reviews
+        .apiCatalystIdsGet(
+          lookup: catalystId.toUri().toStringWithoutScheme(),
+          authorization: token?.authHeader(),
+        )
+        .successBodyOrThrow()
+        .then<bool?>((value) => value.active);
+
+    return response ?? false;
+  }
+
+  @override
   Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
@@ -167,13 +187,12 @@ final class UserRepositoryImpl implements UserRepository {
   Future<String?> _lookupUsernameFromDocuments({
     required CatalystId catalystId,
   }) {
-    final significantId = catalystId.toSignificant();
     return _documentRepository
-        .getLatestDocument(originalAuthorId: significantId)
+        .getLatestDocument(originalAuthorId: catalystId.toSignificant())
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {
-            return authors.firstWhereOrNull((id) => id.toSignificant() == significantId);
+            return authors.firstWhereOrNull((id) => id.isSameAs(catalystId));
           },
         )
         .then((value) => value?.username);
