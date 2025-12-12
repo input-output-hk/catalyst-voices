@@ -30,7 +30,6 @@ sealed class ProposalOrDocument extends Equatable {
     _Document() => null,
   };
 
-  // TODO(damian-molinski): Category name should come from query but atm those are not documents.
   /// The name of the proposal's category.
   String? get categoryName {
     return Campaign.all
