@@ -106,6 +106,14 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<ProposalVersionsTitles> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) {
+    return _database.proposalsV2Dao.getVersionsTitles(proposalIds: proposalIds, nodeId: nodeId);
+  }
+
+  @override
   Future<void> save({required DocumentData data}) => saveAll([data]);
 
   @override

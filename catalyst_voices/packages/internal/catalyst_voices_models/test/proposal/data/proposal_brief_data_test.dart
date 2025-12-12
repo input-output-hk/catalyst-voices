@@ -23,11 +23,6 @@ void main() {
           ),
           template: null,
           actionType: ProposalSubmissionAction.aFinal,
-          versionIds: [
-            id.ver!,
-            DocumentRefFactory.randomUuidV7(),
-            DocumentRefFactory.randomUuidV7(),
-          ],
           commentsCount: 10,
           isFavorite: true,
           originalAuthors: [author],
@@ -38,6 +33,11 @@ void main() {
         final brief = ProposalBriefData.build(
           data: rawProposal,
           proposal: proposalOrDocument,
+          versionTitles: VersionsTitles({
+            id.ver!: title,
+            DocumentRefFactory.randomUuidV7(): null,
+            DocumentRefFactory.randomUuidV7(): null,
+          }),
         );
 
         // Then
@@ -83,7 +83,6 @@ void main() {
           ),
           template: null,
           actionType: ProposalSubmissionAction.draft,
-          versionIds: [id.ver!],
           commentsCount: 0,
           isFavorite: false,
           originalAuthors: [author],
