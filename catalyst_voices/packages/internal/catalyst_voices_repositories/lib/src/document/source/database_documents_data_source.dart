@@ -8,8 +8,6 @@ import 'package:catalyst_voices_repositories/src/database/table/document_authors
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.drift.dart'
-    show DocumentsV2MetadataViewData;
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
@@ -252,17 +250,6 @@ final class DatabaseDocumentsDataSource
   }
 }
 
-extension on String? {
-  SignedDocumentRef? toRef([String? ver]) {
-    final id = this;
-    if (id == null) {
-      return null;
-    }
-
-    return SignedDocumentRef(id: id, ver: ver);
-  }
-}
-
 extension on DocumentData {
   List<DocumentAuthorEntity> toAuthorEntities() {
     return (metadata.authors ?? const []).map((catId) {
@@ -318,24 +305,5 @@ extension on DocumentData {
         documentVer: metadata.id.ver!,
       );
     }).toList();
-  }
-}
-
-// TODO(bstolinski): sync with https://github.com/input-output-hk/catalyst-voices/pull/3844/files#diff-c81017763e9494a99cf0e7a51d7380b8273475e691879910fdf19b0f68aa4981
-// after merging https://github.com/input-output-hk/catalyst-voices/pull/3844
-extension on DocumentsV2MetadataViewData {
-  DocumentDataMetadata toModel() {
-    return DocumentDataMetadata(
-      contentType: DocumentContentType.fromJson(contentType),
-      type: type,
-      id: SignedDocumentRef(id: id, ver: ver),
-      ref: refId.toRef(refVer),
-      template: templateId.toRef(templateVer),
-      reply: replyId.toRef(replyVer),
-      section: section,
-      collaborators: collaborators.isEmpty ? null : collaborators,
-      parameters: parameters,
-      authors: authors.isEmpty ? null : authors,
-    );
   }
 }

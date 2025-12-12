@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.drift.dart';
 import 'package:equatable/equatable.dart';
 
 /// A sealed class that represents either a signed document that has been
@@ -164,6 +165,23 @@ extension DocumentEntityV2Mapper on DocumentEntityV2 {
   }
 }
 
+extension DocumentsV2MetadataViewDataMapper on DocumentsV2MetadataViewData {
+  DocumentDataMetadata toModel() {
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.fromJson(contentType),
+      type: type,
+      id: SignedDocumentRef(id: id, ver: ver),
+      ref: refId.toRef(refVer),
+      template: templateId.toRef(templateVer),
+      reply: replyId.toRef(replyVer),
+      section: section,
+      collaborators: collaborators.isEmpty ? null : collaborators,
+      parameters: parameters,
+      authors: authors.isEmpty ? null : authors,
+    );
+  }
+}
+
 extension LocalDocumentDraftEntityMapper on LocalDocumentDraftEntity {
   DocumentData toModel() {
     return DocumentData(
@@ -180,6 +198,23 @@ extension LocalDocumentDraftEntityMapper on LocalDocumentDraftEntity {
         authors: authors.isEmpty ? null : authors,
       ),
       content: content,
+    );
+  }
+}
+
+extension LocalDocumentsDraftsMetadataViewDataMapper on LocalDocumentsDraftsMetadataViewData {
+  DocumentDataMetadata toModel() {
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.fromJson(contentType),
+      type: type,
+      id: DraftRef(id: id, ver: ver),
+      ref: refId.toRef(refVer),
+      template: templateId.toRef(templateVer),
+      reply: replyId.toRef(replyVer),
+      section: section,
+      collaborators: collaborators.isEmpty ? null : collaborators,
+      parameters: parameters,
+      authors: authors.isEmpty ? null : authors,
     );
   }
 }
