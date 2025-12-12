@@ -7,8 +7,7 @@ project: {
 	}
 	deployment: {
 		on: {
-			//tag: {}
-			always: {}
+			tag: {}
 		}
 
 		bundle: {
@@ -181,8 +180,8 @@ project: {
 								}
 								env: {
 									RETRY_DELAY: {
-										// 30 minutes
-										value: string | *"1800"
+										// 5 minutes
+										value: string | *"300"
 									}
 									ENVIRONMENT: {
 										value: string | *_env
@@ -211,8 +210,8 @@ project: {
 								}
 								env: {
 									RETRY_DELAY: {
-										// 30 minutes
-										value: string | *"1800"
+										// 5 minutes
+										value: string | *"300"
 									}
 									ENVIRONMENT: {
 										value: string | *_env
@@ -357,9 +356,8 @@ project: {
 	release: {
 		docker: {
 			on: {
-				//merge: {}
-				//tag: {}
-				always: {}
+				merge: {}
+				tag: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_HASH_OR_TAG")
