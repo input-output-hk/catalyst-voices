@@ -7,7 +7,8 @@ project: {
 	}
 	deployment: {
 		on: {
-			tag: {}
+			// tag: {}
+			always: {}
 		}
 
 		bundle: {
@@ -293,6 +294,9 @@ project: {
 									WITH_MIGRATIONS: {
 										value: string | *"true"
 									}
+									WITH_SEED_DATA: {
+										value: "."
+									}
 								}
 							}
 						}
@@ -356,8 +360,9 @@ project: {
 	release: {
 		docker: {
 			on: {
-				merge: {}
-				tag: {}
+				// merge: {}
+				// tag: {}
+				always: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_HASH_OR_TAG")
