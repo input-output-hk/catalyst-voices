@@ -67,17 +67,6 @@ final class ProposalDataV2 extends Equatable {
     );
   }
 
-  ProposalPublish? get proposalPublish {
-    if (submissionAction == null && id is DraftRef) {
-      return ProposalPublish.localDraft;
-    } else if (submissionAction == ProposalSubmissionAction.aFinal) {
-      return ProposalPublish.submittedProposal;
-    } else if (submissionAction == ProposalSubmissionAction.draft) {
-      return ProposalPublish.publishedDraft;
-    }
-    return null;
-  }
-
   @override
   List<Object?> get props => [
     id,
@@ -89,4 +78,14 @@ final class ProposalDataV2 extends Equatable {
     versions,
     collaborators,
   ];
+
+  ProposalPublish get publish {
+    if (id is DraftRef) {
+      return ProposalPublish.localDraft;
+    } else if (submissionAction == ProposalSubmissionAction.aFinal) {
+      return ProposalPublish.submittedProposal;
+    } else {
+      return ProposalPublish.publishedDraft;
+    }
+  }
 }
