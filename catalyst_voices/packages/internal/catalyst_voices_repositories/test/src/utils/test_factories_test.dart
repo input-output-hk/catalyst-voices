@@ -16,8 +16,8 @@ void main() {
     });
 
     test('draftRef generates unique refs', () {
-      final ref1 = DocumentRefFactory.draftRef();
-      final ref2 = DocumentRefFactory.draftRef();
+      final ref1 = DocumentRefFactory.draftDocumentRef();
+      final ref2 = DocumentRefFactory.draftDocumentRef();
 
       expect(ref1, isNot(equals(ref2)));
     });

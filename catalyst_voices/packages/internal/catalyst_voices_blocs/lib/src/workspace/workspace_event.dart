@@ -74,12 +74,12 @@ final class InitWorkspaceEvent extends WorkspaceEvent {
 }
 
 final class InternalDataChangeEvent extends WorkspaceEvent {
-  final Page<UsersProposalOverview> page;
+  final List<UsersProposalOverview> proposals;
 
-  const InternalDataChangeEvent(this.page);
+  const InternalDataChangeEvent(this.proposals);
 
   @override
-  List<Object?> get props => [page];
+  List<Object?> get props => [proposals];
 }
 
 final class InternalTabCountChangeEvent extends WorkspaceEvent {

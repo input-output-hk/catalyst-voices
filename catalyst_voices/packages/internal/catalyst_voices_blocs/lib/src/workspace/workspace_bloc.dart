@@ -6,6 +6,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('WorkspaceBloc');
@@ -24,7 +25,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
   StreamSubscription<Map<WorkspacePageTab, int>>? _workspaceTabCountSub;
-  StreamSubscription<Page<UsersProposalOverview>>? _dataPageSub;
+  StreamSubscription<List<UsersProposalOverview>>? _dataPageSub;
 
   WorkspaceBloc(
     this._userService,
@@ -146,10 +147,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     unawaited(_rebuildWorkspaceTabCountSubs());
   }
 
-  void _handleDataChange(Page<UsersProposalOverview> page) {
+  void _handleDataChange(List<UsersProposalOverview> items) {
     if (isClosed) return;
 
-    add(InternalDataChangeEvent(page));
+    add(InternalDataChangeEvent(items));
   }
 
   void _handleWorkspaceTabCountChange(Map<WorkspacePageTab, int> data) {
@@ -289,11 +290,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   void _onInternalDataChange(InternalDataChangeEvent event, Emitter<WorkspaceState> emit) {
     if (_cache.activeTab == WorkspacePageTab.proposals) {
-      _cache = _cache.copyWith(proposals: Optional(event.page.items));
+      _cache = _cache.copyWith(proposals: Optional(event.proposals));
       final newState = _rebuildProposalsState();
       emit(state.copyWith(userProposals: newState, isLoading: false));
     } else if (_cache.activeTab == WorkspacePageTab.proposalInvites) {
-      _cache = _cache.copyWith(userProposalInvites: Optional(event.page.items));
+      _cache = _cache.copyWith(userProposalInvites: Optional(event.proposals));
       final newState = _rebuildInvitesState();
       emit(state.copyWith(userProposalInvites: newState, isLoading: false));
     }
@@ -350,29 +351,23 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   Future<void> _rebuildDataPageSub() async {
     final proposalsFilters = _rebuildProposalFilters();
 
-    // TODO(LynxLynxx): UI for now is not capable of handling infinite scroll with pagination
-    const request = PageRequest(page: 0, size: 999);
-
     final activeCampaign = await _campaign;
 
     if (isClosed) return;
 
     await _dataPageSub?.cancel();
     _dataPageSub = _proposalService
-        .watchProposalsBriefPageV2(
-          request: request,
-          filters: proposalsFilters,
-        )
-        .map(
-          (page) => page.map(
-            (data) => UsersProposalOverview.fromProposalBriefData(
-              proposalData: data,
-              fromActiveCampaign: activeCampaign?.fundNumber == data.fundNumber,
+        .watchWorkspaceProposalsBrief(filters: proposalsFilters)
+        .map((briefs) {
+          return briefs.map((brief) {
+            return UsersProposalOverview.fromProposalBriefData(
+              proposalData: brief,
+              fromActiveCampaign: activeCampaign?.fundNumber == brief.fundNumber,
               activeAccountId: _cache.activeAccountId,
-            ),
-          ),
-        )
-        .distinct()
+            );
+          }).toList();
+        })
+        .distinct(listEquals)
         .listen(_handleDataChange);
   }
 
