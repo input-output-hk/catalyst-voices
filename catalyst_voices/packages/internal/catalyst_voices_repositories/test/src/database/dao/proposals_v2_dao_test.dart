@@ -304,6 +304,164 @@ void main() {
         });
       });
 
+      group('getVersionsTitles', () {
+        final nodeId = DocumentNodeId.fromString('setup.title.title');
+
+        test('returns empty map when input list is empty', () async {
+          // Given: No proposal IDs requested
+          // When
+          final result = await dao.getVersionsTitles(
+            proposalIds: [],
+            nodeId: nodeId,
+          );
+
+          // Then
+          expect(result, isEmpty);
+        });
+
+        test('returns titles for all versions of proposals', () async {
+          // Given: A proposal with multiple versions, each with a title
+          const titleV1 = 'First Title';
+          const titleV2 = 'Second Title';
+
+          final proposalV1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            contentData: {
+              'setup': {
+                'title': {'title': titleV1},
+              },
+            },
+          );
+
+          final proposalV2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v2',
+            contentData: {
+              'setup': {
+                'title': {'title': titleV2},
+              },
+            },
+          );
+
+          await db.documentsV2Dao.saveAll([proposalV1, proposalV2]);
+
+          // When
+          final result = await dao.getVersionsTitles(
+            proposalIds: ['p1'],
+            nodeId: nodeId,
+          );
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result['p1'], isNotNull);
+          expect(result['p1'], hasLength(2));
+          expect(result['p1']!['v1'], equals(titleV1));
+          expect(result['p1']!['v2'], equals(titleV2));
+        });
+
+        test('handles versions with missing titles gracefully', () async {
+          // Given: A proposal with one version having a title and one without
+          const titleV1 = 'Has Title';
+
+          final proposalV1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            contentData: {
+              'setup': {
+                'title': {'title': titleV1},
+              },
+            },
+          );
+
+          final proposalV2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v2',
+            contentData: {
+              'setup': {
+                'title': <String, dynamic>{}, // Missing title
+              },
+            },
+          );
+
+          await db.documentsV2Dao.saveAll([proposalV1, proposalV2]);
+
+          // When
+          final result = await dao.getVersionsTitles(
+            proposalIds: ['p1'],
+            nodeId: nodeId,
+          );
+
+          // Then
+          expect(result, hasLength(1));
+          expect(result['p1']!['v1'], equals(titleV1));
+          expect(result['p1']!['v2'], isNull);
+        });
+
+        test('handles multiple proposals correctly', () async {
+          // Given: Two proposals, each with versions
+          final p1v1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            contentData: {
+              'setup': {
+                'title': {'title': 'Proposal 1 Title'},
+              },
+            },
+          );
+
+          final p2v1 = _createTestDocumentEntity(
+            id: 'p2',
+            ver: 'v1',
+            contentData: {
+              'setup': {
+                'title': {'title': 'Proposal 2 Title'},
+              },
+            },
+          );
+
+          await db.documentsV2Dao.saveAll([p1v1, p2v1]);
+
+          // When
+          final result = await dao.getVersionsTitles(
+            proposalIds: ['p1', 'p2'],
+            nodeId: nodeId,
+          );
+
+          // Then
+          expect(result, hasLength(2));
+          expect(result['p1']!['v1'], equals('Proposal 1 Title'));
+          expect(result['p2']!['v1'], equals('Proposal 2 Title'));
+        });
+
+        test('ignores non-existent proposal IDs', () async {
+          // Given: One proposal exists
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            contentData: {
+              'setup': {
+                'title': {'title': 'Title'},
+              },
+            },
+          );
+
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          // When: Request for both existing and non-existing proposals
+          final result = await dao.getVersionsTitles(
+            proposalIds: ['p1', 'p2', 'p3'],
+            nodeId: nodeId,
+          );
+
+          // Then: Only existing proposal is returned
+          expect(result, hasLength(1));
+          expect(result.containsKey('p1'), isTrue);
+          expect(result.containsKey('p2'), isFalse);
+          expect(result.containsKey('p3'), isFalse);
+        });
+      });
+
       group('getVisibleProposalsCount', () {
         final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
         final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);

@@ -93,6 +93,14 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<Map<String, Map<String, String?>>> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) {
+    return _database.proposalsV2Dao.getVersionsTitles(proposalIds: proposalIds, nodeId: nodeId);
+  }
+
+  @override
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
     return _database.documentsV2Dao.getLatestOf(ref);
   }

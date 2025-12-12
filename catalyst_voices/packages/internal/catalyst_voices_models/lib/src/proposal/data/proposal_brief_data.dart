@@ -46,14 +46,18 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     Vote? draftVote,
     Vote? castedVote,
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
+    Map<String, String?> versionTitles = const {},
   }) {
     final id = data.proposal.id;
     final isFinal = data.isFinal;
 
-    final versions = data.versionIds
-        // TODO(damian-molinski): Get titles for all versions
-        .map((e) => ProposalBriefDataVersion(ref: id.copyWith(ver: Optional(e))))
-        .toList();
+    final versions = data.versionIds.map((versionId) {
+      final title = versionTitles[versionId];
+      return ProposalBriefDataVersion(
+        ref: id.copyWith(ver: Optional(versionId)),
+        title: title,
+      );
+    }).toList();
 
     // Proposal Brief do not support "removed" or "left" status.
     final collaborators = data.proposal.metadata.collaborators?.map(

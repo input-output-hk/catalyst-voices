@@ -458,6 +458,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       proposalsRefs: proposalsRefs,
     );
 
+    // Fetch version titles for all proposals
+    final proposalIds = rawProposals.map((e) => e.proposal.id.id).toSet().toList();
+
+    final versionTitlesMap = await _proposalsLocalSource.getVersionsTitles(
+      proposalIds: proposalIds,
+      nodeId: ProposalDocument.titleNodeId,
+    );
+
     return rawProposals.map((item) {
       final templateData = item.template;
 
@@ -475,6 +483,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       final draftVote = draftVotes[proposalId];
       final castedVote = castedVotes[proposalId];
       final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
+      final proposalVersionsTitles = versionTitlesMap[proposalId.id] ?? const {};
 
       return ProposalBriefData.build(
         data: item,
@@ -482,6 +491,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         draftVote: draftVote,
         castedVote: castedVote,
         collaboratorsActions: proposalCollaboratorsActions,
+        versionTitles: proposalVersionsTitles,
       );
     }).toList();
   }

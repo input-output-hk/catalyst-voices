@@ -16,6 +16,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dar
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -198,6 +199,45 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       filters: filters,
       nodeId: nodeId,
     ).get().then(Map.fromEntries).then(ProposalsTotalAsk.new);
+  }
+
+  @override
+  Future<Map<String, Map<String, String?>>> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) async {
+    if (proposalIds.isEmpty) return {};
+
+    final documentNodeId = DocumentNodeId.fromString(nodeId.value);
+
+    final query = select(documentsV2)
+      ..where(
+        (tbl) => tbl.type.equalsValue(DocumentType.proposalDocument) & tbl.id.isIn(proposalIds),
+      )
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.createdAt)]);
+
+    final results = await query.get();
+
+    final proposalsVersionsTitles = <String, Map<String, String?>>{};
+
+    for (final doc in results) {
+      final proposalId = doc.id;
+
+      try {
+        final content = doc.content.data;
+        final title = DocumentNodeTraverser.getValue(documentNodeId, content) as String?;
+        proposalsVersionsTitles.update(
+          proposalId,
+          (value) => value..[doc.ver] = title,
+          ifAbsent: () => {doc.ver: title},
+        );
+      } catch (_) {
+        // Gracefully handle malformed JSON or missing nodeId
+        proposalsVersionsTitles.putIfAbsent(proposalId, () => {});
+      }
+    }
+
+    return proposalsVersionsTitles;
   }
 
   /// Counts the total number of visible proposals matching the [filters].
@@ -1091,6 +1131,24 @@ abstract interface class ProposalsV2Dao {
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
+  });
+
+  /// Retrieves titles for all versions of the specified proposals.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:** A [Map] where:
+  /// * **Key**: The Proposal ID (`String`).
+  /// * **Value**: A `Map<String, String?>` of version IDs
+  ///     to their extracted titles (titles may be null if not available).
+  Future<Map<String, Map<String, String?>>> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
   });
 
   /// Counts the total number of visible proposals that match the given filters.

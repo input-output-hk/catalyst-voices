@@ -22,6 +22,24 @@ abstract interface class ProposalDocumentDataLocalSource {
     required List<DocumentRef> proposalsRefs,
   });
 
+  /// Retrieves titles for all versions of the specified proposals.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:** A [Map] where:
+  /// * **Key**: The Proposal ID (`String`).
+  /// * **Value**: A `Map<String, String?>` of version IDs
+  ///     to their extracted titles (titles may be null if not available).
+  Future<Map<String, Map<String, String?>>> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  });
+
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
