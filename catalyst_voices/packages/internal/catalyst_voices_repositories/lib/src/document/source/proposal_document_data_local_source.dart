@@ -31,11 +31,9 @@ abstract interface class ProposalDocumentDataLocalSource {
   /// - [proposalIds]: List of proposal IDs to fetch version titles for.
   /// - [nodeId]: The path in the document JSON to extract the title from.
   ///
-  /// **Returns:** A [Map] where:
-  /// * **Key**: The Proposal ID (`String`).
-  /// * **Value**: A `Map<String, String?>` of version IDs
-  ///     to their extracted titles (titles may be null if not available).
-  Future<Map<String, Map<String, String?>>> getVersionsTitles({
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getVersionsTitles({
     required List<String> proposalIds,
     required NodeId nodeId,
   });

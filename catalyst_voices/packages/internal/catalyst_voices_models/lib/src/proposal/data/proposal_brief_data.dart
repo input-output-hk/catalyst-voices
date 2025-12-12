@@ -46,16 +46,16 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     Vote? draftVote,
     Vote? castedVote,
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
-    Map<String, String?> versionTitles = const {},
+    VersionsTitles versionTitles = const VersionsTitles.empty(),
   }) {
     final id = data.proposal.id;
     final isFinal = data.isFinal;
+    final iteration = versionTitles.data.keys.toList().indexOf(id.ver!) + 1;
 
-    final versions = data.versionIds.map((versionId) {
-      final title = versionTitles[versionId];
+    final versions = versionTitles.data.entries.map((entry) {
       return ProposalBriefDataVersion(
-        ref: id.copyWith(ver: Optional(versionId)),
-        title: title,
+        ref: id.copyWith(ver: Optional(entry.key)),
+        title: entry.value,
       );
     }).toList();
 
@@ -89,7 +89,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
       durationInMonths: proposal.durationInMonths,
       fundsRequested: proposal.fundsRequested,
       createdAt: id.ver!.dateTime,
-      iteration: data.iteration,
+      iteration: iteration,
       commentsCount: isFinal ? null : data.commentsCount,
       isFinal: isFinal,
       isFavorite: data.isFavorite,

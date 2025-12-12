@@ -459,9 +459,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
 
     // Fetch version titles for all proposals
+    // TODO(bstolinski): get proposals titles based on template title noteId (dynamic nodeId)
+    // group by template type, from template get nodeId. Exec getVersionsTitles for each template type
+    // right now we have const nodeId ProposalDocument.titleNodeId
     final proposalIds = rawProposals.map((e) => e.proposal.id.id).toSet().toList();
-
-    final versionTitlesMap = await _proposalsLocalSource.getVersionsTitles(
+    final proposalVersionsTitles = await _proposalsLocalSource.getVersionsTitles(
       proposalIds: proposalIds,
       nodeId: ProposalDocument.titleNodeId,
     );
@@ -483,7 +485,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       final draftVote = draftVotes[proposalId];
       final castedVote = castedVotes[proposalId];
       final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
-      final proposalVersionsTitles = versionTitlesMap[proposalId.id] ?? const {};
+      final versionTitles =
+          proposalVersionsTitles.proposalVersions[proposalId.id] ?? const VersionsTitles.empty();
 
       return ProposalBriefData.build(
         data: item,
@@ -491,7 +494,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         draftVote: draftVote,
         castedVote: castedVote,
         collaboratorsActions: proposalCollaboratorsActions,
-        versionTitles: proposalVersionsTitles,
+        versionTitles: versionTitles,
       );
     }).toList();
   }
