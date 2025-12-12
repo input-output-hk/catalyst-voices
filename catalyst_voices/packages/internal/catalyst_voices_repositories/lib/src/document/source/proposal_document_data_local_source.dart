@@ -22,6 +22,8 @@ abstract interface class ProposalDocumentDataLocalSource {
     required List<DocumentRef> proposalsRefs,
   });
 
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id});
+
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
@@ -45,16 +47,15 @@ abstract interface class ProposalDocumentDataLocalSource {
     required CampaignFilters campaign,
   });
 
+  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
+
   Stream<RawProposal?> watchRawProposalData({required DocumentRef id});
 
   Stream<Page<RawProposalBrief>> watchRawProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
-  });
-
-  Future<DocumentRef?> getPreviousOf({required DocumentRef id});
-  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
-    required CatalystId author,
   });
 }

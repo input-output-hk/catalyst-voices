@@ -8,7 +8,7 @@ final class ProposalDataV2 extends Equatable {
   ///
   /// This is `null` when the template couldn't be retrieved.
   /// The UI should show an error message in this case.
-  final ProposalDocument? document;
+  final ProposalOrDocument proposalOrDocument;
   final ProposalSubmissionAction? submissionAction;
   final bool isFavorite;
   final String categoryName;
@@ -18,7 +18,7 @@ final class ProposalDataV2 extends Equatable {
 
   const ProposalDataV2({
     required this.id,
-    required this.document,
+    required this.proposalOrDocument,
     required this.submissionAction,
     required this.isFavorite,
     required this.categoryName,
@@ -30,16 +30,11 @@ final class ProposalDataV2 extends Equatable {
   /// Builds a [ProposalDataV2] from raw data.
   ///
   /// [data] - Raw proposal data from database query.
-  /// [proposal] - Provides extracted data (categoryName, etc.) from proposal.
+  /// [proposalOrDocument] - Provides extracted data (categoryName, etc.) from proposal.
   ///   Works both with and without template loaded.
-  /// [proposalDocument] - Optional parsed proposal document. If null,
-  ///   the UI should show an error that template couldn't be retrieved.
-  ///   The caller (typically in the repository layer) should build this using
-  ///   `ProposalDocumentFactory.create()` when `data.template` is available.
   factory ProposalDataV2.build({
     required RawProposal data,
-    required ProposalOrDocument proposal,
-    ProposalDocument? proposalDocument,
+    required ProposalOrDocument proposalOrDocument,
     Vote? draftVote,
     Vote? castedVote,
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
@@ -62,10 +57,10 @@ final class ProposalDataV2 extends Equatable {
 
     return ProposalDataV2(
       id: id,
-      document: proposalDocument,
+      proposalOrDocument: proposalOrDocument,
       submissionAction: action,
       isFavorite: data.isFavorite,
-      categoryName: proposal.categoryName ?? '',
+      categoryName: proposalOrDocument.categoryName ?? '',
       collaborators: collaborators,
       versions: versions,
       votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
@@ -86,7 +81,7 @@ final class ProposalDataV2 extends Equatable {
   @override
   List<Object?> get props => [
     id,
-    document,
+    proposalOrDocument,
     submissionAction,
     isFavorite,
     categoryName,

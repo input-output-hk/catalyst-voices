@@ -5890,8 +5890,6 @@ void main() {
         });
       });
 
-      group('watchProposal', () {});
-
       group('getLocalDraftsProposalsBrief', () {
         final author = _createTestAuthor(name: 'me', role0KeySeed: 1);
         final otherAuthor = _createTestAuthor(name: 'other', role0KeySeed: 2);

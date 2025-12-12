@@ -558,16 +558,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
             );
             return ProposalOrDocument.proposal(proposal);
           }();
-
-    ProposalDocument? proposalDocument;
-    if (templateData != null) {
-      final template = ProposalTemplateFactory.create(templateData);
-      proposalDocument = ProposalDocumentFactory.create(
-        rawProposal.proposal,
-        template: template,
-      );
-    }
-
     final draftVote = draftVotesMap[proposalId];
     final castedVote = castedVotesMap[proposalId];
 
@@ -576,7 +566,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     // TODO(LynxLynxx): call getMetadata
     final prevMetadata = DocumentDataMetadata.proposal(
       id: prevVersion!,
-      template: proposalDocument!.metadata.templateRef,
+      template: templateData!.id as SignedDocumentRef,
       parameters: const DocumentParameters(),
       authors: const [],
       collaborators: const [],
@@ -602,8 +592,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     return ProposalDataV2.build(
       data: rawProposal,
-      proposal: proposalOrDocument,
-      proposalDocument: proposalDocument,
+      proposalOrDocument: proposalOrDocument,
       draftVote: draftVote,
       castedVote: castedVote,
       collaboratorsActions: proposalCollaboratorsActions,

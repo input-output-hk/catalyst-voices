@@ -750,7 +750,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final p = alias(documentsV2, 'p');
     final t = alias(documentsV2, 't');
     final dlm = alias(documentsLocalMetadata, 'dlm');
-    final da = alias(documentAuthors, 'da');
+    final da = alias(documentsV2, 'da');
 
     // 1. Subquery: Count comments for this specific proposal version
     final commentsCount = subqueryExpression<int>(
@@ -777,14 +777,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     // 4. Subquery: Get Original Authors (authors of version where id == ver)
     final originAuthors = subqueryExpression<String>(
       selectOnly(da)
-        ..addColumns([
-          FunctionCallExpression(
-            'GROUP_CONCAT',
-            [da.accountId],
-          ),
-        ])
-        ..where(da.documentId.equalsExp(p.id))
-        ..where(da.documentVer.equalsExp(p.id)),
+        ..addColumns([da.authors])
+        ..where(da.id.equalsExp(p.id))
+        ..where(da.id.equalsExp(da.ver))
+        ..where(da.type.equalsValue(DocumentType.proposalDocument)),
     );
 
     final query =
@@ -829,11 +825,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final isFavorite = row.read(dlm.isFavorite) ?? false;
 
       // Map Original Authors
-      // Parse comma-separated list from GROUP_CONCAT
-      final authorsStr = row.read(originAuthors) ?? '';
-      final authorsList = authorsStr.isEmpty
-          ? <CatalystId>[]
-          : authorsStr.split(',').map(CatalystId.tryParse).nonNulls.toList();
+      final originalAuthorsRaw = row.read(originAuthors) ?? '';
+      final authorsList = DocumentConverters.catId.fromSql(originalAuthorsRaw);
 
       return RawProposalEntity(
         proposal: proposal,

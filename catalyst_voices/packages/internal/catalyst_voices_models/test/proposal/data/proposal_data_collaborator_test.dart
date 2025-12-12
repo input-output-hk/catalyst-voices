@@ -1,8 +1,5 @@
-import 'dart:math' show Random;
-
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -12,11 +9,11 @@ void main() {
   late final CatalystId collaborator3Id;
   late final CatalystId collaborator4Id;
   setUpAll(() {
-    authorCatalystId = DummyCatalystIdFactory.create(role0KeyBytes: _generateKeyBytes(0));
-    collaborator1Id = DummyCatalystIdFactory.create(role0KeyBytes: _generateKeyBytes(1));
-    collaborator2Id = DummyCatalystIdFactory.create(role0KeyBytes: _generateKeyBytes(2));
-    collaborator3Id = DummyCatalystIdFactory.create(role0KeyBytes: _generateKeyBytes(3));
-    collaborator4Id = DummyCatalystIdFactory.create(role0KeyBytes: _generateKeyBytes(4));
+    authorCatalystId = CatalystIdFactory.create(username: 'Author');
+    collaborator1Id = CatalystIdFactory.create(username: 'Collab1', role0KeySeed: 1);
+    collaborator2Id = CatalystIdFactory.create(username: 'Collab2', role0KeySeed: 2);
+    collaborator3Id = CatalystIdFactory.create(username: 'Collab3', role0KeySeed: 3);
+    collaborator4Id = CatalystIdFactory.create(username: 'Collab4', role0KeySeed: 4);
   });
   group(ProposalDataCollaborator, () {
     test(
@@ -213,9 +210,4 @@ void main() {
       },
     );
   });
-}
-
-Uint8List _generateKeyBytes(int seed) {
-  final random = Random(seed);
-  return Uint8List.fromList(List.generate(32, (_) => random.nextInt(256)));
 }

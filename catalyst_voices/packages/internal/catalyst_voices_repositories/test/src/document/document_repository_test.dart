@@ -590,7 +590,6 @@ void main() {
             authors: [author1],
           );
 
-          // Then - Note: Combined filtering may not work as expected in the current implementation
           expect(actions.length, greaterThan(0));
           expect(
             actions.any(
@@ -599,6 +598,15 @@ void main() {
                   (action.metadata.authors?.contains(author1) ?? false),
             ),
             isTrue,
+          );
+          // Verify no actions from other authors with different refs
+          expect(
+            actions.any(
+              (action) =>
+                  action.metadata.ref != proposal1Ref &&
+                  !(action.metadata.authors?.contains(author1) ?? false),
+            ),
+            isFalse,
           );
         },
         onPlatform: driftOnPlatforms,

@@ -132,7 +132,7 @@ void main() {
             predicate<ProposalDataV2?>((data) {
               if (data == null) return false;
               if (data.id != proposalId) return false;
-              if (data.document == null) return false;
+              if (data.proposalOrDocument.asProposalDocument == null) return false;
               return true;
             }),
           ),
