@@ -28,7 +28,6 @@ final class VersionsTitles extends Equatable {
 
   const VersionsTitles.empty() : data = const {};
 
-
   @override
   List<Object?> get props => [data];
 }
