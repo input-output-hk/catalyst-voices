@@ -36,6 +36,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<CommentWithReplies>>? _commentsSub;
   StreamSubscription<Vote?>? _watchedCastedVotesSub;
+  StreamSubscription<ProposalDataV2?>? _proposalSub;
 
   ProposalCubit(
     this._userService,
@@ -195,6 +196,13 @@ final class ProposalCubit extends Cubit<ProposalState>
         emit(state.copyWith(isLoading: false));
       }
     }
+  }
+
+  Future<void> loadProposal(DocumentRef id) async {
+    await _proposalSub?.cancel();
+    emit(state.copyWith(isLoading: true));
+    // We don't call distinct() here as we need to emit loading off user loads proposal that still not exists
+    _proposalSub = _proposalService.watchProposal(id: id).listen(_handleProposalData);
   }
 
   Future<void> rejectInvitation() async {
@@ -594,6 +602,61 @@ final class ProposalCubit extends Cubit<ProposalState>
     _cache = _cache.copyWith(lastCastedVote: Optional(vote));
 
     emit(state.copyWith(data: _rebuildProposalViewData()));
+  }
+
+  void _handleProposalData(ProposalDataV2? proposal) {
+    if (proposal == null) {
+      emit(state.copyWith(error: const Optional(LocalizedNotFoundException()), isLoading: false));
+    }
+
+    if (proposal?.proposalOrDocument.asProposalDocument == null) {
+      // TODO(LynxLynxx): emitError that template is missing;
+    }
+    final proposalOrDocument = proposal!.proposalOrDocument;
+    final proposalDocument = proposal.proposalOrDocument.asProposalDocument!;
+
+    final campaign = proposalOrDocument.campaign;
+    final category = proposalOrDocument.category;
+
+    final isReadOnlyMode =
+        campaign?.phaseStateTo(CampaignPhaseType.proposalSubmission).status.isPost ?? true;
+
+    final isVotingStage = _isVotingStage(campaign);
+    final showComments = proposal.publish != ProposalPublish.submittedProposal;
+
+    _cache = _cache.copyWith(
+      proposal: Optional(proposalDocument),
+      category: Optional(category),
+      commentTemplate: Optional(commentTemplate),
+      comments: const Optional([]),
+      collaborators: Optional(proposal.collaborators),
+      isFavorite: Optional(proposal.isFavorite),
+      isVotingStage: Optional(isVotingStage),
+      showComments: Optional(showComments),
+      readOnlyMode: Optional(isReadOnlyMode),
+      lastCastedVote: Optional(proposal.votes?.casted),
+    );
+
+    unawaited(_commentsSub?.cancel());
+    _commentsSub = _commentService
+        // Note. watch comments on exact version of proposal.
+        .watchCommentsWith(ref: proposalDocument.metadata.id)
+        .distinct(listEquals)
+        .listen(_handleCommentsChange);
+
+    _ballotBuilder.addListener(_handleBallotBuilderChange);
+
+    final proposalViewData = _rebuildProposalViewData();
+
+    emit(
+      ProposalState(
+        data: proposalViewData,
+        invitation: invitation,
+        readOnlyMode: isReadOnlyMode,
+      ),
+    );
+
+    emit(state.copyWith(isLoading: false, error: const Optional.empty()));
   }
 
   Future<bool> _isReadOnlyMode() async {
