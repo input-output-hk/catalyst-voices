@@ -546,7 +546,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
 
     final proposalId = rawProposal.proposal.id;
-    final isFinal = rawProposal.isFinal;
     final templateData = rawProposal.template;
 
     final proposalOrDocument = templateData == null
@@ -572,12 +571,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final draftVote = draftVotesMap[proposalId];
     final castedVote = castedVotesMap[proposalId];
 
-    final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
-      // if proposal is final find actions for specific version
-      proposalsRefs: [if (isFinal) proposalId else proposalId.toLoose()],
-    );
-    final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
-
     final prevVersion = await _proposalsLocalSource.getPreviousOf(id: proposalId);
 
     // TODO(LynxLynxx): call getMetadata
@@ -598,6 +591,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       actionDocs: actionsDocs,
       proposalId: proposalId,
     );
+
+    final isFinal = action == ProposalSubmissionAction.aFinal;
+
+    final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
+      // if proposal is final find actions for specific version
+      proposalsRefs: [if (isFinal) proposalId else proposalId.toLoose()],
+    );
+    final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
 
     return ProposalDataV2.build(
       data: rawProposal,
