@@ -593,9 +593,10 @@ void main() {
           // Then - Note: Combined filtering may not work as expected in the current implementation
           expect(actions.length, greaterThan(0));
           expect(
-            actions.any((action) =>
-              action.metadata.ref == proposal1Ref &&
-              (action.metadata.authors?.contains(author1) ?? false)
+            actions.any(
+              (action) =>
+                  action.metadata.ref == proposal1Ref &&
+                  (action.metadata.authors?.contains(author1) ?? false),
             ),
             isTrue,
           );
@@ -621,7 +622,6 @@ void main() {
           // Create a regular proposal (not an action)
           final proposal = DocumentDataFactory.build(
             id: proposalRef,
-            type: DocumentType.proposalDocument,
             authors: [authorId],
           );
 
