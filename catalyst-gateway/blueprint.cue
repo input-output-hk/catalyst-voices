@@ -177,7 +177,7 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
-									tag:  "v0.1.1"
+									tag:  _ @forge(name="GIT_HASH_OR_TAG")
 								}
 								env: {
 									ENVIRONMENT: {
@@ -203,7 +203,7 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/setup-fund-documents"
-									tag:  "v0.1.1"
+									tag:  _ @forge(name="GIT_HASH_OR_TAG")
 								}
 								env: {
 									ENVIRONMENT: {
@@ -235,7 +235,7 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
-									tag:  "9eda7ac56e28993f466fbc64d8990bdb4fbba40f,"
+									tag:  _ @forge(name="GIT_HASH_OR_TAG")
 								}
 								env: {
 									DB_HOST: {
