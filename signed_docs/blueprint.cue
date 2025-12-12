@@ -4,6 +4,7 @@ project: {
 	release: {
 		docker: {
 			on: {
+				merge: {}
 				tag: {}
 			}
 			config: {
