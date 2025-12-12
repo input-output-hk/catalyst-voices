@@ -1114,6 +1114,150 @@ void main() {
         });
       });
 
+      group('getDocumentMetadata', () {
+        test('returns null for non-existing ref in empty database', () async {
+          // Given
+          const ref = SignedDocumentRef.exact(id: 'non-existent-id', ver: 'non-existent-ver');
+
+          // When
+          final result = await dao.getDocumentMetadata(id: ref);
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns metadata for existing exact ref', () async {
+          // Given
+          final entity = _createTestDocumentEntity(
+            id: 'test-id',
+            ver: 'test-ver',
+            type: DocumentType.proposalDocument,
+            refId: 'ref-id',
+            refVer: 'ref-ver',
+            templateId: 'template-id',
+            templateVer: 'template-ver',
+            section: 'test-section',
+          );
+          await dao.save(entity);
+
+          // And
+          const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'test-ver');
+
+          // When
+          final result = await dao.getDocumentMetadata(id: ref);
+
+          // Then
+          expect(result, isNotNull);
+          expect(result!.id, 'test-id');
+          expect(result.ver, 'test-ver');
+          expect(result.type, DocumentType.proposalDocument);
+          expect(result.refId, 'ref-id');
+          expect(result.refVer, 'ref-ver');
+          expect(result.templateId, 'template-id');
+          expect(result.templateVer, 'template-ver');
+          expect(result.section, 'test-section');
+        });
+
+        test('returns null for non-existing exact ref', () async {
+          // Given
+          final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
+          await dao.save(entity);
+
+          // And
+          const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'wrong-ver');
+
+          // When
+          final result = await dao.getDocumentMetadata(id: ref);
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns latest metadata for loose ref when multiple versions exist', () async {
+          // Given
+          final oldCreatedAt = DateTime.utc(2023, 1, 1);
+          final newerCreatedAt = DateTime.utc(2024, 1, 1);
+
+          final oldVer = _buildUuidV7At(oldCreatedAt);
+          final newerVer = _buildUuidV7At(newerCreatedAt);
+
+          final entityOld = _createTestDocumentEntity(id: 'test-id', ver: oldVer);
+          final entityNew = _createTestDocumentEntity(id: 'test-id', ver: newerVer);
+          await dao.saveAll([entityOld, entityNew]);
+
+          // And
+          const ref = SignedDocumentRef.loose(id: 'test-id');
+
+          // When
+          final result = await dao.getDocumentMetadata(id: ref);
+
+          // Then
+          expect(result, isNotNull);
+          expect(result!.ver, newerVer);
+          expect(result.createdAt, newerCreatedAt);
+        });
+
+        test('returns null for loose ref if no versions exist', () async {
+          // Given
+          final entity = _createTestDocumentEntity(id: 'other-id', ver: 'other-ver');
+          await dao.save(entity);
+
+          // And
+          const ref = SignedDocumentRef.loose(id: 'non-existent-id');
+
+          // When
+          final result = await dao.getDocumentMetadata(id: ref);
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns all metadata fields correctly populated', () async {
+          // Given
+          final author = _createTestAuthor(name: 'TestAuthor');
+          final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 1);
+          final paramRef = DocumentRefFactory.signedDocumentRef();
+
+          final entity = _createTestDocumentEntity(
+            id: 'full-doc-id',
+            ver: 'full-doc-ver',
+            type: DocumentType.proposalDocument,
+            authors: [author],
+            collaborators: [collaborator],
+            refId: 'parent-ref-id',
+            refVer: 'parent-ref-ver',
+            replyId: 'reply-id',
+            replyVer: 'reply-ver',
+            section: 'test-section',
+            templateId: 'tmpl-id',
+            templateVer: 'tmpl-ver',
+            parameters: [paramRef],
+          );
+          await dao.save(entity);
+
+          // When
+          final result = await dao.getDocumentMetadata(
+            id: const SignedDocumentRef.exact(id: 'full-doc-id', ver: 'full-doc-ver'),
+          );
+
+          // Then
+          expect(result, isNotNull);
+          expect(result!.id, 'full-doc-id');
+          expect(result.ver, 'full-doc-ver');
+          expect(result.type, DocumentType.proposalDocument);
+          expect(result.authors, contains(author));
+          expect(result.collaborators, contains(collaborator));
+          expect(result.refId, 'parent-ref-id');
+          expect(result.refVer, 'parent-ref-ver');
+          expect(result.replyId, 'reply-id');
+          expect(result.replyVer, 'reply-ver');
+          expect(result.section, 'test-section');
+          expect(result.templateId, 'tmpl-id');
+          expect(result.templateVer, 'tmpl-ver');
+          expect(result.parameters.isNotEmpty, isTrue);
+        });
+      });
+
       group('saveAll', () {
         test('does nothing for empty list', () async {
           // Given

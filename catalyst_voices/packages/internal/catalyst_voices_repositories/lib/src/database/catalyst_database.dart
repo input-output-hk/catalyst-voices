@@ -11,6 +11,7 @@ import 'package:catalyst_voices_repositories/src/database/table/document_paramet
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -69,7 +70,10 @@ abstract interface class CatalystDatabase {
     DriftLocalDraftDocumentsV2Dao,
   ],
   queries: {},
-  views: [],
+  views: [
+    DocumentsV2MetadataView,
+    LocalDocumentsDraftsMetadataView,
+  ],
   include: {},
 )
 class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDatabase {

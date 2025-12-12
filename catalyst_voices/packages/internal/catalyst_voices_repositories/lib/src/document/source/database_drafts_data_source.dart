@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
@@ -80,6 +81,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) {
+    return _database.localDocumentsV2Dao
+        .getDocumentMetadata(id: ref)
+        .then((value) => value?.toModel());
+  }
+
+  @override
   Future<void> save({required DocumentData data}) => saveAll([data]);
 
   @override
@@ -144,37 +152,6 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
           referencing: referencing,
         )
         .distinct();
-  }
-}
-
-extension on LocalDocumentDraftEntity {
-  DocumentData toModel() {
-    return DocumentData(
-      metadata: DocumentDataMetadata(
-        contentType: DocumentContentType.fromJson(contentType),
-        type: type,
-        id: DraftRef(id: id, ver: ver),
-        ref: refId.toRef(refVer),
-        template: templateId.toRef(templateVer),
-        reply: replyId.toRef(replyVer),
-        section: section,
-        collaborators: collaborators.isEmpty ? null : collaborators,
-        parameters: parameters,
-        authors: authors.isEmpty ? null : authors,
-      ),
-      content: content,
-    );
-  }
-}
-
-extension on String? {
-  SignedDocumentRef? toRef([String? ver]) {
-    final id = this;
-    if (id == null) {
-      return null;
-    }
-
-    return SignedDocumentRef(id: id, ver: ver);
   }
 }
 

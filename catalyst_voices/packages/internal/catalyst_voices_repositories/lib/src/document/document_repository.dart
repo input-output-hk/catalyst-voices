@@ -77,6 +77,14 @@ abstract interface class DocumentRepository {
     bool useCache,
   });
 
+  /// Similar to [getDocumentData] but returns only [DocumentDataMetadata].
+  ///
+  /// If document does not exist it will throw [DocumentNotFoundException].
+  Future<DocumentDataMetadata> getDocumentMetadata({
+    required DocumentRef id,
+    bool useCache,
+  });
+
   /// Useful when recovering account and we want to lookup
   /// latest [DocumentData] which of [originalAuthorId] and check
   /// username used in [CatalystId] in that document.
@@ -278,20 +286,40 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef id,
     bool useCache = true,
   }) async {
-    final documentData = switch (id) {
-      SignedDocumentRef() => await _getSignedDocumentData(ref: id, useCache: useCache),
-      DraftRef() when !useCache => throw DocumentNotFoundException(
-        ref: id,
-        message: '$id can not be resolved while not using cache',
-      ),
-      DraftRef() => await _getDraftDocumentData(ref: id),
-    };
+    final documentData = await _getDocumentByRef<DocumentData?>(
+      id: id,
+      useCache: useCache,
+      onSignedDocument: (ref) => _getSignedDocumentAndCache(ref: ref, useCache: useCache),
+      onDraft: _drafts.get,
+    );
 
     if (documentData == null) {
       throw DocumentNotFoundException(ref: id);
     }
 
     return documentData;
+  }
+
+  @override
+  Future<DocumentDataMetadata> getDocumentMetadata({
+    required DocumentRef id,
+    bool useCache = true,
+  }) async {
+    final metadata = await _getDocumentByRef<DocumentDataMetadata?>(
+      id: id,
+      useCache: useCache,
+      onSignedDocument: (ref) => _getSignedDocumentAndCache(
+        ref: ref,
+        useCache: useCache,
+      ).then((document) => document?.metadata),
+      onDraft: _drafts.getMetadata,
+    );
+
+    if (metadata == null) {
+      throw DocumentNotFoundException(ref: id);
+    }
+
+    return metadata;
   }
 
   @override
@@ -611,13 +639,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return _localDocuments.watch(referencing: referencing, type: type).distinct();
   }
 
-  Future<DocumentData?> _getDraftDocumentData({
-    required DraftRef ref,
+  /// Fetches document data and handles ref type switching and error handling.
+  ///
+  /// This helper consolidates the common logic for both [getDocumentData] and
+  /// [getDocumentMetadata].
+  Future<T?> _getDocumentByRef<T>({
+    required DocumentRef id,
+    bool useCache = true,
+    required ValueResolver<SignedDocumentRef, Future<T>> onSignedDocument,
+    required ValueResolver<DraftRef, Future<T>> onDraft,
   }) async {
-    return _drafts.get(ref);
+    return switch (id) {
+      SignedDocumentRef() => onSignedDocument(id),
+      DraftRef() when !useCache => throw DocumentNotFoundException(
+        ref: id,
+        message: '$id can not be resolved while not using cache',
+      ),
+      DraftRef() => onDraft(id),
+    };
   }
 
-  Future<DocumentData?> _getSignedDocumentData({
+  Future<DocumentData?> _getSignedDocumentAndCache({
     required SignedDocumentRef ref,
     bool useCache = true,
   }) async {

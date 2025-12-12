@@ -4,11 +4,16 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/local_draft_documents_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.drift.dart';
 import 'package:drift/drift.dart';
 
 @DriftAccessor(
   tables: [
     LocalDocumentsDrafts,
+  ],
+  views: [
+    LocalDocumentsDraftsMetadataView,
   ],
 )
 class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -101,6 +106,23 @@ class DriftLocalDraftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDataba
     DocumentRef? referencing,
   }) {
     return _queryDocument(type: type, id: id, referencing: referencing).getSingleOrNull();
+  }
+
+  @override
+  Future<LocalDocumentsDraftsMetadataViewData?> getDocumentMetadata({
+    required DocumentRef id,
+  }) async {
+    final query = select(localDocumentsDraftsMetadataView)..where((tbl) => tbl.id.equals(id.id));
+
+    if (id.isExact) {
+      query.where((tbl) => tbl.ver.equals(id.ver!));
+    }
+
+    query
+      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
+      ..limit(1);
+
+    return query.getSingleOrNull();
   }
 
   @override
@@ -365,6 +387,17 @@ abstract interface class LocalDraftDocumentsV2Dao {
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+  });
+
+  /// Retrieves only the metadata of a draft document, excluding the content blob.
+  ///
+  /// This is an optimized query that skips fetching the potentially large
+  /// content column from the database.
+  ///
+  /// Returns the [LocalDocumentsDraftsMetadataViewData] for the matching document,
+  /// or `null` if no matching document is found.
+  Future<LocalDocumentsDraftsMetadataViewData?> getDocumentMetadata({
+    required DocumentRef id,
   });
 
   Future<List<LocalDocumentDraftEntity>> getDocuments({
