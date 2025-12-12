@@ -15,6 +15,8 @@ final class CollaborationInvitation extends ProposalsRelationship {
 
   const CollaborationInvitation.pending(this.id) : status = CollaborationInvitationStatus.pending;
 
+  const CollaborationInvitation.rejected(this.id) : status = CollaborationInvitationStatus.rejected;
+
   @override
   List<Object?> get props => [id, status];
 
