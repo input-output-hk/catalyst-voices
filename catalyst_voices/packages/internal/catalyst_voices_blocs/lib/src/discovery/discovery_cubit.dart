@@ -56,8 +56,10 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   Future<void> getAllData() async {
-    getMostRecentProposals();
-    await getCurrentCampaign();
+    await (
+      getMostRecentProposals(),
+      getCurrentCampaign(),
+    ).wait;
   }
 
   Future<void> getCurrentCampaign() async {
@@ -80,7 +82,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     }
   }
 
-  void getMostRecentProposals() {
+  Future<void> getMostRecentProposals() async {
     emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
 
     _watchMostRecentProposals();
@@ -133,7 +135,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     unawaited(_activeCampaignTotalAskSub?.cancel());
     _activeCampaignTotalAskSub = null;
 
-    if (campaign != null) _watchCampaignTotalAsk(campaign);
+    if (campaign != null) {
+      _watchCampaignTotalAsk(campaign);
+    }
   }
 
   void _handleCampaignTotalAskChange(CampaignTotalAsk data) {

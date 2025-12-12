@@ -395,6 +395,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }
 
   Future<DateTime?> _getProposalSubmissionCloseDate() async {
+    // TODO(dt-iohk): consider to use campaign assigned to the proposal
     final campaign = await _campaignService.getActiveCampaign();
     if (campaign == null) {
       return null;
@@ -543,6 +544,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final categoryRef = proposal.categoryRef;
       final category = await _campaignService.getCategory(categoryRef);
       final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryRef);
+      // TODO(dt-iohk): consider to use campaign assigned to the proposal
       final campaign = await _campaignService.getActiveCampaign();
 
       final fromActiveCampaign = campaign?.hasCategory(categoryRef.id) ?? false;

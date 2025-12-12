@@ -27,13 +27,13 @@ abstract interface class CampaignService {
 
   Future<Campaign?> getActiveCampaign();
 
+  Future<CampaignPhase> getActiveCampaignPhaseTimeline(CampaignPhaseType stage);
+
   Future<List<Campaign>> getAllCampaigns();
 
   Future<Campaign> getCampaign({
     required String id,
   });
-
-  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
@@ -58,17 +58,35 @@ final class CampaignServiceImpl implements CampaignService {
   );
 
   @override
-  Stream<Campaign?> get watchActiveCampaign => _activeCampaignObserver.watchCampaign;
+  Stream<Campaign?> get watchActiveCampaign async* {
+    if (_activeCampaignObserver.campaign == null) {
+      await _fetchInitialActiveCampaign();
+    }
+    yield* _activeCampaignObserver.watchCampaign;
+  }
 
   @override
   Future<Campaign?> getActiveCampaign() async {
-    if (_activeCampaignObserver.campaign != null) {
-      return _activeCampaignObserver.campaign;
+    final activeCampaign = _activeCampaignObserver.campaign;
+    if (activeCampaign != null) {
+      return activeCampaign;
+    } else {
+      return _fetchInitialActiveCampaign();
     }
-    // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = await getCampaign(id: initialActiveCampaignRef.id);
-    _activeCampaignObserver.campaign = campaign;
-    return campaign;
+  }
+
+  @override
+  Future<CampaignPhase> getActiveCampaignPhaseTimeline(CampaignPhaseType type) async {
+    final campaign = await getActiveCampaign();
+    if (campaign == null) {
+      throw StateError('No active campaign found');
+    }
+
+    final timelineStage = campaign.timeline.phases.firstWhere(
+      (element) => element.type == type,
+      orElse: () => throw StateError('Type $type not found'),
+    );
+    return timelineStage;
   }
 
   @override
@@ -86,20 +104,6 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType type) async {
-    final campaign = await getActiveCampaign();
-    if (campaign == null) {
-      throw StateError('No active campaign found');
-    }
-
-    final timelineStage = campaign.timeline.phases.firstWhere(
-      (element) => element.type == type,
-      orElse: () => throw StateError('Type $type not found'),
-    );
-    return timelineStage;
-  }
-
-  @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     final category = await _campaignRepository.getCategory(ref);
     if (category == null) {
@@ -108,7 +112,7 @@ final class CampaignServiceImpl implements CampaignService {
       );
     }
 
-    final proposalSubmissionStage = await getCampaignPhaseTimeline(
+    final proposalSubmissionStage = await getActiveCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
 
@@ -195,6 +199,13 @@ final class CampaignServiceImpl implements CampaignService {
     }
 
     return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
+  }
+
+  Future<Campaign?> _fetchInitialActiveCampaign() async {
+    // TODO(LynxLynxx): Call backend to get latest active campaign
+    final campaign = await getCampaign(id: initialActiveCampaignRef.id);
+    _activeCampaignObserver.campaign = campaign;
+    return campaign;
   }
 
   Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
