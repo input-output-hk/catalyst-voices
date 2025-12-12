@@ -175,6 +175,6 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-setup_fund(args.env, args.retry)
+setup_fund(args.env)
 
 print(f"Finished setup Fund.")
