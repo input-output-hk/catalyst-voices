@@ -18,7 +18,7 @@ class ProposalBrief extends Equatable {
   final int? commentsCount;
   final bool isFavorite;
   final VoteButtonData? voteData;
-  final List<ProposalBriefDataCollaborator>? collaborators;
+  final List<ProposalDataCollaborator>? collaborators;
 
   const ProposalBrief({
     required this.id,
@@ -117,7 +117,7 @@ class ProposalBrief extends Equatable {
     Optional<int>? commentsCount,
     bool? isFavorite,
     Optional<VoteButtonData>? voteData,
-    Optional<List<ProposalBriefDataCollaborator>>? collaborators,
+    Optional<List<ProposalDataCollaborator>>? collaborators,
   }) {
     return ProposalBrief(
       id: id ?? this.id,

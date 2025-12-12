@@ -19,7 +19,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
   final bool isFavorite;
   final ProposalBriefDataVotes? votes;
   final List<ProposalBriefDataVersion>? versions;
-  final List<ProposalBriefDataCollaborator>? collaborators;
+  final List<ProposalDataCollaborator>? collaborators;
 
   const ProposalBriefData({
     required this.id,
@@ -58,19 +58,10 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     // Proposal Brief do not support "removed" or "left" status.
     final collaborators = data.proposal.metadata.collaborators?.map(
       (id) {
-        final action = collaboratorsActions[id.toSignificant()]?.action;
-        final status = switch (action) {
-          null => ProposalsCollaborationStatus.pending,
-          ProposalSubmissionAction.aFinal => ProposalsCollaborationStatus.accepted,
-          // When proposal is final, draft action do not mean it's accepted
-          ProposalSubmissionAction.draft when isFinal => ProposalsCollaborationStatus.pending,
-          ProposalSubmissionAction.draft => ProposalsCollaborationStatus.accepted,
-          ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
-        };
-
-        return ProposalBriefDataCollaborator(
+        return ProposalDataCollaborator.fromAction(
           id: id,
-          status: status,
+          action: collaboratorsActions[id.toSignificant()]?.action,
+          isProposalFinal: isFinal,
         );
       },
     ).toList();
@@ -145,7 +136,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     bool? isFavorite,
     Optional<ProposalBriefDataVotes>? votes,
     Optional<List<ProposalBriefDataVersion>>? versions,
-    Optional<List<ProposalBriefDataCollaborator>>? collaborators,
+    Optional<List<ProposalDataCollaborator>>? collaborators,
   }) {
     return ProposalBriefData(
       id: id ?? this.id,
@@ -166,19 +157,6 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
       collaborators: collaborators.dataOr(this.collaborators),
     );
   }
-}
-
-final class ProposalBriefDataCollaborator extends Equatable {
-  final CatalystId id;
-  final ProposalsCollaborationStatus status;
-
-  const ProposalBriefDataCollaborator({
-    required this.id,
-    required this.status,
-  });
-
-  @override
-  List<Object?> get props => [id, status];
 }
 
 final class ProposalBriefDataVersion extends Equatable {

@@ -23,7 +23,13 @@ sealed class ProposalOrDocument extends Equatable {
   /// Creates a [ProposalOrDocument] from a structured [ProposalDocument].
   const factory ProposalOrDocument.proposal(ProposalDocument data) = _Proposal;
 
-  // TODO(damian-molinski): Category name should come from query but atm those are not documents.
+  /// Returns the underlying [ProposalDocument] if this is a proposal,
+  /// or null if it's just a document without a template.
+  ProposalDocument? get asProposalDocument => switch (this) {
+    _Proposal(:final data) => data,
+    _Document() => null,
+  };
+
   /// The name of the proposal's category.
   String? get categoryName {
     return Campaign.all
@@ -36,10 +42,10 @@ sealed class ProposalOrDocument extends Equatable {
   /// A brief description of the proposal.
   String? get description;
 
+  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The duration of the proposal in months.
   int? get durationInMonths;
 
-  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The number of fund this proposal was submitted for.
   int? get fundNumber {
     return Campaign.all
