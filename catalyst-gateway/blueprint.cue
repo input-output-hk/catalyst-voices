@@ -7,7 +7,8 @@ project: {
 	}
 	deployment: {
 		on: {
-			tag: {}
+			//tag: {}
+			always: {}
 		}
 
 		bundle: {
@@ -176,8 +177,7 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
-									// voices-frontend-config/v0.1.1 tag
-									tag:  "e47f44a8ada95c32b3c33214cf837fe9bdb74548"
+									tag:  "v0.1.1"
 								}
 								env: {
 									ENVIRONMENT: {
@@ -203,8 +203,7 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/setup-fund-documents"
-									// setup-fund-documents/v0.1.1 tag
-									tag:  "e47f44a8ada95c32b3c33214cf837fe9bdb74548"
+									tag:  "v0.1.1"
 								}
 								env: {
 									ENVIRONMENT: {
@@ -236,8 +235,7 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
-									// gateway-event-db/v3.0.0 tag
-									tag:  "080d5fc54493d50c190f488e7e38da92f06e9d2b"
+									tag:  "9eda7ac56e28993f466fbc64d8990bdb4fbba40f,"
 								}
 								env: {
 									DB_HOST: {
@@ -351,8 +349,9 @@ project: {
 	release: {
 		docker: {
 			on: {
-				merge: {}
-				tag: {}
+				//merge: {}
+				//tag: {}
+				always: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_HASH_OR_TAG")
