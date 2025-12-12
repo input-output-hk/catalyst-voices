@@ -13,6 +13,10 @@ enum WorkspaceFilters {
 
   bool get isMainProposer => this == mainProposer;
 
+  bool get isAllOrMainProposer => isAllProposals || isMainProposer;
+
+  bool get isCollaboratorOrMainProposer => isAllProposals || isCollaborator;
+
   String localizedName(VoicesLocalizations l10n) {
     return switch (this) {
       allProposals => l10n.allProposals,

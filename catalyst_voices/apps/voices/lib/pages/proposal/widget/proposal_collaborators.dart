@@ -56,7 +56,7 @@ class _Collaborator extends StatelessWidget {
       spacing: 8,
       children: [
         ProfileAvatar(
-          username: collaborator.catalystId.username,
+          username: collaborator.id.username,
           size: 32,
         ),
         Column(
@@ -64,7 +64,7 @@ class _Collaborator extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _Username(
-              catalystId: collaborator.catalystId,
+              catalystId: collaborator.id,
               status: collaborator.status,
             ),
             if (showStatus) _Status(status: collaborator.status),

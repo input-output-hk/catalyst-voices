@@ -347,19 +347,16 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    if (filters.originalAuthor != null) {
-      final significant = filters.originalAuthor!.toSignificant();
-      final escapedSignificant = _escapeSqlString(significant.toString());
+    if (filters.relationships.isNotEmpty) {
+      final relationshipClauses = <String>[];
 
-      /// Check against p.id to target the first version (where id == ver)
-      clauses.add('''
-        EXISTS (
-          SELECT 1 FROM document_authors da
-          WHERE da.document_id = p.id 
-            AND da.document_ver = p.id
-            AND da.account_significant_id = '$escapedSignificant'
-        )
-      ''');
+      for (final rel in filters.relationships) {
+        // TODO(damian-molinski): implement clauses
+      }
+
+      if (relationshipClauses.isNotEmpty) {
+        clauses.add('(${relationshipClauses.join(' OR ')})');
+      }
     }
 
     if (filters.categoryId != null) {
@@ -498,7 +495,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       documentsV2,
       if (filters.isFavorite != null) documentsLocalMetadata,
       if (filters.categoryId != null || filters.campaign != null) documentParameters,
-      if (filters.originalAuthor != null ||
+      if (filters.relationships.whereType<OriginalAuthor>().isNotEmpty ||
           (filters.searchQuery != null && filters.searchQuery!.isNotEmpty))
         documentAuthors,
     };
