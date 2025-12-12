@@ -16,6 +16,7 @@ void main() {
   late SyncStatsStorage statsStorage;
   late DocumentsService documentsService;
   late CampaignService campaignService;
+  late StreamController<Campaign?> activeCampaignStream;
   late SyncManager syncManager;
 
   setUpAll(() async {
@@ -32,6 +33,9 @@ void main() {
 
     documentsService = _MockDocumentsService();
     campaignService = _MockCampaignService();
+
+    activeCampaignStream = StreamController.broadcast(sync: true);
+    when(() => campaignService.watchActiveCampaign).thenAnswer((_) => activeCampaignStream.stream);
 
     syncManager = SyncManager(
       appMetaStorage,
@@ -189,6 +193,40 @@ void main() {
           ).called(1);
         },
       );
+
+      test('when active campaign changes then triggers sync and clears old documents', () async {
+        // Given
+        const oldCampaignId = SignedDocumentRef.first('campaign_old');
+        await appMetaStorage.write(const AppMeta(activeCampaign: oldCampaignId));
+
+        final activeCampaign = Campaign.f15();
+        when(() => campaignService.getActiveCampaign()).thenAnswer((_) async => activeCampaign);
+
+        when(
+          () => documentsService.clear(keepLocalDrafts: any(named: 'keepLocalDrafts')),
+        ).thenAnswer((_) async => 0);
+
+        when(
+          () => documentsService.sync(
+            campaign: any(named: 'campaign'),
+            onProgress: any(named: 'onProgress'),
+          ),
+        ).thenAnswer((_) async => const DocumentsSyncResult());
+
+        // When
+        activeCampaignStream.add(activeCampaign);
+
+        // Wait for the sync to complete
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        // Then
+        verify(
+          () => documentsService.sync(
+            campaign: activeCampaign,
+            onProgress: any(named: 'onProgress'),
+          ),
+        ).called(1);
+      });
     });
   });
 }

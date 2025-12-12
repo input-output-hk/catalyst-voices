@@ -123,6 +123,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         invitation,
       ) = await (
         _isReadOnlyMode(),
+        // TODO(dt-iohk): consider to use campaign assigned to the proposal
         _campaignService.getActiveCampaign(),
         _campaignService.getCategory(proposal.document.metadata.parameters.set.first),
         _commentService.getCommentTemplateFor(
@@ -597,7 +598,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<bool> _isReadOnlyMode() async {
-    final campaignTimeline = await _campaignService.getCampaignPhaseTimeline(
+    final campaignTimeline = await _campaignService.getActiveCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
     final dateRangeStatus = campaignTimeline.timeline.rangeStatus(DateTimeExt.now());
