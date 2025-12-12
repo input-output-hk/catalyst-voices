@@ -46,28 +46,16 @@ def read_admin_key(admin_key_env: str, network: str) -> AdminKey:
 
 
 def publish_document(
-    url: str, timeout: int, retry: bool, doc: SignedDocument, token: str
+    url: str, timeout: int, doc: SignedDocument, token: str
 ):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/cbor"}
     data = bytes.fromhex(doc.build_and_sign())
 
-    while True:
-        try:
-            resp = requests.put(url, timeout=timeout, headers=headers, data=data)
-            resp.raise_for_status()
-            break
-        except requests.exceptions.RequestException as e:
-            errmsg = f"failed to send HTTP request: {e}, resp: {resp.text}"
-            print(errmsg)
+    resp = requests.put(url, timeout=timeout, headers=headers, data=data)
+    resp.raise_for_status()
+        
 
-            if retry:
-                print("Retrying in 1 minute...")
-                time.sleep(60)
-            else:
-                break
-
-
-def setup_fund(env: str, retry: bool):
+def setup_fund(env: str):
     """Read config files from the specified `env`, then apply the configs."""
     file_dir = Path(__file__).resolve().parent
     env_dir = Path(file_dir) / env
@@ -172,18 +160,12 @@ def setup_fund(env: str, retry: bool):
         publish_document(
             url=url,
             timeout=timeout,
-            retry=retry,
             doc=doc,
             token=admin.auth_token(),
         )
 
 
 parser = argparse.ArgumentParser(description="Catalyst Signed Document importer.")
-parser.add_argument(
-    "--retry",
-    action="store_true",
-    help="If submiting fails, wait 1 minute and retry indefinitely until successful.",
-)
 parser.add_argument(
     "env",
     type=str,
@@ -192,6 +174,6 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-setup_fund(args.env, args.retry)
+setup_fund(args.env)
 
 print(f"Finished setup Fund.")

@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-MAX_RETRIES=${MAX_RETRIES:-3}
 RETRY_DELAY=${RETRY_DELAY:-5}
 
 if [ -z "${ENVIRONMENT:-}" ]; then
@@ -19,19 +18,14 @@ echo ">>> Running: uv run setup_fund.py ${ENVIRONMENT}"
 
 set +e
 attempt=1
-while [ $attempt -le "${MAX_RETRIES}" ]; do
-    echo ">>> Attempt $attempt of ${MAX_RETRIES}"
+while true; do
+    echo ">>> Attempt $attempt"
 
     if uv run setup_fund.py "${ENVIRONMENT}"; then
         echo ">>> Command succeeded on attempt $attempt"
         exit 0
     else
         echo ">>> Command failed on attempt $attempt"
-
-        if [ $attempt -eq "${MAX_RETRIES}" ]; then
-            echo ">>> All ${MAX_RETRIES} attempts failed. Exiting with error code."
-            exit 1
-        fi
 
         echo ">>> Waiting ${RETRY_DELAY} seconds before retry..."
         sleep "${RETRY_DELAY}"

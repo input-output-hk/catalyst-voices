@@ -81,8 +81,8 @@ project: {
 								}
 								"EVENT_DB_URL": {
 									secret: {
-										name: "gateway"
-										key:  "event-db-url"
+										name: "db-url"
+										key:  "url"
 									}
 								}
 								"EVENT_DB_MAX_CONNECTIONS": {
@@ -179,6 +179,10 @@ project: {
 									tag:  _ @forge(name="GIT_HASH_OR_TAG")
 								}
 								env: {
+									RETRY_DELAY: {
+										// 5 minutes
+										value: string | *"300"
+									}
 									ENVIRONMENT: {
 										value: string | *_env
 									}
@@ -186,6 +190,42 @@ project: {
 										secret: {
 											name: "gateway"
 											key:  "api-key"
+										}
+									}
+								}
+							}
+						}
+						"setup-fund-documents": {
+							argo: {
+								hook: {
+									type: "PostSync"
+									deletePolicy: ["BeforeHookCreation"]
+								}
+							}
+							hashName: false
+							containers: main: {
+								image: {
+									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/setup-fund-documents"
+									tag:  _ @forge(name="GIT_HASH_OR_TAG")
+								}
+								env: {
+									RETRY_DELAY: {
+										// 5 minutes
+										value: string | *"300"
+									}
+									ENVIRONMENT: {
+										value: string | *_env
+									}
+									API_KEY: {
+										secret: {
+											name: "gateway"
+											key:  "api-key"
+										}
+									}
+									CAT_GATEWAY_ADMIN_PRIVATE_KEY: {
+										secret: {
+											name: "gateway"
+											key:  "admin-private-key"
 										}
 									}
 								}
@@ -252,6 +292,9 @@ project: {
 									}
 									WITH_MIGRATIONS: {
 										value: string | *"true"
+									}
+									WITH_SEED_DATA: {
+										value: "."
 									}
 								}
 							}

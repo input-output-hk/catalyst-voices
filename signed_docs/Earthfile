@@ -1,11 +1,10 @@
 VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.10-mk-signed-docs-key-type AS cat-libs-rust
-
-ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.6 AS python-ci
 
 package:
-    FROM ${REGISTRY}/astral-sh/uv:python3.13-bookworm-slim
+    FROM python-ci+python-base
 
     WORKDIR /app
 
