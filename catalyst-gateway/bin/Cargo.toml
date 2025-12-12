@@ -23,7 +23,7 @@ c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-h
 catalyst-types = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types/v0.0.10" }
 
 clap = { version = "4.5.20", features = ["derive", "env"] }
-tracing = { version = "0.1.40", features = ["log"] }
+tracing = { version = "0.1.40", features = ["attributes", "log"] }
 tracing-subscriber = { version = "0.3.18", features = [
     "fmt",
     "json",
@@ -107,6 +107,14 @@ poem-openapi-derive = { version = "=5.1.4" }
 # Its a transitive dependency of the "poem-openapi-derive" crate,
 # but its breaks API after version "0.20.11".
 darling = { version = "=0.20.10" }
+
+# Optional dependencies for distributed tracing
+tracing-opentelemetry = { version = "0.32" }
+opentelemetry = { version = "0.31" }
+opentelemetry_sdk = { version = "0.31", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.31", features = ["grpc-tonic"] }
+opentelemetry-appender-tracing = { version = "0.31.1" }
+opentelemetry-semantic-conventions = { version = "0.31" }
 
 [dev-dependencies]
 test-case = "3.3.1"

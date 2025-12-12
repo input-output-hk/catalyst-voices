@@ -3,11 +3,12 @@
 use std::sync::OnceLock;
 
 use clap::ValueEnum;
-use tracing::{level_filters::LevelFilter, log::error};
+use tracing::{Subscriber, level_filters::LevelFilter, log::error};
 use tracing_subscriber::{
-    Registry,
+    Layer, Registry,
     fmt::{self, format::FmtSpan, time},
     prelude::*,
+    registry::LookupSpan,
     reload::{self, Handle},
 };
 
@@ -82,9 +83,13 @@ fn set_default_span() {
 }
 
 /// Initialize the tracing subscriber
-pub(crate) fn init(log_level: LogLevel) {
+pub(crate) fn build_fmt_layer<S>() -> Box<dyn Layer<S> + Send + Sync + 'static>
+where
+    S: Subscriber,
+    for<'a> S: LookupSpan<'a>,
+{
     // Create the formatting layer
-    let layer = fmt::layer()
+    fmt::layer()
         .json()
         .with_timer(time::UtcTime::rfc_3339())
         .with_span_events(FmtSpan::CLOSE)
@@ -96,11 +101,32 @@ pub(crate) fn init(log_level: LogLevel) {
         .with_level(true)
         .with_thread_names(true)
         .with_thread_ids(true)
-        .flatten_event(true);
+        .flatten_event(true)
+        .boxed()
+}
 
-    // Create a reloadable layer with the specified log_level
+/// Create a reloadable layer with the specified `log_level`.
+///
+/// Initializes the `LOGGER_HANDLE` static variable, which can be used to modify the log
+/// level with the `modify_logger_level` function.
+pub(crate) fn build_reloadable_filter(log_level: LogLevel) -> reload::Layer<LevelFilter, Registry> {
     let filter = LevelFilter::from_level(log_level.into());
     let (filter, logger_handle) = reload::Layer::new(filter);
+
+    if LOGGER_HANDLE.set(logger_handle).is_err() {
+        error!("Failed to initialize logger handle. Called multiple times?");
+    }
+    filter
+}
+
+/// Initialize the tracing subscriber
+pub(crate) fn init(log_level: LogLevel) {
+    // Create the formatting layer
+    let layer = build_fmt_layer();
+
+    // Create a reloadable layer with the specified log_level
+    let filter = build_reloadable_filter(log_level);
+
     tracing_subscriber::registry()
         .with(filter)
         .with(layer)
@@ -111,13 +137,13 @@ pub(crate) fn init(log_level: LogLevel) {
         )
         .init();
 
+    post_init(log_level);
+}
+
+/// Initialize the tracing subscriber
+pub(crate) fn post_init(log_level: LogLevel) {
     // Logging is globally disabled by default, so globally enable it to the required level.
     tracing::log::set_max_level(log_level.into());
-
-    if LOGGER_HANDLE.set(logger_handle).is_err() {
-        error!("Failed to initialize logger handle. Called multiple times?");
-    }
-
     set_default_span();
 }
 
