@@ -499,7 +499,7 @@ final class ProposalServiceImpl implements ProposalService {
       filters: filters,
     ).map((page) => page.items);
 
-    final originalAuthor = filters.relationships?.whereType<OriginalAuthor>().firstOrNull;
+    final originalAuthor = filters.relationships.whereType<OriginalAuthor>().firstOrNull;
     final localDraftProposalsStream = originalAuthor != null
         ? _proposalRepository.watchLocalDraftProposalsBrief(author: originalAuthor.id)
         : Stream.value(const <ProposalBriefData>[]);

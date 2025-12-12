@@ -350,9 +350,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     if (filters.relationships.isNotEmpty) {
       final relationshipClauses = filters.relationships.map(_buildRelationshipClause);
 
-      if (relationshipClauses.isNotEmpty) {
-        clauses.add('(${relationshipClauses.join(' OR ')})');
-      }
+      clauses.add('(${relationshipClauses.join(' OR ')})');
     }
 
     if (filters.categoryId != null) {
