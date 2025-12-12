@@ -316,7 +316,7 @@ void main() {
           );
 
           // Then
-          expect(result, isEmpty);
+          expect(result.proposalVersions, isEmpty);
         });
 
         test('returns titles for all versions of proposals', () async {
@@ -353,11 +353,11 @@ void main() {
           );
 
           // Then
-          expect(result, hasLength(1));
-          expect(result['p1'], isNotNull);
-          expect(result['p1'], hasLength(2));
-          expect(result['p1']!['v1'], equals(titleV1));
-          expect(result['p1']!['v2'], equals(titleV2));
+          expect(result.proposalVersions, hasLength(1));
+          expect(result.proposalVersions['p1'], isNotNull);
+          expect(result.proposalVersions['p1']!.data, hasLength(2));
+          expect(result.proposalVersions['p1']!.data['v1'], equals(titleV1));
+          expect(result.proposalVersions['p1']!.data['v2'], equals(titleV2));
         });
 
         test('handles versions with missing titles gracefully', () async {
@@ -393,9 +393,9 @@ void main() {
           );
 
           // Then
-          expect(result, hasLength(1));
-          expect(result['p1']!['v1'], equals(titleV1));
-          expect(result['p1']!['v2'], isNull);
+          expect(result.proposalVersions, hasLength(1));
+          expect(result.proposalVersions['p1']!.data['v1'], equals(titleV1));
+          expect(result.proposalVersions['p1']!.data['v2'], isNull);
         });
 
         test('handles multiple proposals correctly', () async {
@@ -429,9 +429,9 @@ void main() {
           );
 
           // Then
-          expect(result, hasLength(2));
-          expect(result['p1']!['v1'], equals('Proposal 1 Title'));
-          expect(result['p2']!['v1'], equals('Proposal 2 Title'));
+          expect(result.proposalVersions, hasLength(2));
+          expect(result.proposalVersions['p1']!.data['v1'], equals('Proposal 1 Title'));
+          expect(result.proposalVersions['p2']!.data['v1'], equals('Proposal 2 Title'));
         });
 
         test('ignores non-existent proposal IDs', () async {
@@ -455,11 +455,38 @@ void main() {
           );
 
           // Then: Only existing proposal is returned
-          expect(result, hasLength(1));
-          expect(result.containsKey('p1'), isTrue);
-          expect(result.containsKey('p2'), isFalse);
-          expect(result.containsKey('p3'), isFalse);
+          expect(result.proposalVersions, hasLength(1));
+          expect(result.proposalVersions.containsKey('p1'), isTrue);
+          expect(result.proposalVersions.containsKey('p2'), isFalse);
+          expect(result.proposalVersions.containsKey('p3'), isFalse);
         });
+
+        test(
+          'returns all versions ordered by ver ASC for proposal with multiple versions',
+          () async {
+            final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+            final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+            final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+            final ver1 = _buildUuidV7At(earliest);
+            final ver2 = _buildUuidV7At(middle);
+            final ver3 = _buildUuidV7At(latest);
+
+            final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
+            final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
+            final proposal3 = _createTestDocumentEntity(id: 'p1', ver: ver3);
+            await db.documentsV2Dao.saveAll([proposal3, proposal1, proposal2]);
+
+            final result = await dao.getVersionsTitles(
+              proposalIds: ['p1'],
+              nodeId: nodeId,
+            );
+
+            expect(result.proposalVersions, hasLength(1));
+            expect(result.proposalVersions['p1']!.data, hasLength(3));
+            expect(result.proposalVersions['p1']!.data.keys, [ver1, ver2, ver3]);
+          },
+        );
       });
 
       group('getVisibleProposalsCount', () {
@@ -2517,32 +2544,8 @@ void main() {
             final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items, hasLength(1));
-            expect(result.items.first.versionIds, hasLength(1));
             expect(result.items.first.proposal.ver, proposalVer);
-            expect(result.items.first.versionIds, [proposalVer]);
           });
-
-          test(
-            'returns all versions ordered by ver ASC for proposal with multiple versions',
-            () async {
-              final ver1 = _buildUuidV7At(earliest);
-              final ver2 = _buildUuidV7At(middle);
-              final ver3 = _buildUuidV7At(latest);
-
-              final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
-              final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
-              final proposal3 = _createTestDocumentEntity(id: 'p1', ver: ver3);
-              await db.documentsV2Dao.saveAll([proposal3, proposal1, proposal2]);
-
-              const request = PageRequest(page: 0, size: 10);
-              final result = await dao.getProposalsBriefPage(request: request);
-
-              expect(result.items, hasLength(1));
-              expect(result.items.first.proposal.ver, ver3);
-              expect(result.items.first.versionIds, hasLength(3));
-              expect(result.items.first.versionIds, [ver1, ver2, ver3]);
-            },
-          );
         });
 
         group('CommentsCount', () {
