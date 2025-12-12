@@ -51,7 +51,6 @@ def publish_document(
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/cbor"}
     data = bytes.fromhex(doc.build_and_sign())
 
-
     resp = requests.put(url, timeout=timeout, headers=headers, data=data)
     resp.raise_for_status()
         

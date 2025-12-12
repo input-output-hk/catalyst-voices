@@ -56,11 +56,10 @@ def apply(url: str, api_key: str, config: any, timeout: int, *, ip: str | None =
     """Send an HTTP request to apply the config to the specified URL."""
     headers = {"X-API-Key": api_key}
 
-    while True:
-        f_url = url if ip is None else f"{url}?IP={ip}"
+    f_url = url if ip is None else f"{url}?IP={ip}"
         
-        resp = requests.put(f_url, json=config, headers=headers, timeout=timeout)
-        resp.raise_for_status()
+    resp = requests.put(f_url, json=config, headers=headers, timeout=timeout)
+    resp.raise_for_status()
             
 
 
