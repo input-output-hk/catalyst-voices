@@ -3990,158 +3990,6 @@ void main() {
             });
           });
 
-          group('by author', () {
-            test('filters proposals by author CatalystId', () async {
-              final author1 = _createTestAuthor(name: 'john_doe', role0KeySeed: 1);
-              final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
-              final author3 = _createTestAuthor(name: 'bob', role0KeySeed: 3);
-
-              final p1Authors = [author1, author2];
-              final p1Ver = _buildUuidV7At(latest);
-              final proposal1 = _createTestDocumentEntity(
-                id: p1Ver,
-                ver: p1Ver,
-                authors: p1Authors,
-              );
-
-              final p2Ver = _buildUuidV7At(middle);
-              final proposal2 = _createTestDocumentEntity(
-                id: p2Ver,
-                ver: p2Ver,
-                authors: [author3],
-              );
-
-              await db.documentsV2Dao.saveAll([proposal1, proposal2]);
-
-              const request = PageRequest(page: 0, size: 10);
-              final result = await dao.getProposalsBriefPage(
-                request: request,
-                filters: ProposalsFiltersV2(relationships: {OriginalAuthor(author1)}),
-              );
-
-              expect(result.items, hasLength(1));
-              expect(result.total, 1);
-              expect(result.items[0].proposal.id, p1Ver);
-            });
-
-            test('filters proposals by different author CatalystId', () async {
-              final author1 = _createTestAuthor(name: 'john_doe', role0KeySeed: 1);
-              final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
-
-              final p1Ver = _buildUuidV7At(latest);
-              final proposal1 = _createTestDocumentEntity(
-                id: p1Ver,
-                ver: p1Ver,
-                authors: [author1],
-              );
-
-              final p2Ver = _buildUuidV7At(middle);
-              final proposal2 = _createTestDocumentEntity(
-                id: p2Ver,
-                ver: p2Ver,
-                authors: [author2],
-              );
-
-              await db.documentsV2Dao.saveAll([proposal1, proposal2]);
-
-              const request = PageRequest(page: 0, size: 10);
-              final result = await dao.getProposalsBriefPage(
-                request: request,
-                filters: ProposalsFiltersV2(relationships: {OriginalAuthor(author2)}),
-              );
-
-              expect(result.items, hasLength(1));
-              expect(result.total, 1);
-              expect(result.items[0].proposal.id, p2Ver);
-            });
-
-            test('handles author with special characters in username', () async {
-              final authorWithSpecialChars = _createTestAuthor(
-                /* cSpell:disable */
-                name: "test'user_100%",
-                /* cSpell:enable */
-                role0KeySeed: 1,
-              );
-              final normalAuthor = _createTestAuthor(name: 'normal', role0KeySeed: 2);
-
-              final p1Ver = _buildUuidV7At(latest);
-              final proposal1 = _createTestDocumentEntity(
-                id: p1Ver,
-                ver: p1Ver,
-                authors: [authorWithSpecialChars],
-              );
-
-              final p2Ver = _buildUuidV7At(middle);
-              final proposal2 = _createTestDocumentEntity(
-                id: p2Ver,
-                ver: p2Ver,
-                authors: [normalAuthor],
-              );
-
-              await db.documentsV2Dao.saveAll([proposal1, proposal2]);
-
-              const request = PageRequest(page: 0, size: 10);
-              final result = await dao.getProposalsBriefPage(
-                request: request,
-                filters: ProposalsFiltersV2(
-                  relationships: {OriginalAuthor(authorWithSpecialChars)},
-                ),
-              );
-
-              expect(result.items, hasLength(1));
-              expect(result.total, 1);
-              expect(result.items[0].proposal.id, p1Ver);
-            });
-
-            test(
-              'excludes proposals where author is only a collaborator (signed later version)',
-              () async {
-                final originalAuthor = _createTestAuthor(name: 'Creator', role0KeySeed: 1);
-                final collaborator = _createTestAuthor(name: 'Collab', role0KeySeed: 2);
-
-                final genesisVer = _buildUuidV7At(earliest);
-                final latestVer = _buildUuidV7At(latest);
-
-                // V1: Signed by Original Author (id == ver)
-                final proposalV1 = _createTestDocumentEntity(
-                  id: genesisVer,
-                  ver: genesisVer,
-                  authors: [originalAuthor],
-                );
-
-                // V2: Signed by Collaborator (id != ver)
-                final proposalV2 = _createTestDocumentEntity(
-                  id: genesisVer,
-                  ver: latestVer,
-                  authors: [collaborator],
-                );
-
-                await db.documentsV2Dao.saveAll([proposalV1, proposalV2]);
-
-                // When: Filtering by Collaborator
-                const request = PageRequest(page: 0, size: 10);
-                final result = await dao.getProposalsBriefPage(
-                  request: request,
-                  filters: ProposalsFiltersV2(relationships: {OriginalAuthor(collaborator)}),
-                );
-
-                // Then: Should exclude the proposal
-                expect(result.items, isEmpty);
-                expect(result.total, 0);
-
-                // When: Filtering by Original Author
-                final resultOriginal = await dao.getProposalsBriefPage(
-                  request: request,
-                  filters: ProposalsFiltersV2(relationships: {OriginalAuthor(originalAuthor)}),
-                );
-
-                // Then: Should include the proposal (showing latest version V2)
-                expect(resultOriginal.items.length, 1);
-                expect(resultOriginal.items[0].proposal.ver, latestVer);
-              },
-            );
-          });
-
           group('by category', () {
             test('filters proposals by category id', () async {
               final cat1 = DocumentRefFactory.signedDocumentRef();
@@ -5011,6 +4859,168 @@ void main() {
               expect(result.items, hasLength(1));
               expect(result.total, 1);
               expect(result.items[0].proposal.id, draftProposal.doc.id);
+            });
+          });
+
+          group('by relationship', () {
+            group(OriginalAuthor, () {
+              test('filters proposals by author CatalystId', () async {
+                final author1 = _createTestAuthor(name: 'john_doe', role0KeySeed: 1);
+                final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
+                final author3 = _createTestAuthor(name: 'bob', role0KeySeed: 3);
+
+                final p1Authors = [author1, author2];
+                final p1Ver = _buildUuidV7At(latest);
+                final proposal1 = _createTestDocumentEntity(
+                  id: p1Ver,
+                  ver: p1Ver,
+                  authors: p1Authors,
+                );
+
+                final p2Ver = _buildUuidV7At(middle);
+                final proposal2 = _createTestDocumentEntity(
+                  id: p2Ver,
+                  ver: p2Ver,
+                  authors: [author3],
+                );
+
+                await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+                const request = PageRequest(page: 0, size: 10);
+                final result = await dao.getProposalsBriefPage(
+                  request: request,
+                  filters: ProposalsFiltersV2(relationships: {OriginalAuthor(author1)}),
+                );
+
+                expect(result.items, hasLength(1));
+                expect(result.total, 1);
+                expect(result.items[0].proposal.id, p1Ver);
+              });
+
+              test('filters proposals by different author CatalystId', () async {
+                final author1 = _createTestAuthor(name: 'john_doe', role0KeySeed: 1);
+                final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
+
+                final p1Ver = _buildUuidV7At(latest);
+                final proposal1 = _createTestDocumentEntity(
+                  id: p1Ver,
+                  ver: p1Ver,
+                  authors: [author1],
+                );
+
+                final p2Ver = _buildUuidV7At(middle);
+                final proposal2 = _createTestDocumentEntity(
+                  id: p2Ver,
+                  ver: p2Ver,
+                  authors: [author2],
+                );
+
+                await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+                const request = PageRequest(page: 0, size: 10);
+                final result = await dao.getProposalsBriefPage(
+                  request: request,
+                  filters: ProposalsFiltersV2(relationships: {OriginalAuthor(author2)}),
+                );
+
+                expect(result.items, hasLength(1));
+                expect(result.total, 1);
+                expect(result.items[0].proposal.id, p2Ver);
+              });
+
+              test('handles author with special characters in username', () async {
+                final authorWithSpecialChars = _createTestAuthor(
+                  /* cSpell:disable */
+                  name: "test'user_100%",
+                  /* cSpell:enable */
+                  role0KeySeed: 1,
+                );
+                final normalAuthor = _createTestAuthor(name: 'normal', role0KeySeed: 2);
+
+                final p1Ver = _buildUuidV7At(latest);
+                final proposal1 = _createTestDocumentEntity(
+                  id: p1Ver,
+                  ver: p1Ver,
+                  authors: [authorWithSpecialChars],
+                );
+
+                final p2Ver = _buildUuidV7At(middle);
+                final proposal2 = _createTestDocumentEntity(
+                  id: p2Ver,
+                  ver: p2Ver,
+                  authors: [normalAuthor],
+                );
+
+                await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+                const request = PageRequest(page: 0, size: 10);
+                final result = await dao.getProposalsBriefPage(
+                  request: request,
+                  filters: ProposalsFiltersV2(
+                    relationships: {OriginalAuthor(authorWithSpecialChars)},
+                  ),
+                );
+
+                expect(result.items, hasLength(1));
+                expect(result.total, 1);
+                expect(result.items[0].proposal.id, p1Ver);
+              });
+
+              test(
+                'excludes proposals where author is only a collaborator (signed later version)',
+                () async {
+                  final originalAuthor = _createTestAuthor(name: 'Creator', role0KeySeed: 1);
+                  final collaborator = _createTestAuthor(name: 'Collab', role0KeySeed: 2);
+
+                  final genesisVer = _buildUuidV7At(earliest);
+                  final latestVer = _buildUuidV7At(latest);
+
+                  // V1: Signed by Original Author (id == ver)
+                  final proposalV1 = _createTestDocumentEntity(
+                    id: genesisVer,
+                    ver: genesisVer,
+                    authors: [originalAuthor],
+                  );
+
+                  // V2: Signed by Collaborator (id != ver)
+                  final proposalV2 = _createTestDocumentEntity(
+                    id: genesisVer,
+                    ver: latestVer,
+                    authors: [collaborator],
+                  );
+
+                  await db.documentsV2Dao.saveAll([proposalV1, proposalV2]);
+
+                  // When: Filtering by Collaborator
+                  const request = PageRequest(page: 0, size: 10);
+                  final result = await dao.getProposalsBriefPage(
+                    request: request,
+                    filters: ProposalsFiltersV2(relationships: {OriginalAuthor(collaborator)}),
+                  );
+
+                  // Then: Should exclude the proposal
+                  expect(result.items, isEmpty);
+                  expect(result.total, 0);
+
+                  // When: Filtering by Original Author
+                  final resultOriginal = await dao.getProposalsBriefPage(
+                    request: request,
+                    filters: ProposalsFiltersV2(relationships: {OriginalAuthor(originalAuthor)}),
+                  );
+
+                  // Then: Should include the proposal (showing latest version V2)
+                  expect(resultOriginal.items.length, 1);
+                  expect(resultOriginal.items[0].proposal.ver, latestVer);
+                },
+              );
+            });
+
+            group(CollaborationInvitation, () {
+              // TODO(damian-molinski): implement unit tests
+            });
+
+            group('Original author or collaborator', () {
+              // TODO(damian-molinski): implement unit tests
             });
           });
         });

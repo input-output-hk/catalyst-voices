@@ -348,11 +348,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     if (filters.relationships.isNotEmpty) {
-      final relationshipClauses = <String>[];
-
-      for (final rel in filters.relationships) {
-        // TODO(damian-molinski): implement clauses
-      }
+      final relationshipClauses = filters.relationships.map(_buildRelationshipClause);
 
       if (relationshipClauses.isNotEmpty) {
         clauses.add('(${relationshipClauses.join(' OR ')})');
@@ -466,6 +462,62 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return documentsV2.$columns
         .map((col) => '$tableAlias.${col.$name} as ${prefix}_${col.$name}')
         .join(', \n      ');
+  }
+
+  String _buildRelationshipClause(ProposalsRelationship relationship) {
+    switch (relationship) {
+      case OriginalAuthor(:final id):
+        final escapedId = _escapeSqlString(id.toSignificant().toString());
+        // Matches if id signed the genesis version (id == ver)
+        return '''
+          EXISTS (
+            SELECT 1 FROM document_authors da
+            WHERE da.document_id = p.id 
+              AND da.document_ver = p.id
+              AND da.account_significant_id = '$escapedId'
+          )
+        ''';
+
+      case CollaborationInvitation(:final id, :final status):
+        final escapedId = _escapeSqlString(id.toSignificant().toString());
+        final actionTypeUuid = DocumentType.proposalActionDocument.uuid;
+
+        // 1. Is the user listed in 'collaborators' on the current version?
+        final isListedAsCollaborator =
+            '''
+          EXISTS (
+            SELECT 1 FROM document_collaborators dc
+            WHERE dc.document_id = p.id 
+              AND dc.document_ver = p.ver
+              AND dc.account_significant_id = '$escapedId'
+          )
+        ''';
+
+        // 2. What is the user's latest action content?
+        final latestAction =
+            '''
+          SELECT json_extract(action.content, '\$.action')
+          FROM documents_v2 action
+          INNER JOIN document_authors da 
+            ON action.id = da.document_id 
+            AND action.ver = da.document_ver
+          WHERE action.type = '$actionTypeUuid'
+            AND action.ref_id = p.id
+            AND da.account_significant_id = '$escapedId'
+          ORDER BY action.ver DESC
+          LIMIT 1
+        ''';
+
+        // 3. Specific Condition based on status
+        final statusCondition = switch (status) {
+          CollaborationInvitationStatus.accepted => "($latestAction) IN ('draft', 'final')",
+          CollaborationInvitationStatus.rejected => "($latestAction) = 'hide'",
+          CollaborationInvitationStatus.pending => '($latestAction) IS NULL',
+        };
+
+        // Combine: MUST be listed AND meet the status condition
+        return '($isListedAsCollaborator AND $statusCondition)';
+    }
   }
 
   /// Internal query to count visible proposals.
