@@ -17,8 +17,6 @@ final _logger = Logger('DocumentRepository');
 
 DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
-typedef DocumentFetcher<T, R extends DocumentRef> = Future<T?> Function(R ref);
-
 /// Base interface to interact with documents. This interface is used to allow interaction with any
 /// document type.
 abstract interface class DocumentRepository {
@@ -648,8 +646,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<T?> _getDocumentByRef<T>({
     required DocumentRef id,
     bool useCache = true,
-    required DocumentFetcher<T, SignedDocumentRef> onSignedDocument,
-    required DocumentFetcher<T, DraftRef> onDraft,
+    required ValueResolver<SignedDocumentRef, Future<T>> onSignedDocument,
+    required ValueResolver<DraftRef, Future<T>> onDraft,
   }) async {
     return switch (id) {
       SignedDocumentRef() => onSignedDocument(id),
