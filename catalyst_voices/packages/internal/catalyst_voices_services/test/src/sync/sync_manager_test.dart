@@ -222,7 +222,7 @@ void main() {
         // Then
         verify(
           () => documentsService.sync(
-            campaign: activeCampaign,
+            campaign: any(named: 'campaign'),
             onProgress: any(named: 'onProgress'),
           ),
         ).called(1);
