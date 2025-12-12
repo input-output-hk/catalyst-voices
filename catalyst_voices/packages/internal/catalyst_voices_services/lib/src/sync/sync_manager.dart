@@ -107,8 +107,13 @@ final class SyncManagerImpl implements SyncManager {
 
     _logger.fine('Active campaign changed from [$previousRef] to [$currentRef]!');
 
-    // schedule at the end of the current sync to avoid interrupting ongoing one
-    unawaited(_lock.synchronized(start));
+    try {
+      // wait until ongoing sync is done then schedule a new one
+      await _lock.synchronized(() async {});
+      await start();
+    } catch (error, stack) {
+      _logger.warning('Sync failed', error, stack);
+    }
   }
 
   Future<void> _startSynchronization() async {
