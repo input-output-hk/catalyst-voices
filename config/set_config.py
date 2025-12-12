@@ -52,30 +52,20 @@ def read_config(env_dir: Path) -> tuple[dict[str, str], dict[str, str]]:
     return settings, config
 
 
-def apply(url: str, api_key: str, config: any, timeout: int, *, ip: str | None = None, retry: bool = False) -> None:
+def apply(url: str, api_key: str, config: any, timeout: int, *, ip: str | None = None) -> None:
     """Send an HTTP request to apply the config to the specified URL."""
     headers = {"X-API-Key": api_key}
 
     while True:
-        try:
-            f_url = url if ip is None else f"{url}?IP={ip}"
+        f_url = url if ip is None else f"{url}?IP={ip}"
+        
+        resp = requests.put(f_url, json=config, headers=headers, timeout=timeout)
+        resp.raise_for_status()
             
-            resp = requests.put(f_url, json=config, headers=headers, timeout=timeout)
-            resp.raise_for_status()
-            break
-        except requests.exceptions.RequestException as e:
-            errmsg = f"failed to send HTTP request: {e}"
-            print(errmsg)
-
-            if retry:
-                print("Retrying in 1 minute...")
-                time.sleep(60)
-            else:
-                break
 
 
 # main action
-def set_config(env: str, *, retry: bool = False) -> None:
+def set_config(env: str) -> None:
     """Read config files from the specified `env`, then apply the configs."""
     file_dir = Path(__file__).resolve().parent
     env_dir = Path(file_dir) / env
@@ -92,7 +82,7 @@ def set_config(env: str, *, retry: bool = False) -> None:
     api_key = os.environ[api_key_env]
 
     # apply base config
-    apply(url, api_key, config, timeout, retry=retry)
+    apply(url, api_key, config, timeout)
 
     # find and apply any ip-specific configs
     ip_config_paths = list(env_dir.glob("ip_*.config.json"))
@@ -101,7 +91,7 @@ def set_config(env: str, *, retry: bool = False) -> None:
             ip, ip_config = parse_ip_config_file(ip_config_path)
             print(f"Applying IP-specific config from {ip_config_path.name}:\n{ip_config}")
 
-            apply(url, api_key, ip_config, timeout, ip=ip, retry=retry)
+            apply(url, api_key, ip_config, timeout, ip=ip)
         except ValueError as e:
             errmsg = f"Skipping {ip_config_path.name}, invalid IP address format: {e}"
             print(errmsg)
@@ -110,11 +100,6 @@ def set_config(env: str, *, retry: bool = False) -> None:
 # args parser
 parser = argparse.ArgumentParser(description="Set environment configuration.")
 parser.add_argument(
-    "--retry",
-    action="store_true",
-    help="If setting config fails, wait 1 minute and retry indefinitely until successful.",
-)
-parser.add_argument(
     "env",
     type=str,
     help="The environment to configure (e.g., dev, qa, preprod, prod).",
@@ -122,5 +107,5 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-set_config(args.env, retry=args.retry)
+set_config(args.env)
 print(f"Finished applying configuration for '{args.env}'.")
