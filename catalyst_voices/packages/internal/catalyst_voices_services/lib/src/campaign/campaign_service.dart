@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('CampaignService');
@@ -128,15 +129,25 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<void> setActiveCampaign(Campaign campaign) async {
-    if (_activeCampaignObserver.campaign?.id != campaign.id) {
-      _activeCampaignObserver.campaign = campaign;
-    }
+    _activeCampaignObserver.campaign = campaign;
   }
 
   @override
-  Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters}) {
-    return _proposalRepository
-        .watchProposalTemplates(campaign: filters.campaign ?? CampaignFilters.active())
+  Stream<CampaignTotalAsk> watchCampaignTotalAsk({
+    required ProposalsTotalAskFilters filters,
+  }) async* {
+    var campaignFilters = filters.campaign;
+    if (campaignFilters == null) {
+      final campaign = await getActiveCampaign();
+      if (campaign != null) {
+        campaignFilters = CampaignFilters.from(campaign);
+      } else {
+        throw StateError('No active campaign found');
+      }
+    }
+
+    yield* _proposalRepository
+        .watchProposalTemplates(campaign: campaignFilters)
         .map((templates) => templates.map((template) => template.toMapEntry()))
         .map(Map.fromEntries)
         .switchMap((templatesMoneyFormat) {
@@ -150,16 +161,16 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) {
-    final activeCampaign = _activeCampaignObserver.campaign;
-    final campaignFilters = activeCampaign != null ? CampaignFilters.from(activeCampaign) : null;
+  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) async* {
+    final campaign = await _getCampaignWithCategory(ref);
+    final campaignFilters = campaign != null ? CampaignFilters.from(campaign) : null;
 
     final filters = ProposalsTotalAskFilters(
       categoryId: ref.id,
       campaign: campaignFilters,
     );
 
-    return watchCampaignTotalAsk(
+    yield* watchCampaignTotalAsk(
       filters: filters,
     ).map((campaignTotalAsk) => campaignTotalAsk.categoryOrZero(ref));
   }
@@ -206,6 +217,15 @@ final class CampaignServiceImpl implements CampaignService {
     final campaign = await getCampaign(id: initialActiveCampaignRef.id);
     _activeCampaignObserver.campaign = campaign;
     return campaign;
+  }
+
+  Future<Campaign?> _getCampaignWithCategory(SignedDocumentRef ref) async {
+    final allCampaigns = await getAllCampaigns();
+    return allCampaigns.firstWhereOrNull((campaign) {
+      return campaign.categories.any((category) {
+        return ref.contains(category.id);
+      });
+    });
   }
 
   Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
