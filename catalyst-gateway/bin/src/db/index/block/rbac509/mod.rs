@@ -184,9 +184,13 @@ impl Rbac509InsertQuery {
         };
 
         let previous_addresses = chain.stake_addresses();
-        let stake_addresses: HashSet<_> = new_chain
-            .stake_addresses()
+        let new_addresses = new_chain.stake_addresses();
+        let added_addresses: HashSet<_> = new_addresses
             .difference(&previous_addresses)
+            .cloned()
+            .collect();
+        let removed_addresses: HashSet<_> = previous_addresses
+            .difference(&new_addresses)
             .cloned()
             .collect();
         let public_keys = reg
@@ -202,13 +206,17 @@ impl Rbac509InsertQuery {
             cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
         }
 
+        for addr in &removed_addresses {
+            context.remove_address(addr);
+        }
+
         self.record_valid_registration(
             txn_hash,
             txn_index,
             slot,
             catalyst_id.clone(),
             Some(previous_txn),
-            stake_addresses,
+            added_addresses,
             public_keys,
             modified_chains,
             purpose,
