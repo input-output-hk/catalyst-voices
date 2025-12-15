@@ -74,9 +74,7 @@ abstract interface class DocumentsV2Dao {
   /// Retrieves only the artifact of a signed document.
   ///
   /// Returns `null` if no matching document is found.
-  Future<DocumentArtifact?> getDocumentArtifact({
-    required DocumentRef id,
-  });
+  Future<DocumentArtifact?> getDocumentArtifact(DocumentRef id);
 
   /// Retrieves a list of documents matching the criteria with pagination.
   ///
@@ -265,9 +263,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<DocumentArtifact?> getDocumentArtifact({
-    required DocumentRef id,
-  }) {
+  Future<DocumentArtifact?> getDocumentArtifact(DocumentRef id) {
     final query = selectOnly(documentArtifacts)
       ..addColumns([documentArtifacts.data])
       ..where(documentArtifacts.id.equals(id.id));

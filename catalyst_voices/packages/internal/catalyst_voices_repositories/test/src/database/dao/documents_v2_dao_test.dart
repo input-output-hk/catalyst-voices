@@ -1118,6 +1118,79 @@ void main() {
         });
       });
 
+      group('getDocumentArtifact', () {
+        test('returns artifact for exact ref', () async {
+          // Given: A document and its artifact exist
+          final artifact = DocumentArtifact(Uint8List.fromList([0xCA, 0xFE, 0xBA, 0xBE]));
+          final doc = _createTestDocumentEntity(id: 'doc-1', ver: 'ver-1', artifact: artifact);
+
+          await dao.save(doc);
+
+          // When
+          final result = await dao.getDocumentArtifact(
+            const SignedDocumentRef.exact(id: 'doc-1', ver: 'ver-1'),
+          );
+
+          // Then
+          expect(result, equals(artifact));
+        });
+
+        test('returns null for exact ref mismatch', () async {
+          // Given: Artifact exists for ver-1
+          final artifact = DocumentArtifact(Uint8List.fromList([1, 2, 3]));
+          final doc = _createTestDocumentEntity(id: 'doc-1', ver: 'ver-1', artifact: artifact);
+
+          await dao.save(doc);
+
+          // When: We query for ver-2
+          final result = await dao.getDocumentArtifact(
+            const SignedDocumentRef.exact(id: 'doc-1', ver: 'ver-2'),
+          );
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns latest artifact for loose ref (latest by ver)', () async {
+          // Given: Two versions of a document, both with artifacts
+          final v1 = _buildUuidV7At(DateTime.utc(2024, 1, 1));
+          final v2 = _buildUuidV7At(DateTime.utc(2024, 1, 2));
+
+          final artifactV1 = DocumentArtifact(Uint8List.fromList([1]));
+          final artifactV2 = DocumentArtifact(Uint8List.fromList([2]));
+
+          final docV1 = _createTestDocumentEntity(id: 'doc-multi', ver: v1, artifact: artifactV1);
+          final docV2 = _createTestDocumentEntity(id: 'doc-multi', ver: v2, artifact: artifactV2);
+
+          await dao.saveAll([docV1, docV2]);
+
+          // When: We query with a loose ref (no version specified)
+          final result = await dao.getDocumentArtifact(
+            const SignedDocumentRef.loose(id: 'doc-multi'),
+          );
+
+          // Then: We expect the artifact from the latest version (v2)
+          expect(result, equals(artifactV2));
+        });
+
+        test('respects foreign key cascade delete', () async {
+          // Given: A document with an artifact
+          final artifact = DocumentArtifact(Uint8List.fromList([1]));
+          final doc = _createTestDocumentEntity(id: 'doc-del', ver: 'ver-1', artifact: artifact);
+          await dao.save(doc);
+
+          // When: The parent document is deleted
+          await (db.delete(db.documentsV2)..where((tbl) => tbl.id.equals('doc-del'))).go();
+
+          // Then: The artifact should also be gone
+          final remaining = await dao.getDocumentArtifact(
+            const SignedDocumentRef.exact(id: 'doc-del', ver: 'ver-1'),
+          );
+
+          expect(remaining, isNull);
+        });
+      });
+
       group('saveAll', () {
         test('does nothing for empty list', () async {
           // Given
@@ -2468,6 +2541,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
   List<CatalystId>? authors,
+  DocumentArtifact? artifact,
   String? refId,
   String? refVer,
   String? replyId,
@@ -2484,6 +2558,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
     contentData: contentData,
     type: type,
     authors: authors,
+    artifact: artifact,
     refId: refId,
     refVer: refVer,
     replyId: replyId,

@@ -90,7 +90,7 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<DocumentArtifact?> getArtifact(SignedDocumentRef id) {
-    return _database.documentsV2Dao.getDocumentArtifact(id: id);
+    return _database.documentsV2Dao.getDocumentArtifact(id);
   }
 
   @override

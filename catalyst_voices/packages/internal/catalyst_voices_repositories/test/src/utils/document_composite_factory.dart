@@ -29,12 +29,12 @@ final class DocumentCompositeFactory {
     String? templateVer,
     List<DocumentRef> parameters = const [],
     List<CatalystId> collaborators = const [],
-    Uint8List? rawData,
+    DocumentArtifact? artifact,
   }) {
     id ??= DocumentRefFactory.randomUuidV7();
     ver ??= id;
     authors ??= const [];
-    rawData ??= Uint8List.fromList(<int>[]);
+    artifact ??= DocumentArtifact(Uint8List(0));
 
     final docEntity = DocumentEntityV2(
       id: id,
@@ -56,7 +56,7 @@ final class DocumentCompositeFactory {
     );
 
     final docArtifact = DocumentArtifactEntity(
-      data: rawData,
+      data: artifact.value,
       id: id,
       ver: ver,
     );
