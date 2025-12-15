@@ -135,7 +135,7 @@ final class VotingCubit extends Cubit<VotingState>
       _loadVotingPower(),
       _loadCampaign(),
     ).wait;
-    
+
     if (isClosed) {
       return;
     }
