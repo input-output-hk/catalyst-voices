@@ -289,7 +289,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final documentData = await _getDocumentByRef<DocumentData?>(
       id: id,
       useCache: useCache,
-      onSignedDocument: (ref) => _getSignedDocumentAndCache(ref: ref, useCache: useCache),
+      onSignedDocument: (ref) {
+        return _getSignedDocumentAndCacheAs<DocumentData>(
+          ref: ref,
+          useCache: useCache,
+          fromCache: _localDocuments.get,
+          fromDocument: (document) => document,
+        );
+      },
       onDraft: _drafts.get,
     );
 
@@ -308,10 +315,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final metadata = await _getDocumentByRef<DocumentDataMetadata?>(
       id: id,
       useCache: useCache,
-      onSignedDocument: (ref) => _getSignedDocumentAndCache(
-        ref: ref,
-        useCache: useCache,
-      ).then((document) => document?.metadata),
+      onSignedDocument: (ref) {
+        return _getSignedDocumentAndCacheAs<DocumentDataMetadata>(
+          ref: ref,
+          useCache: useCache,
+          fromCache: _localDocuments.getMetadata,
+          fromDocument: (document) => document.metadata,
+        );
+      },
       onDraft: _drafts.getMetadata,
     );
 
@@ -659,8 +670,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     };
   }
 
-  Future<DocumentData?> _getSignedDocumentAndCache({
+  Future<T?> _getSignedDocumentAndCacheAs<T>({
     required SignedDocumentRef ref,
+    required ValueResolver<SignedDocumentRef, Future<T?>> fromCache,
+    required ValueResolver<DocumentData, T> fromDocument,
     bool useCache = true,
   }) async {
     // if version is not specified we're asking remote for latest version
@@ -673,7 +686,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final isCached = useCache && await _localDocuments.exists(id: ref);
     if (isCached) {
-      return _localDocuments.get(ref);
+      return fromCache(ref);
     }
 
     final document = await _remoteDocuments.get(ref);
@@ -682,7 +695,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       await _localDocuments.save(data: document);
     }
 
-    return document;
+    return document != null ? fromDocument(document) : null;
   }
 
   bool _isDocumentMetadataValid(DocumentData document) {
