@@ -276,10 +276,6 @@ class DocumentDataMetadataDtoDbV3 {
 
 @JsonSerializable()
 final class DocumentRefDtoDbV3 {
-  /// The separator used for flattened string representation.
-  /// Using '|' to avoid conflicts with UUIDs which contain hyphens.
-  static const _flattenSeparator = '|';
-
   final String id;
   final String? ver;
   @JsonKey(unknownEnumValue: DocumentRefDtoTypeDbV3.signed)
@@ -290,27 +286,6 @@ final class DocumentRefDtoDbV3 {
     this.ver,
     required this.type,
   });
-
-  factory DocumentRefDtoDbV3.fromFlatten(String data) {
-    final parts = data.split(_flattenSeparator);
-    if (parts.length != 3) {
-      throw const FormatException('Flatten data does not have 3 parts');
-    }
-
-    final id = parts[0];
-
-    // Convert empty string back to null, otherwise keep the value
-    final ver = parts[1].isEmpty ? null : parts[1];
-
-    final typeName = parts[2];
-    final type = DocumentRefDtoTypeDbV3.values.asNameMap()[typeName];
-
-    if (type == null) {
-      throw FormatException('Unknown type part ($typeName)');
-    }
-
-    return DocumentRefDtoDbV3(id: id, ver: ver, type: type);
-  }
 
   factory DocumentRefDtoDbV3.fromJson(Map<String, dynamic> json) {
     final migrated = _migrateJson1(json);
@@ -329,12 +304,6 @@ final class DocumentRefDtoDbV3 {
       ver: data.ver,
       type: type,
     );
-  }
-
-  String toFlatten() {
-    // Convert null to empty string to ensure 3 parts exist
-    final verStr = ver ?? '';
-    return '$id$_flattenSeparator$verStr$_flattenSeparator${type.name}';
   }
 
   Map<String, dynamic> toJson() => _$DocumentRefDtoDbV3ToJson(this);
