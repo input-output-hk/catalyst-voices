@@ -122,6 +122,39 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) async {
+    if (proposalIds.isEmpty) return const ProposalVersionsTitles.empty();
+
+    final documentIdColumn = localDocumentsDrafts.id;
+    final documentVerColumn = localDocumentsDrafts.ver;
+    final titleColumn = localDocumentsDrafts.content.jsonExtract<String>('\$.${nodeId.value}');
+
+    final query = selectOnly(localDocumentsDrafts, distinct: true)
+      ..addColumns([
+        documentIdColumn,
+        documentVerColumn,
+        titleColumn,
+      ])
+      ..where(
+        Expression.and([
+          localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument),
+          localDocumentsDrafts.id.isIn(proposalIds),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(localDocumentsDrafts.createdAt)]);
+
+    return _extractVersionsTitles(
+      query: query,
+      idColumn: documentIdColumn,
+      verColumn: documentVerColumn,
+      titleColumn: titleColumn,
+    );
+  }
+
+  @override
   Future<DocumentEntityV2?> getProposal(DocumentRef ref) async {
     final query = select(documentsV2)
       ..where((tbl) => tbl.id.equals(ref.id) & tbl.type.equals(DocumentType.proposalDocument.uuid));
@@ -205,60 +238,33 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<ProposalVersionsTitles> getVersionsTitles({
     required List<String> proposalIds,
     required NodeId nodeId,
-    bool fromLocalDrafts = false,
   }) async {
     if (proposalIds.isEmpty) return const ProposalVersionsTitles.empty();
 
-    final table = fromLocalDrafts ? localDocumentsDrafts : documentsV2;
-    final documentIdColumn = table.id;
-    final documentVerColumn = table.ver;
-    final titleColumn = table.content.jsonExtract<String>('\$.${nodeId.value}');
+    final documentIdColumn = documentsV2.id;
+    final documentVerColumn = documentsV2.ver;
+    final titleColumn = documentsV2.content.jsonExtract<String>('\$.${nodeId.value}');
 
-    final query = switch (fromLocalDrafts) {
-      true =>
-        selectOnly(localDocumentsDrafts, distinct: true)
-          ..addColumns([
-            documentIdColumn,
-            documentVerColumn,
-            titleColumn,
-          ])
-          ..where(
-            Expression.and([
-              localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument),
-              localDocumentsDrafts.id.isIn(proposalIds),
-            ]),
-          )
-          ..orderBy([OrderingTerm.asc(localDocumentsDrafts.createdAt)]),
-      false =>
-        selectOnly(documentsV2, distinct: true)
-          ..addColumns([
-            documentIdColumn,
-            documentVerColumn,
-            titleColumn,
-          ])
-          ..where(
-            Expression.and([
-              documentsV2.type.equalsValue(DocumentType.proposalDocument),
-              documentsV2.id.isIn(proposalIds),
-            ]),
-          )
-          ..orderBy([OrderingTerm.asc(documentsV2.createdAt)]),
-    };
+    final query = selectOnly(documentsV2, distinct: true)
+      ..addColumns([
+        documentIdColumn,
+        documentVerColumn,
+        titleColumn,
+      ])
+      ..where(
+        Expression.and([
+          documentsV2.type.equalsValue(DocumentType.proposalDocument),
+          documentsV2.id.isIn(proposalIds),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(documentsV2.createdAt)]);
 
-    final proposalVersions = <String, VersionsTitles>{};
-
-    await query.map((row) {
-      final id = row.read<String>(documentIdColumn)!;
-      final ver = row.read<String>(documentVerColumn)!;
-      final title = row.read<String>(titleColumn);
-      proposalVersions.update(
-        id,
-        (value) => VersionsTitles({...value.data, ver: title}),
-        ifAbsent: () => VersionsTitles({ver: title}),
-      );
-    }).get();
-
-    return ProposalVersionsTitles(proposalVersions);
+    return _extractVersionsTitles(
+      query: query,
+      idColumn: documentIdColumn,
+      verColumn: documentVerColumn,
+      titleColumn: titleColumn,
+    );
   }
 
   /// Counts the total number of visible proposals matching the [filters].
@@ -614,6 +620,28 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// Returns: The escaped string.
   String _escapeSqlString(String input) {
     return input.replaceAll("'", "''");
+  }
+
+  Future<ProposalVersionsTitles> _extractVersionsTitles({
+    required JoinedSelectStatement<HasResultSet, dynamic> query,
+    required GeneratedColumn<String> idColumn,
+    required GeneratedColumn<String> verColumn,
+    required Expression<String> titleColumn,
+  }) async {
+    final proposalVersions = <String, VersionsTitles>{};
+
+    await query.map((row) {
+      final id = row.read<String>(idColumn)!;
+      final ver = row.read<String>(verColumn)!;
+      final title = row.read<String>(titleColumn);
+      proposalVersions.update(
+        id,
+        (value) => VersionsTitles({...value.data, ver: title}),
+        ifAbsent: () => VersionsTitles({ver: title}),
+      );
+    }).get();
+
+    return ProposalVersionsTitles(proposalVersions);
   }
 
   /// Returns the Common Table Expression (CTE) string defining "Effective Proposals".
@@ -1082,6 +1110,22 @@ abstract interface class ProposalsV2Dao {
     required CatalystId author,
   });
 
+  /// Retrieves titles for all versions of the specified proposals from local drafts.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  });
+
   /// Retrieves a single proposal by its reference.
   ///
   /// Filters by type == proposalDocument.
@@ -1137,7 +1181,7 @@ abstract interface class ProposalsV2Dao {
     required ProposalsTotalAskFilters filters,
   });
 
-  /// Retrieves titles for all versions of the specified proposals.
+  /// Retrieves titles for all versions of the specified proposals from signed documents.
   ///
   /// This method extracts the title from each version of a proposal document by
   /// traversing the JSON content using the provided [nodeId].
@@ -1145,15 +1189,12 @@ abstract interface class ProposalsV2Dao {
   /// **Parameters:**
   /// - [proposalIds]: List of proposal IDs to fetch version titles for.
   /// - [nodeId]: The path in the document JSON to extract the title from.
-  /// - [fromLocalDrafts]: If true, fetches titles from `localDocumentsDrafts`
-  ///   table instead of `documentsV2` table.
   ///
   /// **Returns:**
   /// - [ProposalVersionsTitles]
   Future<ProposalVersionsTitles> getVersionsTitles({
     required List<String> proposalIds,
     required NodeId nodeId,
-    bool fromLocalDrafts,
   });
 
   /// Counts the total number of visible proposals that match the given filters.

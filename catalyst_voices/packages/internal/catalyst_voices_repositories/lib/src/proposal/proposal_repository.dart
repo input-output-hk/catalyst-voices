@@ -471,11 +471,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     // group by template type, from template get nodeId. Exec getVersionsTitles for each template type
     // right now we have const nodeId ProposalDocument.titleNodeId
     final proposalIds = rawProposals.map((e) => e.proposal.id.id).toSet().toList();
-    final proposalVersionsTitles = await _proposalsLocalSource.getVersionsTitles(
-      proposalIds: proposalIds,
-      nodeId: ProposalDocument.titleNodeId,
-      fromLocalDrafts: localDrafts,
-    );
+    final proposalVersionsTitles = localDrafts
+        ? await _proposalsLocalSource.getLocalDraftsVersionsTitles(
+            proposalIds: proposalIds,
+            nodeId: ProposalDocument.titleNodeId,
+          )
+        : await _proposalsLocalSource.getVersionsTitles(
+            proposalIds: proposalIds,
+            nodeId: ProposalDocument.titleNodeId,
+          );
 
     return rawProposals.map((item) {
       final templateData = item.template;

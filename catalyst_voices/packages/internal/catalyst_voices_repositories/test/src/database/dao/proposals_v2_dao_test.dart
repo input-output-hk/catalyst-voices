@@ -488,7 +488,7 @@ void main() {
           },
         );
 
-        test('returns titles from local drafts when fromLocalDrafts is true', () async {
+        test('returns titles from local drafts using getLocalDraftsVersionsTitles', () async {
           // Given: A draft document with multiple versions
           const titleV1 = 'Draft Title V1';
           const titleV2 = 'Draft Title V2';
@@ -516,10 +516,9 @@ void main() {
           await db.localDocumentsV2Dao.saveAll([draftV1, draftV2]);
 
           // When
-          final result = await dao.getVersionsTitles(
+          final result = await dao.getLocalDraftsVersionsTitles(
             proposalIds: ['draft1'],
             nodeId: nodeId,
-            fromLocalDrafts: true,
           );
 
           // Then
@@ -530,7 +529,7 @@ void main() {
           expect(result.proposalVersions['draft1']!.data['v2'], equals(titleV2));
         });
 
-        test('only returns drafts when fromLocalDrafts is true, not published documents', () async {
+        test('getLocalDraftsVersionsTitles only returns drafts, not published documents', () async {
           // Given: Both a published document and a draft with the same ID
           const draftTitle = 'Draft Title';
           const publishedTitle = 'Published Title';
@@ -559,10 +558,9 @@ void main() {
           await db.localDocumentsV2Dao.saveAll([draft]);
 
           // When
-          final result = await dao.getVersionsTitles(
+          final result = await dao.getLocalDraftsVersionsTitles(
             proposalIds: ['p1'],
             nodeId: nodeId,
-            fromLocalDrafts: true,
           );
 
           // Then
