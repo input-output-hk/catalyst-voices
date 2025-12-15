@@ -59,6 +59,12 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
     DocumentRef? referencing,
   });
 
+  /// Retrieves only the metadata of a specific document by its unique reference.
+  ///
+  /// Returns `null` if the document with the specific [DocumentRef.id] and
+  /// [DocumentRef.ver] is not found.
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref);
+
   /// Persists a single [DocumentData] object to local storage.
   ///
   /// If the document already exists, it should be updated (upsert).

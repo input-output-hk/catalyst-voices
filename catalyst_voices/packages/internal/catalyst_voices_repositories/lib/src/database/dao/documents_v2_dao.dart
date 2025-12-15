@@ -7,6 +7,8 @@ import 'package:catalyst_voices_repositories/src/database/table/document_collabo
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.drift.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
@@ -68,6 +70,17 @@ abstract interface class DocumentsV2Dao {
     DocumentRef? referencing,
     CatalystId? author,
     CatalystId? originalAuthor,
+  });
+
+  /// Retrieves only the metadata of a signed document, excluding the content blob.
+  ///
+  /// This is an optimized query that skips fetching the potentially large
+  /// content column from the database.
+  ///
+  /// Returns the [DocumentsV2MetadataViewData] for the matching document,
+  /// or `null` if no matching document is found.
+  Future<DocumentsV2MetadataViewData?> getDocumentMetadata({
+    required DocumentRef id,
   });
 
   /// Retrieves a list of documents matching the criteria with pagination.
@@ -154,6 +167,9 @@ abstract interface class DocumentsV2Dao {
     DocumentAuthors,
     DocumentParameters,
     DocumentCollaborators,
+  ],
+  views: [
+    DocumentsV2MetadataView,
   ],
 )
 class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -253,6 +269,23 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       author: author,
       originalAuthor: originalAuthor,
     ).getSingleOrNull();
+  }
+
+  @override
+  Future<DocumentsV2MetadataViewData?> getDocumentMetadata({
+    required DocumentRef id,
+  }) async {
+    final query = select(documentsV2MetadataView)..where((tbl) => tbl.id.equals(id.id));
+
+    if (id.isExact) {
+      query.where((tbl) => tbl.ver.equals(id.ver!));
+    }
+
+    query
+      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
+      ..limit(1);
+
+    return query.getSingleOrNull();
   }
 
   @override
