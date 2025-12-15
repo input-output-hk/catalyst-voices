@@ -48,21 +48,25 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
-    final compressedPayload = await _brotliCompressPayload(document.toBytes());
+    try {
+      final compressedPayload = await _brotliCompressPayload(document.toBytes());
 
-    final coseSign = await CoseSign.sign(
-      protectedHeaders: metadata.asCoseProtectedHeaders,
-      unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
-      payload: compressedPayload,
-      signers: [_CatalystSigner(catalystId, privateKey)],
-    );
+      final coseSign = await CoseSign.sign(
+        protectedHeaders: metadata.asCoseProtectedHeaders,
+        unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
+        payload: compressedPayload,
+        signers: [_CatalystSigner(catalystId, privateKey)],
+      );
 
-    return _CoseSignedDocument(
-      coseSign: coseSign,
-      payload: document,
-      metadata: metadata,
-      signers: [catalystId],
-    );
+      return _CoseSignedDocument(
+        coseSign: coseSign,
+        payload: document,
+        metadata: metadata,
+        signers: [catalystId],
+      );
+    } on CoseSignException catch (error) {
+      throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
+    }
   }
 
   Future<Uint8List> _brotliCompressPayload(Uint8List payload) async {

@@ -1,5 +1,6 @@
 VERSION 0.8
 
+IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.10-mk-signed-docs-key-type AS cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.6 AS python-ci
 
 package:
@@ -9,25 +10,26 @@ package:
 
     ARG tag='latest'
 
+    COPY cat-libs-rust+build/mk_signed_doc .
+    ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
+
     COPY pyproject.toml .
     COPY uv.lock .
-    COPY set_config.py .
+    COPY setup_fund.py .
 
     COPY --dir dev .
-    COPY --dir preprod .
-    COPY --dir prod .
 
     COPY entrypoint.sh .
     RUN chmod +x entrypoint.sh
 
     ENTRYPOINT ["/app/entrypoint.sh"]
 
-    SAVE IMAGE voices-frontend-config:${tag}
+    SAVE IMAGE setup-fund-documents:${tag}
 
 docker:
     FROM +package
 
-    ARG container="voices-frontend-config"
+    ARG container="setup-fund-documents"
     ARG tag="latest"
 
     SAVE IMAGE ${container}:${tag}

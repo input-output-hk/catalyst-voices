@@ -9,19 +9,19 @@ if [ -z "${ENVIRONMENT:-}" ]; then
     exit 1
 fi
 
-if [ -z "${API_KEY:-}" ]; then
-    echo "API_KEY is not set"
+if [ -z "${CAT_GATEWAY_ADMIN_PRIVATE_KEY:-}" ]; then
+    echo "CAT_GATEWAY_ADMIN_PRIVATE_KEY is not set"
     exit 1
 fi
 
-echo ">>> Running: uv run python set_config.py ${ENVIRONMENT}"
+echo ">>> Running: uv run setup_fund.py ${ENVIRONMENT}"
 
 set +e
 attempt=1
 while true; do
     echo ">>> Attempt $attempt"
 
-    if uv run python set_config.py "${ENVIRONMENT}"; then
+    if uv run setup_fund.py "${ENVIRONMENT}"; then
         echo ">>> Command succeeded on attempt $attempt"
         exit 0
     else

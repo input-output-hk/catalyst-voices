@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/cose_constants.dart';
+import 'package:catalyst_cose/src/exception/cose_exception.dart';
 import 'package:catalyst_cose/src/types/cose_headers.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
@@ -114,32 +115,39 @@ final class CoseSign1 extends Equatable {
     required Uint8List payload,
     required CatalystCoseSigner signer,
   }) async {
-    final kid = await signer.kid;
+    try {
+      final kid = await signer.kid;
 
-    protectedHeaders = protectedHeaders.copyWith(
-      alg: () => signer.alg,
-      kid: () => kid,
-    );
+      protectedHeaders = protectedHeaders.copyWith(
+        alg: () => signer.alg,
+        kid: () => kid,
+      );
 
-    final sigStructure = _createCoseSign1SigStructure(
-      protectedHeader: protectedHeaders.toCbor(),
-      payload: CborBytes(payload),
-    );
+      final sigStructure = _createCoseSign1SigStructure(
+        protectedHeader: protectedHeaders.toCbor(),
+        payload: CborBytes(payload),
+      );
 
-    final toBeSigned = Uint8List.fromList(
-      cbor.encode(
-        CborBytes(
-          cbor.encode(sigStructure),
+      final toBeSigned = Uint8List.fromList(
+        cbor.encode(
+          CborBytes(
+            cbor.encode(sigStructure),
+          ),
         ),
-      ),
-    );
+      );
 
-    return CoseSign1(
-      protectedHeaders: protectedHeaders,
-      unprotectedHeaders: unprotectedHeaders,
-      payload: payload,
-      signature: await signer.sign(toBeSigned),
-    );
+      return CoseSign1(
+        protectedHeaders: protectedHeaders,
+        unprotectedHeaders: unprotectedHeaders,
+        payload: payload,
+        signature: await signer.sign(toBeSigned),
+      );
+    } catch (error) {
+      throw CoseSignException(
+        message: 'Failed to create a CoseSign1 instance',
+        source: error,
+      );
+    }
   }
 
   static CborValue _createCoseSign1SigStructure({

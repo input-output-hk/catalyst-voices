@@ -265,6 +265,7 @@ openapi
 opentelemetry
 overprovisioned
 pageobject
+pathlib
 Pbkdf2
 pbxproj
 Pdart
