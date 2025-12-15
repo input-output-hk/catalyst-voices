@@ -187,7 +187,7 @@ class _TooltipOverlayTile extends StatelessWidget {
             children: [
               AffixDecorator(
                 suffix: CatalystIdText(
-                  collaborator.catalystId,
+                  collaborator.id,
                   isCompact: true,
                   showCopy: false,
                   copyEnabled: false,
@@ -195,7 +195,7 @@ class _TooltipOverlayTile extends StatelessWidget {
                   style: idStyle,
                 ),
                 child: UsernameText(
-                  collaborator.catalystId.username,
+                  collaborator.id.username,
                   style: usernameStyle,
                   maxLines: 1,
                 ),

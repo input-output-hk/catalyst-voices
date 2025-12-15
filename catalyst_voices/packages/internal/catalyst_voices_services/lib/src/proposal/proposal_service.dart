@@ -446,7 +446,9 @@ final class ProposalServiceImpl implements ProposalService {
 
         return ProposalsFiltersV2(
           status: ProposalStatusFilter.aFinal,
-          originalAuthor: author,
+          relationships: {
+            OriginalAuthor(author),
+          },
           campaign: ProposalsCampaignFilters.from(campaign),
         );
       },
@@ -492,9 +494,8 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<List<ProposalBriefData>> watchWorkspaceProposalsBrief({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    // Workspace only supports showing proposals for specific user.
-    final originalAuthor = filters.originalAuthor;
-    if (originalAuthor == null) {
+    // Workspace only supports showing proposals for specific relationships.
+    if (filters.relationships.isEmpty) {
       return Stream.value(const <ProposalBriefData>[]);
     }
 
@@ -505,9 +506,10 @@ final class ProposalServiceImpl implements ProposalService {
       filters: filters,
     ).map((page) => page.items);
 
-    final localDraftProposalsStream = _proposalRepository.watchLocalDraftProposalsBrief(
-      author: originalAuthor,
-    );
+    final originalAuthor = filters.relationships.whereType<OriginalAuthor>().firstOrNull;
+    final localDraftProposalsStream = originalAuthor != null
+        ? _proposalRepository.watchLocalDraftProposalsBrief(author: originalAuthor.id)
+        : Stream.value(const <ProposalBriefData>[]);
 
     return Rx.combineLatest2(
       signedProposalsStream,
