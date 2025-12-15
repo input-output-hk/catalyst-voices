@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_content_mixin.dart';
 import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_metadata_mixin.dart';
+import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_mixin.dart';
 import 'package:drift/drift.dart';
 
 /// This table stores a record of each document with its content and flattened metadata fields.
@@ -32,7 +33,8 @@ import 'package:drift/drift.dart';
 @TableIndex(name: 'idx_documents_v2_ref_id_ver', columns: {#refId, #ver})
 @TableIndex(name: 'idx_documents_v2_type_id_created_at', columns: {#type, #id, #createdAt})
 @TableIndex(name: 'idx_documents_v2_type_ref_id_ref_ver', columns: {#type, #refId, #refVer})
-class DocumentsV2 extends Table with DocumentTableContentMixin, DocumentTableMetadataMixin {
+class DocumentsV2 extends Table
+    with DocumentTableMixin, DocumentTableContentMixin, DocumentTableMetadataMixin {
   /// Timestamp extracted from [ver] field.
   /// Represents when this version was created.
   /// Used for sorting (ORDER BY createdAt DESC) and filtering by date range.

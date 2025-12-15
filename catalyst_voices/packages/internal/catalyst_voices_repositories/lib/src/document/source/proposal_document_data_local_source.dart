@@ -22,6 +22,11 @@ abstract interface class ProposalDocumentDataLocalSource {
     required List<DocumentRef> proposalsRefs,
   });
 
+  Future<ProposalsTotalAsk> getProposalsTotalTask({
+    required NodeId nodeId,
+    required ProposalsTotalAskFilters filters,
+  });
+
   /// Retrieves titles for all versions of the specified proposals.
   ///
   /// This method extracts the title from each version of a proposal document by
@@ -30,17 +35,14 @@ abstract interface class ProposalDocumentDataLocalSource {
   /// **Parameters:**
   /// - [proposalIds]: List of proposal IDs to fetch version titles for.
   /// - [nodeId]: The path in the document JSON to extract the title from.
+  /// - [fromLocalDrafts]: Whether to fetch titles from local drafts or final versions.
   ///
   /// **Returns:**
   /// - [ProposalVersionsTitles]
   Future<ProposalVersionsTitles> getVersionsTitles({
     required List<String> proposalIds,
     required NodeId nodeId,
-  });
-
-  Future<ProposalsTotalAsk> getProposalsTotalTask({
-    required NodeId nodeId,
-    required ProposalsTotalAskFilters filters,
+    bool fromLocalDrafts,
   });
 
   Future<void> updateProposalFavorite({
@@ -61,13 +63,13 @@ abstract interface class ProposalDocumentDataLocalSource {
     required CampaignFilters campaign,
   });
 
+  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
+
   Stream<Page<RawProposalBrief>> watchRawProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
-  });
-
-  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
-    required CatalystId author,
   });
 }

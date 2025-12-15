@@ -487,6 +487,91 @@ void main() {
             expect(result.proposalVersions['p1']!.data.keys, [ver1, ver2, ver3]);
           },
         );
+
+        test('returns titles from local drafts when fromLocalDrafts is true', () async {
+          // Given: A draft document with multiple versions
+          const titleV1 = 'Draft Title V1';
+          const titleV2 = 'Draft Title V2';
+
+          final draftV1 = _createTestLocalDraft(
+            id: 'draft1',
+            ver: 'v1',
+            contentData: {
+              'setup': {
+                'title': {'title': titleV1},
+              },
+            },
+          );
+
+          final draftV2 = _createTestLocalDraft(
+            id: 'draft1',
+            ver: 'v2',
+            contentData: {
+              'setup': {
+                'title': {'title': titleV2},
+              },
+            },
+          );
+
+          await db.localDocumentsV2Dao.saveAll([draftV1, draftV2]);
+
+          // When
+          final result = await dao.getVersionsTitles(
+            proposalIds: ['draft1'],
+            nodeId: nodeId,
+            fromLocalDrafts: true,
+          );
+
+          // Then
+          expect(result.proposalVersions, hasLength(1));
+          expect(result.proposalVersions['draft1'], isNotNull);
+          expect(result.proposalVersions['draft1']!.data, hasLength(2));
+          expect(result.proposalVersions['draft1']!.data['v1'], equals(titleV1));
+          expect(result.proposalVersions['draft1']!.data['v2'], equals(titleV2));
+        });
+
+        test('only returns drafts when fromLocalDrafts is true, not published documents', () async {
+          // Given: Both a published document and a draft with the same ID
+          const draftTitle = 'Draft Title';
+          const publishedTitle = 'Published Title';
+
+          final published = _createTestDocumentEntity(
+            id: 'p1',
+            ver: 'v1',
+            contentData: {
+              'setup': {
+                'title': {'title': publishedTitle},
+              },
+            },
+          );
+
+          final draft = _createTestLocalDraft(
+            id: 'p1',
+            ver: 'v2',
+            contentData: {
+              'setup': {
+                'title': {'title': draftTitle},
+              },
+            },
+          );
+
+          await db.documentsV2Dao.saveAll([published]);
+          await db.localDocumentsV2Dao.saveAll([draft]);
+
+          // When
+          final result = await dao.getVersionsTitles(
+            proposalIds: ['p1'],
+            nodeId: nodeId,
+            fromLocalDrafts: true,
+          );
+
+          // Then
+          expect(result.proposalVersions, hasLength(1));
+          expect(result.proposalVersions['p1']!.data, hasLength(1));
+          expect(result.proposalVersions['p1']!.data.containsKey('v2'), isTrue);
+          expect(result.proposalVersions['p1']!.data['v2'], equals(draftTitle));
+          expect(result.proposalVersions['p1']!.data.containsKey('v1'), isFalse);
+        });
       });
 
       group('getVisibleProposalsCount', () {

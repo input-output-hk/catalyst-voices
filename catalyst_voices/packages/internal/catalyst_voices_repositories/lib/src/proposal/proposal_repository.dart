@@ -310,7 +310,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) {
     return _proposalsLocalSource
         .watchRawLocalDraftsProposalsBrief(author: author)
-        .switchMap((proposals) => Stream.fromFuture(_assembleProposalBriefData(proposals)));
+        .switchMap(
+          (proposals) => Stream.fromFuture(
+            _assembleProposalBriefData(
+              proposals,
+              localDrafts: true,
+            ),
+          ),
+        );
   }
 
   @override
@@ -376,6 +383,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
       final briefs = _assembleProposalBriefData(
         page.items,
+        localDrafts: false,
         draftVotes: draftVotes,
         castedVotes: castedVotes,
       ).then(page.copyWithItems);
@@ -444,6 +452,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   Future<List<ProposalBriefData>> _assembleProposalBriefData(
     List<RawProposalBrief> rawProposals, {
+    required bool localDrafts,
     Map<DocumentRef, Vote> draftVotes = const {},
     Map<DocumentRef, Vote> castedVotes = const {},
   }) async {
@@ -466,6 +475,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final proposalVersionsTitles = await _proposalsLocalSource.getVersionsTitles(
       proposalIds: proposalIds,
       nodeId: ProposalDocument.titleNodeId,
+      fromLocalDrafts: localDrafts,
     );
 
     return rawProposals.map((item) {

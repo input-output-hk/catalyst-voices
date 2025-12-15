@@ -205,26 +205,45 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<ProposalVersionsTitles> getVersionsTitles({
     required List<String> proposalIds,
     required NodeId nodeId,
+    bool fromLocalDrafts = false,
   }) async {
     if (proposalIds.isEmpty) return const ProposalVersionsTitles.empty();
 
-    final documentIdColumn = documentsV2.id;
-    final documentVerColumn = documentsV2.ver;
-    final titleColumn = documentsV2.content.jsonExtract<String>('\$.${nodeId.value}');
+    final table = fromLocalDrafts ? localDocumentsDrafts : documentsV2;
+    final documentIdColumn = table.id;
+    final documentVerColumn = table.ver;
+    final titleColumn = table.content.jsonExtract<String>('\$.${nodeId.value}');
 
-    final query = selectOnly(documentsV2, distinct: true)
-      ..addColumns([
-        documentIdColumn,
-        documentVerColumn,
-        titleColumn,
-      ])
-      ..where(
-        Expression.and([
-          documentsV2.type.equalsValue(DocumentType.proposalDocument),
-          documentsV2.id.isIn(proposalIds),
-        ]),
-      )
-      ..orderBy([OrderingTerm.asc(documentsV2.createdAt)]);
+    final query = switch (fromLocalDrafts) {
+      true =>
+        selectOnly(localDocumentsDrafts, distinct: true)
+          ..addColumns([
+            documentIdColumn,
+            documentVerColumn,
+            titleColumn,
+          ])
+          ..where(
+            Expression.and([
+              localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument),
+              localDocumentsDrafts.id.isIn(proposalIds),
+            ]),
+          )
+          ..orderBy([OrderingTerm.asc(localDocumentsDrafts.createdAt)]),
+      false =>
+        selectOnly(documentsV2, distinct: true)
+          ..addColumns([
+            documentIdColumn,
+            documentVerColumn,
+            titleColumn,
+          ])
+          ..where(
+            Expression.and([
+              documentsV2.type.equalsValue(DocumentType.proposalDocument),
+              documentsV2.id.isIn(proposalIds),
+            ]),
+          )
+          ..orderBy([OrderingTerm.asc(documentsV2.createdAt)]),
+    };
 
     final proposalVersions = <String, VersionsTitles>{};
 
@@ -1126,12 +1145,15 @@ abstract interface class ProposalsV2Dao {
   /// **Parameters:**
   /// - [proposalIds]: List of proposal IDs to fetch version titles for.
   /// - [nodeId]: The path in the document JSON to extract the title from.
+  /// - [fromLocalDrafts]: If true, fetches titles from `localDocumentsDrafts`
+  ///   table instead of `documentsV2` table.
   ///
   /// **Returns:**
   /// - [ProposalVersionsTitles]
   Future<ProposalVersionsTitles> getVersionsTitles({
     required List<String> proposalIds,
     required NodeId nodeId,
+    bool fromLocalDrafts,
   });
 
   /// Counts the total number of visible proposals that match the given filters.

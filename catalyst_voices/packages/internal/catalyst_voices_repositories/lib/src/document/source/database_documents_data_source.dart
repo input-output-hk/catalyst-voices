@@ -109,8 +109,13 @@ final class DatabaseDocumentsDataSource
   Future<ProposalVersionsTitles> getVersionsTitles({
     required List<String> proposalIds,
     required NodeId nodeId,
+    bool fromLocalDrafts = false,
   }) {
-    return _database.proposalsV2Dao.getVersionsTitles(proposalIds: proposalIds, nodeId: nodeId);
+    return _database.proposalsV2Dao.getVersionsTitles(
+      proposalIds: proposalIds,
+      nodeId: nodeId,
+      fromLocalDrafts: fromLocalDrafts,
+    );
   }
 
   @override
