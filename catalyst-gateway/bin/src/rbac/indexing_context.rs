@@ -1,6 +1,6 @@
 //! A RBAC context used during indexing.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use cardano_chain_follower::{Slot, StakeAddress, TxnIndex, hashes::TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
@@ -22,6 +22,8 @@ pub struct RbacBlockIndexingContext {
     /// A map contains pending data that will be written in the
     /// `catalyst_id_for_stake_address` table.
     addresses: HashMap<StakeAddress, CatalystId>,
+    /// A set contains removed stake addresses during indexing.
+    removed_addresses: HashSet<StakeAddress>,
     /// A map containing pending data that will be written in the
     /// `catalyst_id_for_public_key` table.
     public_keys: HashMap<VerifyingKey, CatalystId>,
@@ -35,12 +37,14 @@ impl RbacBlockIndexingContext {
     pub fn new() -> Self {
         let transactions = HashMap::new();
         let addresses = HashMap::new();
+        let removed_addresses = HashSet::new();
         let public_keys = HashMap::new();
         let registrations = HashMap::new();
 
         Self {
             transactions,
             addresses,
+            removed_addresses,
             public_keys,
             registrations,
         }
