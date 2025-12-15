@@ -100,6 +100,8 @@ abstract interface class DocumentRepository {
   });
 
   /// Gets [DocumentDataWithArtifact] from remote. This method do not access any of cache.
+  // TODO(damian-molinski): refactor documents sync into object which has remote source
+  // so this could be removed from here.
   Future<DocumentDataWithArtifact> getRemoteDocumentDataWithArtifact({
     required SignedDocumentRef id,
   });

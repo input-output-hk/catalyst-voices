@@ -11,7 +11,6 @@ import 'package:equatable/equatable.dart';
 ///
 /// [DocumentData] can be created from [SignedDocument] which comes from
 /// backend or locally as work in progress.
-// TODO(damian-molinski): Make it abstract and create LocalDraftDocumentData and SignedDocumentData.
 base class DocumentData extends Equatable implements Comparable<DocumentData> {
   final DocumentDataMetadata metadata;
   final DocumentDataContent content;
