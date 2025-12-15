@@ -97,9 +97,13 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
 
     await _proposalSub?.cancel();
+    _cache = _cache.copyWith(ref: Optional(id));
     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
     // We don't call distinct() here as we need to emit loading off user loads proposal that still not exists
-    _proposalSub = _proposalService.watchProposal(id: id).listen(_handleProposalData);
+    _proposalSub = _proposalService.watchProposal(
+      id: id,
+      originalAuthor: _cache.activeAccountId,
+    ).listen(_handleProposalData);
   }
 
   Future<void> rejectInvitation() async {
@@ -468,6 +472,12 @@ final class ProposalCubit extends Cubit<ProposalState>
     if (_cache.activeAccountId != data) {
       _cache = _cache.copyWith(activeAccountId: Optional(data));
       emit(state.copyWith(data: _rebuildProposalViewData()));
+
+      // Reload proposal if one is already loaded to update with new activeAccountId
+      final currentRef = _cache.ref;
+      if (currentRef != null) {
+        unawaited(loadProposal(currentRef));
+      }
     }
   }
 
@@ -517,6 +527,8 @@ final class ProposalCubit extends Cubit<ProposalState>
         showComments: Optional(showComments),
         readOnlyMode: Optional(isReadOnlyMode),
         votes: Optional(proposal.votes),
+        versions: Optional(proposal.versions),
+        publish: Optional(proposal.publish),
       );
 
       unawaited(_commentsSub?.cancel());
