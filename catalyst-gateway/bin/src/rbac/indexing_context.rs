@@ -92,7 +92,19 @@ impl RbacBlockIndexingContext {
         &self,
         address: &StakeAddress,
     ) -> Option<&CatalystId> {
+        if self.removed_addresses.contains(address) {
+            return None;
+        }
         self.addresses.get(address)
+    }
+
+    /// Marks a given stake address as removed.
+    pub fn remove_address(
+        &mut self,
+        address: &StakeAddress,
+    ) {
+        self.addresses.remove(address);
+        self.removed_addresses.insert(address.clone());
     }
 
     /// Adds a public key to the context.
