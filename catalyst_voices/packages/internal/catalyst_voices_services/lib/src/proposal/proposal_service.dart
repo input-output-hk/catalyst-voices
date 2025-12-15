@@ -473,7 +473,11 @@ final class ProposalServiceImpl implements ProposalService {
         : Stream.value(null);
 
     final proposalData = _proposalRepository.watchProposal(id: id);
-    return Rx.combineLatest2(localProposalData, proposalData, _mergePublicAndLocalProposal);
+    return Rx.combineLatest2(
+      localProposalData,
+      proposalData,
+      (local, public) => _mergePublicAndLocalProposal(id, local, public),
+    );
   }
 
   @override
@@ -562,10 +566,17 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   ProposalDataV2? _mergePublicAndLocalProposal(
+    DocumentRef id,
     ProposalDataV2? localProposal,
     ProposalDataV2? publicProposal,
   ) {
-    return null;
+    // If user is interested in local return it
+    if (localProposal?.id == id) {
+      return localProposal;
+    }
+
+    // Return public proposal with missing versions from local added
+    return publicProposal?.addMissingVersionsFrom(localProposal);
   }
 
   List<ProposalBriefData> _mergePublishedAndLocalProposals(
