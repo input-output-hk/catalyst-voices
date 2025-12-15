@@ -598,6 +598,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<bool> _isReadOnlyMode() async {
+    // TODO(dt-iohk): consider to use campaign assigned to the proposal
     final campaignTimeline = await _campaignService.getActiveCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );

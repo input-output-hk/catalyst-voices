@@ -135,6 +135,10 @@ final class VotingCubit extends Cubit<VotingState>
       _loadVotingPower(),
       _loadCampaign(),
     ).wait;
+    
+    if (isClosed) {
+      return;
+    }
 
     changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
 

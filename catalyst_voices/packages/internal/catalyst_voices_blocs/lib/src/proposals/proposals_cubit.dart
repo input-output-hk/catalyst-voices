@@ -169,6 +169,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _rebuildProposalsCountSubs();
 
     await _loadCampaign();
+
+    if (isClosed) {
+      return;
+    }
+
     changeOrder(order);
     changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
 
