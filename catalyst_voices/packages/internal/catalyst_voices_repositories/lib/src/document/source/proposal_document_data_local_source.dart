@@ -34,6 +34,11 @@ abstract interface class ProposalDocumentDataLocalSource {
     required bool isFavorite,
   });
 
+  Stream<RawProposal?> watchLocalRawProposalData({
+    required DocumentRef id,
+    CatalystId? originalAuthor,
+  });
+
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters,
   });

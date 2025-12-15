@@ -195,6 +195,7 @@ abstract interface class DocumentRepository {
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef id,
     ValueResolver<DocumentData, DocumentRef> refGetter,
+    CatalystId? originalAuthor,
   });
 
   /// When [unique] is true, only latest versions of each document are returned.
@@ -550,6 +551,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef id,
     ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
+    CatalystId? originalAuthor,
   }) {
     return watchDocumentWithRef(
       ref: id,

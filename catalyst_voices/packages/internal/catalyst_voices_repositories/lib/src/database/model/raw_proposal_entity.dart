@@ -1,11 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:equatable/equatable.dart';
 
 class RawProposalEntity extends Equatable {
-  final DocumentEntityV2 proposal;
-  final DocumentEntityV2? template;
+  final SignedDocumentOrLocalDraft proposal;
+  final SignedDocumentOrLocalDraft? template;
   final List<String> versionIds;
   final int commentsCount;
   final bool isFavorite;

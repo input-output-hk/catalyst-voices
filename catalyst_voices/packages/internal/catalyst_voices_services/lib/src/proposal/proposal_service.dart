@@ -117,7 +117,7 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
-  Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? originalAuthor});
 
   /// Streams pages of brief proposal data.
   ///
@@ -464,8 +464,16 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<ProposalDataV2?> watchProposal({required DocumentRef id}) {
-    return _proposalRepository.watchProposal(id: id);
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? originalAuthor}) {
+    final localProposalData = originalAuthor != null
+        ? _proposalRepository.watchLocalProposal(
+            id: id,
+            originalAuthor: originalAuthor,
+          )
+        : Stream.value(null);
+
+    final proposalData = _proposalRepository.watchProposal(id: id);
+    return Rx.combineLatest2(localProposalData, proposalData, _mergePublicAndLocalProposal);
   }
 
   @override
@@ -551,6 +559,13 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
+  }
+
+  ProposalDataV2? _mergePublicAndLocalProposal(
+    ProposalDataV2? localProposal,
+    ProposalDataV2? publicProposal,
+  ) {
+    return null;
   }
 
   List<ProposalBriefData> _mergePublishedAndLocalProposals(

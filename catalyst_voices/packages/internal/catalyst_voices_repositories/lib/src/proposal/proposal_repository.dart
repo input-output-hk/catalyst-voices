@@ -87,10 +87,17 @@ abstract interface class ProposalRepository {
     required CatalystId author,
   });
 
+  Stream<ProposalDataV2?> watchLocalProposal({
+    required DocumentRef id,
+    required CatalystId originalAuthor,
+  });
+
   /// Watches a single proposal by its reference.
   ///
   /// Returns a reactive stream that emits [ProposalDataV2] whenever the
   /// proposal data changes (document, actions, votes, favorites).
+  ///
+  /// Looks only for SignedDocumentRef
   ///
   /// Emits `null` if the proposal is not found.
   Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
@@ -326,6 +333,18 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return _proposalsLocalSource
         .watchRawLocalDraftsProposalsBrief(author: author)
         .switchMap((proposals) => Stream.fromFuture(_assembleProposalBriefData(proposals)));
+  }
+
+  @override
+  Stream<ProposalDataV2?> watchLocalProposal({
+    required DocumentRef id,
+    required CatalystId originalAuthor,
+  }) {
+    return _proposalsLocalSource
+        .watchLocalRawProposalData(id: id, originalAuthor: originalAuthor)
+        .switchMap((document) {
+          return Stream.fromFuture(_assembleProposalData((document, [], [])));
+        });
   }
 
   @override
