@@ -244,7 +244,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   void _watchActiveCampaign() {
     unawaited(_activeCampaignSub?.cancel());
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.id != next?.id)
+        .distinct((previous, next) => previous?.id == next?.id)
         .listen(_handleActiveCampaignChange);
   }
 
