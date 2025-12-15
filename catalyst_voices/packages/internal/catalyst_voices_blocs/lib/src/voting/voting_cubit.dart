@@ -22,6 +22,7 @@ final class VotingCubit extends Cubit<VotingState>
   late Timer _countdownTimer;
 
   StreamSubscription<Account?>? _activeAccountSub;
+  StreamSubscription<Campaign?>? _activeCampaignSub;
   StreamSubscription<Map<VotingPageTab, int>>? _proposalsCountSub;
   StreamSubscription<Page<ProposalBrief>>? _proposalsPageSub;
 
@@ -40,21 +41,14 @@ final class VotingCubit extends Cubit<VotingState>
         .distinct()
         .listen(_handleActiveAccountChange);
 
+    _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
+      _handleActiveCampaignChange,
+    );
+
     _countdownTimer = Timer.periodic(
       const Duration(seconds: 1),
       (_) => _dispatchState(),
     );
-  }
-
-  Future<Campaign?> get _campaign async {
-    final cachedCampaign = _cache.campaign;
-    if (cachedCampaign != null) {
-      return cachedCampaign;
-    }
-
-    final campaign = await _campaignService.getActiveCampaign();
-    _cache = _cache.copyWith(campaign: Optional(campaign));
-    return campaign;
   }
 
   void changeFilters({
@@ -104,6 +98,9 @@ final class VotingCubit extends Cubit<VotingState>
   Future<void> close() async {
     await _activeAccountSub?.cancel();
     _activeAccountSub = null;
+
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
 
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
@@ -262,6 +259,13 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
+  void _handleActiveCampaignChange(Campaign? campaign) {
+    if (_cache.campaign?.id != campaign?.id) {
+      _cache = _cache.copyWith(campaign: Optional(campaign));
+      _dispatchState();
+    }
+  }
+
   void _handleProposalsChange(Page<ProposalBrief> page) {
     _logger.finest(
       'Got page[${page.page}] with proposals[${page.items.length}]. '
@@ -284,7 +288,10 @@ final class VotingCubit extends Cubit<VotingState>
     emit(state.copyWith(count: Map.unmodifiable(data)));
   }
 
-  Future<void> _loadCampaign() => _campaign;
+  Future<void> _loadCampaign() async {
+    final campaign = await _campaignService.getActiveCampaign();
+    _cache = _cache.copyWith(campaign: Optional(campaign));
+  }
 
   Future<void> _loadVotingPower() async {
     await _userService.refreshActiveAccountVotingPower();

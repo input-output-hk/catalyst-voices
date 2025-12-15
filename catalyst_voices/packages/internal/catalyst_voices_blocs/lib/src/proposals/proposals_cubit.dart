@@ -28,6 +28,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   );
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
+  StreamSubscription<Campaign?>? _activeCampaignSub;
   StreamSubscription<Map<ProposalsPageTab, int>>? _proposalsCountSub;
   StreamSubscription<Page<ProposalBrief>>? _proposalsPageSub;
 
@@ -45,17 +46,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         .map((event) => event.activeAccount?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChange);
-  }
 
-  Future<Campaign?> get _campaign async {
-    final cachedCampaign = _cache.campaign;
-    if (cachedCampaign != null) {
-      return cachedCampaign;
-    }
-
-    final campaign = await _campaignService.getActiveCampaign();
-    _cache = _cache.copyWith(campaign: Optional(campaign));
-    return campaign;
+    _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
+      _handleActiveCampaignChange,
+    );
   }
 
   void changeFilters({
@@ -140,6 +134,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   Future<void> close() async {
     await _activeAccountIdSub?.cancel();
     _activeAccountIdSub = null;
+
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
 
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
@@ -256,6 +253,19 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     changeFilters(resetProposals: isMyTab);
   }
 
+  void _handleActiveCampaignChange(Campaign? campaign) {
+    if (_cache.campaign?.id == campaign?.id) {
+      return;
+    }
+
+    _cache = _cache.copyWith(
+      campaign: Optional(campaign),
+      categories: Optional(campaign?.categories),
+    );
+
+    _rebuildCategories();
+  }
+
   void _handleProposalsChange(Page<ProposalBrief> page) {
     _logger.finest(
       'Got page[${page.page}] with proposals[${page.items.length}]. '
@@ -279,12 +289,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   Future<void> _loadCampaignCategories() async {
-    final campaign = await _campaign;
-
-    _cache = _cache.copyWith(categories: Optional(campaign?.categories));
+    final campaign = await _campaignService.getActiveCampaign();
 
     if (!isClosed) {
-      _rebuildCategories();
+      _handleActiveCampaignChange(campaign);
     }
   }
 
