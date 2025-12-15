@@ -60,6 +60,13 @@ abstract interface class DocumentRepository {
     required String id,
   });
 
+  /// Similar to [getDocumentData] but returns only [DocumentArtifact].
+  ///
+  /// If document does not exist it will throw [DocumentNotFoundException].
+  Future<DocumentArtifact> getDocumentArtifact({
+    required SignedDocumentRef id,
+  });
+
   /// When version is not specified in [id] method will try to return latest
   /// version of document matching [id].
   ///
@@ -267,6 +274,21 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final drafts = await _drafts.findAll(id: DraftRef(id: id));
 
     return [...drafts, ...localRefs];
+  }
+
+  @override
+  Future<DocumentArtifact> getDocumentArtifact({required SignedDocumentRef id}) async {
+    final artifact = await _getSignedDocumentAndCacheAs<DocumentArtifact>(
+      ref: id,
+      fromCache: _localDocuments.getArtifact,
+      fromDocument: (document) => document.artifact,
+    );
+
+    if (artifact == null) {
+      throw DocumentNotFoundException(ref: id);
+    }
+
+    return artifact;
   }
 
   @override
@@ -615,6 +637,33 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DraftRef ref,
   }) async {
     return _drafts.get(ref);
+  }
+
+  Future<T?> _getSignedDocumentAndCacheAs<T>({
+    required SignedDocumentRef ref,
+    required ValueResolver<SignedDocumentRef, Future<T?>> fromCache,
+    required ValueResolver<DocumentDataWithArtifact, T> fromDocument,
+  }) async {
+    // if version is not specified we're asking remote for latest version
+    // if remote does not know about this id its probably draft so
+    // local will return latest version
+    if (!ref.isExact) {
+      final latestVersion = await _remoteDocuments.getLatestVersion(ref.id);
+      ref = ref.copyWith(ver: Optional(latestVersion));
+    }
+
+    final isCached = await _localDocuments.exists(id: ref);
+    if (isCached) {
+      return fromCache(ref);
+    }
+
+    final document = await _remoteDocuments.get(ref);
+
+    if (document != null) {
+      await _localDocuments.save(data: document);
+    }
+
+    return document != null ? fromDocument(document) : null;
   }
 
   Future<DocumentData?> _getSignedDocumentData({

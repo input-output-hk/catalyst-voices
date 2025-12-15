@@ -89,6 +89,11 @@ final class DatabaseDocumentsDataSource
   Future<DocumentData?> get(DocumentRef ref) => findFirst(id: ref);
 
   @override
+  Future<DocumentArtifact?> getArtifact(SignedDocumentRef id) {
+    return _database.documentsV2Dao.getDocumentArtifact(id: id);
+  }
+
+  @override
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
     return _database.documentsV2Dao.getLatestOf(ref);
   }

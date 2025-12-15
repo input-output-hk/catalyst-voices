@@ -71,6 +71,13 @@ abstract interface class DocumentsV2Dao {
     CatalystId? originalAuthor,
   });
 
+  /// Retrieves only the artifact of a signed document.
+  ///
+  /// Returns `null` if no matching document is found.
+  Future<DocumentArtifact?> getDocumentArtifact({
+    required DocumentRef id,
+  });
+
   /// Retrieves a list of documents matching the criteria with pagination.
   ///
   /// [latestOnly] - If `true`, only the most recent version (by [DocumentEntityV2.createdAt])
@@ -255,6 +262,29 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       author: author,
       originalAuthor: originalAuthor,
     ).getSingleOrNull();
+  }
+
+  @override
+  Future<DocumentArtifact?> getDocumentArtifact({
+    required DocumentRef id,
+  }) {
+    final query = selectOnly(documentArtifacts)
+      ..addColumns([documentArtifacts.data])
+      ..where(documentArtifacts.id.equals(id.id));
+
+    if (id.isExact) {
+      query.where(documentArtifacts.ver.equals(id.ver!));
+    } else {
+      // If loose ref, get artifact for latest version of that ID.
+      query
+        ..orderBy([OrderingTerm.desc(documentArtifacts.ver)])
+        ..limit(1);
+    }
+
+    return query
+        .map((row) => row.read(documentArtifacts.data))
+        .getSingleOrNull()
+        .then((value) => value != null ? DocumentArtifact(value) : null);
   }
 
   @override
