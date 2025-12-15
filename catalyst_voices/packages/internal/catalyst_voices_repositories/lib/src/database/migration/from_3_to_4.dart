@@ -1,10 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/schema_versions.g.dart';
-import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -21,7 +17,8 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.database.transaction(() async {
     await m.createAll();
 
-    await _migrateDocs(m, schema, batchSize: _batchSize);
+    // Signed documents are dropped in this migration as they require binary representation
+    // which is not present.
     await _migrateDrafts(m, schema, batchSize: _batchSize);
     await _migrateFavorites(m, schema, batchSize: _batchSize);
 
@@ -32,53 +29,6 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
     await m.deleteTable('documents_favorites');
     await m.deleteTable('drafts');
   });
-}
-
-Future<void> _migrateDocs(
-  Migrator m,
-  Schema4 schema, {
-  required int batchSize,
-}) async {
-  final docsCount = await _queryCount('documents', db: m.database);
-  var docsOffset = 0;
-
-  while (docsOffset < docsCount) {
-    await m.database.batch((batch) async {
-      final oldDocs = await _queryRows('documents', batchSize, docsOffset, db: m.database);
-      final rows = <RawValuesInsertable<QueryRow>>[];
-      final authors = <RawValuesInsertable<QueryRow>>[];
-      final parameters = <RawValuesInsertable<QueryRow>>[];
-      final collaborators = <RawValuesInsertable<QueryRow>>[];
-
-      for (final oldDoc in oldDocs) {
-        final rawContent = oldDoc.read<Uint8List>('content');
-        final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
-
-        final rawMetadata = oldDoc.read<Uint8List>('metadata');
-        final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
-        final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
-
-        rows.add(metadata.toDocEntity(content: content).toColumns(true).toInsertable());
-        authors.addAll(metadata.toAuthorEntity().map((e) => e.toColumns(true).toInsertable()));
-        parameters.addAll(
-          metadata.toParameterEntity().map((e) => e.toColumns(true).toInsertable()),
-        );
-        collaborators.addAll(
-          metadata.toCollaboratorEntity().map((entity) => entity.toColumns(true).toInsertable()),
-        );
-      }
-
-      batch
-        ..insertAll(schema.documentsV2, rows)
-        ..insertAll(schema.documentAuthors, authors)
-        ..insertAll(schema.documentParameters, parameters)
-        ..insertAll(schema.documentCollaborators, collaborators);
-
-      docsOffset += oldDocs.length;
-    });
-  }
-
-  _logger.info('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
 }
 
 Future<void> _migrateDrafts(
@@ -419,53 +369,6 @@ extension on DocumentRef {
 }
 
 extension on DocumentDataMetadataDtoDbV3 {
-  List<DocumentAuthorEntity> toAuthorEntity() {
-    return (authors ?? const []).map(CatalystId.parse).map((catId) {
-      return DocumentAuthorEntity(
-        documentId: id.id,
-        documentVer: id.ver!,
-        accountId: catId.toString(),
-        accountSignificantId: catId.toSignificant().toString(),
-        username: catId.username,
-      );
-    }).toList();
-  }
-
-  List<DocumentCollaboratorEntity> toCollaboratorEntity() {
-    return (collaborators ?? const []).map(CatalystId.parse).map((catId) {
-      return DocumentCollaboratorEntity(
-        documentId: id.id,
-        documentVer: id.ver!,
-        accountId: catId.toUri().toString(),
-        accountSignificantId: catId.toSignificant().toUri().toString(),
-        username: catId.username,
-      );
-    }).toList();
-  }
-
-  DocumentEntityV2 toDocEntity({
-    required Map<String, dynamic> content,
-  }) {
-    return DocumentEntityV2(
-      contentType: contentType,
-      id: id.id,
-      ver: id.ver!,
-      type: DocumentType.fromJson(type),
-      createdAt: id.ver!.dateTime,
-      refId: ref?.id,
-      refVer: ref?.ver,
-      replyId: reply?.id,
-      replyVer: reply?.ver,
-      section: section,
-      templateId: template?.id,
-      templateVer: template?.ver,
-      collaborators: collaborators?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
-      parameters: parameters?.toParameters() ?? const DocumentParameters(),
-      authors: authors?.map(CatalystId.tryParse).nonNulls.toList() ?? [],
-      content: DocumentDataContent(content),
-    );
-  }
-
   LocalDocumentDraftEntity toDraftEntity({
     required Map<String, dynamic> content,
   }) {
@@ -494,21 +397,6 @@ extension on DocumentDataMetadataDtoDbV3 {
       content: DocumentDataContent(content),
     );
   }
-
-  List<DocumentParameterEntity> toParameterEntity() {
-    return (parameters ?? const []).map((ref) {
-      return DocumentParameterEntity(
-        id: ref.id,
-        ver: ref.ver!,
-        documentId: id.id,
-        documentVer: id.ver!,
-      );
-    }).toList();
-  }
-}
-
-extension on Map<String, Expression> {
-  RawValuesInsertable<QueryRow> toInsertable() => RawValuesInsertable<QueryRow>(this);
 }
 
 extension on List<DocumentRefDtoDbV3> {
