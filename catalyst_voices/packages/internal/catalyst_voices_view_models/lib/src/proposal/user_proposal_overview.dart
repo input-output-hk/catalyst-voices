@@ -77,7 +77,7 @@ final class UsersProposalOverview extends Equatable {
   /// an `author` is present.
   List<Collaborator> get contributors {
     final mainProposer = author != null
-        ? Collaborator(catalystId: author!, status: ProposalsCollaborationStatus.mainProposer)
+        ? Collaborator(id: author!, status: ProposalsCollaborationStatus.mainProposer)
         : null;
 
     if (collaborators.isEmpty) return [];

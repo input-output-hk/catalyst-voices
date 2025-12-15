@@ -113,6 +113,7 @@ export 'proposal/proposal_version.dart';
 export 'proposal/proposal_votes.dart';
 export 'proposal/proposal_with_context.dart';
 export 'proposal/proposals_collaboration_status.dart';
+export 'proposals/proposals_filter_relationship.dart';
 export 'proposals/proposals_filters_v2.dart';
 export 'proposals/proposals_order.dart';
 export 'proposals/proposals_total_ask_filters.dart';

@@ -6,23 +6,23 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 final class Collaborator extends Equatable {
-  final CatalystId catalystId;
+  final CatalystId id;
   final ProposalsCollaborationStatus status;
 
   const Collaborator({
-    required this.catalystId,
+    required this.id,
     required this.status,
   });
 
   factory Collaborator.fromBriefData(ProposalBriefDataCollaborator briefData) {
     return Collaborator(
-      catalystId: briefData.id,
+      id: briefData.id,
       status: briefData.status,
     );
   }
 
   @override
-  List<Object?> get props => [catalystId, status];
+  List<Object?> get props => [id, status];
 }
 
 /// A status of the collaborator invited to a document (proposal).

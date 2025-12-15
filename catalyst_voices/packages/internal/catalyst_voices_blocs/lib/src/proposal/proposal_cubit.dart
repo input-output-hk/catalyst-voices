@@ -546,7 +546,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     List<Collaborator> collaborators,
     CatalystId? activeAccountId,
   ) async {
-    if (activeAccountId != null && collaborators.none((e) => e.catalystId == activeAccountId)) {
+    if (activeAccountId != null && collaborators.none((e) => e.id == activeAccountId)) {
       return const CollaboratorInvitationState(
         invitation: CollaboratorInvitation(),
       );
@@ -567,7 +567,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     return [
       for (final status in ProposalsCollaborationStatus.values)
         Collaborator(
-          catalystId: catalystId,
+          id: catalystId,
           status: status,
         ),
     ];

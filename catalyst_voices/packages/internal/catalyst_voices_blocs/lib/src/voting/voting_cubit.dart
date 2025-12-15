@@ -65,12 +65,16 @@ final class VotingCubit extends Cubit<VotingState>
   }) {
     _cache = _cache.copyWith(tab: tab);
 
+    final activeAccountId = _cache.activeAccountId;
     final filters = _cache.filters.copyWith(
       status: const Optional(ProposalStatusFilter.aFinal),
       isFavorite: _cache.tab == VotingPageTab.favorites
           ? const Optional(true)
           : const Optional.empty(),
-      originalAuthor: Optional(_cache.tab == VotingPageTab.my ? _cache.activeAccountId : null),
+      relationships: {
+        if (_cache.tab == VotingPageTab.my && activeAccountId != null)
+          OriginalAuthor(activeAccountId),
+      },
       categoryId: categoryId,
       searchQuery: searchQuery,
       latestUpdate: const Optional.empty(),
@@ -202,22 +206,24 @@ final class VotingCubit extends Cubit<VotingState>
       VotingPageTab.total => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        originalAuthor: const Optional.empty(),
+        relationships: const {},
       ),
       VotingPageTab.favorites => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional(true),
-        originalAuthor: const Optional.empty(),
+        relationships: const {},
       ),
       VotingPageTab.my => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        originalAuthor: Optional(_cache.activeAccountId),
+        relationships: {
+          if (_cache.activeAccountId != null) OriginalAuthor(_cache.activeAccountId!),
+        },
       ),
       VotingPageTab.votedOn => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
-        originalAuthor: const Optional.empty(),
+        relationships: const {},
         voteBy: Optional(_cache.activeAccountId),
       ),
     };
