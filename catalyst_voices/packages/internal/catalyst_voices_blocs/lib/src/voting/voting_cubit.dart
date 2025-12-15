@@ -135,7 +135,7 @@ final class VotingCubit extends Cubit<VotingState>
       _loadVotingPower(),
       _loadCampaign(),
     ).wait;
-    
+
     changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
 
     unawaited(_activeAccountSub?.cancel());
