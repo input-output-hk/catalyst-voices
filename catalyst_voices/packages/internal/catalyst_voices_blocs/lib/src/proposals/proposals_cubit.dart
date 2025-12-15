@@ -165,9 +165,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     ProposalsPageTab? tab,
     ProposalsOrder order = const Alphabetical(),
   }) async {
-    await _resetCache();
-    await _loadCampaignCategories();
+    _resetCache();
+    _rebuildProposalsCountSubs();
+
+    await _loadCampaign();
     changeOrder(order);
+    changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
 
     unawaited(_activeAccountIdSub?.cancel());
     _activeAccountIdSub = _userService.watchUser
@@ -179,8 +182,6 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
       _handleActiveCampaignChange,
     );
-
-    changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
   }
 
   /// Changes the favorite status of the proposal with [ref].
@@ -244,11 +245,6 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     };
   }
 
-  Future<ProposalsCampaignFilters?> _getActiveCampaignFilters() async {
-    final campaign = await _campaignService.getActiveCampaign();
-    return campaign != null ? ProposalsCampaignFilters.from(campaign) : null;
-  }
-
   void _handleActiveAccountIdChange(CatalystId? id) {
     if (_cache.activeAccountId == id) {
       return;
@@ -274,13 +270,14 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       categories: Optional(campaign?.categories),
     );
 
-    _rebuildCategories();
-    _rebuildProposalsCountSubs();
-
     if (_cache.filters.categoryId != null) {
       changeSelectedCategory(null);
     } else {
-      changeFilters(categoryId: const Optional.empty());
+      changeFilters(
+        categoryId: const Optional.empty(),
+        resetProposals: true,
+      );
+      _rebuildCategories();
     }
   }
 
@@ -306,7 +303,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     emit(state.copyWith(count: Map.unmodifiable(data)));
   }
 
-  Future<void> _loadCampaignCategories() async {
+  Future<void> _loadCampaign() async {
     final campaign = await _campaignService.getActiveCampaign();
 
     if (!isClosed) {
@@ -370,15 +367,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     ).startWith({}).listen(_handleProposalsCountChange);
   }
 
-  Future<void> _resetCache() async {
+  void _resetCache() {
     final activeAccountId = _userService.user.activeAccount?.catalystId;
-    final campaignFilters = await _getActiveCampaignFilters();
-    final filters = ProposalsFiltersV2(campaign: campaignFilters);
 
-    _cache = ProposalsCubitCache(
-      filters: filters,
-      activeAccountId: activeAccountId,
-    );
+    _cache = ProposalsCubitCache(activeAccountId: activeAccountId);
   }
 
   ProposalsOrder _resolveEffectiveOrder() {
