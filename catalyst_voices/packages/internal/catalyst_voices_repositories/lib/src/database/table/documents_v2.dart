@@ -34,15 +34,4 @@ import 'package:drift/drift.dart';
 @TableIndex(name: 'idx_documents_v2_type_id_created_at', columns: {#type, #id, #createdAt})
 @TableIndex(name: 'idx_documents_v2_type_ref_id_ref_ver', columns: {#type, #refId, #refVer})
 class DocumentsV2 extends Table
-    with DocumentTableMixin, DocumentTableContentMixin, DocumentTableMetadataMixin {
-  /// Timestamp extracted from [ver] field.
-  /// Represents when this version was created.
-  /// Used for sorting (ORDER BY createdAt DESC) and filtering by date range.
-  DateTimeColumn get createdAt => dateTime()();
-
-  /// Composite primary key: ([id], [ver])
-  /// This allows multiple versions of the same document to coexist.
-  /// SQLite enforces uniqueness on this combination.
-  @override
-  Set<Column<Object>>? get primaryKey => {id, ver};
-}
+    with DocumentTableContentMixin, DocumentTableMetadataMixin, DocumentTableMixin {}

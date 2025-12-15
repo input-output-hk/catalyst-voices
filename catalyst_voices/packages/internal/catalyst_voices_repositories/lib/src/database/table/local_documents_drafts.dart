@@ -11,19 +11,10 @@ import 'package:drift/drift.dart';
 /// [content] will be encrypted in future.
 @DataClassName('LocalDocumentDraftEntity')
 class LocalDocumentsDrafts extends Table
-    with DocumentTableMixin, DocumentTableContentMixin, DocumentTableMetadataMixin {
+    with DocumentTableContentMixin, DocumentTableMetadataMixin, DocumentTableMixin {
   /// Keeps usernames of [authors].
   TextColumn get authorsNames => text().map(DocumentConverters.strings)();
 
   /// Keeps significant([CatalystId.toSignificant]) version of [authors].
   TextColumn get authorsSignificant => text().map(DocumentConverters.catId)();
-
-  /// Timestamp extracted from [ver].
-  DateTimeColumn get createdAt => dateTime()();
-
-  /// Composite primary key: ([id], [ver])
-  /// This allows multiple versions of the same document to coexist.
-  /// SQLite enforces uniqueness on this combination.
-  @override
-  Set<Column<Object>>? get primaryKey => {id, ver};
 }
