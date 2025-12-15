@@ -281,7 +281,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     return ids.toList();
   }
 
-  /// Fetches the [DocumentData] for a list of [SignedDocumentRef]s concurrently.
+  /// Fetches the [DocumentDataWithArtifact] for a list of [SignedDocumentRef]s concurrently.
   ///
   /// This method takes a list of document references and uses a [Pool] to manage
   /// the concurrency of network requests, preventing resource exhaustion issues
@@ -291,7 +291,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   /// Each fetch operation is wrapped in a [Result] type. This ensures that even
   /// if some requests fail, the overall process completes, and a list of all
   /// successes and failures can be returned for further processing.
-  Future<List<Result<DocumentData, RefSyncException>>> _syncGetDocuments(
+  Future<List<Result<DocumentDataWithArtifact, RefSyncException>>> _syncGetDocuments(
     List<SignedDocumentRef> refs,
     Pool pool,
   ) {
@@ -299,8 +299,8 @@ final class DocumentsServiceImpl implements DocumentsService {
       (ref) {
         return pool.withResource(() {
           return _documentRepository
-              .getDocumentData(id: ref, useCache: false)
-              .then<Result<DocumentData, RefSyncException>>(Success.new)
+              .getRemoteDocumentDataWithArtifact(id: ref)
+              .then<Result<DocumentDataWithArtifact, RefSyncException>>(Success.new)
               .onError((error, stack) {
                 return Failure(RefSyncException(ref, source: error));
               });
@@ -321,10 +321,10 @@ final class DocumentsServiceImpl implements DocumentsService {
   /// successful documents in a single bulk operation, and then returns a
   /// [DocumentsSyncResult] that tallies the number of new and failed documents.
   Future<DocumentsSyncResult> _syncSaveBatchResults(
-    List<Result<DocumentData, RefSyncException>> results,
+    List<Result<DocumentDataWithArtifact, RefSyncException>> results,
   ) async {
-    final (List<DocumentData> documents, int failures) = results.fold(
-      (<DocumentData>[], 0),
+    final (List<DocumentDataWithArtifact> documents, int failures) = results.fold(
+      (<DocumentDataWithArtifact>[], 0),
       (acc, result) {
         final (docs, failCount) = acc;
         if (result.isSuccess) {
@@ -337,7 +337,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     );
 
     if (documents.isNotEmpty) {
-      await _documentRepository.saveDocumentBulk(documents);
+      await _documentRepository.saveSignedDocumentBulk(documents);
     }
 
     return DocumentsSyncResult(

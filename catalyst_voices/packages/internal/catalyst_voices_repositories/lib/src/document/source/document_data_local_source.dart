@@ -59,14 +59,6 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
     DocumentRef? referencing,
   });
 
-  /// Persists a single [DocumentData] object to local storage.
-  ///
-  /// If the document already exists, it should be updated (upsert).
-  Future<void> save({required DocumentData data});
-
-  /// Persists multiple [DocumentData] objects to local storage in a batch.
-  Future<void> saveAll(Iterable<DocumentData> data);
-
   /// Watches for changes to a single document matching the filters.
   ///
   /// Emits a new value whenever the matching document is updated or inserted.

@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_artifacts.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
@@ -101,15 +102,16 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<void> save({required DocumentData data}) => saveAll([data]);
+  Future<void> save({required DocumentDataWithArtifact data}) => saveAll([data]);
 
   @override
-  Future<void> saveAll(Iterable<DocumentData> data) async {
+  Future<void> saveAll(Iterable<DocumentDataWithArtifact> data) async {
     final entries = data
         .map(
           (e) => DocumentCompositeEntity(
             e.toDocEntity(),
             authors: e.toAuthorEntities(),
+            artifact: e.toArtifactEntity(),
             parameters: e.toParameterEntities(),
             collaborators: e.toCollaboratorEntities(),
           ),
@@ -261,7 +263,15 @@ extension on String? {
   }
 }
 
-extension on DocumentData {
+extension on DocumentDataWithArtifact {
+  DocumentArtifactEntity toArtifactEntity() {
+    return DocumentArtifactEntity(
+      id: metadata.id.id,
+      ver: metadata.id.ver!,
+      data: artifact.value,
+    );
+  }
+
   List<DocumentAuthorEntity> toAuthorEntities() {
     return (metadata.authors ?? const []).map((catId) {
       return DocumentAuthorEntity(

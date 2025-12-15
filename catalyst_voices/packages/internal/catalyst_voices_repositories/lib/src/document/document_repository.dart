@@ -59,22 +59,15 @@ abstract interface class DocumentRepository {
     required String id,
   });
 
-  /// If version is not specified in [id] method will try to return latest
+  /// When version is not specified in [id] method will try to return latest
   /// version of document matching [id].
   ///
   /// If document does not exist it will throw [DocumentNotFoundException].
   ///
-  /// If [DocumentRef] is [SignedDocumentRef] it will look for this document in
-  /// local storage.
-  ///
-  /// If [DocumentRef] is [DraftRef] it will look for this document in local
-  /// storage.
-  ///
-  /// When [useCache] is false [id] will be looped up only remotely. If [id] is referees to
-  /// local draft it will throw [DocumentNotFoundException].
+  /// * If [DocumentRef] is [SignedDocumentRef] it will look for this document in local storage.
+  /// * If [DocumentRef] is [DraftRef] it will look for this document in local storage.
   Future<DocumentData> getDocumentData({
     required DocumentRef id,
-    bool useCache,
   });
 
   /// Useful when recovering account and we want to lookup
@@ -96,6 +89,11 @@ abstract interface class DocumentRepository {
   Future<DocumentData?> getRefToDocumentData({
     required DocumentRef referencing,
     required DocumentType type,
+  });
+
+  /// Gets [DocumentDataWithArtifact] from remote. This method do not access any of cache.
+  Future<DocumentDataWithArtifact> getRemoteDocumentDataWithArtifact({
+    required SignedDocumentRef id,
   });
 
   /// Looks up all signed document refs according to [filters].
@@ -146,34 +144,31 @@ abstract interface class DocumentRepository {
     bool keepLocalDrafts,
   });
 
-  /// Saves a list of documents to the appropriate local storage.
-  ///
-  /// This method iterates through the provided list of [documents] and saves
-  /// each one based on its reference type.
-  /// - [DraftRef] documents are saved as drafts.
-  /// - [SignedDocumentRef] documents are saved as local signed documents.
-  Future<void> saveDocumentBulk(List<DocumentData> documents);
-
   /// Saves a pre-parsed and validated document to storage.
   ///
   /// The document reference will be altered to avoid linking
   /// the imported document to the old document.
   ///
   /// Returns the reference of the saved document.
-  Future<DocumentRef> saveImportedDocument({
+  Future<DraftRef> saveImportedDocument({
     required DocumentData document,
     required CatalystId authorId,
   });
 
-  /// In context of [document] id:
+  /// Saves a list of documents to the local storage.
   ///
-  /// - [DraftRef] -> Creates/updates a local document draft.
-  /// - [SignedDocumentRef] -> Creates a local document. If matching ref
-  /// already exists it will be ignored.
+  /// This method iterates through the provided list of [documents] and saves
+  /// each one based on its reference type.
   ///
-  /// If watching same draft with [watchDocument] it will emit
-  /// change.
-  Future<void> upsertDocument({
+  /// Method saves only signed documents with artifacts.
+  Future<void> saveSignedDocumentBulk(List<DocumentDataWithArtifact> documents);
+
+  /// Creates/updates a local document draft.
+  ///
+  /// If watching same draft with [watchDocument] it will emit change.
+  ///
+  /// This method do not work for signed documents.
+  Future<void> upsertLocalDraftDocument({
     required DocumentData document,
   });
 
@@ -276,14 +271,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<DocumentData> getDocumentData({
     required DocumentRef id,
-    bool useCache = true,
   }) async {
     final documentData = switch (id) {
-      SignedDocumentRef() => await _getSignedDocumentData(ref: id, useCache: useCache),
-      DraftRef() when !useCache => throw DocumentNotFoundException(
-        ref: id,
-        message: '$id can not be resolved while not using cache',
-      ),
+      SignedDocumentRef() => await _getSignedDocumentData(id: id),
       DraftRef() => await _getDraftDocumentData(ref: id),
     };
 
@@ -332,6 +322,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<DocumentDataWithArtifact> getRemoteDocumentDataWithArtifact({
+    required SignedDocumentRef id,
+  }) async {
+    final document = await _remoteDocuments.get(id);
+
+    if (document == null) {
+      throw DocumentNotFoundException(ref: id);
+    }
+
+    return document;
+  }
+
+  @override
   Future<DocumentIndex> index({
     required int page,
     required int limit,
@@ -372,9 +375,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> publishDocument({required SignedDocument document}) async {
-    await _remoteDocuments.publish(document);
-
     final doc = DocumentDataFactory.create(document);
+
+    await _remoteDocuments.publish(doc.artifact);
     await _localDocuments.save(data: doc);
   }
 
@@ -417,25 +420,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> saveDocumentBulk(List<DocumentData> documents) async {
-    final signedDocs = documents.where((element) => element.id is SignedDocumentRef);
-    final draftDocs = documents.where((element) => element.id is DraftRef);
-
-    final signedDocsSave = signedDocs.isNotEmpty
-        ? _localDocuments.saveAll(signedDocs)
-        : Future(() {});
-    final draftsDocsSave = draftDocs.isNotEmpty ? _drafts.saveAll(draftDocs) : Future(() {});
-
-    await [signedDocsSave, draftsDocsSave].wait;
-  }
-
-  @override
-  Future<DocumentRef> saveImportedDocument({
+  Future<DraftRef> saveImportedDocument({
     required DocumentData document,
     required CatalystId authorId,
   }) async {
+    final id = DraftRef.generateFirstRef();
     final newMetadata = document.metadata.copyWith(
-      id: DraftRef.generateFirstRef(),
+      id: id,
       authors: Optional([authorId]),
     );
 
@@ -445,19 +436,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     await _drafts.save(data: newDocument);
-    return newDocument.metadata.id;
+
+    return id;
   }
 
   @override
-  Future<void> upsertDocument({
+  Future<void> saveSignedDocumentBulk(List<DocumentDataWithArtifact> documents) async {
+    assert(
+      documents.every((element) => element.metadata.id.isSigned),
+      'Only signed documents are supported',
+    );
+
+    return _localDocuments.saveAll(documents);
+  }
+
+  @override
+  Future<void> upsertLocalDraftDocument({
     required DocumentData document,
   }) async {
-    switch (document.metadata.id) {
-      case DraftRef():
-        await _drafts.save(data: document);
-      case SignedDocumentRef():
-        await _localDocuments.save(data: document);
-    }
+    assert(document.metadata.id.isDraft, 'Only draft documents are supported');
+
+    await _drafts.save(data: document);
   }
 
   @visibleForTesting
@@ -618,25 +617,24 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   Future<DocumentData?> _getSignedDocumentData({
-    required SignedDocumentRef ref,
-    bool useCache = true,
+    required SignedDocumentRef id,
   }) async {
     // if version is not specified we're asking remote for latest version
     // if remote does not know about this id its probably draft so
     // local will return latest version
-    if (!ref.isExact) {
-      final latestVersion = await _remoteDocuments.getLatestVersion(ref.id);
-      ref = ref.copyWith(ver: Optional(latestVersion));
+    if (!id.isExact) {
+      final latestVersion = await _remoteDocuments.getLatestVersion(id.id);
+      id = id.copyWith(ver: Optional(latestVersion));
     }
 
-    final isCached = useCache && await _localDocuments.exists(id: ref);
+    final isCached = await _localDocuments.exists(id: id);
     if (isCached) {
-      return _localDocuments.get(ref);
+      return _localDocuments.get(id);
     }
 
-    final document = await _remoteDocuments.get(ref);
+    final document = await _remoteDocuments.get(id);
 
-    if (useCache && document != null) {
+    if (document != null) {
       await _localDocuments.save(data: document);
     }
 

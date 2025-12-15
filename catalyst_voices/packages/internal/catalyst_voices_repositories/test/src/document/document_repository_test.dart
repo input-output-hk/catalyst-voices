@@ -275,17 +275,14 @@ void main() {
           'draft document data is saved',
           () async {
             // Given
-            final documentDataToSave = DocumentDataFactory.build(
-              id: DocumentRefFactory.draftRef(),
-            );
+            final id = DocumentRefFactory.draftRef();
+            final documentDataToSave = DocumentDataFactory.buildDraft(id: id);
 
             // When
-            await repository.upsertDocument(document: documentDataToSave);
+            await repository.upsertLocalDraftDocument(document: documentDataToSave);
 
             // Then
-            final savedDocumentData = await repository.getDocumentData(
-              id: documentDataToSave.metadata.id,
-            );
+            final savedDocumentData = await repository.getDocumentData(id: id);
 
             expect(savedDocumentData, equals(documentDataToSave));
           },
@@ -308,12 +305,12 @@ void main() {
         );
 
         final draftRef = DocumentRefFactory.draftRef();
-        final draftData = DocumentDataFactory.build(
+        final draftData = DocumentDataFactory.buildDraft(
           id: draftRef,
           template: templateRef,
         );
 
-        final updatedData = DocumentDataFactory.build(
+        final updatedData = DocumentDataFactory.buildDraft(
           id: draftRef,
           template: templateRef,
           content: updatedContent,
@@ -324,7 +321,7 @@ void main() {
         await draftsSource.save(data: draftData);
 
         // Then
-        await repository.upsertDocument(document: updatedData);
+        await repository.upsertLocalDraftDocument(document: updatedData);
 
         final draftStream = repository.watchDocumentWithRef(
           ref: draftRef,

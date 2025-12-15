@@ -18,7 +18,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   );
 
   @override
-  Future<DocumentData> get(DocumentRef ref) async {
+  Future<DocumentDataWithArtifact> get(DocumentRef ref) async {
     final bytes = await _api.gateway
         .apiV1DocumentDocumentIdGet(
           documentId: ref.id,
@@ -79,11 +79,10 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<void> publish(SignedDocument document) async {
-    final bytes = document.toBytes();
+  Future<void> publish(DocumentArtifact artifact) async {
     await _api.gateway
         .apiV1DocumentPut(
-          body: bytes,
+          body: artifact.value,
           contentType: ContentTypes.applicationCbor,
         )
         .successOrThrow();
@@ -194,6 +193,9 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 }
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
+  @override
+  Future<DocumentDataWithArtifact?> get(DocumentRef ref);
+
   Future<String?> getLatestVersion(String id);
 
   Future<DocumentIndex> index({
@@ -202,7 +204,7 @@ abstract interface class DocumentDataRemoteSource implements DocumentDataSource 
     required DocumentIndexFilters filters,
   });
 
-  Future<void> publish(SignedDocument document);
+  Future<void> publish(DocumentArtifact artifact);
 }
 
 extension on DocumentRefForFilteredDocuments {
