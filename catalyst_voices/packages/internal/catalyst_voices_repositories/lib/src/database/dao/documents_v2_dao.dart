@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Documen
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_artifacts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
@@ -152,6 +153,7 @@ abstract interface class DocumentsV2Dao {
   tables: [
     DocumentsV2,
     DocumentAuthors,
+    DocumentArtifacts,
     DocumentParameters,
     DocumentCollaborators,
   ],
@@ -303,6 +305,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final docs = entries.map((e) => e.doc);
     final authors = entries.map((e) => e.authors).flattened;
+    final artifacts = entries.map((e) => e.artifact);
     final parameters = entries.map((e) => e.parameters).flattened;
     final collaborators = entries.map((e) => e.collaborators).flattened;
 
@@ -317,6 +320,13 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         batch.insertAll(
           documentAuthors,
           authors,
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
+      if (artifacts.isNotEmpty) {
+        batch.insertAll(
+          documentArtifacts,
+          artifacts,
           mode: InsertMode.insertOrIgnore,
         );
       }

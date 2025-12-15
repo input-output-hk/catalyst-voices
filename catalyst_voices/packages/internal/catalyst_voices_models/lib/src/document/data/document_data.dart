@@ -11,7 +11,7 @@ import 'package:equatable/equatable.dart';
 ///
 /// [DocumentData] can be created from [SignedDocument] which comes from
 /// backend or locally as work in progress.
-final class DocumentData extends Equatable implements Comparable<DocumentData> {
+base class DocumentData extends Equatable implements Comparable<DocumentData> {
   final DocumentDataMetadata metadata;
   final DocumentDataContent content;
 
@@ -34,13 +34,46 @@ final class DocumentData extends Equatable implements Comparable<DocumentData> {
     return metadata.id.compareTo(other.metadata.id);
   }
 
-  /// Update document data with a new [id].
+  /// Standard copyWith method.
   DocumentData copyWith({
-    DocumentRef? id,
+    DocumentDataMetadata? metadata,
+    DocumentDataContent? content,
   }) {
     return DocumentData(
-      metadata: metadata.copyWith(id: id),
-      content: content,
+      metadata: metadata ?? this.metadata,
+      content: content ?? this.content,
+    );
+  }
+
+  /// Shorthand for [copyWith].
+  DocumentData copyWithId(DocumentRef id) => copyWith(metadata: metadata.copyWith(id: id));
+}
+
+/// A [DocumentData] that also holds its source [DocumentArtifact].
+///
+/// This is used when the raw proof is required.
+final class DocumentWithArtifact extends DocumentData {
+  final DocumentArtifact artifact;
+
+  const DocumentWithArtifact({
+    required super.metadata,
+    required super.content,
+    required this.artifact,
+  });
+
+  @override
+  List<Object?> get props => super.props + [artifact];
+
+  @override
+  DocumentWithArtifact copyWith({
+    DocumentDataMetadata? metadata,
+    DocumentDataContent? content,
+    DocumentArtifact? artifact,
+  }) {
+    return DocumentWithArtifact(
+      metadata: metadata ?? this.metadata,
+      content: content ?? this.content,
+      artifact: artifact ?? this.artifact,
     );
   }
 }

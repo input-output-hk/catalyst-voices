@@ -45,6 +45,7 @@ export 'document/constant/all_const_documents_refs.dart';
 export 'document/constant/constant_documents_refs.dart';
 export 'document/constant/f14_const_documents_refs.dart';
 export 'document/constant/f15_const_documents_refs.dart';
+export 'document/data/document_artifact.dart';
 export 'document/data/document_content_type.dart';
 export 'document/data/document_data.dart';
 export 'document/data/document_data_content.dart';
