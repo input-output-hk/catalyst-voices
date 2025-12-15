@@ -188,7 +188,7 @@ extension LocalDocumentDraftEntityMapper on LocalDocumentDraftEntity {
       metadata: DocumentDataMetadata(
         contentType: DocumentContentType.fromJson(contentType),
         type: type,
-        id: SignedDocumentRef(id: id, ver: ver),
+        id: DraftRef(id: id, ver: ver),
         ref: refId.toRef(refVer),
         template: templateId.toRef(templateVer),
         reply: replyId.toRef(replyVer),
