@@ -77,6 +77,14 @@ abstract interface class DocumentRepository {
     bool useCache,
   });
 
+  /// Similar to [getDocumentData] but returns only [DocumentDataMetadata].
+  ///
+  /// If document does not exist it will throw [DocumentNotFoundException].
+  Future<DocumentDataMetadata> getDocumentMetadata({
+    required DocumentRef id,
+    bool useCache,
+  });
+
   /// Useful when recovering account and we want to lookup
   /// latest [DocumentData] which of [originalAuthorId] and check
   /// username used in [CatalystId] in that document.
@@ -278,20 +286,51 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef id,
     bool useCache = true,
   }) async {
-    final documentData = switch (id) {
-      SignedDocumentRef() => await _getSignedDocumentData(ref: id, useCache: useCache),
-      DraftRef() when !useCache => throw DocumentNotFoundException(
-        ref: id,
-        message: '$id can not be resolved while not using cache',
-      ),
-      DraftRef() => await _getDraftDocumentData(ref: id),
-    };
+    final documentData = await _getDocumentByRef<DocumentData?>(
+      id: id,
+      useCache: useCache,
+      onSignedDocument: (ref) {
+        return _getSignedDocumentAndCacheAs<DocumentData>(
+          ref: ref,
+          useCache: useCache,
+          fromCache: _localDocuments.get,
+          fromDocument: (document) => document,
+        );
+      },
+      onDraft: _drafts.get,
+    );
 
     if (documentData == null) {
       throw DocumentNotFoundException(ref: id);
     }
 
     return documentData;
+  }
+
+  @override
+  Future<DocumentDataMetadata> getDocumentMetadata({
+    required DocumentRef id,
+    bool useCache = true,
+  }) async {
+    final metadata = await _getDocumentByRef<DocumentDataMetadata?>(
+      id: id,
+      useCache: useCache,
+      onSignedDocument: (ref) {
+        return _getSignedDocumentAndCacheAs<DocumentDataMetadata>(
+          ref: ref,
+          useCache: useCache,
+          fromCache: _localDocuments.getMetadata,
+          fromDocument: (document) => document.metadata,
+        );
+      },
+      onDraft: _drafts.getMetadata,
+    );
+
+    if (metadata == null) {
+      throw DocumentNotFoundException(ref: id);
+    }
+
+    return metadata;
   }
 
   @override
@@ -611,14 +650,30 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return _localDocuments.watch(referencing: referencing, type: type).distinct();
   }
 
-  Future<DocumentData?> _getDraftDocumentData({
-    required DraftRef ref,
+  /// Fetches document data and handles ref type switching and error handling.
+  ///
+  /// This helper consolidates the common logic for both [getDocumentData] and
+  /// [getDocumentMetadata].
+  Future<T?> _getDocumentByRef<T>({
+    required DocumentRef id,
+    bool useCache = true,
+    required ValueResolver<SignedDocumentRef, Future<T>> onSignedDocument,
+    required ValueResolver<DraftRef, Future<T>> onDraft,
   }) async {
-    return _drafts.get(ref);
+    return switch (id) {
+      SignedDocumentRef() => onSignedDocument(id),
+      DraftRef() when !useCache => throw DocumentNotFoundException(
+        ref: id,
+        message: '$id can not be resolved while not using cache',
+      ),
+      DraftRef() => onDraft(id),
+    };
   }
 
-  Future<DocumentData?> _getSignedDocumentData({
+  Future<T?> _getSignedDocumentAndCacheAs<T>({
     required SignedDocumentRef ref,
+    required ValueResolver<SignedDocumentRef, Future<T?>> fromCache,
+    required ValueResolver<DocumentData, T> fromDocument,
     bool useCache = true,
   }) async {
     // if version is not specified we're asking remote for latest version
@@ -631,7 +686,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final isCached = useCache && await _localDocuments.exists(id: ref);
     if (isCached) {
-      return _localDocuments.get(ref);
+      return fromCache(ref);
     }
 
     final document = await _remoteDocuments.get(ref);
@@ -640,7 +695,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       await _localDocuments.save(data: document);
     }
 
-    return document;
+    return document != null ? fromDocument(document) : null;
   }
 
   bool _isDocumentMetadataValid(DocumentData document) {

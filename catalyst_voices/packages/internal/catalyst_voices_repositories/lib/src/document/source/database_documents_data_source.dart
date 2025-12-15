@@ -98,6 +98,11 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) {
+    return _database.documentsV2Dao.getDocumentMetadata(id: ref).then((value) => value?.toModel());
+  }
+
+  @override
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
