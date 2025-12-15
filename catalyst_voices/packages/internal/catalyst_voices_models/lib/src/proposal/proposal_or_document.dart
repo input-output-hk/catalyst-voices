@@ -50,6 +50,7 @@ sealed class ProposalOrDocument extends Equatable {
   /// A brief description of the proposal.
   String? get description;
 
+  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The duration of the proposal in months.
   int? get durationInMonths;
 
