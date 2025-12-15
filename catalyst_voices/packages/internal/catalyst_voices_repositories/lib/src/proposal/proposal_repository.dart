@@ -244,14 +244,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
-    // TODO(LynxLynxx): implement new method. _documentRepository.getDocumentMetadata to receive only metadata
-    final documentData = await _documentRepository.getDocumentData(id: proposalId);
+    final documentMetadata = await _documentRepository.getDocumentMetadata(id: proposalId);
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
       metadata: DocumentDataMetadata.proposalAction(
         id: actionId,
         proposalRef: proposalId,
-        parameters: documentData.metadata.parameters,
+        parameters: documentMetadata.parameters,
       ),
       catalystId: catalystId,
       privateKey: privateKey,
