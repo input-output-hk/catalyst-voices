@@ -54,6 +54,7 @@ final class DatabaseDocumentsDataSource
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    List<CatalystId>? authors,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -63,6 +64,7 @@ final class DatabaseDocumentsDataSource
           type: type,
           id: id,
           referencing: referencing,
+          authors: authors,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -95,6 +97,11 @@ final class DatabaseDocumentsDataSource
   @override
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
     return _database.documentsV2Dao.getLatestOf(ref);
+  }
+
+  @override
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
+    return _database.documentsV2Dao.getPreviousOf(id: id);
   }
 
   @override
@@ -228,6 +235,18 @@ final class DatabaseDocumentsDataSource
         .watchLocalDraftsProposalsBrief(author: author)
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
+  }
+
+  @override
+  Stream<RawProposal?> watchRawProposalData({required DocumentRef id}) {
+    final tr = _profiler.startTransaction('Query proposal: $id');
+    return _database.proposalsV2Dao
+        .watchProposal(id: id)
+        .doOnData((_) {
+          if (!tr.finished) unawaited(tr.finish());
+        })
+        .distinct()
+        .map((proposal) => proposal?.toModel());
   }
 
   @override

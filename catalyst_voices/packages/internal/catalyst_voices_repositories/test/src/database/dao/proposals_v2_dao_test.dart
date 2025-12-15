@@ -6,6 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
@@ -6434,6 +6435,531 @@ void main() {
 
           expect(favResult.isFavorite, isTrue);
           expect(normalResult.isFavorite, isFalse);
+        });
+      });
+
+      group('watchProposal', () {
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        test('emits null when proposal does not exist', () async {
+          // Given
+          const ref = SignedDocumentRef(id: 'non-existent', ver: 'non-existent');
+
+          // When
+          final stream = dao.watchProposal(id: ref);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(predicate<RawProposalEntity?>((e) => e == null)),
+          );
+        });
+
+        test('emits proposal data when proposal exists', () async {
+          // Given
+          final proposalVer = _buildUuidV7At(earliest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          final ref = SignedDocumentRef(id: 'p1', ver: proposalVer);
+
+          // When
+          final stream = dao.watchProposal(id: ref);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.proposal.id == 'p1' && e.proposal.ver == proposalVer;
+              }),
+            ),
+          );
+        });
+
+        test('emits latest version when using loose ref', () async {
+          // Given
+          final ver1 = _buildUuidV7At(earliest);
+          final ver2 = _buildUuidV7At(latest);
+
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver1,
+            authors: _createTestAuthors(['author1']),
+          );
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver2,
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+          const looseRef = SignedDocumentRef(id: 'p1');
+
+          // When
+          final stream = dao.watchProposal(id: looseRef);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.proposal.ver == ver2;
+              }),
+            ),
+          );
+        });
+
+        test('emits specific version when using exact ref', () async {
+          // Given
+          final ver1 = _buildUuidV7At(earliest);
+          final ver2 = _buildUuidV7At(latest);
+
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver1,
+            authors: _createTestAuthors(['author1']),
+          );
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver2,
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+          final exactRef = SignedDocumentRef(id: 'p1', ver: ver1);
+
+          // When
+          final stream = dao.watchProposal(id: exactRef);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.proposal.ver == ver1;
+              }),
+            ),
+          );
+        });
+
+        test('includes all version IDs for the proposal', () async {
+          // Given
+          final ver1 = _buildUuidV7At(earliest);
+          final ver2 = _buildUuidV7At(middle);
+          final ver3 = _buildUuidV7At(latest);
+
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver1,
+            authors: _createTestAuthors(['author1']),
+          );
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver2,
+            authors: _createTestAuthors(['author1']),
+          );
+          final proposal3 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver3,
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+          const looseRef = SignedDocumentRef(id: 'p1');
+
+          // When
+          final stream = dao.watchProposal(id: looseRef);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null &&
+                    e.versionIds.length == 3 &&
+                    e.versionIds.contains(ver1) &&
+                    e.versionIds.contains(ver2) &&
+                    e.versionIds.contains(ver3);
+              }),
+            ),
+          );
+        });
+
+        test('includes correct comments count for the specific version', () async {
+          // Given
+          final proposalVer = _buildUuidV7At(earliest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            authors: _createTestAuthors(['author1']),
+          );
+
+          final comment1Ver = _buildUuidV7At(middle);
+          final comment1 = _createTestDocumentEntity(
+            id: 'c1',
+            ver: comment1Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: proposalVer,
+          );
+
+          final comment2Ver = _buildUuidV7At(latest);
+          final comment2 = _createTestDocumentEntity(
+            id: 'c2',
+            ver: comment2Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: proposalVer,
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, comment1, comment2]);
+
+          final ref = SignedDocumentRef(id: 'p1', ver: proposalVer);
+
+          // When
+          final stream = dao.watchProposal(id: ref);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.commentsCount == 2;
+              }),
+            ),
+          );
+        });
+
+        test('includes isFavorite status', () async {
+          // Given
+          final proposalVer = _buildUuidV7At(earliest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+          await dao.updateProposalFavorite(id: 'p1', isFavorite: true);
+
+          final ref = SignedDocumentRef(id: 'p1', ver: proposalVer);
+
+          // When
+          final stream = dao.watchProposal(id: ref);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.isFavorite == true;
+              }),
+            ),
+          );
+        });
+
+        test('includes original authors from first version', () async {
+          // Given
+          final ver1 = _buildUuidV7At(earliest);
+          final ver2 = _buildUuidV7At(latest);
+
+          final originalAuthor = _createTestAuthor(name: 'original');
+          final newAuthor = _createTestAuthor(name: 'new', role0KeySeed: 1);
+
+          // First version has id == ver (original version)
+          final proposal1 = _createTestDocumentEntity(
+            id: ver1,
+            ver: ver1,
+            authors: [originalAuthor],
+          );
+          // Second version has different ver
+          final proposal2 = _createTestDocumentEntity(
+            id: ver1,
+            ver: ver2,
+            authors: [newAuthor],
+          );
+          await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+          final looseRef = SignedDocumentRef(id: ver1);
+
+          // When
+          final stream = dao.watchProposal(id: looseRef);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null &&
+                    e.originalAuthors.length == 1 &&
+                    e.originalAuthors.first.username == 'original';
+              }),
+            ),
+          );
+        });
+
+        test('includes template data when template exists', () async {
+          // Given
+          final templateVer = _buildUuidV7At(earliest);
+          final template = _createTestDocumentEntity(
+            id: 't1',
+            ver: templateVer,
+            type: DocumentType.proposalTemplate,
+          );
+
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            templateId: 't1',
+            templateVer: templateVer,
+            authors: _createTestAuthors(['author1']),
+          );
+
+          await db.documentsV2Dao.saveAll([template, proposal]);
+
+          final ref = SignedDocumentRef(id: 'p1', ver: proposalVer);
+
+          // When
+          final stream = dao.watchProposal(id: ref);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null &&
+                    e.template != null &&
+                    e.template!.id == 't1' &&
+                    e.template!.ver == templateVer;
+              }),
+            ),
+          );
+        });
+
+        test('reacts to new proposal version being added', () async {
+          // Given
+          final proposalVer = _buildUuidV7At(earliest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            contentData: {'title': 'Original'},
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          const looseRef = SignedDocumentRef(id: 'p1');
+
+          // When - subscribe to stream
+          final emissions = <RawProposalEntity?>[];
+          final subscription = dao.watchProposal(id: looseRef).listen(emissions.add);
+
+          // Wait for first emission
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          expect(emissions, hasLength(1));
+          expect(emissions.first!.proposal.ver, proposalVer);
+
+          // When - add new version
+          final newVer = _buildUuidV7At(latest);
+          final updatedProposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: newVer,
+            contentData: {'title': 'Updated'},
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([updatedProposal]);
+
+          // Wait for reactive update
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+
+          // Then - stream should have emitted new value
+          expect(emissions.length, greaterThanOrEqualTo(2));
+          expect(emissions.last!.proposal.ver, newVer);
+
+          await subscription.cancel();
+        });
+
+        test('reacts to favorite status change', () async {
+          // Given
+          final proposalVer = _buildUuidV7At(earliest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          final ref = SignedDocumentRef(id: 'p1', ver: proposalVer);
+
+          // When - subscribe to stream
+          final emissions = <RawProposalEntity?>[];
+          final subscription = dao.watchProposal(id: ref).listen(emissions.add);
+
+          // Wait for first emission
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          expect(emissions, hasLength(1));
+          expect(emissions.first!.isFavorite, isFalse);
+
+          // When - update favorite
+          await dao.updateProposalFavorite(id: 'p1', isFavorite: true);
+
+          // Wait for reactive update
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+
+          // Then - stream should have emitted new value
+          expect(emissions.length, greaterThanOrEqualTo(2));
+          expect(emissions.last!.isFavorite, isTrue);
+
+          await subscription.cancel();
+        });
+
+        test('reacts to comment being added', () async {
+          // Given
+          final proposalVer = _buildUuidV7At(earliest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          final ref = SignedDocumentRef(id: 'p1', ver: proposalVer);
+
+          // When - subscribe to stream
+          final emissions = <RawProposalEntity?>[];
+          final subscription = dao.watchProposal(id: ref).listen(emissions.add);
+
+          // Wait for first emission
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          expect(emissions, hasLength(1));
+          expect(emissions.first!.commentsCount, 0);
+
+          // When - add comment
+          final commentVer = _buildUuidV7At(latest);
+          final comment = _createTestDocumentEntity(
+            id: 'c1',
+            ver: commentVer,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: proposalVer,
+          );
+          await db.documentsV2Dao.saveAll([comment]);
+
+          // Wait for reactive update
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+
+          // Then - stream should have emitted new value
+          expect(emissions.length, greaterThanOrEqualTo(2));
+          expect(emissions.last!.commentsCount, 1);
+
+          await subscription.cancel();
+        });
+
+        test('template is null when template does not exist', () async {
+          // Given
+          final proposalVer = _buildUuidV7At(earliest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            templateId: 'non-existent',
+            templateVer: 'non-existent',
+            authors: _createTestAuthors(['author1']),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          final ref = SignedDocumentRef(id: 'p1', ver: proposalVer);
+
+          // When
+          final stream = dao.watchProposal(id: ref);
+
+          // Then
+          await expectLater(
+            stream,
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.template == null;
+              }),
+            ),
+          );
+        });
+
+        test('counts only comments for the specific version', () async {
+          // Given
+          final ver1 = _buildUuidV7At(earliest);
+          final ver2 = _buildUuidV7At(middle);
+
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver1,
+            authors: _createTestAuthors(['author1']),
+          );
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver2,
+            authors: _createTestAuthors(['author1']),
+          );
+
+          // Comments for ver1
+          final comment1 = _createTestDocumentEntity(
+            id: 'c1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: ver1,
+          );
+          final comment2 = _createTestDocumentEntity(
+            id: 'c2',
+            ver: _buildUuidV7At(latest.add(const Duration(hours: 1))),
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: ver1,
+          );
+
+          // Comment for ver2
+          final comment3 = _createTestDocumentEntity(
+            id: 'c3',
+            ver: _buildUuidV7At(latest.add(const Duration(hours: 2))),
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: ver2,
+          );
+
+          await db.documentsV2Dao.saveAll([
+            proposal1,
+            proposal2,
+            comment1,
+            comment2,
+            comment3,
+          ]);
+
+          final refVer1 = SignedDocumentRef(id: 'p1', ver: ver1);
+          final refVer2 = SignedDocumentRef(id: 'p1', ver: ver2);
+
+          // When/Then - ver1 has 2 comments
+          await expectLater(
+            dao.watchProposal(id: refVer1),
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.commentsCount == 2;
+              }),
+            ),
+          );
+
+          // When/Then - ver2 has 1 comment
+          await expectLater(
+            dao.watchProposal(id: refVer2),
+            emits(
+              predicate<RawProposalEntity?>((e) {
+                return e != null && e.commentsCount == 1;
+              }),
+            ),
+          );
         });
       });
     },
