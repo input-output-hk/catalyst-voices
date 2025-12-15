@@ -83,19 +83,25 @@ test("test", async ({ testModel }) => {
 
 ### Running tests in containers
 
+0. Navigate to the e2e tests directory
+
+```bash
+cd catalyst_voices/apps/voices/e2e_tests
+```
+
 1. Build all images
 
 ```bash
 earthly +all-images
 ```
 
-1. Spin up Gateway and Voices
+2. Spin up Gateway and Voices
 
 ```bash
-docker compose -f catalyst-voices/apps/voices/e2e_tests/docker-compose.yml up nginx
+docker compose up nginx
 ```
 
-1. Wait until the Gateway is healthy
+3. Wait until the Gateway is healthy
 
 ```bash
 curl --location 'http://localhost:80/api/gateway/v1/health/ready'
@@ -103,13 +109,13 @@ curl --location 'http://localhost:80/api/gateway/v1/health/ready'
 
 This should return 204.
 
-1. Run the tests
+4. Run the tests
 
 ```bash
 npx playwright test
 ```
 
-1. Clean up
+5. Clean up
 
 ```bash
 docker compose -f catalyst-voices/apps/voices/e2e_tests/docker-compose.yml down
