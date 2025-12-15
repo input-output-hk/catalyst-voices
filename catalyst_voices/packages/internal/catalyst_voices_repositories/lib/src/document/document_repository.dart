@@ -19,6 +19,7 @@ DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
 /// Base interface to interact with documents. This interface is used to allow interaction with any
 /// document type.
+// TODO(damian-molinski): split into local drafts and signed documents repositories
 abstract interface class DocumentRepository {
   factory DocumentRepository(
     CatalystDatabase db,

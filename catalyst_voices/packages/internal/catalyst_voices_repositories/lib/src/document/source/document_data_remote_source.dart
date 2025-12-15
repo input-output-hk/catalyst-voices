@@ -19,14 +19,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<DocumentDataWithArtifact> get(DocumentRef ref) async {
-    final bytes = await _api.gateway
+    final artifact = await _api.gateway
         .apiV1DocumentDocumentIdGet(
           documentId: ref.id,
           version: ref.ver,
         )
-        .successBodyBytesOrThrow();
+        .successBodyBytesOrThrow()
+        .then(DocumentArtifact.new);
 
-    final signedDocument = await _signedDocumentManager.parseDocument(bytes);
+    final signedDocument = await _signedDocumentManager.parseDocument(artifact);
     return DocumentDataFactory.create(signedDocument);
   }
 

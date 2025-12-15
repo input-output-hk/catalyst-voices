@@ -20,7 +20,7 @@ final class DocumentDataFactory {
         type: SignedDocumentContentType.unknown,
       ),
     };
-    final artifact = DocumentArtifact(document.toBytes());
+    final artifact = document.toArtifact();
 
     return DocumentDataWithArtifact(
       metadata: metadata,
