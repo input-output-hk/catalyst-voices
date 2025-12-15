@@ -100,26 +100,30 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   ProposalsFiltersV2 _buildFiltersForTab(WorkspacePageTab tab) {
-    // TODO(damian-molinski): AllProposals should be either where activeAccountId == author OR activeAccountId is a collaborator
+    final activeAccountId = _cache.activeAccountId;
+    if (activeAccountId == null) {
+      return const ProposalsFiltersV2();
+    }
+
     return switch (tab) {
       WorkspacePageTab.proposals => ProposalsFiltersV2(
-        originalAuthor:
-            _cache.workspaceFilter.isAllProposals || _cache.workspaceFilter.isMainProposer
-            ? _cache.activeAccountId
-            : null,
-        collaboration: ProposalsCollaborationFilters(
-          collaborator:
-              _cache.workspaceFilter.isCollaborator || _cache.workspaceFilter.isAllProposals
-              ? _cache.activeAccountId
-              : null,
-          excludeStatus: ProposalsCollaborationStatusFilter.pending,
-        ),
+        relationships: switch (_cache.workspaceFilter) {
+          WorkspaceFilters.allProposals => {
+            OriginalAuthor(activeAccountId),
+            CollaborationInvitation.accepted(activeAccountId),
+          },
+          WorkspaceFilters.mainProposer => {
+            OriginalAuthor(activeAccountId),
+          },
+          WorkspaceFilters.collaborator => {
+            CollaborationInvitation.accepted(activeAccountId),
+          },
+        },
       ),
       WorkspacePageTab.proposalInvites => ProposalsFiltersV2(
-        collaboration: ProposalsCollaborationFilters(
-          collaborator: _cache.activeAccountId,
-          status: ProposalsCollaborationStatusFilter.pending,
-        ),
+        relationships: {
+          CollaborationInvitation.pending(activeAccountId),
+        },
       ),
     };
   }
@@ -138,9 +142,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       return;
     }
 
-    _cache = _cache.copyWith(
-      campaign: Optional(campaign),
-    );
+    _cache = _cache.copyWith(campaign: Optional(campaign));
 
     add(const GetTimelineItemsEvent());
     unawaited(_rebuildDataPageSub());
