@@ -30,4 +30,8 @@ final class VersionsTitles extends Equatable {
 
   @override
   List<Object?> get props => [data];
+
+  int verIteration(String ver) {
+    return data.keys.toList().indexOf(ver) + 1;
+  }
 }

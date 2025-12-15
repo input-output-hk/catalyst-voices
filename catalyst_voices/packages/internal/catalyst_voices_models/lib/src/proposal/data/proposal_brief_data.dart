@@ -50,7 +50,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
   }) {
     final id = data.proposal.id;
     final isFinal = data.isFinal;
-    final iteration = versionTitles.data.keys.toList().indexOf(id.ver!) + 1;
+    final iteration = versionTitles.verIteration(id.ver!);
 
     final versions = versionTitles.data.entries.map((entry) {
       return ProposalBriefDataVersion(
