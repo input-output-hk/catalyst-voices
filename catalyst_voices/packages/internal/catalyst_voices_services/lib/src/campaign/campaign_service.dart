@@ -80,7 +80,7 @@ final class CampaignServiceImpl implements CampaignService {
   Future<CampaignPhase> getActiveCampaignPhaseTimeline(CampaignPhaseType type) async {
     final campaign = await getActiveCampaign();
     if (campaign == null) {
-      // TODO(dt-iohk): Add specialised exceptions here.
+      // TODO(dt-iohk): Add specialized exceptions here.
       // Later Campaign will by dynamic and there is no guarantee we do have active campaign.
       throw StateError('No active campaign found');
     }
