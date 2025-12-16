@@ -8,21 +8,21 @@ and the app will run locally.
 
 These tests cover browser-based end-to-end workflows for the Catalyst Voices application:
 
-- **Cardano wallet integration testing** (Lace, Eternl, Yoroi, Nufi)
-- **User authentication and account management**
-- **Cross-environment testing** (dev, preprod, prod)
-- **Browser extension interaction**
-- **Application title and basic navigation**
+* **Cardano wallet integration testing** (Lace, Eternl, Yoroi, Nufi)
+* **User authentication and account management**
+* **Cross-environment testing** (dev, preprod, prod)
+* **Browser extension interaction**
+* **Application title and basic navigation**
 
 ## Building & Setup
 
 ### Prerequisites
 
-- **Node.js** (v18 or higher)
-- **npm** package manager
-- **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/)
+* **Node.js** (v18 or higher)
+* **npm** package manager
+* **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/)
   or download using [puppeteer](https://pptr.dev/browsers-api))
-- Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
+* Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
 
 ### Installation
 
