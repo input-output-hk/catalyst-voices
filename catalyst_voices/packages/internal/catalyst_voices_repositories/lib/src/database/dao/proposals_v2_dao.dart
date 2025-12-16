@@ -18,6 +18,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dri
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/extensions/json1.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Data Access Object for Proposal-specific queries.
@@ -122,6 +123,39 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) async {
+    if (proposalIds.isEmpty) return const ProposalVersionsTitles.empty();
+
+    final documentIdColumn = localDocumentsDrafts.id;
+    final documentVerColumn = localDocumentsDrafts.ver;
+    final titleColumn = localDocumentsDrafts.content.jsonExtract<String>('\$.${nodeId.value}');
+
+    final query = selectOnly(localDocumentsDrafts, distinct: true)
+      ..addColumns([
+        documentIdColumn,
+        documentVerColumn,
+        titleColumn,
+      ])
+      ..where(
+        Expression.and([
+          localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument),
+          localDocumentsDrafts.id.isIn(proposalIds),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(localDocumentsDrafts.createdAt)]);
+
+    return _extractVersionsTitles(
+      query: query,
+      idColumn: documentIdColumn,
+      verColumn: documentVerColumn,
+      titleColumn: titleColumn,
+    );
+  }
+
+  @override
   Future<DocumentEntityV2?> getProposal(DocumentRef ref) async {
     final query = select(documentsV2)
       ..where((tbl) => tbl.id.equals(ref.id) & tbl.type.equals(DocumentType.proposalDocument.uuid));
@@ -199,6 +233,39 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       filters: filters,
       nodeId: nodeId,
     ).get().then(Map.fromEntries).then(ProposalsTotalAsk.new);
+  }
+
+  @override
+  Future<ProposalVersionsTitles> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) async {
+    if (proposalIds.isEmpty) return const ProposalVersionsTitles.empty();
+
+    final documentIdColumn = documentsV2.id;
+    final documentVerColumn = documentsV2.ver;
+    final titleColumn = documentsV2.content.jsonExtract<String>('\$.${nodeId.value}');
+
+    final query = selectOnly(documentsV2, distinct: true)
+      ..addColumns([
+        documentIdColumn,
+        documentVerColumn,
+        titleColumn,
+      ])
+      ..where(
+        Expression.and([
+          documentsV2.type.equalsValue(DocumentType.proposalDocument),
+          documentsV2.id.isIn(proposalIds),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(documentsV2.createdAt)]);
+
+    return _extractVersionsTitles(
+      query: query,
+      idColumn: documentIdColumn,
+      verColumn: documentVerColumn,
+      titleColumn: titleColumn,
+    );
   }
 
   /// Counts the total number of visible proposals matching the [filters].
@@ -616,6 +683,28 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return input.replaceAll("'", "''");
   }
 
+  Future<ProposalVersionsTitles> _extractVersionsTitles({
+    required JoinedSelectStatement<HasResultSet, dynamic> query,
+    required GeneratedColumn<String> idColumn,
+    required GeneratedColumn<String> verColumn,
+    required Expression<String> titleColumn,
+  }) async {
+    final proposalVersions = <String, VersionsTitles>{};
+
+    await query.map((row) {
+      final id = row.read<String>(idColumn)!;
+      final ver = row.read<String>(verColumn)!;
+      final title = row.read<String>(titleColumn);
+      proposalVersions.update(
+        id,
+        (value) => VersionsTitles({...value.data, ver: title}),
+        ifAbsent: () => VersionsTitles({ver: title}),
+      );
+    }).get();
+
+    return ProposalVersionsTitles(proposalVersions);
+  }
+
   /// Returns the Common Table Expression (CTE) string defining "Effective Proposals".
   ///
   /// **CTE Stages:**
@@ -856,8 +945,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
               : null,
           // Local drafts do not have a submission action state
           actionType: null,
-          // Local drafts effectively have one version (themselves)
-          versionIds: [proposal.ver],
           // Local drafts are not public, so 0 comments
           commentsCount: 0,
           isFavorite: isFavorite,
@@ -1070,16 +1157,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       ep.action_type,
       
       (
-        SELECT GROUP_CONCAT(v_list.ver, ',')
-        FROM (
-          SELECT ver 
-          FROM documents_v2 v_sub 
-          WHERE v_sub.id = p.id AND v_sub.type = ? 
-          ORDER BY v_sub.ver ASC
-        ) v_list
-      ) as version_ids_str,
-      
-      (
         SELECT COUNT(*) 
         FROM documents_v2 c 
         WHERE c.ref_id = p.id AND c.ref_ver = p.ver AND c.type = ?
@@ -1111,7 +1188,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         // Subquery Variables
-        Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.commentDocument.uuid),
         // Main Join Variables
         // origin join, template join, main WHERE
@@ -1140,9 +1216,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final actionTypeRaw = row.readNullable<String>('action_type') ?? '';
       final actionType = ProposalSubmissionActionDto.fromJson(actionTypeRaw)?.toModel();
 
-      final versionIdsRaw = row.readNullable<String>('version_ids_str') ?? '';
-      final versionIds = versionIdsRaw.split(',');
-
       final commentsCount = row.readNullable<int>('comments_count') ?? 0;
       final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
 
@@ -1153,7 +1226,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         proposal: SignedDocumentOrLocalDraft.signed(proposal),
         template: template != null ? SignedDocumentOrLocalDraft.signed(template) : null,
         actionType: actionType,
-        versionIds: versionIds,
         commentsCount: commentsCount,
         isFavorite: isFavorite,
         originalAuthors: originalAuthors,
@@ -1258,6 +1330,22 @@ abstract interface class ProposalsV2Dao {
     required CatalystId author,
   });
 
+  /// Retrieves titles for all versions of the specified proposals from local drafts.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  });
+
   /// Retrieves a single proposal by its reference.
   ///
   /// Filters by type == proposalDocument.
@@ -1311,6 +1399,22 @@ abstract interface class ProposalsV2Dao {
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
+  });
+
+  /// Retrieves titles for all versions of the specified proposals from signed documents.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
   });
 
   /// Counts the total number of visible proposals that match the given filters.
