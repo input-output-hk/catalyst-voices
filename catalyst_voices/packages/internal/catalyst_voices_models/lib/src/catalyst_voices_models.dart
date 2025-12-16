@@ -99,6 +99,7 @@ export 'proposal/core_proposal.dart';
 export 'proposal/data/proposal_brief_data.dart';
 export 'proposal/data/proposal_data_collaborator.dart';
 export 'proposal/data/proposal_data_v2.dart';
+export 'proposal/data/proposal_versions_titles.dart';
 export 'proposal/data/proposals_total_ask.dart';
 export 'proposal/data/raw_proposal.dart';
 export 'proposal/data/raw_proposal_brief.dart';
