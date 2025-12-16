@@ -130,9 +130,7 @@ abstract interface class ProposalService {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<int> watchProposalsCountV2({
-    ProposalsFiltersV2 filters,
-  });
+  Stream<int> watchProposalsCountV2({ProposalsFiltersV2 filters, bool includeLocals = false});
 
   /// Similar to [watchProposalsBriefPageV2] but also includes local drafts of proposals
   /// but do not support pagination.
@@ -479,8 +477,23 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+    bool includeLocals = false,
   }) {
-    return _proposalRepository.watchProposalsCountV2(filters: filters);
+    // Get published proposals count
+    final publishedCountStream = _proposalRepository.watchProposalsCountV2(filters: filters);
+
+    // Get local drafts count if there's an OriginalAuthor filter
+    final originalAuthor = filters.relationships.whereType<OriginalAuthor>().firstOrNull;
+    final localDraftsCountStream = originalAuthor != null && includeLocals
+        ? _proposalRepository.watchLocalDraftProposalsCount(author: originalAuthor.id)
+        : Stream.value(0);
+
+    // Combine both counts
+    return Rx.combineLatest2<int, int, int>(
+      publishedCountStream,
+      localDraftsCountStream,
+      (publishedCount, localDraftsCount) => publishedCount + localDraftsCount,
+    );
   }
 
   @override

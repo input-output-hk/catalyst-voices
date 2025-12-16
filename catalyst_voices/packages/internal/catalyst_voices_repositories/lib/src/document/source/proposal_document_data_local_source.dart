@@ -51,6 +51,10 @@ abstract interface class ProposalDocumentDataLocalSource {
     required CatalystId author,
   });
 
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  });
+
   Stream<RawProposal?> watchRawProposalData({required DocumentRef id});
 
   Stream<Page<RawProposalBrief>> watchRawProposalsBriefPage({
