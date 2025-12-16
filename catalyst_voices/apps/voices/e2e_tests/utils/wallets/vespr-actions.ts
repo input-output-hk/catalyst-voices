@@ -24,7 +24,7 @@ export class VesprActions implements WalletActions {
     await this.page.locator("//flt-semantics[@role='button' and text()='Continue']").click();
     await this.page
       .locator("//textarea[@aria-label='Seed Phrase']")
-      .pressSequentially(this.walletConfig.seed.join(" "));
+      .fill(this.walletConfig.seed.join(" "));
     await this.page.locator("//flt-semantics[@role='button' and text()='Submit']").click();
     await this.page
       .locator("//input[@aria-label='Enter a password']")
