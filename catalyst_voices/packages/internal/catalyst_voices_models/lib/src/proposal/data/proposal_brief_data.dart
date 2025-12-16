@@ -46,14 +46,18 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     Vote? draftVote,
     Vote? castedVote,
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
+    VersionsTitles versionTitles = const VersionsTitles.empty(),
   }) {
     final id = data.proposal.id;
     final isFinal = data.isFinal;
+    final iteration = versionTitles.verIteration(id.ver!);
 
-    final versions = data.versionIds
-        // TODO(damian-molinski): Get titles for all versions
-        .map((e) => ProposalBriefDataVersion(ref: id.copyWith(ver: Optional(e))))
-        .toList();
+    final versions = versionTitles.data.entries.map((entry) {
+      return ProposalBriefDataVersion(
+        ref: id.copyWith(ver: Optional(entry.key)),
+        title: entry.value,
+      );
+    }).toList();
 
     // Proposal Brief do not support "removed" or "left" status.
     final collaborators = data.proposal.metadata.collaborators?.map(
@@ -76,7 +80,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
       durationInMonths: proposal.durationInMonths,
       fundsRequested: proposal.fundsRequested,
       createdAt: id.ver!.dateTime,
-      iteration: data.iteration,
+      iteration: iteration,
       commentsCount: isFinal ? null : data.commentsCount,
       isFinal: isFinal,
       isFavorite: data.isFavorite,

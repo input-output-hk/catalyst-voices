@@ -512,6 +512,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       proposalsRefs: proposalsRefs,
     );
 
+    // Fetch version titles for all proposals
+    // TODO(bstolinski): get proposals titles based on template title noteId (dynamic nodeId)
+    // group by template type, from template get nodeId. Exec getVersionsTitles for each template type
+    // right now we have const nodeId ProposalDocument.titleNodeId
+    final rawProposalsRefs = rawProposals.map((e) => e.proposal.id).toList();
+    final rawProposalVersionsTitles = await _getProposalsVersionsTitles(rawProposalsRefs);
+
     return rawProposals.map((item) {
       final templateData = item.template;
 
@@ -529,6 +536,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       final draftVote = draftVotes[proposalId];
       final castedVote = castedVotes[proposalId];
       final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
+      final versionTitles =
+          rawProposalVersionsTitles.proposalVersions[proposalId.id] ?? const VersionsTitles.empty();
 
       return ProposalBriefData.build(
         data: item,
@@ -536,6 +545,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         draftVote: draftVote,
         castedVote: castedVote,
         collaboratorsActions: proposalCollaboratorsActions,
+        versionTitles: versionTitles,
       );
     }).toList();
   }
@@ -645,6 +655,26 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
+  }
+
+  Future<ProposalVersionsTitles> _getProposalsVersionsTitles(List<DocumentRef> refs) async {
+    final signedDocsIds = refs.where((ref) => ref.isSigned).map((e) => e.id).toSet().toList();
+    final draftsDocsIds = refs.where((ref) => ref.isDraft).map((e) => e.id).toSet().toList();
+
+    final signedDocsVersionsTitles = _proposalsLocalSource.getVersionsTitles(
+      proposalIds: signedDocsIds,
+      nodeId: ProposalDocument.titleNodeId,
+    );
+
+    final draftsDocsVersionsTitles = _proposalsLocalSource.getLocalDraftsVersionsTitles(
+      proposalIds: draftsDocsIds,
+      nodeId: ProposalDocument.titleNodeId,
+    );
+
+    return [
+      signedDocsVersionsTitles,
+      draftsDocsVersionsTitles,
+    ].wait.then(ProposalVersionsTitles.fromList);
   }
 
   /// Resolves the effective action for a specific proposal version.
