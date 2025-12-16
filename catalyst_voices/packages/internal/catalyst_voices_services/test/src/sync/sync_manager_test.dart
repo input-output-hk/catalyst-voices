@@ -214,6 +214,8 @@ void main() {
         ).thenAnswer((_) async => const DocumentsSyncResult());
 
         // When
+        await syncManager.init();
+
         activeCampaignStream.add(activeCampaign);
 
         // Wait for the sync to complete

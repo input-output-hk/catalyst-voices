@@ -25,6 +25,9 @@ abstract interface class SyncManager {
 
   Future<void> dispose();
 
+  /// Initializes the [SyncManager], expected to be called once per instance lifetime.
+  Future<void> init();
+
   Future<void> start();
 }
 
@@ -49,11 +52,7 @@ final class SyncManagerImpl implements SyncManager {
     this._documentsService,
     this._campaignService,
     this._profiler,
-  ) {
-    _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
-      _handleActiveCampaignChanged,
-    );
-  }
+  );
 
   @override
   Stream<double> get progressStream => _progressController.stream;
@@ -74,6 +73,14 @@ final class SyncManagerImpl implements SyncManager {
     }
 
     await _progressController.close();
+  }
+
+  @override
+  Future<void> init() async {
+    unawaited(_activeCampaignSub?.cancel());
+    _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
+      _handleActiveCampaignChanged,
+    );
   }
 
   @override
