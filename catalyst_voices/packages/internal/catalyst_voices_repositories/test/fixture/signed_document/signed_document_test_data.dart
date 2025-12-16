@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
@@ -358,7 +357,7 @@ final class SignedDocumentTestData {
   );
 
   /// A hex encoded cbor of proposal document created with v0.0.4 spec.
-  static final Future<Uint8List> signedDocumentV0_0_4Bytes = _getBytesFromHexFile(
+  static final Future<Uint8List> signedDocumentV0_0_4Bytes = _getBytesFromHex(
     signedDocument_v0_0_4,
   );
 
@@ -368,7 +367,7 @@ final class SignedDocumentTestData {
   );
 
   /// A json file with exported proposal with v0.0.4 spec.
-  static final Future<Uint8List> exportedProposalV0_0_4Bytes = _getBytesFromJsonFile(
+  static final Future<Uint8List> exportedProposalV0_0_4Bytes = _getBytesFromJson(
     exportedProposal_v0_0_4,
   );
 
@@ -376,19 +375,7 @@ final class SignedDocumentTestData {
     return Uint8List.fromList(hex.decode(data.trim()));
   }
 
-  static Future<Uint8List> _getBytesFromHexFile(String path) async {
-    final file = File(path);
-    final data = await file.readAsString();
-    return Uint8List.fromList(hex.decode(data.trim()));
-  }
-
   static Future<Uint8List> _getBytesFromJson(String data) async {
-    return Uint8List.fromList(utf8.encode(data.trim()));
-  }
-
-  static Future<Uint8List> _getBytesFromJsonFile(String path) async {
-    final file = File(path);
-    final data = await file.readAsString();
     return Uint8List.fromList(utf8.encode(data.trim()));
   }
 }
