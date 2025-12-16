@@ -13,11 +13,10 @@ services:
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=catalyst-event-dev
       - DB_USER_PASSWORD=CHANGE_ME
-
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=false
     ports:
-      - 5432:5432
+      - "5432:5432"
     healthcheck:
       test:
         [
@@ -41,7 +40,6 @@ services:
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=catalyst-event-dev
       - DB_USER_PASSWORD=CHANGE_ME
-
       - INIT_AND_DROP_DB=false
       - WITH_SEED_DATA=.
       - WITH_MIGRATIONS=true
@@ -62,7 +60,6 @@ services:
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=catalyst-event-dev
       - DB_USER_PASSWORD=CHANGE_ME
-
       - INIT_AND_DROP_DB=false
       - WITH_SEED_DATA=.
       - WITH_MIGRATIONS=true
@@ -77,7 +74,7 @@ services:
     restart: unless-stopped
     command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
     ports:
-      - 9042:9042
+      - "9042:9042"
     healthcheck:
       test: cqlsh -e "SHOW VERSION" || exit 1
       interval: 15s
@@ -103,10 +100,13 @@ services:
       - YES_I_REALLY_WANT_TO_PANIC=panic attack
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
+      # cspell: disable
+      - ADMIN_CATALYST_ID=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
+      # cspell: enable
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     ports:
-      - 3030:3030
+      - "3030:3030"
     depends_on:
       event-db-migrations:
         condition: service_started
@@ -155,6 +155,7 @@ services:
     environment:
       - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
       - CAT_GATEWAY_INTERNAL_API_KEY=123
+      - CAT_GATEWAY_ADMIN_PRIVATE_KEY=4dc7e0388d106e973d602044daae8838b16bbae651a368d0b5c0d8ee990e09b4
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
     command: >

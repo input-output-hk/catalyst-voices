@@ -179,7 +179,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       await keychain.setMasterKey(masterKey);
     });
 
-    await _userService.useAccount(account);
+    await _userService.recoverAccount(account);
 
     return true;
   }

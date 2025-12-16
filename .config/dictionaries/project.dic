@@ -265,6 +265,7 @@ openapi
 opentelemetry
 overprovisioned
 pageobject
+pathlib
 Pbkdf2
 pbxproj
 Pdart
@@ -296,6 +297,7 @@ pyproject
 pyright
 pytest
 qrcode
+ranjg
 rapidoc
 ratelimit
 redoc
@@ -410,6 +412,7 @@ vsync
 wallclock
 wasmtime
 Wconditional
+webfactory
 webos
 Werror
 Wireframes

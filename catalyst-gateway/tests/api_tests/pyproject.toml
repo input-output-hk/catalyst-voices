@@ -1,4 +1,4 @@
-# cspell: words bitcoinlib addopts beautifulsoup cloudscraper certifi
+# cspell: words bitcoinlib addopts certifi
 
 [tool.poetry]
 name = "api_tests"
@@ -13,18 +13,15 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
+catalyst-python = { git = "https://github.com/input-output-hk/catalyst-libs.git", subdirectory="catalyst-python",  tag = "catalyst-python/v0.1.0" }
 python = "^3.14"
 loguru = "^0.7.2"
 asyncpg = "^0.30.0"
 requests = "^2.32.3"
-python-bitcoinlib = "^0.12.2"
-pycardano = "^0.17.0"
-beautifulsoup4 = "^4.13.4"
-cloudscraper = "^1.2.71"
 certifi = "^2025.1.31"
 cbor2 = "^5.6.5"
-uuid = "^1.30"
 httpx = "^0.28.1"
+cryptography = "^46.0.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
