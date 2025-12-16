@@ -93,17 +93,17 @@ impl RbacBlockIndexingContext {
         address: &StakeAddress,
     ) -> Option<&CatalystId> {
         if self.removed_addresses.contains(address) {
-            return None;
+            None
+        } else {
+            self.addresses.get(address)
         }
-        self.addresses.get(address)
     }
 
-    /// Marks a given stake address as removed.
+    /// Marks the given stake address as removed so it will be excluded from `find_address` lookups.
     pub fn remove_address(
         &mut self,
         address: &StakeAddress,
     ) {
-        self.addresses.remove(address);
         self.removed_addresses.insert(address.clone());
     }
 
