@@ -130,7 +130,10 @@ abstract interface class ProposalService {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<int> watchProposalsCountV2({ProposalsFiltersV2 filters, bool includeLocals = false});
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
+    bool includeLocals,
+  });
 
   /// Similar to [watchProposalsBriefPageV2] but also includes local drafts of proposals
   /// but do not support pagination.
