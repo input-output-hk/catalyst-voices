@@ -2,7 +2,7 @@ VERSION 0.8
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
-package:
+testing-package:
     FROM ${REGISTRY}/python:3.12-alpine3.20
 
     ARG version=3.39.16

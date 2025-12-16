@@ -1,7 +1,6 @@
 //! Catalyst RBAC Security Scheme
 use std::{env, error::Error, time::Duration};
 
-use catalyst_types::catalyst_id::role_index::RoleId;
 use poem::{IntoResponse, Request, error::ResponseError, http::StatusCode};
 use poem_openapi::{SecurityScheme, auth::Bearer};
 use tracing::{debug, error};
@@ -9,9 +8,8 @@ use tracing::{debug, error};
 use super::token::CatalystRBACTokenV1;
 use crate::{
     db::index::session::CassandraSessionError,
-    rbac::latest_rbac_chain,
     service::common::{
-        auth::api_key::check_api_key,
+        auth::{api_key::check_api_key, rbac::token::VerificationError},
         responses::{ErrorResponses, WithErrorResponses},
         types::headers::retry_after::{RetryAfterHeader, RetryAfterOption},
     },
@@ -94,7 +92,17 @@ impl ResponseError for AuthTokenError {
 /// Not enough access rights, so its a 403 response.
 #[derive(Debug, thiserror::Error)]
 #[error("Insufficient Permission for Catalyst RBAC Token: {0:?}")]
-pub struct AuthTokenAccessViolation(Vec<String>);
+enum AuthTokenAccessViolation {
+    /// Not a Admin RBAC token
+    #[error("Not a valid Admin RBAC token")]
+    NotAdmin,
+    /// Invalid RBAC token signature
+    #[error("Invalid RBAC Token signature.")]
+    InvalidSignature,
+    /// RBAC token expired
+    #[error("Expired RBAC token.")]
+    Expired,
+}
 
 impl ResponseError for AuthTokenAccessViolation {
     fn status(&self) -> StatusCode {
@@ -105,7 +113,7 @@ impl ResponseError for AuthTokenAccessViolation {
     fn as_response(&self) -> poem::Response
     where Self: Error + Send + Sync + 'static {
         // TODO: Actually check permissions needed for an endpoint.
-        ErrorResponses::forbidden(Some(self.0.clone())).into_response()
+        ErrorResponses::forbidden(self.to_string()).into_response()
     }
 }
 
@@ -127,7 +135,7 @@ async fn checker_api_catalyst_auth(
     const RBAC_OFF: &str = "RBAC_OFF";
 
     // Deserialize the token: this performs the 1-5 steps of the validation.
-    let token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
+    let mut token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
         debug!("Corrupt auth token: {e:?}");
         AuthTokenError::ParseRbacToken(e.to_string())
     })?;
@@ -137,47 +145,39 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     }
 
-    // Step 6: get the registration chain
-    let reg_chain = match latest_rbac_chain(token.catalyst_id()).await {
-        Ok(Some(c)) => c.chain,
-        Ok(None) => {
-            debug!(cat_id = %token.catalyst_id(), "Unable to find registrations for Catalyst ID");
-            return Err(AuthTokenError::RegistrationNotFound.into());
-        },
+    // Step 6, 8, 9: get the registration chain (or check is it a valid admin token), verify
+    // the signature against the Role 0 pk.
+    match token.verify().await {
+        Ok(()) => {},
         Err(e) if e.is::<CassandraSessionError>() => return Err(ServiceUnavailableError(e).into()),
         Err(e) => {
-            // This should never happen normally because we validate RBAC registration transactions
-            // before adding them to the database.
-            error!(cat_id = %token.catalyst_id(), err = ?e, "Unable to build a registration chain");
-            return Err(AuthTokenError::BuildRegChain(e.to_string()).into());
+            error!(cat_id = %token.catalyst_id(), err = ?e, "RBAC token fails validation");
+            match e.downcast::<VerificationError>() {
+                Ok(VerificationError::LatestSigningKey) => {
+                    return Err(AuthTokenError::LatestSigningKey.into());
+                },
+                Ok(VerificationError::RegistrationNotFound) => {
+                    return Err(AuthTokenError::RegistrationNotFound.into());
+                },
+                Ok(VerificationError::NotAdmin) => {
+                    return Err(AuthTokenAccessViolation::NotAdmin.into());
+                },
+                Ok(VerificationError::InvalidSignature) => {
+                    return Err(AuthTokenAccessViolation::InvalidSignature.into());
+                },
+                Err(e) => {
+                    return Err(AuthTokenError::BuildRegChain(e.to_string()).into());
+                },
+            }
         },
-    };
+    }
 
     // Step 7: Verify that the nonce is in the acceptable range.
     // If `InternalApiKeyAuthorization` auth is provided, skip validation.
     if check_api_key(req.headers()).is_err() && !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
         debug!("Auth token expired: {token}");
-        Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
-    }
-
-    // Step 8: Get the latest stable signing certificate registered for Role 0.
-    let (latest_pk, _) = reg_chain
-        .get_latest_signing_pk_for_role(&RoleId::Role0)
-        .ok_or_else(|| {
-            debug!(
-                "Unable to get last signing key for {} Catalyst ID",
-                token.catalyst_id()
-            );
-            AuthTokenError::LatestSigningKey
-        })?;
-
-    // Step 9: Verify the signature against the Role 0 pk.
-    if let Err(error) = token.verify(&latest_pk) {
-        debug!(error=%error, "Invalid signature for token: {token}");
-        Err(AuthTokenAccessViolation(vec![
-            "INVALID SIGNATURE".to_string(),
-        ]))?;
+        Err(AuthTokenAccessViolation::Expired)?;
     }
 
     // Step 10 is optional and isn't currently implemented.

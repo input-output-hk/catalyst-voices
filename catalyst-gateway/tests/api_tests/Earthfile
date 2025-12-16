@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.3 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.8 AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.10-mk-signed-docs-key-type AS cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.4-fix-earthly-build AS dep-cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
 
@@ -21,7 +21,7 @@ builder:
     DO python-ci+BUILDER_WITH_POETRY
 
 # Creates a package of the python integration test runner
-package:
+testing-package:
     FROM +builder
 
     ENV ASSETS_DATA_PATH="./cardano-asset-preprod.json"
@@ -29,7 +29,7 @@ package:
     ENV DEP_MK_SIGNED_DOC_PATH="./dep_mk_signed_doc"
 
     # Install socat
-    RUN apt-get update \
+    RUN apt-get clean && apt-get autoremove && apt-get update \
         && apt-get install -y --no-install-recommends socat \
         && rm -rf /var/lib/apt/lists/*
 

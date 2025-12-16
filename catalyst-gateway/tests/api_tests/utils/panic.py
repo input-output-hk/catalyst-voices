@@ -1,5 +1,6 @@
 import asyncio
 import httpx
+
 from api import cat_gateway_endpoint_url
 
 # Configuration

@@ -91,6 +91,7 @@ jobs:
         run: |
           export HYPOTHESIS_MAX_EXAMPLES=5000
           export MAX_RESPONSE_TIME=25000
+          export HYPOTHESIS_DEADLINE=25000
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
 
       - name: Spin up catalyst-gateway with haproxy
@@ -130,40 +131,12 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
-  slack:
-    name: slack notification
+  slack-notification:
     needs: tests
-    runs-on: ubuntu-latest
-    if: failure()
-    steps:
-      - uses: slackapi/slack-github-action@v2.1.1
-        with:
-          payload: |
-            {
-              "text": "😭 *Voices Nightly Tests Failed* 😭",
-              "attachments": [
-                {
-                  "color": "danger",
-                  "blocks": [
-                    {
-                      "type": "section",
-                      "text": {
-                        "type": "mrkdwn",
-                        "text": "*Workflow:* ${{ github.workflow }} failed on ${{ github.ref_name }}.\n\n*Action Required:* <!channel> please review the logs."
-                      }
-                    },
-                    {
-                      "type": "context",
-                      "elements": [
-                        {
-                          "type": "mrkdwn",
-                          "text": "View Logs: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Click here>"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: webhook-trigger
+    if: ${{ always() && needs.tests.result == 'failure' }}
+    uses: input-output-hk/catalyst-ci/.github/workflows/qa-notify.yml@master
+    with:
+      failed_repo: ${{ github.repository }}
+      failed_run_id: ${{ github.run_id }}
+    secrets:
+      slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
