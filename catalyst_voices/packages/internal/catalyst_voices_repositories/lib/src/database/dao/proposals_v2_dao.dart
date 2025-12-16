@@ -800,7 +800,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
       final publicVersionIdsStr = row.read(publicVersionIds) ?? '';
       // Combine local draft version with any public versions from documentsV2
-      final publicVersionsList = publicVersionIdsStr.isEmpty ? <String>[] : publicVersionIdsStr.split(',');
+      final publicVersionsList = publicVersionIdsStr.isEmpty
+          ? <String>[]
+          : publicVersionIdsStr.split(',');
       final allVersionIds = [proposal.ver, ...publicVersionsList];
 
       final isFavorite = row.read(dlm.isFavorite) ?? false;
