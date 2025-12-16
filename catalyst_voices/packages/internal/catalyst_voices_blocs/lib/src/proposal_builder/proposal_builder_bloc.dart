@@ -963,7 +963,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
                   .watchProposalsCountV2(
                     filters: ProposalsFiltersV2(
                       status: ProposalStatusFilter.aFinal,
-                      originalAuthor: activeAccountId,
+                      relationships: {OriginalAuthor(activeAccountId)},
                     ),
                   )
                   .first;

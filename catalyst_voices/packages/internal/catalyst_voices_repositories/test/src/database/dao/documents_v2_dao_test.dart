@@ -1817,6 +1817,157 @@ void main() {
         });
       });
 
+      group('getPreviousOf', () {
+        test('returns null for non-existing id in empty database', () async {
+          // Given
+          const ref = SignedDocumentRef.exact(id: 'non-existent-id', ver: 'non-existent-ver');
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns first version for loose ref when document exists', () async {
+          // Given
+          final genesisVer = _buildUuidV7At(DateTime.utc(2023, 1, 1));
+          final entity = _createTestDocumentEntity(id: genesisVer, ver: genesisVer);
+          await dao.save(entity);
+
+          final ref = SignedDocumentRef.loose(id: genesisVer);
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then
+          expect(result, isNotNull);
+          expect(result!.id, genesisVer);
+          expect(result.ver, genesisVer);
+          expect(result.isExact, isTrue);
+        });
+
+        test('returns null for loose ref when no genesis version exists', () async {
+          // Given: Document where id != ver (not a genesis version)
+          final entity = _createTestDocumentEntity(id: 'test-id', ver: 'different-ver');
+          await dao.save(entity);
+
+          // And
+          const ref = SignedDocumentRef.loose(id: 'test-id');
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns null for loose ref with non-existing id', () async {
+          // Given
+          final entity = _createTestDocumentEntity(id: 'other-id', ver: 'other-ver');
+          await dao.save(entity);
+
+          // And
+          const ref = SignedDocumentRef.loose(id: 'non-existent-id');
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns null for exact ref when only one version exists', () async {
+          // Given
+          final ver = _buildUuidV7At(DateTime.utc(2024, 1, 1));
+          final entity = _createTestDocumentEntity(id: 'test-id', ver: ver);
+          await dao.save(entity);
+
+          // And
+          final ref = SignedDocumentRef.exact(id: 'test-id', ver: ver);
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns previous version for exact ref with multiple versions', () async {
+          // Given
+          final oldCreatedAt = DateTime.utc(2023, 1, 1);
+          final newerCreatedAt = DateTime.utc(2024, 1, 1);
+
+          final oldVer = _buildUuidV7At(oldCreatedAt);
+          final newerVer = _buildUuidV7At(newerCreatedAt);
+
+          final entityOld = _createTestDocumentEntity(id: 'test-id', ver: oldVer);
+          final entityNew = _createTestDocumentEntity(id: 'test-id', ver: newerVer);
+          await dao.saveAll([entityOld, entityNew]);
+
+          // And: ref pointing to newer version
+          final ref = SignedDocumentRef.exact(id: 'test-id', ver: newerVer);
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then
+          expect(result, isNotNull);
+          expect(result!.id, 'test-id');
+          expect(result.ver, oldVer);
+        });
+
+        test('returns immediately previous version among many versions', () async {
+          // Given: 5 versions with distinct creation times
+          final dates = [
+            DateTime.utc(2023, 1, 1),
+            DateTime.utc(2023, 6, 15),
+            DateTime.utc(2024, 3, 10),
+            DateTime.utc(2024, 8, 1),
+            DateTime.utc(2024, 12, 25),
+          ];
+          final versions = dates.map(_buildUuidV7At).toList();
+          final entities = versions
+              .map((ver) => _createTestDocumentEntity(id: 'multi-ver-id', ver: ver))
+              .toList();
+          await dao.saveAll(entities);
+
+          // And: ref pointing to version at index 3 (2024-08-01)
+          final ref = SignedDocumentRef.exact(id: 'multi-ver-id', ver: versions[3]);
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then: returns version at index 2 (2024-03-10)
+          expect(result, isNotNull);
+          expect(result!.ver, versions[2]);
+        });
+
+        test('does not return versions from different document ids', () async {
+          // Given: Two documents with overlapping timestamps
+          final sharedTime = DateTime.utc(2024, 1, 1);
+          final olderTime = DateTime.utc(2023, 1, 1);
+
+          final doc1Ver = _buildUuidV7At(sharedTime);
+          final doc2OldVer = _buildUuidV7At(olderTime);
+          final doc2NewVer = _buildUuidV7At(sharedTime.add(const Duration(hours: 1)));
+
+          final doc1 = _createTestDocumentEntity(id: 'doc-1', ver: doc1Ver);
+          final doc2Old = _createTestDocumentEntity(id: 'doc-2', ver: doc2OldVer);
+          final doc2New = _createTestDocumentEntity(id: 'doc-2', ver: doc2NewVer);
+          await dao.saveAll([doc1, doc2Old, doc2New]);
+
+          // And: ref pointing to doc-1's only version
+          final ref = SignedDocumentRef.exact(id: 'doc-1', ver: doc1Ver);
+
+          // When
+          final result = await dao.getPreviousOf(id: ref);
+
+          // Then: should return null, not doc-2's older version
+          expect(result, isNull);
+        });
+      });
+
       group('getLatestOf', () {
         test('returns null for non-existing id in empty database', () async {
           // Given
