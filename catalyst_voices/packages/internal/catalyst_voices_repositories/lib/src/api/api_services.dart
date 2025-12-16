@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' show AppEnvi
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/dio_interceptor_factory.dart';
 import 'package:catalyst_voices_repositories/src/common/content_types.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -29,7 +30,7 @@ final class ApiServices {
     final catDioOptions = BaseOptions(contentType: ContentTypes.applicationJson);
     final rbacAuthInterceptor = interceptorFactory.rbacAuthInterceptor(authTokenProvider);
     final retryInterceptor = interceptorFactory.retryInterceptor(rbacAuthInterceptor);
-    final catLogInterceptor = interceptorFactory.logInterceptor();
+    final catLogInterceptor = interceptorFactory.logInterceptor(Logger('CatApiServices'));
 
     final gateway = CatGatewayService.dio(
       baseUrl: env.app.replace(path: '/api/gateway').toString(),

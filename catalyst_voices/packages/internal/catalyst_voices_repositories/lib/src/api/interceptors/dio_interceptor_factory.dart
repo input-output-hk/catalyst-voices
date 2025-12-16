@@ -7,23 +7,24 @@ import 'package:flutter/foundation.dart';
 
 /// Creates common [Dio] client [Interceptor]s.
 class DioInterceptorFactory {
-  LogInterceptor? logInterceptor() {
-    final catApiServiceLogger = Logger('CatApiServices');
+  Interceptor? logInterceptor([Logger? logger]) {
+    logger ??= Logger('LogInterceptor');
 
-    return kDebugMode ? LogInterceptor(logPrint: catApiServiceLogger.fine) : null;
+    return kDebugMode ? LogInterceptor(logPrint: logger.fine) : null;
   }
 
-  RbacAuthInterceptor? rbacAuthInterceptor(AuthTokenProvider? authTokenProvider) {
+  Interceptor? rbacAuthInterceptor(AuthTokenProvider? authTokenProvider) {
     return authTokenProvider != null ? RbacAuthInterceptor(authTokenProvider) : null;
   }
 
-  RetryInterceptor retryInterceptor([RbacAuthInterceptor? rbacInterceptor]) {
+  Interceptor retryInterceptor([Interceptor? authInterceptor]) {
     final retryDio = Dio();
-    if (rbacInterceptor != null) {
-      retryDio.interceptors.add(rbacInterceptor);
-    }
 
-    return RetryInterceptor(
+    final retryInterceptor = RetryInterceptor(
+      // RetryInterceptor suggests to use the original dio however this creates a problem
+      // of a chicken and egg but also causes all interceptors to trigger their logic
+      // on the retry. As we only want some of them on the retry request (auth but not logger) we
+      // are recreating a dio here with a custom list of interceptors that are reused on the retry.
       dio: retryDio,
       retryDelays: const [
         Duration(seconds: 1),
@@ -31,5 +32,12 @@ class DioInterceptorFactory {
         Duration(seconds: 4),
       ],
     );
+
+    retryDio.interceptors.addAll([
+      ?authInterceptor,
+      retryInterceptor,
+    ]);
+
+    return retryInterceptor;
   }
 }
