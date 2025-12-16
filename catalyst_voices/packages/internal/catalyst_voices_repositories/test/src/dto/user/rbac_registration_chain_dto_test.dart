@@ -127,7 +127,10 @@ const _voterAndProposerJson = r'''
     {
       "previous_txn": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
       "purpose": "c9993e54-1ee1-41f7-ab99-3fdec865c744",
-      "report": "An error has occurred, the details of the error are ...",
+      "report": {
+        "kind": "Error",
+        "msg": "An error has occurred, the details of the error are ..."
+      },
       "slot": 1234567,
       "time": "2024-04-09T15:28:21+00:00",
       "txn_id": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",

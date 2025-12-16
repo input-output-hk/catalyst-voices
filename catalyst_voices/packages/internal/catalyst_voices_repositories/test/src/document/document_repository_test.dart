@@ -613,23 +613,31 @@ void main() {
       onPlatform: driftOnPlatforms,
     );
 
-    test('parseDocumentForImport exported with v0.0.1 signed document spec', () async {
-      final bytes = await SignedDocumentTestData.exportedProposalV0_0_1Bytes;
-      final document = await repository.parseDocumentForImport(data: bytes);
+    test(
+      'parseDocumentForImport exported with v0.0.1 signed document spec',
+      () async {
+        final bytes = await SignedDocumentTestData.exportedProposalV0_0_1Bytes;
+        final document = await repository.parseDocumentForImport(data: bytes);
 
-      expect(document.metadata.type, equals(DocumentType.proposalDocument));
-      expect(document.metadata.template, isNotNull);
-      expect(document.metadata.parameters, isNotEmpty);
-    });
+        expect(document.metadata.type, equals(DocumentType.proposalDocument));
+        expect(document.metadata.template, isNotNull);
+        expect(document.metadata.parameters, isNotEmpty);
+      },
+      onPlatform: driftOnPlatforms,
+    );
 
-    test('parseDocumentForImport exported with v0.0.4 signed document spec', () async {
-      final bytes = await SignedDocumentTestData.exportedProposalV0_0_4Bytes;
-      final document = await repository.parseDocumentForImport(data: bytes);
+    test(
+      'parseDocumentForImport exported with v0.0.4 signed document spec',
+      () async {
+        final bytes = await SignedDocumentTestData.exportedProposalV0_0_4Bytes;
+        final document = await repository.parseDocumentForImport(data: bytes);
 
-      expect(document.metadata.type, equals(DocumentType.proposalDocument));
-      expect(document.metadata.template, isNotNull);
-      expect(document.metadata.parameters, isNotEmpty);
-    });
+        expect(document.metadata.type, equals(DocumentType.proposalDocument));
+        expect(document.metadata.template, isNotNull);
+        expect(document.metadata.parameters, isNotEmpty);
+      },
+      onPlatform: driftOnPlatforms,
+    );
   });
 }
 
