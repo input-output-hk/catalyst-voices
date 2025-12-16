@@ -28,18 +28,18 @@ final class ApiServices {
     interceptorFactory ??= DioInterceptorFactory();
 
     final catDioOptions = BaseOptions(contentType: ContentTypes.applicationJson);
-    final rbacAuthInterceptor = interceptorFactory.rbacAuthInterceptor(authTokenProvider);
-    final retryInterceptor = interceptorFactory.retryInterceptor(rbacAuthInterceptor);
-    final catLogInterceptor = interceptorFactory.logInterceptor(Logger('CatApiServices'));
+    final authInterceptor = interceptorFactory.authInterceptor(authTokenProvider);
+    final retryInterceptor = interceptorFactory.retryInterceptor(authInterceptor);
+    final logInterceptor = interceptorFactory.logInterceptor(Logger('CatApiServices'));
 
     final gateway = CatGatewayService.dio(
       baseUrl: env.app.replace(path: '/api/gateway').toString(),
       options: catDioOptions,
       interceptClient: interceptClient,
       interceptors: [
-        ?rbacAuthInterceptor,
+        ?authInterceptor,
         retryInterceptor,
-        ?catLogInterceptor,
+        ?logInterceptor,
       ],
     );
     final reviews = CatReviewsService.dio(
@@ -47,9 +47,9 @@ final class ApiServices {
       options: catDioOptions,
       interceptClient: interceptClient,
       interceptors: [
-        ?rbacAuthInterceptor,
+        ?authInterceptor,
         retryInterceptor,
-        ?catLogInterceptor,
+        ?logInterceptor,
       ],
     );
     final status = CatStatusService.dio(
@@ -57,7 +57,7 @@ final class ApiServices {
       interceptClient: interceptClient,
       interceptors: [
         retryInterceptor,
-        ?catLogInterceptor,
+        ?logInterceptor,
       ],
     );
 

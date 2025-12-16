@@ -7,14 +7,14 @@ import 'package:flutter/foundation.dart';
 
 /// Creates common [Dio] client [Interceptor]s.
 class DioInterceptorFactory {
+  Interceptor? authInterceptor(AuthTokenProvider? authTokenProvider) {
+    return authTokenProvider != null ? RbacAuthInterceptor(authTokenProvider) : null;
+  }
+
   Interceptor? logInterceptor([Logger? logger]) {
     logger ??= Logger('LogInterceptor');
 
     return kDebugMode ? LogInterceptor(logPrint: logger.fine) : null;
-  }
-
-  Interceptor? rbacAuthInterceptor(AuthTokenProvider? authTokenProvider) {
-    return authTokenProvider != null ? RbacAuthInterceptor(authTokenProvider) : null;
   }
 
   Interceptor retryInterceptor([Interceptor? authInterceptor]) {
