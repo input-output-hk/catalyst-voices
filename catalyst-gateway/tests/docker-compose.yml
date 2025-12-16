@@ -100,6 +100,7 @@ services:
       - YES_I_REALLY_WANT_TO_PANIC=panic attack
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
+      - TELEMETRY_ENABLED=true
       # cspell: disable
       - ADMIN_CATALYST_ID=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
       # cspell: enable
