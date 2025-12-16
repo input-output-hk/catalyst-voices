@@ -29,6 +29,38 @@ abstract interface class ProposalDocumentDataLocalSource {
     required ProposalsTotalAskFilters filters,
   });
 
+  /// Retrieves titles for all versions of the specified proposals from signed documents.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  });
+
+  /// Retrieves titles for all versions of the specified proposals from local drafts.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  });
+
   Future<void> updateProposalFavorite({
     required String id,
     required bool isFavorite,
