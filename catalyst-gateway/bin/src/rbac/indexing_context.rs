@@ -99,7 +99,8 @@ impl RbacBlockIndexingContext {
         }
     }
 
-    /// Marks the given stake address as removed so it will be excluded from `find_address` lookups.
+    /// Marks the given stake address as removed so it will be excluded from
+    /// `find_address` lookups.
     pub fn remove_address(
         &mut self,
         address: &StakeAddress,
