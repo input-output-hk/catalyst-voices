@@ -56,10 +56,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   Future<void> getAllData() async {
-    await (
-      getMostRecentProposals(),
-      getCurrentCampaign(),
-    ).wait;
+    getMostRecentProposals();
+    await getCurrentCampaign();
   }
 
   Future<void> getCurrentCampaign() async {
@@ -82,7 +80,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     }
   }
 
-  Future<void> getMostRecentProposals() async {
+  void getMostRecentProposals() {
     emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
 
     _watchMostRecentProposals();

@@ -66,9 +66,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       latestUpdate: isRecentEnabled != null
           ? Optional(isRecentEnabled ? _recentProposalsMaxAge : null)
           : null,
-      campaign: campaign != null
-          ? Optional(ProposalsCampaignFilters.from(campaign))
-          : const Optional.empty(),
+      campaign: Optional(
+        campaign != null
+            ? ProposalsCampaignFilters.from(campaign)
+            : const ProposalsCampaignFilters(categoriesIds: {}),
+      ),
     );
 
     if (_cache.filters == filters) {

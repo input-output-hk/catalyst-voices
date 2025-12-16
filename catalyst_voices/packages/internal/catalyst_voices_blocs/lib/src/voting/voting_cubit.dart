@@ -52,9 +52,11 @@ final class VotingCubit extends Cubit<VotingState>
       categoryId: categoryId,
       searchQuery: searchQuery,
       latestUpdate: const Optional.empty(),
-      campaign: campaign != null
-          ? Optional(ProposalsCampaignFilters.from(campaign))
-          : const Optional.empty(),
+      campaign: Optional(
+        campaign != null
+            ? ProposalsCampaignFilters.from(campaign)
+            : const ProposalsCampaignFilters(categoriesIds: {}),
+      ),
       voteBy: _cache.tab == VotingPageTab.votedOn
           ? Optional(_cache.activeAccountId)
           : const Optional.empty(),
