@@ -587,7 +587,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
 
     // if there is no previous authors then it can fallback to originalAuthors
-    final prevAutors = prevMetadata?.authors ?? rawProposal.originalAuthors;
+    final prevAuthors = prevMetadata?.authors ?? rawProposal.originalAuthors;
 
     final actionsDocs = await _documentRepository.getProposalSubmissionActions(
       referencing: proposalId.toLoose(),
@@ -614,7 +614,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       castedVote: castedVote,
       collaboratorsActions: proposalCollaboratorsActions,
       prevCollaborators: prevMetadata?.collaborators ?? [],
-      prevAuthors: prevAutors,
+      prevAuthors: prevAuthors,
       action: action,
     );
   }
