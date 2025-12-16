@@ -263,9 +263,7 @@ final class DatabaseDocumentsDataSource
   Stream<int> watchLocalDraftProposalsCount({
     required CatalystId author,
   }) {
-    return _database.proposalsV2Dao
-        .watchLocalDraftProposalsCount(author: author)
-        .distinct();
+    return _database.proposalsV2Dao.watchLocalDraftProposalsCount(author: author).distinct();
   }
 
   @override

@@ -144,7 +144,10 @@ void main() {
 
         // When
         final briefsStream = proposalService.watchWorkspaceProposalsBrief(filters: filters);
-        final countStream = proposalService.watchProposalsCountV2(filters: filters, includeLocals: true);
+        final countStream = proposalService.watchProposalsCountV2(
+          filters: filters,
+          includeLocals: true,
+        );
 
         // Then - verify count matches list length
         final briefs = await briefsStream.first;
