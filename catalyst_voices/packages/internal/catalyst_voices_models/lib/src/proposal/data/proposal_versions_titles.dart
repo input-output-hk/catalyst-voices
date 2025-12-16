@@ -11,6 +11,13 @@ final class ProposalVersionsTitles extends Equatable {
 
   const ProposalVersionsTitles.empty() : proposalVersions = const {};
 
+  factory ProposalVersionsTitles.fromList(List<ProposalVersionsTitles> value) {
+    final newProposalVersions = {
+      for (final item in value) ...item.proposalVersions,
+    };
+    return ProposalVersionsTitles(newProposalVersions);
+  }
+
   @override
   List<Object?> get props => [proposalVersions];
 }
