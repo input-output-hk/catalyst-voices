@@ -581,14 +581,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final prevVersion = await _proposalsLocalSource.getPreviousOf(id: proposalId);
 
-    // TODO(LynxLynxx): call getMetadata
-    final prevMetadata = DocumentDataMetadata.proposal(
-      id: prevVersion!,
-      template: templateData!.id as SignedDocumentRef,
-      parameters: const DocumentParameters(),
-      authors: const [],
-      collaborators: const [],
-    );
+    DocumentDataMetadata? prevMetadata;
+    if (prevVersion != null) {
+      prevMetadata = await _documentRepository.getDocumentMetadata(id: prevVersion);
+    }
+
+    // if there is no previous authors then it can fallback to originalAuthors
+    final prevAutors = prevMetadata?.authors ?? rawProposal.originalAuthors;
 
     final actionsDocs = await _documentRepository.getProposalSubmissionActions(
       referencing: proposalId.toLoose(),
@@ -614,8 +613,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       draftVote: draftVote,
       castedVote: castedVote,
       collaboratorsActions: proposalCollaboratorsActions,
-      prevCollaborators: prevMetadata.collaborators ?? [],
-      prevAuthors: prevMetadata.authors ?? [],
+      prevCollaborators: prevMetadata?.collaborators ?? [],
+      prevAuthors: prevAutors,
       action: action,
     );
   }

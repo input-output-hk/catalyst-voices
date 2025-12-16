@@ -100,10 +100,12 @@ final class ProposalCubit extends Cubit<ProposalState>
     _cache = _cache.copyWith(ref: Optional(id));
     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
     // We don't call distinct() here as we need to emit loading off user loads proposal that still not exists
-    _proposalSub = _proposalService.watchProposal(
-      id: id,
-      originalAuthor: _cache.activeAccountId,
-    ).listen(_handleProposalData);
+    _proposalSub = _proposalService
+        .watchProposal(
+          id: id,
+          originalAuthor: _cache.activeAccountId,
+        )
+        .listen(_handleProposalData);
   }
 
   Future<void> rejectInvitation() async {
