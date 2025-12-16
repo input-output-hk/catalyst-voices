@@ -6,7 +6,14 @@ import 'package:catalyst_voices_repositories/src/document/source/proposal_docume
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
+
+typedef _ProposalDataComponents = (
+  RawProposal? rawProposal,
+  List<Vote> draftVotes,
+  List<Vote> castedVotes,
+);
 
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
 /// provides additional methods specific to proposals.
@@ -79,6 +86,14 @@ abstract interface class ProposalRepository {
   Stream<List<ProposalBriefData>> watchLocalDraftProposalsBrief({
     required CatalystId author,
   });
+
+  /// Watches a single proposal by its reference.
+  ///
+  /// Returns a reactive stream that emits [ProposalDataV2] whenever the
+  /// proposal data changes (document, actions, votes, favorites).
+  ///
+  /// Emits `null` if the proposal is not found.
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
 
   /// Watches for [ProposalSubmissionAction] that were made on [referencing] document.
   ///
@@ -320,6 +335,34 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id}) {
+    // 1. The Data Stream - raw proposal from database
+    final proposalStream = _proposalsLocalSource.watchRawProposalData(id: id);
+
+    // 2. The Trigger Stream - watch action documents for collaborator updates
+    final actionTrigger = _documentRepository.watchCount(
+      type: DocumentType.proposalActionDocument,
+    );
+
+    // 3. Local ballot votes
+    final draftVotes = _ballotBuilder.watchVotes;
+
+    // 4. Casted votes stream
+    final castedVotes = _castedVotesObserver.watchCastedVotes;
+
+    // 5. Combine and assemble ProposalDataV2
+    return Rx.combineLatest4(
+      proposalStream,
+      actionTrigger,
+      draftVotes,
+      castedVotes,
+      (rawProposal, _, draftVotes, castedVotes) => (rawProposal, draftVotes, castedVotes),
+    ).switchMap(
+      (components) => Stream.fromFuture(_assembleProposalData(components)),
+    );
+  }
+
+  @override
   Stream<ProposalPublish?> watchProposalPublish({
     required DocumentRef referencing,
   }) {
@@ -512,6 +555,79 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }).toList();
   }
 
+  Future<ProposalDataV2?> _assembleProposalData(
+    _ProposalDataComponents components,
+  ) async {
+    final rawProposal = components.$1;
+
+    if (rawProposal == null) {
+      return null;
+    }
+
+    final draftVotesMap = Map.fromEntries(
+      components.$2.map((e) => MapEntry(e.proposal, e)),
+    );
+    final castedVotesMap = Map.fromEntries(
+      components.$3.map((e) => MapEntry(e.proposal, e)),
+    );
+
+    final proposalId = rawProposal.proposal.id;
+    final templateData = rawProposal.template;
+
+    final proposalOrDocument = templateData == null
+        ? ProposalOrDocument.data(rawProposal.proposal)
+        : () {
+            final template = ProposalTemplateFactory.create(templateData);
+            final proposal = ProposalDocumentFactory.create(
+              rawProposal.proposal,
+              template: template,
+            );
+            return ProposalOrDocument.proposal(proposal);
+          }();
+    final draftVote = draftVotesMap[proposalId];
+    final castedVote = castedVotesMap[proposalId];
+
+    final prevVersion = await _proposalsLocalSource.getPreviousOf(id: proposalId);
+
+    // TODO(LynxLynxx): call getMetadata
+    final prevMetadata = DocumentDataMetadata.proposal(
+      id: prevVersion!,
+      template: templateData!.id as SignedDocumentRef,
+      parameters: const DocumentParameters(),
+      authors: const [],
+      collaborators: const [],
+    );
+
+    final actionsDocs = await _documentRepository.getProposalSubmissionActions(
+      referencing: proposalId.toLoose(),
+      authors: rawProposal.originalAuthors,
+    );
+
+    final action = _resolveProposalAction(
+      actionDocs: actionsDocs,
+      proposalId: proposalId,
+    );
+
+    final isFinal = action == ProposalSubmissionAction.aFinal;
+
+    final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
+      // if proposal is final find actions for specific version
+      proposalsRefs: [if (isFinal) proposalId else proposalId.toLoose()],
+    );
+    final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
+
+    return ProposalDataV2.build(
+      data: rawProposal,
+      proposalOrDocument: proposalOrDocument,
+      draftVote: draftVote,
+      castedVote: castedVote,
+      collaboratorsActions: proposalCollaboratorsActions,
+      prevCollaborators: prevMetadata.collaborators ?? [],
+      prevAuthors: prevMetadata.authors ?? [],
+      action: action,
+    );
+  }
+
   ProposalSubmissionAction? _buildProposalActionData(
     DocumentData? action,
   ) {
@@ -544,5 +660,50 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
+  }
+
+  /// Resolves the effective action for a specific proposal version.
+  ///
+  /// [actionDocs] will be sorted from latest to oldest by version.
+  /// [proposalId] is the specific proposal version to find the action for.
+  ///
+  /// Returns:
+  /// - `ProposalSubmissionAction.hide` if the latest action is hide
+  /// - The action for [proposalId] if it's not hide
+  /// - Another non-hide action referencing [proposalId] if the matching action is hide but not latest
+  /// - `null` if no suitable action is found
+  ProposalSubmissionAction? _resolveProposalAction({
+    required List<DocumentData> actionDocs,
+    required DocumentRef proposalId,
+  }) {
+    if (actionDocs.isEmpty) return null;
+
+    // Sort from latest to oldest by version
+    final sortedDocs = actionDocs.sorted(
+      (a, b) => b.metadata.id.compareTo(a.metadata.id),
+    );
+
+    final latestActionDoc = sortedDocs.first;
+    final latestAction = _buildProposalActionData(latestActionDoc);
+
+    // If latest action is hide, return hide
+    if (latestAction == ProposalSubmissionAction.hide) {
+      return ProposalSubmissionAction.hide;
+    }
+
+    // Find all actions referencing proposalRef
+    final matchingDocs = sortedDocs.where(
+      (doc) => doc.metadata.ref?.contains(proposalId) ?? false,
+    );
+
+    // Find a non-hide action for this proposal, or return null
+    for (final doc in matchingDocs) {
+      final action = _buildProposalActionData(doc);
+      if (action != ProposalSubmissionAction.hide) {
+        return action;
+      }
+    }
+
+    return null;
   }
 }

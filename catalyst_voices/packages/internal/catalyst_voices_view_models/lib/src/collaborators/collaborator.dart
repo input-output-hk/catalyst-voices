@@ -14,7 +14,7 @@ final class Collaborator extends Equatable {
     required this.status,
   });
 
-  factory Collaborator.fromBriefData(ProposalBriefDataCollaborator briefData) {
+  factory Collaborator.fromBriefData(ProposalDataCollaborator briefData) {
     return Collaborator(
       id: briefData.id,
       status: briefData.status,

@@ -95,6 +95,11 @@ abstract interface class DocumentRepository {
   /// Returns latest matching [DocumentRef] version with same id as [id].
   Future<DocumentRef?> getLatestOf({required DocumentRef id});
 
+  Future<List<DocumentData>> getProposalSubmissionActions({
+    DocumentRef? referencing,
+    List<CatalystId>? authors,
+  });
+
   /// Returns count of documents matching [referencing] id and [type].
   Future<int> getRefCount({
     required DocumentRef referencing,
@@ -352,6 +357,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     return _localDocuments.getLatestRefOf(id);
+  }
+
+  @override
+  Future<List<DocumentData>> getProposalSubmissionActions({
+    DocumentRef? referencing,
+    List<CatalystId>? authors,
+  }) {
+    return _localDocuments.findAll(
+      type: DocumentType.proposalActionDocument,
+      referencing: referencing,
+      authors: authors,
+      limit: 999,
+    );
   }
 
   @override
