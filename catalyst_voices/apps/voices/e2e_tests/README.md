@@ -8,21 +8,21 @@ and the app will run locally.
 
 These tests cover browser-based end-to-end workflows for the Catalyst Voices application:
 
-* **Cardano wallet integration testing** (Lace, Eternl, Yoroi, Nufi)
-* **User authentication and account management**
-* **Cross-environment testing** (dev, preprod, prod)
-* **Browser extension interaction**
-* **Application title and basic navigation**
+- **Cardano wallet integration testing** (Lace, Eternl, Yoroi, Nufi)
+- **User authentication and account management**
+- **Cross-environment testing** (dev, preprod, prod)
+- **Browser extension interaction**
+- **Application title and basic navigation**
 
 ## Building & Setup
 
 ### Prerequisites
 
-* **Node.js** (v18 or higher)
-* **npm** package manager
-* **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/)
+- **Node.js** (v18 or higher)
+- **npm** package manager
+- **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/)
   or download using [puppeteer](https://pptr.dev/browsers-api))
-* Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
+- Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
 
 ### Installation
 
@@ -85,32 +85,32 @@ test("test", async ({ testModel }) => {
 
 1. Navigate to the e2e tests directory
 
-```bash
-cd catalyst_voices/apps/voices/e2e_tests
-```
+   ```bash
+   cd catalyst_voices/apps/voices/e2e_tests
+   ```
 
 2. Build all images
 
-```bash
-earthly +all-images
-```
+   ```bash
+   earthly +all-images
+   ```
 
 3. Spin up Gateway and Voices
 
-```bash
-docker compose up nginx
-```
+   ```bash
+   docker compose up nginx
+   ```
 
 4. Wait until the Gateway is healthy
 
-```bash
-curl --location 'http://localhost:80/api/gateway/v1/health/ready'
-```
+   ```bash
+   curl --location 'http://localhost:80/api/gateway/v1/health/ready'
+   ```
 
-This should return 204.
+   This should return 204.
 
 5. Run the tests
 
-```bash
-npx playwright test
-```
+   ```bash
+   npx playwright test
+   ```
