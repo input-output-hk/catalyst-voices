@@ -60,7 +60,7 @@ final class Campaign extends Equatable {
       fundNumber: 15,
       timeline: f15StaticCampaignTimeline,
       publish: CampaignPublish.published,
-      categories: f15StaticCampaignCategories,
+      categories: f15DynamicCampaignCategories,
     );
   }
 
