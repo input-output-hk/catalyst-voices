@@ -1,7 +1,6 @@
 import argparse
 import os
 import requests
-import time
 import json
 from pathlib import Path
 
@@ -9,7 +8,6 @@ from catalyst_python.admin import AdminKey
 from catalyst_python.ed25519 import Ed25519Keys
 from catalyst_python.signed_doc import (
     SignedDocument,
-    DocumentRef,
     brand_parameters_form_template_doc,
     brand_parameters_doc,
     campaign_parameters_form_template_doc,
@@ -45,15 +43,13 @@ def read_admin_key(admin_key_env: str, network: str) -> AdminKey:
     return AdminKey(key=key, network="cardano", subnet=network)
 
 
-def publish_document(
-    url: str, timeout: int, doc: SignedDocument, token: str
-):
+def publish_document(url: str, timeout: int, doc: SignedDocument, token: str):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/cbor"}
-    data = bytes.fromhex(doc.build_and_sign())
+    data = bytes.fromhex(doc.hex_cbor)
 
     resp = requests.put(url, timeout=timeout, headers=headers, data=data)
     resp.raise_for_status()
-        
+
 
 def setup_fund(env: str):
     """Read config files from the specified `env`, then apply the configs."""
@@ -79,7 +75,7 @@ def setup_fund(env: str):
             env_dir, brand_parameters_form_template_settings["path"]
         ),
         admin_key=admin,
-    )
+    ).build_and_sign()
     docs_to_publish.append(brand_parameters_form_template)
 
     brand_parameters_settings = settings["brand"]["parameters"]
@@ -87,7 +83,7 @@ def setup_fund(env: str):
         content=read_json_file(env_dir, brand_parameters_settings["path"]),
         brand_parameters_form_template_ref=brand_parameters_form_template.doc_ref(),
         admin_key=admin,
-    )
+    ).build_and_sign()
     docs_to_publish.append(brand_parameters)
 
     for campaign in settings["brand"]["campaigns"]:
@@ -100,7 +96,7 @@ def setup_fund(env: str):
             ),
             param_ref=brand_parameters.doc_ref(),
             admin_key=admin,
-        )
+        ).build_and_sign()
         docs_to_publish.append(campaign_parameters_form_template)
 
         campaign_parameters_settings = campaign["parameters"]
@@ -109,7 +105,7 @@ def setup_fund(env: str):
             campaign_parameters_form_template_doc=campaign_parameters_form_template.doc_ref(),
             param_ref=brand_parameters.doc_ref(),
             admin_key=admin,
-        )
+        ).build_and_sign()
         docs_to_publish.append(campaign_parameters)
 
         for category in campaign["categories"]:
@@ -122,7 +118,7 @@ def setup_fund(env: str):
                 ),
                 param_ref=campaign_parameters.doc_ref(),
                 admin_key=admin,
-            )
+            ).build_and_sign()
             docs_to_publish.append(category_parameters_form_template)
 
             category_parameters_settings = category["parameters"]
@@ -131,7 +127,7 @@ def setup_fund(env: str):
                 category_parameters_form_template_doc=category_parameters_form_template.doc_ref(),
                 param_ref=campaign_parameters.doc_ref(),
                 admin_key=admin,
-            )
+            ).build_and_sign()
             docs_to_publish.append(category_parameters)
 
             proposal_form_template_settings = category["proposal_form_template"]
@@ -141,7 +137,7 @@ def setup_fund(env: str):
                 ),
                 param_ref=category_parameters.doc_ref(),
                 admin_key=admin,
-            )
+            ).build_and_sign()
             docs_to_publish.append(proposal_form_template)
 
             proposal_comment_form_template_settings = category[
@@ -153,7 +149,7 @@ def setup_fund(env: str):
                 ),
                 param_ref=category_parameters.doc_ref(),
                 admin_key=admin,
-            )
+            ).build_and_sign()
             docs_to_publish.append(proposal_comment_form_template)
 
     for doc in docs_to_publish:
