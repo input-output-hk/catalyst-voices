@@ -67,13 +67,16 @@ abstract interface class DocumentRepository {
     required SignedDocumentRef id,
   });
 
-  /// When version is not specified in [id] method will try to return latest
-  /// version of document matching [id].
+  /// Retrieves the data for a specific document, resolving the correct version.
   ///
-  /// If document does not exist it will throw [DocumentNotFoundException].
+  /// If [id] is [DocumentRef.isExact], fetches that specific version.
+  /// If [id] is [DocumentRef.isLoose], retrieves the most recent version based on [DocumentData]
+  /// ver timestamp (UUIDv7).
   ///
-  /// * If [DocumentRef] is [SignedDocumentRef] it will look for this document in local storage.
-  /// * If [DocumentRef] is [DraftRef] it will look for this document in local storage.
+  /// If [id] is [SignedDocumentRef], the method targets signed documents only
+  /// If [id] is [DraftRef], the method targets local-drafts only
+  ///
+  /// Returns the [DocumentData] matching the resolved reference, or `null` if not found.
   Future<DocumentData> getDocumentData({
     required DocumentRef id,
   });
@@ -671,9 +674,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentData?> _getSignedDocumentData({
     required SignedDocumentRef id,
   }) async {
-    // if version is not specified we're asking remote for latest version
-    // if remote does not know about this id its probably draft so
-    // local will return latest version
+    // if version is not specified we're asking remote for latest version.
     if (!id.isExact) {
       final latestVersion = await _remoteDocuments.getLatestVersion(id.id);
       id = id.copyWith(ver: Optional(latestVersion));
