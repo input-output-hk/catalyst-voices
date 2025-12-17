@@ -1,7 +1,0 @@
-global:
-  scrape_interval: 60s
-
-scrape_configs:
-  - job_name: 'otel-collector'
-    static_configs:
-      - targets: ['192.168.1.125:9090', '192.168.1.125:3030']

@@ -95,3 +95,11 @@ export INTERNAL_API_KEY="123"
 export EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost:5432/CatalystEventDev"
 ./catalyst-gateway/target/release/cat-gateway run
 ```
+
+To enable optional telemetry, the following environment variables must be added:
+
+```sh
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+export OTEL_SERVICE_NAME=cat-gateway
+export TELEMETRY_ENABLED=true
+```
