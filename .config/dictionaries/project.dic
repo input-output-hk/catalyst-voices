@@ -11,6 +11,7 @@ androidx
 anypolicy
 apirequest
 appbar
+appender
 appspot
 Arbritrary
 ARCHS
@@ -151,6 +152,7 @@ Hackathons
 headful
 headlessui
 healthz
+healthcheckv
 HIDPI
 hotfixes
 hotspots
@@ -175,6 +177,7 @@ iohk
 IPFS
 iphoneos
 iphonesimulator
+jaegertracing
 jdbc
 jetbrains
 jlumbroso
