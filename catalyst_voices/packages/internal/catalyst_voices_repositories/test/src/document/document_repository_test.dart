@@ -448,7 +448,7 @@ void main() {
         'categories refs are filtered out',
         () async {
           // Given
-          final categoriesRefs = allConstantDocumentRefs
+          final categoriesRefs = constantDocumentRefsPerCampaign(Campaign.f14Ref)
               .expand(
                 (element) => [
                   element.category.toTyped(DocumentType.categoryParametersDocument),

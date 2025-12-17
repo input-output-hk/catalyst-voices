@@ -283,7 +283,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required Campaign campaign,
   }) async {
     final allRefs = await _remoteDocuments.index(campaign: campaign).then(_uniqueTypedRefs);
-    final allConstRefs = allConstantDocumentRefs.expand((element) => element.all);
+    final allConstRefs = constantDocumentRefsPerCampaign(
+      campaign.selfRef,
+    ).expand((element) => element.all);
 
     final nonConstRefs = allRefs
         .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
