@@ -87,7 +87,7 @@ void main() {
 
       // Then
       verify(() => authTokenProvider.createRbacToken(forceRefresh: true)).called(1);
-      expect(options.headers['Retry-Count'], '1');
+      expect(options.headers['Rbac-Retry-Count'], '1');
     });
 
     test('403 response code triggers force token update', () async {
@@ -106,14 +106,14 @@ void main() {
 
       // Then
       verify(() => authTokenProvider.createRbacToken(forceRefresh: true)).called(1);
-      expect(options.headers['Retry-Count'], '1');
+      expect(options.headers['Rbac-Retry-Count'], '1');
     });
 
     test('token refresh gives up after 1st try', () async {
       // Given
       final options = RequestOptions(
         path: '/test',
-        headers: {'Retry-Count': '1'},
+        headers: {'Rbac-Retry-Count': '1'},
       );
       final dioError = DioException(
         requestOptions: options,
@@ -129,7 +129,7 @@ void main() {
       // Then
       verify(() => errorHandler.next(dioError)).called(1);
       verifyNever(() => authTokenProvider.createRbacToken(forceRefresh: true));
-      expect(options.headers['Retry-Count'], '1');
+      expect(options.headers['Rbac-Retry-Count'], '1');
     });
   });
 }

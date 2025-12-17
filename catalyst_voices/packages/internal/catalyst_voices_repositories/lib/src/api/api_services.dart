@@ -1,10 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' show AppEnvironmentType;
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
+import 'package:catalyst_voices_repositories/src/api/interceptors/dio_interceptor_factory.dart';
 import 'package:catalyst_voices_repositories/src/common/content_types.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:logging/logging.dart';
 
 typedef InterceptClient = void Function(Dio dio);
 
@@ -21,24 +21,25 @@ final class ApiServices {
 
   factory ApiServices.dio({
     required AppEnvironmentType env,
+    DioInterceptorFactory? interceptorFactory,
     AuthTokenProvider? authTokenProvider,
     InterceptClient? interceptClient,
   }) {
-    final catApiServiceLogger = Logger('CatApiServices');
+    interceptorFactory ??= DioInterceptorFactory();
+
     final catDioOptions = BaseOptions(contentType: ContentTypes.applicationJson);
-    final rbacAuthInterceptor = authTokenProvider != null
-        ? RbacAuthInterceptor(authTokenProvider)
-        : null;
-    final catLogInterceptor = kDebugMode
-        ? LogInterceptor(logPrint: catApiServiceLogger.fine)
-        : null;
+    final authInterceptor = interceptorFactory.authInterceptor(authTokenProvider);
+    final retryInterceptor = interceptorFactory.retryInterceptor(authInterceptor);
+    final logInterceptor = interceptorFactory.logInterceptor(Logger('CatApiServices'));
+
     final gateway = CatGatewayService.dio(
       baseUrl: env.app.replace(path: '/api/gateway').toString(),
       options: catDioOptions,
       interceptClient: interceptClient,
       interceptors: [
-        ?rbacAuthInterceptor,
-        ?catLogInterceptor,
+        ?authInterceptor,
+        retryInterceptor,
+        ?logInterceptor,
       ],
     );
     final reviews = CatReviewsService.dio(
@@ -46,14 +47,18 @@ final class ApiServices {
       options: catDioOptions,
       interceptClient: interceptClient,
       interceptors: [
-        ?rbacAuthInterceptor,
-        ?catLogInterceptor,
+        ?authInterceptor,
+        retryInterceptor,
+        ?logInterceptor,
       ],
     );
     final status = CatStatusService.dio(
       baseUrl: env.status.toString(),
       interceptClient: interceptClient,
-      interceptors: [?catLogInterceptor],
+      interceptors: [
+        retryInterceptor,
+        ?logInterceptor,
+      ],
     );
 
     return ApiServices.internal(
