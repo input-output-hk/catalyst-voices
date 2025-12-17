@@ -196,7 +196,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required ProposalBuilderMetadata proposalMetadata,
     required CampaignCategory category,
   }) async {
-    final commentTemplate = await _commentService.getCommentTemplateFor(category: category.selfRef);
+    final commentTemplate = await _commentService.getCommentTemplate(category: category.selfRef);
 
     _cache = _cache.copyWith(
       proposalBuilder: Optional(proposalDocument.toBuilder()),

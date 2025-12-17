@@ -88,9 +88,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
       final category = await _campaignService.getCategory(proposal.document.metadata.parameters);
-      final commentTemplate = await _commentService.getCommentTemplateFor(
-        category: category.selfRef,
-      );
+      final commentTemplate = await _commentService.getCommentTemplate(category: category.selfRef);
       final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _cache = _cache.copyWith(
