@@ -24,7 +24,7 @@ from catalyst_python.signed_doc import (
 
 
 def publish_document(doc: SignedDocument, token: str):
-    resp = document.put(data=doc.build_and_sign(), token=token)
+    resp = document.put(data=doc.hex_cbor, token=token)
     assert resp.status_code == 201, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
@@ -32,33 +32,39 @@ def publish_document(doc: SignedDocument, token: str):
 
 @pytest.fixture(scope="session")
 def proposal_doc_factory(admin_key, rbac_chain_factory):
-    brand_template = brand_parameters_form_template_doc({"type": "object"}, admin_key)
+    brand_template = brand_parameters_form_template_doc(
+        {"type": "object"}, admin_key
+    ).build_and_sign()
     publish_document(brand_template, admin_key.auth_token())
 
-    brand = brand_parameters_doc({}, brand_template, admin_key)
+    brand = brand_parameters_doc({}, brand_template, admin_key).build_and_sign()
     publish_document(brand, admin_key.auth_token())
 
     campaign_template = campaign_parameters_form_template_doc(
         {"type": "object"}, brand, admin_key
-    )
+    ).build_and_sign()
     publish_document(campaign_template, admin_key.auth_token())
 
-    campaign = campaign_parameters_doc({}, campaign_template, brand, admin_key)
+    campaign = campaign_parameters_doc(
+        {}, campaign_template, brand, admin_key
+    ).build_and_sign()
     publish_document(campaign, admin_key.auth_token())
 
     category_template = category_parameters_form_template_doc(
         {"type": "object"}, campaign, admin_key
-    )
+    ).build_and_sign()
     publish_document(category_template, admin_key.auth_token())
 
-    category = category_parameters_doc({}, category_template, campaign, admin_key)
+    category = category_parameters_doc(
+        {}, category_template, campaign, admin_key
+    ).build_and_sign()
     publish_document(category, admin_key.auth_token())
 
     with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
         proposal_template_content = json.load(json_file)
     proposal_template = proposal_form_template_doc(
         proposal_template_content, category, admin_key
-    )
+    ).build_and_sign()
     publish_document(proposal_template, admin_key.auth_token())
 
     rbac_chain = rbac_chain_factory()
@@ -66,7 +72,9 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     def proposal_doc_factory() -> SignedDocument:
         with open("./test_data/signed_docs/proposal.json", "r") as json_file:
             proposal_content = json.load(json_file)
-        doc = proposal_doc(proposal_content, proposal_template, category, rbac_chain)
+        doc = proposal_doc(
+            proposal_content, proposal_template, category, rbac_chain
+        ).build_and_sign()
         publish_document(doc, rbac_chain.auth_token())
         return doc
 
