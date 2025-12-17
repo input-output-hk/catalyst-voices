@@ -33,11 +33,11 @@ final class RbacRegistrationChain {
   final List<RbacRoleData> roles;
 
   /// A list of invalid registrations.
-  final List<InvalidRegistration> invalid;
+  final List<InvalidRegistration>? invalid;
 
   /// A list of stake addresses of the chain.
   @JsonKey(name: 'stake_addresses')
-  final List<RbacStakeAddressInfo> stakeAddresses;
+  final List<RbacStakeAddressInfo>? stakeAddresses;
 
   const RbacRegistrationChain({
     required this.catalystId,
