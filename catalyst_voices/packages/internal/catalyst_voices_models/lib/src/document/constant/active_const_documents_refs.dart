@@ -1,3 +1,3 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
-const activeCampaignRef = Campaign.dynamicF15Ref;
+const activeCampaignRef = Campaign.f15Ref;
