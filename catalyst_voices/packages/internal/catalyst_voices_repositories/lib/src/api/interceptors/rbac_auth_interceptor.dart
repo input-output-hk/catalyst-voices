@@ -16,7 +16,7 @@ final _logger = Logger('RbacAuthInterceptor');
 /// - 403: The token is valid, we know who they are but either the timestamp is
 /// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor extends Interceptor {
-  static const _retryCountHeaderName = 'Retry-Count';
+  static const _retryCountHeaderName = 'Rbac-Retry-Count';
   static const _retryStatusCodes = [401, 403];
   static const _maxRetries = 1;
 
