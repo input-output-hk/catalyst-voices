@@ -18,7 +18,7 @@ final class RbacRoleData {
 
   /// A list of role encryption keys.
   @JsonKey(name: 'encryption_keys')
-  final List<KeyData> encryptionKeys;
+  final List<KeyData>? encryptionKeys;
 
   /// A list of role payment addresses.
   @JsonKey(name: 'payment_addresses')
@@ -27,14 +27,14 @@ final class RbacRoleData {
   /// A map of the extended data.
   /// Unlike other fields, we don't track history for this data.
   @JsonKey(name: 'extended_data')
-  final List<ExtendedData> extendedData;
+  final List<ExtendedData>? extendedData;
 
   const RbacRoleData({
     required this.roleId,
     required this.signingKeys,
-    required this.encryptionKeys,
     required this.paymentAddresses,
-    required this.extendedData,
+    this.encryptionKeys = const [],
+    this.extendedData = const [],
   });
 
   factory RbacRoleData.fromJson(Map<String, dynamic> json) => _$RbacRoleDataFromJson(json);
