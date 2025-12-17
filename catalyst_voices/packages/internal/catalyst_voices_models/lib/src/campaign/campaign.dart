@@ -46,7 +46,7 @@ final class Campaign extends Equatable {
 
   factory Campaign.dynamicF15() {
     return Campaign(
-      selfRef: f15Ref,
+      selfRef: dynamicF15Ref,
       name: 'Catalyst Fund15',
       description: '''TODO''',
       allFunds: MultiCurrencyAmount.list([
