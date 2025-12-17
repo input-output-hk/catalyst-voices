@@ -163,7 +163,8 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
   }
 }
 
-final class ProposalBriefDataVersion extends Equatable {
+final class ProposalBriefDataVersion extends Equatable
+    implements Comparable<ProposalBriefDataVersion> {
   final DocumentRef ref;
   final String? title;
 
@@ -172,8 +173,17 @@ final class ProposalBriefDataVersion extends Equatable {
     this.title,
   });
 
+  DateTime get createdAt => ref.ver!.dateTime;
+
   @override
   List<Object?> get props => [ref, title];
+
+  @override
+  int compareTo(ProposalBriefDataVersion other) {
+    final versionA = ref.ver ?? '';
+    final versionB = other.ref.ver ?? '';
+    return versionB.compareTo(versionA);
+  }
 }
 
 final class ProposalBriefDataVotes extends Equatable {
@@ -187,4 +197,10 @@ final class ProposalBriefDataVotes extends Equatable {
 
   @override
   List<Object?> get props => [draft, casted];
+}
+
+extension ProposalBriefDataVersionList on List<ProposalBriefDataVersion> {
+  int versionNumber(String version) {
+    return length - indexWhere((element) => element.ref.ver == version);
+  }
 }

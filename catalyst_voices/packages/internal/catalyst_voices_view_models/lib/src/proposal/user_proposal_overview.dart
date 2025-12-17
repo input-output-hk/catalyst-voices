@@ -40,9 +40,13 @@ final class UsersProposalOverview extends Equatable {
     required bool fromActiveCampaign,
     CatalystId? activeAccountId,
   }) {
-    final publish = _ProposalPublishExt.getStatus(
+    final publish = ProposalPublishExt.getStatus(
       isFinal: proposalData.isFinal,
       ref: proposalData.id,
+    );
+
+    final versions = proposalData.versions!.toViewModels(
+      finalVer: proposalData.isFinal ? proposalData.id.ver : null,
     );
 
     return UsersProposalOverview(
@@ -53,8 +57,7 @@ final class UsersProposalOverview extends Equatable {
       fundsRequested: proposalData.fundsRequested ?? Money.zero(currency: Currencies.fallback),
       publish: publish,
       iteration: proposalData.iteration,
-      // TODO(LynxLynxx): map versions when they will be implemented
-      versions: const [],
+      versions: versions,
       commentsCount: proposalData.commentsCount ?? 0,
       category: proposalData.categoryName ?? '',
       fundNumber: proposalData.fundNumber,
@@ -143,17 +146,5 @@ final class UsersProposalOverview extends Equatable {
       collaborators: collaborators ?? this.collaborators,
       ownership: ownership ?? this.ownership,
     );
-  }
-}
-
-extension _ProposalPublishExt on ProposalPublish {
-  static ProposalPublish getStatus({required bool isFinal, required DocumentRef ref}) {
-    if (isFinal) {
-      return ProposalPublish.submittedProposal;
-    } else if (!isFinal && DocumentRef is SignedDocumentRef) {
-      return ProposalPublish.publishedDraft;
-    } else {
-      return ProposalPublish.localDraft;
-    }
   }
 }

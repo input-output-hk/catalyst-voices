@@ -10,7 +10,6 @@ class UserProposalSection extends StatefulWidget {
   final String info;
   final String? learnMoreUrl;
   final String emptyTextMessage;
-  final WorkspaceProposalType type;
 
   const UserProposalSection({
     super.key,
@@ -19,7 +18,6 @@ class UserProposalSection extends StatefulWidget {
     required this.title,
     required this.info,
     this.learnMoreUrl,
-    this.type = WorkspaceProposalType.proposal,
   });
 
   @override
@@ -29,12 +27,10 @@ class UserProposalSection extends StatefulWidget {
 class _ListOfProposals extends StatelessWidget {
   final List<UsersProposalOverview> items;
   final String emptyTextMessage;
-  final WorkspaceProposalType type;
 
   const _ListOfProposals({
     required this.items,
     required this.emptyTextMessage,
-    required this.type,
   });
 
   @override
@@ -56,7 +52,6 @@ class _ListOfProposals extends StatelessWidget {
         return WorkspaceProposalCard(
           key: ValueKey(item.id),
           proposal: item,
-          type: type,
         );
       },
     );
@@ -67,13 +62,11 @@ class _ProposalVisibility extends StatelessWidget {
   final bool isExpanded;
   final List<UsersProposalOverview> items;
   final String emptyTextMessage;
-  final WorkspaceProposalType type;
 
   const _ProposalVisibility({
     required this.isExpanded,
     required this.items,
     required this.emptyTextMessage,
-    required this.type,
   });
 
   @override
@@ -85,7 +78,6 @@ class _ProposalVisibility extends StatelessWidget {
     return _ListOfProposals(
       items: items,
       emptyTextMessage: emptyTextMessage,
-      type: type,
     );
   }
 }
@@ -110,7 +102,6 @@ class _UserProposalSectionState extends State<UserProposalSection> {
           isExpanded: _isExpanded,
           items: widget.items,
           emptyTextMessage: widget.emptyTextMessage,
-          type: widget.type,
         ),
       ],
     );

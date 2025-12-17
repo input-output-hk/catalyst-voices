@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+
 enum ProposalPublish implements Comparable<ProposalPublish> {
   /// A proposal has not yet been published,
   /// it's stored only in the local storage.
@@ -43,4 +45,16 @@ enum ProposalSubmissionAction {
   /// `hide` is only actioned if sent by the author,
   /// for a collaborator its synonymous with `draft`.
   hide,
+}
+
+extension ProposalPublishExt on ProposalPublish {
+  static ProposalPublish getStatus({required bool isFinal, required DocumentRef ref}) {
+    if (isFinal) {
+      return ProposalPublish.submittedProposal;
+    } else if (!isFinal && DocumentRef is SignedDocumentRef) {
+      return ProposalPublish.publishedDraft;
+    } else {
+      return ProposalPublish.localDraft;
+    }
+  }
 }

@@ -97,4 +97,3 @@ export 'voting/voting_phase_progress_view_model.dart';
 export 'voting/voting_power_status_view_model.dart';
 export 'voting/voting_power_view_model.dart';
 export 'workspace/workspace_filters.dart';
-export 'workspace/workspace_page_tab.dart';

@@ -20,17 +20,22 @@ final class ProposalVersionViewModel extends Equatable {
     required this.versionNumber,
   });
 
-  factory ProposalVersionViewModel.fromProposalVersion(
-    ProposalVersion version, {
+  factory ProposalVersionViewModel.fromBriefData(
+    ProposalBriefDataVersion version, {
     required bool isLatest,
     required bool isLatestLocal,
     required int versionNumber,
+    required bool isFinal,
   }) {
+    final publish = ProposalPublishExt.getStatus(
+      isFinal: isFinal,
+      ref: version.ref,
+    );
     return ProposalVersionViewModel(
-      title: version.title,
-      id: version.id,
+      title: version.title ?? '',
+      id: version.ref,
       createdAt: version.createdAt,
-      publish: version.publish,
+      publish: publish,
       isLatest: isLatest,
       isLatestLocal: isLatestLocal,
       versionNumber: versionNumber,
@@ -73,14 +78,16 @@ extension ProposalVersionViewModelListExt on List<ProposalVersionViewModel> {
   ProposalVersionViewModel get latest => firstWhere((e) => e.isLatest);
 }
 
-extension ProposalVersionViewModelMapper on List<ProposalVersion> {
-  List<ProposalVersionViewModel> toViewModels() {
+extension ProposalVersionViewModelMapper on List<ProposalBriefDataVersion> {
+  List<ProposalVersionViewModel> toViewModels({String? finalVer}) {
+    sort();
     return map(
-      (version) => ProposalVersionViewModel.fromProposalVersion(
+      (version) => ProposalVersionViewModel.fromBriefData(
         version,
-        isLatest: first.id == version.id,
-        isLatestLocal: first.id == version.id && version.publish.isLocal,
-        versionNumber: versionNumber(version.id.ver!),
+        isLatest: first.ref == version.ref,
+        isLatestLocal: first.ref == version.ref && version.ref is DraftRef,
+        versionNumber: versionNumber(version.ref.ver!),
+        isFinal: finalVer == version.ref.ver,
       ),
     ).toList();
   }
