@@ -34,8 +34,8 @@ export class WalletConnectedPanel extends OnboardingBasePage {
   }
   async getWalletAddressValue() {
     await this.click(this.walletAddressClipboardIcon);
-    const address = await this.page.evaluate(() =>
-      navigator.clipboard.readText()
+    const address = await this.page.evaluate(async () =>
+      await navigator.clipboard.readText()
     );
     return address;
   }
