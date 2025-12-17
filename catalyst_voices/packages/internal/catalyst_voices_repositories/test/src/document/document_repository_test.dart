@@ -320,7 +320,7 @@ void main() {
           );
           final remoteRefs = [...refs, ...refs];
           final expectedRefs = <TypedDocumentRef>[
-            ...activeConstantDocumentRefs.expand(
+            ...constantDocumentRefsPerCampaign(Campaign.f14Ref).expand(
               (e) {
                 return e.allTyped.where((element) => element.type != categoryType);
               },
@@ -405,7 +405,7 @@ void main() {
         'remote loose refs to const documents are removed',
         () async {
           // Given
-          final constTemplatesRefs = activeConstantDocumentRefs
+          final constTemplatesRefs = constantDocumentRefsPerCampaign(Campaign.f14Ref)
               .expand(
                 (element) => [
                   element.proposal?.toTyped(DocumentType.proposalTemplate),
@@ -495,7 +495,7 @@ void main() {
             TypedDocumentRef(ref: ref, type: DocumentType.unknown),
           ];
           final expectedRefs = <TypedDocumentRef>[
-            ...activeConstantDocumentRefs.expand(
+            ...constantDocumentRefsPerCampaign(Campaign.f14Ref).expand(
               (refs) => refs.allTyped.where((e) => e.type != categoryType),
             ),
             TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),

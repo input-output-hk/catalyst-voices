@@ -304,7 +304,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
-      ...activeConstantDocumentRefs.expand(
+      ...constantDocumentRefsPerCampaign(campaign.selfRef).expand(
         (element) => element.allTyped.where((e) => !e.type.isCategory),
       ),
       ...allLatestRefs,
