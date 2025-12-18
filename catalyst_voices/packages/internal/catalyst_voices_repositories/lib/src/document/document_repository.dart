@@ -283,7 +283,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required Campaign campaign,
   }) async {
     final allRefs = await _remoteDocuments.index(campaign: campaign).then(_uniqueTypedRefs);
-    final allConstRefs = allConstantDocumentRefs.expand((element) => element.all);
+    final allConstRefs = constantDocumentRefsPerCampaign(
+      campaign.selfRef,
+    ).expand((element) => element.all);
 
     final nonConstRefs = allRefs
         .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
@@ -304,7 +306,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
-      ...activeConstantDocumentRefs.expand(
+      ...constantDocumentRefsPerCampaign(campaign.selfRef).expand(
         (element) => element.allTyped.where((e) => !e.type.isCategory),
       ),
       ...allLatestRefs,

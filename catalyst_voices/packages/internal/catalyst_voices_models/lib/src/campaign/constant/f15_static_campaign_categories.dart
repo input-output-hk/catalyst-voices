@@ -1,6 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
+/// Temporary list of campaign categories assigned to the [Campaign.dynamicF15Ref].
+final f15DynamicCampaignCategories = f15StaticCampaignCategories
+    .map((e) => e.copyWith(campaignRef: Campaign.dynamicF15Ref))
+    .toList();
+
 /// List of static [CampaignCategory] definitions.
 ///
 /// Categories will come from documents later.

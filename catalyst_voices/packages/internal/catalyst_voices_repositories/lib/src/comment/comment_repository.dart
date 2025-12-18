@@ -11,8 +11,8 @@ abstract interface class CommentRepository {
     DocumentRepository documentRepository,
   ) = DocumentsCommentRepository;
 
-  Future<CommentTemplate> getCommentTemplate({
-    required SignedDocumentRef ref,
+  Future<CommentTemplate?> getCommentTemplate({
+    required DocumentRef category,
   });
 
   Future<void> publishComment({
@@ -40,12 +40,19 @@ final class DocumentsCommentRepository implements CommentRepository {
   );
 
   @override
-  Future<CommentTemplate> getCommentTemplate({
-    required SignedDocumentRef ref,
+  Future<CommentTemplate?> getCommentTemplate({
+    required DocumentRef category,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(ref: ref);
+    final document = await _documentRepository.getLatestDocument(
+      type: DocumentType.commentTemplate,
+      category: category,
+    );
 
-    return _buildCommentTemplate(documentData: documentData);
+    if (document == null) {
+      return null;
+    }
+
+    return _buildCommentTemplate(documentData: document);
   }
 
   @override

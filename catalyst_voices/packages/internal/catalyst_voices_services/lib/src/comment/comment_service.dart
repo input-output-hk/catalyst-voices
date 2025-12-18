@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:collection/collection.dart';
 
 /// CommentService provides comment-related functionality.
 ///
@@ -14,7 +13,7 @@ abstract interface class CommentService {
   ) = CommentServiceImpl;
 
   /// [CommentTemplate] is connected to category.
-  Future<CommentTemplate> getCommentTemplateFor({
+  Future<CommentTemplate> getCommentTemplate({
     required DocumentRef category,
   });
 
@@ -43,20 +42,15 @@ final class CommentServiceImpl implements CommentService {
   );
 
   @override
-  Future<CommentTemplate> getCommentTemplateFor({
+  Future<CommentTemplate> getCommentTemplate({
     required DocumentRef category,
   }) async {
-    final commentTemplateRef = allConstantDocumentRefs
-        .firstWhereOrNull((element) => element.category.id == category.id)
-        ?.comment;
-
-    if (commentTemplateRef == null) {
-      throw ApiBadResponseException.notFound(
-        message: 'No comment template for category id ${category.id}',
-      );
+    final template = await _commentRepository.getCommentTemplate(category: category);
+    if (template == null) {
+      throw CommentTemplateNotFoundException(category: category);
     }
 
-    return _commentRepository.getCommentTemplate(ref: commentTemplateRef);
+    return template;
   }
 
   @override

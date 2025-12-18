@@ -1,5 +1,14 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
+final class CommentTemplateNotFoundException implements DocumentException {
+  final DocumentRef category;
+
+  const CommentTemplateNotFoundException({required this.category});
+
+  @override
+  String toString() => 'Comment template for category $category not found';
+}
+
 /// Base class for all document exceptions.
 sealed class DocumentException implements Exception {}
 

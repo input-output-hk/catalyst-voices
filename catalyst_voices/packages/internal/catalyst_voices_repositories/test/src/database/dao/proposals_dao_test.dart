@@ -2132,9 +2132,10 @@ String _buildUuidAt(DateTime dateTime) {
 }
 
 SignedDocumentRef _getCategoryRef({
+  DocumentRef campaignRef = Campaign.f14Ref,
   int index = 0,
 }) {
-  return activeConstantDocumentRefs.elementAtOrNull(index)?.category ??
+  return constantDocumentRefsPerCampaign(campaignRef).elementAtOrNull(index)?.category ??
       _dummyCategoriesCache.putIfAbsent(index, DocumentRefFactory.signedDocumentRef);
 }
 

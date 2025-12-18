@@ -9,7 +9,9 @@ final class CampaignFilters extends Equatable {
   });
 
   factory CampaignFilters.active() {
-    final categoriesIds = activeConstantDocumentRefs.map((e) => e.category.id).toList();
+    final categoriesIds = constantDocumentRefsPerCampaign(
+      activeCampaignRef,
+    ).map((e) => e.category.id).toList();
     return CampaignFilters(categoriesIds: categoriesIds);
   }
 
