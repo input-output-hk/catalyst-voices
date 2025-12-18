@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +9,14 @@ class InvitationsApprovalsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _InvitationsApprovalsButton(count: 10);
+    return BlocSelector<WorkspaceBloc, WorkspaceState, int>(
+      selector: (state) {
+        return state.invitationsApprovalsCount;
+      },
+      builder: (context, count) {
+        return _InvitationsApprovalsButton(count: count);
+      },
+    );
   }
 }
 

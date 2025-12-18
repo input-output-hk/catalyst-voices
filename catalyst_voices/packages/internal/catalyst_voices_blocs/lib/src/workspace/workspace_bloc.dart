@@ -7,6 +7,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('WorkspaceBloc');
 
@@ -24,6 +25,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
   StreamSubscription<List<UsersProposalOverview>>? _dataPageSub;
+  StreamSubscription<int>? _invitationsAndApprovalsSub;
 
   WorkspaceBloc(
     this._userService,
@@ -44,6 +46,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<WatchActiveCampaignChangeEvent>(_onWatchActiveCampaignChange);
     on<InternalDataChangeEvent>(_onInternalDataChange);
     on<LeaveProposalEvent>(_onLeaveProposal);
+    on<WorkspaceInvitationsAndApprovalsCount>(_onInvitationsAndApprovalsCountChange);
 
     unawaited(
       _userService.watchUnlockedActiveAccount
@@ -76,6 +79,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
 
+    await _invitationsAndApprovalsSub?.cancel();
+    _invitationsAndApprovalsSub = null;
+
     return super.close();
   }
 
@@ -99,6 +105,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     _cache = _cache.copyWith(activeAccountId: Optional(id));
 
     unawaited(_rebuildDataPageSub());
+    _rebuildInvitationsAndApprovalsCountSub();
   }
 
   void _handleActiveCampaignChange(Campaign? campaign) {
@@ -240,12 +247,20 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     _resetCache();
     add(const WatchUserCatalystIdEvent());
     add(const WatchActiveCampaignChangeEvent());
+    _rebuildInvitationsAndApprovalsCountSub();
   }
 
   void _onInternalDataChange(InternalDataChangeEvent event, Emitter<WorkspaceState> emit) {
     _cache = _cache.copyWith(proposals: Optional(event.proposals));
     final newState = _rebuildProposalsState();
     emit(state.copyWith(userProposals: newState, isLoading: false));
+  }
+
+  void _onInvitationsAndApprovalsCountChange(
+    WorkspaceInvitationsAndApprovalsCount event,
+    Emitter<WorkspaceState> emit,
+  ) {
+    emit(state.copyWith(invitationsApprovalsCount: event.count));
   }
 
   Future<void> _onLeaveProposal(LeaveProposalEvent event, Emitter<WorkspaceState> emit) async {
@@ -334,6 +349,32 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         })
         .distinct(listEquals)
         .listen(_handleDataChange);
+  }
+
+  void _rebuildInvitationsAndApprovalsCountSub() {
+    final activeCatalystId = _cache.activeAccountId;
+    if (activeCatalystId == null) {
+      return add(const WorkspaceInvitationsAndApprovalsCount(0));
+    }
+    final invitationsFilters = CollaboratorInvitationsProposalsFilter(activeCatalystId);
+    final approvalsFilters = CollaboratorProposalApprovalsFilter(activeCatalystId);
+
+    final invitationsCountStream = _proposalService.watchProposalsCountV2(
+      filters: invitationsFilters,
+    );
+    final approvalsCountStream = _proposalService.watchProposalsCountV2(
+      filters: approvalsFilters,
+    );
+
+    unawaited(_invitationsAndApprovalsSub?.cancel());
+    _invitationsAndApprovalsSub =
+        Rx.combineLatest2(
+          invitationsCountStream,
+          approvalsCountStream,
+          (invitations, approvals) => invitations + approvals,
+        ).distinct().listen((count) {
+          add(WorkspaceInvitationsAndApprovalsCount(count));
+        });
   }
 
   /// Rebuilds WorkspaceStateUserProposals from the current cache.

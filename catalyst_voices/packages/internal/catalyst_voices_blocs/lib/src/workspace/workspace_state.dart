@@ -9,6 +9,7 @@ final class WorkspaceState extends Equatable {
   final WorkspaceStateUserProposals userProposals;
   final List<CampaignTimelineViewModel> timelineItems;
   final int fundNumber;
+  final int invitationsApprovalsCount;
 
   const WorkspaceState({
     this.isLoading = false,
@@ -16,6 +17,7 @@ final class WorkspaceState extends Equatable {
     this.userProposals = const WorkspaceStateUserProposals(),
     this.timelineItems = const [],
     this.fundNumber = 0,
+    this.invitationsApprovalsCount = 0,
   });
 
   WorkspaceStateCampaignTimeline get campaignTimeline =>
@@ -28,6 +30,7 @@ final class WorkspaceState extends Equatable {
     userProposals,
     timelineItems,
     fundNumber,
+    invitationsApprovalsCount,
   ];
 
   bool get showProposals => error == null && !isLoading;
@@ -45,6 +48,7 @@ final class WorkspaceState extends Equatable {
     WorkspaceStateUserProposals? userProposals,
     List<CampaignTimelineViewModel>? timelineItems,
     int? fundNumber,
+    int? invitationsApprovalsCount,
   }) {
     return WorkspaceState(
       isLoading: isLoading ?? this.isLoading,
@@ -52,6 +56,7 @@ final class WorkspaceState extends Equatable {
       userProposals: userProposals ?? this.userProposals,
       timelineItems: timelineItems ?? this.timelineItems,
       fundNumber: fundNumber ?? this.fundNumber,
+      invitationsApprovalsCount: invitationsApprovalsCount ?? this.invitationsApprovalsCount,
     );
   }
 }

@@ -124,3 +124,12 @@ sealed class WorkspaceEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }
+
+final class WorkspaceInvitationsAndApprovalsCount extends WorkspaceEvent {
+  final int count;
+
+  const WorkspaceInvitationsAndApprovalsCount(this.count);
+
+  @override
+  List<Object?> get props => [...super.props, count];
+}
