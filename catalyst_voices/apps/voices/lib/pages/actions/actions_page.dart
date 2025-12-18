@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -10,18 +11,12 @@ class ActionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const VoicesDrawer(
-      width: 500,
-      child: Padding(
-        padding: EdgeInsets.all(12),
-        child: Column(
-          children: [
-            _Header(),
-            SizedBox(height: 30),
-            _Content(),
-          ],
-        ),
-      ),
+    return const Column(
+      children: [
+        _Header(),
+        SizedBox(height: 30),
+        _Content(),
+      ],
     );
   }
 }
@@ -45,13 +40,13 @@ class _Content extends StatelessWidget {
             VoicesFilledButton(
               child: const Text('Proposal Approval'),
               onTap: () {
-                const ProposalApprovalRoute().go(context);
+                unawaited(const ProposalApprovalRoute().push(context));
               },
             ),
             VoicesFilledButton(
               child: const Text('Co-Proposer Display Consent'),
               onTap: () {
-                const CoProposersConsentRoute().go(context);
+                unawaited(const CoProposersConsentRoute().push(context));
               },
             ),
           ],
@@ -74,7 +69,7 @@ class _Header extends StatelessWidget {
           style: context.textTheme.titleLarge,
         ),
         CloseButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: Scaffold.of(context).closeEndDrawer,
         ),
       ],
     );

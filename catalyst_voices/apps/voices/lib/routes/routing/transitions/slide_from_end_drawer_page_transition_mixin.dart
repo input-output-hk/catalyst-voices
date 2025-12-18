@@ -2,14 +2,20 @@ import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// A mixin that provides a drawer-like page transition using Scaffold's
-/// endDrawer.
+/// A mixin that provides a drawer-like page transition for [ShellRouteData].
 ///
 /// This creates a transparent page with a Scaffold that automatically opens
 /// its endDrawer, keeping the previous page visible underneath.
-mixin SlideFromEndDrawerPageTransitionMixin on GoRouteData {
+
+/// Use this when you want the shell route to display its content in
+/// an end drawer, allowing nested routes to change the drawer content.
+mixin SlideFromEndDrawerShellPageTransitionMixin on ShellRouteData {
   @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
+  Page<void> pageBuilder(
+    BuildContext context,
+    GoRouterState state,
+    Widget navigator,
+  ) {
     return CustomTransitionPage(
       key: state.pageKey,
       name: state.name ?? state.path,
@@ -22,7 +28,7 @@ mixin SlideFromEndDrawerPageTransitionMixin on GoRouteData {
       barrierDismissible: true,
       transitionDuration: Duration.zero,
       reverseTransitionDuration: Duration.zero,
-      child: _EndDrawerScaffold(drawerContent: build(context, state)),
+      child: _EndDrawerScaffold(drawerContent: builder(context, state, navigator)),
       transitionsBuilder: (context, animation, secondaryAnimation, child) => child,
     );
   }
