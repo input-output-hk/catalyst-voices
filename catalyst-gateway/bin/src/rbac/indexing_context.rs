@@ -101,11 +101,11 @@ impl RbacBlockIndexingContext {
 
     /// Marks the given stake address as removed so it will be excluded from
     /// `find_address` lookups.
-    pub fn remove_address(
+    pub fn remove_addresses(
         &mut self,
-        address: &StakeAddress,
+        address: HashSet<StakeAddress>,
     ) {
-        self.removed_addresses.insert(address.clone());
+        self.removed_addresses.extend(address);
     }
 
     /// Adds a public key to the context.

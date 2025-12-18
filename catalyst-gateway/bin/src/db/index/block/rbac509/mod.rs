@@ -206,9 +206,7 @@ impl Rbac509InsertQuery {
             cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
         }
 
-        for addr in &removed_addresses {
-            context.remove_address(addr);
-        }
+        context.remove_addresses(removed_addresses.clone());
 
         self.record_valid_registration(
             txn_hash,
@@ -217,6 +215,7 @@ impl Rbac509InsertQuery {
             catalyst_id.clone(),
             Some(previous_txn),
             added_addresses,
+            removed_addresses,
             public_keys,
             modified_chains,
             purpose,
@@ -309,6 +308,7 @@ impl Rbac509InsertQuery {
             catalyst_id.clone(),
             None,
             stake_addresses,
+            HashSet::new(),
             public_keys,
             modified_chains,
             purpose,
@@ -327,14 +327,16 @@ impl Rbac509InsertQuery {
         slot: Slot,
         catalyst_id: CatalystId,
         previous_transaction: Option<TransactionId>,
-        stake_addresses: HashSet<StakeAddress>,
+        added_stake_addresses: HashSet<StakeAddress>,
+        removed_stake_addresses: HashSet<StakeAddress>,
         public_keys: HashSet<VerifyingKey>,
         modified_chains: HashMap<CatalystId, HashSet<StakeAddress>>,
         purpose: Option<UuidV4>,
         context: &mut RbacBlockIndexingContext,
     ) {
         context.insert_transaction(txn_hash, catalyst_id.clone());
-        context.insert_addresses(stake_addresses.clone(), &catalyst_id);
+        context.insert_addresses(added_stake_addresses.clone(), &catalyst_id);
+        context.remove_addresses(removed_stake_addresses.clone());
         context.insert_public_keys(public_keys.clone(), &catalyst_id);
         context.insert_registration(
             catalyst_id.clone(),
@@ -351,8 +353,11 @@ impl Rbac509InsertQuery {
                 txn_hash,
                 slot,
             ));
-        // Record new stake addresses.
-        for address in stake_addresses {
+        // Record new stake addresses that are not marked as removed.
+        for address in added_stake_addresses
+            .difference(&removed_stake_addresses)
+            .cloned()
+        {
             self.catalyst_id_for_stake_address.push(
                 insert_catalyst_id_for_stake_address::Params::new(
                     address,
