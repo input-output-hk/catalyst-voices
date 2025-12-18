@@ -290,7 +290,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _activeCampaignSub?.cancel();
 
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.id != next?.id)
+        .distinct((previous, next) => previous?.id == next?.id)
         .listen(_handleActiveCampaignChange);
   }
 

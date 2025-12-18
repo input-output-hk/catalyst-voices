@@ -25,6 +25,9 @@ abstract interface class SyncManager {
 
   Future<void> dispose();
 
+  /// Initializes the [SyncManager], expected to be called once per instance lifetime.
+  Future<void> init();
+
   Future<void> start();
 }
 
@@ -37,6 +40,8 @@ final class SyncManagerImpl implements SyncManager {
 
   final _lock = Lock();
   final _progressController = StreamController<double>.broadcast();
+
+  StreamSubscription<Campaign?>? _activeCampaignSub;
 
   Timer? _syncTimer;
   var _synchronizationCompleter = Completer<bool>();
@@ -57,6 +62,9 @@ final class SyncManagerImpl implements SyncManager {
 
   @override
   Future<void> dispose() async {
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
+
     _syncTimer?.cancel();
     _syncTimer = null;
 
@@ -68,10 +76,18 @@ final class SyncManagerImpl implements SyncManager {
   }
 
   @override
-  Future<void> start() {
+  Future<void> init() async {
+    unawaited(_activeCampaignSub?.cancel());
+    _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
+      _handleActiveCampaignChanged,
+    );
+  }
+
+  @override
+  Future<void> start() async {
     if (_lock.locked) {
       _logger.finest('Synchronization in progress');
-      return Future(() {});
+      return;
     }
 
     _syncTimer?.cancel();
@@ -79,11 +95,32 @@ final class SyncManagerImpl implements SyncManager {
       const Duration(minutes: 15),
       (_) {
         _logger.finest('Scheduled synchronization starts');
-        // ignore: discarded_futures
         _lock.synchronized(_startSynchronization).ignore();
       },
     );
+
     return _lock.synchronized(_startSynchronization);
+  }
+
+  Future<void> _handleActiveCampaignChanged(Campaign? campaign) async {
+    final appMeta = await _appMetaStorage.read();
+
+    final previousRef = appMeta.activeCampaign;
+    final currentRef = campaign?.id;
+
+    if (previousRef == currentRef) {
+      return;
+    }
+
+    _logger.fine('Active campaign changed from [$previousRef] to [$currentRef]!');
+
+    try {
+      // wait until ongoing sync is done then trigger a new one
+      await _lock.synchronized(() async {});
+      await start();
+    } catch (error, stack) {
+      _logger.warning('Sync failed', error, stack);
+    }
   }
 
   Future<void> _startSynchronization() async {
@@ -166,16 +203,16 @@ final class SyncManagerImpl implements SyncManager {
     final appMeta = await _appMetaStorage.read();
     final activeCampaign = await _campaignService.getActiveCampaign();
 
-    final previous = appMeta.activeCampaign;
-    final current = activeCampaign?.id;
+    final previousRef = appMeta.activeCampaign;
+    final currentRef = activeCampaign?.id;
 
-    if (previous == current) {
+    if (previousRef == currentRef) {
       return activeCampaign;
     }
 
-    _logger.fine('Active campaign changed from [$previous] to [$current]!');
+    _logger.fine('Updating active campaign from [$previousRef] to [$currentRef]!');
 
-    final updatedAppMeta = appMeta.copyWith(activeCampaign: Optional(current));
+    final updatedAppMeta = appMeta.copyWith(activeCampaign: Optional(currentRef));
     await _appMetaStorage.write(updatedAppMeta);
     await _documentsService.clear(keepLocalDrafts: true);
 

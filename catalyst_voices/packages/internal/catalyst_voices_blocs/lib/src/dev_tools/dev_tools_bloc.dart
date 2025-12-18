@@ -10,7 +10,7 @@ const _requiredTapCount = 6;
 final _logger = Logger('DevToolsBloc');
 
 /// Manages the dev tools.
-
+///
 /// It allows developers to obtain information about the system.
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
@@ -99,7 +99,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
 
     final settings = await _loggingService!.updateSettings(collectLogs: Optional(collectLogs));
 
-    if (!isClosed) emit(state.copyWith(collectLogs: settings.effectiveCollectLogs));
+    emit(state.copyWith(collectLogs: settings.effectiveCollectLogs));
   }
 
   Future<void> _handleChangeLogLevel(ChangeLogLevelEvent event, Emitter<DevToolsState> emit) async {
@@ -109,7 +109,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
 
     final settings = await _loggingService!.updateSettings(level: Optional(level));
 
-    if (!isClosed) emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
+    emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
   }
 
   Future<void> _handleClearDocuments(ClearDocumentsEvent event, Emitter<DevToolsState> emit) async {
@@ -182,21 +182,19 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     final activeCampaign = await _campaignService.getActiveCampaign();
     final allCampaigns = await _campaignService.getAllCampaigns();
 
-    if (!isClosed) {
-      emit(
-        state.copyWith(
-          isDeveloper: isDeveloper,
-          syncStats: Optional(syncStats),
-          areLogsOptionsAvailable: areLogsOptionsAvailable,
-          logsLevel: Optional(loggingSettings?.effectiveLevel),
-          collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
-          campaign: DevToolsCampaignState(
-            activeCampaign: activeCampaign,
-            allCampaigns: allCampaigns,
-          ),
+    emit(
+      state.copyWith(
+        isDeveloper: isDeveloper,
+        syncStats: Optional(syncStats),
+        areLogsOptionsAvailable: areLogsOptionsAvailable,
+        logsLevel: Optional(loggingSettings?.effectiveLevel),
+        collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
+        campaign: DevToolsCampaignState(
+          activeCampaign: activeCampaign,
+          allCampaigns: allCampaigns,
         ),
-      );
-    }
+      ),
+    );
   }
 
   Future<void> _handleStopWatchingActiveCampaign(
