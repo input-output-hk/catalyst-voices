@@ -8,6 +8,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_accoun
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/widgets/menu/voices_raw_popup_menu.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -114,6 +115,10 @@ sealed class _MenuItemEvent {
   const _MenuItemEvent();
 }
 
+final class _MyActions extends _MenuItemEvent {
+  const _MyActions();
+}
+
 final class _MyOpportunities extends _MenuItemEvent {
   const _MyOpportunities();
 }
@@ -136,6 +141,21 @@ class _Opportunities extends StatelessWidget {
   }
 }
 
+class _Actions extends StatelessWidget {
+  const _Actions();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO(bstolinski): add red dot indicator
+    return MenuItemTile(
+      key: const Key('MyActionsMenuItem'),
+      title: Text(context.l10n.myActions),
+      leading: VoicesAssets.icons.fire.buildIcon(),
+      onTap: () => Navigator.pop(context, const _MyActions()),
+    );
+  }
+}
+
 class _PopupMenu extends StatelessWidget {
   const _PopupMenu();
 
@@ -149,6 +169,8 @@ class _PopupMenu extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _AccountHeader(),
+            VoicesDivider.expanded(),
+            _Actions(),
             VoicesDivider.expanded(),
             _Opportunities(),
             VoicesDivider.expanded(),
@@ -279,6 +301,8 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with 
         unawaited(context.read<SessionCubit>().lock());
       case _MyOpportunities():
         Scaffold.maybeOf(context)?.openEndDrawer();
+      case _MyActions():
+        unawaited(const ActionsRoute().push(context));
     }
   }
 }

@@ -4258,5 +4258,9 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
+  },
+  "myActions": "My Actions",
+  "@myActions": {
+    "description": "Header text for user's actions section"
   }
 }
