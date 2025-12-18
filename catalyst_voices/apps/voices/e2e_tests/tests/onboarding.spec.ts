@@ -35,5 +35,14 @@ for (const walletConfig of walletConfigs) {
         walletConfig.stakeAddress
       );
     });
+    test.skip(`Create Catalyst Keychain - ${walletConfig.extension.Name}`, async ({
+      restoreWallet,
+      appBaseURL,
+      testModel,
+    }) => {
+      const page = restoreWallet.pages()[0];
+      await page.goto(appBaseURL);
+      await page.locator("//*[@aria-label='Enable accessibility']").evaluate((element: HTMLElement) => element.click());
+    });
   });
 }
