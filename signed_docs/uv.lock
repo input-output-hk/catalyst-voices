@@ -84,7 +84,7 @@ wheels = [
 [[package]]
 name = "catalyst-python"
 version = "0.1.0"
-source = { git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&branch=feat%2Fcatalyst-python#f710cd4bd2f23953345ce263f022d862b5dbf12e" }
+source = { git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&tag=catalyst-python%2Fv0.2.0#530970e5fc42d570359bd8a7192ba874fa0b4a3a" }
 dependencies = [
     { name = "cryptography" },
     { name = "ipfs-cid" },
@@ -784,7 +784,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "argparse", specifier = ">=1.4.0" },
-    { name = "catalyst-python", git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&branch=feat%2Fcatalyst-python" },
+    { name = "catalyst-python", git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&tag=catalyst-python%2Fv0.2.0" },
     { name = "pathlib", specifier = ">=1.0.1" },
     { name = "requests", specifier = ">=2.32.5" },
 ]

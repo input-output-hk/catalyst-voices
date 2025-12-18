@@ -510,8 +510,8 @@ requests = ">=2.32.5"
 [package.source]
 type = "git"
 url = "https://github.com/input-output-hk/catalyst-libs.git"
-reference = "feat/catalyst-python"
-resolved_reference = "0187f3aa8c83bb9877995896fe787fe1bff3cba1"
+reference = "catalyst-python/v0.2.0"
+resolved_reference = "530970e5fc42d570359bd8a7192ba874fa0b4a3a"
 subdirectory = "catalyst-python"
 
 [[package]]
@@ -3153,4 +3153,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.14"
-content-hash = "482735e777ef4c15808dfdc8ca506712540b7ea1c77fee33ec26b87f1aab6a6d"
+content-hash = "66f81976251945bafc611a493e84dd6d73249d93d45832ccaba72e8eb0bc2aaa"
