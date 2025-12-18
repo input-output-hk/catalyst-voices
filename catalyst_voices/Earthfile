@@ -111,8 +111,13 @@ build-web:
 package:
     FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
     ARG tag='latest'
+    ARG UPLOAD_DEBUG_SYMBOLS=false
 
-    COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true) /app
+    IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
+        COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true --tag=$tag) /app
+    ELSE
+        COPY --keep-ts +build-web/web /app
+    END
 
     # Note this is only used for local development, a different Caddyfile is
     # used during deployment. See the blueprint.cue file.
@@ -124,10 +129,11 @@ package:
     SAVE IMAGE voices-frontend:$tag
 
 docker:
-   FROM +package
-
    ARG container="voices"
    ARG tag="latest"
+   ARG UPLOAD_DEBUG_SYMBOLS=true
+
+   FROM +package --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS --tag=$tag
 
    SAVE IMAGE ${container}:${tag}
 
