@@ -271,7 +271,7 @@ void main() {
         // When: originalAuthor provided and id matches
         final stream = proposalService.watchProposal(
           id: proposalId,
-          originalAuthor: authorId,
+          activeAccount: authorId,
         );
 
         // Then: Should emit local proposal
@@ -348,7 +348,7 @@ void main() {
         // When: Query for public version2
         final stream = proposalService.watchProposal(
           id: version2,
-          originalAuthor: authorId,
+          activeAccount: authorId,
         );
 
         // Then: Should merge versions from local into public
@@ -428,7 +428,7 @@ void main() {
         // When
         final stream = proposalService.watchProposal(
           id: version2,
-          originalAuthor: authorId,
+          activeAccount: authorId,
         );
 
         // Then: Should return public proposal without modification
@@ -461,7 +461,7 @@ void main() {
         // When
         final stream = proposalService.watchProposal(
           id: proposalId,
-          originalAuthor: authorId,
+          activeAccount: authorId,
         );
 
         // Then: Should emit null

@@ -103,7 +103,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     _proposalSub = _proposalService
         .watchProposal(
           id: id,
-          originalAuthor: _cache.activeAccountId,
+          activeAccount: _cache.activeAccountId,
         )
         .listen(_handleProposalData);
   }

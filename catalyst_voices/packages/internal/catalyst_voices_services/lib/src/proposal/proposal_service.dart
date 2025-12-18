@@ -117,7 +117,7 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
-  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? originalAuthor});
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount});
 
   /// Streams pages of brief proposal data.
   ///
@@ -466,11 +466,11 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? originalAuthor}) {
-    final localProposalData = originalAuthor != null
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount}) {
+    final localProposalData = activeAccount != null
         ? _proposalRepository.watchLocalProposal(
             id: id,
-            originalAuthor: originalAuthor,
+            originalAuthor: activeAccount,
           )
         : Stream.value(null);
 
