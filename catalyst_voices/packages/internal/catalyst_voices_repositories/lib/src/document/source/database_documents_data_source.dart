@@ -267,6 +267,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  }) {
+    return _database.proposalsV2Dao.watchLocalDraftProposalsCount(author: author).distinct();
+  }
+
+  @override
   Stream<RawProposal?> watchRawProposalData({required DocumentRef id}) {
     final tr = _profiler.startTransaction('Query proposal: $id');
     return _database.proposalsV2Dao
