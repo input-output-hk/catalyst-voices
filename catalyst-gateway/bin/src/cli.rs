@@ -45,7 +45,10 @@ impl Cli {
     pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
-                Settings::init(settings)?;
+                // Returns optional guard for telemetry providers.
+                // We must hold this guard while the main process runs.
+                // No need to do anything else.
+                let _guard = Settings::init(settings)?;
 
                 let mut tasks = Vec::new();
 

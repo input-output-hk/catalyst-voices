@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Documen
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_artifacts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
@@ -72,6 +73,11 @@ abstract interface class DocumentsV2Dao {
     CatalystId? originalAuthor,
   });
 
+  /// Retrieves only the artifact of a signed document.
+  ///
+  /// Returns `null` if no matching document is found.
+  Future<DocumentArtifact?> getDocumentArtifact(DocumentRef id);
+
   /// Retrieves only the metadata of a signed document, excluding the content blob.
   ///
   /// This is an optimized query that skips fetching the potentially large
@@ -79,9 +85,7 @@ abstract interface class DocumentsV2Dao {
   ///
   /// Returns the [DocumentsV2MetadataViewData] for the matching document,
   /// or `null` if no matching document is found.
-  Future<DocumentsV2MetadataViewData?> getDocumentMetadata({
-    required DocumentRef id,
-  });
+  Future<DocumentsV2MetadataViewData?> getDocumentMetadata(DocumentRef id);
 
   /// Retrieves a list of documents matching the criteria with pagination.
   ///
@@ -176,6 +180,7 @@ abstract interface class DocumentsV2Dao {
   tables: [
     DocumentsV2,
     DocumentAuthors,
+    DocumentArtifacts,
     DocumentParameters,
     DocumentCollaborators,
   ],
@@ -283,9 +288,28 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<DocumentsV2MetadataViewData?> getDocumentMetadata({
-    required DocumentRef id,
-  }) async {
+  Future<DocumentArtifact?> getDocumentArtifact(DocumentRef id) {
+    final query = selectOnly(documentArtifacts)
+      ..addColumns([documentArtifacts.data])
+      ..where(documentArtifacts.id.equals(id.id));
+
+    if (id.isExact) {
+      query.where(documentArtifacts.ver.equals(id.ver!));
+    } else {
+      // If loose ref, get artifact for latest version of that ID.
+      query
+        ..orderBy([OrderingTerm.desc(documentArtifacts.ver)])
+        ..limit(1);
+    }
+
+    return query
+        .map((row) => row.read(documentArtifacts.data))
+        .getSingleOrNull()
+        .then((value) => value != null ? DocumentArtifact(value) : null);
+  }
+
+  @override
+  Future<DocumentsV2MetadataViewData?> getDocumentMetadata(DocumentRef id) async {
     final query = select(documentsV2MetadataView)..where((tbl) => tbl.id.equals(id.id));
 
     if (id.isExact) {
@@ -374,6 +398,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final docs = entries.map((e) => e.doc);
     final authors = entries.map((e) => e.authors).flattened;
+    final artifacts = entries.map((e) => e.artifact);
     final parameters = entries.map((e) => e.parameters).flattened;
     final collaborators = entries.map((e) => e.collaborators).flattened;
 
@@ -388,6 +413,13 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         batch.insertAll(
           documentAuthors,
           authors,
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
+      if (artifacts.isNotEmpty) {
+        batch.insertAll(
+          documentArtifacts,
+          artifacts,
           mode: InsertMode.insertOrIgnore,
         );
       }
