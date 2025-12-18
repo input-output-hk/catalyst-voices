@@ -1,12 +1,9 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/routes/routing/actions_route.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class ActionsPage extends StatelessWidget {
-  const ActionsPage({super.key});
+class ProposalApprovalPage extends StatelessWidget {
+  const ProposalApprovalPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,28 +30,11 @@ class _Content extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Center(
-        child: Column(
-          spacing: 20,
-          children: [
-            Text(
-              'No actions',
-              style: context.textTheme.bodyLarge?.copyWith(
-                color: context.colors.textOnPrimaryLevel1,
-              ),
-            ),
-            VoicesFilledButton(
-              child: const Text('Proposal Approval'),
-              onTap: () {
-                const ProposalApprovalRoute().go(context);
-              },
-            ),
-            VoicesFilledButton(
-              child: const Text('Co-Proposer Display Consent'),
-              onTap: () {
-                const CoProposersConsentRoute().go(context);
-              },
-            ),
-          ],
+        child: Text(
+          'No actions',
+          style: context.textTheme.bodyLarge?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
         ),
       ),
     );
@@ -70,7 +50,7 @@ class _Header extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          context.l10n.myActions,
+          'Final Proposal Approval',
           style: context.textTheme.titleLarge,
         ),
         CloseButton(
