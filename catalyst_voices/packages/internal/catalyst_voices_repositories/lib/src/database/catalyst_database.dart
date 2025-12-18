@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_local
 import 'package:catalyst_voices_repositories/src/database/dao/local_draft_documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_artifacts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
@@ -58,6 +59,7 @@ abstract interface class CatalystDatabase {
   tables: [
     DocumentsV2,
     DocumentAuthors,
+    DocumentArtifacts,
     DocumentCollaborators,
     DocumentParameters,
     DocumentsLocalMetadata,

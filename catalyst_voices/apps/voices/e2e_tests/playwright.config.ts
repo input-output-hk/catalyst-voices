@@ -8,8 +8,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: "html",
-  timeout: 120 * 1000,
+  reporter: [["junit", { outputFile: "/results/voices.junit-report.xml" }], ["html"]],
+  timeout: 1200 * 1000,
   use: {
     baseURL: `https://app.${process.env.ENVIRONMENT}.projectcatalyst.io/`,
     trace: "on-first-retry",
@@ -22,6 +22,14 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         testIdAttribute: "flt-semantics-identifier",
+      },
+    },
+    {
+      name: "local-run",
+      use: {
+        ...devices["Desktop Chrome"],
+        testIdAttribute: "flt-semantics-identifier",
+        baseURL: `http://localhost:80`,
       },
     },
   ],

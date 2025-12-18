@@ -25,6 +25,11 @@ export class EternlActions implements WalletActions {
     await this.page.locator("#passwordInput").fill(this.walletConfig.password);
     await this.page.locator("#modelSetupSettingsBtnNext").click();
 
+    await this.page.locator("(//input[@type='checkbox'])[1]").click();
+    await this.page.locator("(//input[@type='checkbox'])[2]").click();
+    await this.page.locator("(//input[@type='checkbox'])[3]").click();
+    await this.page.locator("//button[span[text()='Confirm']]").click();
+
     // Click Restore wallet
     await this.page.locator('button:has-text("Enter a Seed-phrase")').click();
 
