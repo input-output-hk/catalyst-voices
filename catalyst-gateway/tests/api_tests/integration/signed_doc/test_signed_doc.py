@@ -34,9 +34,9 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     # Put document with different ver
     new_doc = proposal_doc.copy()
     new_doc.new_version()
-    new_doc_cbor = new_doc.build_and_sign()
+    new_doc = new_doc.build_and_sign()
     resp = document_v1.put(
-        data=new_doc_cbor,
+        data=new_doc.hex_cbor,
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -45,7 +45,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     # Put a document again
     resp = document_v1.put(
-        data=new_doc_cbor,
+        data=new_doc.hex_cbor,
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 204, (
@@ -67,8 +67,9 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     new_doc = proposal_doc.copy()
     new_doc.new_version()
     new_doc.content["setup"]["title"]["title"] = "another title"
+    new_doc = new_doc.build_and_sign()
     resp = document_v1.put(
-        data=new_doc.build_and_sign(),
+        data=new_doc.cbor_hex,
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -91,8 +92,9 @@ def test_document_index_endpoint(
         doc = doc.copy()
         # keep the same id, but different version
         doc.new_version()
+        doc = doc.build_and_sign()
         resp = document_v1.put(
-            data=doc.build_and_sign(),
+            data=doc.cbor_hex,
             token=rbac_chain.auth_token(),
         )
         assert resp.status_code == 201, (

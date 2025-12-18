@@ -73,7 +73,7 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
         with open("./test_data/signed_docs/proposal.json", "r") as json_file:
             proposal_content = json.load(json_file)
         doc = proposal_doc(
-            proposal_content, proposal_template, category, rbac_chain
+            proposal_content, proposal_template.doc_ref(), category, rbac_chain
         ).build_and_sign()
         publish_document(doc, rbac_chain.auth_token())
         return doc
