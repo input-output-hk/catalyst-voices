@@ -7335,12 +7335,7 @@ void main() {
 
         test('returns proper amount of invitations', () async {
           final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
-          final invitationsFilters = ProposalsFiltersV2(
-            status: ProposalStatusFilter.draft,
-            relationships: {
-              CollaborationInvitation.pending(collaborator),
-            },
-          );
+          final invitationsFilters = CollaboratorInvitationsProposalsFilter(collaborator);
 
           final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
 
@@ -7393,14 +7388,7 @@ void main() {
 
         test('returns proper amount of approvals of proposals', () async {
           final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
-          final approvalsFilters = ProposalsFiltersV2(
-            status: ProposalStatusFilter.aFinal,
-            relationships: {
-              CollaborationInvitation.pending(collaborator),
-              CollaborationInvitation.accepted(collaborator),
-              CollaborationInvitation.rejected(collaborator),
-            },
-          );
+          final approvalsFilters = CollaboratorProposalApprovalsFilter(collaborator);
 
           final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
 
@@ -7480,8 +7468,8 @@ void main() {
             collaborators: [collaborator],
           );
 
-          final collaboratorAcceptInvideProposa4Ver1 = _createTestDocumentEntity(
-            id: 'collaboratorAcceptInvideProposalVer4Ver1',
+          final collaboratorAcceptInviteProposal4Ver1 = _createTestDocumentEntity(
+            id: 'collaboratorAcceptInviteProposalVer4Ver1',
             ver: _buildUuidV7At(veryEarly),
             type: DocumentType.proposalActionDocument,
             refId: proposal4Ver1.doc.id,
@@ -7516,7 +7504,7 @@ void main() {
             proposal3, // Draft proposal3
             authorFinalActionProposal3, //Author makes proposal final which collaborator has pending status
             proposal4Ver1,
-            collaboratorAcceptInvideProposa4Ver1,
+            collaboratorAcceptInviteProposal4Ver1,
             proposal4Ver2,
             authorFinalActionProposal4Ver2,
           ]);
