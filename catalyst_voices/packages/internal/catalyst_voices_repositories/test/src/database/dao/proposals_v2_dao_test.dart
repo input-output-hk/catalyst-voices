@@ -7328,6 +7328,7 @@ void main() {
       });
 
       group('watchVisibleProposalsCount', () {
+        final veryEarly = DateTime.utc(2025, 2, 5, 5, 20, 0);
         final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
         final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
         final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
@@ -7469,8 +7470,8 @@ void main() {
 
           // Proposal where on first version draft collaborator accepted invite
           // Author makes final version
-          final p4Ver = _buildUuidV7At(earliest);
-          final p4Ver2 = _buildUuidV7At(middle);
+          final p4Ver = _buildUuidV7At(veryEarly);
+          final p4Ver2 = _buildUuidV7At(earliest);
 
           final proposal4Ver1 = _createTestDocumentEntity(
             id: p4Ver,
@@ -7481,7 +7482,7 @@ void main() {
 
           final collaboratorAcceptInvideProposa4Ver1 = _createTestDocumentEntity(
             id: 'collaboratorAcceptInvideProposalVer4Ver1',
-            ver: _buildUuidV7At(earliest),
+            ver: _buildUuidV7At(veryEarly),
             type: DocumentType.proposalActionDocument,
             refId: proposal4Ver1.doc.id,
             refVer: proposal4Ver1.doc.ver,
@@ -7498,7 +7499,7 @@ void main() {
 
           final authorFinalActionProposal4Ver2 = _createTestDocumentEntity(
             id: 'authorFinalActionProposal4Ver2',
-            ver: _buildUuidV7At(latest),
+            ver: _buildUuidV7At(middle),
             type: DocumentType.proposalActionDocument,
             refId: proposal4Ver2.doc.id,
             refVer: proposal4Ver2.doc.ver,
