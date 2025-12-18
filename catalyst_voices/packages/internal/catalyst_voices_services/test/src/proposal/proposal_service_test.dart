@@ -146,7 +146,7 @@ void main() {
         final briefsStream = proposalService.watchWorkspaceProposalsBrief(filters: filters);
         final countStream = proposalService.watchProposalsCountV2(
           filters: filters,
-          includeLocals: true,
+          includeLocalDrafts: true,
         );
 
         // Then - verify count matches list length
@@ -155,7 +155,7 @@ void main() {
 
         expect(count, equals(briefs.length)); // Should both be 2 (1 published + 1 local draft)
         expect(count, equals(2));
-        expect(briefs.length, equals(2));
+        expect(briefs, hasLength(2));
       });
 
       test('merges signed and local proposals correctly', () async {
