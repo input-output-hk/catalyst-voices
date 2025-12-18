@@ -37,7 +37,9 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     ).build_and_sign()
     publish_document(brand_template, admin_key.auth_token())
 
-    brand = brand_parameters_doc({}, brand_template, admin_key).build_and_sign()
+    brand = brand_parameters_doc(
+        {}, brand_template.doc_ref(), admin_key
+    ).build_and_sign()
     publish_document(brand, admin_key.auth_token())
 
     campaign_template = campaign_parameters_form_template_doc(
@@ -46,24 +48,24 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     publish_document(campaign_template, admin_key.auth_token())
 
     campaign = campaign_parameters_doc(
-        {}, campaign_template, brand, admin_key
+        {}, campaign_template.doc_ref(), brand, admin_key
     ).build_and_sign()
     publish_document(campaign, admin_key.auth_token())
 
     category_template = category_parameters_form_template_doc(
-        {"type": "object"}, campaign, admin_key
+        {"type": "object"}, campaign.doc_ref(), admin_key
     ).build_and_sign()
     publish_document(category_template, admin_key.auth_token())
 
     category = category_parameters_doc(
-        {}, category_template, campaign, admin_key
+        {}, category_template.doc_ref(), campaign, admin_key
     ).build_and_sign()
     publish_document(category, admin_key.auth_token())
 
     with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
         proposal_template_content = json.load(json_file)
     proposal_template = proposal_form_template_doc(
-        proposal_template_content, category, admin_key
+        proposal_template_content, category.doc_ref(), admin_key
     ).build_and_sign()
     publish_document(proposal_template, admin_key.auth_token())
 
