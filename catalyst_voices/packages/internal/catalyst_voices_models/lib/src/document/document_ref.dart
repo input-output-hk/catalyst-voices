@@ -37,10 +37,14 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
     return isDraft ? DraftRef(id: id, ver: ver) : SignedDocumentRef(id: id, ver: ver);
   }
 
+  bool get isDraft => this is DraftRef;
+
   /// Whether the ref specifies the document [ver].
   bool get isExact => ver != null;
 
   bool get isLoose => !isExact;
+
+  bool get isSigned => this is SignedDocumentRef;
 
   @override
   List<Object?> get props => [id, ver];
