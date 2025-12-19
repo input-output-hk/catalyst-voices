@@ -699,16 +699,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   /// [getDocumentMetadata].
   Future<T?> _getDocumentByRef<T>({
     required DocumentRef id,
-    bool useCache = true,
     required ValueResolver<SignedDocumentRef, Future<T>> onSignedDocument,
     required ValueResolver<DraftRef, Future<T>> onDraft,
   }) async {
     return switch (id) {
       SignedDocumentRef() => onSignedDocument(id),
-      DraftRef() when !useCache => throw DocumentNotFoundException(
-        ref: id,
-        message: '$id can not be resolved while not using cache',
-      ),
       DraftRef() => onDraft(id),
     };
   }
