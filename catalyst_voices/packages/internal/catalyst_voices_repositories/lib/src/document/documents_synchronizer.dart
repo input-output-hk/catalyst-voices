@@ -15,8 +15,8 @@ abstract interface class DocumentsSynchronizer {
     DocumentDataRemoteSource remote,
   ) = DocumentsSynchronizerImpl;
 
-  Future<DocumentsSyncResult> start({
-    required Campaign campaign,
+  Future<DocumentsSyncResult> start(
+    DocumentsSyncRequest request, {
     ValueChanged<double>? onProgress,
     int maxConcurrent,
     int batchSize,
@@ -35,27 +35,24 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
   );
 
   @override
-  Future<DocumentsSyncResult> start({
-    required Campaign campaign,
+  Future<DocumentsSyncResult> start(
+    DocumentsSyncRequest request, {
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
     int batchSize = 300,
   }) async {
-    _logger.finer('Indexing documents for f${campaign.fundNumber}');
+    _logger.finer('Synchronizing documents for $request');
 
     var syncResult = const DocumentsSyncResult();
-    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet().toList();
 
+    final requestIndexFilters = request.toIndexFilters();
     // The sync process is ordered. Templates are synced first as other documents
     // may depend on them.
-    final syncOrder = <DocumentType>[
-      DocumentType.proposalTemplate,
-      DocumentType.commentTemplate,
-    ];
+    final prioritizedDocumentTypes = request.prioritizedDocumentTypes;
 
-    // We perform one pass for each type in syncOrder, plus one final pass
+    // We perform one pass for each type in prioritizedDocumentTypes, plus one final pass
     // for all remaining document types (when documentType is null).
-    final totalSyncSteps = syncOrder.length + 1;
+    final totalSyncSteps = prioritizedDocumentTypes.length + 1;
     final progressPerStep = 1 / totalSyncSteps;
     var completedSteps = 0;
 
@@ -63,7 +60,7 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
     onProgress?.call(0);
 
     try {
-      /// Synchronizing documents is done in certain order, according to [syncOrder]
+      /// Synchronizing documents is done in certain order, according to [prioritizedDocumentTypes]
       /// because some are more important then others and should be here first, like templates.
       /// Most of other docs refs to them.
       ///
@@ -73,12 +70,9 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
         final baseProgress = completedSteps * progressPerStep;
 
         // In the final pass, `documentType` will be null, which signals _sync
-        // to handle all remaining documents not covered by the explicit syncOrder.
-        final documentType = syncOrder.elementAtOrNull(stepIndex);
-        final filters = DocumentIndexFilters(
-          type: documentType,
-          categoriesIds: categoriesIds,
-        );
+        // to handle all remaining documents not covered by the explicit prioritizedDocumentTypes.
+        final documentType = prioritizedDocumentTypes.elementAtOrNull(stepIndex);
+        final filters = requestIndexFilters.copyWith(type: Optional(documentType));
 
         final result = await _sync(
           pool: pool,
@@ -89,11 +83,15 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
             DocumentBaseType.category,
           },
           excludeIds: _syncExcludeIds(
-            syncOrder,
-            documentType: documentType,
-            // this should not be needed. Remove it later when categories are documents too
-            // and we have no more const refs.
-            additional: categoriesIds,
+            prioritizedDocumentTypes,
+            excludeTypes: [
+              // Current document type should not be excluded from sync
+              ?documentType,
+            ],
+            additionalTypes: [
+              // Category parameters are not documents so have to be excluded,
+              DocumentType.categoryParametersDocument,
+            ],
           ),
           onProgress: onProgress == null
               ? null
@@ -189,29 +187,31 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
   /// method helps to exclude documents of types that are not yet supposed to be
   /// synced. This is particularly useful for excluding constant document
   /// references (like templates for proposals or comments) until it is their
-  /// turn to be synced according to the [syncOrder].
+  /// turn to be synced according to the [prioritizedDocumentTypes].
   ///
-  /// - [syncOrder]: The list defining the priority order for syncing document types.
-  /// - [documentType]: The [DocumentType] currently being synced. If null, no
-  ///   types from the `syncOrder` are excluded.
-  /// - [additional]: A list of extra document IDs to add to the exclusion set.
+  /// - [prioritizedDocumentTypes]: The list defining the priority order for syncing document types.
+  /// - [excludeTypes]: The list of [DocumentType] which should be excluded.
   ///
   /// Returns a [Set] of document IDs that should be skipped in the current sync pass.
   Set<String> _syncExcludeIds(
-    List<DocumentType> syncOrder, {
-    DocumentType? documentType,
-    List<String> additional = const [],
+    List<DocumentType> prioritizedDocumentTypes, {
+    List<DocumentType> excludeTypes = const [],
+    List<DocumentType> additionalTypes = const [],
   }) {
-    final excludedDocumentTypes = syncOrder.where((type) => type != documentType).toSet();
-    final excludedConstIds = allConstantDocumentRefs
-        .expand((element) => element.asMap().entries)
-        .where((entry) => excludedDocumentTypes.contains(entry.key))
-        .map((entry) => entry.value.id);
+    final excludedDocumentTypes = prioritizedDocumentTypes
+        .where((type) => !excludeTypes.contains(type))
+        .toList();
 
-    return {
-      ...additional,
-      ...excludedConstIds,
-    };
+    final skippedDocumentTypes = [
+      ...excludedDocumentTypes,
+      ...additionalTypes,
+    ];
+
+    return allConstantDocumentRefs
+        .expand((element) => element.asMap().entries)
+        .where((entry) => skippedDocumentTypes.contains(entry.key))
+        .map((entry) => entry.value.id)
+        .toSet();
   }
 
   /// Takes a [DocumentIndex], extracts all document references from it,
@@ -311,5 +311,14 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
       newDocumentsCount: documents.length,
       failedDocumentsCount: failures,
     );
+  }
+}
+
+extension on DocumentsSyncRequest {
+  List<DocumentType> get prioritizedDocumentTypes {
+    return switch (this) {
+      CampaignSyncRequest() => [DocumentType.proposalTemplate, DocumentType.commentTemplate],
+      TargetSyncRequest() => const [],
+    };
   }
 }

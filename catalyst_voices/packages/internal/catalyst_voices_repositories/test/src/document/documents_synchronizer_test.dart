@@ -57,7 +57,7 @@ void main() {
         when(() => local.filterExisting(any())).thenAnswer((_) async => []);
 
         // When
-        final result = await synchronizer.start(campaign: campaign);
+        final result = await synchronizer.start(CampaignSyncRequest(campaign));
 
         // Then
         expect(result.newDocumentsCount, 0);
@@ -133,7 +133,7 @@ void main() {
         when(() => local.saveAll(any())).thenAnswer((_) async {});
 
         // When
-        final result = await synchronizer.start(campaign: campaign);
+        final result = await synchronizer.start(CampaignSyncRequest(campaign));
 
         // Then
         expect(result.newDocumentsCount, 1);
@@ -185,7 +185,7 @@ void main() {
         when(() => local.filterExisting(any())).thenAnswer((_) async => [docRef]);
 
         // When
-        final result = await synchronizer.start(campaign: campaign);
+        final result = await synchronizer.start(CampaignSyncRequest(campaign));
 
         // Then
         expect(result.newDocumentsCount, 0);

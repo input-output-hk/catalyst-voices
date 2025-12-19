@@ -24,14 +24,14 @@ abstract interface class DocumentsService {
   /// Syncs locally stored documents with api.
   ///
   /// Parameters:
-  /// * [campaign] - used to sync documents only for it.
+  /// * [request] - used to sync documents for.
   /// * [onProgress] - emits from 0.0 to 1.0.
   /// * [maxConcurrent] - number of concurrent requests made at same time inside one batch.
   /// * [batchSize] - how many documents to request from the index in a single page.
   ///
   /// Returns [DocumentsSyncResult] with count of new and failed refs.
-  Future<DocumentsSyncResult> sync({
-    required Campaign campaign,
+  Future<DocumentsSyncResult> sync(
+    DocumentsSyncRequest request, {
     ValueChanged<double>? onProgress,
     int maxConcurrent,
     int batchSize,
@@ -66,14 +66,14 @@ final class DocumentsServiceImpl implements DocumentsService {
   }
 
   @override
-  Future<DocumentsSyncResult> sync({
-    required Campaign campaign,
+  Future<DocumentsSyncResult> sync(
+    DocumentsSyncRequest request, {
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
     int batchSize = 300,
   }) {
     return _documentsSynchronizer.start(
-      campaign: campaign,
+      request,
       onProgress: onProgress,
       maxConcurrent: maxConcurrent,
       batchSize: batchSize,

@@ -150,7 +150,7 @@ final class SyncManagerImpl implements SyncManager {
       }
 
       syncResult = await _documentsService.sync(
-        campaign: activeCampaign,
+        CampaignSyncRequest(activeCampaign),
         onProgress: (value) {
           if (!_progressController.isClosed) {
             _progressController.add(value);

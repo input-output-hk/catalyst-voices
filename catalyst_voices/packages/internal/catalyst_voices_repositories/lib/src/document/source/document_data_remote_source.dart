@@ -67,9 +67,17 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     int limit = 100,
     required DocumentIndexFilters filters,
   }) {
+    final id = filters.id;
+    final categoriesIds = filters.categoriesIds;
+
+    // TODO(damian-molinski): Update parameters mapping after merging sync_with_gateway.
     final body = DocumentIndexQueryFilter(
       type: filters.type?.uuid,
-      parameters: IdRefOnly(id: IdSelectorDto.inside(filters.categoriesIds)).toJson(),
+      id: id != null ? IdSelectorDto.eq(id.id) : null,
+      ver: id != null && id.isExact ? EqOrRangedVer.fromJson({'eq': id.ver}) : null,
+      parameters: categoriesIds != null
+          ? IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson()
+          : null,
     );
 
     return _getDocumentIndexList(

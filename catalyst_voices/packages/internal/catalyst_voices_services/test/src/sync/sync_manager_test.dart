@@ -25,6 +25,7 @@ void main() {
     registerFallbackValue(Campaign.f15());
     registerFallbackValue(const Uuid().v7());
     registerFallbackValue(SignedDocumentRef.first(const Uuid().v7()));
+    registerFallbackValue(CampaignSyncRequest(Campaign.f15()) as DocumentsSyncRequest);
   });
 
   setUp(() {
@@ -66,7 +67,7 @@ void main() {
 
           when(
             () => documentsService.sync(
-              campaign: any(named: 'campaign'),
+              any(),
               onProgress: any(named: 'onProgress'),
             ),
           ).thenAnswer(
@@ -86,7 +87,7 @@ void main() {
 
           verify(
             () => documentsService.sync(
-              campaign: campaign,
+              CampaignSyncRequest(campaign),
               onProgress: any(named: 'onProgress'),
             ),
           ).called(1);
@@ -115,7 +116,7 @@ void main() {
 
           when(
             () => documentsService.sync(
-              campaign: any(named: 'campaign'),
+              any(),
               onProgress: any(named: 'onProgress'),
             ),
           ).thenAnswer((_) async => const DocumentsSyncResult());
@@ -141,7 +142,7 @@ void main() {
 
           when(
             () => documentsService.sync(
-              campaign: any(named: 'campaign'),
+              any(),
               onProgress: any(named: 'onProgress'),
             ),
           ).thenThrow(Exception('Sync failed'));
@@ -171,7 +172,7 @@ void main() {
           final syncCompleter = Completer<DocumentsSyncResult>();
           when(
             () => documentsService.sync(
-              campaign: any(named: 'campaign'),
+              any(),
               onProgress: any(named: 'onProgress'),
             ),
           ).thenAnswer((_) => syncCompleter.future);
@@ -187,7 +188,7 @@ void main() {
           // Then
           verify(
             () => documentsService.sync(
-              campaign: any(named: 'campaign'),
+              any(),
               onProgress: any(named: 'onProgress'),
             ),
           ).called(1);
@@ -208,7 +209,7 @@ void main() {
 
         when(
           () => documentsService.sync(
-            campaign: any(named: 'campaign'),
+            any(),
             onProgress: any(named: 'onProgress'),
           ),
         ).thenAnswer((_) async => const DocumentsSyncResult());
@@ -224,7 +225,7 @@ void main() {
         // Then
         verify(
           () => documentsService.sync(
-            campaign: any(named: 'campaign'),
+            any(),
             onProgress: any(named: 'onProgress'),
           ),
         ).called(1);
