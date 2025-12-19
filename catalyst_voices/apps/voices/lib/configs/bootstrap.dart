@@ -112,9 +112,7 @@ Future<BootstrapArgs> bootstrap({
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
   Dependencies.instance.get<SessionCubit>().init();
-  unawaited(
-    startupProfiler.documentsSync(body: () => Dependencies.instance.get<SyncManager>().start()),
-  );
+  unawaited(_initSyncManager(startupProfiler));
 
   return BootstrapArgs(
     routerConfig: router,
@@ -288,6 +286,12 @@ Future<void> _initReportingService(SentryConfig sentryConfig) async {
       );
     },
   );
+}
+
+Future<void> _initSyncManager(CatalystStartupProfiler profiler) async {
+  final syncManager = Dependencies.instance.get<SyncManager>();
+  await syncManager.init();
+  await profiler.documentsSync(body: syncManager.start);
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {

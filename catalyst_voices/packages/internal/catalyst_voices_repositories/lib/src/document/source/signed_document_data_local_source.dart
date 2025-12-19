@@ -18,6 +18,20 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
     CatalystId? originalAuthorId,
   });
 
+  /// Retrieves only the artifact of a specific document by its unique reference.
+  ///
+  /// Returns `null` if the document with the specific [DocumentRef.id] and
+  /// [DocumentRef.ver] is not found.
+  Future<DocumentArtifact?> getArtifact(SignedDocumentRef id);
+
+  /// Persists a single [DocumentDataWithArtifact] object to local storage.
+  ///
+  /// If the document already exists, it should be updated (upsert).
+  Future<void> save({required DocumentDataWithArtifact data});
+
+  /// Persists multiple [DocumentDataWithArtifact] objects to local storage in a batch.
+  Future<void> saveAll(Iterable<DocumentDataWithArtifact> data);
+
   /// Watches for changes to a list of signed documents.
   ///
   /// * [originalAuthorId]: Filters documents authored by a specific [CatalystId].
