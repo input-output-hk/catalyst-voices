@@ -64,7 +64,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         action: CollaboratorInvitationAction.accept,
       );
       if (!isClosed) {
-        emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsAccepted: true)));
+        emit(state.copyWith(invitation: const AcceptedCollaboratorInvitationState()));
       }
     } catch (error, stackTrace) {
       _logger.severe('acceptInvitation', error, stackTrace);
@@ -94,7 +94,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<void> dismissInvitation() async {
-    emit(state.copyWith(invitation: const CollaboratorInvitationState()));
+    emit(state.copyWith(invitation: const NoneCollaboratorInvitationState()));
   }
 
   Future<void> load({required DocumentRef ref}) async {
@@ -205,7 +205,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         action: CollaboratorInvitationAction.reject,
       );
       if (!isClosed) {
-        emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsRejected: true)));
+        emit(state.copyWith(invitation: const RejectedCollaboratorInvitationState()));
       }
     } catch (error, stackTrace) {
       _logger.severe('rejectInvitation', error, stackTrace);
@@ -548,11 +548,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     CatalystId? activeAccountId,
   ) async {
     if (activeAccountId != null && collaborators.none((e) => e.id == activeAccountId)) {
-      return const CollaboratorInvitationState(
-        invitation: CollaboratorInvitation(),
-      );
+      return const PendingCollaboratorInvitationState();
     }
-    return const CollaboratorInvitationState();
+    return const NoneCollaboratorInvitationState();
   }
 
   Future<List<Collaborator>> _getCollaborators() async {

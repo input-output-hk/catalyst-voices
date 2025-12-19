@@ -20,15 +20,12 @@ class ProposalInvitationBanner extends StatelessWidget {
     return BlocSelector<ProposalCubit, ProposalState, CollaboratorInvitationState>(
       selector: (state) => state.invitation,
       builder: (context, invitation) {
-        if (invitation.showAsAccepted) {
-          return const _InvitationAcceptedBanner();
-        } else if (invitation.showAsRejected) {
-          return const _InvitationRejectedBanner();
-        } else if (invitation.invitation != null) {
-          return const _InvitationPendingBanner();
-        } else {
-          return const Offstage();
-        }
+        return switch (invitation) {
+          PendingCollaboratorInvitationState() => const _InvitationPendingBanner(),
+          AcceptedCollaboratorInvitationState() => const _InvitationAcceptedBanner(),
+          RejectedCollaboratorInvitationState() => const _InvitationRejectedBanner(),
+          NoneCollaboratorInvitationState() => const Offstage(),
+        };
       },
     );
   }

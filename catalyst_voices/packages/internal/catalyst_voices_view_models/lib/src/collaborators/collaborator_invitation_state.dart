@@ -1,17 +1,24 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class CollaboratorInvitationState extends Equatable {
-  final CollaboratorInvitation? invitation;
-  final bool showAsAccepted;
-  final bool showAsRejected;
+final class AcceptedCollaboratorInvitationState extends CollaboratorInvitationState {
+  const AcceptedCollaboratorInvitationState();
+}
 
-  const CollaboratorInvitationState({
-    this.invitation,
-    this.showAsAccepted = false,
-    this.showAsRejected = false,
-  });
+sealed class CollaboratorInvitationState extends Equatable {
+  const CollaboratorInvitationState();
 
   @override
-  List<Object?> get props => [invitation, showAsAccepted, showAsRejected];
+  List<Object?> get props => [];
+}
+
+final class NoneCollaboratorInvitationState extends CollaboratorInvitationState {
+  const NoneCollaboratorInvitationState();
+}
+
+final class PendingCollaboratorInvitationState extends CollaboratorInvitationState {
+  const PendingCollaboratorInvitationState();
+}
+
+final class RejectedCollaboratorInvitationState extends CollaboratorInvitationState {
+  const RejectedCollaboratorInvitationState();
 }

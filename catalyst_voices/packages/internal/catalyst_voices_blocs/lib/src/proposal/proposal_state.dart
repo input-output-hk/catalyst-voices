@@ -15,7 +15,7 @@ final class ProposalState extends Equatable {
     this.isLoading = false,
     this.data = const ProposalViewData(),
     this.comments = const CommentsState(),
-    this.invitation = const CollaboratorInvitationState(),
+    this.invitation = const NoneCollaboratorInvitationState(),
     this.error,
     this.readOnlyMode = false,
   });
