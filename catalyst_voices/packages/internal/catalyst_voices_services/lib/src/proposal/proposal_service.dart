@@ -117,6 +117,8 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
+
   /// Streams pages of brief proposal data.
   ///
   /// The [request] parameter defines the page number and size.
@@ -462,6 +464,11 @@ final class ProposalServiceImpl implements ProposalService {
             .map((event) => event >= ProposalDocument.maxSubmittedProposalsPerUser);
       },
     );
+  }
+
+  @override
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id}) {
+    return _proposalRepository.watchProposal(id: id);
   }
 
   @override
