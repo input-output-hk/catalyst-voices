@@ -501,7 +501,7 @@
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
   },
-  "collaboratorFinalProposalAcceptButton": "Allow",
+  "collaboratorFinalProposalAcceptButton": "Approve Final Proposal",
   "@collaboratorFinalProposalAcceptButton": {
     "description": "Dialog button when accepting a final proposal as a collaborator."
   },
@@ -2749,7 +2749,7 @@
   "@proposalViewRejectedInvitationBannerChangeToAllow": {
     "description": "The button in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation and wants to accept it instead."
   },
-  "proposalViewRejectedInvitationBannerMessage": "**Invitation Rejected:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
+  "proposalViewRejectedInvitationBannerMessage": "**Display Denied:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
   "@proposalViewRejectedInvitationBannerMessage": {
     "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation."
   },
