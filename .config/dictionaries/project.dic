@@ -11,6 +11,7 @@ androidx
 anypolicy
 apirequest
 appbar
+appender
 appspot
 Arbritrary
 ARCHS
@@ -80,6 +81,7 @@ CQLSH
 cryptoxide
 Cunego
 Cupertino
+curlimages
 dalek
 damian-molinski
 daos
@@ -128,6 +130,7 @@ EUTXO
 eventdb
 extn
 fetchval
+filechooser
 Filecoin
 fmtchk
 fmtfix
@@ -149,6 +152,7 @@ Hackathons
 headful
 headlessui
 healthz
+healthcheckv
 HIDPI
 hotfixes
 hotspots
@@ -173,6 +177,7 @@ iohk
 IPFS
 iphoneos
 iphonesimulator
+jaegertracing
 jdbc
 jetbrains
 jlumbroso

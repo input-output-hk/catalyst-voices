@@ -21,10 +21,8 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
 * **Node.js** (v18 or higher)
 * **npm** package manager
 * **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/)
-   or download using [puppeteer](https://pptr.dev/browsers-api))
+  or download using [puppeteer](https://pptr.dev/browsers-api))
 * Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
-* Check `catalyst_voices/apps/voices/e2e_tests/.env.example` for the environment variables
-   (for testing on localhost, use `localhost:5555`)
 
 ### Installation
 
@@ -70,15 +68,49 @@ Most of the time you will want to use the `getAccountModel` and `getWalletConfig
 example:
 
 ```ts
-const accountModel = getAccountModel('DummyForTesting');
-const walletConfig = getWalletConfigByName('Lace');
+const accountModel = getAccountModel("DummyForTesting");
+const walletConfig = getWalletConfigByName("Lace");
 ```
 
 In the tests you will be able to use the `testModel` fixture to get the account and wallet config.
 
 ```ts
-test('test', async ({ testModel }) => {
+test("test", async ({ testModel }) => {
   const accountModel = testModel.accountModel;
   const walletConfig = testModel.walletConfig;
 });
 ```
+
+### Running tests in containers
+
+1. Navigate to the e2e tests directory
+
+   ```bash
+   cd catalyst_voices/apps/voices/e2e_tests
+   ```
+
+2. Build all images
+
+   ```bash
+   earthly +all-images
+   ```
+
+3. Spin up Gateway and Voices
+
+   ```bash
+   docker compose up nginx
+   ```
+
+4. Wait until the Gateway is healthy
+
+   ```bash
+   curl --location 'http://localhost:80/api/gateway/v1/health/ready'
+   ```
+
+   This should return 204.
+
+5. Run the tests
+
+   ```bash
+   npx playwright test
+   ```

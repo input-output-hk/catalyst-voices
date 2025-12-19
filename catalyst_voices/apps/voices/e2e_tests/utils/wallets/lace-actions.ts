@@ -17,6 +17,8 @@ export class LaceActions implements WalletActions {
 
     // Handle the next page (sometimes shows "Choose recovery method")
     await this.handleNextPage();
+    await this.page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
+    await this.handleNextPage();
 
     // Select 15-word recovery phrase
     await this.page.locator('//span[@data-testid="recovery-phrase-15"]').click();

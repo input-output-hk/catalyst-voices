@@ -37,6 +37,8 @@ export class ProfileSetupPanel extends OnboardingBasePage {
   }
   async goto() {
     await new IntroductionPanel(this.page, this.testModel).goto();
+    await new IntroductionPanel(this.page, this.testModel).tosCheckboxClick();
+    await new IntroductionPanel(this.page, this.testModel).privacyPolicyCheckboxClick();
     await new IntroductionPanel(this.page, this.testModel).createYourProfileClick();
   }
 }
