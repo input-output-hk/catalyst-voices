@@ -130,6 +130,7 @@ export 'signed_document/signed_document_payload.dart';
 export 'sync/documents_sync_result.dart';
 export 'sync/sync_stats.dart';
 export 'user/account.dart';
+export 'user/account_invites_approvals_count.dart';
 export 'user/account_public_profile.dart';
 export 'user/account_public_rbac_status.dart';
 export 'user/account_public_status.dart';

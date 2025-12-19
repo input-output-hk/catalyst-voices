@@ -115,26 +115,23 @@ sealed class _MenuItemEvent {
   const _MenuItemEvent();
 }
 
-final class _MyOpportunities extends _MenuItemEvent {
-  const _MyOpportunities();
+final class _MyActionsEvent extends _MenuItemEvent {
+  const _MyActionsEvent();
+}
+
+class _MyActionsTile extends StatelessWidget {
+  const _MyActionsTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return MyActionsMenuItemTile(
+      onTap: () => Navigator.pop(context, const _MyActionsEvent()),
+    );
+  }
 }
 
 final class _OpenAccountDetails extends _MenuItemEvent {
   const _OpenAccountDetails();
-}
-
-class _Opportunities extends StatelessWidget {
-  const _Opportunities();
-
-  @override
-  Widget build(BuildContext context) {
-    return MenuItemTile(
-      key: const Key('MyOpportunitiesMenuItem'),
-      title: Text(context.l10n.myOpportunities),
-      leading: VoicesAssets.icons.lightBulb.buildIcon(),
-      onTap: () => Navigator.pop(context, const _MyOpportunities()),
-    );
-  }
 }
 
 class _PopupMenu extends StatelessWidget {
@@ -151,8 +148,7 @@ class _PopupMenu extends StatelessWidget {
           children: [
             _AccountHeader(),
             VoicesDivider.expanded(),
-            _Opportunities(),
-            MyActionsMenuItemTile(),
+            _MyActionsTile(),
             VoicesDivider.expanded(),
             _Account(),
             _Settings(),
@@ -279,8 +275,8 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with 
         unawaited(launchUri(uri));
       case _Lock():
         unawaited(context.read<SessionCubit>().lock());
-      case _MyOpportunities():
-        Scaffold.maybeOf(context)?.openEndDrawer();
+      case _MyActionsEvent():
+      // TODO(LynxLynxx): call new My Actions side sheet
     }
   }
 }

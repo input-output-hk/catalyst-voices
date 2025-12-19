@@ -25,20 +25,24 @@ final class SessionCubit extends Cubit<SessionState>
   final AccessControl _accessControl;
   final AdminTools _adminTools;
   final FeatureFlagsService _featureFlagsService;
+  final ProposalService _proposalService;
 
   final _logger = Logger('SessionCubit');
 
+  // TODO(LynxLynxx): Create SessionCubitCache
   UserSettings? _userSettings;
   Account? _account;
   AdminToolsState _adminToolsState;
   bool _hasWallets = false;
   bool _isVotingFeatureFlagEnabled = false;
+  bool _hasProposalActions = false;
 
   StreamSubscription<UserSettings>? _userSettingsSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
   StreamSubscription<Account?>? _accountSub;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
   StreamSubscription<bool>? _votingFeatureFlagValueSub;
+  StreamSubscription<bool>? _hasProposalActionsSub;
 
   SessionCubit(
     this._userService,
@@ -47,34 +51,9 @@ final class SessionCubit extends Cubit<SessionState>
     this._accessControl,
     this._adminTools,
     this._featureFlagsService,
+    this._proposalService,
   ) : _adminToolsState = _adminTools.state,
-      super(const SessionState.initial()) {
-    _userSettingsSub = _userService.watchUser
-        .map((user) => user.settings)
-        .distinct()
-        .listen(_handleUserSettings);
-
-    _keychainUnlockedSub = _userService.watchUnlockedActiveAccount
-        .map((account) => account != null)
-        .distinct()
-        .listen(_onActiveKeychainUnlockChanged);
-
-    _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
-
-    _accountSub = _userService.watchUser
-        .map((user) => user.activeAccount)
-        .listen(_onActiveAccountChanged);
-
-    _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
-
-    _votingFeatureFlagValueSub = _featureFlagsService
-        .watchFeatureFlag(Features.voting)
-        .listen(_onVotingFeatureFlagChanged);
-
-    if (!_alwaysAllowRegistration) {
-      unawaited(checkAvailableWallets());
-    }
-  }
+      super(const SessionState.initial());
 
   Future<bool> checkAvailableWallets() async {
     final wallets = await _registrationService.getCardanoWallets().onError((_, __) => const []);
@@ -107,7 +86,42 @@ final class SessionCubit extends Cubit<SessionState>
     await _votingFeatureFlagValueSub?.cancel();
     _votingFeatureFlagValueSub = null;
 
+    await _hasProposalActionsSub?.cancel();
+    _hasProposalActionsSub = null;
+
     return super.close();
+  }
+
+  /// Initializes all stream subscriptions for the session cubit.
+  /// This should be called once when the app starts, after dependencies are initialized.
+  void init() {
+    _userSettingsSub = _userService.watchUser
+        .map((user) => user.settings)
+        .distinct()
+        .listen(_handleUserSettings);
+
+    _keychainUnlockedSub = _userService.watchUnlockedActiveAccount
+        .map((account) => account != null)
+        .distinct()
+        .listen(_onActiveKeychainUnlockChanged);
+
+    _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
+
+    _accountSub = _userService.watchUser
+        .map((user) => user.activeAccount)
+        .listen(_onActiveAccountChanged);
+
+    _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
+
+    _votingFeatureFlagValueSub = _featureFlagsService
+        .watchFeatureFlag(Features.voting)
+        .listen(_onVotingFeatureFlagChanged);
+
+    _initProposalActionsSubscription();
+
+    if (!_alwaysAllowRegistration) {
+      unawaited(checkAvailableWallets());
+    }
   }
 
   Future<void> lock() async {
@@ -187,15 +201,18 @@ final class SessionCubit extends Cubit<SessionState>
           overallSpaces: spaces,
           spacesShortcuts: spacesShortcuts,
           canCreateAccount: true,
+          hasProposalActions: _hasProposalActions,
         );
       case SessionStatus.guest:
-        return const SessionState.guest(
+        return SessionState.guest(
           canCreateAccount: true,
+          hasProposalActions: _hasProposalActions,
         );
       case SessionStatus.visitor:
-        return const SessionState.visitor(
+        return SessionState.visitor(
           isRegistrationInProgress: false,
           canCreateAccount: true,
+          hasProposalActions: _hasProposalActions,
         );
     }
   }
@@ -216,6 +233,7 @@ final class SessionCubit extends Cubit<SessionState>
         canCreateAccount: canCreateAccount,
         isRegistrationInProgress: !isEmpty,
         settings: sessionSettings,
+        hasProposalActions: _hasProposalActions,
       );
     }
 
@@ -223,6 +241,7 @@ final class SessionCubit extends Cubit<SessionState>
       return SessionState.guest(
         canCreateAccount: canCreateAccount,
         settings: sessionSettings,
+        hasProposalActions: _hasProposalActions,
       );
     }
 
@@ -245,6 +264,7 @@ final class SessionCubit extends Cubit<SessionState>
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,
       settings: sessionSettings,
+      hasProposalActions: _hasProposalActions,
     );
   }
 
@@ -274,11 +294,29 @@ final class SessionCubit extends Cubit<SessionState>
     _updateState();
   }
 
+  void _initProposalActionsSubscription() {
+    unawaited(_hasProposalActionsSub?.cancel());
+    _hasProposalActionsSub = null;
+
+    final account = _account;
+    if (account == null) {
+      _hasProposalActions = false;
+      return;
+    }
+
+    _hasProposalActionsSub = _proposalService
+        .watchInvitesApprovalsCount(id: account.catalystId)
+        .map((count) => count.hasActions)
+        .distinct()
+        .listen(_onHasProposalActionsChanged);
+  }
+
   void _onActiveAccountChanged(Account? account) {
     _logger.fine('Active account changed [$account]');
 
     _account = account;
 
+    _initProposalActionsSubscription();
     _emitAccountBasedSignal();
     _updateState();
   }
@@ -294,6 +332,13 @@ final class SessionCubit extends Cubit<SessionState>
     _logger.fine('Admin tools changed: $adminTools');
 
     _adminToolsState = adminTools;
+    _updateState();
+  }
+
+  void _onHasProposalActionsChanged(bool hasActions) {
+    _logger.fine('Has proposal actions changed: $hasActions');
+
+    _hasProposalActions = hasActions;
     _updateState();
   }
 

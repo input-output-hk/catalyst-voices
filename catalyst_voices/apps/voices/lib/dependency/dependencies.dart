@@ -95,6 +95,7 @@ final class Dependencies extends DependencyProvider {
             get<AccessControl>(),
             get<AdminTools>(),
             get<FeatureFlagsService>(),
+            get<ProposalService>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
