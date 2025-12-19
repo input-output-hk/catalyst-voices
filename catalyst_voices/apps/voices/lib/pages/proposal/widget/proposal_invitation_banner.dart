@@ -66,6 +66,44 @@ class _AcceptButton extends StatelessWidget {
   }
 }
 
+class _ChangeToAllowButton extends StatelessWidget {
+  const _ChangeToAllowButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesOutlinedButton(
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      child: Text(context.l10n.proposalViewRejectedInvitationBannerChangeToAllow),
+      onTap: () => _acceptInvitation(context),
+    );
+  }
+
+  void _acceptInvitation(BuildContext context) {
+    unawaited(context.read<ProposalCubit>().acceptInvitation());
+  }
+}
+
+class _ChangeToDenyButton extends StatelessWidget {
+  const _ChangeToDenyButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesOutlinedButton(
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      child: Text(context.l10n.proposalViewAcceptedInvitationBannerChangeToDeny),
+      onTap: () => _rejectInvitation(context),
+    );
+  }
+
+  void _rejectInvitation(BuildContext context) {
+    unawaited(context.read<ProposalCubit>().rejectInvitation());
+  }
+}
+
 class _InvitationAcceptedBanner extends StatelessWidget {
   const _InvitationAcceptedBanner();
 
@@ -74,6 +112,7 @@ class _InvitationAcceptedBanner extends StatelessWidget {
     return _InvitationDismissibleBanner(
       icon: VoicesAssets.icons.check.buildIcon(color: Theme.of(context).colors.iconsSuccess),
       message: context.l10n.proposalViewAcceptedInvitationBannerMessage,
+      button: const _ChangeToDenyButton(),
     );
   }
 }
@@ -81,10 +120,12 @@ class _InvitationAcceptedBanner extends StatelessWidget {
 class _InvitationDismissibleBanner extends StatelessWidget {
   final Widget icon;
   final String message;
+  final Widget button;
 
   const _InvitationDismissibleBanner({
     required this.icon,
     required this.message,
+    required this.button,
   });
 
   @override
@@ -107,18 +148,20 @@ class _InvitationDismissibleBanner extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 8,
           children: [
             IconTheme(
               data: IconTheme.of(context).copyWith(size: 28),
               child: icon,
             ),
+            const SizedBox(width: 8),
             Flexible(
               child: MarkdownText(
                 MarkdownData(message),
                 pStyle: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
+            const SizedBox(width: 16),
+            button,
           ],
         ),
       ),
@@ -169,6 +212,7 @@ class _InvitationRejectedBanner extends StatelessWidget {
     return _InvitationDismissibleBanner(
       icon: VoicesAssets.icons.xCircle.buildIcon(color: Theme.of(context).colors.iconsError),
       message: context.l10n.proposalViewRejectedInvitationBannerMessage,
+      button: const _ChangeToAllowButton(),
     );
   }
 }
