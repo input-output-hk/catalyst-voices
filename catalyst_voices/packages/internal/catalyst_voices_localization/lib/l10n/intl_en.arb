@@ -509,9 +509,9 @@
   "@collaboratorFinalProposalAcceptMessage": {
     "description": "Dialog message when accepting a final proposal as a collaborator."
   },
-  "collaboratorFinalProposalAcceptTitle": "Display consent?",
+  "collaboratorFinalProposalAcceptTitle": "Final Publishing consent?",
   "@collaboratorFinalProposalAcceptTitle": {
-    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+    "description": "Dialog title when accepting a final proposal as a collaborator."
   },
   "collaboratorFinalProposalRejectButton": "Reject Final Proposal",
   "@collaboratorFinalProposalRejectButton": {
@@ -533,9 +533,9 @@
   "@collaboratorInvitationAcceptMessage": {
     "description": "Dialog message when accepting an invitation to become a collaborator on a proposal."
   },
-  "collaboratorInvitationAcceptTitle": "Final Publishing consent?",
+  "collaboratorInvitationAcceptTitle": "Display consent?",
   "@collaboratorInvitationAcceptTitle": {
-    "description": "Dialog title when accepting a final proposal as a collaborator."
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
   },
   "collaboratorInvitationRejectButton": "Deny",
   "@collaboratorInvitationRejectButton": {
