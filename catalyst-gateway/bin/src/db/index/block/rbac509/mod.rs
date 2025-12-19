@@ -355,7 +355,7 @@ impl Rbac509InsertQuery {
             ));
         // Record new stake addresses that are not marked as removed.
         for address in added_stake_addresses
-            .difference(&removed_stake_addresses)
+            .difference(removed_stake_addresses)
             .cloned()
         {
             self.catalyst_id_for_stake_address.push(
