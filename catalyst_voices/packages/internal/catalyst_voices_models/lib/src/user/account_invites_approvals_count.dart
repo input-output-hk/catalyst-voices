@@ -6,10 +6,10 @@ final class AccountInvitesApprovalsCount extends Equatable {
 
   const AccountInvitesApprovalsCount({required this.invitesCount, required this.approvalsCount});
 
-  bool get hasActions => sum > 0;
+  bool get hasActions => totalCount > 0;
 
   @override
   List<Object?> get props => [invitesCount, approvalsCount];
 
-  int get sum => invitesCount + approvalsCount;
+  int get totalCount => invitesCount + approvalsCount;
 }

@@ -359,7 +359,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     unawaited(_invitationsAndApprovalsSub?.cancel());
     _invitationsAndApprovalsSub = _proposalService
         .watchInvitesApprovalsCount(id: activeCatalystId)
-        .map((countInfo) => countInfo.sum)
+        .map((countInfo) => countInfo.totalCount)
         .distinct()
         .listen((count) => add(WorkspaceInvitationsAndApprovalsCount(count)));
   }
