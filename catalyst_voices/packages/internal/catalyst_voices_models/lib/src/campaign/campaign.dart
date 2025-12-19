@@ -228,6 +228,7 @@ enum CampaignPhaseStatus {
   }
 
   bool get isActive => this == CampaignPhaseStatus.active;
+  bool get isPost => this == CampaignPhaseStatus.post;
 }
 
 enum CampaignPublish {
