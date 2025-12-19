@@ -16,6 +16,14 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
     List<DocumentType>? excludeTypes,
   });
 
+  /// Persists a single [DocumentData] object to local storage.
+  ///
+  /// If the document already exists, it should be updated (upsert).
+  Future<void> save({required DocumentData data});
+
+  /// Persists multiple [DocumentData] objects to local storage in a batch.
+  Future<void> saveAll(Iterable<DocumentData> data);
+
   /// Updates the content of an existing draft identified by [ref].
   ///
   /// This is distinct from [save] as it implies modifying the payload

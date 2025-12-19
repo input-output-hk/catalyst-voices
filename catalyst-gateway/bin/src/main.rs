@@ -11,6 +11,7 @@ mod metrics;
 mod rbac;
 mod service;
 mod settings;
+mod telemetry;
 mod utils;
 
 #[tokio::main]

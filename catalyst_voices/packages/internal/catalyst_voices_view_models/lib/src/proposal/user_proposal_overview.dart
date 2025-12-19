@@ -40,7 +40,7 @@ final class UsersProposalOverview extends Equatable {
     required bool fromActiveCampaign,
     CatalystId? activeAccountId,
   }) {
-    final publish = ProposalPublishExt.getStatus(
+    final publish = ProposalPublish.getStatus(
       isFinal: proposalData.isFinal,
       ref: proposalData.id,
     );

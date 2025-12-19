@@ -105,7 +105,13 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          versions: [ProposalBriefDataVersion(ref: signedDocId, title: 'Published Proposal')],
+          versions: [
+            ProposalBriefDataVersion(
+              ref: signedDocId,
+              title: 'Published Proposal',
+              versionNumber: 1,
+            ),
+          ],
         );
 
         // A completely new local draft
@@ -146,7 +152,7 @@ void main() {
         final briefsStream = proposalService.watchWorkspaceProposalsBrief(filters: filters);
         final countStream = proposalService.watchProposalsCountV2(
           filters: filters,
-          includeLocals: true,
+          includeLocalDrafts: true,
         );
 
         // Then - verify count matches list length
@@ -155,7 +161,7 @@ void main() {
 
         expect(count, equals(briefs.length)); // Should both be 2 (1 published + 1 local draft)
         expect(count, equals(2));
-        expect(briefs.length, equals(2));
+        expect(briefs, hasLength(2));
       });
 
       test('merges signed and local proposals correctly', () async {
@@ -172,7 +178,13 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          versions: [ProposalBriefDataVersion(ref: signedDocId, title: 'Published Proposal')],
+          versions: [
+            ProposalBriefDataVersion(
+              ref: signedDocId,
+              title: 'Published Proposal',
+              versionNumber: 1,
+            ),
+          ],
         );
 
         // A local draft version of the SAME signed proposal

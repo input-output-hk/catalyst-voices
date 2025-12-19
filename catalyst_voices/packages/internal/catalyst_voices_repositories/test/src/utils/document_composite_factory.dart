@@ -1,11 +1,13 @@
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_artifacts.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:drift/drift.dart';
 
 final class DocumentCompositeFactory {
   DocumentCompositeFactory._();
@@ -27,10 +29,12 @@ final class DocumentCompositeFactory {
     String? templateVer,
     List<DocumentRef> parameters = const [],
     List<CatalystId> collaborators = const [],
+    DocumentArtifact? artifact,
   }) {
     id ??= DocumentRefFactory.randomUuidV7();
     ver ??= id;
     authors ??= const [];
+    artifact ??= DocumentArtifact(Uint8List(0));
 
     final docEntity = DocumentEntityV2(
       id: id,
@@ -49,6 +53,12 @@ final class DocumentCompositeFactory {
       templateVer: templateVer,
       collaborators: collaborators,
       parameters: DocumentParameters(parameters.map((e) => e.toSignedDocumentRef()).toSet()),
+    );
+
+    final docArtifact = DocumentArtifactEntity(
+      data: artifact.value,
+      id: id,
+      ver: ver,
     );
 
     final authorsEntities = authors
@@ -88,6 +98,7 @@ final class DocumentCompositeFactory {
 
     return DocumentCompositeEntity(
       docEntity,
+      artifact: docArtifact,
       authors: authorsEntities,
       parameters: parametersEntities,
       collaborators: collaboratorsEntities,
