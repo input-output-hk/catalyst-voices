@@ -57,17 +57,31 @@ final class ProposalCubit extends Cubit<ProposalState>
         .listen(_handleActiveAccountIdChanged);
   }
 
-  Future<void> acceptInvitation() async {
+  Future<void> acceptCollaboratorInvitation() async {
     try {
       await _proposalService.respondToCollaboratorInvite(
         ref: _cache.ref!,
         action: CollaboratorInvitationAction.accept,
       );
       if (!isClosed) {
-        emit(state.copyWith(invitation: const AcceptedCollaboratorInvitationState()));
+        emit(state.copyWith(collaborator: const AcceptedCollaboratorInvitationState()));
       }
     } catch (error, stackTrace) {
-      _logger.severe('acceptInvitation', error, stackTrace);
+      _logger.severe('acceptCollaboratorInvitation', error, stackTrace);
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
+    }
+  }
+
+  Future<void> acceptFinalProposal() async {
+    try {
+      // TODO(dt-iohk): send proposal action to approve it
+      if (!isClosed) {
+        emit(state.copyWith(collaborator: const AcceptedFinalProposalConsentState()));
+      }
+    } catch (error, stackTrace) {
+      _logger.severe('acceptFinalProposal', error, stackTrace);
       if (!isClosed) {
         emitError(LocalizedException.create(error));
       }
@@ -93,8 +107,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     return super.close();
   }
 
-  Future<void> dismissInvitation() async {
-    emit(state.copyWith(invitation: const NoneCollaboratorInvitationState()));
+  Future<void> dismissCollaboratorBanner() async {
+    emit(state.copyWith(collaborator: const NoneCollaboratorProposalState()));
   }
 
   Future<void> load({required DocumentRef ref}) async {
@@ -120,7 +134,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         category,
         commentTemplate,
         isFavorite,
-        invitation,
+        collaborator,
       ) = await (
         _isReadOnlyMode(),
         // TODO(dt-iohk): consider to use campaign assigned to the proposal
@@ -130,7 +144,7 @@ final class ProposalCubit extends Cubit<ProposalState>
           category: proposal.document.metadata.parameters.set.first,
         ),
         _documentsService.isFavorite(ref),
-        _getCollaboratorInvitation(proposalCollaborators, _cache.activeAccountId),
+        _getCollaboratorState(proposalCollaborators, _cache.activeAccountId),
       ).wait;
 
       if (isClosed) {
@@ -172,7 +186,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(
         ProposalState(
           data: proposalViewData,
-          invitation: invitation,
+          collaborator: collaborator,
           readOnlyMode: isReadOnlyMode,
         ),
       );
@@ -198,17 +212,32 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
-  Future<void> rejectInvitation() async {
+  Future<void> rejectCollaboratorInvitation() async {
     try {
       await _proposalService.respondToCollaboratorInvite(
         ref: _cache.ref!,
         action: CollaboratorInvitationAction.reject,
       );
       if (!isClosed) {
-        emit(state.copyWith(invitation: const RejectedCollaboratorInvitationState()));
+        emit(state.copyWith(collaborator: const RejectedCollaboratorInvitationState()));
       }
     } catch (error, stackTrace) {
-      _logger.severe('rejectInvitation', error, stackTrace);
+      _logger.severe('rejectCollaboratorInvitation', error, stackTrace);
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
+    }
+  }
+
+  Future<void> rejectFinalProposal() async {
+    try {
+      // TODO(dt-iohk): send proposal action to reject it
+
+      if (!isClosed) {
+        emit(state.copyWith(collaborator: const RejectedCollaboratorFinalProposalConsentState()));
+      }
+    } catch (error, stackTrace) {
+      _logger.severe('rejectFinalProposal', error, stackTrace);
       if (!isClosed) {
         emitError(LocalizedException.create(error));
       }
@@ -542,17 +571,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     ];
   }
 
-  // TODO(dt-iohk): remove dummy logic when data source for invitations is ready
-  Future<CollaboratorInvitationState> _getCollaboratorInvitation(
-    List<Collaborator> collaborators,
-    CatalystId? activeAccountId,
-  ) async {
-    if (activeAccountId != null && collaborators.none((e) => e.id == activeAccountId)) {
-      return const PendingCollaboratorInvitationState();
-    }
-    return const NoneCollaboratorInvitationState();
-  }
-
   Future<List<Collaborator>> _getCollaborators() async {
     // TODO(dt-iohk): connect to real data source and remove hardcoded collaborators.
     /* cSpell:disable */
@@ -570,6 +588,17 @@ final class ProposalCubit extends Cubit<ProposalState>
           status: status,
         ),
     ];
+  }
+
+  // TODO(dt-iohk): remove dummy logic when data source for invitations is ready
+  Future<CollaboratorProposalState> _getCollaboratorState(
+    List<Collaborator> collaborators,
+    CatalystId? activeAccountId,
+  ) async {
+    if (activeAccountId != null && collaborators.none((e) => e.id == activeAccountId)) {
+      return const PendingCollaboratorInvitationState();
+    }
+    return const NoneCollaboratorProposalState();
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {

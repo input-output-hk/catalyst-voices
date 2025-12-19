@@ -7,7 +7,7 @@ final class ProposalState extends Equatable {
   final bool isLoading;
   final ProposalViewData data;
   final CommentsState comments;
-  final CollaboratorInvitationState invitation;
+  final CollaboratorProposalState collaborator;
   final LocalizedException? error;
   final bool readOnlyMode;
 
@@ -15,7 +15,7 @@ final class ProposalState extends Equatable {
     this.isLoading = false,
     this.data = const ProposalViewData(),
     this.comments = const CommentsState(),
-    this.invitation = const NoneCollaboratorInvitationState(),
+    this.collaborator = const NoneCollaboratorProposalState(),
     this.error,
     this.readOnlyMode = false,
   });
@@ -25,7 +25,7 @@ final class ProposalState extends Equatable {
     isLoading,
     data,
     comments,
-    invitation,
+    collaborator,
     error,
     readOnlyMode,
   ];
@@ -38,7 +38,7 @@ final class ProposalState extends Equatable {
     bool? isLoading,
     ProposalViewData? data,
     CommentsState? comments,
-    CollaboratorInvitationState? invitation,
+    CollaboratorProposalState? collaborator,
     Optional<LocalizedException>? error,
     bool? readOnlyMode,
   }) {
@@ -46,7 +46,7 @@ final class ProposalState extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       data: data ?? this.data,
       comments: comments ?? this.comments,
-      invitation: invitation ?? this.invitation,
+      collaborator: collaborator ?? this.collaborator,
       error: error.dataOr(this.error),
       readOnlyMode: readOnlyMode ?? this.readOnlyMode,
     );

@@ -4,19 +4,41 @@ final class AcceptedCollaboratorInvitationState extends CollaboratorInvitationSt
   const AcceptedCollaboratorInvitationState();
 }
 
-sealed class CollaboratorInvitationState extends Equatable {
+final class AcceptedFinalProposalConsentState extends CollaboratorFinalProposalConsentState {
+  const AcceptedFinalProposalConsentState();
+}
+
+sealed class CollaboratorFinalProposalConsentState extends CollaboratorProposalState {
+  const CollaboratorFinalProposalConsentState();
+}
+
+sealed class CollaboratorInvitationState extends CollaboratorProposalState {
   const CollaboratorInvitationState();
+}
+
+sealed class CollaboratorProposalState extends Equatable {
+  const CollaboratorProposalState();
 
   @override
   List<Object?> get props => [];
 }
 
-final class NoneCollaboratorInvitationState extends CollaboratorInvitationState {
-  const NoneCollaboratorInvitationState();
+final class NoneCollaboratorProposalState extends CollaboratorProposalState {
+  const NoneCollaboratorProposalState();
+}
+
+final class PendingCollaboratorFinalProposalConsentState
+    extends CollaboratorFinalProposalConsentState {
+  const PendingCollaboratorFinalProposalConsentState();
 }
 
 final class PendingCollaboratorInvitationState extends CollaboratorInvitationState {
   const PendingCollaboratorInvitationState();
+}
+
+final class RejectedCollaboratorFinalProposalConsentState
+    extends CollaboratorFinalProposalConsentState {
+  const RejectedCollaboratorFinalProposalConsentState();
 }
 
 final class RejectedCollaboratorInvitationState extends CollaboratorInvitationState {
