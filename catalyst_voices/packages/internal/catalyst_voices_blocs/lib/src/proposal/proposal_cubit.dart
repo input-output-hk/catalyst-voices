@@ -480,13 +480,15 @@ final class ProposalCubit extends Cubit<ProposalState>
   Future<void> _handleProposalData(ProposalDataV2? proposal) async {
     try {
       if (proposal == null) {
-        emit(state.copyWith(error: const Optional(LocalizedNotFoundException()), isLoading: false));
+        return emit(state.copyWith(error: const Optional(LocalizedNotFoundException())));
       }
 
-      if (proposal?.proposalOrDocument.asProposalDocument == null) {
-        // TODO(LynxLynxx): emitError that template is missing;
+      if (proposal.proposalOrDocument.asProposalDocument == null) {
+        return emit(
+          state.copyWith(error: const Optional(LocalizedProposalTemplateNotFoundException())),
+        );
       }
-      final proposalOrDocument = proposal!.proposalOrDocument;
+      final proposalOrDocument = proposal.proposalOrDocument;
       final proposalDocument = proposal.proposalOrDocument.asProposalDocument!;
 
       final campaign = proposalOrDocument.campaign;
@@ -528,13 +530,15 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       final proposalViewData = _rebuildProposalViewData();
 
-      emit(
-        ProposalState(
-          data: proposalViewData,
-          invitation: invitation,
-          readOnlyMode: isReadOnlyMode,
-        ),
-      );
+      if (!isClosed) {
+        emit(
+          ProposalState(
+            data: proposalViewData,
+            invitation: invitation,
+            readOnlyMode: isReadOnlyMode,
+          ),
+        );
+      }
 
       if (proposalViewData.isCurrentVersionLatest == false &&
           isVotingStage &&
