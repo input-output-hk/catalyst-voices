@@ -194,11 +194,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 }
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
+  /// Looks up matching signed document according to [ref].
   @override
   Future<DocumentDataWithArtifact?> get(DocumentRef ref);
 
   Future<String?> getLatestVersion(String id);
 
+  /// Looks up all signed document refs according to [filters].
+  ///
+  /// Response is paginated using [page] and [limit].
   Future<DocumentIndex> index({
     int page,
     int limit,

@@ -298,6 +298,13 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())
+      ..registerLazySingleton<DocumentsSynchronizer>(() {
+        return DocumentsSynchronizer(
+          get<CatalystDatabase>(),
+          get<DatabaseDocumentsDataSource>(),
+          get<CatGatewayDocumentDataSource>(),
+        );
+      })
       ..registerLazySingleton<ProposalRepository>(
         () => ProposalRepository(
           get<SignedDocumentManager>(),
@@ -435,6 +442,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<DocumentsService>(() {
       return DocumentsService(
         get<DocumentRepository>(),
+        get<DocumentsSynchronizer>(),
       );
     });
     registerLazySingleton<DevToolsService>(() {

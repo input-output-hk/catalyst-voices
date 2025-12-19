@@ -28,13 +28,6 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
-  /// Analyzes the database to gather statistics and potentially optimize it.
-  ///
-  /// This can be a long-running operation, so it should be used judiciously,
-  /// for example, during application startup or in a background process
-  /// for maintenance.
-  Future<void> analyzeDatabase();
-
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef id,
@@ -114,27 +107,6 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
-  /// Gets [DocumentDataWithArtifact] from remote. This method do not access any of cache.
-  // TODO(damian-molinski): refactor documents sync into object which has remote source
-  // so this could be removed from here.
-  Future<DocumentDataWithArtifact> getRemoteDocumentDataWithArtifact({
-    required SignedDocumentRef id,
-  });
-
-  /// Looks up all signed document refs according to [filters].
-  ///
-  /// Response is paginated using [page] and [limit].
-  Future<DocumentIndex> index({
-    required int page,
-    required int limit,
-    required DocumentIndexFilters filters,
-  });
-
-  /// Filters and returns only the DocumentRefs from [ids] which are cached.
-  Future<List<DocumentRef>> isCachedBulk({
-    required List<DocumentRef> ids,
-  });
-
   Future<bool> isFavorite(DocumentRef id);
 
   /// Parses a document [data] previously encoded by [encodeDocumentForExport].
@@ -179,14 +151,6 @@ abstract interface class DocumentRepository {
     required DocumentData document,
     required CatalystId authorId,
   });
-
-  /// Saves a list of documents to the local storage.
-  ///
-  /// This method iterates through the provided list of [documents] and saves
-  /// each one based on its reference type.
-  ///
-  /// Method saves only signed documents with artifacts.
-  Future<void> saveSignedDocumentBulk(List<DocumentDataWithArtifact> documents);
 
   /// Creates/updates a local document draft.
   ///
@@ -255,9 +219,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._localDocuments,
     this._remoteDocuments,
   );
-
-  @override
-  Future<void> analyzeDatabase() => _db.analyze();
 
   @override
   Future<void> deleteDocumentDraft({required DraftRef id}) {
@@ -405,46 +366,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentDataWithArtifact> getRemoteDocumentDataWithArtifact({
-    required SignedDocumentRef id,
-  }) async {
-    final document = await _remoteDocuments.get(id);
-
-    if (document == null) {
-      throw DocumentNotFoundException(ref: id);
-    }
-
-    return document;
-  }
-
-  @override
-  Future<DocumentIndex> index({
-    required int page,
-    required int limit,
-    required DocumentIndexFilters filters,
-  }) {
-    return _remoteDocuments.index(
-      page: page,
-      limit: limit,
-      filters: filters,
-    );
-  }
-
-  @override
-  Future<List<DocumentRef>> isCachedBulk({required List<DocumentRef> ids}) {
-    final signedRefs = ids.whereType<SignedDocumentRef>().toList();
-    final localDraftsRefs = ids.whereType<DraftRef>().toList();
-
-    final signedDocsSave = _localDocuments.filterExisting(signedRefs);
-    final draftsDocsSave = _drafts.filterExisting(localDraftsRefs);
-
-    return [
-      signedDocsSave,
-      draftsDocsSave,
-    ].wait.then((value) => value.expand((refs) => refs).toList());
-  }
-
-  @override
   Future<bool> isFavorite(DocumentRef id) {
     return _db.localMetadataDao.isFavorite(id.id);
   }
@@ -521,16 +442,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _drafts.save(data: newDocument);
 
     return id;
-  }
-
-  @override
-  Future<void> saveSignedDocumentBulk(List<DocumentDataWithArtifact> documents) async {
-    assert(
-      documents.every((element) => element.metadata.id.isSigned),
-      'Only signed documents are supported',
-    );
-
-    return _localDocuments.saveAll(documents);
   }
 
   @override
