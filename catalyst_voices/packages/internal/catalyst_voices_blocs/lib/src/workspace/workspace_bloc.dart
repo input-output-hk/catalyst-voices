@@ -334,7 +334,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _activeCampaignSub?.cancel();
 
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.id != next?.id)
+        .distinct((previous, next) => previous?.id == next?.id)
         .listen(_handleActiveCampaignChange);
   }
 
@@ -394,7 +394,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     final streams = WorkspacePageTab.values.map((tab) {
       final filters = _buildFiltersForTab(tab);
       return _proposalService
-          .watchProposalsCountV2(filters: filters)
+          .watchProposalsCountV2(filters: filters, includeLocalDrafts: true)
           .distinct()
           .map((count) => MapEntry(tab, count));
     });

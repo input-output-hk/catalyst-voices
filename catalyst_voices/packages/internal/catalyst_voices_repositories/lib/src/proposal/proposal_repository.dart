@@ -91,6 +91,11 @@ abstract interface class ProposalRepository {
     required DocumentRef id,
     required CatalystId originalAuthor,
   });
+  
+  /// Watches the count of [author]'s local drafts (not published).
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  });
 
   /// Watches a single proposal by its reference.
   ///
@@ -289,7 +294,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> upsertDraftProposal({required DocumentData document}) {
-    return _documentRepository.upsertDocument(document: document);
+    return _documentRepository.upsertLocalDraftDocument(document: document);
   }
 
   @override
@@ -344,6 +349,12 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         .switchMap((document) {
           return Stream.fromFuture(_assembleProposalData((document, [], [])));
         });
+  }
+  
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  }) {
+    return _proposalsLocalSource.watchLocalDraftProposalsCount(author: author);
   }
 
   @override

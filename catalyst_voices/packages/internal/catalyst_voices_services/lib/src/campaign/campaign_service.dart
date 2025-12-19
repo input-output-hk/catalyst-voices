@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('CampaignService');
@@ -27,13 +28,13 @@ abstract interface class CampaignService {
 
   Future<Campaign?> getActiveCampaign();
 
+  Future<CampaignPhase> getActiveCampaignPhaseTimeline(CampaignPhaseType stage);
+
   Future<List<Campaign>> getAllCampaigns();
 
   Future<Campaign> getCampaign({
     required String id,
   });
-
-  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
@@ -58,17 +59,33 @@ final class CampaignServiceImpl implements CampaignService {
   );
 
   @override
-  Stream<Campaign?> get watchActiveCampaign => _activeCampaignObserver.watchCampaign;
+  Stream<Campaign?> get watchActiveCampaign async* {
+    if (_activeCampaignObserver.campaign == null) {
+      await _fetchInitialActiveCampaign();
+    }
+    yield* _activeCampaignObserver.watchCampaign;
+  }
 
   @override
   Future<Campaign?> getActiveCampaign() async {
-    if (_activeCampaignObserver.campaign != null) {
-      return _activeCampaignObserver.campaign;
+    final activeCampaign = _activeCampaignObserver.campaign;
+    if (activeCampaign != null) {
+      return activeCampaign;
+    } else {
+      return _fetchInitialActiveCampaign();
     }
-    // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = await getCampaign(id: initialActiveCampaignRef.id);
-    _activeCampaignObserver.campaign = campaign;
-    return campaign;
+  }
+
+  @override
+  Future<CampaignPhase> getActiveCampaignPhaseTimeline(CampaignPhaseType type) async {
+    final campaign = await getActiveCampaign();
+    if (campaign == null) {
+      // TODO(dt-iohk): Add specialized exceptions here.
+      // Later Campaign will by dynamic and there is no guarantee we do have active campaign.
+      throw StateError('No active campaign found');
+    }
+
+    return campaign.getPhaseTimeline(type);
   }
 
   @override
@@ -86,20 +103,6 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType type) async {
-    final campaign = await getActiveCampaign();
-    if (campaign == null) {
-      throw StateError('No active campaign found');
-    }
-
-    final timelineStage = campaign.timeline.phases.firstWhere(
-      (element) => element.type == type,
-      orElse: () => throw StateError('Type $type not found'),
-    );
-    return timelineStage;
-  }
-
-  @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     final category = await _campaignRepository.getCategory(ref);
     if (category == null) {
@@ -108,7 +111,14 @@ final class CampaignServiceImpl implements CampaignService {
       );
     }
 
-    final proposalSubmissionStage = await getCampaignPhaseTimeline(
+    final campaign = await _getCampaignWithCategory(ref);
+    if (campaign == null) {
+      throw NotFoundException(
+        message: 'Did not find campaign which contains the category with ref $ref',
+      );
+    }
+
+    final proposalSubmissionStage = campaign.getPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
 
@@ -124,15 +134,20 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<void> setActiveCampaign(Campaign campaign) async {
-    if (_activeCampaignObserver.campaign?.id != campaign.id) {
-      _activeCampaignObserver.campaign = campaign;
-    }
+    _activeCampaignObserver.campaign = campaign;
   }
 
   @override
-  Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters}) {
-    return _proposalRepository
-        .watchProposalTemplates(campaign: filters.campaign ?? CampaignFilters.active())
+  Stream<CampaignTotalAsk> watchCampaignTotalAsk({
+    required ProposalsTotalAskFilters filters,
+  }) async* {
+    final campaignFilters = filters.campaign;
+    if (campaignFilters == null) {
+      throw StateError('Campaign filters are required to watch campaign total ask!');
+    }
+
+    yield* _proposalRepository
+        .watchProposalTemplates(campaign: campaignFilters)
         .map((templates) => templates.map((template) => template.toMapEntry()))
         .map(Map.fromEntries)
         .switchMap((templatesMoneyFormat) {
@@ -146,16 +161,20 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) {
-    final activeCampaign = _activeCampaignObserver.campaign;
-    final campaignFilters = activeCampaign != null ? CampaignFilters.from(activeCampaign) : null;
+  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) async* {
+    final campaign = await _getCampaignWithCategory(ref);
+    if (campaign == null) {
+      throw NotFoundException(
+        message: 'Did not find campaign which contains the category with ref $ref',
+      );
+    }
 
     final filters = ProposalsTotalAskFilters(
       categoryId: ref.id,
-      campaign: campaignFilters,
+      campaign: CampaignFilters.from(campaign),
     );
 
-    return watchCampaignTotalAsk(
+    yield* watchCampaignTotalAsk(
       filters: filters,
     ).map((campaignTotalAsk) => campaignTotalAsk.categoryOrZero(ref));
   }
@@ -197,6 +216,18 @@ final class CampaignServiceImpl implements CampaignService {
     return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
   }
 
+  Future<Campaign?> _fetchInitialActiveCampaign() async {
+    // TODO(LynxLynxx): Call backend to get latest active campaign
+    final campaign = await getCampaign(id: initialActiveCampaignRef.id);
+    _activeCampaignObserver.campaign = campaign;
+    return campaign;
+  }
+
+  Future<Campaign?> _getCampaignWithCategory(SignedDocumentRef ref) async {
+    final allCampaigns = await getAllCampaigns();
+    return allCampaigns.firstWhereOrNull((campaign) => campaign.hasCategory(ref.id));
+  }
+
   Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
     final proposalSubmissionTime = campaign
         .phaseStateTo(CampaignPhaseType.proposalSubmission)
@@ -225,5 +256,14 @@ extension on ProposalTemplate {
         : null;
 
     return MapEntry(ref, (category: category, moneyFormat: moneyFormat));
+  }
+}
+
+extension on Campaign {
+  CampaignPhase getPhaseTimeline(CampaignPhaseType type) {
+    return timeline.phases.firstWhere(
+      (element) => element.type == type,
+      orElse: () => throw StateError('Campaign $id does not have $type phase'),
+    );
   }
 }

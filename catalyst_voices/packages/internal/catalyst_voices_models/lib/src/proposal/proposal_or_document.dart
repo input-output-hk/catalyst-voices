@@ -46,14 +46,13 @@ sealed class ProposalOrDocument extends Equatable {
     return category?.formattedCategoryName;
   }
 
-  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// A brief description of the proposal.
   String? get description;
 
-  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The duration of the proposal in months.
   int? get durationInMonths;
 
+  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The number of fund this proposal was submitted for.
   int? get fundNumber {
     return Campaign.all

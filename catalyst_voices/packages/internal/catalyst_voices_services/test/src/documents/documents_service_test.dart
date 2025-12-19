@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -66,7 +68,7 @@ void main() {
             ),
           ).called(3);
 
-          verifyNever(() => documentRepository.saveDocumentBulk(any()));
+          verifyNever(() => documentRepository.saveSignedDocumentBulk(any()));
         },
       );
 
@@ -84,13 +86,14 @@ void main() {
               DocumentIndexDocVersion(ver: docRef.ver!, type: DocumentType.proposalTemplate),
             ],
           );
-          final docData = DocumentData(
+          final docData = DocumentDataWithArtifact(
             metadata: DocumentDataMetadata(
               contentType: DocumentContentType.json,
               type: DocumentType.proposalTemplate,
               id: docRef,
             ),
             content: const DocumentDataContent({}),
+            artifact: DocumentArtifact(Uint8List(0)),
           );
 
           // Step 1: Index returns 1 doc
@@ -123,14 +126,11 @@ void main() {
 
           // Fetch succeeds
           when(
-            () => documentRepository.getDocumentData(
-              id: any(named: 'id'),
-              useCache: any(named: 'useCache'),
-            ),
+            () => documentRepository.getRemoteDocumentDataWithArtifact(id: any(named: 'id')),
           ).thenAnswer((_) async => docData);
 
           // Save succeeds
-          when(() => documentRepository.saveDocumentBulk(any())).thenAnswer((_) async {});
+          when(() => documentRepository.saveSignedDocumentBulk(any())).thenAnswer((_) async {});
 
           // When
           final result = await service.sync(campaign: campaign);
@@ -139,14 +139,8 @@ void main() {
           expect(result.newDocumentsCount, 1);
           expect(result.failedDocumentsCount, 0);
 
-          verify(
-            () => documentRepository.getDocumentData(
-              id: docRef,
-              useCache: false,
-            ),
-          ).called(1);
-
-          verify(() => documentRepository.saveDocumentBulk(any())).called(1);
+          verify(() => documentRepository.getRemoteDocumentDataWithArtifact(id: docRef)).called(1);
+          verify(() => documentRepository.saveSignedDocumentBulk(any())).called(1);
         },
       );
 
@@ -200,10 +194,7 @@ void main() {
 
           // Verify fetch was NEVER called
           verifyNever(
-            () => documentRepository.getDocumentData(
-              id: any(named: 'id'),
-              useCache: any(named: 'useCache'),
-            ),
+            () => documentRepository.getRemoteDocumentDataWithArtifact(id: any(named: 'id')),
           );
         },
       );

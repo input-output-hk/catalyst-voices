@@ -80,13 +80,12 @@ final class ProposalDataV2 extends Equatable {
   ];
 
   ProposalPublish get publish {
-    if (id is DraftRef) {
-      return ProposalPublish.localDraft;
-    } else if (submissionAction == ProposalSubmissionAction.aFinal) {
-      return ProposalPublish.submittedProposal;
-    } else {
-      return ProposalPublish.publishedDraft;
-    }
+    return switch (id) {
+      DraftRef() => ProposalPublish.localDraft,
+      SignedDocumentRef() when submissionAction == ProposalSubmissionAction.aFinal =>
+        ProposalPublish.submittedProposal,
+      _ => ProposalPublish.publishedDraft,
+    };
   }
 
   /// Adds missing versions from [other] proposal to this proposal.

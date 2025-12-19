@@ -11,6 +11,7 @@ final class Schema4 extends i0.VersionedSchema {
   late final List<i1.DatabaseSchemaEntity> entities = [
     documentsV2,
     documentAuthors,
+    documentArtifacts,
     documentCollaborators,
     documentParameters,
     documentsLocalMetadata,
@@ -72,6 +73,20 @@ final class Schema4 extends i0.VersionedSchema {
     ),
     alias: null,
   );
+  late final Shape2 documentArtifacts = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'document_artifacts',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id, ver)',
+        'FOREIGN KEY (id, ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
+      ],
+      columns: [_column_21, _column_4, _column_14],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
   late final Shape1 documentCollaborators = Shape1(
     source: i0.VersionedTable(
       entityName: 'document_collaborators',
@@ -86,7 +101,7 @@ final class Schema4 extends i0.VersionedSchema {
     ),
     alias: null,
   );
-  late final Shape2 documentParameters = Shape2(
+  late final Shape3 documentParameters = Shape3(
     source: i0.VersionedTable(
       entityName: 'document_parameters',
       withoutRowId: false,
@@ -100,18 +115,18 @@ final class Schema4 extends i0.VersionedSchema {
     ),
     alias: null,
   );
-  late final Shape3 documentsLocalMetadata = Shape3(
+  late final Shape4 documentsLocalMetadata = Shape4(
     source: i0.VersionedTable(
       entityName: 'documents_local_metadata',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id)'],
-      columns: [_column_4, _column_21],
+      columns: [_column_4, _column_22],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape4 localDocumentsDrafts = Shape4(
+  late final Shape5 localDocumentsDrafts = Shape5(
     source: i0.VersionedTable(
       entityName: 'local_documents_drafts',
       withoutRowId: false,
@@ -133,8 +148,8 @@ final class Schema4 extends i0.VersionedSchema {
         _column_12,
         _column_13,
         _column_14,
-        _column_22,
         _column_23,
+        _column_24,
         _column_15,
       ],
       attachedDatabase: database,
@@ -400,6 +415,24 @@ i1.GeneratedColumn<String> _column_20(String aliasedName) =>
 
 class Shape2 extends i0.VersionedTable {
   Shape2({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<i2.Uint8List> get data =>
+      columnsByName['data']! as i1.GeneratedColumn<i2.Uint8List>;
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get ver =>
+      columnsByName['ver']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<i2.Uint8List> _column_21(String aliasedName) =>
+    i1.GeneratedColumn<i2.Uint8List>(
+      'data',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.blob,
+    );
+
+class Shape3 extends i0.VersionedTable {
+  Shape3({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get documentId =>
       columnsByName['document_id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get documentVer =>
@@ -410,15 +443,15 @@ class Shape2 extends i0.VersionedTable {
       columnsByName['ver']! as i1.GeneratedColumn<String>;
 }
 
-class Shape3 extends i0.VersionedTable {
-  Shape3({required super.source, required super.alias}) : super.aliased();
+class Shape4 extends i0.VersionedTable {
+  Shape4({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<bool> get isFavorite =>
       columnsByName['is_favorite']! as i1.GeneratedColumn<bool>;
 }
 
-i1.GeneratedColumn<bool> _column_21(String aliasedName) =>
+i1.GeneratedColumn<bool> _column_22(String aliasedName) =>
     i1.GeneratedColumn<bool>(
       'is_favorite',
       aliasedName,
@@ -429,8 +462,8 @@ i1.GeneratedColumn<bool> _column_21(String aliasedName) =>
       ),
     );
 
-class Shape4 extends i0.VersionedTable {
-  Shape4({required super.source, required super.alias}) : super.aliased();
+class Shape5 extends i0.VersionedTable {
+  Shape5({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<i2.Uint8List> get content =>
       columnsByName['content']! as i1.GeneratedColumn<i2.Uint8List>;
   i1.GeneratedColumn<String> get authors =>
@@ -469,14 +502,14 @@ class Shape4 extends i0.VersionedTable {
       columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_22(String aliasedName) =>
+i1.GeneratedColumn<String> _column_23(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'authors_names',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_23(String aliasedName) =>
+i1.GeneratedColumn<String> _column_24(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'authors_significant',
       aliasedName,
