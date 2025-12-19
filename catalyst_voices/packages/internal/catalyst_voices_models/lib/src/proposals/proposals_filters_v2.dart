@@ -11,12 +11,6 @@ final class ProposalsCampaignFilters extends Equatable {
     required this.categoriesIds,
   });
 
-  /// Currently hardcoded active campaign helper constructor.
-  factory ProposalsCampaignFilters.active() {
-    final categoriesIds = activeConstantDocumentRefs.map((e) => e.category.id).toSet();
-    return ProposalsCampaignFilters(categoriesIds: categoriesIds);
-  }
-
   factory ProposalsCampaignFilters.from(Campaign campaign) {
     final categoriesIds = campaign.categories.map((e) => e.id.id).toSet();
     return ProposalsCampaignFilters(categoriesIds: categoriesIds);

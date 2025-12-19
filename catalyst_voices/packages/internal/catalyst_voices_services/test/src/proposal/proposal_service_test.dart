@@ -91,6 +91,73 @@ void main() {
         expect(stream, emits(isEmpty));
       });
 
+      test('watchProposalsCountV2 matches watchWorkspaceProposalsBrief length', () async {
+        // Given
+        final authorId = CatalystIdFactory.create();
+        final filters = ProposalsFiltersV2(relationships: {OriginalAuthor(authorId)});
+
+        final signedDocId = DocumentRefFactory.signedDocumentRef();
+        final newDraftId = DocumentRefFactory.draftDocumentRef();
+
+        // A signed proposal
+        final signedProposal = ProposalBriefData(
+          id: signedDocId,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+          title: 'Published Proposal',
+          author: authorId,
+          versions: [ProposalBriefDataVersion(ref: signedDocId, title: 'Published Proposal')],
+        );
+
+        // A completely new local draft
+        final localDraftNew = ProposalBriefData(
+          id: newDraftId,
+          createdAt: DateTime.now().subtract(const Duration(days: 1)),
+          title: 'New Standalone Draft',
+          author: authorId,
+        );
+
+        // Mock signed proposals page
+        when(
+          () => mockProposalRepository.watchProposalsBriefPage(
+            request: any(named: 'request'),
+            order: any(named: 'order'),
+            filters: any(named: 'filters'),
+          ),
+        ).thenAnswer(
+          (_) => Stream.value(Page(items: [signedProposal], total: 1, page: 0, maxPerPage: 999)),
+        );
+
+        // Mock local drafts list
+        when(
+          () => mockProposalRepository.watchLocalDraftProposalsBrief(author: any(named: 'author')),
+        ).thenAnswer((_) => Stream.value([localDraftNew]));
+
+        // Mock published count
+        when(
+          () => mockProposalRepository.watchProposalsCountV2(filters: any(named: 'filters')),
+        ).thenAnswer((_) => Stream.value(1)); // 1 published proposal
+
+        // Mock local drafts count
+        when(
+          () => mockProposalRepository.watchLocalDraftProposalsCount(author: any(named: 'author')),
+        ).thenAnswer((_) => Stream.value(1)); // 1 local draft
+
+        // When
+        final briefsStream = proposalService.watchWorkspaceProposalsBrief(filters: filters);
+        final countStream = proposalService.watchProposalsCountV2(
+          filters: filters,
+          includeLocalDrafts: true,
+        );
+
+        // Then - verify count matches list length
+        final briefs = await briefsStream.first;
+        final count = await countStream.first;
+
+        expect(count, equals(briefs.length)); // Should both be 2 (1 published + 1 local draft)
+        expect(count, equals(2));
+        expect(briefs, hasLength(2));
+      });
+
       test('merges signed and local proposals correctly', () async {
         // Given
         final authorId = CatalystIdFactory.create();

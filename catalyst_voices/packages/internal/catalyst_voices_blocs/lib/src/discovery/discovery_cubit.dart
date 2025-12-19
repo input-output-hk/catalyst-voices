@@ -133,7 +133,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     unawaited(_activeCampaignTotalAskSub?.cancel());
     _activeCampaignTotalAskSub = null;
 
-    if (campaign != null) _watchCampaignTotalAsk(campaign);
+    if (campaign != null) {
+      _watchCampaignTotalAsk(campaign);
+    }
   }
 
   void _handleCampaignTotalAskChange(CampaignTotalAsk data) {
@@ -200,7 +202,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     unawaited(_activeCampaignSub?.cancel());
 
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.id != next?.id)
+        .distinct((previous, next) => previous?.id == next?.id)
         .listen(_handleActiveCampaignChange);
   }
 

@@ -24,7 +24,7 @@ abstract interface class SignedDocument {
   List<CatalystId> get signers;
 
   /// Converts the document into binary representation.
-  Uint8List toBytes();
+  DocumentArtifact toArtifact();
 
   /// Verifies if the [payload] has been signed by a private key
   /// that belongs to the given [catalystId].

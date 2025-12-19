@@ -316,6 +316,18 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  }) {
+    final query = selectOnly(localDocumentsDrafts)
+      ..addColumns([localDocumentsDrafts.id.count()])
+      ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
+      ..where(localDocumentsDrafts.authorsSignificant.equalsValue([author.toSignificant()]));
+
+    return query.map((row) => row.read(localDocumentsDrafts.id.count()) ?? 0).watchSingle();
+  }
+
+  @override
   Stream<RawProposalEntity?> watchProposal({required DocumentRef id}) {
     return _queryProposal(id).watchSingleOrNull();
   }
@@ -1378,6 +1390,13 @@ abstract interface class ProposalsV2Dao {
   ///
   /// Updates automatically when local drafts are changing.
   Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
+
+  /// Watches the count of [author]'s local drafts (not published).
+  ///
+  /// Updates automatically when local drafts are created or deleted.
+  Stream<int> watchLocalDraftProposalsCount({
     required CatalystId author,
   });
 

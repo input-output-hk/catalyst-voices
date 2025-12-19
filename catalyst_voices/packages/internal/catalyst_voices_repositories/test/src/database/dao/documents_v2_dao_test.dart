@@ -1,4 +1,6 @@
 // ignore_for_file: avoid_redundant_argument_values
+import 'dart:typed_data';
+
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
@@ -1120,7 +1122,7 @@ void main() {
           const ref = SignedDocumentRef.exact(id: 'non-existent-id', ver: 'non-existent-ver');
 
           // When
-          final result = await dao.getDocumentMetadata(id: ref);
+          final result = await dao.getDocumentMetadata(ref);
 
           // Then
           expect(result, isNull);
@@ -1144,7 +1146,7 @@ void main() {
           const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'test-ver');
 
           // When
-          final result = await dao.getDocumentMetadata(id: ref);
+          final result = await dao.getDocumentMetadata(ref);
 
           // Then
           expect(result, isNotNull);
@@ -1167,7 +1169,7 @@ void main() {
           const ref = SignedDocumentRef.exact(id: 'test-id', ver: 'wrong-ver');
 
           // When
-          final result = await dao.getDocumentMetadata(id: ref);
+          final result = await dao.getDocumentMetadata(ref);
 
           // Then
           expect(result, isNull);
@@ -1189,7 +1191,7 @@ void main() {
           const ref = SignedDocumentRef.loose(id: 'test-id');
 
           // When
-          final result = await dao.getDocumentMetadata(id: ref);
+          final result = await dao.getDocumentMetadata(ref);
 
           // Then
           expect(result, isNotNull);
@@ -1206,7 +1208,7 @@ void main() {
           const ref = SignedDocumentRef.loose(id: 'non-existent-id');
 
           // When
-          final result = await dao.getDocumentMetadata(id: ref);
+          final result = await dao.getDocumentMetadata(ref);
 
           // Then
           expect(result, isNull);
@@ -1237,7 +1239,7 @@ void main() {
 
           // When
           final result = await dao.getDocumentMetadata(
-            id: const SignedDocumentRef.exact(id: 'full-doc-id', ver: 'full-doc-ver'),
+            const SignedDocumentRef.exact(id: 'full-doc-id', ver: 'full-doc-ver'),
           );
 
           // Then
@@ -1255,6 +1257,79 @@ void main() {
           expect(result.templateId, 'tmpl-id');
           expect(result.templateVer, 'tmpl-ver');
           expect(result.parameters.isNotEmpty, isTrue);
+        });
+      });
+
+      group('getDocumentArtifact', () {
+        test('returns artifact for exact ref', () async {
+          // Given: A document and its artifact exist
+          final artifact = DocumentArtifact(Uint8List.fromList([0xCA, 0xFE, 0xBA, 0xBE]));
+          final doc = _createTestDocumentEntity(id: 'doc-1', ver: 'ver-1', artifact: artifact);
+
+          await dao.save(doc);
+
+          // When
+          final result = await dao.getDocumentArtifact(
+            const SignedDocumentRef.exact(id: 'doc-1', ver: 'ver-1'),
+          );
+
+          // Then
+          expect(result, equals(artifact));
+        });
+
+        test('returns null for exact ref mismatch', () async {
+          // Given: Artifact exists for ver-1
+          final artifact = DocumentArtifact(Uint8List.fromList([1, 2, 3]));
+          final doc = _createTestDocumentEntity(id: 'doc-1', ver: 'ver-1', artifact: artifact);
+
+          await dao.save(doc);
+
+          // When: We query for ver-2
+          final result = await dao.getDocumentArtifact(
+            const SignedDocumentRef.exact(id: 'doc-1', ver: 'ver-2'),
+          );
+
+          // Then
+          expect(result, isNull);
+        });
+
+        test('returns latest artifact for loose ref (latest by ver)', () async {
+          // Given: Two versions of a document, both with artifacts
+          final v1 = _buildUuidV7At(DateTime.utc(2024, 1, 1));
+          final v2 = _buildUuidV7At(DateTime.utc(2024, 1, 2));
+
+          final artifactV1 = DocumentArtifact(Uint8List.fromList([1]));
+          final artifactV2 = DocumentArtifact(Uint8List.fromList([2]));
+
+          final docV1 = _createTestDocumentEntity(id: 'doc-multi', ver: v1, artifact: artifactV1);
+          final docV2 = _createTestDocumentEntity(id: 'doc-multi', ver: v2, artifact: artifactV2);
+
+          await dao.saveAll([docV1, docV2]);
+
+          // When: We query with a loose ref (no version specified)
+          final result = await dao.getDocumentArtifact(
+            const SignedDocumentRef.loose(id: 'doc-multi'),
+          );
+
+          // Then: We expect the artifact from the latest version (v2)
+          expect(result, equals(artifactV2));
+        });
+
+        test('respects foreign key cascade delete', () async {
+          // Given: A document with an artifact
+          final artifact = DocumentArtifact(Uint8List.fromList([1]));
+          final doc = _createTestDocumentEntity(id: 'doc-del', ver: 'ver-1', artifact: artifact);
+          await dao.save(doc);
+
+          // When: The parent document is deleted
+          await (db.delete(db.documentsV2)..where((tbl) => tbl.id.equals('doc-del'))).go();
+
+          // Then: The artifact should also be gone
+          final remaining = await dao.getDocumentArtifact(
+            const SignedDocumentRef.exact(id: 'doc-del', ver: 'ver-1'),
+          );
+
+          expect(remaining, isNull);
         });
       });
 
@@ -2746,6 +2821,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
   List<CatalystId>? authors,
+  DocumentArtifact? artifact,
   String? refId,
   String? refVer,
   String? replyId,
@@ -2762,6 +2838,7 @@ DocumentCompositeEntity _createTestDocumentEntity({
     contentData: contentData,
     type: type,
     authors: authors,
+    artifact: artifact,
     refId: refId,
     refVer: refVer,
     replyId: replyId,
