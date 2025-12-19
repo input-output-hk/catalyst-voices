@@ -363,7 +363,7 @@ class _RejectedFinalProposalBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _DismissibleBanner(
-      icon: VoicesAssets.icons.check.buildIcon(color: Theme.of(context).colors.iconsSuccess),
+      icon: VoicesAssets.icons.xCircle.buildIcon(color: Theme.of(context).colors.iconsError),
       message: context.l10n.proposalViewRejectedFinalProposalBannerMessage,
       button: const _ChangeToAllowFinalProposalButton(),
     );
