@@ -25,6 +25,14 @@ enum ProposalPublish implements Comparable<ProposalPublish> {
   int compareTo(ProposalPublish other) {
     return other.index.compareTo(index);
   }
+
+  static ProposalPublish getStatus({required bool isFinal, required DocumentRef ref}) {
+    return switch (ref) {
+      DraftRef() => ProposalPublish.localDraft,
+      SignedDocumentRef() when isFinal => ProposalPublish.submittedProposal,
+      SignedDocumentRef() => ProposalPublish.publishedDraft,
+    };
+  }
 }
 
 // Note. This enum may be deleted later. Its here for backwards compatibility.
@@ -45,16 +53,4 @@ enum ProposalSubmissionAction {
   /// `hide` is only actioned if sent by the author,
   /// for a collaborator its synonymous with `draft`.
   hide,
-}
-
-extension ProposalPublishExt on ProposalPublish {
-  static ProposalPublish getStatus({required bool isFinal, required DocumentRef ref}) {
-    if (isFinal) {
-      return ProposalPublish.submittedProposal;
-    } else if (!isFinal && DocumentRef is SignedDocumentRef) {
-      return ProposalPublish.publishedDraft;
-    } else {
-      return ProposalPublish.localDraft;
-    }
-  }
 }

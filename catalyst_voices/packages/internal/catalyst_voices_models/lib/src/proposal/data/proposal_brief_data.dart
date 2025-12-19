@@ -52,12 +52,19 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     final isFinal = data.isFinal;
     final iteration = versionTitles.verIteration(id.ver!);
 
-    final versions = versionTitles.data.entries.map((entry) {
+    // Sort entries by version (oldest to newest) to assign correct version numbers
+    final versionsList = versionTitles.data.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    final versions = versionsList.asMap().entries.map((mapEntry) {
+      final index = mapEntry.key;
+      final entry = mapEntry.value;
       return ProposalBriefDataVersion(
         ref: id.copyWith(ver: Optional(entry.key)),
         title: entry.value,
+        versionNumber: index + 1,
       );
-    }).toList();
+    }).toList(); // Stored oldest to newest
 
     // Proposal Brief do not support "removed" or "left" status.
     final collaborators = data.proposal.metadata.collaborators?.map(
@@ -114,11 +121,18 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     required DocumentRef ref,
     String? title,
   }) {
-    final version = ProposalBriefDataVersion(ref: ref, title: title);
+    final newVersionNumber = (versions?.length ?? 0) + 1;
+    final version = ProposalBriefDataVersion(
+      ref: ref,
+      title: title,
+      versionNumber: newVersionNumber,
+    );
 
-    final versions = [...?this.versions, version];
+    // Keep versions sorted oldest to newest
+    final updatedVersions = [...?versions, version]
+      ..sort((a, b) => a.ref.ver!.compareTo(b.ref.ver!));
 
-    return copyWith(versions: Optional(versions));
+    return copyWith(versions: Optional(updatedVersions));
   }
 
   @override
@@ -161,29 +175,29 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
       collaborators: collaborators.dataOr(this.collaborators),
     );
   }
+
+  int versionNumber(String version) {
+    final versionsList = versions;
+    if (versionsList == null) return 1;
+    return versionsList.length - versionsList.indexWhere((element) => element.ref.ver == version);
+  }
 }
 
-final class ProposalBriefDataVersion extends Equatable
-    implements Comparable<ProposalBriefDataVersion> {
+final class ProposalBriefDataVersion extends Equatable {
   final DocumentRef ref;
   final String? title;
+  final int versionNumber;
 
   const ProposalBriefDataVersion({
     required this.ref,
     this.title,
+    required this.versionNumber,
   });
 
   DateTime get createdAt => ref.ver!.dateTime;
 
   @override
-  List<Object?> get props => [ref, title];
-
-  @override
-  int compareTo(ProposalBriefDataVersion other) {
-    final versionA = ref.ver ?? '';
-    final versionB = other.ref.ver ?? '';
-    return versionB.compareTo(versionA);
-  }
+  List<Object?> get props => [ref, title, versionNumber];
 }
 
 final class ProposalBriefDataVotes extends Equatable {
@@ -197,10 +211,4 @@ final class ProposalBriefDataVotes extends Equatable {
 
   @override
   List<Object?> get props => [draft, casted];
-}
-
-extension ProposalBriefDataVersionList on List<ProposalBriefDataVersion> {
-  int versionNumber(String version) {
-    return length - indexWhere((element) => element.ref.ver == version);
-  }
 }

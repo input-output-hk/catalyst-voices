@@ -27,7 +27,7 @@ final class ProposalVersionViewModel extends Equatable {
     required int versionNumber,
     required bool isFinal,
   }) {
-    final publish = ProposalPublishExt.getStatus(
+    final publish = ProposalPublish.getStatus(
       isFinal: isFinal,
       ref: version.ref,
     );
@@ -80,15 +80,18 @@ extension ProposalVersionViewModelListExt on List<ProposalVersionViewModel> {
 
 extension ProposalVersionViewModelMapper on List<ProposalBriefDataVersion> {
   List<ProposalVersionViewModel> toViewModels({String? finalVer}) {
-    sort();
-    return map(
-      (version) => ProposalVersionViewModel.fromBriefData(
-        version,
-        isLatest: first.ref == version.ref,
-        isLatestLocal: first.ref == version.ref && version.ref is DraftRef,
-        versionNumber: versionNumber(version.ref.ver!),
-        isFinal: finalVer == version.ref.ver,
-      ),
-    ).toList();
+    // Reverse versions from oldest to newest to newest to oldest for display
+    return reversed
+        .toList()
+        .map(
+          (version) => ProposalVersionViewModel.fromBriefData(
+            version,
+            isLatest: reversed.first.ref == version.ref,
+            isLatestLocal: reversed.first.ref == version.ref && version.ref is DraftRef,
+            versionNumber: version.versionNumber,
+            isFinal: finalVer == version.ref.ver,
+          ),
+        )
+        .toList();
   }
 }
