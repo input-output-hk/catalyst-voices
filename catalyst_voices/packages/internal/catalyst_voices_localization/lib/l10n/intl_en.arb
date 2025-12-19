@@ -1997,6 +1997,10 @@
   "@myAccount": {
     "description": "Header text for user's account section"
   },
+  "myActions": "My Actions",
+  "@myActions": {
+    "description": "CTA to open My Actions side bar"
+  },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
     "description": "Options available to user to make more impact in the app"
