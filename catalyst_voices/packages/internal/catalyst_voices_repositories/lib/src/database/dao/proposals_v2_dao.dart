@@ -309,6 +309,18 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  }) {
+    final query = selectOnly(localDocumentsDrafts)
+      ..addColumns([localDocumentsDrafts.id.count()])
+      ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
+      ..where(localDocumentsDrafts.authorsSignificant.equalsValue([author.toSignificant()]));
+
+    return query.map((row) => row.read(localDocumentsDrafts.id.count()) ?? 0).watchSingle();
+  }
+
+  @override
   Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
     required CatalystId author,
   }) {
@@ -321,17 +333,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     required CatalystId author,
   }) {
     return _queryLocalDraftRawProposal(id: id, author: author).watchSingleOrNull();
-  }
-  
-  Stream<int> watchLocalDraftProposalsCount({
-    required CatalystId author,
-  }) {
-    final query = selectOnly(localDocumentsDrafts)
-      ..addColumns([localDocumentsDrafts.id.count()])
-      ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
-      ..where(localDocumentsDrafts.authorsSignificant.equalsValue([author.toSignificant()]));
-
-    return query.map((row) => row.read(localDocumentsDrafts.id.count()) ?? 0).watchSingle();
   }
 
   @override
@@ -1459,6 +1460,13 @@ abstract interface class ProposalsV2Dao {
     required bool isFavorite,
   });
 
+  /// Watches the count of [author]'s local drafts (not published).
+  ///
+  /// Updates automatically when local drafts are created or deleted.
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  });
+
   /// Reactive stream version of [getLocalDraftsProposalsBrief].
   ///
   /// Updates automatically when local drafts are changing.
@@ -1468,12 +1476,6 @@ abstract interface class ProposalsV2Dao {
 
   Stream<RawProposalEntity?> watchLocalRawProposal({
     required DocumentRef id,
-  });
-  
-  /// Watches the count of [author]'s local drafts (not published).
-  ///
-  /// Updates automatically when local drafts are created or deleted.
-  Stream<int> watchLocalDraftProposalsCount({
     required CatalystId author,
   });
 
