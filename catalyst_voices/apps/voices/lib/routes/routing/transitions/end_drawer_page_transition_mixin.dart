@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +12,9 @@ import 'package:go_router/go_router.dart';
 
 /// Use this when you want the shell route to display its content in
 /// an end drawer, allowing nested routes to change the drawer content.
-mixin SlideFromEndDrawerShellPageTransitionMixin on ShellRouteData {
+mixin EndDrawerShellPageTransitionMixin on ShellRouteData {
+  static const transitionPageName = 'EndDrawerShellPageTransition';
+
   @override
   Page<void> pageBuilder(
     BuildContext context,
@@ -18,7 +23,7 @@ mixin SlideFromEndDrawerShellPageTransitionMixin on ShellRouteData {
   ) {
     return CustomTransitionPage(
       key: state.pageKey,
-      name: state.name ?? state.path,
+      name: transitionPageName,
       arguments: <String, String>{
         ...state.pathParameters,
         ...state.uri.queryParameters,
@@ -63,15 +68,37 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
       endDrawer: widget.drawerContent,
       drawerEnableOpenDragGesture: false,
       onEndDrawerChanged: _onEndDrawerChanged,
-      body: const SizedBox.expand(),
+      body: const SizedBox.shrink(),
     );
   }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scaffoldKey.currentState?.openEndDrawer();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final router = GoRouter.of(context);
+      final currentConfiguration = router.routerDelegate.currentConfiguration;
+      if (currentConfiguration.matches.length >= 2) {
+        _scaffoldKey.currentState?.openEndDrawer();
+      } else {
+        router.go(Routes.initialLocation);
+        final currentPath = currentConfiguration.fullPath;
+
+        if (currentPath.contains(const ActionsRoute().location)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            unawaited(router.push(const ActionsRoute().location));
+            if (currentPath.contains(const ProposalApprovalRoute().location)) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                unawaited(router.push(const ProposalApprovalRoute().location));
+              });
+            } else if (currentPath.contains(const CoProposersConsentRoute().location)) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                unawaited(router.push(const CoProposersConsentRoute().location));
+              });
+            }
+          });
+        }
+      }
     });
   }
 
@@ -94,12 +121,15 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
 
     if (!mounted) return;
 
-    final router = GoRouter.maybeOf(context);
-    if (router != null && router.canPop()) {
-      router.pop();
-      return;
-    }
+    var isShell = false;
 
-    GoRouter.of(context).go(Routes.initialLocation);
+    Navigator.of(context).popUntil((predicate) {
+      if (predicate.settings.name == EndDrawerShellPageTransitionMixin.transitionPageName) {
+        isShell = true;
+        return false;
+      }
+
+      return isShell;
+    });
   }
 }

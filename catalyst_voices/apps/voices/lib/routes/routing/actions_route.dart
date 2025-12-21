@@ -2,8 +2,8 @@ import 'package:catalyst_voices/pages/actions/actions_page.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/co_proposers_consent/co_proposers_consent_page.dart';
 import 'package:catalyst_voices/pages/proposal_approval/proposal_approval_page.dart';
+import 'package:catalyst_voices/routes/routing/transitions/end_drawer_page_transition_mixin.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
-import 'package:catalyst_voices/routes/routing/transitions/slide_from_end_drawer_page_transition_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -36,8 +36,7 @@ final class ActionsRoute extends GoRouteData {
     ),
   ],
 )
-final class ActionsShellRoute extends ShellRouteData
-    with SlideFromEndDrawerShellPageTransitionMixin {
+final class ActionsShellRoute extends ShellRouteData with EndDrawerShellPageTransitionMixin {
   const ActionsShellRoute();
 
   @override
