@@ -2,9 +2,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// Matches proposals where [id] is a collaborator with a specific [status].
+/// If [status] is null, matches all collaboration invitations regardless of status.
 final class CollaborationInvitation extends ProposalsRelationship {
   final CatalystId id;
-  final CollaborationInvitationStatus status;
+  final CollaborationInvitationStatus? status;
 
   const CollaborationInvitation({
     required this.id,
@@ -17,11 +18,13 @@ final class CollaborationInvitation extends ProposalsRelationship {
 
   const CollaborationInvitation.rejected(this.id) : status = CollaborationInvitationStatus.rejected;
 
+  const CollaborationInvitation.any(this.id) : status = null;
+
   @override
   List<Object?> get props => [id, status];
 
   @override
-  String toString() => 'Collaborator($id, status: $status)';
+  String toString() => status != null ? 'Collaborator($id, status: $status)' : 'Collaborator($id, status: any)';
 }
 
 /// Defines the status of a collaborator's relationship with a proposal.
