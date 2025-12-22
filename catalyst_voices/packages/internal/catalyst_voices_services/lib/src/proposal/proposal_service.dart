@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -113,6 +115,8 @@ abstract interface class ProposalService {
   });
 
   Future<CollaboratorValidationResult> validateForCollaborator(CatalystId id);
+
+  Stream<AccountInvitesApprovalsCount> watchInvitesApprovalsCount({required CatalystId id});
 
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
@@ -428,6 +432,26 @@ final class ProposalServiceImpl implements ProposalService {
       (false, true) => const MissingProposerRole(),
       (false, false) => const NotProposerAndNotVerified(),
     };
+  }
+
+  @override
+  Stream<AccountInvitesApprovalsCount> watchInvitesApprovalsCount({required CatalystId id}) {
+    final invitationsFilters = CollaboratorInvitationsProposalsFilter(id);
+    final approvalsFilters = CollaboratorProposalApprovalsFilter(id);
+
+    final invitationsCountStream = watchProposalsCountV2(
+      filters: invitationsFilters,
+    );
+    final approvalsCountStream = watchProposalsCountV2(
+      filters: approvalsFilters,
+    );
+
+    return Rx.combineLatest2(
+      invitationsCountStream,
+      approvalsCountStream,
+      (invitations, approvals) =>
+          AccountInvitesApprovalsCount(invitesCount: invitations, approvalsCount: approvals),
+    );
   }
 
   @override

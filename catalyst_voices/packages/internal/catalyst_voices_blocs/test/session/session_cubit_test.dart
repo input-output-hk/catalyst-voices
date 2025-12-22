@@ -26,6 +26,7 @@ void main() {
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
   late final FeatureFlagsService featureFlagService;
+  late final ProposalService proposalService;
 
   late AdminToolsCubit adminToolsCubit;
   late SessionCubit sessionCubit;
@@ -66,6 +67,7 @@ void main() {
     accessControl = const AccessControl();
     featureFlagsRepository = FakeFeatureFlagsRepository();
     featureFlagService = FeatureFlagsService(featureFlagsRepository);
+    proposalService = _MockProposalService();
   });
 
   tearDownAll(() async {
@@ -92,7 +94,8 @@ void main() {
       accessControl,
       adminToolsCubit,
       featureFlagService,
-    );
+      proposalService,
+    )..init();
   });
 
   tearDown(() async {
@@ -270,7 +273,8 @@ void main() {
           accessControl,
           adminToolsCubit,
           featureFlagService,
-        );
+          proposalService,
+        )..init();
 
         // Gives time for stream to emit.
         await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -302,7 +306,8 @@ void main() {
           accessControl,
           adminToolsCubit,
           featureFlagService,
-        );
+          proposalService,
+        )..init();
 
         // Gives time for stream to emit.
         await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -357,4 +362,11 @@ final class _NoOpPoller implements RegistrationStatusPoller {
 
   @override
   void stop() {}
+}
+
+final class _MockProposalService extends Mock implements ProposalService {
+  @override
+  Stream<AccountInvitesApprovalsCount> watchInvitesApprovalsCount({required CatalystId id}) {
+    return Stream.value(const AccountInvitesApprovalsCount(invitesCount: 0, approvalsCount: 0));
+  }
 }
