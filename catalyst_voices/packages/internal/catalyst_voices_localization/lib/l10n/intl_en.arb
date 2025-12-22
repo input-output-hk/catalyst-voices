@@ -2025,6 +2025,10 @@
   "@myAccount": {
     "description": "Header text for user's account section"
   },
+  "myActions": "My Actions",
+  "@myActions": {
+    "description": "Header text for user's actions section"
+  },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
     "description": "Options available to user to make more impact in the app"
@@ -4326,9 +4330,5 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
-  },
-  "myActions": "My Actions",
-  "@myActions": {
-    "description": "Header text for user's actions section"
   }
 }

@@ -4,8 +4,15 @@ import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+/// Configuration for building a hierarchical route stack for drawer navigation.
+///
+/// This class defines the structure of routes and their sub-routes,
+/// enabling the drawer to properly manage navigation state.
 class EndDrawerRouteStackConfig {
+  /// The route path for this configuration node.
   final String route;
+
+  /// Child route configurations that can be nested under this route.
   final List<EndDrawerRouteStackConfig> subRoutes;
 
   const EndDrawerRouteStackConfig({
@@ -40,9 +47,9 @@ class EndDrawerRouteStackConfig {
 
 /// A mixin that provides a drawer-like page transition for [ShellRouteData].
 ///
-/// This creates a transparent page with a Scaffold that automatically opens
-/// its endDrawer, keeping the previous page visible underneath.
-
+/// This creates a transparent page with a [Scaffold] that automatically opens
+/// its end drawer, keeping the previous page visible underneath.
+///
 /// Use this when you want the shell route to display its content in
 /// an end drawer, allowing nested routes to change the drawer content.
 mixin EndDrawerShellPageTransitionMixin on ShellRouteData {
@@ -60,7 +67,7 @@ mixin EndDrawerShellPageTransitionMixin on ShellRouteData {
     return CustomTransitionPage(
       key: state.pageKey,
       name: transitionPageName,
-      arguments: <String, String>{
+      arguments: {
         ...state.pathParameters,
         ...state.uri.queryParameters,
       },
@@ -69,11 +76,11 @@ mixin EndDrawerShellPageTransitionMixin on ShellRouteData {
       barrierDismissible: true,
       transitionDuration: Duration.zero,
       reverseTransitionDuration: Duration.zero,
+      transitionsBuilder: (_, _, _, child) => child,
       child: _EndDrawerScaffold(
         drawerContent: builder(context, state, navigator),
         routeStackConfig: routeStackConfig,
       ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) => child,
     );
   }
 }
@@ -92,10 +99,11 @@ class _EndDrawerScaffold extends StatefulWidget {
 }
 
 class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
-  // The duration comes from Flutter's DrawerController which uses
-  // `_kBaseSettleDuration = Duration(milliseconds: 246)`.
-  // See: https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/drawer.dart
-  final _kBaseSettleDuration = const Duration(milliseconds: 246);
+  /// The duration comes from Flutter's DrawerController which uses
+  /// `_kBaseSettleDuration = Duration(milliseconds: 246)`.
+  ///
+  /// See: https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/drawer.dart
+  final _drawerAnimationDuration = const Duration(milliseconds: 246);
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _hasPopped = false;
   bool _wasOpened = false;
@@ -106,8 +114,8 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
       key: _scaffoldKey,
       backgroundColor: Colors.transparent,
       endDrawerEnableOpenDragGesture: false,
-      endDrawer: widget.drawerContent,
       drawerEnableOpenDragGesture: false,
+      endDrawer: widget.drawerContent,
       onEndDrawerChanged: _onEndDrawerChanged,
       body: const SizedBox.shrink(),
     );
@@ -116,41 +124,50 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final router = GoRouter.of(context);
-      final currentConfiguration = router.routerDelegate.currentConfiguration;
-      final currentPath = currentConfiguration.last.matchedLocation;
-      final queryString = router.routeInformationProvider.value.uri.query;
-
-      if (currentConfiguration.matches.length > 1) {
-        final requiredRoutes = _buildRouteStack(currentPath, queryString);
-        final existingPaths = currentConfiguration.matches
-            .map((match) => match.matchedLocation)
-            .toList();
-        final missingRoutes = requiredRoutes.where((route) {
-          final routePath = Uri.parse(route).path;
-          return !existingPaths.contains(routePath);
-        }).toList();
-
-        if (missingRoutes.isNotEmpty) {
-          _pushRoutesSequentially(router, requiredRoutes);
-        }
-
-        _scaffoldKey.currentState?.openEndDrawer();
-      } else {
-        router.go(Routes.initialLocation);
-        final routesToPush = _buildRouteStack(currentPath, queryString);
-        _pushRoutesSequentially(router, routesToPush);
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _setupNavigation());
   }
 
-  List<String> _buildRouteStack(String currentPath, String queryString) {
+  List<String> _buildRouteStackWithQuery(String currentPath, String queryString) {
     final routes = widget.routeStackConfig.buildRouteStack(currentPath);
     if (routes.isEmpty || queryString.isEmpty) return routes;
 
-    // Add query parameters to all routes
     return routes.map((route) => '$route?$queryString').toList();
+  }
+
+  void _handleExistingRouteStack({
+    required GoRouter router,
+    required String currentPath,
+    required String queryString,
+    required RouteMatchList currentConfiguration,
+  }) {
+    final requiredRoutes = _buildRouteStackWithQuery(currentPath, queryString);
+    final existingPaths = currentConfiguration.matches
+        .map((match) => match.matchedLocation)
+        .toSet();
+
+    final hasMissingRoutes = requiredRoutes.any(
+      (route) => !existingPaths.contains(Uri.parse(route).path),
+    );
+
+    if (hasMissingRoutes) {
+      _pushRoutesSequentially(router, requiredRoutes);
+    }
+
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  void _handleFreshNavigation({
+    required GoRouter router,
+    required String currentPath,
+    required String queryString,
+  }) {
+    router.go(Routes.initialLocation);
+    final routesToPush = _buildRouteStackWithQuery(currentPath, queryString);
+    _pushRoutesSequentially(router, routesToPush);
+  }
+
+  bool _hasExistingRoutes(RouteMatchList configuration) {
+    return configuration.matches.length > 1;
   }
 
   Future<void> _onEndDrawerChanged(bool isOpened) async {
@@ -159,11 +176,30 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
       return;
     }
 
-    // Only pop when drawer closes after being opened
     if (_wasOpened && !_hasPopped) {
       _hasPopped = true;
-      await _waitForDrawerDismissed();
+      await _popRouteStackAfterDrawerClose();
     }
+  }
+
+  Future<void> _popRouteStackAfterDrawerClose() async {
+    await Future<void>.delayed(_drawerAnimationDuration);
+
+    if (!mounted) return;
+
+    var foundShellRoute = false;
+
+    Navigator.of(context).popUntil((route) {
+      final isShellTransition =
+          route.settings.name == EndDrawerShellPageTransitionMixin.transitionPageName;
+
+      if (isShellTransition) {
+        foundShellRoute = true;
+        return false;
+      }
+
+      return foundShellRoute;
+    });
   }
 
   /// Pushes routes sequentially, each in its own post frame callback.
@@ -182,21 +218,25 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
     pushNext(0);
   }
 
-  Future<void> _waitForDrawerDismissed() async {
-    // Wait for the drawer close animation to complete.
-    await Future<void>.delayed(_kBaseSettleDuration);
+  void _setupNavigation() {
+    final router = GoRouter.of(context);
+    final currentConfiguration = router.routerDelegate.currentConfiguration;
+    final currentPath = currentConfiguration.last.matchedLocation;
+    final queryString = router.routeInformationProvider.value.uri.query;
 
-    if (!mounted) return;
-
-    var isShell = false;
-
-    Navigator.of(context).popUntil((predicate) {
-      if (predicate.settings.name == EndDrawerShellPageTransitionMixin.transitionPageName) {
-        isShell = true;
-        return false;
-      }
-
-      return isShell;
-    });
+    if (_hasExistingRoutes(currentConfiguration)) {
+      _handleExistingRouteStack(
+        router: router,
+        currentPath: currentPath,
+        queryString: queryString,
+        currentConfiguration: currentConfiguration,
+      );
+    } else {
+      _handleFreshNavigation(
+        router: router,
+        currentPath: currentPath,
+        queryString: queryString,
+      );
+    }
   }
 }

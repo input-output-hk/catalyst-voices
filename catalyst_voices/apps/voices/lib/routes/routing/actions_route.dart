@@ -13,14 +13,12 @@ part 'actions_route.g.dart';
 final class ActionsRoute extends GoRouteData {
   final String? tab;
 
-  const ActionsRoute({
-    this.tab,
-  });
+  const ActionsRoute({this.tab});
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final tab = ActionsPageTab.values.asNameMap()[this.tab] ?? ActionsPageTab.all;
-    return ActionsPage(tab: tab);
+    final resolvedTab = ActionsPageTab.values.asNameMap()[tab] ?? ActionsPageTab.all;
+    return ActionsPage(tab: resolvedTab);
   }
 }
 
@@ -49,24 +47,14 @@ final class ActionsShellRoute extends ShellRouteData with EndDrawerShellPageTran
   EndDrawerRouteStackConfig get routeStackConfig => EndDrawerRouteStackConfig(
     route: const ActionsRoute().location,
     subRoutes: [
-      EndDrawerRouteStackConfig(
-        route: const ProposalApprovalRoute().location,
-      ),
-      EndDrawerRouteStackConfig(
-        route: const CoProposersConsentRoute().location,
-      ),
+      EndDrawerRouteStackConfig(route: const ProposalApprovalRoute().location),
+      EndDrawerRouteStackConfig(route: const CoProposersConsentRoute().location),
     ],
   );
 
   @override
-  Widget builder(
-    BuildContext context,
-    GoRouterState state,
-    Widget navigator,
-  ) {
-    return ActionsShellPage(
-      child: navigator,
-    );
+  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
+    return ActionsShellPage(child: navigator);
   }
 }
 
