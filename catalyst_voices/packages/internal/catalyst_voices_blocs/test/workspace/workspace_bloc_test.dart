@@ -80,7 +80,9 @@ void main() {
       );
 
       // Set up default mock for watching workspace proposals
-      when(() => mockProposalService.watchWorkspaceProposalsBrief(filters: any(named: 'filters'))).thenAnswer(
+      when(
+        () => mockProposalService.watchWorkspaceProposalsBrief(filters: any(named: 'filters')),
+      ).thenAnswer(
         (_) => const Stream.empty(),
       );
 
@@ -102,52 +104,18 @@ void main() {
     });
 
     group('Proposal sync tests', () {
-      UsersProposalOverview createProposal({
-        required String title,
-        required ProposalPublish publish,
-        required int commentsCount,
-        bool isLatestLocal = false,
-        DocumentRef? id,
-      }) {
-        final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
-        return UsersProposalOverview(
-          id: effectiveId,
-          title: title,
-          updateDate: DateTime(2025, 10, 15),
-          fundsRequested: Money.zero(currency: Currencies.ada),
-          publish: publish,
-          versions: [
-            ProposalVersionViewModel(
-              title: title,
-              id: effectiveId,
-              createdAt: DateTime(2025, 10, 15),
-              publish: publish,
-              isLatest: true,
-              isLatestLocal: isLatestLocal,
-              versionNumber: 1,
-            ),
-          ],
-          fromActiveCampaign: true,
-          commentsCount: commentsCount,
-          category: 'Test Category',
-          fundNumber: 14,
-          iteration: 1,
-          ownership: const AuthorProposalOwnership(),
-        );
-      }
-
       blocTest<WorkspaceBloc, WorkspaceState>(
         'internal data change - all derived properties stay in sync',
         build: () => workspaceBloc,
         act: (bloc) {
           final proposals = [
-            createProposal(
+            _createProposal(
               title: 'Local 1',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
+            _createProposal(
               title: 'Local 2',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
@@ -191,24 +159,24 @@ void main() {
         build: () => workspaceBloc,
         act: (bloc) {
           final proposals = [
-            createProposal(
+            _createProposal(
               title: 'Local 1',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
+            _createProposal(
               title: 'Local 2',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
+            _createProposal(
               title: 'Draft',
               publish: ProposalPublish.publishedDraft,
               commentsCount: 5,
             ),
-            createProposal(
+            _createProposal(
               title: 'Final',
               publish: ProposalPublish.submittedProposal,
               commentsCount: 2,
@@ -238,20 +206,20 @@ void main() {
         },
         build: () => workspaceBloc,
         act: (bloc) {
-          final local = createProposal(
+          final local = _createProposal(
             title: 'Local',
             publish: ProposalPublish.localDraft,
             commentsCount: 0,
             isLatestLocal: true,
           );
           const draftRef = DraftRef(id: 'draft-123');
-          final draft = createProposal(
+          final draft = _createProposal(
             title: 'Draft',
             publish: ProposalPublish.publishedDraft,
             commentsCount: 5,
             id: draftRef,
           );
-          final final$ = createProposal(
+          final final$ = _createProposal(
             title: 'Final',
             publish: ProposalPublish.submittedProposal,
             commentsCount: 0,
@@ -300,21 +268,21 @@ void main() {
         },
         build: () => workspaceBloc,
         act: (bloc) {
-          final local1 = createProposal(
+          final local1 = _createProposal(
             title: 'Local 1',
             publish: ProposalPublish.localDraft,
             commentsCount: 0,
             isLatestLocal: true,
           );
           final local2Ref = SignedDocumentRef.generateFirstRef();
-          final local2 = createProposal(
+          final local2 = _createProposal(
             title: 'Local 2',
             publish: ProposalPublish.localDraft,
             commentsCount: 0,
             isLatestLocal: true,
             id: local2Ref,
           );
-          final draft = createProposal(
+          final draft = _createProposal(
             title: 'Draft',
             publish: ProposalPublish.publishedDraft,
             commentsCount: 5,
@@ -359,13 +327,13 @@ void main() {
         build: () => workspaceBloc,
         act: (bloc) {
           final proposals = [
-            createProposal(
+            _createProposal(
               title: 'Local',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
+            _createProposal(
               title: 'Final',
               publish: ProposalPublish.submittedProposal,
               commentsCount: 0,
@@ -405,6 +373,40 @@ void main() {
       );
     });
   });
+}
+
+UsersProposalOverview _createProposal({
+  required String title,
+  required ProposalPublish publish,
+  required int commentsCount,
+  bool isLatestLocal = false,
+  DocumentRef? id,
+}) {
+  final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
+  return UsersProposalOverview(
+    id: effectiveId,
+    title: title,
+    updateDate: DateTime(2025, 10, 15),
+    fundsRequested: Money.zero(currency: Currencies.ada),
+    publish: publish,
+    versions: [
+      ProposalVersionViewModel(
+        title: title,
+        id: effectiveId,
+        createdAt: DateTime(2025, 10, 15),
+        publish: publish,
+        isLatest: true,
+        isLatestLocal: isLatestLocal,
+        versionNumber: 1,
+      ),
+    ],
+    fromActiveCampaign: true,
+    commentsCount: commentsCount,
+    category: 'Test Category',
+    fundNumber: 14,
+    iteration: 1,
+    ownership: const AuthorProposalOwnership(),
+  );
 }
 
 class MockCampaignService extends Mock implements CampaignService {}
