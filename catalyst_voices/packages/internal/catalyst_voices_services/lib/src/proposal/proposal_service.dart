@@ -85,7 +85,7 @@ abstract interface class ProposalService {
   });
 
   Future<void> removeFavoriteProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   Future<void> submitCollaboratorProposalAction({
@@ -121,6 +121,14 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  /// Stream emits [ProposalDataV2] whenever underlying database changes so it emits newest
+  /// available data.
+  ///
+  /// Returns null if proposal with [id] is not found. Be aware if latest proposal submission
+  /// action is a [ProposalSubmissionAction.hide], such document will be returned.
+  ///
+  /// If [id] is a [DraftRef] then such proposal will be returned only if [activeAccount]
+  /// is an author.
   Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount});
 
   /// Streams pages of brief proposal data.
@@ -332,8 +340,8 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> removeFavoriteProposal({required DocumentRef ref}) {
-    return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: false);
+  Future<void> removeFavoriteProposal({required DocumentRef id}) {
+    return _proposalRepository.updateProposalFavorite(id: id.id, isFavorite: false);
   }
 
   @override

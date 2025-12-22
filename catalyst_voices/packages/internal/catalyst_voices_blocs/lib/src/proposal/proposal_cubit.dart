@@ -168,13 +168,14 @@ final class ProposalCubit extends Cubit<ProposalState>
     required Document document,
     SignedDocumentRef? reply,
   }) async {
-    final proposalRef = _cache.id;
-    final proposalCategoryId = _cache.proposal?.metadata.parameters.set.first;
-    assert(proposalRef != null, 'Proposal ref not found. Load document first!');
+    final proposalId = _cache.id;
+    assert(proposalId != null, 'Proposal ref not found. Load document first!');
     assert(
-      proposalRef is SignedDocumentRef,
+      proposalId != null && proposalId.isSigned,
       'Can comment only on signed documents',
     );
+
+    final proposalCategoryId = _cache.proposalData?.proposalOrDocument.category?.id;
 
     final activeAccountId = _cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
@@ -188,7 +189,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final comment = CommentDocument(
       metadata: CommentMetadata(
         id: commentRef,
-        ref: proposalRef! as SignedDocumentRef,
+        ref: proposalId! as SignedDocumentRef,
         template: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: reply,
         parameters: DocumentParameters({?proposalCategoryId}),
@@ -199,7 +200,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final comments = (_cache.comments ?? []).addComment(comment: comment);
     _cache = _cache.copyWith(comments: Optional(comments));
-    emit(state.copyWith(data: _buildProposalViewDataUsingCache()));
+    _rebuildState();
 
     final documentData = comment.toDocumentData(mapper: _documentMapper);
 
@@ -208,20 +209,20 @@ final class ProposalCubit extends Cubit<ProposalState>
     } catch (error, stack) {
       _logger.info('Publishing comment failed', error, stack);
 
-      final localizedException = LocalizedException.create(
-        error,
-        fallback: LocalizedUnknownPublishCommentException.new,
-      );
+      if (!isClosed) {
+        final localizedException = LocalizedException.create(
+          error,
+          fallback: LocalizedUnknownPublishCommentException.new,
+        );
 
-      emitError(localizedException);
+        emitError(localizedException);
+      }
 
       final source = _cache.comments;
       final comments = (source ?? []).removeComment(ref: commentRef);
       _cache = _cache.copyWith(comments: Optional(comments));
 
-      if (!isClosed) {
-        emit(state.copyWith(data: _buildProposalViewDataUsingCache()));
-      }
+      if (!isClosed) _rebuildState();
     }
   }
 
@@ -260,16 +261,16 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<void> updateIsFavorite({required bool value}) async {
-    final ref = _cache.id;
-    assert(ref != null, 'Proposal ref not found. Load doc first');
+    final id = _cache.id;
+    assert(id != null, 'Proposal id not found. Load doc first');
 
-    _cache = _cache.copyWith(isFavorite: Optional(value));
+    _cache = _cache.copyWithIsFavorite(value: value);
     emit(state.copyWithFavorite(isFavorite: value));
 
     if (value) {
-      await _proposalService.addFavoriteProposal(id: ref!);
+      await _proposalService.addFavoriteProposal(id: id!);
     } else {
-      await _proposalService.removeFavoriteProposal(ref: ref!);
+      await _proposalService.removeFavoriteProposal(id: id!);
     }
   }
 
@@ -374,38 +375,35 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   ProposalViewData _buildProposalViewDataUsingCache() {
-    final proposal = _cache.proposal;
-    final category = _cache.category;
+    final proposalData = _cache.proposalData;
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? const [];
     final commentsSort = state.comments.commentsSort;
-    final collaborators = _cache.collaborators ?? const [];
-    final isFavorite = _cache.isFavorite ?? false;
-    final isVotingStage = _cache.isVotingStage ?? false;
-    final showComments = _cache.showComments ?? false;
-    final readOnlyMode = _cache.readOnlyMode ?? false;
     final activeAccountId = _cache.activeAccountId;
-    final votes = _cache.votes;
-    final proposalVersions = _cache.versions;
-    final publish = _cache.publish;
+
+    final proposalCampaign = proposalData?.proposalOrDocument.campaign;
+    final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
+    final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
+
+    final isVotingStage = _isVotingStage(proposalCampaign);
 
     return _buildProposalViewData(
       activeAccountId: activeAccountId,
       hasAccountUsername: !(activeAccountId?.isAnonymous ?? true),
-      proposal: proposal,
-      category: category,
+      proposal: proposalData?.proposalOrDocument.asProposalDocument,
+      category: proposalData?.proposalOrDocument.category,
       comments: comments,
       commentSchema: commentTemplate?.schema,
       commentsSort: commentsSort,
-      collaborators: collaborators,
-      isFavorite: isFavorite,
-      readOnlyMode: readOnlyMode,
+      collaborators: proposalData?.collaborators ?? const [],
+      isFavorite: proposalData?.isFavorite ?? false,
+      readOnlyMode: isReadOnlyMode,
       isVotingStage: isVotingStage,
-      showComments: showComments,
-      lastCastedVote: votes?.casted,
-      draftVote: votes?.draft,
-      proposalVersions: proposalVersions ?? [],
-      publish: publish,
+      showComments: !(proposalData?.publish.isPublished ?? false),
+      lastCastedVote: proposalData?.votes?.casted,
+      draftVote: proposalData?.votes?.draft,
+      proposalVersions: proposalData?.versions ?? [],
+      publish: proposalData?.publish,
     );
   }
 
@@ -544,22 +542,20 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     _cache = _cache.copyWith(commentTemplate: Optional(commentTemplate));
 
-    if (!isClosed) {
-      final proposalViewData = _buildProposalViewDataUsingCache();
-
-      emit(ProposalState(data: proposalViewData));
-    }
+    if (!isClosed) _rebuildState();
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {
     final activeAccountId = _cache.activeAccountId;
-    if (activeAccountId != data) {
-      _cache = _cache.copyWith(activeAccountId: Optional(data));
-
-      emit(state.copyWith(data: _buildProposalViewDataUsingCache()));
+    if (activeAccountId == data) {
+      return;
     }
 
-    if (!activeAccountId.isSameAs(data)) {
+    _cache = _cache.copyWith(activeAccountId: Optional(data));
+
+    if (activeAccountId.isSameAs(data)) {
+      _rebuildState();
+    } else {
       unawaited(_watchProposal());
     }
   }
@@ -567,19 +563,39 @@ final class ProposalCubit extends Cubit<ProposalState>
   void _handleCommentsChange(List<CommentWithReplies> comments) {
     _cache = _cache.copyWith(comments: Optional(comments));
 
-    emit(state.copyWith(data: _buildProposalViewDataUsingCache()));
+    _rebuildState();
   }
 
   void _handleProposalData(ProposalDataV2? proposal) {
     final proposalIdChanged = _cache.proposalData?.id != proposal?.id;
+
     _cache = _cache.copyWith(proposalData: Optional(proposal));
 
     if (proposalIdChanged) {
       unawaited(_getCommentBuilderTemplate());
       unawaited(_watchProposalComments());
+
+      emit(state.copyWith(comments: const CommentsState()));
     }
 
     _rebuildState();
+
+    if (proposalIdChanged) _handleProposalVersionSignal();
+  }
+
+  void _handleProposalVersionSignal() {
+    if (state.isLoading || state.isViewingLatestVersion) {
+      return;
+    }
+
+    final proposalCampaign = _cache.proposalData?.proposalOrDocument.campaign;
+    final isVotingStage = _isVotingStage(proposalCampaign);
+
+    if (isVotingStage && _cache.activeAccountId != null) {
+      emitSignal(const ViewingOlderVersionWhileVotingSignal());
+    } else {
+      emitSignal(const ViewingOlderVersionSignal());
+    }
   }
 
   bool _isVotingStage(Campaign? campaign) {
@@ -589,71 +605,45 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   void _rebuildState() {
-    try {
-      final proposalData = _cache.proposalData;
-      if (proposalData == null) {
-        // TODO(damian-molinski): check if still loading.
-        emit(state.copyWith(error: const Optional(LocalizedNotFoundException())));
-        return;
-      }
+    final id = _cache.id;
+    final proposalData = _cache.proposalData;
 
-      final proposalOrDocument = proposalData.proposalOrDocument;
-      final proposalDocument = proposalOrDocument.asProposalDocument;
-      if (proposalDocument == null) {
-        // TODO(damian-molinski): check if still loading.
-        emit(state.copyWith(error: const Optional(LocalizedProposalTemplateNotFoundException())));
-        return;
-      }
-
-      final campaign = proposalOrDocument.campaign;
-      final category = proposalOrDocument.category;
-
-      final isReadOnlyMode =
-          campaign?.phaseStateTo(CampaignPhaseType.proposalSubmission).status.isPost ?? true;
-
-      final isVotingStage = _isVotingStage(campaign);
-      final showComments = proposalData.publish != ProposalPublish.submittedProposal;
-
-      _cache = _cache.copyWith(
-        proposal: Optional(proposalDocument),
-        category: Optional(category),
-        collaborators: Optional(proposalData.collaborators),
-        isFavorite: Optional(proposalData.isFavorite),
-        isVotingStage: Optional(isVotingStage),
-        showComments: Optional(showComments),
-        readOnlyMode: Optional(isReadOnlyMode),
-        votes: Optional(proposalData.votes),
-        versions: Optional(proposalData.versions),
-        publish: Optional(proposalData.publish),
-      );
-
-      final activeAccountId = _cache.activeAccountId;
-      final collaborators = proposalData.collaborators ?? const <ProposalDataCollaborator>[];
-      final collaboratorsState = _getCollaboratorState(collaborators, activeAccountId);
-
-      final proposalViewData = _buildProposalViewDataUsingCache();
-
-      emit(
-        ProposalState(
-          data: proposalViewData,
-          collaborator: collaboratorsState,
-          readOnlyMode: isReadOnlyMode,
-        ),
-      );
-
-      if (proposalViewData.isCurrentVersionLatest == false &&
-          isVotingStage &&
-          activeAccountId != null) {
-        emitSignal(const ViewingOlderVersionWhileVotingSignal());
-      } else if (proposalViewData.isCurrentVersionLatest == false) {
-        emitSignal(const ViewingOlderVersionSignal());
-      }
-    } catch (error, stack) {
-      _logger.severe('Rebuilding state failed failed', error, stack);
-
-      _cache = _cache.copyWithoutProposal();
-      emit(ProposalState(error: LocalizedException.create(error)));
+    // Not found or still loading but ProposalState won't show error if is still loading
+    if (id != null && proposalData == null) {
+      emit(state.copyWith(error: const Optional(LocalizedNotFoundException())));
+      return;
     }
+
+    if (proposalData != null && proposalData.isHidden) {
+      emit(state.copyWith(error: const Optional(LocalizedProposalHiddenException())));
+      return;
+    }
+
+    final proposalOrDocument = proposalData?.proposalOrDocument;
+    final proposalDocument = proposalOrDocument?.asProposalDocument;
+    if (proposalData != null && proposalDocument == null) {
+      emit(state.copyWith(error: const Optional(LocalizedProposalTemplateNotFoundException())));
+      return;
+    }
+
+    final proposalCampaign = proposalData?.proposalOrDocument.campaign;
+    final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
+    final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
+
+    final activeAccountId = _cache.activeAccountId;
+    final collaborators = proposalData?.collaborators ?? const <ProposalDataCollaborator>[];
+    final collaboratorsState = _getCollaboratorState(collaborators, activeAccountId);
+
+    final proposalViewData = _buildProposalViewDataUsingCache();
+
+    // TODO(damian-molinski): where to clear an error?
+    emit(
+      state.copyWith(
+        data: proposalViewData,
+        collaborator: collaboratorsState,
+        readOnlyMode: isReadOnlyMode,
+      ),
+    );
   }
 
   Future<void> _watchProposal() async {
@@ -665,7 +655,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         : Stream.value(null);
 
     await _proposalSub?.cancel();
-    _proposalSub = stream.listen(_handleProposalData);
+    _proposalSub = stream.distinct().listen(_handleProposalData);
   }
 
   /// Watch comments on exact version of proposal.

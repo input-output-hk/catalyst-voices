@@ -578,12 +578,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       return null;
     }
 
-    final draftVotesMap = Map.fromEntries(
-      components.$2.map((e) => MapEntry(e.proposal, e)),
-    );
-    final castedVotesMap = Map.fromEntries(
-      components.$3.map((e) => MapEntry(e.proposal, e)),
-    );
+    final draftVotesMap = Map.fromEntries(components.$2.map((e) => MapEntry(e.proposal, e)));
+    final castedVotesMap = Map.fromEntries(components.$3.map((e) => MapEntry(e.proposal, e)));
 
     final proposalId = rawProposal.proposal.id;
     final templateData = rawProposal.template;

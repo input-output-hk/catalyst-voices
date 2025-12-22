@@ -67,6 +67,8 @@ final class ProposalDataV2 extends Equatable {
     );
   }
 
+  bool get isHidden => submissionAction == ProposalSubmissionAction.hide;
+
   @override
   List<Object?> get props => [
     id,
