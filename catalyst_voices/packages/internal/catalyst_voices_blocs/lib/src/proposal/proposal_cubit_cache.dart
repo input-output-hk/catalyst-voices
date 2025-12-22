@@ -5,7 +5,8 @@ import 'package:equatable/equatable.dart';
 /// Cache for [ProposalCubit].
 final class ProposalCubitCache extends Equatable {
   final CatalystId? activeAccountId;
-  final DocumentRef? ref;
+  final DocumentRef? id;
+  final ProposalDataV2? proposalData;
   final ProposalDocument? proposal;
   final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
@@ -21,7 +22,8 @@ final class ProposalCubitCache extends Equatable {
 
   const ProposalCubitCache({
     this.activeAccountId,
-    this.ref,
+    this.id,
+    this.proposalData,
     this.proposal,
     this.category,
     this.commentTemplate,
@@ -39,7 +41,8 @@ final class ProposalCubitCache extends Equatable {
   @override
   List<Object?> get props => [
     activeAccountId,
-    ref,
+    id,
+    proposalData,
     proposal,
     category,
     commentTemplate,
@@ -56,7 +59,8 @@ final class ProposalCubitCache extends Equatable {
 
   ProposalCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,
-    Optional<DocumentRef>? ref,
+    Optional<DocumentRef>? id,
+    Optional<ProposalDataV2>? proposalData,
     Optional<ProposalDocument>? proposal,
     Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
@@ -72,7 +76,8 @@ final class ProposalCubitCache extends Equatable {
   }) {
     return ProposalCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
-      ref: ref.dataOr(this.ref),
+      id: id.dataOr(this.id),
+      proposalData: proposalData.dataOr(this.proposalData),
       proposal: proposal.dataOr(this.proposal),
       category: category.dataOr(this.category),
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
@@ -90,6 +95,7 @@ final class ProposalCubitCache extends Equatable {
 
   ProposalCubitCache copyWithoutProposal() {
     return copyWith(
+      proposalData: const Optional.empty(),
       proposal: const Optional.empty(),
       commentTemplate: const Optional.empty(),
       comments: const Optional.empty(),
@@ -99,7 +105,7 @@ final class ProposalCubitCache extends Equatable {
       readOnlyMode: const Optional.empty(),
       category: const Optional.empty(),
       votes: const Optional.empty(),
-      ref: const Optional.empty(),
+      id: const Optional.empty(),
       versions: const Optional.empty(),
       publish: const Optional.empty(),
     );
