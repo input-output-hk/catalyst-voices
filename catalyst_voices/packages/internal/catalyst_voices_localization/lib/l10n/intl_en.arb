@@ -1862,6 +1862,10 @@
   "@invalidSeedPhraseWord": {
     "description": "Error shown when user inputs SeedPhrase word but invalid does not match any"
   },
+  "invitationsAndApprovals": "Invitations & Approvals",
+  "@invitationsAndApprovals": {
+    "description": "CTA to show Invitations and Approvals"
+  },
   "joinNewsletter": "Join Newsletter",
   "@joinNewsletter": {
     "description": "Action to join newsletter"

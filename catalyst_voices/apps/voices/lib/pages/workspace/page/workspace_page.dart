@@ -9,20 +9,16 @@ import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialo
 import 'package:catalyst_voices/pages/workspace/widgets/header/workspace_header.dart';
 import 'package:catalyst_voices/pages/workspace/widgets/workspace_content.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
-import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class WorkspacePage extends StatefulWidget {
-  final WorkspacePageTab? tab;
-
-  const WorkspacePage({super.key, this.tab});
+  const WorkspacePage({super.key});
 
   @override
   State<WorkspacePage> createState() => _WorkspacePageState();
@@ -33,26 +29,24 @@ class _WorkspacePageState extends State<WorkspacePage>
         TickerProviderStateMixin,
         SignalHandlerStateMixin<WorkspaceBloc, WorkspaceSignal, WorkspacePage>,
         ErrorHandlerStateMixin<WorkspaceBloc, WorkspacePage> {
-  late final VoicesTabController<WorkspacePageTab> _tabController;
-
   @override
   Widget build(BuildContext context) {
-    return ProposalSubmissionPhaseAware(
+    return const ProposalSubmissionPhaseAware(
       activeChild: Scaffold(
         body: WorkspaceLoading(
           child: CustomScrollView(
             slivers: [
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: SizedBox(height: 10),
               ),
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: WorkspaceHeader(),
               ),
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: WorkspaceError(),
               ),
-              WorkspaceContent(tabController: _tabController),
-              const SliverToBoxAdapter(
+              WorkspaceContent(),
+              SliverToBoxAdapter(
                 child: SizedBox(height: 50),
               ),
             ],
@@ -60,26 +54,6 @@ class _WorkspacePageState extends State<WorkspacePage>
         ),
       ),
     );
-  }
-
-  @override
-  void didUpdateWidget(WorkspacePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final tab = widget.tab ?? WorkspacePageTab.proposals;
-
-    if (widget.tab != oldWidget.tab) {
-      _tabController.animateToTab(tab);
-      context.read<WorkspaceBloc>().add(
-        ChangeWorkspaceFilters(tab: tab),
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   @override
@@ -94,8 +68,6 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   void handleSignal(WorkspaceSignal signal) {
     switch (signal) {
-      case ChangeTabWorkspaceSignal(:final tab):
-        _updateRoute(tab: tab);
       case ImportedProposalWorkspaceSignal():
         unawaited(
           ProposalBuilderRoute.fromRef(ref: signal.proposalRef).push(context),
@@ -116,27 +88,10 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   void initState() {
     super.initState();
-    final selectedTab = _determineTab(widget.tab);
-
-    _tabController = VoicesTabController(
-      initialTab: selectedTab,
-      tabs: WorkspacePageTab.values,
-      vsync: this,
-    );
-
-    _tabController.addListener(() {
-      context.read<WorkspaceBloc>().add(
-        ChangeWorkspaceFilters(tab: _tabController.tab),
-      );
-    });
 
     context.read<WorkspaceBloc>()
-      ..add(InitWorkspaceEvent(tab: selectedTab))
+      ..add(const InitWorkspaceEvent())
       ..add(const GetTimelineItemsEvent());
-  }
-
-  WorkspacePageTab _determineTab(WorkspacePageTab? initialTab) {
-    return initialTab ?? widget.tab ?? WorkspacePageTab.proposals;
   }
 
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
@@ -182,17 +137,5 @@ class _WorkspacePageState extends State<WorkspacePage>
       submissionCloseAt: submissionCloseDate,
       dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
     );
-  }
-
-  void _updateRoute({
-    WorkspacePageTab? tab,
-  }) {
-    Router.neglect(context, () {
-      final effectiveTab = tab ?? widget.tab;
-
-      WorkspaceRoute(
-        tab: effectiveTab?.name,
-      ).replace(context);
-    });
   }
 }

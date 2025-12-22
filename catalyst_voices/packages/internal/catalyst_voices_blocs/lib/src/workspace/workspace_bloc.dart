@@ -24,8 +24,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
-  StreamSubscription<Map<WorkspacePageTab, int>>? _workspaceTabCountSub;
   StreamSubscription<List<UsersProposalOverview>>? _dataPageSub;
+  StreamSubscription<int>? _invitationsAndApprovalsSub;
 
   WorkspaceBloc(
     this._userService,
@@ -45,8 +45,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<WatchUserCatalystIdEvent>(_onWatchUserCatalystId);
     on<WatchActiveCampaignChangeEvent>(_onWatchActiveCampaignChange);
     on<InternalDataChangeEvent>(_onInternalDataChange);
-    on<InternalTabCountChangeEvent>(_onInternalTabCountChange);
     on<LeaveProposalEvent>(_onLeaveProposal);
+    on<WorkspaceInvitationsAndApprovalsCount>(_onInvitationsAndApprovalsCountChange);
 
     unawaited(
       _userService.watchUnlockedActiveAccount
@@ -76,11 +76,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _dataPageSub?.cancel();
     _dataPageSub = null;
 
-    await _workspaceTabCountSub?.cancel();
-    _workspaceTabCountSub = null;
-
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
+
+    await _invitationsAndApprovalsSub?.cancel();
+    _invitationsAndApprovalsSub = null;
 
     return super.close();
   }
@@ -99,42 +99,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  ProposalsFiltersV2 _buildFiltersForTab(WorkspacePageTab tab) {
-    final activeAccountId = _cache.activeAccountId;
-    if (activeAccountId == null) {
-      return const ProposalsFiltersV2();
-    }
-
-    return switch (tab) {
-      WorkspacePageTab.proposals => ProposalsFiltersV2(
-        relationships: switch (_cache.workspaceFilter) {
-          WorkspaceFilters.allProposals => {
-            OriginalAuthor(activeAccountId),
-            CollaborationInvitation.accepted(activeAccountId),
-          },
-          WorkspaceFilters.mainProposer => {
-            OriginalAuthor(activeAccountId),
-          },
-          WorkspaceFilters.collaborator => {
-            CollaborationInvitation.accepted(activeAccountId),
-          },
-        },
-      ),
-      WorkspacePageTab.proposalInvites => ProposalsFiltersV2(
-        relationships: {
-          CollaborationInvitation.pending(activeAccountId),
-        },
-      ),
-    };
-  }
-
   void _handleActiveAccountIdChange(CatalystId? id) {
     if (isClosed) return;
 
     _cache = _cache.copyWith(activeAccountId: Optional(id));
 
-    unawaited(_rebuildWorkspaceTabCountSubs());
     unawaited(_rebuildDataPageSub());
+    _rebuildInvitationsAndApprovalsCountSub();
   }
 
   void _handleActiveCampaignChange(Campaign? campaign) {
@@ -146,7 +117,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     add(const GetTimelineItemsEvent());
     unawaited(_rebuildDataPageSub());
-    unawaited(_rebuildWorkspaceTabCountSubs());
   }
 
   void _handleDataChange(List<UsersProposalOverview> items) {
@@ -155,19 +125,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     add(InternalDataChangeEvent(items));
   }
 
-  void _handleWorkspaceTabCountChange(Map<WorkspacePageTab, int> data) {
-    if (isClosed) return;
-
-    add(InternalTabCountChangeEvent(data));
-  }
-
   Future<void> _onChangeFilters(ChangeWorkspaceFilters event, Emitter<WorkspaceState> emit) async {
     final filter = event.filters;
-    final tab = event.tab;
 
-    _cache = tab != null
-        ? _cache.copyWith(workspaceFilter: filter, activeTab: Optional(tab))
-        : _cache.copyWith(workspaceFilter: filter);
+    _cache = _cache.copyWith(workspaceFilter: filter);
 
     emit(
       state.copyWith(
@@ -176,7 +137,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       ),
     );
 
-    unawaited(_rebuildWorkspaceTabCountSubs());
     await _rebuildDataPageSub();
 
     if (!isClosed) {
@@ -284,27 +244,23 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _onInit(InitWorkspaceEvent event, Emitter<WorkspaceState> emit) async {
-    _resetCache(tab: event.tab);
-    await _rebuildWorkspaceTabCountSubs();
+    _resetCache();
     add(const WatchUserCatalystIdEvent());
     add(const WatchActiveCampaignChangeEvent());
+    _rebuildInvitationsAndApprovalsCountSub();
   }
 
   void _onInternalDataChange(InternalDataChangeEvent event, Emitter<WorkspaceState> emit) {
-    if (_cache.activeTab == WorkspacePageTab.proposals) {
-      _cache = _cache.copyWith(proposals: Optional(event.proposals));
-      final newState = _rebuildProposalsState();
-      emit(state.copyWith(userProposals: newState, isLoading: false));
-    } else if (_cache.activeTab == WorkspacePageTab.proposalInvites) {
-      _cache = _cache.copyWith(userProposalInvites: Optional(event.proposals));
-      final newState = _rebuildInvitesState();
-      emit(state.copyWith(userProposalInvites: newState, isLoading: false));
-    }
+    _cache = _cache.copyWith(proposals: Optional(event.proposals));
+    final newState = _rebuildProposalsState();
+    emit(state.copyWith(userProposals: newState, isLoading: false));
   }
 
-  void _onInternalTabCountChange(InternalTabCountChangeEvent event, Emitter<WorkspaceState> emit) {
-    _logger.finest('Proposals count changed: ${event.count}');
-    emit(state.copyWith(count: Map.unmodifiable(event.count)));
+  void _onInvitationsAndApprovalsCountChange(
+    WorkspaceInvitationsAndApprovalsCount event,
+    Emitter<WorkspaceState> emit,
+  ) {
+    emit(state.copyWith(invitationsApprovalsCount: event.count));
   }
 
   Future<void> _onLeaveProposal(LeaveProposalEvent event, Emitter<WorkspaceState> emit) async {
@@ -350,8 +306,30 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         .listen(_handleActiveAccountIdChange);
   }
 
+  ProposalsFiltersV2 _proposalFilters() {
+    final activeAccountId = _cache.activeAccountId;
+    if (activeAccountId == null) {
+      return const ProposalsFiltersV2();
+    }
+
+    return ProposalsFiltersV2(
+      relationships: switch (_cache.workspaceFilter) {
+        WorkspaceFilters.allProposals => {
+          OriginalAuthor(activeAccountId),
+          CollaborationInvitation.accepted(activeAccountId),
+        },
+        WorkspaceFilters.mainProposer => {
+          OriginalAuthor(activeAccountId),
+        },
+        WorkspaceFilters.collaborator => {
+          CollaborationInvitation.accepted(activeAccountId),
+        },
+      },
+    );
+  }
+
   Future<void> _rebuildDataPageSub() async {
-    final proposalsFilters = _rebuildProposalFilters();
+    final proposalsFilters = _proposalFilters();
 
     final activeCampaign = await _campaign;
 
@@ -373,13 +351,30 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         .listen(_handleDataChange);
   }
 
-  WorkspaceStateProposalInvites _rebuildInvitesState() {
-    final invites = _cache.userProposalInvites ?? [];
-    return WorkspaceStateProposalInvites.fromList(invites: invites);
-  }
+  void _rebuildInvitationsAndApprovalsCountSub() {
+    final activeCatalystId = _cache.activeAccountId;
+    if (activeCatalystId == null) {
+      return add(const WorkspaceInvitationsAndApprovalsCount(0));
+    }
+    final invitationsFilters = CollaboratorInvitationsProposalsFilter(activeCatalystId);
+    final approvalsFilters = CollaboratorProposalApprovalsFilter(activeCatalystId);
 
-  ProposalsFiltersV2 _rebuildProposalFilters() {
-    return _buildFiltersForTab(_cache.activeTab ?? WorkspacePageTab.proposals);
+    final invitationsCountStream = _proposalService.watchProposalsCountV2(
+      filters: invitationsFilters,
+    );
+    final approvalsCountStream = _proposalService.watchProposalsCountV2(
+      filters: approvalsFilters,
+    );
+
+    unawaited(_invitationsAndApprovalsSub?.cancel());
+    _invitationsAndApprovalsSub =
+        Rx.combineLatest2(
+          invitationsCountStream,
+          approvalsCountStream,
+          (invitations, approvals) => invitations + approvals,
+        ).distinct().listen((count) {
+          add(WorkspaceInvitationsAndApprovalsCount(count));
+        });
   }
 
   /// Rebuilds WorkspaceStateUserProposals from the current cache.
@@ -390,36 +385,19 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     return WorkspaceStateUserProposals.fromList(proposals, filter);
   }
 
-  Future<void> _rebuildWorkspaceTabCountSubs() async {
-    final streams = WorkspacePageTab.values.map((tab) {
-      final filters = _buildFiltersForTab(tab);
-      return _proposalService
-          .watchProposalsCountV2(filters: filters, includeLocalDrafts: true)
-          .distinct()
-          .map((count) => MapEntry(tab, count));
-    });
-
-    await _workspaceTabCountSub?.cancel();
-    _workspaceTabCountSub = Rx.combineLatest(
-      streams,
-      Map<WorkspacePageTab, int>.fromEntries,
-    ).startWith({}).listen(_handleWorkspaceTabCountChange);
-  }
-
   /// Removes a proposal from the cache by its reference.
   void _removeProposalFromCache(DocumentRef ref) {
     final updatedProposals = _cache.proposals?.where((e) => e.id.id != ref.id).toList() ?? [];
     _cache = _cache.copyWith(proposals: Optional(updatedProposals));
   }
 
-  void _resetCache({WorkspacePageTab? tab}) {
+  void _resetCache() {
     final activeAccountId = _userService.user.activeAccount?.catalystId;
-    final filters = _rebuildProposalFilters();
+    final filters = _proposalFilters();
 
     _cache = WorkspaceBlocCache(
       proposalsFilters: filters,
       activeAccountId: activeAccountId,
-      activeTab: tab ?? WorkspacePageTab.proposals,
     );
   }
 }
