@@ -77,7 +77,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     )
 
 @pytest.mark.preprod_indexing
-def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory):
+def test_document_put_validation_failed(proposal_doc_factory, rbac_chain_factory):
     with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
         proposal_template_content = json.load(json_file)
         proposal_template_content["definitions"]["segment"]["properties"]["proposer"] = { "type": "boolean" }
