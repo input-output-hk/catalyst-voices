@@ -52,9 +52,9 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> acceptCollaboratorInvitation() async {
     try {
-      await _proposalService.respondToCollaboratorInvite(
+      await _proposalService.submitCollaboratorProposalAction(
         ref: _cache.ref!,
-        action: CollaboratorInvitationAction.accept,
+        action: CollaboratorProposalAction.acceptInvitation,
       );
       if (!isClosed) {
         emit(state.copyWith(collaborator: const AcceptedCollaboratorInvitationState()));
@@ -69,7 +69,11 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> acceptFinalProposal() async {
     try {
-      // TODO(dt-iohk): send proposal action to approve it
+      await _proposalService.submitCollaboratorProposalAction(
+        ref: _cache.ref!,
+        action: CollaboratorProposalAction.acceptFinal,
+      );
+
       if (!isClosed) {
         emit(state.copyWith(collaborator: const AcceptedFinalProposalConsentState()));
       }
@@ -118,9 +122,9 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> rejectCollaboratorInvitation() async {
     try {
-      await _proposalService.respondToCollaboratorInvite(
+      await _proposalService.submitCollaboratorProposalAction(
         ref: _cache.ref!,
-        action: CollaboratorInvitationAction.reject,
+        action: CollaboratorProposalAction.rejectInvitation,
       );
       if (!isClosed) {
         emit(state.copyWith(collaborator: const RejectedCollaboratorInvitationState()));
@@ -135,7 +139,10 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> rejectFinalProposal() async {
     try {
-      // TODO(dt-iohk): send proposal action to reject it
+      await _proposalService.submitCollaboratorProposalAction(
+        ref: _cache.ref!,
+        action: CollaboratorProposalAction.rejectFinal,
+      );
 
       if (!isClosed) {
         emit(state.copyWith(collaborator: const RejectedCollaboratorFinalProposalConsentState()));
