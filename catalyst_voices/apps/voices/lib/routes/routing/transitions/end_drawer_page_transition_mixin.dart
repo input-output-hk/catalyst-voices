@@ -1,9 +1,42 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+class EndDrawerRouteStackConfig {
+  final String route;
+  final List<EndDrawerRouteStackConfig> subRoutes;
+
+  const EndDrawerRouteStackConfig({
+    required this.route,
+    this.subRoutes = const [],
+  });
+
+  /// Builds a list of routes that need to be pushed based on the current path.
+  ///
+  /// For a path like `/myactions/proposal_approval`, this returns:
+  /// ['/myactions', '/myactions/proposal_approval']
+  List<String> buildRouteStack(String currentPath) {
+    final routesToPush = <String>[];
+    _collectMatchingRoutes(currentPath, routesToPush);
+    return routesToPush;
+  }
+
+  void _collectMatchingRoutes(String currentPath, List<String> routesToPush) {
+    if (!currentPath.contains(route)) return;
+
+    routesToPush.add(route);
+
+    // Check if any sub-route matches
+    for (final subRouteConfig in subRoutes) {
+      if (currentPath.contains(subRouteConfig.route)) {
+        subRouteConfig._collectMatchingRoutes(currentPath, routesToPush);
+        return;
+      }
+    }
+  }
+}
 
 /// A mixin that provides a drawer-like page transition for [ShellRouteData].
 ///
@@ -14,6 +47,9 @@ import 'package:go_router/go_router.dart';
 /// an end drawer, allowing nested routes to change the drawer content.
 mixin EndDrawerShellPageTransitionMixin on ShellRouteData {
   static const transitionPageName = 'EndDrawerShellPageTransition';
+
+  /// Configuration that defines how the route stack should be built.
+  EndDrawerRouteStackConfig get routeStackConfig;
 
   @override
   Page<void> pageBuilder(
@@ -33,7 +69,10 @@ mixin EndDrawerShellPageTransitionMixin on ShellRouteData {
       barrierDismissible: true,
       transitionDuration: Duration.zero,
       reverseTransitionDuration: Duration.zero,
-      child: _EndDrawerScaffold(drawerContent: builder(context, state, navigator)),
+      child: _EndDrawerScaffold(
+        drawerContent: builder(context, state, navigator),
+        routeStackConfig: routeStackConfig,
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) => child,
     );
   }
@@ -41,9 +80,11 @@ mixin EndDrawerShellPageTransitionMixin on ShellRouteData {
 
 class _EndDrawerScaffold extends StatefulWidget {
   final Widget drawerContent;
+  final EndDrawerRouteStackConfig routeStackConfig;
 
   const _EndDrawerScaffold({
     required this.drawerContent,
+    required this.routeStackConfig,
   });
 
   @override
@@ -78,28 +119,32 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final router = GoRouter.of(context);
       final currentConfiguration = router.routerDelegate.currentConfiguration;
-      if (currentConfiguration.matches.length >= 2) {
+      final currentPath = currentConfiguration.last.matchedLocation;
+
+      if (currentConfiguration.matches.length > 1) {
+        final requiredRoutes = _buildRouteStack(currentPath);
+        final existingPaths = currentConfiguration.matches
+            .map((match) => match.matchedLocation)
+            .toList();
+        final missingRoutes = requiredRoutes
+            .where((route) => !existingPaths.contains(route))
+            .toList();
+
+        if (missingRoutes.isNotEmpty) {
+          _pushRoutesSequentially(router, requiredRoutes);
+        }
+
         _scaffoldKey.currentState?.openEndDrawer();
       } else {
         router.go(Routes.initialLocation);
-        final currentPath = currentConfiguration.fullPath;
-
-        if (currentPath.contains(const ActionsRoute().location)) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            unawaited(router.push(const ActionsRoute().location));
-            if (currentPath.contains(const ProposalApprovalRoute().location)) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                unawaited(router.push(const ProposalApprovalRoute().location));
-              });
-            } else if (currentPath.contains(const CoProposersConsentRoute().location)) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                unawaited(router.push(const CoProposersConsentRoute().location));
-              });
-            }
-          });
-        }
+        final routesToPush = _buildRouteStack(currentPath);
+        _pushRoutesSequentially(router, routesToPush);
       }
     });
+  }
+
+  List<String> _buildRouteStack(String currentPath) {
+    return widget.routeStackConfig.buildRouteStack(currentPath);
   }
 
   Future<void> _onEndDrawerChanged(bool isOpened) async {
@@ -113,6 +158,22 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
       _hasPopped = true;
       await _waitForDrawerDismissed();
     }
+  }
+
+  /// Pushes routes sequentially, each in its own post frame callback.
+  void _pushRoutesSequentially(GoRouter router, List<String> routes) {
+    if (routes.isEmpty) return;
+
+    void pushNext(int index) {
+      if (index >= routes.length) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        unawaited(router.push(routes[index]));
+        pushNext(index + 1);
+      });
+    }
+
+    pushNext(0);
   }
 
   Future<void> _waitForDrawerDismissed() async {

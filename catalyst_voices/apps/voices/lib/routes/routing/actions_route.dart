@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/actions/actions_page.dart';
+import 'package:catalyst_voices/pages/actions/actions_page_tab.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/co_proposers_consent/co_proposers_consent_page.dart';
 import 'package:catalyst_voices/pages/proposal_approval/proposal_approval_page.dart';
@@ -10,11 +11,16 @@ import 'package:go_router/go_router.dart';
 part 'actions_route.g.dart';
 
 final class ActionsRoute extends GoRouteData {
-  const ActionsRoute();
+  final String? tab;
+
+  const ActionsRoute({
+    this.tab,
+  });
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const ActionsPage();
+    final tab = ActionsPageTab.values.asNameMap()[this.tab] ?? ActionsPageTab.all;
+    return ActionsPage(tab: tab);
   }
 }
 
@@ -38,6 +44,19 @@ final class ActionsRoute extends GoRouteData {
 )
 final class ActionsShellRoute extends ShellRouteData with EndDrawerShellPageTransitionMixin {
   const ActionsShellRoute();
+
+  @override
+  EndDrawerRouteStackConfig get routeStackConfig => EndDrawerRouteStackConfig(
+    route: const ActionsRoute().location,
+    subRoutes: [
+      EndDrawerRouteStackConfig(
+        route: const ProposalApprovalRoute().location,
+      ),
+      EndDrawerRouteStackConfig(
+        route: const CoProposersConsentRoute().location,
+      ),
+    ],
+  );
 
   @override
   Widget builder(

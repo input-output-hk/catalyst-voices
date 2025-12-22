@@ -1,41 +1,48 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/actions/actions_page_tab.dart';
 import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class ActionsPage extends StatelessWidget {
-  const ActionsPage({super.key});
+  final ActionsPageTab tab;
+
+  const ActionsPage({
+    super.key,
+    required this.tab,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        _Header(),
-        SizedBox(height: 30),
-        _Content(),
+        const _Header(),
+        const SizedBox(height: 30),
+        _Content(tab),
       ],
     );
   }
 }
 
 class _Content extends StatelessWidget {
-  const _Content();
+  final ActionsPageTab tab;
+
+  const _Content(this.tab);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           spacing: 20,
           children: [
             Text(
-              'No actions',
-              style: context.textTheme.bodyLarge?.copyWith(
-                color: context.colors.textOnPrimaryLevel1,
-              ),
+              'Tab: ${tab.name}',
+              style: context.textTheme.titleLarge,
             ),
             VoicesFilledButton(
               child: const Text('Proposal Approval'),
