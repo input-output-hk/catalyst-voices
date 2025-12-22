@@ -105,11 +105,13 @@ final class ShowSubmitConfirmationSignal extends ProposalBuilderSignal {
   final String? proposalTitle;
   final int? currentIteration;
   final int nextIteration;
+  final bool hasCollaborators;
 
   const ShowSubmitConfirmationSignal({
     required this.proposalTitle,
     required this.currentIteration,
     required this.nextIteration,
+    required this.hasCollaborators,
   });
 
   @override
@@ -117,6 +119,7 @@ final class ShowSubmitConfirmationSignal extends ProposalBuilderSignal {
     proposalTitle,
     currentIteration,
     nextIteration,
+    hasCollaborators,
   ];
 }
 
