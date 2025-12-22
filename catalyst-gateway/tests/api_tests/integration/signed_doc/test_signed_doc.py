@@ -69,7 +69,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     new_doc.content["setup"]["title"]["title"] = "another title"
     new_doc = new_doc.build_and_sign()
     resp = document_v1.put(
-        data=new_doc.cbor_hex,
+        data=new_doc.hex_cbor,
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 201, (
