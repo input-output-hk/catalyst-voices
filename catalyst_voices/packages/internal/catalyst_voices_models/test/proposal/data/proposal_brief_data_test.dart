@@ -137,7 +137,11 @@ void main() {
         // Given
         final id = DocumentRefFactory.signedDocumentRef();
         final existingVersionRef = DocumentRefFactory.signedDocumentRef();
-        final existingVersion = ProposalBriefDataVersion(ref: existingVersionRef, title: 'Old');
+        final existingVersion = ProposalBriefDataVersion(
+          ref: existingVersionRef,
+          title: 'Old',
+          versionNumber: 1,
+        );
 
         final baseBrief = ProposalBriefData(
           id: id,
@@ -156,6 +160,7 @@ void main() {
 
         // Then
         expect(updatedBrief.versions, hasLength(2));
+        // Versions are sorted oldest→newest, so existing version should be first
         expect(updatedBrief.versions![0], existingVersion);
         expect(updatedBrief.versions![1].ref, newVersionRef);
         expect(updatedBrief.versions![1].title, newVersionTitle);

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/header/invitations_approvals_button.dart';
 import 'package:catalyst_voices/pages/workspace/widgets/header/workspace_timeline.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -37,6 +38,7 @@ class _HeaderActions extends StatelessWidget {
       spacing: 8,
       children: [
         const CreateProposalButton(showTrailingIcon: true),
+        const InvitationsApprovalsButton(),
         const _ImportProposalButton(),
         _TimelineToggleButton(
           onPressed: onTap,

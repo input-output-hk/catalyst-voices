@@ -105,7 +105,13 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          versions: [ProposalBriefDataVersion(ref: signedDocId, title: 'Published Proposal')],
+          versions: [
+            ProposalBriefDataVersion(
+              ref: signedDocId,
+              title: 'Published Proposal',
+              versionNumber: 1,
+            ),
+          ],
         );
 
         // A completely new local draft
@@ -172,7 +178,13 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          versions: [ProposalBriefDataVersion(ref: signedDocId, title: 'Published Proposal')],
+          versions: [
+            ProposalBriefDataVersion(
+              ref: signedDocId,
+              title: 'Published Proposal',
+              versionNumber: 1,
+            ),
+          ],
         );
 
         // A local draft version of the SAME signed proposal
@@ -245,6 +257,363 @@ void main() {
             }),
           ),
         );
+      });
+    });
+
+    group('watchProposal', () {
+      test('returns only public proposal when originalAuthor is null', () async {
+        // Given: No originalAuthor provided
+        final proposalId = SignedDocumentRef.generateFirstRef();
+        final publicProposal = ProposalDataV2(
+          id: proposalId,
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: proposalId,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [CatalystIdFactory.create()],
+              ),
+              content: const DocumentDataContent({'title': 'Public Proposal'}),
+            ),
+          ),
+          submissionAction: ProposalSubmissionAction.draft,
+          isFavorite: false,
+          categoryName: 'Category',
+          versions: [proposalId],
+        );
+
+        // Mock public proposal
+        when(
+          () => mockProposalRepository.watchProposal(id: proposalId),
+        ).thenAnswer((_) => Stream.value(publicProposal));
+
+        // When: No originalAuthor provided
+        final stream = proposalService.watchProposal(id: proposalId);
+
+        // Then: Should emit only public proposal
+        await expectLater(
+          stream,
+          emits(
+            predicate<ProposalDataV2?>((p) {
+              return p?.id == proposalId && p?.versions?.length == 1;
+            }),
+          ),
+        );
+
+        // Verify watchLocalProposal was not called
+        verifyNever(
+          () => mockProposalRepository.watchLocalProposal(
+            id: any<DocumentRef>(named: 'id'),
+            originalAuthor: any<CatalystId>(named: 'originalAuthor'),
+          ),
+        );
+      });
+
+      test('returns local proposal when id matches localProposal.id', () async {
+        // Given: Local proposal with matching id
+        final proposalId = DraftRef.generateFirstRef();
+        final authorId = CatalystIdFactory.create();
+
+        final localProposal = ProposalDataV2(
+          id: proposalId,
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: proposalId,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [authorId],
+              ),
+              content: const DocumentDataContent({'title': 'Local Draft'}),
+            ),
+          ),
+          submissionAction: null,
+          isFavorite: false,
+          categoryName: 'Category',
+          versions: [proposalId],
+        );
+
+        // Mock local proposal
+        when(
+          () => mockProposalRepository.watchLocalProposal(
+            id: proposalId,
+            originalAuthor: authorId,
+          ),
+        ).thenAnswer((_) => Stream.value(localProposal));
+
+        // Mock public proposal (should be ignored)
+        when(
+          () => mockProposalRepository.watchProposal(id: proposalId),
+        ).thenAnswer((_) => Stream.value(null));
+
+        // When: originalAuthor provided and id matches
+        final stream = proposalService.watchProposal(
+          id: proposalId,
+          activeAccount: authorId,
+        );
+
+        // Then: Should emit local proposal
+        await expectLater(
+          stream,
+          emits(
+            predicate<ProposalDataV2?>((p) {
+              return p?.id == proposalId && p == localProposal;
+            }),
+          ),
+        );
+      });
+
+      test('merges public and local versions when local has extra versions', () async {
+        // Given: Public proposal with 2 versions, local proposal only tracks the document ID
+        final proposalId = SignedDocumentRef.generateFirstRef();
+        final authorId = CatalystIdFactory.create();
+        final version1 = proposalId;
+        final version2 = proposalId.nextVersion();
+        final localDraftVersion = DraftRef.generateNextRefFor(proposalId.id);
+
+        // Public proposal with 2 public versions
+        final publicProposal = ProposalDataV2(
+          id: version2,
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: version2,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [authorId],
+              ),
+              content: const DocumentDataContent({'title': 'Public Proposal'}),
+            ),
+          ),
+          submissionAction: ProposalSubmissionAction.draft,
+          isFavorite: false,
+          categoryName: 'Category',
+          versions: [version1, version2],
+        );
+
+        // Local proposal: user is working on a draft edit, so it tracks all versions including the draft
+        final localProposal = ProposalDataV2(
+          id: version2, // User is viewing version2, but has a local draft
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: version2,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [authorId],
+              ),
+              content: const DocumentDataContent({'title': 'Local Draft'}),
+            ),
+          ),
+          submissionAction: null,
+          isFavorite: false,
+          categoryName: 'Category',
+          versions: [version1, version2, localDraftVersion],
+        );
+
+        // Mock repositories
+        when(
+          () => mockProposalRepository.watchLocalProposal(
+            id: version2,
+            originalAuthor: authorId,
+          ),
+        ).thenAnswer((_) => Stream.value(localProposal));
+
+        when(
+          () => mockProposalRepository.watchProposal(id: version2),
+        ).thenAnswer((_) => Stream.value(publicProposal));
+
+        // When: Query for public version2
+        final stream = proposalService.watchProposal(
+          id: version2,
+          activeAccount: authorId,
+        );
+
+        // Then: Should merge versions from local into public
+        await expectLater(
+          stream,
+          emits(
+            predicate<ProposalDataV2?>((p) {
+              if (p == null) return false;
+              // Should have all 3 versions
+              if (p.versions?.length != 3) return false;
+              // Should be the public proposal as base
+              if (p.id != version2) return false;
+              // Should contain the local draft version
+              return p.versions!.any((v) => v.id == localDraftVersion.id);
+            }),
+          ),
+        );
+      });
+
+      test('returns public proposal when local has no extra versions', () async {
+        // Given: Public and local proposals with same versions
+        final proposalId = SignedDocumentRef.generateFirstRef();
+        final authorId = CatalystIdFactory.create();
+        final version1 = proposalId;
+        final version2 = proposalId.nextVersion();
+
+        final publicProposal = ProposalDataV2(
+          id: version2,
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: version2,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [authorId],
+              ),
+              content: const DocumentDataContent({'title': 'Public Proposal'}),
+            ),
+          ),
+          submissionAction: ProposalSubmissionAction.draft,
+          isFavorite: false,
+          categoryName: 'Category',
+          versions: [version1, version2],
+        );
+
+        final localProposal = ProposalDataV2(
+          id: version2,
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: version2,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [authorId],
+              ),
+              content: const DocumentDataContent({'title': 'Local Draft'}),
+            ),
+          ),
+          submissionAction: null,
+          isFavorite: false,
+          categoryName: 'Category',
+          versions: [version1, version2],
+        );
+
+        // Mock repositories
+        when(
+          () => mockProposalRepository.watchLocalProposal(
+            id: version2,
+            originalAuthor: authorId,
+          ),
+        ).thenAnswer((_) => Stream.value(localProposal));
+
+        when(
+          () => mockProposalRepository.watchProposal(id: version2),
+        ).thenAnswer((_) => Stream.value(publicProposal));
+
+        // When
+        final stream = proposalService.watchProposal(
+          id: version2,
+          activeAccount: authorId,
+        );
+
+        // Then: Should return public proposal without modification
+        await expectLater(
+          stream,
+          emits(
+            predicate<ProposalDataV2?>((p) {
+              return p?.versions?.length == 2 && p?.id == version2;
+            }),
+          ),
+        );
+      });
+
+      test('returns null when both public and local are null', () async {
+        // Given: No proposals exist
+        final proposalId = SignedDocumentRef.generateFirstRef();
+        final authorId = CatalystIdFactory.create();
+
+        when(
+          () => mockProposalRepository.watchLocalProposal(
+            id: proposalId,
+            originalAuthor: authorId,
+          ),
+        ).thenAnswer((_) => Stream.value(null));
+
+        when(
+          () => mockProposalRepository.watchProposal(id: proposalId),
+        ).thenAnswer((_) => Stream.value(null));
+
+        // When
+        final stream = proposalService.watchProposal(
+          id: proposalId,
+          activeAccount: authorId,
+        );
+
+        // Then: Should emit null
+        await expectLater(stream, emits(null));
+      });
+
+      test('emits updates when public proposal changes', () async {
+        // Given: Initial public proposal
+        final proposalId = SignedDocumentRef.generateFirstRef();
+        final streamController = StreamController<ProposalDataV2?>();
+
+        final initialProposal = ProposalDataV2(
+          id: proposalId,
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: proposalId,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [CatalystIdFactory.create()],
+              ),
+              content: const DocumentDataContent({'title': 'Initial'}),
+            ),
+          ),
+          submissionAction: ProposalSubmissionAction.draft,
+          isFavorite: false,
+          categoryName: 'Category',
+          versions: [proposalId],
+        );
+
+        final updatedProposal = ProposalDataV2(
+          id: proposalId,
+          proposalOrDocument: ProposalOrDocument.data(
+            DocumentData(
+              metadata: DocumentDataMetadata.proposal(
+                id: proposalId,
+                template: SignedDocumentRef.generateFirstRef(),
+                parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
+                authors: [CatalystIdFactory.create()],
+              ),
+              content: const DocumentDataContent({'title': 'Updated'}),
+            ),
+          ),
+          submissionAction: ProposalSubmissionAction.aFinal,
+          isFavorite: true,
+          categoryName: 'Category',
+          versions: [proposalId],
+        );
+
+        when(
+          () => mockProposalRepository.watchProposal(id: proposalId),
+        ).thenAnswer((_) => streamController.stream);
+
+        // When
+        final stream = proposalService.watchProposal(id: proposalId);
+        final emissions = <ProposalDataV2?>[];
+        final subscription = stream.listen(emissions.add);
+
+        // Emit initial value
+        streamController.add(initialProposal);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        // Emit updated value
+        streamController.add(updatedProposal);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        // Then: Should receive both emissions
+        expect(emissions.length, 2);
+        expect(emissions[0]?.submissionAction, ProposalSubmissionAction.draft);
+        expect(emissions[1]?.submissionAction, ProposalSubmissionAction.aFinal);
+
+        await subscription.cancel();
+        await streamController.close();
       });
     });
   });

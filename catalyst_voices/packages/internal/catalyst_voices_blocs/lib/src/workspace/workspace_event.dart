@@ -6,12 +6,11 @@ import 'package:equatable/equatable.dart';
 
 final class ChangeWorkspaceFilters extends WorkspaceEvent {
   final WorkspaceFilters? filters;
-  final WorkspacePageTab? tab;
 
-  const ChangeWorkspaceFilters({this.filters, this.tab});
+  const ChangeWorkspaceFilters({this.filters});
 
   @override
-  List<Object?> get props => [...super.props, filters, tab];
+  List<Object?> get props => [...super.props, filters];
 }
 
 final class DeleteDraftProposalEvent extends WorkspaceEvent {
@@ -65,12 +64,10 @@ final class ImportProposalEvent extends WorkspaceEvent {
 }
 
 final class InitWorkspaceEvent extends WorkspaceEvent {
-  final WorkspacePageTab? tab;
-
-  const InitWorkspaceEvent({this.tab});
+  const InitWorkspaceEvent();
 
   @override
-  List<Object?> get props => [tab];
+  List<Object?> get props => [];
 }
 
 final class InternalDataChangeEvent extends WorkspaceEvent {
@@ -80,15 +77,6 @@ final class InternalDataChangeEvent extends WorkspaceEvent {
 
   @override
   List<Object?> get props => [proposals];
-}
-
-final class InternalTabCountChangeEvent extends WorkspaceEvent {
-  final Map<WorkspacePageTab, int> count;
-
-  const InternalTabCountChangeEvent(this.count);
-
-  @override
-  List<Object?> get props => [count];
 }
 
 final class LeaveProposalEvent extends WorkspaceEvent {
@@ -135,4 +123,13 @@ sealed class WorkspaceEvent extends Equatable {
 
   @override
   List<Object?> get props => [];
+}
+
+final class WorkspaceInvitationsAndApprovalsCount extends WorkspaceEvent {
+  final int count;
+
+  const WorkspaceInvitationsAndApprovalsCount(this.count);
+
+  @override
+  List<Object?> get props => [...super.props, count];
 }
