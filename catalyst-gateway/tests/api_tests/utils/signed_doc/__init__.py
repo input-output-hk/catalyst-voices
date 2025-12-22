@@ -57,11 +57,9 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
 
     def proposal_doc_factory(proposal_template_content: dict | None = None) -> SignedDocument:
-        if proposal_template == "none":
+        if proposal_template_content == None:
             with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
                 proposal_template_content = json.load(json_file)
-        else:
-            proposal_template_content = proposal_template
 
         proposal_template_content = proposal_form_template_doc(
             proposal_template_content, category, admin_key
