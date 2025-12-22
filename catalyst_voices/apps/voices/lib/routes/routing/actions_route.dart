@@ -1,19 +1,29 @@
 import 'package:catalyst_voices/pages/actions/actions_page.dart';
-import 'package:catalyst_voices/pages/actions/actions_page_tab.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/co_proposers_consent/co_proposers_consent_page.dart';
 import 'package:catalyst_voices/pages/proposal_approval/proposal_approval_page.dart';
+import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
+import 'package:catalyst_voices/routes/guards/route_guard.dart';
+import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
+import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
 import 'package:catalyst_voices/routes/routing/transitions/end_drawer_page_transition_mixin.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 part 'actions_route.g.dart';
 
-final class ActionsRoute extends GoRouteData {
+final class ActionsRoute extends GoRouteData with CompositeRouteGuardMixin {
   final String? tab;
 
   const ActionsRoute({this.tab});
+
+  @override
+  List<RouteGuard> get routeGuards => [
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -58,8 +68,15 @@ final class ActionsShellRoute extends ShellRouteData with EndDrawerShellPageTran
   }
 }
 
-final class CoProposersConsentRoute extends GoRouteData with FadePageTransitionMixin {
+final class CoProposersConsentRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const CoProposersConsentRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -67,8 +84,15 @@ final class CoProposersConsentRoute extends GoRouteData with FadePageTransitionM
   }
 }
 
-final class ProposalApprovalRoute extends GoRouteData with FadePageTransitionMixin {
+final class ProposalApprovalRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const ProposalApprovalRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

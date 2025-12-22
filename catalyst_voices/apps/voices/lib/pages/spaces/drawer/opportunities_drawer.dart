@@ -3,6 +3,7 @@ import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart'
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/session_account_drawer_catalyst_id.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
+import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -105,17 +106,8 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          context.l10n.myOpportunities,
-          style: context.textTheme.titleLarge,
-        ),
-        CloseButton(
-          onPressed: () => Navigator.maybeOf(context)?.pop(),
-        ),
-      ],
+    return VoicesDrawerHeader(
+      text: context.l10n.myOpportunities,
     );
   }
 }

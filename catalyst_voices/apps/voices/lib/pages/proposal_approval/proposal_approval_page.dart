@@ -1,17 +1,21 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ProposalApprovalPage extends StatelessWidget {
   const ProposalApprovalPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        _Header(),
-        SizedBox(height: 30),
-        _Content(),
+        VoicesDrawerHeader(
+          text: 'Final Proposal Approval',
+          onCloseTap: Scaffold.of(context).closeEndDrawer,
+          showBackButton: true,
+        ),
+        const SizedBox(height: 30),
+        const _Content(),
       ],
     );
   }
@@ -31,32 +35,6 @@ class _Content extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: context.pop,
-        ),
-        Expanded(
-          child: Text(
-            'Final Proposal Approval',
-            style: context.textTheme.titleLarge,
-          ),
-        ),
-        CloseButton(
-          onPressed: Scaffold.of(context).closeEndDrawer,
-        ),
-      ],
     );
   }
 }
