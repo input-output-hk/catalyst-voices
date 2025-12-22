@@ -7327,7 +7327,9 @@ void main() {
         });
       });
 
-      group('watchLocalRawProposal', () {
+      group(
+        'watchLocalRawProposal',
+        () {
           final author1 = _createTestAuthor(name: 'author1');
           final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 1);
 
