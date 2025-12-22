@@ -3,12 +3,10 @@ part of 'workspace_proposal_card.dart';
 class _LargeScreen extends StatelessWidget {
   final UsersProposalOverview proposal;
   final bool isSubmitted;
-  final WorkspaceProposalType type;
 
   const _LargeScreen({
     required this.proposal,
     required this.isSubmitted,
-    required this.type,
   });
 
   @override
@@ -31,7 +29,7 @@ class _LargeScreen extends StatelessWidget {
               ProposalIterationStageChip(
                 status: proposal.publish,
                 versionNumber: proposal.iteration,
-                useInternalBackground: !isSubmitted || type.isInvite,
+                useInternalBackground: !isSubmitted,
               ),
             ],
           ),
@@ -51,13 +49,13 @@ class _LargeScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            if (!type.isInvite)
-              _CampaignData(
-                leadValue: proposal.commentsCount == 0
-                    ? context.l10n.notAvailableAbbr
-                    : proposal.commentsCount.toString(),
-                subValue: context.l10n.comments(proposal.commentsCount),
-              ),
+
+            _CampaignData(
+              leadValue: proposal.commentsCount == 0
+                  ? context.l10n.notAvailableAbbr
+                  : proposal.commentsCount.toString(),
+              subValue: context.l10n.comments(proposal.commentsCount),
+            ),
           ],
         ),
         // This allows to center previous row
@@ -70,12 +68,10 @@ class _LargeScreen extends StatelessWidget {
 class _MediumScreen extends StatelessWidget {
   final UsersProposalOverview proposal;
   final bool isSubmitted;
-  final WorkspaceProposalType type;
 
   const _MediumScreen({
     required this.proposal,
     required this.isSubmitted,
-    required this.type,
   });
 
   @override
@@ -116,13 +112,13 @@ class _MediumScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            if (!type.isInvite)
-              _CampaignData(
-                leadValue: proposal.commentsCount == 0
-                    ? context.l10n.notAvailableAbbr
-                    : proposal.commentsCount.toString(),
-                subValue: context.l10n.comments(proposal.commentsCount),
-              ),
+
+            _CampaignData(
+              leadValue: proposal.commentsCount == 0
+                  ? context.l10n.notAvailableAbbr
+                  : proposal.commentsCount.toString(),
+              subValue: context.l10n.comments(proposal.commentsCount),
+            ),
           ],
         ),
       ],
@@ -133,12 +129,10 @@ class _MediumScreen extends StatelessWidget {
 class _SmallScreen extends StatelessWidget {
   final UsersProposalOverview proposal;
   final bool isSubmitted;
-  final WorkspaceProposalType type;
 
   const _SmallScreen({
     required this.proposal,
     required this.isSubmitted,
-    required this.type,
   });
 
   @override
@@ -174,13 +168,12 @@ class _SmallScreen extends StatelessWidget {
               leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
-            if (!type.isInvite)
-              _CampaignData(
-                leadValue: proposal.commentsCount == 0
-                    ? context.l10n.notAvailableAbbr
-                    : proposal.commentsCount.toString(),
-                subValue: context.l10n.comments(proposal.commentsCount),
-              ),
+            _CampaignData(
+              leadValue: proposal.commentsCount == 0
+                  ? context.l10n.notAvailableAbbr
+                  : proposal.commentsCount.toString(),
+              subValue: context.l10n.comments(proposal.commentsCount),
+            ),
           ],
         ),
       ],
@@ -190,9 +183,8 @@ class _SmallScreen extends StatelessWidget {
 
 class _WorkspaceProposalCardResponsiveness extends StatelessWidget {
   final UsersProposalOverview proposal;
-  final WorkspaceProposalType type;
 
-  const _WorkspaceProposalCardResponsiveness(this.proposal, {required this.type});
+  const _WorkspaceProposalCardResponsiveness(this.proposal);
 
   @override
   Widget build(BuildContext context) {
@@ -201,17 +193,14 @@ class _WorkspaceProposalCardResponsiveness extends StatelessWidget {
       sm: (_) => _SmallScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
-        type: type,
       ),
       md: (_) => _MediumScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
-        type: type,
       ),
       lg: (_) => _LargeScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
-        type: type,
       ),
     );
   }

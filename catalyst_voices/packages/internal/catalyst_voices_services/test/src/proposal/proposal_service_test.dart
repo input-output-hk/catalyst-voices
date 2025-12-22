@@ -105,7 +105,13 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          versions: [ProposalBriefDataVersion(ref: signedDocId, title: 'Published Proposal')],
+          versions: [
+            ProposalBriefDataVersion(
+              ref: signedDocId,
+              title: 'Published Proposal',
+              versionNumber: 1,
+            ),
+          ],
         );
 
         // A completely new local draft
@@ -172,7 +178,13 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          versions: [ProposalBriefDataVersion(ref: signedDocId, title: 'Published Proposal')],
+          versions: [
+            ProposalBriefDataVersion(
+              ref: signedDocId,
+              title: 'Published Proposal',
+              versionNumber: 1,
+            ),
+          ],
         );
 
         // A local draft version of the SAME signed proposal

@@ -24,7 +24,7 @@ final class ProposalsCampaignFilters extends Equatable {
 }
 
 /// A set of filters to be applied when querying for proposals.
-final class ProposalsFiltersV2 extends Equatable {
+base class ProposalsFiltersV2 extends Equatable {
   /// Filters proposals by their effective status. If null, this filter is not applied.
   final ProposalStatusFilter? status;
 
