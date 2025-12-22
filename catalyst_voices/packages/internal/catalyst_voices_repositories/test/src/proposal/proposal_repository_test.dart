@@ -114,6 +114,21 @@ void main() {
           (_) async => const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
         );
 
+        // Mock previous version metadata
+        when(
+          () => mockDocumentRepository.getDocumentMetadata(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+          ),
+        ).thenAnswer(
+          (_) async => DocumentDataMetadata.proposal(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+            template: const SignedDocumentRef(id: 'template-1', ver: 'template-ver-1'),
+            parameters: const DocumentParameters(),
+            authors: const [],
+            collaborators: const [],
+          ),
+        );
+
         // Mock proposal submission actions
         when(
           () => mockDocumentRepository.getProposalSubmissionActions(
@@ -195,6 +210,21 @@ void main() {
           (_) async => const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
         );
 
+        // Mock previous version metadata
+        when(
+          () => mockDocumentRepository.getDocumentMetadata(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+          ),
+        ).thenAnswer(
+          (_) async => DocumentDataMetadata.proposal(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+            template: const SignedDocumentRef(id: 'template-1', ver: 'template-ver-1'),
+            parameters: const DocumentParameters(),
+            authors: const [],
+            collaborators: const [],
+          ),
+        );
+
         // Mock proposal submission actions
         when(
           () => mockDocumentRepository.getProposalSubmissionActions(
@@ -265,6 +295,21 @@ void main() {
           () => mockProposalsLocalSource.getPreviousOf(id: proposalId),
         ).thenAnswer(
           (_) async => const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+        );
+
+        // Mock previous version metadata
+        when(
+          () => mockDocumentRepository.getDocumentMetadata(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+          ),
+        ).thenAnswer(
+          (_) async => DocumentDataMetadata.proposal(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+            template: const SignedDocumentRef(id: 'template-1', ver: 'template-ver-1'),
+            parameters: const DocumentParameters(),
+            authors: const [],
+            collaborators: const [],
+          ),
         );
 
         // Mock proposal submission actions
@@ -345,6 +390,21 @@ void main() {
           () => mockProposalsLocalSource.getPreviousOf(id: proposalId),
         ).thenAnswer(
           (_) async => const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+        );
+
+        // Mock previous version metadata
+        when(
+          () => mockDocumentRepository.getDocumentMetadata(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+          ),
+        ).thenAnswer(
+          (_) async => DocumentDataMetadata.proposal(
+            id: const SignedDocumentRef(id: 'proposal-1', ver: 'v0'),
+            template: const SignedDocumentRef(id: 'template-1', ver: 'template-ver-1'),
+            parameters: const DocumentParameters(),
+            authors: const [],
+            collaborators: const [],
+          ),
         );
 
         // Mock proposal submission actions

@@ -7327,6 +7327,186 @@ void main() {
         });
       });
 
+      group(
+        'watchLocalRawProposal',
+        () {
+          final author1 = _createTestAuthor(name: 'author1');
+          final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 1);
+
+          test('returns null when no local draft exists', () async {
+            const ref = DraftRef(id: 'non-existent');
+
+            await expectLater(
+              dao.watchLocalRawProposal(id: ref, author: author1),
+              emits(null),
+            );
+          });
+
+          test('returns null when local draft exists but author does not match', () async {
+            final localDraft = _createTestLocalDraft(
+              id: 'p1',
+              ver: 'local-v1',
+              authors: [author1],
+            );
+
+            await db.localDocumentsV2Dao.saveAll([localDraft]);
+
+            await expectLater(
+              dao.watchLocalRawProposal(
+                id: DraftRef(id: localDraft.id),
+                author: author2,
+              ),
+              emits(null),
+            );
+          });
+
+          test('returns local draft when it exists for the author', () async {
+            final localDraft = _createTestLocalDraft(
+              id: 'p1',
+              ver: 'local-v1',
+              authors: [author1],
+            );
+
+            await db.localDocumentsV2Dao.saveAll([localDraft]);
+
+            await expectLater(
+              dao.watchLocalRawProposal(
+                id: DraftRef(id: localDraft.id),
+                author: author1,
+              ),
+              emits(
+                predicate<RawProposalEntity?>((e) {
+                  return e != null &&
+                      e.proposal.id == localDraft.id &&
+                      e.proposal.ver == localDraft.ver;
+                }),
+              ),
+            );
+          });
+
+          test('includes template when template exists', () async {
+            final template = _createTestDocumentEntity(
+              id: 't1',
+              ver: 'tv1',
+              type: DocumentType.proposalTemplate,
+            );
+
+            final localDraft = _createTestLocalDraft(
+              id: 'p1',
+              ver: 'local-v1',
+              authors: [author1],
+              templateId: template.doc.id,
+              templateVer: template.doc.ver,
+            );
+
+            await db.documentsV2Dao.saveAll([template]);
+            await db.localDocumentsV2Dao.saveAll([localDraft]);
+
+            await expectLater(
+              dao.watchLocalRawProposal(
+                id: DraftRef(id: localDraft.id),
+                author: author1,
+              ),
+              emits(
+                predicate<RawProposalEntity?>((e) {
+                  return e != null &&
+                      e.template?.id == template.doc.id &&
+                      e.template?.ver == template.doc.ver;
+                }),
+              ),
+            );
+          });
+
+          test('combines local draft version with public versions', () async {
+            final publicV1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: 'public-v1',
+              authors: [author1],
+            );
+            final publicV2 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: 'public-v2',
+              authors: [author1],
+            );
+
+            final localDraft = _createTestLocalDraft(
+              id: 'p1',
+              ver: 'local-v1',
+              authors: [author1],
+            );
+
+            await db.documentsV2Dao.saveAll([publicV1, publicV2]);
+            await db.localDocumentsV2Dao.saveAll([localDraft]);
+
+            await expectLater(
+              dao.watchLocalRawProposal(
+                id: DraftRef(id: localDraft.id),
+                author: author1,
+              ),
+              emits(
+                predicate<RawProposalEntity?>((e) {
+                  if (e == null) return false;
+                  return e.versionIds.length == 3 &&
+                      e.versionIds.contains(localDraft.ver) &&
+                      e.versionIds.contains(publicV1.doc.ver) &&
+                      e.versionIds.contains(publicV2.doc.ver);
+                }),
+              ),
+            );
+          });
+
+          test('includes isFavorite when local metadata exists', () async {
+            final localDraft = _createTestLocalDraft(
+              id: 'p1',
+              ver: 'local-v1',
+              authors: [author1],
+            );
+
+            final favoriteMetadata = DocumentLocalMetadataEntity(
+              id: localDraft.id,
+              isFavorite: true,
+            );
+
+            await db.localDocumentsV2Dao.saveAll([localDraft]);
+            await db.into(db.documentsLocalMetadata).insert(favoriteMetadata);
+
+            await expectLater(
+              dao.watchLocalRawProposal(
+                id: DraftRef(id: localDraft.id),
+                author: author1,
+              ),
+              emits(
+                predicate<RawProposalEntity?>((e) {
+                  return e != null && e.isFavorite == true;
+                }),
+              ),
+            );
+          });
+
+          test('sets commentsCount to 0 for local drafts', () async {
+            final localDraft = _createTestLocalDraft(
+              id: 'p1',
+              ver: 'local-v1',
+              authors: [author1],
+            );
+
+            await db.localDocumentsV2Dao.saveAll([localDraft]);
+
+            await expectLater(
+              dao.watchLocalRawProposal(
+                id: DraftRef(id: localDraft.id),
+                author: author1,
+              ),
+              emits(
+                predicate<RawProposalEntity?>((e) {
+                  return e != null && e.commentsCount == 0;
+                }),
+              ),
+            );
+          });
+        },
+      );
+
       group('watchVisibleProposalsCount', () {
         final veryEarly = DateTime.utc(2025, 2, 5, 5, 20, 0);
         final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);

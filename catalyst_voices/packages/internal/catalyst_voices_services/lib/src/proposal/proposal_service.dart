@@ -117,7 +117,7 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
-  Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount});
 
   /// Streams pages of brief proposal data.
   ///
@@ -467,8 +467,20 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<ProposalDataV2?> watchProposal({required DocumentRef id}) {
-    return _proposalRepository.watchProposal(id: id);
+  Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount}) {
+    final localProposalData = activeAccount != null
+        ? _proposalRepository.watchLocalProposal(
+            id: id,
+            originalAuthor: activeAccount,
+          )
+        : Stream.value(null);
+
+    final proposalData = _proposalRepository.watchProposal(id: id);
+    return Rx.combineLatest2(
+      localProposalData,
+      proposalData,
+      (local, public) => _mergePublicAndLocalProposal(id, local, public),
+    );
   }
 
   @override
@@ -569,6 +581,20 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
+  }
+
+  ProposalDataV2? _mergePublicAndLocalProposal(
+    DocumentRef id,
+    ProposalDataV2? localProposal,
+    ProposalDataV2? publicProposal,
+  ) {
+    // If user is interested in local return it
+    if (localProposal?.id == id) {
+      return localProposal;
+    }
+
+    // Return public proposal with missing versions from local added
+    return publicProposal?.addMissingVersionsFrom(localProposal);
   }
 
   List<ProposalBriefData> _mergePublishedAndLocalProposals(

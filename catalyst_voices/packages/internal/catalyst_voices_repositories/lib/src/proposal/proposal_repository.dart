@@ -92,10 +92,17 @@ abstract interface class ProposalRepository {
     required CatalystId author,
   });
 
+  Stream<ProposalDataV2?> watchLocalProposal({
+    required DocumentRef id,
+    required CatalystId originalAuthor,
+  });
+
   /// Watches a single proposal by its reference.
   ///
   /// Returns a reactive stream that emits [ProposalDataV2] whenever the
   /// proposal data changes (document, actions, votes, favorites).
+  ///
+  /// Looks only for SignedDocumentRef
   ///
   /// Emits `null` if the proposal is not found.
   Stream<ProposalDataV2?> watchProposal({required DocumentRef id});
@@ -337,6 +344,18 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required CatalystId author,
   }) {
     return _proposalsLocalSource.watchLocalDraftProposalsCount(author: author);
+  }
+
+  @override
+  Stream<ProposalDataV2?> watchLocalProposal({
+    required DocumentRef id,
+    required CatalystId originalAuthor,
+  }) {
+    return _proposalsLocalSource
+        .watchLocalRawProposalData(id: id, originalAuthor: originalAuthor)
+        .switchMap((document) {
+          return Stream.fromFuture(_assembleProposalData((document, [], [])));
+        });
   }
 
   @override
@@ -584,14 +603,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final prevVersion = await _proposalsLocalSource.getPreviousOf(id: proposalId);
 
-    // TODO(LynxLynxx): call getMetadata
-    final prevMetadata = DocumentDataMetadata.proposal(
-      id: prevVersion!,
-      template: templateData!.id as SignedDocumentRef,
-      parameters: const DocumentParameters(),
-      authors: const [],
-      collaborators: const [],
-    );
+    DocumentDataMetadata? prevMetadata;
+    if (prevVersion != null) {
+      prevMetadata = await _documentRepository.getDocumentMetadata(id: prevVersion);
+    }
+
+    // if there is no previous authors then it can fallback to originalAuthors
+    final prevAuthors = prevMetadata?.authors ?? rawProposal.originalAuthors;
 
     final actionsDocs = await _documentRepository.getProposalSubmissionActions(
       referencing: proposalId.toLoose(),
@@ -617,8 +635,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       draftVote: draftVote,
       castedVote: castedVote,
       collaboratorsActions: proposalCollaboratorsActions,
-      prevCollaborators: prevMetadata.collaborators ?? [],
-      prevAuthors: prevMetadata.authors ?? [],
+      prevCollaborators: prevMetadata?.collaborators ?? [],
+      prevAuthors: prevAuthors,
       action: action,
     );
   }

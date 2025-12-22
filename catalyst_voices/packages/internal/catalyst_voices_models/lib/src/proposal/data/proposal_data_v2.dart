@@ -87,4 +87,53 @@ final class ProposalDataV2 extends Equatable {
       _ => ProposalPublish.publishedDraft,
     };
   }
+
+  /// Adds missing versions from [other] proposal to this proposal.
+  /// Returns a new [ProposalDataV2] with merged versions.
+  ProposalDataV2 addMissingVersionsFrom(ProposalDataV2? other) {
+    if (other?.versions == null || other!.versions!.isEmpty) {
+      return this;
+    }
+
+    final currentVersions = versions ?? [];
+    final otherVersions = other.versions!;
+
+    final missingVersions = otherVersions
+        .where(
+          (otherVersion) => !currentVersions.any(
+            (currentVersion) => currentVersion.id == otherVersion.id,
+          ),
+        )
+        .toList();
+
+    if (missingVersions.isEmpty) {
+      return this;
+    }
+
+    return copyWith(
+      versions: [...currentVersions, ...missingVersions],
+    );
+  }
+
+  ProposalDataV2 copyWith({
+    DocumentRef? id,
+    ProposalOrDocument? proposalOrDocument,
+    ProposalSubmissionAction? submissionAction,
+    bool? isFavorite,
+    String? categoryName,
+    ProposalBriefDataVotes? votes,
+    List<DocumentRef>? versions,
+    List<ProposalDataCollaborator>? collaborators,
+  }) {
+    return ProposalDataV2(
+      id: id ?? this.id,
+      proposalOrDocument: proposalOrDocument ?? this.proposalOrDocument,
+      submissionAction: submissionAction ?? this.submissionAction,
+      isFavorite: isFavorite ?? this.isFavorite,
+      categoryName: categoryName ?? this.categoryName,
+      votes: votes ?? this.votes,
+      versions: versions ?? this.versions,
+      collaborators: collaborators ?? this.collaborators,
+    );
+  }
 }
