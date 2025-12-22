@@ -30,22 +30,29 @@ sealed class ProposalOrDocument extends Equatable {
     _Document() => null,
   };
 
-  /// The name of the proposal's category.
-  String? get categoryName {
+  Campaign? get campaign {
+    return Campaign.all.firstWhereOrNull((campaign) => campaign.hasAnyParameterId(_parameters));
+  }
+
+  CampaignCategory? get category {
     return Campaign.all
         .map((e) => e.categories)
         .flattened
-        .firstWhereOrNull((category) => _parameters.containsId(category.id.id))
-        ?.formattedCategoryName;
+        .firstWhereOrNull((category) => _parameters.containsId(category.id.id));
+  }
+
+  /// The name of the proposal's category.
+  String? get categoryName {
+    return category?.formattedCategoryName;
   }
 
   /// A brief description of the proposal.
   String? get description;
 
-  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The duration of the proposal in months.
   int? get durationInMonths;
 
+  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The number of fund this proposal was submitted for.
   int? get fundNumber {
     return Campaign.all

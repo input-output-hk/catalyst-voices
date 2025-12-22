@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_artifacts.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
@@ -88,6 +89,11 @@ final class DatabaseDocumentsDataSource
   Future<DocumentData?> get(DocumentRef ref) => findFirst(id: ref);
 
   @override
+  Future<DocumentArtifact?> getArtifact(SignedDocumentRef id) {
+    return _database.documentsV2Dao.getDocumentArtifact(id);
+  }
+
+  @override
   Future<Map<String, RawProposalCollaboratorsActions>> getCollaboratorsActions({
     required List<DocumentRef> proposalsRefs,
   }) {
@@ -100,13 +106,24 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
-    return _database.documentsV2Dao.getPreviousOf(id: id);
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) {
+    return _database.proposalsV2Dao.getLocalDraftsVersionsTitles(
+      proposalIds: proposalIds,
+      nodeId: nodeId,
+    );
   }
 
   @override
   Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) {
-    return _database.documentsV2Dao.getDocumentMetadata(id: ref).then((value) => value?.toModel());
+    return _database.documentsV2Dao.getDocumentMetadata(ref).then((value) => value?.toModel());
+  }
+
+  @override
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
+    return _database.documentsV2Dao.getPreviousOf(id: id);
   }
 
   @override
@@ -129,26 +146,16 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
-    required List<String> proposalIds,
-    required NodeId nodeId,
-  }) {
-    return _database.proposalsV2Dao.getLocalDraftsVersionsTitles(
-      proposalIds: proposalIds,
-      nodeId: nodeId,
-    );
-  }
+  Future<void> save({required DocumentDataWithArtifact data}) => saveAll([data]);
 
   @override
-  Future<void> save({required DocumentData data}) => saveAll([data]);
-
-  @override
-  Future<void> saveAll(Iterable<DocumentData> data) async {
+  Future<void> saveAll(Iterable<DocumentDataWithArtifact> data) async {
     final entries = data
         .map(
           (e) => DocumentCompositeEntity(
             e.toDocEntity(),
             authors: e.toAuthorEntities(),
+            artifact: e.toArtifactEntity(),
             parameters: e.toParameterEntities(),
             collaborators: e.toCollaboratorEntities(),
           ),
@@ -260,6 +267,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  }) {
+    return _database.proposalsV2Dao.watchLocalDraftProposalsCount(author: author).distinct();
+  }
+
+  @override
   Stream<RawProposal?> watchRawProposalData({required DocumentRef id}) {
     final tr = _profiler.startTransaction('Query proposal: $id');
     return _database.proposalsV2Dao
@@ -291,7 +305,15 @@ final class DatabaseDocumentsDataSource
   }
 }
 
-extension on DocumentData {
+extension on DocumentDataWithArtifact {
+  DocumentArtifactEntity toArtifactEntity() {
+    return DocumentArtifactEntity(
+      id: metadata.id.id,
+      ver: metadata.id.ver!,
+      data: artifact.value,
+    );
+  }
+
   List<DocumentAuthorEntity> toAuthorEntities() {
     return (metadata.authors ?? const []).map((catId) {
       return DocumentAuthorEntity(

@@ -1,15 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
-
-final class ChangeTabWorkspaceSignal extends WorkspaceSignal {
-  final WorkspacePageTab tab;
-
-  const ChangeTabWorkspaceSignal(this.tab);
-
-  @override
-  List<Object?> get props => [tab];
-}
 
 final class DeletedDraftWorkspaceSignal extends WorkspaceSignal {
   const DeletedDraftWorkspaceSignal();

@@ -173,6 +173,10 @@
   "@apiErrorUnknown": {
     "description": "A fallback error message when api returns error code"
   },
+  "approve": "Approve",
+  "@approve": {
+    "description": "Action label to approve (give consent) to something."
+  },
   "back": "Back",
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
@@ -497,27 +501,51 @@
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
   },
-  "collaboratorInvitationAcceptButton": "Accept Invitation",
+  "collaboratorFinalProposalAcceptButton": "Approve Final Proposal",
+  "@collaboratorFinalProposalAcceptButton": {
+    "description": "Dialog button when accepting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalAcceptMessage": "Are you sure you want to publish this final proposal\nto the next governance stage? ",
+  "@collaboratorFinalProposalAcceptMessage": {
+    "description": "Dialog message when accepting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalAcceptTitle": "Final Publishing consent?",
+  "@collaboratorFinalProposalAcceptTitle": {
+    "description": "Dialog title when accepting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalRejectButton": "Reject Final Proposal",
+  "@collaboratorFinalProposalRejectButton": {
+    "description": "Dialog button when rejecting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalRejectMessage": "Are you sure you want to publish this final proposal\nto the next governance stage? ",
+  "@collaboratorFinalProposalRejectMessage": {
+    "description": "Dialog message when rejecting a final proposal as a collaborator"
+  },
+  "collaboratorFinalProposalRejectTitle": "Final Publishing consent?",
+  "@collaboratorFinalProposalRejectTitle": {
+    "description": "Dialog title when rejecting a final proposal as a collaborator"
+  },
+  "collaboratorInvitationAcceptButton": "Allow",
   "@collaboratorInvitationAcceptButton": {
     "description": "Dialog button when accepting an invitation to become a collaborator on a proposal."
   },
-  "collaboratorInvitationAcceptMessage": "Are you sure you want to accept this proposal invitation?\nYou can leave at any time…",
+  "collaboratorInvitationAcceptMessage": "Are you sure you want to be displayed as\nco-proposer on this proposal?",
   "@collaboratorInvitationAcceptMessage": {
     "description": "Dialog message when accepting an invitation to become a collaborator on a proposal."
   },
-  "collaboratorInvitationAcceptTitle": "Accept Invitation?",
+  "collaboratorInvitationAcceptTitle": "Display consent?",
   "@collaboratorInvitationAcceptTitle": {
     "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
   },
-  "collaboratorInvitationRejectButton": "Reject Invitation",
+  "collaboratorInvitationRejectButton": "Deny",
   "@collaboratorInvitationRejectButton": {
     "description": "Dialog button when rejecting an invitation to become a collaborator on a proposal."
   },
-  "collaboratorInvitationRejectMessage": "Are you sure you want to reject this proposal invitation?\nThis cannot be undone.",
+  "collaboratorInvitationRejectMessage": "Are you sure you want to be displayed as\nco-proposer on this proposal?",
   "@collaboratorInvitationRejectMessage": {
     "description": "Dialog message when rejecting an invitation to become a collaborator on a proposal."
   },
-  "collaboratorInvitationRejectTitle": "Reject Invitation?",
+  "collaboratorInvitationRejectTitle": "Display consent?",
   "@collaboratorInvitationRejectTitle": {
     "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
   },
@@ -1834,6 +1862,10 @@
   "@invalidSeedPhraseWord": {
     "description": "Error shown when user inputs SeedPhrase word but invalid does not match any"
   },
+  "invitationsAndApprovals": "Invitations & Approvals",
+  "@invitationsAndApprovals": {
+    "description": "CTA to show Invitations and Approvals"
+  },
   "joinNewsletter": "Join Newsletter",
   "@joinNewsletter": {
     "description": "Action to join newsletter"
@@ -2637,11 +2669,27 @@
       }
     }
   },
+  "proposalTemplateNotFound": "Template for this Proposal is missing. Can't view this document",
+  "@proposalTemplateNotFound": {
+    "description": "Message shown to user when proposal can't be build because of missing template"
+  },
   "proposalTitleShortDescription": "A strong proposal title can really set the tone and capture attention. ",
   "@proposalTitleShortDescription": {
     "description": "Short description for the title input field"
   },
-  "proposalViewAcceptedInvitationBannerMessage": "**Invitation Accepted:** You'll be named as a collaborator and will be eligible for funding on final proposals with your team. You'll need to continue approving future iterations to remain named.",
+  "proposalViewAcceptedFinalProposalBannerChangeToReject": "Change to Reject",
+  "@proposalViewAcceptedFinalProposalBannerChangeToReject": {
+    "description": "The button in the collaborator final proposal banner on the proposal viewer page after the user has accepted and wants to reject it instead."
+  },
+  "proposalViewAcceptedFinalProposalBannerMessage": "**Invitation Accepted:** You'll be named as a co-proposer and will be eligible for funding on final proposals with your team.",
+  "@proposalViewAcceptedFinalProposalBannerMessage": {
+    "description": "The message in the collaborator final proposal banner on the proposal viewer page after the user has accepted the proposal."
+  },
+  "proposalViewAcceptedInvitationBannerChangeToDeny": "Change to Deny",
+  "@proposalViewAcceptedInvitationBannerChangeToDeny": {
+    "description": "The button in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation and wants to reject it instead."
+  },
+  "proposalViewAcceptedInvitationBannerMessage": "**Display allowed:** You'll be named as a co-proposer and will be eligible for funding on final proposals with your team.",
   "@proposalViewAcceptedInvitationBannerMessage": {
     "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation."
   },
@@ -2673,15 +2721,19 @@
   "@proposalViewNotFoundTitle": {
     "description": "Error title shown when proposal cannot be found."
   },
-  "proposalViewPendingInvitationBannerAcceptButton": "Accept Invitation",
+  "proposalViewPendingFinalProposalBannerMessage": "Are you sure you want to publish this final proposal to the next governance stage?",
+  "@proposalViewPendingFinalProposalBannerMessage": {
+    "description": "Message for the pending final proposal banner on the proposal asking the collaborator to approve / reject it."
+  },
+  "proposalViewPendingInvitationBannerAcceptButton": "Allow",
   "@proposalViewPendingInvitationBannerAcceptButton": {
     "description": "The accept button label in the collaborator invitation banner on the proposal viewer page."
   },
-  "proposalViewPendingInvitationBannerMessage": "You have been invited to join this proposal iteration as a co-proposer",
+  "proposalViewPendingInvitationBannerMessage": "You have been invited to be displayed as a co-proposer on this proposal",
   "@proposalViewPendingInvitationBannerMessage": {
     "description": "The message in the collaborator invitation banner on the proposal viewer page."
   },
-  "proposalViewPendingInvitationBannerRejectButton": "Reject Invitation",
+  "proposalViewPendingInvitationBannerRejectButton": "Deny",
   "@proposalViewPendingInvitationBannerRejectButton": {
     "description": "The reject button label in the collaborator invitation banner on the proposal viewer page."
   },
@@ -2693,7 +2745,19 @@
   "@proposalViewProjectDuration": {
     "description": "When viewing proposal"
   },
-  "proposalViewRejectedInvitationBannerMessage": "**Invitation Rejected:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
+  "proposalViewRejectedFinalProposalBannerChangeToApprove": "Change to Approve",
+  "@proposalViewRejectedFinalProposalBannerChangeToApprove": {
+    "description": "The button in the collaborator final proposal banner on the proposal viewer page after the user has rejected the proposal and wants to accept it instead."
+  },
+  "proposalViewRejectedFinalProposalBannerMessage": "**Final Proposal Rejected:** You rejected this proposal to be final.  Be aware that co-proposers, who do not respond or reject and not shown on the final proposal!",
+  "@proposalViewRejectedFinalProposalBannerMessage": {
+    "description": "The message in the collaborator final proposal banner on the proposal viewer page after the user has rejected the proposal."
+  },
+  "proposalViewRejectedInvitationBannerChangeToAllow": "Change to Allow",
+  "@proposalViewRejectedInvitationBannerChangeToAllow": {
+    "description": "The button in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation and wants to accept it instead."
+  },
+  "proposalViewRejectedInvitationBannerMessage": "**Display Denied:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
   "@proposalViewRejectedInvitationBannerMessage": {
     "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation."
   },
@@ -3155,6 +3219,10 @@
   "registrationWalletNotFound": "Wallet not found",
   "@registrationWalletNotFound": {
     "description": "Error message shown when connect wallet but matching was not found"
+  },
+  "reject": "Reject",
+  "@reject": {
+    "description": "Action label to deny (forbid consent) something."
   },
   "removeFromVoteList": "Remove from Vote List",
   "@removeFromVoteList": {

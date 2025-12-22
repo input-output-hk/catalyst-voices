@@ -7206,6 +7206,317 @@ void main() {
           );
         });
       });
+
+      group('watchLocalDraftProposalsCount', () {
+        test('returns 0 when no local drafts exist', () async {
+          // Given
+          final author = _createTestAuthor(name: 'author1');
+
+          // When
+          final stream = dao.watchLocalDraftProposalsCount(author: author);
+
+          // Then
+          await expectLater(stream, emits(0));
+        });
+
+        test('returns count of local drafts for specific author', () async {
+          // Given
+          final author1 = _createTestAuthor(name: 'author1', role0KeySeed: 1);
+          final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 2);
+
+          // Create 2 local drafts for author1
+          final draft1 = _createTestLocalDraft(
+            id: 'draft1',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+          final draft2 = _createTestLocalDraft(
+            id: 'draft2',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+
+          // Create 1 local draft for author2
+          final draft3 = _createTestLocalDraft(
+            id: 'draft3',
+            authors: [author2],
+            type: DocumentType.proposalDocument,
+          );
+
+          await db.localDocumentsV2Dao.saveAll([draft1, draft2, draft3]);
+
+          // When
+          final streamAuthor1 = dao.watchLocalDraftProposalsCount(author: author1);
+          final streamAuthor2 = dao.watchLocalDraftProposalsCount(author: author2);
+
+          // Then
+          await expectLater(streamAuthor1, emits(2)); // author1 has 2 drafts
+          await expectLater(streamAuthor2, emits(1)); // author2 has 1 draft
+        });
+
+        test('only counts proposal documents, not other document types', () async {
+          // Given
+          final author = _createTestAuthor(name: 'author1');
+
+          final proposalDraft = _createTestLocalDraft(
+            id: 'proposal-draft',
+            authors: [author],
+            type: DocumentType.proposalDocument,
+          );
+
+          final commentDraft = _createTestLocalDraft(
+            id: 'comment-draft',
+            authors: [author],
+            type: DocumentType.commentDocument,
+          );
+
+          await db.localDocumentsV2Dao.saveAll([proposalDraft, commentDraft]);
+
+          // When
+          final stream = dao.watchLocalDraftProposalsCount(author: author);
+
+          // Then
+          await expectLater(stream, emits(1)); // Only counts proposal documents
+        });
+
+        test('returns correct count with multiple authors and document types', () async {
+          // Given
+          final author1 = _createTestAuthor(name: 'author1', role0KeySeed: 1);
+          final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 2);
+
+          // Create 3 proposal drafts for author1
+          final draft1 = _createTestLocalDraft(
+            id: 'draft1',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+          final draft2 = _createTestLocalDraft(
+            id: 'draft2',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+          final draft3 = _createTestLocalDraft(
+            id: 'draft3',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+
+          // Create 1 comment draft for author1 (should not be counted)
+          final commentDraft = _createTestLocalDraft(
+            id: 'comment1',
+            authors: [author1],
+            type: DocumentType.commentDocument,
+          );
+
+          // Create 1 proposal draft for author2
+          final draft4 = _createTestLocalDraft(
+            id: 'draft4',
+            authors: [author2],
+            type: DocumentType.proposalDocument,
+          );
+
+          await db.localDocumentsV2Dao.saveAll([draft1, draft2, draft3, commentDraft, draft4]);
+
+          // When
+          final streamAuthor1 = dao.watchLocalDraftProposalsCount(author: author1);
+          final streamAuthor2 = dao.watchLocalDraftProposalsCount(author: author2);
+
+          // Then
+          await expectLater(streamAuthor1, emits(3)); // author1 has 3 proposal drafts
+          await expectLater(streamAuthor2, emits(1)); // author2 has 1 proposal draft
+        });
+      });
+
+      group('watchVisibleProposalsCount', () {
+        final veryEarly = DateTime.utc(2025, 2, 5, 5, 20, 0);
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        test('returns proper amount of invitations', () async {
+          final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
+          final invitationsFilters = CollaboratorInvitationsProposalsFilter(collaborator);
+
+          final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
+
+          final p1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: p1Ver,
+            ver: p1Ver,
+            authors: [author],
+          );
+
+          final p2Ver = _buildUuidV7At(middle);
+          final proposal2 = _createTestDocumentEntity(
+            id: p2Ver,
+            ver: p2Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final p3Ver = _buildUuidV7At(earliest);
+          final proposal3 = _createTestDocumentEntity(
+            id: p3Ver,
+            ver: p3Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final finalAction = _createTestDocumentEntity(
+            id: 'a1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal3.doc.id,
+            refVer: proposal3.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3, finalAction]);
+
+          final invitesCount = dao.watchVisibleProposalsCount(filters: invitationsFilters);
+
+          await expectLater(
+            invitesCount,
+            emits(1),
+            reason:
+                'User has invite only for proposal2 as '
+                'on proposal1 he is not an collaborator '
+                'proposal2 is final proposal',
+          );
+        });
+
+        test('returns proper amount of approvals of proposals', () async {
+          final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
+          final approvalsFilters = CollaboratorProposalApprovalsFilter(collaborator);
+
+          final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
+
+          final p1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: p1Ver,
+            ver: p1Ver,
+            authors: [author],
+          );
+
+          // Proposal where collaborator rejected it on draft level
+          final p2Ver = _buildUuidV7At(middle);
+          final p2Ver2 = _buildUuidV7At(latest);
+
+          final proposal2 = _createTestDocumentEntity(
+            id: p2Ver,
+            ver: p2Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+          final proposal2Ver2 = _createTestDocumentEntity(
+            id: p2Ver,
+            ver: p2Ver2,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final collaboratorHideActionProposal2 = _createTestDocumentEntity(
+            id: 'collaboratorHideActionProposal2',
+            ver: _buildUuidV7At(middle),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
+            authors: [collaborator],
+            contentData: ProposalSubmissionActionDto.hide.toJson(),
+          );
+
+          final authorFinalActionProposal2Ver2 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal2Ver2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal2Ver2.doc.id,
+            refVer: proposal2Ver2.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          // Proposal where collaborator did not make any action yet
+          final p3Ver = _buildUuidV7At(earliest);
+
+          final proposal3 = _createTestDocumentEntity(
+            id: p3Ver,
+            ver: p3Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final authorFinalActionProposal3 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal3',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal3.doc.id,
+            refVer: proposal3.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          // Proposal where on first version draft collaborator accepted invite
+          // Author makes final version
+          final p4Ver = _buildUuidV7At(veryEarly);
+          final p4Ver2 = _buildUuidV7At(earliest);
+
+          final proposal4Ver1 = _createTestDocumentEntity(
+            id: p4Ver,
+            ver: p4Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final collaboratorAcceptInviteProposal4Ver1 = _createTestDocumentEntity(
+            id: 'collaboratorAcceptInviteProposalVer4Ver1',
+            ver: _buildUuidV7At(veryEarly),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal4Ver1.doc.id,
+            refVer: proposal4Ver1.doc.ver,
+            authors: [collaborator],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          final proposal4Ver2 = _createTestDocumentEntity(
+            id: p4Ver,
+            ver: p4Ver2,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final authorFinalActionProposal4Ver2 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal4Ver2',
+            ver: _buildUuidV7At(middle),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal4Ver2.doc.id,
+            refVer: proposal4Ver2.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([
+            proposal1,
+            proposal2, // Draft proposal 2
+            collaboratorHideActionProposal2, // Reject invite collaborator for proposal 2
+            proposal2Ver2,
+            authorFinalActionProposal2Ver2, // Author makes proposal2 final
+            proposal3, // Draft proposal3
+            authorFinalActionProposal3, //Author makes proposal final which collaborator has pending status
+            proposal4Ver1,
+            collaboratorAcceptInviteProposal4Ver1,
+            proposal4Ver2,
+            authorFinalActionProposal4Ver2,
+          ]);
+
+          final invitesCount = dao.watchVisibleProposalsCount(filters: approvalsFilters);
+
+          await expectLater(
+            invitesCount,
+            emits(3),
+          );
+        });
+      });
     },
     skip: driftSkip,
   );

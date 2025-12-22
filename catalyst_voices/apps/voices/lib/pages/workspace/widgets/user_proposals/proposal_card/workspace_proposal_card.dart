@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_menu_action_button.dart';
-import 'package:catalyst_voices/pages/workspace/widgets/user_proposal_invites/review_request_button.dart';
 import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
@@ -18,12 +17,10 @@ part 'workspace_proposal_card_responsiveness.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
   final UsersProposalOverview proposal;
-  final WorkspaceProposalType type;
 
   const WorkspaceProposalCard({
     super.key,
     required this.proposal,
-    this.type = WorkspaceProposalType.proposal,
   });
 
   @override
@@ -32,56 +29,34 @@ class WorkspaceProposalCard extends StatelessWidget {
 
     return _ProposalSubmitState(
       isSubmitted: isSubmitted,
-      type: type,
-      child: _WorkspaceProposalCard(
-        type: type,
-        proposal: proposal,
-      ),
+      child: _WorkspaceProposalCard(proposal: proposal),
     );
   }
 }
 
-enum WorkspaceProposalType {
-  proposal,
-  invite;
-
-  const WorkspaceProposalType();
-
-  bool get isInvite => this == invite;
-  bool get isProposal => this == proposal;
-}
-
 class _ActionButton extends StatelessWidget {
   final UsersProposalOverview proposal;
-  final WorkspaceProposalType type;
 
-  const _ActionButton({
-    required this.proposal,
-    required this.type,
-  });
+  const _ActionButton({required this.proposal});
 
   @override
   Widget build(BuildContext context) {
-    return switch (type) {
-      WorkspaceProposalType.proposal => ProposalMenuActionButton(
-        ref: proposal.id,
-        proposalPublish: proposal.publish,
-        title: proposal.title,
-        version: proposal.iteration,
-        hasNewerLocalIteration: proposal.hasNewerLocalIteration,
-        fromActiveCampaign: proposal.fromActiveCampaign,
-        ownership: proposal.ownership,
-      ),
-      WorkspaceProposalType.invite => ReviewRequestButton(id: proposal.id),
-    };
+    return ProposalMenuActionButton(
+      ref: proposal.id,
+      proposalPublish: proposal.publish,
+      title: proposal.title,
+      version: proposal.iteration,
+      hasNewerLocalIteration: proposal.hasNewerLocalIteration,
+      fromActiveCampaign: proposal.fromActiveCampaign,
+      ownership: proposal.ownership,
+    );
   }
 }
 
 class _Body extends StatelessWidget {
   final UsersProposalOverview proposal;
-  final WorkspaceProposalType type;
 
-  const _Body(this.proposal, this.type);
+  const _Body(this.proposal);
 
   @override
   Widget build(BuildContext context) {
@@ -91,15 +66,9 @@ class _Body extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: _WorkspaceProposalCardResponsiveness(
-            proposal,
-            type: type,
-          ),
+          child: _WorkspaceProposalCardResponsiveness(proposal),
         ),
-        _ActionButton(
-          proposal: proposal,
-          type: type,
-        ),
+        _ActionButton(proposal: proposal),
       ],
     );
   }
@@ -107,33 +76,27 @@ class _Body extends StatelessWidget {
 
 class _ProposalSubmitState extends InheritedWidget {
   final bool isSubmitted;
-  final WorkspaceProposalType type;
 
   const _ProposalSubmitState({
     required super.child,
     required this.isSubmitted,
-    required this.type,
   });
 
-  Color backgroundColor(BuildContext context) => isSubmitted && type.isProposal
-      ? context.colors.iconsPrimary
-      : context.colors.elevationsOnSurfaceNeutralLv1White;
+  Color backgroundColor(BuildContext context) =>
+      isSubmitted ? context.colors.iconsPrimary : context.colors.elevationsOnSurfaceNeutralLv1White;
 
-  Color dataLabelColor(BuildContext context) => isSubmitted && type.isProposal
-      ? context.colors.primaryContainer
-      : context.colors.textOnPrimaryLevel1;
+  Color dataLabelColor(BuildContext context) =>
+      isSubmitted ? context.colors.primaryContainer : context.colors.textOnPrimaryLevel1;
 
-  Color headerColor(BuildContext context) => isSubmitted && type.isProposal
-      ? context.colors.textOnPrimaryWhite
-      : context.colors.textOnPrimaryLevel0;
+  Color headerColor(BuildContext context) =>
+      isSubmitted ? context.colors.textOnPrimaryWhite : context.colors.textOnPrimaryLevel0;
 
-  Color headerLabelColor(BuildContext context) => isSubmitted && type.isProposal
-      ? context.colors.textOnPrimaryWhite
-      : context.colors.textOnPrimaryLevel1;
+  Color headerLabelColor(BuildContext context) =>
+      isSubmitted ? context.colors.textOnPrimaryWhite : context.colors.textOnPrimaryLevel1;
 
   @override
   bool updateShouldNotify(_ProposalSubmitState oldWidget) {
-    return oldWidget.isSubmitted != isSubmitted || oldWidget.type != type;
+    return oldWidget.isSubmitted != isSubmitted;
   }
 
   static _ProposalSubmitState? of(BuildContext context) {
@@ -142,13 +105,9 @@ class _ProposalSubmitState extends InheritedWidget {
 }
 
 class _WorkspaceProposalCard extends StatelessWidget {
-  final WorkspaceProposalType type;
   final UsersProposalOverview proposal;
 
-  const _WorkspaceProposalCard({
-    required this.type,
-    required this.proposal,
-  });
+  const _WorkspaceProposalCard({required this.proposal});
 
   @override
   Widget build(BuildContext context) {
@@ -168,8 +127,8 @@ class _WorkspaceProposalCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _Body(proposal, type),
-            if (isPublishedDraft && proposal.versions.length >= 2 && !type.isInvite)
+            _Body(proposal),
+            if (isPublishedDraft && proposal.versions.length >= 2)
               ProposalIterationHistory(
                 proposal: proposal,
               ),

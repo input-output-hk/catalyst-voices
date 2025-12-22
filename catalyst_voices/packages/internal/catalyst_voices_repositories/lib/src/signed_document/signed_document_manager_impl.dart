@@ -23,10 +23,10 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   });
 
   @override
-  Future<SignedDocument> parseDocument(Uint8List bytes) async {
+  Future<SignedDocument> parseDocument(DocumentArtifact artifact) async {
     final cborValue = await profiler.timeWithResult(
       'cbor_decode_doc',
-      () => cbor.decode(bytes),
+      () => cbor.decode(artifact.value),
       debounce: true,
     );
     final coseSign = await profiler.timeWithResult(
@@ -184,9 +184,9 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   List<Object?> get props => [_coseSign, payload, metadata, signers];
 
   @override
-  Uint8List toBytes() {
+  DocumentArtifact toArtifact() {
     final bytes = cbor.encode(_coseSign.toCbor(tagged: false));
-    return Uint8List.fromList(bytes);
+    return DocumentArtifact(Uint8List.fromList(bytes));
   }
 
   @override

@@ -34,10 +34,8 @@ void main() {
         final isVerified = await signedDocument.verifySignature(_catalystId);
         expect(isVerified, isTrue);
 
-        final signedDocumentBytes = signedDocument.toBytes();
-        final parsedDocument = await documentManager.parseDocument(
-          signedDocumentBytes,
-        );
+        final signedDocumentArtifact = signedDocument.toArtifact();
+        final parsedDocument = await documentManager.parseDocument(signedDocumentArtifact);
 
         expect(parsedDocument, equals(signedDocument));
         expect(parsedDocument.signers, [_catalystId]);

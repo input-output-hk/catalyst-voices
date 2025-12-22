@@ -7,7 +7,6 @@ import 'package:equatable/equatable.dart';
 final class WorkspaceBlocCache extends Equatable {
   final Campaign? campaign;
   final CatalystId? activeAccountId;
-  final WorkspacePageTab? activeTab;
   final ProposalsFiltersV2 proposalsFilters;
   final WorkspaceFilters workspaceFilter;
   final List<CampaignCategory>? categories;
@@ -17,7 +16,6 @@ final class WorkspaceBlocCache extends Equatable {
   const WorkspaceBlocCache({
     this.campaign,
     this.activeAccountId,
-    this.activeTab,
     this.workspaceFilter = WorkspaceFilters.allProposals,
     this.proposalsFilters = const ProposalsFiltersV2(),
     this.categories,
@@ -29,7 +27,6 @@ final class WorkspaceBlocCache extends Equatable {
   List<Object?> get props => [
     campaign,
     activeAccountId,
-    activeTab,
     workspaceFilter,
     proposalsFilters,
     categories,
@@ -40,7 +37,6 @@ final class WorkspaceBlocCache extends Equatable {
   WorkspaceBlocCache copyWith({
     Optional<Campaign>? campaign,
     Optional<CatalystId>? activeAccountId,
-    Optional<WorkspacePageTab>? activeTab,
     ProposalsFiltersV2? proposalsFilters,
     WorkspaceFilters? workspaceFilter,
     Optional<List<CampaignCategory>>? categories,
@@ -50,7 +46,6 @@ final class WorkspaceBlocCache extends Equatable {
     return WorkspaceBlocCache(
       campaign: campaign.dataOr(this.campaign),
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
-      activeTab: activeTab.dataOr(this.activeTab),
       proposalsFilters: proposalsFilters ?? this.proposalsFilters,
       workspaceFilter: workspaceFilter ?? this.workspaceFilter,
       categories: categories.dataOr(this.categories),

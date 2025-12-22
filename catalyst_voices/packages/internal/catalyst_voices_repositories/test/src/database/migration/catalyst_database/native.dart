@@ -58,10 +58,10 @@ void migrationBody() {
     test(
       'from v3 to v4 does not corrupt data',
       () async {
-        // 1. Documents
+        // 1. Documents are dropped
         final docs = _generateDocuments(10);
         final oldDocumentsData = docs.map((e) => e.v3()).toList();
-        final expectedNewDocumentsData = docs.map((e) => e.v4()).toList();
+        final expectedNewDocumentsData = List<v4.DocumentsV2Data>.empty();
 
         // 2. Document Favorites
         final oldDocumentsFavoritesData = docs
@@ -83,18 +83,10 @@ void migrationBody() {
         final expectedNewDraftsData = drafts.map((e) => e.v4Draft()).toList();
 
         // 4. Authors
-        final expectedAuthors = docs
-            .map((e) => e.v4Authors())
-            .flattened
-            .toList();
-        final expectedParameters = docs
-            .map((e) => e.v4Parameters())
-            .flattened
-            .toList();
-        final expectedCollaborators = docs
-            .map((e) => e.v4Collaborators())
-            .flattened
-            .toList();
+        final expectedAuthors = List<v4.DocumentAuthorsData>.empty();
+        final expectedParameters = List<v4.DocumentParametersData>.empty();
+        final expectedCollaborators =
+            List<v4.DocumentCollaboratorsData>.empty();
 
         await verifier.testWithDataIntegrity(
           oldVersion: 3,
@@ -117,7 +109,7 @@ void migrationBody() {
             expect(
               migratedDocs,
               hasLength(expectedNewDocumentsData.length),
-              reason: 'Should migrate the same number of documents',
+              reason: 'Should drop documents',
             );
             // Using a collection matcher for a more readable assertion
             expect(
@@ -295,14 +287,6 @@ List<DocumentData> _generateDocuments(
   });
 }
 
-typedef _NewDocumentAuthor = v4.DocumentAuthorsData;
-
-typedef _NewDocumentCollaborators = v4.DocumentCollaboratorsData;
-
-typedef _NewDocumentData = v4.DocumentsV2Data;
-
-typedef _NewDocumentParameters = v4.DocumentParametersData;
-
 typedef _NewDraftData = v4.LocalDocumentsDraftsData;
 
 typedef _OldDocumentData = v3.DocumentsData;
@@ -350,63 +334,6 @@ extension on DocumentData {
     );
   }
 
-  _NewDocumentData v4() {
-    return _NewDocumentData(
-      contentType: metadata.contentType.value,
-      content: jsonb().encode(content.data),
-      id: metadata.id.id,
-      type: metadata.type.uuid,
-      ver: metadata.id.ver!,
-      authors: DocumentConverters.catId.toSql(metadata.authors ?? []),
-      refId: metadata.ref?.id,
-      refVer: metadata.ref?.ver,
-      replyId: metadata.reply?.id,
-      replyVer: metadata.reply?.ver,
-      section: metadata.section,
-      templateId: metadata.template?.id,
-      templateVer: metadata.template?.ver,
-      collaborators: DocumentConverters.catId.toSql(
-        metadata.collaborators ?? [],
-      ),
-      parameters: DocumentConverters.parameters.toSql(metadata.parameters),
-      createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
-    );
-  }
-
-  List<_NewDocumentAuthor> v4Authors() {
-    final documentId = metadata.id.id;
-    final documentVer = metadata.id.ver!;
-
-    return (metadata.authors ?? []).map(
-      (catId) {
-        return _NewDocumentAuthor(
-          documentId: documentId,
-          documentVer: documentVer,
-          accountId: catId.toUri().toString(),
-          accountSignificantId: catId.toSignificant().toUri().toString(),
-          username: catId.username,
-        );
-      },
-    ).toList();
-  }
-
-  List<_NewDocumentCollaborators> v4Collaborators() {
-    final documentId = metadata.id.id;
-    final documentVer = metadata.id.ver!;
-
-    return (metadata.collaborators ?? []).map(
-      (catId) {
-        return _NewDocumentCollaborators(
-          documentId: documentId,
-          documentVer: documentVer,
-          accountId: catId.toUri().toString(),
-          accountSignificantId: catId.toSignificant().toUri().toString(),
-          username: catId.username,
-        );
-      },
-    ).toList();
-  }
-
   _NewDraftData v4Draft() {
     final idHiLo = UuidHiLo.from(metadata.id.id);
     final verHiLo = UuidHiLo.from(metadata.id.ver!);
@@ -441,21 +368,5 @@ extension on DocumentData {
       parameters: DocumentConverters.parameters.toSql(metadata.parameters),
       createdAt: metadata.id.ver!.tryDateTime ?? DateTime.timestamp(),
     );
-  }
-
-  List<_NewDocumentParameters> v4Parameters() {
-    final documentId = metadata.id.id;
-    final documentVer = metadata.id.ver!;
-
-    return metadata.parameters.set.map(
-      (ref) {
-        return _NewDocumentParameters(
-          id: ref.id,
-          ver: ref.ver!,
-          documentId: documentId,
-          documentVer: documentVer,
-        );
-      },
-    ).toList();
   }
 }

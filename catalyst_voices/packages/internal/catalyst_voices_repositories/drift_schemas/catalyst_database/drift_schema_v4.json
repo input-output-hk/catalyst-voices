@@ -308,6 +308,61 @@
       ],
       "type": "table",
       "data": {
+        "name": "document_artifacts",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "data",
+            "getter_name": "data",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver",
+            "getter_name": "ver",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+          "FOREIGN KEY (id, ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE"
+        ],
+        "explicit_pk": [
+          "id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
         "name": "document_collaborators",
         "was_declared_in_moor": false,
         "columns": [
@@ -380,7 +435,7 @@
       }
     },
     {
-      "id": 3,
+      "id": 4,
       "references": [
         0
       ],
@@ -448,7 +503,7 @@
       }
     },
     {
-      "id": 4,
+      "id": 5,
       "references": [
       ],
       "type": "table",
@@ -493,7 +548,7 @@
       }
     },
     {
-      "id": 5,
+      "id": 6,
       "references": [
       ],
       "type": "table",
@@ -739,7 +794,7 @@
       }
     },
     {
-      "id": 6,
+      "id": 7,
       "references": [
         0
       ],
@@ -756,7 +811,7 @@
       }
     },
     {
-      "id": 7,
+      "id": 8,
       "references": [
         0
       ],
@@ -774,7 +829,7 @@
       }
     },
     {
-      "id": 8,
+      "id": 9,
       "references": [
         0
       ],
@@ -791,7 +846,7 @@
       }
     },
     {
-      "id": 9,
+      "id": 10,
       "references": [
         0
       ],
@@ -809,7 +864,7 @@
       }
     },
     {
-      "id": 10,
+      "id": 11,
       "references": [
         0
       ],
@@ -826,7 +881,7 @@
       }
     },
     {
-      "id": 11,
+      "id": 12,
       "references": [
         0
       ],
@@ -844,7 +899,7 @@
       }
     },
     {
-      "id": 12,
+      "id": 13,
       "references": [
         0
       ],
@@ -862,7 +917,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 14,
       "references": [
         1
       ],
@@ -880,7 +935,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 15,
       "references": [
         1
       ],
@@ -896,7 +951,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 16,
       "references": [
         1
       ],
@@ -912,13 +967,13 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "references": [
-        2
+        3
       ],
       "type": "index",
       "data": {
-        "on": 2,
+        "on": 3,
         "name": "idx_document_collaborators_composite",
         "sql": null,
         "unique": false,
@@ -930,34 +985,18 @@
       }
     },
     {
-      "id": 17,
+      "id": 18,
       "references": [
-        2
+        3
       ],
       "type": "index",
       "data": {
-        "on": 2,
+        "on": 3,
         "name": "idx_document_collaborators_identity",
         "sql": null,
         "unique": false,
         "columns": [
           "account_significant_id"
-        ]
-      }
-    },
-    {
-      "id": 18,
-      "references": [
-        2
-      ],
-      "type": "index",
-      "data": {
-        "on": 2,
-        "name": "idx_document_collaborators_username",
-        "sql": null,
-        "unique": false,
-        "columns": [
-          "username"
         ]
       }
     },
@@ -969,6 +1008,22 @@
       "type": "index",
       "data": {
         "on": 3,
+        "name": "idx_document_collaborators_username",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "username"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "references": [
+        4
+      ],
+      "type": "index",
+      "data": {
+        "on": 4,
         "name": "idx_document_parameters_composite",
         "sql": null,
         "unique": false,

@@ -7,19 +7,17 @@ final class WorkspaceState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final WorkspaceStateUserProposals userProposals;
-  final WorkspaceStateProposalInvites userProposalInvites;
   final List<CampaignTimelineViewModel> timelineItems;
-  final Map<WorkspacePageTab, int> count;
   final int fundNumber;
+  final int invitationsApprovalsCount;
 
   const WorkspaceState({
     this.isLoading = false,
     this.error,
     this.userProposals = const WorkspaceStateUserProposals(),
-    this.userProposalInvites = const WorkspaceStateProposalInvites(),
-    this.count = const {},
     this.timelineItems = const [],
     this.fundNumber = 0,
+    this.invitationsApprovalsCount = 0,
   });
 
   WorkspaceStateCampaignTimeline get campaignTimeline =>
@@ -30,10 +28,9 @@ final class WorkspaceState extends Equatable {
     isLoading,
     error,
     userProposals,
-    userProposalInvites,
-    count,
     timelineItems,
     fundNumber,
+    invitationsApprovalsCount,
   ];
 
   bool get showProposals => error == null && !isLoading;
@@ -49,19 +46,17 @@ final class WorkspaceState extends Equatable {
     bool? isLoading,
     Optional<LocalizedException>? error,
     WorkspaceStateUserProposals? userProposals,
-    WorkspaceStateProposalInvites? userProposalInvites,
-    Map<WorkspacePageTab, int>? count,
     List<CampaignTimelineViewModel>? timelineItems,
     int? fundNumber,
+    int? invitationsApprovalsCount,
   }) {
     return WorkspaceState(
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
       userProposals: userProposals ?? this.userProposals,
-      userProposalInvites: userProposalInvites ?? this.userProposalInvites,
-      count: count ?? this.count,
       timelineItems: timelineItems ?? this.timelineItems,
       fundNumber: fundNumber ?? this.fundNumber,
+      invitationsApprovalsCount: invitationsApprovalsCount ?? this.invitationsApprovalsCount,
     );
   }
 }
@@ -75,23 +70,6 @@ final class WorkspaceStateCampaignTimeline extends Equatable {
 
   @override
   List<Object?> get props => [items];
-}
-
-final class WorkspaceStateProposalInvites extends Equatable {
-  final UserProposalsView userProposalInvites;
-
-  const WorkspaceStateProposalInvites({
-    this.userProposalInvites = const UserProposalsView(),
-  });
-
-  factory WorkspaceStateProposalInvites.fromList({
-    required List<UsersProposalOverview> invites,
-  }) {
-    return WorkspaceStateProposalInvites(userProposalInvites: UserProposalsView(items: invites));
-  }
-
-  @override
-  List<Object?> get props => [userProposalInvites];
 }
 
 final class WorkspaceStateUserProposals extends Equatable {
