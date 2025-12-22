@@ -40,6 +40,7 @@ export 'exception/localized_exception.dart';
 export 'exception/localized_not_found_exception.dart';
 export 'exception/localized_permission_need_explanation_exception.dart';
 export 'exception/localized_permission_need_rationale_exception.dart';
+export 'exception/localized_proposal_template_not_found_exception.dart';
 export 'exception/localized_unknown_exception.dart';
 export 'exception/localized_wallet_exception.dart';
 export 'managers/video_manager_assets.dart';

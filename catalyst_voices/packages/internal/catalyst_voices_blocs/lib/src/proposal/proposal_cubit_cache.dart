@@ -1,22 +1,23 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// Cache for [ProposalCubit].
 final class ProposalCubitCache extends Equatable {
   final CatalystId? activeAccountId;
   final DocumentRef? ref;
-  final ProposalDetailData? proposal;
+  final ProposalDocument? proposal;
   final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
-  final List<Collaborator>? collaborators;
+  final List<ProposalDataCollaborator>? collaborators;
   final bool? isFavorite;
   final bool? isVotingStage;
   final bool? showComments;
   final bool? readOnlyMode;
-  final Vote? lastCastedVote;
+  final ProposalBriefDataVotes? votes;
+  final List<DocumentRef>? versions;
+  final ProposalPublish? publish;
 
   const ProposalCubitCache({
     this.activeAccountId,
@@ -30,7 +31,9 @@ final class ProposalCubitCache extends Equatable {
     this.isVotingStage,
     this.showComments,
     this.readOnlyMode,
-    this.lastCastedVote,
+    this.votes,
+    this.versions,
+    this.publish,
   });
 
   @override
@@ -46,22 +49,26 @@ final class ProposalCubitCache extends Equatable {
     isVotingStage,
     showComments,
     readOnlyMode,
-    lastCastedVote,
+    votes,
+    versions,
+    publish,
   ];
 
   ProposalCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,
     Optional<DocumentRef>? ref,
-    Optional<ProposalDetailData>? proposal,
+    Optional<ProposalDocument>? proposal,
     Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
-    Optional<List<Collaborator>>? collaborators,
+    Optional<List<ProposalDataCollaborator>>? collaborators,
     Optional<bool>? isFavorite,
     Optional<bool>? isVotingStage,
     Optional<bool>? showComments,
     Optional<bool>? readOnlyMode,
-    Optional<Vote>? lastCastedVote,
+    Optional<ProposalBriefDataVotes>? votes,
+    Optional<List<DocumentRef>>? versions,
+    Optional<ProposalPublish>? publish,
   }) {
     return ProposalCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
@@ -75,7 +82,9 @@ final class ProposalCubitCache extends Equatable {
       isVotingStage: isVotingStage.dataOr(this.isVotingStage),
       showComments: showComments.dataOr(this.showComments),
       readOnlyMode: readOnlyMode.dataOr(this.readOnlyMode),
-      lastCastedVote: lastCastedVote.dataOr(this.lastCastedVote),
+      votes: votes.dataOr(this.votes),
+      versions: versions.dataOr(this.versions),
+      publish: publish.dataOr(this.publish),
     );
   }
 
@@ -89,8 +98,10 @@ final class ProposalCubitCache extends Equatable {
       showComments: const Optional.empty(),
       readOnlyMode: const Optional.empty(),
       category: const Optional.empty(),
-      lastCastedVote: const Optional.empty(),
+      votes: const Optional.empty(),
       ref: const Optional.empty(),
+      versions: const Optional.empty(),
+      publish: const Optional.empty(),
     );
   }
 }

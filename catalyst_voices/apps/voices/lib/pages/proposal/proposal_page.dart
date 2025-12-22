@@ -117,7 +117,7 @@ class _ProposalPageState extends State<ProposalPage>
     super.didUpdateWidget(oldWidget);
 
     if (widget.ref != oldWidget.ref) {
-      unawaited(context.read<ProposalCubit>().load(ref: widget.ref));
+      unawaited(context.read<ProposalCubit>().loadProposal(widget.ref));
     }
   }
 
@@ -180,7 +180,7 @@ class _ProposalPageState extends State<ProposalPage>
 
     // TODO(damian-molinski): ProposalCubit should be scoped to this screen.
     bloc.clear();
-    unawaited(bloc.load(ref: widget.ref));
+    unawaited(bloc.loadProposal(widget.ref));
   }
 
   void _changeVersion(String? version) {
