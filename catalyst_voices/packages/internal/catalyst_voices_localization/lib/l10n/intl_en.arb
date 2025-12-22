@@ -2641,6 +2641,10 @@
       }
     }
   },
+  "proposalTemplateNotFound": "Template for this Proposal is missing. Can't view this document",
+  "@proposalTemplateNotFound": {
+    "description": "Message shown to user when proposal can't be build because of missing template"
+  },
   "proposalTitleShortDescription": "A strong proposal title can really set the tone and capture attention. ",
   "@proposalTitleShortDescription": {
     "description": "Short description for the title input field"
