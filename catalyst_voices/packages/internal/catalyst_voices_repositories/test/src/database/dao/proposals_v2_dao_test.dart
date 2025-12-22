@@ -7207,6 +7207,126 @@ void main() {
         });
       });
 
+      group('watchLocalDraftProposalsCount', () {
+        test('returns 0 when no local drafts exist', () async {
+          // Given
+          final author = _createTestAuthor(name: 'author1');
+
+          // When
+          final stream = dao.watchLocalDraftProposalsCount(author: author);
+
+          // Then
+          await expectLater(stream, emits(0));
+        });
+
+        test('returns count of local drafts for specific author', () async {
+          // Given
+          final author1 = _createTestAuthor(name: 'author1', role0KeySeed: 1);
+          final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 2);
+
+          // Create 2 local drafts for author1
+          final draft1 = _createTestLocalDraft(
+            id: 'draft1',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+          final draft2 = _createTestLocalDraft(
+            id: 'draft2',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+
+          // Create 1 local draft for author2
+          final draft3 = _createTestLocalDraft(
+            id: 'draft3',
+            authors: [author2],
+            type: DocumentType.proposalDocument,
+          );
+
+          await db.localDocumentsV2Dao.saveAll([draft1, draft2, draft3]);
+
+          // When
+          final streamAuthor1 = dao.watchLocalDraftProposalsCount(author: author1);
+          final streamAuthor2 = dao.watchLocalDraftProposalsCount(author: author2);
+
+          // Then
+          await expectLater(streamAuthor1, emits(2)); // author1 has 2 drafts
+          await expectLater(streamAuthor2, emits(1)); // author2 has 1 draft
+        });
+
+        test('only counts proposal documents, not other document types', () async {
+          // Given
+          final author = _createTestAuthor(name: 'author1');
+
+          final proposalDraft = _createTestLocalDraft(
+            id: 'proposal-draft',
+            authors: [author],
+            type: DocumentType.proposalDocument,
+          );
+
+          final commentDraft = _createTestLocalDraft(
+            id: 'comment-draft',
+            authors: [author],
+            type: DocumentType.commentDocument,
+          );
+
+          await db.localDocumentsV2Dao.saveAll([proposalDraft, commentDraft]);
+
+          // When
+          final stream = dao.watchLocalDraftProposalsCount(author: author);
+
+          // Then
+          await expectLater(stream, emits(1)); // Only counts proposal documents
+        });
+
+        test('returns correct count with multiple authors and document types', () async {
+          // Given
+          final author1 = _createTestAuthor(name: 'author1', role0KeySeed: 1);
+          final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 2);
+
+          // Create 3 proposal drafts for author1
+          final draft1 = _createTestLocalDraft(
+            id: 'draft1',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+          final draft2 = _createTestLocalDraft(
+            id: 'draft2',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+          final draft3 = _createTestLocalDraft(
+            id: 'draft3',
+            authors: [author1],
+            type: DocumentType.proposalDocument,
+          );
+
+          // Create 1 comment draft for author1 (should not be counted)
+          final commentDraft = _createTestLocalDraft(
+            id: 'comment1',
+            authors: [author1],
+            type: DocumentType.commentDocument,
+          );
+
+          // Create 1 proposal draft for author2
+          final draft4 = _createTestLocalDraft(
+            id: 'draft4',
+            authors: [author2],
+            type: DocumentType.proposalDocument,
+          );
+
+          await db.localDocumentsV2Dao.saveAll([draft1, draft2, draft3, commentDraft, draft4]);
+
+          // When
+          final streamAuthor1 = dao.watchLocalDraftProposalsCount(author: author1);
+          final streamAuthor2 = dao.watchLocalDraftProposalsCount(author: author2);
+
+          // Then
+          await expectLater(streamAuthor1, emits(3)); // author1 has 3 proposal drafts
+          await expectLater(streamAuthor2, emits(1)); // author2 has 1 proposal draft
+        });
+      });
+
       group(
         'watchLocalRawProposal',
         () {
@@ -7383,126 +7503,6 @@ void main() {
                 }),
               ),
             );
-          });
-
-          group('watchLocalDraftProposalsCount', () {
-            test('returns 0 when no local drafts exist', () async {
-              // Given
-              final author = _createTestAuthor(name: 'author1');
-
-              // When
-              final stream = dao.watchLocalDraftProposalsCount(author: author);
-
-              // Then
-              await expectLater(stream, emits(0));
-            });
-
-            test('returns count of local drafts for specific author', () async {
-              // Given
-              final author1 = _createTestAuthor(name: 'author1', role0KeySeed: 1);
-              final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 2);
-
-              // Create 2 local drafts for author1
-              final draft1 = _createTestLocalDraft(
-                id: 'draft1',
-                authors: [author1],
-                type: DocumentType.proposalDocument,
-              );
-              final draft2 = _createTestLocalDraft(
-                id: 'draft2',
-                authors: [author1],
-                type: DocumentType.proposalDocument,
-              );
-
-              // Create 1 local draft for author2
-              final draft3 = _createTestLocalDraft(
-                id: 'draft3',
-                authors: [author2],
-                type: DocumentType.proposalDocument,
-              );
-
-              await db.localDocumentsV2Dao.saveAll([draft1, draft2, draft3]);
-
-              // When
-              final streamAuthor1 = dao.watchLocalDraftProposalsCount(author: author1);
-              final streamAuthor2 = dao.watchLocalDraftProposalsCount(author: author2);
-
-              // Then
-              await expectLater(streamAuthor1, emits(2)); // author1 has 2 drafts
-              await expectLater(streamAuthor2, emits(1)); // author2 has 1 draft
-            });
-
-            test('only counts proposal documents, not other document types', () async {
-              // Given
-              final author = _createTestAuthor(name: 'author1');
-
-              final proposalDraft = _createTestLocalDraft(
-                id: 'proposal-draft',
-                authors: [author],
-                type: DocumentType.proposalDocument,
-              );
-
-              final commentDraft = _createTestLocalDraft(
-                id: 'comment-draft',
-                authors: [author],
-                type: DocumentType.commentDocument,
-              );
-
-              await db.localDocumentsV2Dao.saveAll([proposalDraft, commentDraft]);
-
-              // When
-              final stream = dao.watchLocalDraftProposalsCount(author: author);
-
-              // Then
-              await expectLater(stream, emits(1)); // Only counts proposal documents
-            });
-
-            test('returns correct count with multiple authors and document types', () async {
-              // Given
-              final author1 = _createTestAuthor(name: 'author1', role0KeySeed: 1);
-              final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 2);
-
-              // Create 3 proposal drafts for author1
-              final draft1 = _createTestLocalDraft(
-                id: 'draft1',
-                authors: [author1],
-                type: DocumentType.proposalDocument,
-              );
-              final draft2 = _createTestLocalDraft(
-                id: 'draft2',
-                authors: [author1],
-                type: DocumentType.proposalDocument,
-              );
-              final draft3 = _createTestLocalDraft(
-                id: 'draft3',
-                authors: [author1],
-                type: DocumentType.proposalDocument,
-              );
-
-              // Create 1 comment draft for author1 (should not be counted)
-              final commentDraft = _createTestLocalDraft(
-                id: 'comment1',
-                authors: [author1],
-                type: DocumentType.commentDocument,
-              );
-
-              // Create 1 proposal draft for author2
-              final draft4 = _createTestLocalDraft(
-                id: 'draft4',
-                authors: [author2],
-                type: DocumentType.proposalDocument,
-              );
-
-              await db.localDocumentsV2Dao.saveAll([draft1, draft2, draft3, commentDraft, draft4]);
-
-              // When
-              final streamAuthor1 = dao.watchLocalDraftProposalsCount(author: author1);
-              final streamAuthor2 = dao.watchLocalDraftProposalsCount(author: author2);
-
-              // Then
-              await expectLater(streamAuthor1, emits(3)); // author1 has 3 proposal drafts
-              await expectLater(streamAuthor2, emits(1)); // author2 has 1 proposal draft
-            });
           });
         },
       );
