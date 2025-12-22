@@ -21,7 +21,7 @@ import 'package:uuid_plus/uuid_plus.dart' as u;
 const _collabId =
     'id.catalyst://CollabA@preprod.cardano/AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=';
 
-var _time = DateTime.timestamp().millisecondsSinceEpoch;
+var _time = DateTime.utc(2025, 12, 19, 20, 3).millisecondsSinceEpoch;
 
 String _testAccountAuthorGetter(DocumentRef ref) {
   /* cSpell:disable */
@@ -31,7 +31,8 @@ String _testAccountAuthorGetter(DocumentRef ref) {
 /* cSpell:enable */
 
 String _v7() {
-  final config = u.V7Options(_time -= 2000, null);
+  final rand = Uint8List.fromList([42, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  final config = u.V7Options(_time -= 2000, rand);
   return const u.Uuid().v7(config: config);
 }
 
