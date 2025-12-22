@@ -2865,19 +2865,19 @@
   "@publishButtonText": {
     "description": "Text shown in publish button"
   },
-  "publishNewProposalIterationDialogList1": "Co-Proposers will be notified via email. They can choose to accept or reject the invitation, so publish your drafts and finals wisely. ",
+  "publishNewProposalIterationDialogList1": "Co-Proposers will be notified within the application. They can choose to accept or reject the invitation, so publish wisely.",
   "@publishNewProposalIterationDialogList1": {
-    "description": "The bullet point in the dialog for publishing a proposal iteration about Co-Proposers will be notified via email."
+    "description": "The bullet point in the dialog for publishing a proposal iteration about Co-Proposers will be notified via application."
   },
   "publishNewProposalIterationDialogList2": "Published iterations are always public.",
   "@publishNewProposalIterationDialogList2": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about proposals being public."
   },
-  "publishNewProposalIterationDialogList3": "Contributors can comment on the latest iteration.",
+  "publishNewProposalIterationDialogList3": "Voters can comment on the latest iteration.",
   "@publishNewProposalIterationDialogList3": {
-    "description": "The bullet point in the dialog for publishing a proposal iteration about contributors being able to comment on drafts."
+    "description": "The bullet point in the dialog for publishing a proposal iteration about voters being able to comment on drafts."
   },
-  "publishNewProposalIterationDialogList4": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
+  "publishNewProposalIterationDialogList4": "Drafts are not submitted for voting. Use ‘Submit for review’ to enter the community review stage.",
   "@publishNewProposalIterationDialogList4": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about drafts not being automatically submitted for voting."
   },
@@ -2893,16 +2893,20 @@
   "@publishProposalForReviewDialogAgreement": {
     "description": "The agreement confirmation in the dialog for submitting a proposal into review."
   },
-  "publishProposalForReviewDialogList1": "Published iterations are always public.",
+  "publishProposalForReviewDialogList1": "Co-Proposers will be notified within the application. They can choose to accept or reject the invitation, so publish wisely. ",
   "@publishProposalForReviewDialogList1": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about Co-Proposers will be notified via application."
+  },
+  "publishProposalForReviewDialogList2": "Published iterations are always public.",
+  "@publishProposalForReviewDialogList2": {
     "description": "The bullet point in the dialog for submitting a proposal into review about proposals being public."
   },
-  "publishProposalForReviewDialogList2": "Contributors can only comment on the latest iteration.",
-  "@publishProposalForReviewDialogList2": {
-    "description": "The bullet point in the dialog for submitting a proposal into review about contributors being able to comment on drafts."
-  },
-  "publishProposalForReviewDialogList3": "Proposals are entered into the review stage unless a later iteration is published before the deadline.",
+  "publishProposalForReviewDialogList3": "Voters can comment on the latest iteration.",
   "@publishProposalForReviewDialogList3": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about voters being able to comment on drafts."
+  },
+  "publishProposalForReviewDialogList4": "Drafts are not submitted for voting. Use ‘Submit for review’ to enter the community review stage.",
+  "@publishProposalForReviewDialogList4": {
     "description": "The bullet point in the dialog for submitting a proposal into review about drafts not being automatically submitted for voting."
   },
   "publishProposalForReviewDialogSubtitle": "Submitted final proposals are entered into the community review stage and are eligible for funding.",
