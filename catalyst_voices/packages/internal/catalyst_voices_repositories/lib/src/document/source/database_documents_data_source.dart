@@ -224,6 +224,21 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<RawProposal?> watchLocalRawProposalData({
+    required DocumentRef id,
+    CatalystId? originalAuthor,
+  }) {
+    // If author is null, return null stream as verification that author can see this version
+    if (originalAuthor == null) {
+      return Stream.value(null);
+    }
+
+    return _database.proposalsV2Dao
+        .watchLocalRawProposal(id: id, author: originalAuthor)
+        .map((data) => data?.toModel());
+  }
+
+  @override
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {

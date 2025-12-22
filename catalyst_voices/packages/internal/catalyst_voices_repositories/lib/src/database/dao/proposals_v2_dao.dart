@@ -309,13 +309,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
-    required CatalystId author,
-  }) {
-    return _queryLocalDraftsProposalsBrief(author: author).watch();
-  }
-
-  @override
   Stream<int> watchLocalDraftProposalsCount({
     required CatalystId author,
   }) {
@@ -325,6 +318,21 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       ..where(localDocumentsDrafts.authorsSignificant.equalsValue([author.toSignificant()]));
 
     return query.map((row) => row.read(localDocumentsDrafts.id.count()) ?? 0).watchSingle();
+  }
+
+  @override
+  Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftsProposalsBrief(author: author).watch();
+  }
+
+  @override
+  Stream<RawProposalEntity?> watchLocalRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftRawProposal(id: id, author: author).watchSingleOrNull();
   }
 
   @override
@@ -845,6 +853,72 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     return tempMap.map((key, value) => MapEntry(key, RawProposalCollaboratorsActions(value)));
   }
 
+  Selectable<RawProposalEntity> _queryLocalDraftRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  }) {
+    final ldd = alias(localDocumentsDrafts, 'ldd');
+    final t = alias(documentsV2, 't');
+    final dlm = alias(documentsLocalMetadata, 'dlm');
+
+    // Subquery: Get all public versions from documentsV2 for this proposal ID
+    final publicVersionIds = subqueryExpression<String>(
+      selectOnly(documentsV2)
+        ..addColumns([
+          FunctionCallExpression(
+            'GROUP_CONCAT',
+            [documentsV2.ver],
+          ),
+        ])
+        ..where(documentsV2.id.equalsExp(ldd.id))
+        ..where(documentsV2.type.equalsValue(DocumentType.proposalDocument)),
+    );
+
+    final query =
+        select(ldd).join([
+            leftOuterJoin(
+              t,
+              Expression.and([
+                t.id.equalsExp(ldd.templateId),
+                t.ver.equalsExp(ldd.templateVer),
+              ]),
+            ),
+            leftOuterJoin(dlm, dlm.id.equalsExp(ldd.id)),
+          ])
+          // Add calculated columns to the selection
+          ..addColumns([
+            publicVersionIds,
+          ])
+          // Filter by ID, Type, and Author (NOT by ver - only one local version exists)
+          ..where(ldd.id.equals(id.id))
+          ..where(ldd.type.equalsValue(DocumentType.proposalDocument))
+          ..where(ldd.authorsSignificant.equalsValue([author.toSignificant()]))
+          ..limit(1);
+
+    return query.map((row) {
+      final proposal = row.readTable(ldd);
+      final template = row.readTableOrNull(t);
+
+      final publicVersionIdsStr = row.read(publicVersionIds) ?? '';
+      // Combine local draft version with any public versions from documentsV2
+      final publicVersionsList = publicVersionIdsStr.isEmpty
+          ? <String>[]
+          : publicVersionIdsStr.split(',');
+      final allVersionIds = [proposal.ver, ...publicVersionsList];
+
+      final isFavorite = row.read(dlm.isFavorite) ?? false;
+
+      return RawProposalEntity(
+        proposal: SignedDocumentOrLocalDraft.local(proposal),
+        template: template != null ? SignedDocumentOrLocalDraft.signed(template) : null,
+        versionIds: allVersionIds,
+        commentsCount: 0,
+        isFavorite: isFavorite,
+        originalAuthors: proposal.authors,
+      );
+    });
+  }
+
   Selectable<RawProposalBriefEntity> _queryLocalDraftsProposalsBrief({
     required CatalystId author,
   }) {
@@ -975,8 +1049,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final authorsList = DocumentConverters.catId.fromSql(originalAuthorsRaw);
 
       return RawProposalEntity(
-        proposal: proposal,
-        template: template,
+        proposal: SignedDocumentOrLocalDraft.signed(proposal),
+        template: template != null ? SignedDocumentOrLocalDraft.signed(template) : null,
         versionIds: versionIdsList,
         commentsCount: count,
         isFavorite: isFavorite,
@@ -1386,6 +1460,13 @@ abstract interface class ProposalsV2Dao {
     required bool isFavorite,
   });
 
+  /// Watches the count of [author]'s local drafts (not published).
+  ///
+  /// Updates automatically when local drafts are created or deleted.
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  });
+
   /// Reactive stream version of [getLocalDraftsProposalsBrief].
   ///
   /// Updates automatically when local drafts are changing.
@@ -1393,10 +1474,8 @@ abstract interface class ProposalsV2Dao {
     required CatalystId author,
   });
 
-  /// Watches the count of [author]'s local drafts (not published).
-  ///
-  /// Updates automatically when local drafts are created or deleted.
-  Stream<int> watchLocalDraftProposalsCount({
+  Stream<RawProposalEntity?> watchLocalRawProposal({
+    required DocumentRef id,
     required CatalystId author,
   });
 

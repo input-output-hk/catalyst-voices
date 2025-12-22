@@ -7,6 +7,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_accoun
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_popup_catalyst_id.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/account_popup/widgets/my_actions_menu_item_tile.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/widgets/menu/voices_raw_popup_menu.dart';
@@ -115,45 +116,23 @@ sealed class _MenuItemEvent {
   const _MenuItemEvent();
 }
 
-final class _MyActions extends _MenuItemEvent {
-  const _MyActions();
+final class _MyActionsEvent extends _MenuItemEvent {
+  const _MyActionsEvent();
 }
 
-final class _MyOpportunities extends _MenuItemEvent {
-  const _MyOpportunities();
+class _MyActionsTile extends StatelessWidget {
+  const _MyActionsTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return MyActionsMenuItemTile(
+      onTap: () => Navigator.pop(context, const _MyActionsEvent()),
+    );
+  }
 }
 
 final class _OpenAccountDetails extends _MenuItemEvent {
   const _OpenAccountDetails();
-}
-
-class _Opportunities extends StatelessWidget {
-  const _Opportunities();
-
-  @override
-  Widget build(BuildContext context) {
-    return MenuItemTile(
-      key: const Key('MyOpportunitiesMenuItem'),
-      title: Text(context.l10n.myOpportunities),
-      leading: VoicesAssets.icons.lightBulb.buildIcon(),
-      onTap: () => Navigator.pop(context, const _MyOpportunities()),
-    );
-  }
-}
-
-class _Actions extends StatelessWidget {
-  const _Actions();
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO(bstolinski): add red dot indicator
-    return MenuItemTile(
-      key: const Key('MyActionsMenuItem'),
-      title: Text(context.l10n.myActions),
-      leading: VoicesAssets.icons.fire.buildIcon(),
-      onTap: () => Navigator.pop(context, const _MyActions()),
-    );
-  }
 }
 
 class _PopupMenu extends StatelessWidget {
@@ -170,9 +149,7 @@ class _PopupMenu extends StatelessWidget {
           children: [
             _AccountHeader(),
             VoicesDivider.expanded(),
-            _Actions(),
-            VoicesDivider.expanded(),
-            _Opportunities(),
+            _MyActionsTile(),
             VoicesDivider.expanded(),
             _Account(),
             _Settings(),
@@ -299,9 +276,7 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with 
         unawaited(launchUri(uri));
       case _Lock():
         unawaited(context.read<SessionCubit>().lock());
-      case _MyOpportunities():
-        Scaffold.maybeOf(context)?.openEndDrawer();
-      case _MyActions():
+      case _MyActionsEvent():
         unawaited(const ActionsRoute().push(context));
     }
   }

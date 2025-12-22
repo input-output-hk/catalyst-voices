@@ -136,6 +136,7 @@ enum ProposalMenuItemAction {
       _ when !fromActiveCampaign => [view],
       ProposalPublish.localDraft when ownership is AuthorProposalOwnership => [
         edit,
+        view,
         export,
         delete,
       ],

@@ -2027,7 +2027,7 @@
   },
   "myActions": "My Actions",
   "@myActions": {
-    "description": "Header text for user's actions section"
+    "description": "CTA to open My Actions side bar"
   },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
