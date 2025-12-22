@@ -61,14 +61,14 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
             with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
                 proposal_template_content = json.load(json_file)
 
-        proposal_template_content = proposal_form_template_doc(
+        proposal_template = proposal_form_template_doc(
             proposal_template_content, category, admin_key
         )
-        publish_document(proposal_template_content, admin_key.auth_token())
+        publish_document(proposal_template, admin_key.auth_token())
 
         with open("./test_data/signed_docs/proposal.json", "r") as json_file:
             proposal_content = json.load(json_file)
-        doc = proposal_doc(proposal_content, proposal_template_content, category, rbac_chain)
+        doc = proposal_doc(proposal_content, proposal_template, category, rbac_chain)
         publish_document(doc, rbac_chain.auth_token())
         return doc
 
