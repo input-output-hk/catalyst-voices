@@ -24,7 +24,8 @@ final class CollaborationInvitation extends ProposalsRelationship {
   List<Object?> get props => [id, status];
 
   @override
-  String toString() => status != null ? 'Collaborator($id, status: $status)' : 'Collaborator($id, status: any)';
+  String toString() =>
+      status != null ? 'Collaborator($id, status: $status)' : 'Collaborator($id, status: any)';
 }
 
 /// Defines the status of a collaborator's relationship with a proposal.
