@@ -88,9 +88,9 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Future<void> respondToCollaboratorInvite({
+  Future<void> submitCollaboratorProposalAction({
     required DocumentRef ref,
-    required CollaboratorInvitationAction action,
+    required CollaboratorProposalAction action,
   });
 
   /// Submits a proposal draft into review.
@@ -337,9 +337,9 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> respondToCollaboratorInvite({
+  Future<void> submitCollaboratorProposalAction({
     required DocumentRef ref,
-    required CollaboratorInvitationAction action,
+    required CollaboratorProposalAction action,
   }) async {
     // TODO(dt-iohk): replace by real implementation once data sources are ready
     await Future<void>.delayed(const Duration(seconds: 2));

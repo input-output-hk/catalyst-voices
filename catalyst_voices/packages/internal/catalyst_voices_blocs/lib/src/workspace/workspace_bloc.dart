@@ -263,9 +263,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _onLeaveProposal(LeaveProposalEvent event, Emitter<WorkspaceState> emit) async {
-    await _proposalService.respondToCollaboratorInvite(
+    await _proposalService.submitCollaboratorProposalAction(
       ref: event.id,
-      action: CollaboratorInvitationAction.leave,
+      action: CollaboratorProposalAction.leaveProposal,
     );
   }
 
