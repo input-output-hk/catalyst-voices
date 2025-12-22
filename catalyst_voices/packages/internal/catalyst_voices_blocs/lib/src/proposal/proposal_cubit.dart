@@ -50,17 +50,35 @@ final class ProposalCubit extends Cubit<ProposalState>
         .listen(_handleActiveAccountIdChanged);
   }
 
-  Future<void> acceptInvitation() async {
+  Future<void> acceptCollaboratorInvitation() async {
     try {
-      await _proposalService.respondToCollaboratorInvite(
+      await _proposalService.submitCollaboratorProposalAction(
         ref: _cache.ref!,
-        action: CollaboratorInvitationAction.accept,
+        action: CollaboratorProposalAction.acceptInvitation,
       );
       if (!isClosed) {
-        emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsAccepted: true)));
+        emit(state.copyWith(collaborator: const AcceptedCollaboratorInvitationState()));
       }
     } catch (error, stackTrace) {
-      _logger.severe('acceptInvitation', error, stackTrace);
+      _logger.severe('acceptCollaboratorInvitation', error, stackTrace);
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
+    }
+  }
+
+  Future<void> acceptFinalProposal() async {
+    try {
+      await _proposalService.submitCollaboratorProposalAction(
+        ref: _cache.ref!,
+        action: CollaboratorProposalAction.acceptFinal,
+      );
+
+      if (!isClosed) {
+        emit(state.copyWith(collaborator: const AcceptedFinalProposalConsentState()));
+      }
+    } catch (error, stackTrace) {
+      _logger.severe('acceptFinalProposal', error, stackTrace);
       if (!isClosed) {
         emitError(LocalizedException.create(error));
       }
@@ -86,8 +104,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     return super.close();
   }
 
-  Future<void> dismissInvitation() async {
-    emit(state.copyWith(invitation: const CollaboratorInvitationState()));
+  Future<void> dismissCollaboratorBanner() async {
+    emit(state.copyWith(collaborator: const NoneCollaboratorProposalState()));
   }
 
   Future<void> loadProposal(DocumentRef id) async {
@@ -102,17 +120,35 @@ final class ProposalCubit extends Cubit<ProposalState>
     _proposalSub = _proposalService.watchProposal(id: id).listen(_handleProposalData);
   }
 
-  Future<void> rejectInvitation() async {
+  Future<void> rejectCollaboratorInvitation() async {
     try {
-      await _proposalService.respondToCollaboratorInvite(
+      await _proposalService.submitCollaboratorProposalAction(
         ref: _cache.ref!,
-        action: CollaboratorInvitationAction.reject,
+        action: CollaboratorProposalAction.rejectInvitation,
       );
       if (!isClosed) {
-        emit(state.copyWith(invitation: const CollaboratorInvitationState(showAsRejected: true)));
+        emit(state.copyWith(collaborator: const RejectedCollaboratorInvitationState()));
       }
     } catch (error, stackTrace) {
-      _logger.severe('rejectInvitation', error, stackTrace);
+      _logger.severe('rejectCollaboratorInvitation', error, stackTrace);
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
+    }
+  }
+
+  Future<void> rejectFinalProposal() async {
+    try {
+      await _proposalService.submitCollaboratorProposalAction(
+        ref: _cache.ref!,
+        action: CollaboratorProposalAction.rejectFinal,
+      );
+
+      if (!isClosed) {
+        emit(state.copyWith(collaborator: const RejectedCollaboratorFinalProposalConsentState()));
+      }
+    } catch (error, stackTrace) {
+      _logger.severe('rejectFinalProposal', error, stackTrace);
       if (!isClosed) {
         emitError(LocalizedException.create(error));
       }
@@ -452,16 +488,14 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   // TODO(dt-iohk): remove dummy logic when data source for invitations is ready
   // TODO(LynxLynxx): Rewrite this method as ProposalDataCollaborator should already have all data needed
-  CollaboratorInvitationState _getCollaboratorInvitation(
+  CollaboratorProposalState _getCollaboratorInvitation(
     List<ProposalDataCollaborator> collaborators,
     CatalystId? activeAccountId,
   ) {
     if (activeAccountId != null && collaborators.none((e) => e.id == activeAccountId)) {
-      return const CollaboratorInvitationState(
-        invitation: CollaboratorInvitation(),
-      );
+      return const PendingCollaboratorInvitationState();
     }
-    return const CollaboratorInvitationState();
+    return const NoneCollaboratorProposalState();
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {
@@ -500,7 +534,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       final isVotingStage = _isVotingStage(campaign);
       final showComments = proposal.publish != ProposalPublish.submittedProposal;
 
-      final invitation = _getCollaboratorInvitation(
+      final collaborator = _getCollaboratorInvitation(
         proposal.collaborators ?? [],
         _cache.activeAccountId,
       );
@@ -534,7 +568,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         emit(
           ProposalState(
             data: proposalViewData,
-            invitation: invitation,
+            collaborator: collaborator,
             readOnlyMode: isReadOnlyMode,
           ),
         );

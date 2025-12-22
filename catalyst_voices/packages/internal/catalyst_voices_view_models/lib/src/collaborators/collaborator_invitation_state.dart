@@ -1,17 +1,46 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class CollaboratorInvitationState extends Equatable {
-  final CollaboratorInvitation? invitation;
-  final bool showAsAccepted;
-  final bool showAsRejected;
+final class AcceptedCollaboratorInvitationState extends CollaboratorInvitationState {
+  const AcceptedCollaboratorInvitationState();
+}
 
-  const CollaboratorInvitationState({
-    this.invitation,
-    this.showAsAccepted = false,
-    this.showAsRejected = false,
-  });
+final class AcceptedFinalProposalConsentState extends CollaboratorFinalProposalConsentState {
+  const AcceptedFinalProposalConsentState();
+}
+
+sealed class CollaboratorFinalProposalConsentState extends CollaboratorProposalState {
+  const CollaboratorFinalProposalConsentState();
+}
+
+sealed class CollaboratorInvitationState extends CollaboratorProposalState {
+  const CollaboratorInvitationState();
+}
+
+sealed class CollaboratorProposalState extends Equatable {
+  const CollaboratorProposalState();
 
   @override
-  List<Object?> get props => [invitation, showAsAccepted, showAsRejected];
+  List<Object?> get props => [];
+}
+
+final class NoneCollaboratorProposalState extends CollaboratorProposalState {
+  const NoneCollaboratorProposalState();
+}
+
+final class PendingCollaboratorFinalProposalConsentState
+    extends CollaboratorFinalProposalConsentState {
+  const PendingCollaboratorFinalProposalConsentState();
+}
+
+final class PendingCollaboratorInvitationState extends CollaboratorInvitationState {
+  const PendingCollaboratorInvitationState();
+}
+
+final class RejectedCollaboratorFinalProposalConsentState
+    extends CollaboratorFinalProposalConsentState {
+  const RejectedCollaboratorFinalProposalConsentState();
+}
+
+final class RejectedCollaboratorInvitationState extends CollaboratorInvitationState {
+  const RejectedCollaboratorInvitationState();
 }
