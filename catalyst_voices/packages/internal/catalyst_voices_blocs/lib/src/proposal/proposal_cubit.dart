@@ -117,8 +117,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     _cache = _cache.copyWith(id: Optional(id));
 
     // TODO(damian-molinski): where to which on loading?
-    // emit(state.copyWith(isLoading: true, error: const Optional.empty()));
-    emit(state.copyWith(error: const Optional.empty()));
+    emit(state.copyWith(isLoading: true, error: const Optional.empty()));
 
     await _watchProposal();
   }
@@ -553,11 +552,14 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {
-    if (_cache.activeAccountId != data) {
+    final activeAccountId = _cache.activeAccountId;
+    if (activeAccountId != data) {
       _cache = _cache.copyWith(activeAccountId: Optional(data));
 
       emit(state.copyWith(data: _buildProposalViewDataUsingCache()));
+    }
 
+    if (!activeAccountId.isSameAs(data)) {
       unawaited(_watchProposal());
     }
   }
