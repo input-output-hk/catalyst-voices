@@ -30,7 +30,7 @@ final class SessionState extends Equatable {
   final SessionSettings settings;
 
   /// Whether the user has pending proposal actions (invites or approvals).
-  final bool hasProposalActions;
+  final bool hasProposalsActions;
 
   const SessionState({
     required this.status,
@@ -41,19 +41,19 @@ final class SessionState extends Equatable {
     this.spacesShortcuts = const {},
     this.canCreateAccount = false,
     this.settings = const SessionSettings.fallback(),
-    this.hasProposalActions = false,
+    this.hasProposalsActions = false,
   });
 
   const SessionState.guest({
     required bool canCreateAccount,
     SessionSettings settings = const SessionSettings.fallback(),
-    bool hasProposalActions = false,
+    bool hasProposalsActions = false,
   }) : this(
          status: SessionStatus.guest,
          canCreateAccount: canCreateAccount,
          spaces: AccessControl.defaultSpacesAccess,
          settings: settings,
-         hasProposalActions: hasProposalActions,
+         hasProposalsActions: hasProposalsActions,
        );
 
   const SessionState.initial()
@@ -73,7 +73,7 @@ final class SessionState extends Equatable {
          isRegistrationInProgress: isRegistrationInProgress,
          spaces: AccessControl.defaultSpacesAccess,
          settings: settings,
-         hasProposalActions: hasProposalActions,
+         hasProposalsActions: hasProposalActions,
        );
 
   bool get isActive => status == SessionStatus.actor;
@@ -94,6 +94,6 @@ final class SessionState extends Equatable {
     spacesShortcuts,
     canCreateAccount,
     settings,
-    hasProposalActions,
+    hasProposalsActions,
   ];
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/session/session_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -29,13 +30,7 @@ final class SessionCubit extends Cubit<SessionState>
 
   final _logger = Logger('SessionCubit');
 
-  // TODO(LynxLynxx): Create SessionCubitCache
-  UserSettings? _userSettings;
-  Account? _account;
-  AdminToolsState _adminToolsState;
-  bool _hasWallets = false;
-  bool _isVotingFeatureFlagEnabled = false;
-  bool _hasProposalActions = false;
+  SessionCubitCache _cache = const SessionCubitCache();
 
   StreamSubscription<UserSettings>? _userSettingsSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
@@ -52,19 +47,18 @@ final class SessionCubit extends Cubit<SessionState>
     this._adminTools,
     this._featureFlagsService,
     this._proposalService,
-  ) : _adminToolsState = _adminTools.state,
-      super(const SessionState.initial());
+  ) : super(const SessionState.initial());
 
   Future<bool> checkAvailableWallets() async {
     final wallets = await _registrationService.getCardanoWallets().onError((_, __) => const []);
 
-    _hasWallets = wallets.isNotEmpty;
+    _cache = _cache.copyWith(hasWallets: wallets.isNotEmpty);
 
     if (!isClosed) {
       _updateState();
     }
 
-    return _alwaysAllowRegistration || _hasWallets;
+    return _alwaysAllowRegistration || _cache.hasWallets;
   }
 
   @override
@@ -122,6 +116,8 @@ final class SessionCubit extends Cubit<SessionState>
     if (!_alwaysAllowRegistration) {
       unawaited(checkAvailableWallets());
     }
+
+    _cache = _cache.copyWith(adminToolsState: _adminTools.state);
   }
 
   Future<void> lock() async {
@@ -186,12 +182,16 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   SessionState _createMockedSessionState() {
-    switch (_adminToolsState.sessionStatus) {
+    final sessionStatus = _cache.adminToolsState?.sessionStatus ?? SessionStatus.visitor;
+    final isVotingFeatureFlagEnabled = _cache.isVotingFeatureFlagEnabled;
+    final hasProposalsActions = _cache.hasProposalsActions;
+
+    switch (sessionStatus) {
       case SessionStatus.actor:
-        final spaces = _isVotingFeatureFlagEnabled
+        final spaces = isVotingFeatureFlagEnabled
             ? Space.values
             : (List.of(Space.values)..remove(Space.voting));
-        final spacesShortcuts = _isVotingFeatureFlagEnabled
+        final spacesShortcuts = isVotingFeatureFlagEnabled
             ? AccessControl.allSpacesShortcutsActivators
             : (Map.of(AccessControl.allSpacesShortcutsActivators)..remove(Space.voting));
         return SessionState(
@@ -201,27 +201,27 @@ final class SessionCubit extends Cubit<SessionState>
           overallSpaces: spaces,
           spacesShortcuts: spacesShortcuts,
           canCreateAccount: true,
-          hasProposalActions: _hasProposalActions,
+          hasProposalsActions: hasProposalsActions,
         );
       case SessionStatus.guest:
         return SessionState.guest(
           canCreateAccount: true,
-          hasProposalActions: _hasProposalActions,
+          hasProposalsActions: hasProposalsActions,
         );
       case SessionStatus.visitor:
         return SessionState.visitor(
           isRegistrationInProgress: false,
           canCreateAccount: true,
-          hasProposalActions: _hasProposalActions,
+          hasProposalActions: hasProposalsActions,
         );
     }
   }
 
   SessionState _createSessionState() {
-    final account = _account;
-    final userSettings = _userSettings;
-    final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
-    final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
+    final account = _cache.account;
+    final userSettings = _cache.userSettings;
+    final isUnlocked = _cache.account?.keychain.lastIsUnlocked ?? false;
+    final canCreateAccount = _alwaysAllowRegistration || _cache.hasWallets;
 
     final sessionSettings = userSettings != null
         ? SessionSettings.fromUser(userSettings)
@@ -233,7 +233,7 @@ final class SessionCubit extends Cubit<SessionState>
         canCreateAccount: canCreateAccount,
         isRegistrationInProgress: !isEmpty,
         settings: sessionSettings,
-        hasProposalActions: _hasProposalActions,
+        hasProposalActions: _cache.hasProposalsActions,
       );
     }
 
@@ -241,18 +241,20 @@ final class SessionCubit extends Cubit<SessionState>
       return SessionState.guest(
         canCreateAccount: canCreateAccount,
         settings: sessionSettings,
-        hasProposalActions: _hasProposalActions,
+        hasProposalsActions: _cache.hasProposalsActions,
       );
     }
 
     final sessionAccount = SessionAccount.fromAccount(account);
-    final spaces = _isVotingFeatureFlagEnabled
+    final isVotingFeatureFlagEnabled = _cache.isVotingFeatureFlagEnabled;
+
+    final spaces = isVotingFeatureFlagEnabled
         ? _accessControl.spacesAccess(account)
         : (List.of(_accessControl.spacesAccess(account))..remove(Space.voting));
-    final overallSpaces = _isVotingFeatureFlagEnabled
+    final overallSpaces = isVotingFeatureFlagEnabled
         ? _accessControl.overallSpaces(account)
         : (List.of(_accessControl.overallSpaces(account))..remove(Space.voting));
-    final spacesShortcuts = _isVotingFeatureFlagEnabled
+    final spacesShortcuts = isVotingFeatureFlagEnabled
         ? _accessControl.spacesShortcutsActivators(account)
         : (Map.of(_accessControl.spacesShortcutsActivators(account))..remove(Space.voting));
 
@@ -264,12 +266,12 @@ final class SessionCubit extends Cubit<SessionState>
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,
       settings: sessionSettings,
-      hasProposalActions: _hasProposalActions,
+      hasProposalsActions: _cache.hasProposalsActions,
     );
   }
 
   void _emitAccountBasedSignal() {
-    final account = _account;
+    final account = _cache.account;
 
     if (account == null || !account.keychain.lastIsUnlocked) {
       emitSignal(const CancelAccountNeedsVerificationSignal());
@@ -289,7 +291,7 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   void _handleUserSettings(UserSettings settings) {
-    _userSettings = settings;
+    _cache = _cache.copyWith(userSettings: Optional(settings));
 
     _updateState();
   }
@@ -298,9 +300,9 @@ final class SessionCubit extends Cubit<SessionState>
     unawaited(_hasProposalActionsSub?.cancel());
     _hasProposalActionsSub = null;
 
-    final account = _account;
+    final account = _cache.account;
     if (account == null) {
-      _hasProposalActions = false;
+      _cache = _cache.copyWith(hasProposalsActions: false);
       return;
     }
 
@@ -314,7 +316,7 @@ final class SessionCubit extends Cubit<SessionState>
   void _onActiveAccountChanged(Account? account) {
     _logger.fine('Active account changed [$account]');
 
-    _account = account;
+    _cache = _cache.copyWith(account: Optional(account));
 
     _initProposalActionsSubscription();
     _emitAccountBasedSignal();
@@ -331,14 +333,14 @@ final class SessionCubit extends Cubit<SessionState>
   void _onAdminToolsChanged(AdminToolsState adminTools) {
     _logger.fine('Admin tools changed: $adminTools');
 
-    _adminToolsState = adminTools;
+    _cache = _cache.copyWith(adminToolsState: adminTools);
     _updateState();
   }
 
   void _onHasProposalActionsChanged(bool hasActions) {
     _logger.fine('Has proposal actions changed: $hasActions');
 
-    _hasProposalActions = hasActions;
+    _cache = _cache.copyWith(hasProposalsActions: hasActions);
     _updateState();
   }
 
@@ -349,7 +351,7 @@ final class SessionCubit extends Cubit<SessionState>
   void _onVotingFeatureFlagChanged(bool isEnabled) {
     _logger.fine('Voting feature flag changed: $isEnabled');
 
-    _isVotingFeatureFlagEnabled = isEnabled;
+    _cache = _cache.copyWith(isVotingFeatureFlagEnabled: isEnabled);
     _updateState();
   }
 
@@ -371,7 +373,8 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   void _updateState() {
-    if (_adminToolsState.enabled) {
+    final adminToolsState = _cache.adminToolsState;
+    if (adminToolsState?.enabled ?? false) {
       emit(_createMockedSessionState());
     } else {
       emit(_createSessionState());

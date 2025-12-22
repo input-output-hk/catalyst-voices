@@ -111,7 +111,6 @@ Future<BootstrapArgs> bootstrap({
   }
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
-  Dependencies.instance.get<SessionCubit>().init();
   unawaited(_initSyncManager(startupProfiler));
 
   return BootstrapArgs(

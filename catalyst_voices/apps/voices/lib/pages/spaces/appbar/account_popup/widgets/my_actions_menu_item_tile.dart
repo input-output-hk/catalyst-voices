@@ -14,7 +14,7 @@ class MyActionsMenuItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState, bool>(
       selector: (state) {
-        return state.hasProposalActions;
+        return state.hasProposalsActions;
       },
       builder: (context, showBadge) {
         return _MyActionsMenuItemTile(
