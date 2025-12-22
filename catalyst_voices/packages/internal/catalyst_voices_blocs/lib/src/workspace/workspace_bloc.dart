@@ -7,7 +7,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('WorkspaceBloc');
 
@@ -356,25 +355,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     if (activeCatalystId == null) {
       return add(const WorkspaceInvitationsAndApprovalsCount(0));
     }
-    final invitationsFilters = CollaboratorInvitationsProposalsFilter(activeCatalystId);
-    final approvalsFilters = CollaboratorProposalApprovalsFilter(activeCatalystId);
-
-    final invitationsCountStream = _proposalService.watchProposalsCountV2(
-      filters: invitationsFilters,
-    );
-    final approvalsCountStream = _proposalService.watchProposalsCountV2(
-      filters: approvalsFilters,
-    );
 
     unawaited(_invitationsAndApprovalsSub?.cancel());
-    _invitationsAndApprovalsSub =
-        Rx.combineLatest2(
-          invitationsCountStream,
-          approvalsCountStream,
-          (invitations, approvals) => invitations + approvals,
-        ).distinct().listen((count) {
-          add(WorkspaceInvitationsAndApprovalsCount(count));
-        });
+    _invitationsAndApprovalsSub = _proposalService
+        .watchInvitesApprovalsCount(id: activeCatalystId)
+        .map((countInfo) => countInfo.totalCount)
+        .distinct()
+        .listen((count) => add(WorkspaceInvitationsAndApprovalsCount(count)));
   }
 
   /// Rebuilds WorkspaceStateUserProposals from the current cache.
