@@ -120,15 +120,17 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
       final router = GoRouter.of(context);
       final currentConfiguration = router.routerDelegate.currentConfiguration;
       final currentPath = currentConfiguration.last.matchedLocation;
+      final queryString = router.routeInformationProvider.value.uri.query;
 
       if (currentConfiguration.matches.length > 1) {
-        final requiredRoutes = _buildRouteStack(currentPath);
+        final requiredRoutes = _buildRouteStack(currentPath, queryString);
         final existingPaths = currentConfiguration.matches
             .map((match) => match.matchedLocation)
             .toList();
-        final missingRoutes = requiredRoutes
-            .where((route) => !existingPaths.contains(route))
-            .toList();
+        final missingRoutes = requiredRoutes.where((route) {
+          final routePath = Uri.parse(route).path;
+          return !existingPaths.contains(routePath);
+        }).toList();
 
         if (missingRoutes.isNotEmpty) {
           _pushRoutesSequentially(router, requiredRoutes);
@@ -137,14 +139,18 @@ class _EndDrawerScaffoldState extends State<_EndDrawerScaffold> {
         _scaffoldKey.currentState?.openEndDrawer();
       } else {
         router.go(Routes.initialLocation);
-        final routesToPush = _buildRouteStack(currentPath);
+        final routesToPush = _buildRouteStack(currentPath, queryString);
         _pushRoutesSequentially(router, routesToPush);
       }
     });
   }
 
-  List<String> _buildRouteStack(String currentPath) {
-    return widget.routeStackConfig.buildRouteStack(currentPath);
+  List<String> _buildRouteStack(String currentPath, String queryString) {
+    final routes = widget.routeStackConfig.buildRouteStack(currentPath);
+    if (routes.isEmpty || queryString.isEmpty) return routes;
+
+    // Add query parameters to all routes
+    return routes.map((route) => '$route?$queryString').toList();
   }
 
   Future<void> _onEndDrawerChanged(bool isOpened) async {
