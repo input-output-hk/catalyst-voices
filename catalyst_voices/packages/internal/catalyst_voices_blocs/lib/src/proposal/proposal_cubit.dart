@@ -116,10 +116,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
     _cache = _cache.copyWith(id: Optional(id));
 
-    // TODO(damian-molinski): where to which on loading?
-    emit(state.copyWith(isLoading: true, error: const Optional.empty()));
+    await _syncProposal();
 
-    await _watchProposal();
+    _watchProposal();
   }
 
   Future<void> rejectCollaboratorInvitation() async {
@@ -556,7 +555,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     if (activeAccountId.isSameAs(data)) {
       _rebuildState();
     } else {
-      unawaited(_watchProposal());
+      _watchProposal();
     }
   }
 
@@ -567,20 +566,21 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   void _handleProposalData(ProposalDataV2? data) {
+    final proposalDataChanged = _cache.proposalData != data;
     final proposalIdChanged = _cache.proposalData?.id != data?.id;
 
     _cache = _cache.copyWith(proposalData: Optional(data));
 
     if (proposalIdChanged) {
       unawaited(_getCommentBuilderTemplate());
-      unawaited(_watchProposalComments());
+      _watchProposalComments();
 
       emit(state.copyWith(comments: const CommentsState()));
+
+      _handleProposalVersionSignal();
     }
 
-    _rebuildState();
-
-    if (proposalIdChanged) _handleProposalVersionSignal();
+    if (proposalDataChanged) _rebuildState();
   }
 
   void _handleProposalVersionSignal() {
@@ -605,26 +605,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   void _rebuildState() {
-    final id = _cache.id;
     final proposalData = _cache.proposalData;
-
-    // Not found or still loading but ProposalState won't show error if is still loading
-    if (id != null && proposalData == null) {
-      emit(state.copyWith(error: const Optional(LocalizedNotFoundException())));
-      return;
-    }
-
-    if (proposalData != null && proposalData.isHidden) {
-      emit(state.copyWith(error: const Optional(LocalizedProposalHiddenException())));
-      return;
-    }
-
-    final proposalOrDocument = proposalData?.proposalOrDocument;
-    final proposalDocument = proposalOrDocument?.asProposalDocument;
-    if (proposalData != null && proposalDocument == null) {
-      emit(state.copyWith(error: const Optional(LocalizedProposalTemplateNotFoundException())));
-      return;
-    }
 
     final proposalCampaign = proposalData?.proposalOrDocument.campaign;
     final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
@@ -636,7 +617,6 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final proposalViewData = _buildProposalViewDataUsingCache();
 
-    // TODO(damian-molinski): where to clear an error?
     emit(
       state.copyWith(
         data: proposalViewData,
@@ -646,7 +626,39 @@ final class ProposalCubit extends Cubit<ProposalState>
     );
   }
 
-  Future<void> _watchProposal() async {
+  Future<void> _syncProposal() async {
+    final id = _cache.id;
+    if (id == null) {
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, error: const Optional.empty()));
+    try {
+      _validateProposalData(null);
+      _handleProposalData(null);
+    } catch (error, stack) {
+      _logger.severe('Synchronizing proposal($id) failed', error, stack);
+      emit(state.copyWith(error: Optional(LocalizedException.create(error))));
+    } finally {
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  void _validateProposalData(ProposalDataV2? data) {
+    if (data == null) {
+      throw const LocalizedNotFoundException();
+    }
+
+    if (data.isHidden) {
+      throw const LocalizedNotFoundException();
+    }
+
+    if (!data.proposalOrDocument.isProposal) {
+      throw const LocalizedProposalTemplateNotFoundException();
+    }
+  }
+
+  void _watchProposal() {
     final id = _cache.id;
     final activeAccountId = _cache.activeAccountId;
 
@@ -654,19 +666,19 @@ final class ProposalCubit extends Cubit<ProposalState>
         ? _proposalService.watchProposal(id: id, activeAccount: activeAccountId)
         : Stream.value(null);
 
-    await _proposalSub?.cancel();
+    unawaited(_proposalSub?.cancel());
     _proposalSub = stream.distinct().listen(_handleProposalData);
   }
 
   /// Watch comments on exact version of proposal.
-  Future<void> _watchProposalComments() async {
+  void _watchProposalComments() {
     final id = _cache.proposalData?.id;
 
     final stream = id != null
         ? _commentService.watchCommentsWith(ref: id).startWith(const <CommentWithReplies>[])
         : Stream.value(const <CommentWithReplies>[]);
 
-    await _commentsSub?.cancel();
+    unawaited(_commentsSub?.cancel());
     _commentsSub = stream.distinct(listEquals).listen(_handleCommentsChange);
   }
 }
