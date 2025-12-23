@@ -1,10 +1,8 @@
 //! `FullSignedDoc` struct implementation.
 
-use anyhow::Context;
-
 use super::SignedDocBody;
 use crate::{
-    db::event::{EventDB, EventDBConnectionError},
+    db::event::EventDB,
     jinja::{JinjaTemplateSource, get_template},
 };
 
@@ -17,11 +15,6 @@ pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplat
     source: include_str!("./sql/select_signed_documents.sql.jinja"),
 };
 
-/// `FullSignedDoc::store` method error.
-#[derive(thiserror::Error, Debug)]
-#[error("Document with the same `id` and `ver` already exists")]
-pub(crate) struct StoreError;
-
 /// Full signed doc event db struct
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct FullSignedDoc {
@@ -31,6 +24,45 @@ pub(crate) struct FullSignedDoc {
     payload: Option<serde_json::Value>,
     /// `signed_doc` table `raw` field
     raw: Vec<u8>,
+}
+
+impl TryFrom<&catalyst_signed_doc::CatalystSignedDocument> for FullSignedDoc {
+    type Error = anyhow::Error;
+
+    fn try_from(doc: &catalyst_signed_doc::CatalystSignedDocument) -> Result<Self, Self::Error> {
+        let authors = doc
+            .authors()
+            .iter()
+            .map(|v| v.as_short_id().to_string())
+            .collect();
+
+        let doc_meta_json = doc.doc_meta().to_json()?;
+
+        let payload = if matches!(
+            doc.doc_content_type(),
+            Some(catalyst_signed_doc::ContentType::Json)
+        ) {
+            match serde_json::from_slice(doc.decoded_content()?.as_slice()) {
+                Ok(payload) => Some(payload),
+                Err(e) => {
+                    anyhow::bail!("Invalid Document Content, not Json encoded: {e}");
+                },
+            }
+        } else {
+            None
+        };
+
+        let doc_body = SignedDocBody::new(
+            doc.doc_id()?.into(),
+            doc.doc_ver()?.into(),
+            doc.doc_type()?.uuid(),
+            authors,
+            Some(doc_meta_json),
+        );
+        let doc_bytes = doc.to_bytes()?;
+
+        Ok(FullSignedDoc::new(doc_body, payload, doc_bytes))
+    }
 }
 
 impl FullSignedDoc {
@@ -60,6 +92,7 @@ impl FullSignedDoc {
     }
 
     /// Returns the `SignedDocBody`.
+    #[allow(dead_code)]
     pub(crate) fn body(&self) -> &SignedDocBody {
         &self.body
     }
@@ -70,15 +103,12 @@ impl FullSignedDoc {
     }
 
     /// Uploads a `FullSignedDoc` to the event db.
-    /// Returns `true` if document was added into the db, `false` if it was already added
-    /// previously.
     ///
     /// Make an insert query into the `event-db` by adding data into the `signed_docs`
     /// table.
     ///
     /// * IF the record primary key (id,ver) does not exist, then add the new record.
     ///   Return success.
-    /// * IF the record does exist, but all values are the same as stored, return Success.
     /// * Otherwise return an error. (Can not over-write an existing record with new
     ///   data).
     ///
@@ -86,21 +116,12 @@ impl FullSignedDoc {
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
     ///  - `doc_type` is a UUID v4
-    pub(crate) async fn store(&self) -> anyhow::Result<bool> {
+    pub(crate) async fn store(&self) -> anyhow::Result<()> {
         // Perform insert before checking if the document already exists.
         // This should prevent race condition.
         match EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await {
             // Able to insert, no conflict
-            Ok(()) => Ok(true),
-            Err(e) if !e.is::<EventDBConnectionError>() => {
-                // Attempt to retrieve the document now that we failed to insert
-                let doc = Self::retrieve(self.id(), Some(self.ver()))
-                    .await
-                    .context("Cannot retrieve the document which has failed")?;
-                anyhow::ensure!(&doc == self, StoreError);
-                // Document already exists and matches, return false
-                Ok(false)
-            },
+            Ok(()) => Ok(()),
             Err(e) => Err(e),
         }
     }

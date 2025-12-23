@@ -91,6 +91,7 @@ jobs:
         run: |
           export HYPOTHESIS_MAX_EXAMPLES=5000
           export MAX_RESPONSE_TIME=25000
+          export HYPOTHESIS_DEADLINE=25000
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
 
       - name: Spin up catalyst-gateway with haproxy

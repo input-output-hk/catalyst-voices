@@ -1,0 +1,43 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.6.10 AS playwright-ci
+
+# Base setup for E2E test runner using catalyst-ci playwright module
+builder:
+    DO playwright-ci+SETUP --workdir=/workspace
+
+    # Copy test files
+    COPY package.json package-lock.json ./
+    RUN npm ci
+
+    # Copy all test-related files
+    COPY . .
+
+# Build the E2E test runner image
+docker:
+    FROM +builder
+
+    ARG container="e2e-test-runner"
+    ARG tag="latest"
+    
+    # Set working directory
+    WORKDIR /workspace
+
+    # Run tests with Xvfb for headed Chrome (required for browser extensions)
+    CMD ["xvfb-run", "--auto-servernum", "--server-args=-screen 0 1920x1080x24", "npx", "playwright", "test", "--project=local-run"]
+
+    SAVE IMAGE ${container}:${tag}
+
+# Build all required images for E2E testing
+all-images:
+    FROM scratch
+    
+    # Build gateway and its dependencies
+    BUILD ../../../../catalyst-gateway+docker
+    BUILD ../../../../catalyst-gateway/event-db+docker
+    
+    # Build voices frontend (without debug symbols for e2e tests)
+    BUILD ../../../+docker --UPLOAD_DEBUG_SYMBOLS=false
+    
+    # Build E2E test runner
+    BUILD +docker

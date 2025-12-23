@@ -18,6 +18,7 @@ use crate::{
     build_info::{BUILD_INFO, log_build_info},
     logger::{self, LOG_LEVEL_DEFAULT, LogLevel},
     service::utilities::net::{get_public_ipv4, get_public_ipv6},
+    telemetry::{self, TelemetryGuard},
     utils::blake2b_hash::generate_uuid_string_from_data,
 };
 
@@ -160,6 +161,9 @@ struct EnvVars {
 
     /// Set to Log 404 not found.
     log_not_found: Option<StringEnvVar>,
+
+    /// Telemetry should be enabled.
+    telemetry_enabled: Option<StringEnvVar>,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -243,6 +247,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             u64::MAX,
         ),
         log_not_found: StringEnvVar::new_optional("LOG_NOT_FOUND", false),
+        telemetry_enabled: StringEnvVar::new_optional("TELEMETRY_ENABLED", false),
     }
 });
 
@@ -269,7 +274,7 @@ pub(crate) struct Settings();
 
 impl Settings {
     /// Initialize the settings data.
-    pub(crate) fn init(settings: ServiceSettings) -> anyhow::Result<()> {
+    pub(crate) fn init(settings: ServiceSettings) -> anyhow::Result<Option<TelemetryGuard>> {
         let log_level = settings.log_level;
 
         if SERVICE_SETTINGS.set(settings).is_err() {
@@ -277,13 +282,20 @@ impl Settings {
             println!("Failed to initialize service settings. Called multiple times?");
         }
 
-        // Init the logger.
-        logger::init(log_level);
+        let guard = if ENV_VARS.telemetry_enabled.is_some() {
+            let guard = telemetry::init(log_level)?;
+            Some(guard)
+        } else {
+            // Init the regular fmt logger.
+            logger::init(log_level);
+            None
+        };
 
         log_build_info();
 
         // Validate any settings we couldn't validate when loaded.
-        EnvVars::validate()
+        EnvVars::validate()?;
+        Ok(guard)
     }
 
     /// Get the current Event DB settings for this service.
