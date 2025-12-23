@@ -17,8 +17,8 @@ void main() {
       final subsequentRef = DraftRef(id: originalRef.id, version: const Uuid().v7());
       final freshRef = subsequentRef.freshVersion();
 
-      expect(subsequentRef.id, equals(freshRef.id));
-      expect(subsequentRef.version, isNot(freshRef.version));
+      expect(originalRef.id, equals(freshRef.id));
+      expect(originalRef.version, isNot(freshRef.version));
     });
   });
 
