@@ -41,6 +41,8 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// Whether the ref specifies the document [version].
   bool get isExact => version != null;
 
+  bool get isGenesis => id == version;
+
   @override
   List<Object?> get props => [id, version];
 
@@ -75,8 +77,8 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// first version of the document. The [version] will be the same as [id].
   ///
   /// If [id] != [version] then only a new version is generated equalling to [DateTime.now].
-  DraftRef freshVersion() {
-    if (id == version) {
+  DraftRef fresh() {
+    if (isGenesis) {
       return DraftRef.generateFirstRef();
     }
 
