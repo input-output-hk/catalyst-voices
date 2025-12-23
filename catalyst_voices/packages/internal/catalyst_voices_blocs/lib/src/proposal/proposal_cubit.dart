@@ -102,6 +102,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     await _watchedCastedVotesSub?.cancel();
     _watchedCastedVotesSub = null;
 
+    await _proposalSub?.cancel();
+    _proposalSub = null;
+
     return super.close();
   }
 
@@ -116,9 +119,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
     _cache = _cache.copyWith(id: Optional(id));
 
-    await _syncProposal();
-
-    _watchProposal();
+    await _syncAndWatchProposal();
   }
 
   Future<void> rejectCollaboratorInvitation() async {
@@ -555,7 +556,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     if (activeAccountId.isSameAs(data)) {
       _rebuildState();
     } else {
-      _watchProposal();
+      unawaited(_syncAndWatchProposal());
     }
   }
 
@@ -626,6 +627,15 @@ final class ProposalCubit extends Cubit<ProposalState>
     );
   }
 
+  Future<void> _syncAndWatchProposal() async {
+    await _proposalSub?.cancel();
+    _proposalSub = null;
+
+    await _syncProposal();
+
+    if (!isClosed) _watchProposal();
+  }
+
   Future<void> _syncProposal() async {
     final id = _cache.id;
     if (id == null) {
@@ -634,13 +644,18 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
     try {
-      _validateProposalData(null);
-      _handleProposalData(null);
+      final activeAccountId = _cache.activeAccountId;
+      final proposal = await _proposalService.getProposalV2(id: id, activeAccount: activeAccountId);
+
+      if (isClosed) return;
+
+      _validateProposalData(proposal);
+      _handleProposalData(proposal);
     } catch (error, stack) {
       _logger.severe('Synchronizing proposal($id) failed', error, stack);
-      emit(state.copyWith(error: Optional(LocalizedException.create(error))));
+      if (!isClosed) emit(state.copyWith(error: Optional(LocalizedException.create(error))));
     } finally {
-      emit(state.copyWith(isLoading: false));
+      if (!isClosed) emit(state.copyWith(isLoading: false));
     }
   }
 

@@ -62,6 +62,15 @@ abstract interface class ProposalService {
     required DocumentRef id,
   });
 
+  /// Similar to [watchProposal] but also will synchronise any missing documents for [id].
+  ///
+  /// If document with [id] is not found locally it will try to synchronise and get it remotely and
+  /// when such document is not found remotely null will be returned.
+  ///
+  /// If [id] is a [DraftRef] then [activeAccount] must be non null and author of such document,
+  /// otherwise will return null, even if found.
+  Future<ProposalDataV2?> getProposalV2({required DocumentRef id, CatalystId? activeAccount});
+
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
   ///
   /// The proposal reference will be altered to avoid linking
@@ -124,8 +133,9 @@ abstract interface class ProposalService {
   /// Stream emits [ProposalDataV2] whenever underlying database changes so it emits newest
   /// available data.
   ///
-  /// Returns null if proposal with [id] is not found. Be aware if latest proposal submission
-  /// action is a [ProposalSubmissionAction.hide], such document will be returned.
+  /// Returns null if proposal with [id] is not found.
+  /// Be aware if latest proposal submission action is a [ProposalSubmissionAction.hide],
+  /// such document will be returned.
   ///
   /// If [id] is a [DraftRef] then such proposal will be returned only if [activeAccount]
   /// is an author.
