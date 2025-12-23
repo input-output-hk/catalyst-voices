@@ -132,7 +132,7 @@ pub(crate) async fn endpoint(
         Ok(false) => {
             match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
                 Ok(true) => (),
-                Ok(false) => {
+                Ok(false) if doc.problem_report().is_problematic() => {
                     return Responses::UnprocessableContent(Json(
                         PutDocumentUnprocessableContent::new(
                             "Failed validating document integrity",
@@ -141,6 +141,9 @@ pub(crate) async fn endpoint(
                     ))
                     .into();
                 },
+                Ok(false) => {
+                    return AllResponses::handle_error(&anyhow::anyhow!("Document must be problematic, empty problem report."));
+                }
                 Err(err) => {
                     // means that something happened inside the `DocProvider`, some db error.
                     return AllResponses::handle_error(&err);
