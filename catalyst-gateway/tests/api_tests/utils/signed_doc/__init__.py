@@ -62,16 +62,18 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     ).build_and_sign()
     publish_document(category, admin_key.auth_token())
 
-    with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
-        proposal_template_content = json.load(json_file)
-    proposal_template = proposal_form_template_doc(
-        proposal_template_content, category.doc_ref(), admin_key
-    ).build_and_sign()
-    publish_document(proposal_template, admin_key.auth_token())
-
     rbac_chain = rbac_chain_factory()
 
-    def proposal_doc_factory() -> SignedDocument:
+    def proposal_doc_factory(proposal_template_content: dict | None = None) -> SignedDocument:
+        if proposal_template_content == None:
+            with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
+                proposal_template_content = json.load(json_file)
+
+        proposal_template = proposal_form_template_doc(
+            proposal_template_content, category, admin_key
+        )
+        publish_document(proposal_template, admin_key.auth_token())
+
         with open("./test_data/signed_docs/proposal.json", "r") as json_file:
             proposal_content = json.load(json_file)
         doc = proposal_doc(
