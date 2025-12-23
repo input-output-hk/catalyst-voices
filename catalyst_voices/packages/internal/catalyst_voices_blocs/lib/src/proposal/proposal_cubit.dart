@@ -114,13 +114,17 @@ final class ProposalCubit extends Cubit<ProposalState>
       return;
     }
 
-    await _proposalSub?.cancel();
-    _cache = _cache.copyWith(ref: Optional(id));
+    // If the ref is loose (no version), resolve it to the latest version first
+    final refToWatch = id.isLoose ? await _proposalService.getLatestProposalVersion(id: id) : id;
+
+    _cache = _cache.copyWith(ref: Optional(refToWatch));
     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
+
+    await _proposalSub?.cancel();
     // We don't call distinct() here as we need to emit loading off user loads proposal that still not exists
     _proposalSub = _proposalService
         .watchProposal(
-          id: id,
+          id: refToWatch,
           activeAccount: _cache.activeAccountId,
         )
         .listen(_handleProposalData);
@@ -492,18 +496,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     ];
   }
 
-  // TODO(dt-iohk): remove dummy logic when data source for invitations is ready
-  // TODO(LynxLynxx): Rewrite this method as ProposalDataCollaborator should already have all data needed
-  CollaboratorProposalState _getCollaboratorInvitation(
-    List<ProposalDataCollaborator> collaborators,
-    CatalystId? activeAccountId,
-  ) {
-    if (activeAccountId != null && collaborators.none((e) => e.id == activeAccountId)) {
-      return const PendingCollaboratorInvitationState();
-    }
-    return const NoneCollaboratorProposalState();
-  }
-
   void _handleActiveAccountIdChanged(CatalystId? data) {
     if (_cache.activeAccountId != data) {
       _cache = _cache.copyWith(activeAccountId: Optional(data));
@@ -546,9 +538,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       final isVotingStage = _isVotingStage(campaign);
       final showComments = proposal.publish != ProposalPublish.submittedProposal;
 
-      final collaborator = _getCollaboratorInvitation(
-        proposal.collaborators ?? [],
-        _cache.activeAccountId,
+      final collaborator = CollaboratorProposalState.fromCollaboratorData(
+        collaborators: proposal.collaborators ?? [],
+        activeAccountId: _cache.activeAccountId,
+        isFinal: proposal.publish.isPublished,
       );
 
       final commentTemplate = await _commentService.getCommentTemplateFor(
