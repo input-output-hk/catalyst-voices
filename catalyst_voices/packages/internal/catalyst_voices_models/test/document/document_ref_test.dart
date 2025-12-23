@@ -3,6 +3,25 @@ import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
+  group(DocumentRef, () {
+    test('freshVersion generates new id and version for first document', () {
+      final originalRef = DraftRef.generateFirstRef();
+      final freshRef = originalRef.freshVersion();
+
+      expect(originalRef.id, isNot(freshRef.id));
+      expect(originalRef.version, isNot(freshRef.version));
+    });
+
+    test('freshVersion generates new version only for subsequent document', () {
+      final originalRef = DraftRef.generateFirstRef();
+      final subsequentRef = DraftRef(id: originalRef.id, version: const Uuid().v7());
+      final freshRef = subsequentRef.freshVersion();
+
+      expect(subsequentRef.id, equals(freshRef.id));
+      expect(subsequentRef.version, isNot(freshRef.version));
+    });
+  });
+
   group(DraftRef, () {
     test('should generate first reference correctly', () {
       final draftRef = DraftRef.generateFirstRef();
