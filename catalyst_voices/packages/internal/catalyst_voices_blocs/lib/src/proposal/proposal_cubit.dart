@@ -566,10 +566,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     _rebuildState();
   }
 
-  void _handleProposalData(ProposalDataV2? proposal) {
-    final proposalIdChanged = _cache.proposalData?.id != proposal?.id;
+  void _handleProposalData(ProposalDataV2? data) {
+    final proposalIdChanged = _cache.proposalData?.id != data?.id;
 
-    _cache = _cache.copyWith(proposalData: Optional(proposal));
+    _cache = _cache.copyWith(proposalData: Optional(data));
 
     if (proposalIdChanged) {
       unawaited(_getCommentBuilderTemplate());
