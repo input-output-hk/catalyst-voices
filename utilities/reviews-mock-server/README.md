@@ -6,13 +6,13 @@ Mock server for the Catalyst Reviews API using Prism and Express.
 
 The mock server consists of two layers:
 
-- **Prism** (port 4010) - Generates mock responses from the OpenAPI specification
-- **Express** (port 4020) - Entry point that intercepts specific endpoints for custom logic, proxies everything else to Prism
+* **Prism** (port 4010) - Generates mock responses from the OpenAPI specification
+* **Express** (port 4020) - Entry point that intercepts specific endpoints for custom logic, proxies everything else to Prism
 
 ## Prerequisites
 
-- Node.js 18+
-- npm
+* Node.js 18+
+* npm
 
 ## Local Development
 
