@@ -39,7 +39,7 @@ sealed class CollaboratorProposalState extends Equatable {
 
     // Find the collaborator matching the active account
     final collaborator = collaborators.firstWhereOrNull(
-      (c) => c.id == activeAccountId,
+      (c) => c.id.isSameAs(activeAccountId),
     );
 
     // If not found in collaborators list, return None
@@ -55,23 +55,18 @@ sealed class CollaboratorProposalState extends Equatable {
     }
 
     // Map status to appropriate state based on proposal finality
-    if (isFinal) {
-      return switch (collaborator.status) {
-        ProposalsCollaborationStatus.accepted => const AcceptedFinalProposalConsentState(),
-        ProposalsCollaborationStatus.rejected =>
-          const RejectedCollaboratorFinalProposalConsentState(),
-        ProposalsCollaborationStatus.pending =>
-          const PendingCollaboratorFinalProposalConsentState(),
-        _ => const NoneCollaboratorProposalState(),
-      };
-    } else {
-      return switch (collaborator.status) {
-        ProposalsCollaborationStatus.accepted => const AcceptedCollaboratorInvitationState(),
-        ProposalsCollaborationStatus.rejected => const RejectedCollaboratorInvitationState(),
-        ProposalsCollaborationStatus.pending => const PendingCollaboratorInvitationState(),
-        _ => const NoneCollaboratorProposalState(),
-      };
-    }
+    return switch (collaborator.status) {
+      ProposalsCollaborationStatus.accepted when isFinal =>
+        const AcceptedFinalProposalConsentState(),
+      ProposalsCollaborationStatus.accepted => const AcceptedCollaboratorInvitationState(),
+      ProposalsCollaborationStatus.rejected when isFinal =>
+        const RejectedCollaboratorFinalProposalConsentState(),
+      ProposalsCollaborationStatus.rejected => const RejectedCollaboratorInvitationState(),
+      ProposalsCollaborationStatus.pending when isFinal =>
+        const PendingCollaboratorFinalProposalConsentState(),
+      ProposalsCollaborationStatus.pending => const PendingCollaboratorInvitationState(),
+      _ => const NoneCollaboratorProposalState(),
+    };
   }
 
   @override

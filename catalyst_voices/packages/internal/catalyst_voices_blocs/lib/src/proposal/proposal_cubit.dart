@@ -116,6 +116,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     // If the ref is loose (no version), resolve it to the latest version first
     final refToWatch = id.isLoose ? await _proposalService.getLatestProposalVersion(id: id) : id;
+    if (isClosed) return;
 
     _cache = _cache.copyWith(ref: Optional(refToWatch));
     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
