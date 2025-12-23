@@ -221,12 +221,13 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _syncStartsSub = null;
   }
 
-  Future<void> _handleSyncDocuments(SyncDocumentsEvent event, Emitter<DevToolsState> emit) async {
-    try {
-      await _syncManager.start();
-    } catch (error, stack) {
-      _logger.warning('Sync failed', error, stack);
+  void _handleSyncDocuments(SyncDocumentsEvent event, Emitter<DevToolsState> emit) {
+    final activeCampaign = state.campaign.activeCampaign;
+    if (activeCampaign == null) {
+      return;
     }
+    final request = CampaignSyncRequest(activeCampaign);
+    _syncManager.queue(request);
   }
 
   void _handleSyncStatsChanged(SyncStatsChangedEvent event, Emitter<DevToolsState> emit) {

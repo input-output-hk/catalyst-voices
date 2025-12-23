@@ -1,70 +1,63 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:synchronized/extension.dart';
 import 'package:synchronized/synchronized.dart';
 
 final _logger = Logger('SyncManager');
 
+typedef SyncRequestPredicate = bool Function(DocumentsSyncRequest request);
+
+typedef SyncRequestProgress = ({DocumentsSyncRequest request, double progress});
+
 /// [SyncManager] provides synchronization functionality for documents.
 abstract interface class SyncManager {
   factory SyncManager(
-    AppMetaStorage appMetaStorage,
+    DocumentsSynchronizer synchronizer,
     SyncStatsStorage statsStorage,
-    DocumentsService documentsService,
-    CampaignService campaignService,
     CatalystProfiler profiler,
   ) = SyncManagerImpl;
 
-  /// Stream of synchronization progress (0.0 to 1.0).
-  Stream<double> get progressStream;
-
-  Future<bool> get waitForSync;
+  /// Stream of synchronization progress (0.0 to 1.0) for current request.
+  Stream<SyncRequestProgress> get progressStream;
 
   Future<void> dispose();
 
-  /// Initializes the [SyncManager], expected to be called once per instance lifetime.
-  Future<void> init();
+  void queue(DocumentsSyncRequest request);
 
-  Future<void> start();
+  Future<bool> waitForSync({
+    required SyncRequestPredicate predicate,
+  });
 }
 
 final class SyncManagerImpl implements SyncManager {
-  final AppMetaStorage _appMetaStorage;
+  final DocumentsSynchronizer _synchronizer;
   final SyncStatsStorage _statsStorage;
-  final DocumentsService _documentsService;
-  final CampaignService _campaignService;
   final CatalystProfiler _profiler;
 
   final _lock = Lock();
-  final _progressController = StreamController<double>.broadcast();
+  final _progressController = StreamController<SyncRequestProgress>.broadcast();
 
-  StreamSubscription<Campaign?>? _activeCampaignSub;
+  final _requestsQueue = Queue<DocumentsSyncRequest>();
+  final _requestsCompleters = <DocumentsSyncRequest, Completer<bool>>{};
 
   Timer? _syncTimer;
-  var _synchronizationCompleter = Completer<bool>();
+  bool _isDisposed = false;
 
   SyncManagerImpl(
-    this._appMetaStorage,
+    this._synchronizer,
     this._statsStorage,
-    this._documentsService,
-    this._campaignService,
     this._profiler,
   );
 
   @override
-  Stream<double> get progressStream => _progressController.stream;
-
-  @override
-  Future<bool> get waitForSync => _synchronizationCompleter.future;
+  Stream<SyncRequestProgress> get progressStream => _progressController.stream;
 
   @override
   Future<void> dispose() async {
-    await _activeCampaignSub?.cancel();
-    _activeCampaignSub = null;
-
     _syncTimer?.cancel();
     _syncTimer = null;
 
@@ -73,97 +66,55 @@ final class SyncManagerImpl implements SyncManager {
     }
 
     await _progressController.close();
+
+    _isDisposed = true;
   }
 
   @override
-  Future<void> init() async {
-    unawaited(_activeCampaignSub?.cancel());
-    _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
-      _handleActiveCampaignChanged,
-    );
+  void queue(DocumentsSyncRequest request) {
+    if (request.isPeriodic) {
+      _scheduleRequest(request, periodic: request.periodic!);
+      return;
+    }
+
+    _requestsQueue.addLast(request);
+
+    if (!_lock.inLock) _next();
   }
 
   @override
-  Future<void> start() async {
-    if (_lock.locked) {
-      _logger.finest('Synchronization in progress');
-      return;
-    }
-
-    _syncTimer?.cancel();
-    _syncTimer = Timer.periodic(
-      const Duration(minutes: 15),
-      (_) {
-        _logger.finest('Scheduled synchronization starts');
-        _lock.synchronized(_startSynchronization).ignore();
-      },
-    );
-
-    return _lock.synchronized(_startSynchronization);
+  Future<bool> waitForSync({
+    required SyncRequestPredicate predicate,
+  }) {
+    // TODO: implement waitCompletion
+    throw UnimplementedError();
   }
 
-  Future<void> _handleActiveCampaignChanged(Campaign? campaign) async {
-    final appMeta = await _appMetaStorage.read();
+  Future<void> _execute(DocumentsSyncRequest request) async {
+    final completer = Completer<bool>();
 
-    final previousRef = appMeta.activeCampaign;
-    final currentRef = campaign?.id;
-
-    if (previousRef == currentRef) {
-      return;
-    }
-
-    _logger.fine('Active campaign changed from [$previousRef] to [$currentRef]!');
-
-    try {
-      // wait until ongoing sync is done then trigger a new one
-      await _lock.synchronized(() async {});
-      await start();
-    } catch (error, stack) {
-      _logger.warning('Sync failed', error, stack);
-    }
-  }
-
-  Future<void> _startSynchronization() async {
-    if (_synchronizationCompleter.isCompleted) {
-      _synchronizationCompleter = Completer();
-    }
-
-    final timeline = _profiler.startTransaction('sync');
+    final timeline = _profiler.startTransaction('sync-$request');
     final timelineArgs = CatalystProfilerTimelineFinishArguments();
     final stopwatch = Stopwatch()..start();
 
     var syncResult = const DocumentsSyncResult();
 
     try {
-      _logger.fine('Synchronization started');
+      _logger.fine('Executing $request');
 
-      // This means when campaign will become document we'll have get it first
-      // with separate request
-      final activeCampaign = await _updateActiveCampaign();
-      if (activeCampaign == null) {
-        _logger.finer('No active campaign found!');
-        return;
-      }
+      _updateProgress(request, 0);
 
-      if (!_progressController.isClosed) {
-        _progressController.add(0);
-      }
-
-      syncResult = await _documentsService.sync(
-        CampaignSyncRequest(activeCampaign),
-        onProgress: (value) {
-          if (!_progressController.isClosed) {
-            _progressController.add(value);
-          }
-        },
+      syncResult = await _synchronizer.start(
+        request,
+        onProgress: (value) => _updateProgress(request, value),
       );
 
       unawaited(timeline.finish());
 
-      _logger.fine('Synchronization completed. New documents: ${syncResult.newDocumentsCount}');
+      _logger.fine('Completed $request. New documents: ${syncResult.newDocumentsCount}');
 
       if (syncResult.failedDocumentsCount > 0) {
-        _logger.info('Synchronization failed for documents: ${syncResult.failedDocumentsCount}');
+        _logger.info('$request failed documents: ${syncResult.failedDocumentsCount}');
       }
 
       timelineArgs
@@ -172,21 +123,17 @@ final class SyncManagerImpl implements SyncManager {
             'new docs[${syncResult.newDocumentsCount}], '
             'failed docs[${syncResult.failedDocumentsCount}]';
 
-      _synchronizationCompleter.complete(true);
+      completer.complete(true);
     } catch (error, stack) {
-      _logger.fine('Synchronization failed', error, stack);
+      _logger.fine('$request failed', error, stack);
 
       timelineArgs
         ..status = 'failed'
         ..throwable = error;
 
-      _synchronizationCompleter.complete(false);
-
-      rethrow;
+      completer.complete(false);
     } finally {
-      if (!_progressController.isClosed) {
-        _progressController.add(1);
-      }
+      _updateProgress(request, 1);
 
       stopwatch.stop();
       timelineArgs.took = stopwatch.elapsed;
@@ -199,24 +146,24 @@ final class SyncManagerImpl implements SyncManager {
     }
   }
 
-  Future<Campaign?> _updateActiveCampaign() async {
-    final appMeta = await _appMetaStorage.read();
-    final activeCampaign = await _campaignService.getActiveCampaign();
+  void _next() {
+    if (_requestsQueue.isEmpty || _isDisposed) return;
+    final request = _requestsQueue.removeFirst();
 
-    final previousRef = appMeta.activeCampaign;
-    final currentRef = activeCampaign?.id;
+    unawaited(_lock.synchronized(() => _execute(request)).whenComplete(_next));
+  }
 
-    if (previousRef == currentRef) {
-      return activeCampaign;
+  void _scheduleRequest(
+    DocumentsSyncRequest request, {
+    required Duration periodic,
+  }) {
+    assert(request.isPeriodic, 'Schedule only periodic tasks');
+  }
+
+  void _updateProgress(DocumentsSyncRequest request, double progress) {
+    if (!_progressController.isClosed) {
+      _progressController.add((request: request, progress: progress));
     }
-
-    _logger.fine('Updating active campaign from [$previousRef] to [$currentRef]!');
-
-    final updatedAppMeta = appMeta.copyWith(activeCampaign: Optional(currentRef));
-    await _appMetaStorage.write(updatedAppMeta);
-    await _documentsService.clear(keepLocalDrafts: true);
-
-    return activeCampaign;
   }
 
   Future<void> _updateSuccessfulSyncStats({

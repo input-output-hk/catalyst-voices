@@ -16,6 +16,7 @@ abstract interface class ProposalService {
     UserService userService,
     SignerService signerService,
     ActiveCampaignObserver activeCampaignObserver,
+    SyncManager syncManager,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -172,6 +173,7 @@ final class ProposalServiceImpl implements ProposalService {
   final UserService _userService;
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
+  final SyncManager _syncManager;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -179,6 +181,7 @@ final class ProposalServiceImpl implements ProposalService {
     this._userService,
     this._signerService,
     this._activeCampaignObserver,
+    this._syncManager,
   );
 
   @override
@@ -286,6 +289,22 @@ final class ProposalServiceImpl implements ProposalService {
     );
 
     return proposalTemplate;
+  }
+
+  @override
+  Future<ProposalDataV2?> getProposalV2({
+    required DocumentRef id,
+    CatalystId? activeAccount,
+  }) async {
+    final isCached = id.isExact && await _documentRepository.isCached(id: id);
+
+    /*final localProposalData = activeAccount != null
+        ? await _proposalRepository.watchLocalProposal(id: id, originalAuthor: activeAccount).first
+        : null;
+
+    final proposalData = await _proposalRepository.watchProposal(id: id).first;*/
+
+    return _mergePublicAndLocalProposal(id, null, null);
   }
 
   @override
@@ -511,10 +530,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount}) {
     final localProposalData = activeAccount != null
-        ? _proposalRepository.watchLocalProposal(
-            id: id,
-            originalAuthor: activeAccount,
-          )
+        ? _proposalRepository.watchLocalProposal(id: id, originalAuthor: activeAccount)
         : Stream.value(null);
 
     final proposalData = _proposalRepository.watchProposal(id: id);
@@ -625,18 +641,16 @@ final class ProposalServiceImpl implements ProposalService {
     return account.catalystId;
   }
 
+  /// Returns [ProposalDataV2] with merged versions from both sources.
   ProposalDataV2? _mergePublicAndLocalProposal(
     DocumentRef id,
     ProposalDataV2? localProposal,
     ProposalDataV2? publicProposal,
   ) {
-    // If user is interested in local return it
-    if (localProposal?.id == id) {
-      return localProposal;
-    }
-
-    // Return public proposal with missing versions from local added
-    return publicProposal?.addMissingVersionsFrom(localProposal);
+    return switch (id) {
+      DraftRef() => localProposal?.addMissingVersionsFrom(publicProposal),
+      SignedDocumentRef() => publicProposal?.addMissingVersionsFrom(localProposal),
+    };
   }
 
   List<ProposalBriefData> _mergePublishedAndLocalProposals(

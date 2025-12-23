@@ -411,9 +411,12 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
+        get<AppMetaStorage>(),
+        get<DocumentRepository>(),
         get<CampaignRepository>(),
         get<ProposalRepository>(),
         get<ActiveCampaignObserver>(),
+        get<SyncManager>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
@@ -423,6 +426,7 @@ final class Dependencies extends DependencyProvider {
         get<UserService>(),
         get<SignerService>(),
         get<ActiveCampaignObserver>(),
+        get<SyncManager>(),
       );
     });
     registerLazySingleton<CommentService>(() {
@@ -439,7 +443,6 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<DocumentsService>(() {
       return DocumentsService(
         get<DocumentRepository>(),
-        get<DocumentsSynchronizer>(),
       );
     });
     registerLazySingleton<DevToolsService>(() {
@@ -548,10 +551,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<SyncManager>(
       () {
         return SyncManager(
-          get<AppMetaStorage>(),
+          get<DocumentsSynchronizer>(),
           get<SyncStatsStorage>(),
-          get<DocumentsService>(),
-          get<CampaignService>(),
           get<CatalystProfiler>(),
         );
       },

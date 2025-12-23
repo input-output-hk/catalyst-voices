@@ -4,24 +4,55 @@ import 'package:equatable/equatable.dart';
 final class CampaignSyncRequest extends DocumentsSyncRequest {
   final Campaign campaign;
 
-  const CampaignSyncRequest(this.campaign);
+  const CampaignSyncRequest(
+    this.campaign, {
+    super.periodic,
+  });
 
   @override
-  List<Object?> get props => [campaign];
+  List<Object?> get props => [campaign, periodic];
+
+  @override
+  CampaignSyncRequest copyWith({
+    Campaign? campaign,
+    Optional<Duration>? periodic,
+  }) {
+    return CampaignSyncRequest(
+      campaign ?? this.campaign,
+      periodic: periodic.dataOr(this.periodic),
+    );
+  }
 
   @override
   DocumentIndexFilters toIndexFilters() => DocumentIndexFilters.forCampaign(campaign: campaign);
 
   @override
-  String toString() => 'CampaignSyncRequest(f${campaign.fundNumber})';
+  String toString() {
+    return periodic != null
+        ? 'CampaignSyncRequest(f${campaign.fundNumber} periodic: $periodic)'
+        : 'CampaignSyncRequest(f${campaign.fundNumber})';
+  }
 }
 
 sealed class DocumentsSyncRequest extends Equatable {
-  const DocumentsSyncRequest();
+  final Duration? periodic;
 
-  const factory DocumentsSyncRequest.campaign(Campaign campaign) = CampaignSyncRequest;
+  const DocumentsSyncRequest({
+    this.periodic,
+  });
+
+  const factory DocumentsSyncRequest.campaign(
+    Campaign campaign, {
+    Duration? periodic,
+  }) = CampaignSyncRequest;
 
   const factory DocumentsSyncRequest.target(SignedDocumentRef id) = TargetSyncRequest;
+
+  bool get isPeriodic => periodic != null;
+
+  DocumentsSyncRequest copyWith({
+    Optional<Duration>? periodic,
+  });
 
   DocumentIndexFilters toIndexFilters();
 }
@@ -29,10 +60,24 @@ sealed class DocumentsSyncRequest extends Equatable {
 final class TargetSyncRequest extends DocumentsSyncRequest {
   final SignedDocumentRef id;
 
-  const TargetSyncRequest(this.id);
+  const TargetSyncRequest(
+    this.id, {
+    super.periodic,
+  });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, periodic];
+
+  @override
+  TargetSyncRequest copyWith({
+    SignedDocumentRef? id,
+    Optional<Duration>? periodic,
+  }) {
+    return TargetSyncRequest(
+      id ?? this.id,
+      periodic: periodic.dataOr(this.periodic),
+    );
+  }
 
   @override
   DocumentIndexFilters toIndexFilters() => DocumentIndexFilters.forTarget(id);

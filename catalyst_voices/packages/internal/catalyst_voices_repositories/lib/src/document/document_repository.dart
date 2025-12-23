@@ -107,6 +107,8 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
+  Future<bool> isCached({required DocumentRef id});
+
   Future<bool> isFavorite(DocumentRef id);
 
   /// Parses a document [data] previously encoded by [encodeDocumentForExport].
@@ -363,6 +365,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
   }) {
     return _localDocuments.findFirst(referencing: referencing, type: type);
+  }
+
+  @override
+  Future<bool> isCached({required DocumentRef id}) {
+    return switch (id) {
+      DraftRef() => _drafts.exists(id: id),
+      SignedDocumentRef() => _localDocuments.exists(id: id),
+    };
   }
 
   @override

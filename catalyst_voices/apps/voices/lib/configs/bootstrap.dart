@@ -111,7 +111,7 @@ Future<BootstrapArgs> bootstrap({
   }
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
-  unawaited(_initSyncManager(startupProfiler));
+  unawaited(_initCampaign());
 
   return BootstrapArgs(
     routerConfig: router,
@@ -266,6 +266,16 @@ Future<AppConfig> _getAppConfig({
   return service.getAppConfig(env: env);
 }
 
+Future<void> _initCampaign() async {
+  try {
+    final service = Dependencies.instance.get<CampaignService>();
+    final activeCampaign = await service.getActiveCampaign();
+    if (activeCampaign != null) await service.setActiveCampaign(activeCampaign);
+  } catch (error, stack) {
+    unawaited(_reportBootstrapError(error, stack));
+  }
+}
+
 Future<void> _initCryptoUtils() async {
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();
@@ -285,12 +295,6 @@ Future<void> _initReportingService(SentryConfig sentryConfig) async {
       );
     },
   );
-}
-
-Future<void> _initSyncManager(CatalystStartupProfiler profiler) async {
-  final syncManager = Dependencies.instance.get<SyncManager>();
-  await syncManager.init();
-  await profiler.documentsSync(body: syncManager.start);
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
