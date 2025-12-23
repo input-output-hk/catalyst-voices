@@ -73,7 +73,7 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   ///
   /// If the [id] == [version] then a new [id] will be generated since it's considered the
   /// first version of the document. The [version] will be the same as [id].
-  /// 
+  ///
   /// If [id] != [version] then only a new version is generated equalling to [DateTime.now].
   DraftRef freshVersion() {
     if (id == version) {
