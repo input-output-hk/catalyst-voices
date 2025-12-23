@@ -6,13 +6,13 @@ Mock server for the Catalyst Reviews API using Prism and Express.
 
 The mock server consists of two layers:
 
-* **Prism** (port 4010) - Generates mock responses from the OpenAPI specification
-* **Express** (port 4020) - Entry point that intercepts specific endpoints for custom logic, proxies everything else to Prism
+- **Prism** (port 4010) - Generates mock responses from the OpenAPI specification
+- **Express** (port 4020) - Entry point that intercepts specific endpoints for custom logic, proxies everything else to Prism
 
 ## Prerequisites
 
-* Node.js 18+
-* npm
+- Node.js 18+
+- npm
 
 ## Local Development
 
@@ -28,11 +28,12 @@ Start the server:
 npm run dev
 ```
 
-This runs both Prism and Express concurrently using the OpenAPI spec from the canonical location at `catalyst_voices/packages/internal/catalyst_voices_repositories/openapi/cat-reviews.json`.
+This runs both Prism and Express concurrently.
+Uses the OpenAPI spec from `catalyst_voices/packages/internal/catalyst_voices_repositories/openapi/cat-reviews.json`.
 
 ## OpenAPI Spec
 
-The `cat-reviews.json` file in this directory is a copy of the canonical spec for Docker builds. 
+The `cat-reviews.json` file in this directory is a copy of the canonical spec for Docker builds.
 If the API changes, update the canonical file and copy it here:
 
 ```sh
@@ -59,7 +60,8 @@ The following endpoints have custom mock implementations instead of Prism-genera
 
 ### POST `/api/catalyst-ids/me`
 
-Registers a Catalyst ID. Caches the data for subsequent GET requests.
+Registers a Catalyst ID.
+Caches the data for subsequent GET requests.
 
 **Request:**
 
@@ -84,7 +86,8 @@ Registers a Catalyst ID. Caches the data for subsequent GET requests.
 
 ### GET `/api/catalyst-ids/me`
 
-Retrieves the cached Catalyst ID data. Extracts `_cid` from the Authorization header.
+Retrieves the cached Catalyst ID data.
+Extracts `_cid` from the Authorization header.
 
 **Authorization header format:**
 
@@ -96,7 +99,7 @@ Bearer catid.:<timestamp>@<network>.<chain>/<publicKey>.<signature>
 
 ## Integration with E2E Tests
 
-The mock server is included in the E2E test infrastructure via `docker-compose.yml`. 
+The mock server is included in the E2E test infrastructure via `docker-compose.yml`.
 Nginx routes `/api/reviews/*` requests to this mock server, rewriting paths:
 
 ```text

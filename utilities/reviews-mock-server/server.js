@@ -16,8 +16,8 @@ const catalystIdCache = new Map();
 /**
  * Extract _cid from Authorization header
  * Format: Bearer catid.:<timestamp>@<network>.<chain>/<public_key>.<signature>
- * Example: Bearer catid.:1765968337@preprod.cardano/1lqpGK1D21gACRKMYO3ZZZDYaAtQkINakfa03ZgI9ck.MHutV8m4...
- * Returns: preprod.cardano/1lqpGK1D21gACRKMYO3ZZZDYaAtQkINakfa03ZgI9ck
+ * Example: Bearer catid.:1765968337@preprod.cardano/<public_key>.<signature>
+ * Returns: preprod.cardano/<public_key>
  */
 function extractCidFromAuth(authHeader) {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

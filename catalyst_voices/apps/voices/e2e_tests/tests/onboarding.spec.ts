@@ -35,6 +35,7 @@ for (const walletConfig of walletConfigs) {
         walletConfig.stakeAddress
       );
     });
+    //TODO: Add test for creating Catalyst Keychain in next PR
     test.skip(`Create Catalyst Keychain - ${walletConfig.extension.Name}`, async ({
       restoreWallet,
       appBaseURL,

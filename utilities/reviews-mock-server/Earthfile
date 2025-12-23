@@ -30,9 +30,6 @@ docker:
     # Copy built artifacts from builder
     COPY +builder/app .
 
-    # Expose the main server port
-    EXPOSE 4020
-
     # Run both prism (on 4010) and express server (on 4020)
     CMD ["npx", "concurrently", "-k", \
          "npx prism mock cat-reviews.json -p 4010 -h 0.0.0.0", \
