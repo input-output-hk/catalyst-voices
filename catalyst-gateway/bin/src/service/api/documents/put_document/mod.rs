@@ -142,8 +142,10 @@ pub(crate) async fn endpoint(
                     .into();
                 },
                 Ok(false) => {
-                    return AllResponses::handle_error(&anyhow::anyhow!("Document must be problematic, empty problem report."));
-                }
+                    return AllResponses::handle_error(&anyhow::anyhow!(
+                        "Document must be problematic, empty problem report."
+                    ));
+                },
                 Err(err) => {
                     // means that something happened inside the `DocProvider`, some db error.
                     return AllResponses::handle_error(&err);
