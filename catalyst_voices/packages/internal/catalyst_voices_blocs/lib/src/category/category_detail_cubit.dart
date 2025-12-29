@@ -6,13 +6,15 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 final _logger = Logger('CategoryDetailCubit');
 
 /// Manages the category detail.
 /// Allows to get the category detail and list of categories.
-class CategoryDetailCubit extends Cubit<CategoryDetailState> {
+class CategoryDetailCubit extends Cubit<CategoryDetailState>
+    with BlocSignalEmitterMixin<CategoryDetailSignal, CategoryDetailState> {
   final CampaignService _campaignService;
 
   CategoryDetailCubitCache _cache = const CategoryDetailCubitCache();
@@ -55,8 +57,23 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     );
 
     emit(state.copyWith(selectedCategoryRef: Optional(categoryRef)));
+    emitSignal(ChangeCategoryRefSignal(categoryRef: categoryRef));
     _updateCategoriesState();
 
+    // Try to find category in cached categories list first
+    final cachedCategory = _cache.categories?.firstWhereOrNull(
+      (category) => category.id == categoryRef,
+    );
+
+    if (cachedCategory != null) {
+      // Use cached data immediately for instant response
+      _cache = _cache.copyWith(selectedCategory: Optional(cachedCategory));
+      _watchCategoryTotalAsk(categoryRef);
+      _updateSelectedCategoryState();
+      return;
+    }
+
+    // Category not in cache, fetch from service
     if (!state.isLoading) {
       emit(state.copyWith(isLoading: true));
     }
