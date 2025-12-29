@@ -16,22 +16,22 @@ abstract interface class SyncManager {
     CatalystProfiler profiler,
   ) = SyncManagerImpl;
 
-  ///
+  /// Returns the currently executing [DocumentsSyncRequest], if any.
   DocumentsSyncRequest? get activeRequest;
 
   /// Stream of synchronization progress (0.0 to 1.0) for current request.
   Stream<double> get activeRequestProgress;
 
-  ///
+  /// Returns a list of [DocumentsSyncRequest] currently waiting in the queue.
   List<DocumentsSyncRequest> get pendingRequests;
 
-  ///
+  /// A future that completes when the [activeRequest] finishes.
   Future<bool> get waitForActiveRequest;
 
-  ///
+  /// Cleans up resources, cancels timers, and closes streams.
   Future<void> dispose();
 
-  ///
+  /// Adds a [request] to the processing queue.
   void queue(DocumentsSyncRequest request);
 }
 
@@ -75,9 +75,7 @@ final class SyncManagerImpl implements SyncManager {
   Future<void> dispose() async {
     _isDisposed = true;
 
-    // Make copy so to be sure map won't change while iterating
-    final scheduledRequestsTimers = Map.of(_scheduledRequestsTimers);
-    for (final timer in scheduledRequestsTimers.values) {
+    for (final timer in _scheduledRequestsTimers.values) {
       timer.cancel();
     }
     _scheduledRequestsTimers.clear();
@@ -101,6 +99,7 @@ final class SyncManagerImpl implements SyncManager {
     _next();
   }
 
+  /// Processes a single [request].
   Future<void> _execute(DocumentsSyncRequest request) async {
     _activeRequest = request;
     final completer = Completer<bool>();
@@ -110,30 +109,35 @@ final class SyncManagerImpl implements SyncManager {
     final timelineArgs = CatalystProfilerTimelineFinishArguments();
     final stopwatch = Stopwatch()..start();
 
-    var syncResult = const DocumentsSyncResult();
+    late bool isSuccess;
 
     try {
       _logger.fine('Executing $request');
 
       _updateProgress(0);
 
-      syncResult = await _synchronizer.start(request, onProgress: _updateProgress);
+      final result = await _synchronizer.start(request, onProgress: _updateProgress);
 
       unawaited(timeline.finish());
 
-      _logger.fine('Completed $request. New documents: ${syncResult.newDocumentsCount}');
+      _logger.fine('Completed $request. New documents: ${result.newDocumentsCount}');
 
-      if (syncResult.failedDocumentsCount > 0) {
-        _logger.info('$request failed documents: ${syncResult.failedDocumentsCount}');
+      if (result.failedDocumentsCount > 0) {
+        _logger.info('$request failed documents: ${result.failedDocumentsCount}');
       }
 
       timelineArgs
         ..status = 'success'
         ..hint =
-            'new docs[${syncResult.newDocumentsCount}], '
-            'failed docs[${syncResult.failedDocumentsCount}]';
+            'new docs[${result.newDocumentsCount}], '
+            'failed docs[${result.failedDocumentsCount}]';
 
-      completer.complete(true);
+      await _updateSuccessfulSyncStats(
+        newRefsCount: result.newDocumentsCount,
+        duration: stopwatch.elapsed,
+      );
+
+      isSuccess = true;
     } catch (error, stack) {
       _logger.fine('$request failed', error, stack);
 
@@ -141,7 +145,7 @@ final class SyncManagerImpl implements SyncManager {
         ..status = 'failed'
         ..throwable = error;
 
-      completer.complete(false);
+      isSuccess = false;
     } finally {
       _updateProgress(1);
 
@@ -149,16 +153,15 @@ final class SyncManagerImpl implements SyncManager {
       timelineArgs.took = stopwatch.elapsed;
 
       await timeline.finish(arguments: timelineArgs);
-      await _updateSuccessfulSyncStats(
-        newRefsCount: syncResult.newDocumentsCount,
-        duration: stopwatch.elapsed,
-      );
 
       _activeRequest = null;
       _activeRequestCompleter = null;
+
+      completer.complete(isSuccess);
     }
   }
 
+  /// Attempts to process the next item in the queue.
   void _next() {
     if (_isActive || _isDisposed) return;
     if (_requestsQueue.isEmpty) {
@@ -168,9 +171,11 @@ final class SyncManagerImpl implements SyncManager {
 
     final request = _requestsQueue.removeFirst();
 
+    // Use synchronized to ensure execution isolation
     unawaited(_lock.synchronized(() => _execute(request)).whenComplete(_next));
   }
 
+  /// Sets up a periodic timer for recurring requests.
   void _scheduleRequest(
     DocumentsSyncRequest request, {
     required Duration periodic,
@@ -183,7 +188,8 @@ final class SyncManagerImpl implements SyncManager {
     }
 
     final timer = Timer.periodic(request.periodic!, (timer) {
-      if (timer.isActive) {
+      if (!_isDisposed && timer.isActive) {
+        // Strip periodicity for the instance added to the queue to avoid recursion
         final oneTimeRequest = request.copyWith(periodic: const Optional.empty());
         _logger.info('Queueing schedule sync $oneTimeRequest');
         queue(oneTimeRequest);
