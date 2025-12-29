@@ -3,6 +3,8 @@ import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign
 import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_timeline.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_timeline.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/next_fund_static_campaign_categories.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/next_fund_static_campaign_timeline.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -60,7 +62,7 @@ final class Campaign extends Equatable {
       fundNumber: 16,
       timeline: nextFundStaticCampaignTimeline,
       publish: CampaignPublish.published,
-      categories: dynamicNextFundCampaignCategories,
+      categories: nextFundCampaignCategories,
     );
   }
 
