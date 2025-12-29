@@ -9,6 +9,8 @@ final class CampaignSyncRequest extends DocumentsSyncRequest {
     super.periodic,
   });
 
+  CampaignSyncRequest.periodic(this.campaign) : super(periodic: const Duration(minutes: 15));
+
   @override
   List<Object?> get props => [campaign, periodic];
 

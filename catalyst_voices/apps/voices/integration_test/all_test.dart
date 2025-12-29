@@ -30,7 +30,7 @@ void main() {
 
     await loggingService.updateSettings(printToConsole: const Optional(false));
 
-    await Dependencies.instance.get<CampaignService>().setActiveCampaign(f14Campaign);
+    await Dependencies.instance.get<CampaignService>().changeActiveCampaign(f14Campaign);
     await Dependencies.instance.get<SyncManager>().waitForActiveRequest;
   });
 

@@ -10,9 +10,7 @@ abstract interface class DocumentsService {
   ) = DocumentsServiceImpl;
 
   /// Removes all locally stored documents.
-  ///
-  /// if [keepLocalDrafts] is true local drafts and their templates will be kept.
-  Future<int> clear({bool keepLocalDrafts});
+  Future<int> clear();
 
   Future<bool> isFavorite(DocumentRef id);
 
@@ -31,8 +29,8 @@ final class DocumentsServiceImpl implements DocumentsService {
   );
 
   @override
-  Future<int> clear({bool keepLocalDrafts = false}) {
-    return _documentRepository.removeAll(keepLocalDrafts: keepLocalDrafts);
+  Future<int> clear() {
+    return _documentRepository.removeAll();
   }
 
   @override

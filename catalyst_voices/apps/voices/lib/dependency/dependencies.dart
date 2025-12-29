@@ -282,6 +282,7 @@ final class Dependencies extends DependencyProvider {
         () {
           return CampaignRepository(
             get<DatabaseDocumentsDataSource>(),
+            get<AppMetaStorage>(),
           );
         },
       )
@@ -410,10 +411,9 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
-        get<AppMetaStorage>(),
-        get<DocumentRepository>(),
         get<CampaignRepository>(),
         get<ProposalRepository>(),
+        get<DocumentRepository>(),
         get<ActiveCampaignObserver>(),
         get<SyncManager>(),
       );

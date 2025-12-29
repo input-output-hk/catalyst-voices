@@ -23,10 +23,15 @@ abstract interface class SyncManager {
   Stream<double> get activeRequestProgress;
 
   /// Returns a list of [DocumentsSyncRequest] currently waiting in the queue.
-  List<DocumentsSyncRequest> get pendingRequests;
+  Iterable<DocumentsSyncRequest> get pendingRequests;
+
+  /// returns a list of [DocumentsSyncRequest] currently have recurring timer.
+  Iterable<DocumentsSyncRequest> get scheduledRequests;
 
   /// A future that completes when the [activeRequest] finishes.
   Future<bool> get waitForActiveRequest;
+
+  void cancel(DocumentsSyncRequest request);
 
   /// Cleans up resources, cancels timers, and closes streams.
   Future<void> dispose();
@@ -64,12 +69,23 @@ final class SyncManagerImpl implements SyncManager {
   Stream<double> get activeRequestProgress => _activeSyncProgressSC.stream;
 
   @override
-  List<DocumentsSyncRequest> get pendingRequests => List.unmodifiable(_requestsQueue);
+  Iterable<DocumentsSyncRequest> get pendingRequests => List.unmodifiable(_requestsQueue);
+
+  @override
+  Iterable<DocumentsSyncRequest> get scheduledRequests {
+    return List.unmodifiable(_scheduledRequestsTimers.keys);
+  }
 
   @override
   Future<bool> get waitForActiveRequest => _activeRequestCompleter?.future ?? Future.value(true);
 
   bool get _isActive => _activeRequest != null;
+
+  @override
+  void cancel(DocumentsSyncRequest request) {
+    _requestsQueue.remove(request);
+    _scheduledRequestsTimers.remove(request)?.cancel();
+  }
 
   @override
   Future<void> dispose() async {

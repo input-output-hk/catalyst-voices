@@ -266,16 +266,6 @@ Future<AppConfig> _getAppConfig({
   return service.getAppConfig(env: env);
 }
 
-Future<void> _initCampaign() async {
-  try {
-    final service = Dependencies.instance.get<CampaignService>();
-    final activeCampaign = await service.getActiveCampaign();
-    if (activeCampaign != null) await service.setActiveCampaign(activeCampaign);
-  } catch (error, stack) {
-    unawaited(_reportBootstrapError(error, stack));
-  }
-}
-
 Future<void> _initCryptoUtils() async {
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();
@@ -286,19 +276,35 @@ Future<void> _initCryptoUtils() async {
 }
 
 Future<void> _initDocuments(GoRouter router) async {
-  final effectiveInitialLocation = router.routeInformationProvider.value.uri;
-  final isProposalRoute = ProposalRoute.isPath(effectiveInitialLocation);
-  if (isProposalRoute) {
-    final route = ProposalRoute.fromPath(effectiveInitialLocation);
-    final routeRef = route.ref;
-    if (routeRef.isSigned) {
-      final request = TargetSyncRequest(routeRef.toSignedDocumentRef());
-      Dependencies.instance.get<SyncManager>().queue(request);
-    }
-  }
+  try {
+    final requests = <DocumentsSyncRequest>[];
 
-  // TODO(damian-molinski): de-copule campaign init from sync.
-  unawaited(_initCampaign());
+    final service = Dependencies.instance.get<CampaignService>();
+    final activeCampaign = await service.getActiveCampaign();
+    if (activeCampaign != null) {
+      await service.changeActiveCampaign(activeCampaign, sync: false);
+      requests.add(CampaignSyncRequest.periodic(activeCampaign));
+    }
+
+    final effectiveInitialLocation = router.routeInformationProvider.value.uri;
+    final isProposalRoute = ProposalRoute.isPath(effectiveInitialLocation);
+    if (isProposalRoute) {
+      final route = ProposalRoute.fromPath(effectiveInitialLocation);
+      final routeRef = route.ref;
+      if (routeRef.isSigned) {
+        requests.insert(0, TargetSyncRequest(routeRef.toSignedDocumentRef()));
+      }
+    }
+
+    if (requests.isEmpty) return;
+
+    final manager = Dependencies.instance.get<SyncManager>();
+    for (final request in requests) {
+      manager.queue(request);
+    }
+  } catch (error, stack) {
+    unawaited(_reportBootstrapError(error, stack));
+  }
 }
 
 Future<void> _initReportingService(SentryConfig sentryConfig) async {

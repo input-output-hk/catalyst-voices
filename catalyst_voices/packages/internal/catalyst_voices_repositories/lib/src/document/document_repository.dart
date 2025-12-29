@@ -136,11 +136,16 @@ abstract interface class DocumentRepository {
 
   /// Removes all locally stored documents.
   ///
-  /// Returns number of deleted rows.
+  /// * [excludeTypes]: If provided, deletes all documents *except* those
+  ///   matching the types in this list.
+  /// * [localDrafts]: if true will delete from local drafts.
+  /// * [localDocuments] if true will delete from local documents.
   ///
-  /// if [keepLocalDrafts] is true local drafts will be kept and related templates.
+  /// Returns number of deleted rows.
   Future<int> removeAll({
-    bool keepLocalDrafts,
+    List<DocumentType>? excludeTypes,
+    bool localDrafts = true,
+    bool localDocuments = true,
   });
 
   /// Saves a pre-parsed and validated document to storage.
@@ -424,11 +429,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<int> removeAll({
-    bool keepLocalDrafts = false,
+    List<DocumentType>? excludeTypes,
+    bool localDrafts = true,
+    bool localDocuments = true,
   }) async {
-    final deletedDrafts = keepLocalDrafts ? 0 : await _drafts.delete();
-    final excludeTypes = keepLocalDrafts ? [DocumentType.proposalTemplate] : null;
-    final deletedDocuments = await _localDocuments.delete(excludeTypes: excludeTypes);
+    final deletedDrafts = localDrafts ? await _drafts.delete(excludeTypes: excludeTypes) : 0;
+    final deletedDocuments = localDocuments
+        ? await _localDocuments.delete(excludeTypes: excludeTypes)
+        : 0;
 
     return deletedDrafts + deletedDocuments;
   }

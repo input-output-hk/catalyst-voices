@@ -19,15 +19,19 @@ typedef _ProposalTemplateCategoryAndMoneyFormat = ({
 /// like total ask, proposals count, etc, with need to be calculated.
 abstract interface class CampaignService {
   const factory CampaignService(
-    AppMetaStorage appMetaStorage,
-    DocumentRepository documentRepository,
     CampaignRepository campaignRepository,
     ProposalRepository proposalRepository,
+    DocumentRepository documentRepository,
     ActiveCampaignObserver activeCampaignObserver,
     SyncManager syncManager,
   ) = CampaignServiceImpl;
 
   Stream<Campaign?> get watchActiveCampaign;
+
+  Future<void> changeActiveCampaign(
+    Campaign campaign, {
+    bool sync,
+  });
 
   Future<Campaign?> getActiveCampaign();
 
@@ -35,15 +39,11 @@ abstract interface class CampaignService {
 
   Future<List<Campaign>> getAllCampaigns();
 
-  Future<Campaign> getCampaign({
-    required String id,
-  });
+  Future<Campaign> getCampaign({required String id});
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
-
-  Future<void> setActiveCampaign(Campaign campaign);
 
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters});
 
@@ -51,18 +51,16 @@ abstract interface class CampaignService {
 }
 
 final class CampaignServiceImpl implements CampaignService {
-  final AppMetaStorage _appMetaStorage;
-  final DocumentRepository _documentRepository;
   final CampaignRepository _campaignRepository;
   final ProposalRepository _proposalRepository;
+  final DocumentRepository _documentRepository;
   final ActiveCampaignObserver _activeCampaignObserver;
   final SyncManager _syncManager;
 
   const CampaignServiceImpl(
-    this._appMetaStorage,
-    this._documentRepository,
     this._campaignRepository,
     this._proposalRepository,
+    this._documentRepository,
     this._activeCampaignObserver,
     this._syncManager,
   );
@@ -73,6 +71,45 @@ final class CampaignServiceImpl implements CampaignService {
       await _fetchInitialActiveCampaign();
     }
     yield* _activeCampaignObserver.watchCampaign;
+  }
+
+  @override
+  Future<void> changeActiveCampaign(
+    Campaign campaign, {
+    bool sync = true,
+  }) async {
+    final observedCampaignId = _activeCampaignObserver.campaign?.id;
+    final observedCampaignIdChanged = observedCampaignId != campaign.id;
+    _activeCampaignObserver.campaign = campaign;
+
+    final appActiveCampaignId = await _campaignRepository.getAppActiveCampaignId();
+    if (appActiveCampaignId != campaign.id) {
+      _logger.fine(
+        'Updating active campaign from '
+        '[$appActiveCampaignId] '
+        'to '
+        '[${campaign.id}]!',
+      );
+
+      await _campaignRepository.updateAppActiveCampaignId(id: campaign.id);
+      await _documentRepository.removeAll(
+        excludeTypes: [DocumentType.proposalTemplate],
+        localDrafts: false,
+      );
+    }
+
+    if (sync && observedCampaignIdChanged) {
+      final activeRequestsForCancellation = {
+        ..._syncManager.pendingRequests.whereType<CampaignSyncRequest>(),
+        ..._syncManager.scheduledRequests.whereType<CampaignSyncRequest>(),
+      };
+
+      for (final request in activeRequestsForCancellation) {
+        _syncManager.cancel(request);
+      }
+
+      _syncManager.queue(CampaignSyncRequest.periodic(campaign));
+    }
   }
 
   @override
@@ -139,41 +176,6 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref}) {
     return watchCategoryTotalAsk(ref: ref).first;
-  }
-
-  @override
-  Future<void> setActiveCampaign(Campaign campaign) async {
-    final currentActiveCampaignId = campaign.id;
-    final previouslyObserverActiveCampaignId = _activeCampaignObserver.campaign?.id;
-    final observedCampaignIdChanged = previouslyObserverActiveCampaignId != currentActiveCampaignId;
-
-    _activeCampaignObserver.campaign = campaign;
-
-    if (!observedCampaignIdChanged) return;
-
-    final appMeta = await _appMetaStorage.read();
-    final previousActiveCampaignId = appMeta.activeCampaign;
-
-    final activeCampaignIdChanged = previousActiveCampaignId != currentActiveCampaignId;
-
-    if (activeCampaignIdChanged) {
-      _logger.fine(
-        'Updating active campaign from '
-        '[$previousActiveCampaignId] '
-        'to '
-        '[$currentActiveCampaignId]!',
-      );
-
-      final updatedAppMeta = appMeta.copyWith(activeCampaign: Optional(currentActiveCampaignId));
-      await _appMetaStorage.write(updatedAppMeta);
-      await _documentRepository.removeAll(keepLocalDrafts: true);
-    }
-
-    final request = CampaignSyncRequest(campaign, periodic: const Duration(minutes: 15));
-
-    _logger.fine('Requesting synchronisation for campaign f${campaign.fundNumber}: ${campaign.id}');
-
-    _syncManager.queue(request);
   }
 
   @override
