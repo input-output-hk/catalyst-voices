@@ -182,7 +182,6 @@ class _CategoryDetailError extends StatelessWidget {
 
 class _CategoryPageState extends State<CategoryPage>
     with SignalHandlerStateMixin<CategoryDetailCubit, CategoryDetailSignal, CategoryPage> {
-
   @override
   Widget build(BuildContext context) {
     return ProposalSubmissionPhaseAware(
