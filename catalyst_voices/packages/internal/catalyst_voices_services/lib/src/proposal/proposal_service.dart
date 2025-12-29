@@ -314,12 +314,10 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     final localProposalData = activeAccount != null
-        // TODO(damian-molinski): implement getLocalProposal
-        ? await _proposalRepository.watchLocalProposal(id: id, originalAuthor: activeAccount).first
+        ? await _proposalRepository.getLocalProposal(id: id, originalAuthor: activeAccount)
         : null;
 
-    // TODO(damian-molinski): implement getProposal
-    final proposalData = await _proposalRepository.watchProposal(id: id).first;
+    final proposalData = await _proposalRepository.getProposalV2(id: id);
 
     return _mergePublicAndLocalProposal(id, localProposalData, proposalData);
   }

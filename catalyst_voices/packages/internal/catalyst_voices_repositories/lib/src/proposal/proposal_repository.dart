@@ -32,6 +32,12 @@ abstract interface class ProposalRepository {
     required DocumentData document,
   });
 
+  /// Similar to [watchLocalProposal] but returns single Future.
+  Future<ProposalDataV2?> getLocalProposal({
+    required DocumentRef id,
+    required CatalystId originalAuthor,
+  });
+
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   });
@@ -46,6 +52,9 @@ abstract interface class ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
+
+  /// Similar to [watchProposal] but returns single Future.
+  Future<ProposalDataV2?> getProposalV2({required DocumentRef id});
 
   Future<void> publishProposal({
     required DocumentData document,
@@ -174,6 +183,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<ProposalDataV2?> getLocalProposal({
+    required DocumentRef id,
+    required CatalystId originalAuthor,
+  }) {
+    return _proposalsLocalSource
+        .getLocalRawProposalData(id: id, originalAuthor: originalAuthor)
+        .then((document) => _assembleProposalData((document, [], [])));
+  }
+
+  @override
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
@@ -220,6 +239,18 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final documentData = await _documentRepository.getDocumentData(id: ref);
 
     return ProposalTemplateFactory.create(documentData);
+  }
+
+  @override
+  Future<ProposalDataV2?> getProposalV2({
+    required DocumentRef id,
+  }) async {
+    final proposalData = await _proposalsLocalSource.getRawProposalData(id: id);
+
+    final draftVotes = _ballotBuilder.votes;
+    final castedVotes = _castedVotesObserver.votes;
+
+    return _assembleProposalData((proposalData, draftVotes, castedVotes));
   }
 
   @override
