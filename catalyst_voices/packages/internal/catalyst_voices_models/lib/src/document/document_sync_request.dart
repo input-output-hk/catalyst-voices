@@ -65,6 +65,54 @@ sealed class DocumentsSyncRequest extends Equatable {
   List<DocumentIndexFilters> steps();
 }
 
+final class ParametersSyncRequest extends DocumentsSyncRequest {
+  final DocumentParameters parameters;
+  final DocumentType? type;
+
+  const ParametersSyncRequest(
+    this.parameters, {
+    this.type,
+    super.periodic,
+  });
+
+  @override
+  List<Object?> get props => [parameters, type, periodic];
+
+  @override
+  ParametersSyncRequest copyWith({
+    DocumentParameters? parameters,
+    Optional<DocumentType>? type,
+    Optional<Duration>? periodic,
+  }) {
+    return ParametersSyncRequest(
+      parameters ?? this.parameters,
+      type: type.dataOr(this.type),
+      periodic: periodic.dataOr(this.periodic),
+    );
+  }
+
+  @override
+  List<DocumentIndexFilters> steps() {
+    return [
+      DocumentIndexFilters(
+        parameters: parameters.set.map((e) => e.id).toList(),
+        type: type,
+      ),
+    ];
+  }
+
+  @override
+  String toString() {
+    final buffer = StringBuffer('ParametersSyncRequest($parameters');
+
+    if (periodic != null) buffer.write(', periodic: $periodic');
+
+    buffer.write(')');
+
+    return buffer.toString();
+  }
+}
+
 final class TargetSyncRequest extends DocumentsSyncRequest {
   final SignedDocumentRef id;
 

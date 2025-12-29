@@ -31,7 +31,13 @@ abstract interface class SyncManager {
   /// A future that completes when the [activeRequest] finishes.
   Future<bool> get waitForActiveRequest;
 
+  /// Removes [request] from pending and scheduled lists.
   void cancel(DocumentsSyncRequest request);
+
+  /// Adds [request] to the top of processing queue.
+  ///
+  /// Returned future will complete when [request] is processed.
+  Future<bool> complete(DocumentsSyncRequest request);
 
   /// Cleans up resources, cancels timers, and closes streams.
   Future<void> dispose();
@@ -50,9 +56,9 @@ final class SyncManagerImpl implements SyncManager {
 
   final _requestsQueue = Queue<DocumentsSyncRequest>();
   final _scheduledRequestsTimers = <DocumentsSyncRequest, Timer>{};
+  final _requestsCompleters = <DocumentsSyncRequest, Completer<bool>>{};
 
   DocumentsSyncRequest? _activeRequest;
-  Completer<bool>? _activeRequestCompleter;
 
   bool _isDisposed = false;
 
@@ -77,7 +83,10 @@ final class SyncManagerImpl implements SyncManager {
   }
 
   @override
-  Future<bool> get waitForActiveRequest => _activeRequestCompleter?.future ?? Future.value(true);
+  Future<bool> get waitForActiveRequest {
+    final activeRequest = _activeRequest;
+    return _requestsCompleters[activeRequest]?.future ?? Future.value(false);
+  }
 
   bool get _isActive => _activeRequest != null;
 
@@ -85,6 +94,16 @@ final class SyncManagerImpl implements SyncManager {
   void cancel(DocumentsSyncRequest request) {
     _requestsQueue.remove(request);
     _scheduledRequestsTimers.remove(request)?.cancel();
+  }
+
+  @override
+  Future<bool> complete(DocumentsSyncRequest request) {
+    final completer = Completer<bool>();
+    _requestsCompleters[request] = completer;
+
+    queue(request, priority: true);
+
+    return completer.future;
   }
 
   @override
@@ -100,7 +119,10 @@ final class SyncManagerImpl implements SyncManager {
   }
 
   @override
-  void queue(DocumentsSyncRequest request) {
+  void queue(
+    DocumentsSyncRequest request, {
+    bool priority = false,
+  }) {
     if (_isDisposed) {
       _logger.warning('Tried to queue sync request on disposed manager');
       return;
@@ -111,15 +133,20 @@ final class SyncManagerImpl implements SyncManager {
     }
 
     _logger.finer('Queueing $request');
-    _requestsQueue.addLast(request);
+
+    if (priority) {
+      _requestsQueue.addFirst(request);
+    } else {
+      _requestsQueue.addLast(request);
+    }
+
     _next();
   }
 
   /// Processes a single [request].
   Future<void> _execute(DocumentsSyncRequest request) async {
     _activeRequest = request;
-    final completer = Completer<bool>();
-    _activeRequestCompleter = completer;
+    final completer = _requestsCompleters.putIfAbsent(request, Completer<bool>.new);
 
     final timeline = _profiler.startTransaction('sync-$request');
     final timelineArgs = CatalystProfilerTimelineFinishArguments();
@@ -171,7 +198,7 @@ final class SyncManagerImpl implements SyncManager {
       await timeline.finish(arguments: timelineArgs);
 
       _activeRequest = null;
-      _activeRequestCompleter = null;
+      _requestsCompleters.remove(request);
 
       completer.complete(isSuccess);
     }
