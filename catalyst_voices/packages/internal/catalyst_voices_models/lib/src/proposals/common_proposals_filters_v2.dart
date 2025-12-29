@@ -15,11 +15,7 @@ final class CollaboratorProposalApprovalsFilter extends ProposalsFiltersV2 {
     : super(
         status: ProposalStatusFilter.aFinal,
         relationships: {
-          // TODO(LynxLynxx): make CollaborationInvitationStatus in this class nullable so there could
-          // be factory constructor .any() CC: (damian-molinski)
-          CollaborationInvitation.pending(id),
-          CollaborationInvitation.accepted(id),
-          CollaborationInvitation.rejected(id),
+          CollaborationInvitation.any(id),
         },
       );
 }

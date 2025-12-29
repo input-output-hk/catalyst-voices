@@ -578,19 +578,24 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
             '''
           EXISTS (
             SELECT 1 FROM document_collaborators dc
-            WHERE dc.document_id = p.id 
+            WHERE dc.document_id = p.id
               AND dc.document_ver = p.ver
               AND dc.account_significant_id = '$escapedId'
           )
         ''';
+
+        // If status is null, only check if user is listed as collaborator (match any status)
+        if (status == null) {
+          return isListedAsCollaborator;
+        }
 
         // 2. What is the user's latest action content?
         final latestAction =
             '''
           SELECT json_extract(action.content, '\$.action')
           FROM documents_v2 action
-          INNER JOIN document_authors da 
-            ON action.id = da.document_id 
+          INNER JOIN document_authors da
+            ON action.id = da.document_id
             AND action.ver = da.document_ver
           WHERE action.type = '$actionTypeUuid'
             AND action.ref_id = p.id

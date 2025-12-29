@@ -997,6 +997,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final proposalTitle = state.proposalTitle;
       final latestVersion = state.metadata.latestVersion;
       final nextIteration = latestVersion?.number ?? DocumentVersion.firstNumber;
+      final hasCollaborators = state.metadata.collaborators.isNotEmpty;
 
       final int? currentIteration;
       if (_isLocal(state.metadata.publish, nextIteration)) {
@@ -1017,6 +1018,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           proposalTitle: proposalTitle,
           currentIteration: currentIteration,
           nextIteration: nextIteration,
+          hasCollaborators: hasCollaborators,
         ),
       );
     } finally {

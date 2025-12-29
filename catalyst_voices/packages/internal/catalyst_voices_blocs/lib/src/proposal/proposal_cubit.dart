@@ -117,7 +117,11 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(error: const Optional(LocalizedDocumentReferenceException())));
       return;
     }
-    _cache = _cache.copyWith(id: Optional(id));
+    // If the ref is loose (no version), resolve it to the latest version first
+    final effectiveId = id.isLoose ? await _proposalService.getLatestProposalVersion(id: id) : id;
+    if (isClosed) return;
+
+    _cache = _cache.copyWith(id: Optional(effectiveId));
 
     await _syncAndWatchProposal();
   }
@@ -522,18 +526,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     ];
   }
 
-  // TODO(dt-iohk): remove dummy logic when data source for invitations is ready
-  // TODO(LynxLynxx): Rewrite this method as ProposalDataCollaborator should already have all data needed
-  CollaboratorProposalState _getCollaboratorState(
-    List<ProposalDataCollaborator> collaborators,
-    CatalystId? activeAccountId,
-  ) {
-    if (activeAccountId != null && collaborators.none((e) => e.id == activeAccountId)) {
-      return const PendingCollaboratorInvitationState();
-    }
-    return const NoneCollaboratorProposalState();
-  }
-
   Future<void> _getCommentBuilderTemplate() async {
     final categoryId = _cache.proposalData?.proposalOrDocument.category?.id;
     final commentTemplate = categoryId != null
@@ -614,7 +606,11 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final activeAccountId = _cache.activeAccountId;
     final collaborators = proposalData?.collaborators ?? const <ProposalDataCollaborator>[];
-    final collaboratorsState = _getCollaboratorState(collaborators, activeAccountId);
+    final collaboratorsState = CollaboratorProposalState.fromCollaboratorData(
+      collaborators: collaborators,
+      activeAccountId: activeAccountId,
+      isFinal: proposalData?.publish.isPublished ?? false,
+    );
 
     final proposalViewData = _buildProposalViewDataUsingCache();
 
