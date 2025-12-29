@@ -1,9 +1,17 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-/// Temporary list of campaign categories assigned to the [Campaign.dynamicF15Ref].
-final f15DynamicCampaignCategories = f15StaticCampaignCategories
-    .map((e) => e.copyWith(campaignRef: Campaign.dynamicF15Ref))
+// TODO(dt-iohk): define list of static campaign categories for the next fund.
+// The code here is temporary just to allow testing.
+/// Temporary list of campaign categories assigned to the [Campaign.dynamicNextFundRef].
+final dynamicNextFundCampaignCategories = f15StaticCampaignCategories
+    .take(1)
+    .map(
+      (e) => e.copyWith(
+        campaignRef: Campaign.dynamicNextFundRef,
+        selfRef: const SignedDocumentRef.first('019b4b08-6b3a-7f56-8751-c6a7fd038b97'),
+      ),
+    )
     .toList();
 
 /// List of static [CampaignCategory] definitions.

@@ -73,3 +73,6 @@ final f15StaticCampaignTimeline = CampaignTimeline(
     ),
   ],
 );
+
+// TODO(dt-iohk): define a campaign timeline for the next fund, for now we're reusing the existing one.
+final nextFundStaticCampaignTimeline = f15StaticCampaignTimeline;

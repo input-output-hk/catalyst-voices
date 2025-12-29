@@ -12,12 +12,12 @@ final class Campaign extends Equatable {
   // They're only used to difference between campaigns.
   static const f14Ref = SignedDocumentRef.first('01997695-e26f-70db-b9d4-92574a806bcd');
   static const f15Ref = SignedDocumentRef.first('0199802c-21b4-7d91-986d-0e913cd81391');
-  static const dynamicF15Ref = SignedDocumentRef.first('019b2c80-47fa-7634-ac50-0b1317313369');
+  static const dynamicNextFundRef = SignedDocumentRef.first('019b4b08-6b39-7ec1-8ae5-6696f28e370c');
 
   static final all = <Campaign>[
     Campaign.f14(),
     Campaign.f15(),
-    Campaign.dynamicF15(),
+    Campaign.dynamicNextFund(),
   ];
 
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
@@ -44,10 +44,10 @@ final class Campaign extends Equatable {
     required this.publish,
   });
 
-  factory Campaign.dynamicF15() {
+  factory Campaign.dynamicNextFund() {
     return Campaign(
-      selfRef: dynamicF15Ref,
-      name: 'Catalyst Fund15',
+      selfRef: dynamicNextFundRef,
+      name: 'Catalyst Next Fund',
       description: '''TODO''',
       allFunds: MultiCurrencyAmount.list([
         Currencies.ada.amount(20000000),
@@ -57,10 +57,10 @@ final class Campaign extends Equatable {
         Money.zero(currency: Currencies.ada),
         Money.zero(currency: Currencies.usdm),
       ]),
-      fundNumber: 15,
-      timeline: f15StaticCampaignTimeline,
+      fundNumber: 16,
+      timeline: nextFundStaticCampaignTimeline,
       publish: CampaignPublish.published,
-      categories: f15DynamicCampaignCategories,
+      categories: dynamicNextFundCampaignCategories,
     );
   }
 
