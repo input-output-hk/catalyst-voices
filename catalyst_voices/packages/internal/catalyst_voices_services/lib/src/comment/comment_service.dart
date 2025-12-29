@@ -60,7 +60,7 @@ final class CommentServiceImpl implements CommentService {
     if (document.metadata.selfRef is SignedDocumentRef) {
       throw ArgumentError('Drafts not supported for comments');
     }
-    
+
     await _signerService.useVoterCredentials((catalystId, privateKey) {
       return _commentRepository.publishComment(
         document: document,
