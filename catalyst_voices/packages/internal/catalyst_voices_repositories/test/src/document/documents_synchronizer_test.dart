@@ -21,7 +21,7 @@ void main() {
 
       synchronizer = DocumentsSynchronizer(db, local, remote);
 
-      registerFallbackValue(const DocumentIndexFilters(categoriesIds: []));
+      registerFallbackValue(const DocumentIndexFilters(parameters: []));
       registerFallbackValue(SignedDocumentRef(id: const Uuid().v7()));
     },
   );

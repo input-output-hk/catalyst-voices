@@ -9,7 +9,7 @@ final class CampaignSyncRequest extends DocumentsSyncRequest {
     super.periodic,
   });
 
-  CampaignSyncRequest.periodic(this.campaign) : super(periodic: const Duration(minutes: 15));
+  const CampaignSyncRequest.periodic(this.campaign) : super(periodic: const Duration(minutes: 15));
 
   @override
   List<Object?> get props => [campaign, periodic];
@@ -26,7 +26,13 @@ final class CampaignSyncRequest extends DocumentsSyncRequest {
   }
 
   @override
-  DocumentIndexFilters toIndexFilters() => DocumentIndexFilters.forCampaign(campaign: campaign);
+  List<DocumentIndexFilters> steps() {
+    return [
+      DocumentIndexFilters.forCampaign(campaign: campaign, type: DocumentType.proposalTemplate),
+      DocumentIndexFilters.forCampaign(campaign: campaign, type: DocumentType.commentTemplate),
+      DocumentIndexFilters.forCampaign(campaign: campaign),
+    ];
+  }
 
   @override
   String toString() {
@@ -56,7 +62,7 @@ sealed class DocumentsSyncRequest extends Equatable {
     Optional<Duration>? periodic,
   });
 
-  DocumentIndexFilters toIndexFilters();
+  List<DocumentIndexFilters> steps();
 }
 
 final class TargetSyncRequest extends DocumentsSyncRequest {
@@ -82,8 +88,21 @@ final class TargetSyncRequest extends DocumentsSyncRequest {
   }
 
   @override
-  DocumentIndexFilters toIndexFilters() => DocumentIndexFilters.forTarget(id);
+  List<DocumentIndexFilters> steps() {
+    return [
+      DocumentIndexFilters.forTarget(id),
+    ];
+  }
 
   @override
-  String toString() => 'TargetSyncRequest(id:${id.id}, ver:${id.ver})';
+  String toString() {
+    final buffer = StringBuffer('TargetSyncRequest(id:${id.id}');
+
+    if (id.isExact) buffer.write(', ver:${id.ver}');
+    if (periodic != null) buffer.write(', periodic: $periodic');
+
+    buffer.write(')');
+
+    return buffer.toString();
+  }
 }

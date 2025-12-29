@@ -45,14 +45,9 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
 
     var syncResult = const DocumentsSyncResult();
 
-    final requestIndexFilters = request.toIndexFilters();
-    // The sync process is ordered. Templates are synced first as other documents
-    // may depend on them.
-    final prioritizedDocumentTypes = request.prioritizedDocumentTypes;
-
-    // We perform one pass for each type in prioritizedDocumentTypes, plus one final pass
-    // for all remaining document types (when documentType is null).
-    final totalSyncSteps = prioritizedDocumentTypes.length + 1;
+    final steps = request.steps();
+    final stepsDocumentTypes = steps.map((e) => e.type).nonNulls.toList();
+    final totalSyncSteps = steps.length;
     final progressPerStep = 1 / totalSyncSteps;
     var completedSteps = 0;
 
@@ -60,19 +55,14 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
     onProgress?.call(0);
 
     try {
-      /// Synchronizing documents is done in certain order, according to [prioritizedDocumentTypes]
-      /// because some are more important then others and should be here first, like templates.
-      /// Most of other docs refs to them.
+      /// Synchronizing documents is done in certain order, according to [steps].
       ///
       /// Doing it using such loop allows us to now have to query all cached documents for
       /// checking if something is cached or not.
       for (var stepIndex = 0; stepIndex < totalSyncSteps; stepIndex++) {
         final baseProgress = completedSteps * progressPerStep;
 
-        // In the final pass, `documentType` will be null, which signals _sync
-        // to handle all remaining documents not covered by the explicit prioritizedDocumentTypes.
-        final documentType = prioritizedDocumentTypes.elementAtOrNull(stepIndex);
-        final filters = requestIndexFilters.copyWith(type: Optional(documentType));
+        final filters = steps[stepIndex];
 
         final result = await _sync(
           pool: pool,
@@ -83,10 +73,10 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
             DocumentBaseType.category,
           },
           excludeIds: _syncExcludeIds(
-            prioritizedDocumentTypes,
+            stepsDocumentTypes,
             excludeTypes: [
               // Current document type should not be excluded from sync
-              ?documentType,
+              ?filters.type,
             ],
             additionalTypes: [
               // Category parameters are not documents so have to be excluded,
@@ -311,14 +301,5 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
       newDocumentsCount: documents.length,
       failedDocumentsCount: failures,
     );
-  }
-}
-
-extension on DocumentsSyncRequest {
-  List<DocumentType> get prioritizedDocumentTypes {
-    return switch (this) {
-      CampaignSyncRequest() => [DocumentType.proposalTemplate, DocumentType.commentTemplate],
-      TargetSyncRequest() => const [],
-    };
   }
 }
