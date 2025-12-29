@@ -207,7 +207,7 @@ final class SyncManagerImpl implements SyncManager {
       if (!_isDisposed && timer.isActive) {
         // Strip periodicity for the instance added to the queue to avoid recursion
         final oneTimeRequest = request.copyWith(periodic: const Optional.empty());
-        _logger.info('Queueing schedule sync $oneTimeRequest');
+        _logger.info('Queueing scheduled $oneTimeRequest');
         queue(oneTimeRequest);
       }
     });
