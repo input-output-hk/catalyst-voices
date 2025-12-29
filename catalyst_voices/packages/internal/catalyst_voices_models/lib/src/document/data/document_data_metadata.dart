@@ -126,7 +126,7 @@ final class DocumentDataMetadata extends Equatable {
   }) {
     return DocumentDataMetadata(
       type: DocumentType.proposalTemplate,
-      contentType: DocumentContentType.json,
+      contentType: DocumentContentType.schemaJson,
       selfRef: selfRef,
       parameters: parameters,
     );

@@ -92,10 +92,10 @@ final class SignedDocumentMapper {
   static DocumentContentType _mapContentTypeFromCose(CoseMediaType? type) {
     return switch (type) {
       CoseMediaType.json => DocumentContentType.json,
+      CoseMediaType.schemaJson => DocumentContentType.schemaJson,
       // Note: Spec supports Markdown/HTML, but Domain model currently treats them as unknown.
       CoseMediaType.cbor ||
       CoseMediaType.cddl ||
-      CoseMediaType.schemaJson ||
       CoseMediaType.css ||
       CoseMediaType.cssHandlebars ||
       CoseMediaType.html ||
@@ -111,6 +111,7 @@ final class SignedDocumentMapper {
   static CoseMediaType? _mapContentTypeToCose(DocumentContentType type) {
     return switch (type) {
       DocumentContentType.json => CoseMediaType.json,
+      DocumentContentType.schemaJson => CoseMediaType.schemaJson,
       DocumentContentType.unknown => null,
     };
   }

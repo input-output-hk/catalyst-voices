@@ -219,9 +219,19 @@ final class DocumentDataMetadataDto {
       return json;
     } else {
       final modified = Map.of(json);
-      modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
+      final type = _tryParseDocumentType(json['type']);
+      final contentType = type?.contentType ?? DocumentContentType.json;
+      modified['contentType'] = DocumentContentType.toJson(contentType);
       return modified;
     }
+  }
+
+  static DocumentType? _tryParseDocumentType(Object? object) {
+    if (object is String) {
+      return DocumentType.fromJson(object);
+    }
+
+    return null;
   }
 }
 

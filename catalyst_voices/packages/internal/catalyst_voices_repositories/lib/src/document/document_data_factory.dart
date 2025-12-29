@@ -12,6 +12,7 @@ final class DocumentDataFactory {
   static DocumentData create(SignedDocument document) {
     final content = switch (document.payload) {
       SignedDocumentJsonPayload(:final data) => DocumentDataContent(data),
+      SignedDocumentJsonSchemaPayload(:final data) => DocumentDataContent(data),
       SignedDocumentUnknownPayload() => throw UnknownDocumentContentTypeException(
         type: document.metadata.contentType,
       ),

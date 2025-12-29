@@ -44,7 +44,7 @@ final class CoseHeaderKeys {
   static const kid = CborSmallInt(4);
 
   /// The header key for "content encoding".
-  static final contentEncoding = CborString('Content-Encoding');
+  static final contentEncoding = CborString('content-encoding');
 
   /// The header key for "type".
   static final type = CborString('type');
