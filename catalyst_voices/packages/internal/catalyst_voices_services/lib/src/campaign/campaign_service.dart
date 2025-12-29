@@ -144,8 +144,8 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Future<void> setActiveCampaign(Campaign campaign) async {
     final currentActiveCampaignId = campaign.id;
-    final observedCampaignIdChanged =
-        _activeCampaignObserver.campaign?.id != currentActiveCampaignId;
+    final previouslyObserverActiveCampaignId = _activeCampaignObserver.campaign?.id;
+    final observedCampaignIdChanged = previouslyObserverActiveCampaignId != currentActiveCampaignId;
 
     _activeCampaignObserver.campaign = campaign;
 
@@ -255,13 +255,9 @@ final class CampaignServiceImpl implements CampaignService {
     return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
   }
 
-  Future<Campaign?> _fetchInitialActiveCampaign() async {
-    // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = await getCampaign(id: initialActiveCampaignRef.id);
-
-    await setActiveCampaign(campaign);
-
-    return campaign;
+  // TODO(LynxLynxx): Call backend to get latest active campaign
+  Future<Campaign?> _fetchInitialActiveCampaign() {
+    return getCampaign(id: initialActiveCampaignRef.id);
   }
 
   Future<Campaign?> _getCampaignWithCategory(SignedDocumentRef ref) async {

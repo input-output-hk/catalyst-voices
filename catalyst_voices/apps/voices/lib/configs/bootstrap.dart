@@ -111,6 +111,10 @@ Future<BootstrapArgs> bootstrap({
   }
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
+
+  // TODO(damian-molinski): If starts at proposal just request proposal sync first.
+  final effectiveInitialLocation = router.routeInformationProvider.value.uri;
+  debugPrint('effectiveInitialLocation -> $effectiveInitialLocation');
   unawaited(_initCampaign());
 
   return BootstrapArgs(
