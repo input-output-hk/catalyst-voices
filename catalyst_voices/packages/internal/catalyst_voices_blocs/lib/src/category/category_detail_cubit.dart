@@ -96,6 +96,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState>
 
   void watchActiveCampaignCategories() {
     unawaited(_categoriesSub?.cancel());
+    // TODO(LynxLynxx): We should probably look for a campaign that this category is from and not just the active campaign
     _categoriesSub = _campaignService.watchActiveCampaign
         .map((event) => event?.categories)
         .distinct(listEquals)
