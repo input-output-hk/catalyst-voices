@@ -332,7 +332,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
 
-  // TODO(damian-molinski): consider also checking with remote source.
   @override
   Future<DocumentRef?> getLatestOf({required DocumentRef id}) async {
     final draft = await _drafts.getLatestRefOf(id);
@@ -340,7 +339,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       return draft;
     }
 
-    return _localDocuments.getLatestRefOf(id);
+    return _getSignedDocumentAndCacheAs<DocumentRef?>(
+      ref: id.toSignedDocumentRef().toLoose(),
+      fromCache: Future.value,
+      fromDocument: (document) => document.id,
+    );
   }
 
   @override
