@@ -102,8 +102,7 @@ Future<BootstrapArgs> bootstrap({
 
   final router = buildAppRouter(initialLocation: initialLocation);
 
-  // Observer is very noisy on Logger. Enable it only if you want to debug
-  // something
+  // Observer is very noisy on Logger. Enable it only if you want to debug something
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
   if (config.stressTest.isEnabled && config.stressTest.clearDatabase) {
@@ -112,10 +111,7 @@ Future<BootstrapArgs> bootstrap({
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
 
-  // TODO(damian-molinski): If starts at proposal just request proposal sync first.
-  final effectiveInitialLocation = router.routeInformationProvider.value.uri;
-  debugPrint('effectiveInitialLocation -> $effectiveInitialLocation');
-  unawaited(_initCampaign());
+  unawaited(_initDocuments(router));
 
   return BootstrapArgs(
     routerConfig: router,
@@ -287,6 +283,22 @@ Future<void> _initCryptoUtils() async {
   CatalystPrivateKey.factory = const Bip32Ed25519XCatalystPrivateKeyFactory();
   CatalystPublicKey.factory = const Bip32Ed25519XCatalystPublicKeyFactory();
   CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
+}
+
+Future<void> _initDocuments(GoRouter router) async {
+  final effectiveInitialLocation = router.routeInformationProvider.value.uri;
+  final isProposalRoute = ProposalRoute.isPath(effectiveInitialLocation);
+  if (isProposalRoute) {
+    final route = ProposalRoute.fromPath(effectiveInitialLocation);
+    final routeRef = route.ref;
+    if (routeRef.isSigned) {
+      final request = TargetSyncRequest(routeRef.toSignedDocumentRef());
+      Dependencies.instance.get<SyncManager>().queue(request);
+    }
+  }
+
+  // TODO(damian-molinski): de-copule campaign init from sync.
+  unawaited(_initCampaign());
 }
 
 Future<void> _initReportingService(SentryConfig sentryConfig) async {
