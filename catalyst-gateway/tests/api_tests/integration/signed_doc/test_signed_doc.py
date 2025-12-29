@@ -1,6 +1,7 @@
 import pytest
 from utils.rbac_chain import rbac_chain_factory
 from utils.admin import admin_key
+import json
 from utils.signed_doc import (
     proposal_doc_factory,
 )
@@ -75,6 +76,19 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
+@pytest.mark.preprod_indexing
+def test_document_put_validation_failed(proposal_doc_factory, rbac_chain_factory):
+    with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
+        proposal_template_content = json.load(json_file)
+        proposal_template_content["definitions"]["segment"]["properties"]["proposer"] = { "type": "boolean" }
+    try:
+        proposal_doc_factory(proposal_template_content)
+        assert False # Document published successfully - expected 422 validation
+    except AssertionError as e:
+        if "422" in str(e):
+            pass
+        else:
+            raise
 
 @pytest.mark.preprod_indexing
 def test_document_index_endpoint(
