@@ -5572,6 +5572,105 @@ void main() {
                 // does not list user as collaborator.
                 expect(result.items, isEmpty);
               });
+
+              test('.any() matches all collaborators regardless of action status', () async {
+                // Given: Three proposals with collab in different states
+                final p1Ver = _buildUuidV7At(earliest);
+                final p2Ver = _buildUuidV7At(middle);
+                final p3Ver = _buildUuidV7At(latest);
+
+                // P1: Pending (no action)
+                final proposal1 = _createTestDocumentEntity(
+                  id: p1Ver,
+                  ver: p1Ver,
+                  authors: [author],
+                  collaborators: [collab],
+                );
+
+                // P2: Accepted (draft action)
+                final proposal2 = _createTestDocumentEntity(
+                  id: p2Ver,
+                  ver: p2Ver,
+                  authors: [author],
+                  collaborators: [collab],
+                );
+
+                final actionDraft = _createTestDocumentEntity(
+                  id: 'action-draft',
+                  ver: _buildUuidV7At(middle.add(const Duration(seconds: 1))),
+                  type: DocumentType.proposalActionDocument,
+                  refId: proposal2.doc.id,
+                  refVer: proposal2.doc.ver,
+                  authors: [collab],
+                  contentData: ProposalSubmissionActionDto.draft.toJson(),
+                );
+
+                // P3: Rejected (hide action)
+                final proposal3 = _createTestDocumentEntity(
+                  id: p3Ver,
+                  ver: p3Ver,
+                  authors: [author],
+                  collaborators: [collab],
+                );
+
+                final actionHide = _createTestDocumentEntity(
+                  id: 'action-hide',
+                  ver: _buildUuidV7At(latest.add(const Duration(seconds: 1))),
+                  type: DocumentType.proposalActionDocument,
+                  refId: proposal3.doc.id,
+                  refVer: proposal3.doc.ver,
+                  authors: [collab],
+                  contentData: ProposalSubmissionActionDto.hide.toJson(),
+                );
+
+                await db.documentsV2Dao.saveAll([
+                  proposal1,
+                  proposal2,
+                  actionDraft,
+                  proposal3,
+                  actionHide,
+                ]);
+
+                // When: Using .any() to match all collaborations
+                final result = await dao.getProposalsBriefPage(
+                  request: const PageRequest(page: 0, size: 10),
+                  filters: ProposalsFiltersV2(
+                    relationships: {
+                      CollaborationInvitation.any(collab),
+                    },
+                  ),
+                );
+
+                // Then: Should match all three proposals
+                expect(result.items, hasLength(3));
+                final ids = result.items.map((e) => e.proposal.id).toSet();
+                expect(ids, containsAll([p1Ver, p2Ver, p3Ver]));
+              });
+
+              test('.any() does not match non-collaborators', () async {
+                // Given: Proposal where only 'collab' is listed (not 'stranger')
+                final pVer = _buildUuidV7At(latest);
+                final proposal = _createTestDocumentEntity(
+                  id: pVer,
+                  ver: pVer,
+                  authors: [author],
+                  collaborators: [collab],
+                );
+                await db.documentsV2Dao.saveAll([proposal]);
+
+                // When: Using .any() to search for stranger
+                final result = await dao.getProposalsBriefPage(
+                  request: const PageRequest(page: 0, size: 10),
+                  filters: ProposalsFiltersV2(
+                    relationships: {
+                      CollaborationInvitation.any(stranger),
+                    },
+                  ),
+                );
+
+                // Then: Should not find any proposals
+                expect(result.items, isEmpty);
+              });
             });
 
             group('Combined (OR logic)', () {
