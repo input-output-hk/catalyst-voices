@@ -19,6 +19,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
 
   StreamSubscription<List<CampaignCategory>?>? _categoriesSub;
   StreamSubscription<CampaignCategoryTotalAsk>? _selectedCategoryTotalAskSub;
+  StreamSubscription<DateTime?>? _proposalSubmissionDeadlineSub;
 
   CategoryDetailCubit(
     this._campaignService,
@@ -31,6 +32,9 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
 
     await _selectedCategoryTotalAskSub?.cancel();
     _selectedCategoryTotalAskSub = null;
+
+    await _proposalSubmissionDeadlineSub?.cancel();
+    _proposalSubmissionDeadlineSub = null;
 
     await super.close();
   }
@@ -81,6 +85,21 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
         .listen(_handleCategoriesChange);
   }
 
+  void watchProposalSubmissionDeadline() {
+    unawaited(_proposalSubmissionDeadlineSub?.cancel());
+    _proposalSubmissionDeadlineSub = _campaignService.watchActiveCampaign
+        .map((campaign) {
+          try {
+            return campaign?.phaseStateTo(CampaignPhaseType.proposalSubmission).phase.timeline.to;
+          } catch (error) {
+            _logger.warning('Failed to get proposal submission deadline: $error');
+            return null;
+          }
+        })
+        .distinct()
+        .listen(_handleProposalSubmissionDeadlineChange);
+  }
+
   void _handleCategoriesChange(List<CampaignCategory>? categories) {
     _cache = _cache.copyWith(categories: Optional(categories));
     _updateCategoriesState();
@@ -90,6 +109,12 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     _logger.finest('Category total ask changed: $data');
     _cache = _cache.copyWith(selectedCategoryTotalAsk: Optional(data));
     _updateSelectedCategoryState();
+  }
+
+  void _handleProposalSubmissionDeadlineChange(DateTime? deadline) {
+    _logger.finest('Proposal submission deadline changed: $deadline');
+    _cache = _cache.copyWith(submissionCloseAt: Optional(deadline));
+    emit(state.copyWith(submissionCloseAt: Optional(deadline)));
   }
 
   void _updateCategoriesState() {

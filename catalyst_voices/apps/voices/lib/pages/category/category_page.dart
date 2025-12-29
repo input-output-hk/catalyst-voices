@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/typedefs.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
-import 'package:catalyst_voices/pages/category/card_information.dart';
 import 'package:catalyst_voices/pages/category/category_detail_view.dart';
 import 'package:catalyst_voices/pages/category/draggable_sheet_category_information.dart';
+import 'package:catalyst_voices/pages/category/widgets/card_information/card_information.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
@@ -217,7 +217,9 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
-    final cubit = context.read<CategoryDetailCubit>()..watchActiveCampaignCategories();
+    final cubit = context.read<CategoryDetailCubit>()
+      ..watchActiveCampaignCategories()
+      ..watchProposalSubmissionDeadline();
     unawaited(cubit.getCategoryDetail(widget.categoryRef));
     _listenForProposalRef(cubit);
   }
