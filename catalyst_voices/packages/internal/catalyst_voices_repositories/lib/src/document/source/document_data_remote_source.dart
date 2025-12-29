@@ -226,7 +226,17 @@ extension on DocumentRefForFilteredDocuments {
 
 extension on DocumentIndexList {
   Iterable<DocumentIndexListDto> get _docs {
-    return docs.cast<Map<String, dynamic>>().map(DocumentIndexListDto.fromJson);
+    return docs.map((doc) {
+      if (doc is Map<String, dynamic>) {
+        return DocumentIndexListDto.fromJson(doc);
+      }
+
+      if (doc is DocumentIndexListDto) {
+        return doc;
+      }
+
+      return null;
+    }).nonNulls;
   }
 
   DocumentIndex toModel() {
