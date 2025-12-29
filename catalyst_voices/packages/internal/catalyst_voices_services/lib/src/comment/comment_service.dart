@@ -57,11 +57,10 @@ final class CommentServiceImpl implements CommentService {
   Future<SignedDocumentRef> submitComment({
     required DocumentData document,
   }) async {
-    assert(
-      document.metadata.selfRef is SignedDocumentRef,
-      'Drafts not supported for comments',
-    );
-
+    if (document.metadata.selfRef is SignedDocumentRef) {
+      throw ArgumentError('Drafts not supported for comments');
+    }
+    
     await _signerService.useVoterCredentials((catalystId, privateKey) {
       return _commentRepository.publishComment(
         document: document,
