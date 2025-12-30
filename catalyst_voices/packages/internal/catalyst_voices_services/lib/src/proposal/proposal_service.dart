@@ -63,9 +63,9 @@ abstract interface class ProposalService {
     required DocumentRef id,
   });
 
-  /// Similar to [watchProposal] but also will synchronise any missing documents for [id].
+  /// Similar to [watchProposal] but also will synchronize any missing documents for [id].
   ///
-  /// If document with [id] is not found locally it will try to synchronise and get it remotely and
+  /// If document with [id] is not found locally it will try to synchronize and get it remotely and
   /// when such document is not found remotely null will be returned.
   ///
   /// If [id] is a [DraftRef] then [activeAccount] must be non null and author of such document,
