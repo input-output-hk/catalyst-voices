@@ -23,6 +23,8 @@ final class Schema4 extends i0.VersionedSchema {
     idxDocumentsV2RefIdVer,
     idxDocumentsV2TypeIdCreatedAt,
     idxDocumentsV2TypeRefIdRefVer,
+    idxDocumentsV2TypeCreatedAt,
+    idxDocumentsV2TypeTemplate,
     idxDocumentAuthorsComposite,
     idxDocumentAuthorsIdentity,
     idxDocumentAuthorsUsername,
@@ -30,6 +32,10 @@ final class Schema4 extends i0.VersionedSchema {
     idxDocumentCollaboratorsIdentity,
     idxDocumentCollaboratorsUsername,
     idxDocumentParametersComposite,
+    idxLocalMetadataFavorite,
+    idxLocalDraftsTypeAuthors,
+    idxLocalDraftsTypeId,
+    idxLocalDraftsCreatedAt,
   ];
   late final Shape0 documentsV2 = Shape0(
     source: i0.VersionedTable(
@@ -184,6 +190,14 @@ final class Schema4 extends i0.VersionedSchema {
     'idx_documents_v2_type_ref_id_ref_ver',
     'CREATE INDEX idx_documents_v2_type_ref_id_ref_ver ON documents_v2 (type, ref_id, ref_ver)',
   );
+  final i1.Index idxDocumentsV2TypeCreatedAt = i1.Index(
+    'idx_documents_v2_type_created_at',
+    'CREATE INDEX idx_documents_v2_type_created_at ON documents_v2 (type, created_at)',
+  );
+  final i1.Index idxDocumentsV2TypeTemplate = i1.Index(
+    'idx_documents_v2_type_template',
+    'CREATE INDEX idx_documents_v2_type_template ON documents_v2 (type, template_id, template_ver)',
+  );
   final i1.Index idxDocumentAuthorsComposite = i1.Index(
     'idx_document_authors_composite',
     'CREATE INDEX idx_document_authors_composite ON document_authors (document_id, document_ver, account_significant_id)',
@@ -211,6 +225,22 @@ final class Schema4 extends i0.VersionedSchema {
   final i1.Index idxDocumentParametersComposite = i1.Index(
     'idx_document_parameters_composite',
     'CREATE INDEX idx_document_parameters_composite ON document_parameters (document_id, document_ver, id, ver)',
+  );
+  final i1.Index idxLocalMetadataFavorite = i1.Index(
+    'idx_local_metadata_favorite',
+    'CREATE INDEX idx_local_metadata_favorite ON documents_local_metadata (is_favorite)',
+  );
+  final i1.Index idxLocalDraftsTypeAuthors = i1.Index(
+    'idx_local_drafts_type_authors',
+    'CREATE INDEX idx_local_drafts_type_authors ON local_documents_drafts (type, authors_significant)',
+  );
+  final i1.Index idxLocalDraftsTypeId = i1.Index(
+    'idx_local_drafts_type_id',
+    'CREATE INDEX idx_local_drafts_type_id ON local_documents_drafts (type, id)',
+  );
+  final i1.Index idxLocalDraftsCreatedAt = i1.Index(
+    'idx_local_drafts_created_at',
+    'CREATE INDEX idx_local_drafts_created_at ON local_documents_drafts (created_at)',
   );
 }
 

@@ -32,6 +32,8 @@ import 'package:drift/drift.dart';
 @TableIndex(name: 'idx_documents_v2_ref_id_ver', columns: {#refId, #ver})
 @TableIndex(name: 'idx_documents_v2_type_id_created_at', columns: {#type, #id, #createdAt})
 @TableIndex(name: 'idx_documents_v2_type_ref_id_ref_ver', columns: {#type, #refId, #refVer})
+@TableIndex(name: 'idx_documents_v2_type_created_at', columns: {#type, #createdAt})
+@TableIndex(name: 'idx_documents_v2_type_template', columns: {#type, #templateId, #templateVer})
 class DocumentsV2 extends Table with DocumentTableContentMixin, DocumentTableMetadataMixin {
   /// Timestamp extracted from [ver] field.
   /// Represents when this version was created.

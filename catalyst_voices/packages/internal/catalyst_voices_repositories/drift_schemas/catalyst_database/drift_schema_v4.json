@@ -919,6 +919,41 @@
     {
       "id": 14,
       "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_created_at",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "created_at"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_template",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "template_id",
+          "template_ver"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "references": [
         1
       ],
       "type": "index",
@@ -935,7 +970,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 17,
       "references": [
         1
       ],
@@ -951,7 +986,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 18,
       "references": [
         1
       ],
@@ -967,7 +1002,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 19,
       "references": [
         3
       ],
@@ -985,7 +1020,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 20,
       "references": [
         3
       ],
@@ -1001,7 +1036,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 21,
       "references": [
         3
       ],
@@ -1017,7 +1052,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 22,
       "references": [
         4
       ],
@@ -1032,6 +1067,72 @@
           "document_ver",
           "id",
           "ver"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "references": [
+        5
+      ],
+      "type": "index",
+      "data": {
+        "on": 5,
+        "name": "idx_local_metadata_favorite",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "is_favorite"
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_local_drafts_type_authors",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "authors_significant"
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_local_drafts_type_id",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_local_drafts_created_at",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "created_at"
         ]
       }
     }
