@@ -226,8 +226,8 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     if (activeCampaign == null) {
       return;
     }
-    final request = CampaignSyncRequest(activeCampaign);
-    _syncManager.queue(request);
+    // Non periodic request, no need to cancel periodic one.
+    _syncManager.queue(CampaignSyncRequest(activeCampaign));
   }
 
   void _handleSyncStatsChanged(SyncStatsChangedEvent event, Emitter<DevToolsState> emit) {
