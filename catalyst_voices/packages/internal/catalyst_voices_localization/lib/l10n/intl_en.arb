@@ -1307,6 +1307,10 @@
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
   },
+  "errorWalletBalance": "Couldn't find wallet balance",
+  "@errorWalletBalance": {
+    "description": "Error message shown when trying to find wallet balance but got error response."
+  },
   "errorWalletLinkAccountChange": "Wallet account change",
   "@errorWalletLinkAccountChange": {
     "description": "Error message shown when wallet account has changed"

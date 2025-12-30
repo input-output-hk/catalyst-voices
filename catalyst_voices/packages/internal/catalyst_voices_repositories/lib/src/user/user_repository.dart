@@ -91,9 +91,13 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
 
-    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
+    final publicProfile = await _getAccountPublicProfile(
+      token: rbacToken,
+    ).onError<ForbiddenException>((_, _) => null);
+
     final username =
         publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
+
     final votingPower = await _getVotingPower(token: rbacToken);
 
     return RecoverableAccount(

@@ -14,6 +14,8 @@ extension FutureResponseMapper<T> on Future<T> {
           throw NotFoundException(message: message);
         } else if (statusCode == ApiResponseStatusCode.unauthorized) {
           throw UnauthorizedException(message: message);
+        } else if (statusCode == ApiResponseStatusCode.forbidden) {
+          throw ForbiddenException(message: message);
         } else if (statusCode == ApiResponseStatusCode.conflict) {
           throw ResourceConflictException(message: message);
         }

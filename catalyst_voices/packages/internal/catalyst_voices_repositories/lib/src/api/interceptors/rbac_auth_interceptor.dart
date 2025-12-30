@@ -16,7 +16,8 @@ final _logger = Logger('RbacAuthInterceptor');
 /// - 403: The token is valid, we know who they are but either the timestamp is
 /// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor extends Interceptor {
-  static const _retryCountHeaderName = 'Rbac-Retry-Count';
+  static const _retryCountExtra = 'Rbac-Retry-Count';
+  static const _interceptorAuthExtra = 'Rbac-Interceptor-Auth';
   static const _retryStatusCodes = [401, 403];
   static const _maxRetries = 1;
 
@@ -27,38 +28,45 @@ final class RbacAuthInterceptor extends Interceptor {
   @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     final statusCode = err.response?.statusCode;
-    if (statusCode != null && _retryStatusCodes.contains(statusCode)) {
-      try {
-        final options = err.requestOptions;
-        final rawRetryCount = options.headers[_retryCountHeaderName];
-        final retryCount = int.tryParse(rawRetryCount?.toString() ?? '') ?? 0;
-
-        if (retryCount >= _maxRetries) {
-          _logger.severe('Giving up on ${options.uri} auth retry[$retryCount]');
-          return handler.next(err);
-        }
-
-        final newToken = await _authTokenProvider.createRbacToken(forceRefresh: true);
-
-        if (newToken == null) {
-          throw StateError(
-            'Could not create a new RBAC token, '
-            'did the keychain become locked in the meantime?',
-          );
-        }
-
-        options.headers[HttpHeaders.authorization] = newToken.authHeader();
-        options.headers[_retryCountHeaderName] = '${retryCount + 1}';
-
-        final response = await Dio().fetch<dynamic>(options);
-        return handler.resolve(response);
-      } catch (error, stack) {
-        _logger.severe('Re-authentication failed', error, stack);
-        return handler.next(err);
-      }
+    if (statusCode == null || !_retryStatusCodes.contains(statusCode)) {
+      handler.next(err);
+      return;
     }
 
-    handler.next(err);
+    final options = err.requestOptions;
+
+    // If authorization came from different source. eg direct token lookup, don't try to
+    // force token from _authTokenProvider as it may be locked or null.
+    if (!options.extra.containsKey(_interceptorAuthExtra)) {
+      handler.next(err);
+      return;
+    }
+
+    final rawRetryCount = options.extra[_retryCountExtra];
+    final retryCount = int.tryParse(rawRetryCount?.toString() ?? '') ?? 0;
+    if (retryCount >= _maxRetries) {
+      _logger.severe('Giving up on ${options.uri} auth retry[$retryCount]');
+      return handler.next(err);
+    }
+
+    try {
+      final newToken = await _authTokenProvider.createRbacToken(forceRefresh: true);
+      if (newToken == null) {
+        throw StateError(
+          'Could not create a new RBAC token, '
+          'did the keychain become locked in the meantime?',
+        );
+      }
+
+      options.headers[HttpHeaders.authorization] = newToken.authHeader();
+      options.extra[_retryCountExtra] = '${retryCount + 1}';
+
+      final response = await Dio().fetch<dynamic>(options);
+      return handler.resolve(response);
+    } catch (error, stack) {
+      _logger.severe('Re-authentication failed', error, stack);
+      return handler.next(err);
+    }
   }
 
   @override
@@ -78,6 +86,8 @@ final class RbacAuthInterceptor extends Interceptor {
     }
 
     options.headers[HttpHeaders.authorization] = token.authHeader();
+    options.extra[_interceptorAuthExtra] = true;
+
     handler.next(options);
   }
 }

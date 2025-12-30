@@ -66,6 +66,7 @@ export 'document/validation/document_validation_result.dart';
 export 'document/validation/document_validator.dart';
 export 'document/values/grouped_tags.dart';
 export 'errors/errors.dart';
+export 'errors/forbidden_exception.dart';
 export 'errors/sync_exception.dart';
 export 'feature_flags/feature_app_environment_type_setting.dart';
 export 'feature_flags/feature_flag.dart';
