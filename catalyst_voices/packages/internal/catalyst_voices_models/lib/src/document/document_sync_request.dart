@@ -75,6 +75,9 @@ final class ParametersSyncRequest extends DocumentsSyncRequest {
     super.periodic,
   });
 
+  const ParametersSyncRequest.commentTemplate(this.parameters)
+    : type = DocumentType.commentTemplate;
+
   @override
   List<Object?> get props => [parameters, type, periodic];
 

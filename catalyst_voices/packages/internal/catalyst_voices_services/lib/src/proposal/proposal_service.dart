@@ -299,17 +299,14 @@ final class ProposalServiceImpl implements ProposalService {
     final isCached = id.isExact && await _documentRepository.isCached(id: id);
     if (!isCached) {
       await _syncManager.complete(TargetSyncRequest(id.toSignedDocumentRef().toLoose()));
+
       final metadata = await _documentRepository
           .getDocumentMetadata(id: id)
           .then<DocumentDataMetadata?>((value) => value)
           .onError<DocumentNotFoundException>((_, _) => null);
 
-      if (metadata != null) {
-        final request = ParametersSyncRequest(
-          metadata.parameters,
-          type: DocumentType.commentTemplate,
-        );
-        await _syncManager.complete(request);
+      if (metadata != null && metadata.parameters.isNotEmpty) {
+        await _syncManager.complete(ParametersSyncRequest.commentTemplate(metadata.parameters));
       }
     }
 

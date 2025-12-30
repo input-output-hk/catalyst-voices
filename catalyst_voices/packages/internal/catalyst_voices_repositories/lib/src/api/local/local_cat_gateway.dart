@@ -456,6 +456,7 @@ extension on SignedDocumentMetadata {
       reply: reply?.asIndex,
       template: template?.asIndex,
       category: categoryId?.asIndex,
+      parameters: categoryId?.asIndex,
     );
   }
 }

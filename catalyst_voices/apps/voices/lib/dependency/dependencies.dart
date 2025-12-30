@@ -306,6 +306,8 @@ final class Dependencies extends DependencyProvider {
         () => ProposalRepository(
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
+          get<CatGatewayDocumentDataSource>(),
+          get<DatabaseDocumentsDataSource>(),
           get<DatabaseDocumentsDataSource>(),
           get<CastedVotesObserver>(),
           get<VotingBallotBuilder>(),

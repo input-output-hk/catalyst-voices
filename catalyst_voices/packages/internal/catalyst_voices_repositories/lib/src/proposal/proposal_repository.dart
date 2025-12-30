@@ -21,6 +21,8 @@ abstract interface class ProposalRepository {
   const factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
+    DocumentDataRemoteSource documentRemoteSource,
+    SignedDocumentDataSource documentLocalSource,
     ProposalDocumentDataLocalSource proposalsLocalSource,
     CastedVotesObserver castedVotesObserver,
     VotingBallotBuilder ballotBuilder,
@@ -156,6 +158,8 @@ abstract interface class ProposalRepository {
 final class ProposalRepositoryImpl implements ProposalRepository {
   final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
+  final DocumentDataRemoteSource _documentRemoteSource;
+  final SignedDocumentDataSource _documentLocalSource;
   final ProposalDocumentDataLocalSource _proposalsLocalSource;
   final CastedVotesObserver _castedVotesObserver;
   final VotingBallotBuilder _ballotBuilder;
@@ -163,6 +167,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   const ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
+    this._documentRemoteSource,
+    this._documentLocalSource,
     this._proposalsLocalSource,
     this._castedVotesObserver,
     this._ballotBuilder,
@@ -603,28 +609,40 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalDataV2?> _assembleProposalData(
     _ProposalDataComponents components,
   ) async {
-    final rawProposal = components.$1;
+    var rawProposal = components.$1;
 
     if (rawProposal == null) {
       return null;
     }
 
+    if (rawProposal.template == null && rawProposal.proposal.metadata.template != null) {
+      final templateId = rawProposal.proposal.metadata.template!;
+      final template = await _documentRemoteSource.get(templateId).onError((_, _) => null);
+      if (template != null) {
+        await _documentLocalSource.save(data: template);
+
+        rawProposal = rawProposal.copyWith(template: Optional(template));
+      }
+    }
+
     final draftVotesMap = Map.fromEntries(components.$2.map((e) => MapEntry(e.proposal, e)));
     final castedVotesMap = Map.fromEntries(components.$3.map((e) => MapEntry(e.proposal, e)));
 
-    final proposalId = rawProposal.proposal.id;
+    final proposalData = rawProposal.proposal;
     final templateData = rawProposal.template;
 
     final proposalOrDocument = templateData == null
-        ? ProposalOrDocument.data(rawProposal.proposal)
+        ? ProposalOrDocument.data(proposalData)
         : () {
             final template = ProposalTemplateFactory.create(templateData);
             final proposal = ProposalDocumentFactory.create(
-              rawProposal.proposal,
+              proposalData,
               template: template,
             );
             return ProposalOrDocument.proposal(proposal);
           }();
+
+    final proposalId = proposalData.id;
     final draftVote = draftVotesMap[proposalId];
     final castedVote = castedVotesMap[proposalId];
 
