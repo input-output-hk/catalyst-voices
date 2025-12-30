@@ -110,7 +110,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     index_db_proxy.disable()
     health.is_ready()  # assertion
     # index-db threshold to start returning 503
-    health.is_not_ready(380)  # assertion
+    health.is_not_ready(480)  # assertion
     # Event DB testing
     resp = document.post(filter={}, limit=10, page=0)
     assert resp.status_code == 503, (

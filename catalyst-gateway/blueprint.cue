@@ -85,34 +85,28 @@ project: {
 										key:  "url"
 									}
 								}
-								"EVENT_DB_MAX_CONNECTIONS_SIZE": {
-									secret: {
-										name: "gateway"
-										key:  "db-max-connections"
-									}
+								"EVENT_DB_MAX_CONNECTIONS": {
+									value: string | *"150"
 								}
-								"EVENT_DB_MAX_LIFETIME": {
-									secret: {
-										name: "gateway"
-										key:  "db-max-lifetime"
-									}
+								"EVENT_DB_CONN_TIMEOUT": {
+									value: string | *"5s"
 								}
-								"EVENT_DB_MIN_IDLE": {
-									secret: {
-										name: "gateway"
-										key:  "db-min-idle"
-									}
+								"EVENT_DB_SLOT_WAIT_TIMEOUT": {
+									value: string | *"5s"
 								}
-								"EVENT_DB_CONNECTION_TIMEOUT": {
-									secret: {
-										name: "gateway"
-										key:  "db-connection-timeout"
-									}
+								"EVENT_DB_CONN_RECYCLE_TIMEOUT": {
+									value: string | *"5s"
 								}
 								"INTERNAL_API_KEY": {
 									secret: {
 										name: "gateway"
 										key:  "api-key"
+									}
+								}
+								"ADMIN_CATALYST_ID": {
+									secret: {
+										name: "gateway"
+										key:  "admin-catalyst-id"
 									}
 								}
 							}
@@ -182,9 +176,13 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
-									tag:  _ @forge(name="GIT_HASH_OR_TAG")
+									tag:  "v1.0.0"
 								}
 								env: {
+									RETRY_DELAY: {
+										// 5 minutes
+										value: string | *"300"
+									}
 									ENVIRONMENT: {
 										value: string | *_env
 									}
@@ -192,6 +190,42 @@ project: {
 										secret: {
 											name: "gateway"
 											key:  "api-key"
+										}
+									}
+								}
+							}
+						}
+						"setup-fund-documents": {
+							argo: {
+								hook: {
+									type: "PostSync"
+									deletePolicy: ["BeforeHookCreation"]
+								}
+							}
+							hashName: false
+							containers: main: {
+								image: {
+									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/setup-fund-documents"
+									tag:  "v1.0.0"
+								}
+								env: {
+									RETRY_DELAY: {
+										// 5 minutes
+										value: string | *"300"
+									}
+									ENVIRONMENT: {
+										value: string | *_env
+									}
+									API_KEY: {
+										secret: {
+											name: "gateway"
+											key:  "api-key"
+										}
+									}
+									CAT_GATEWAY_ADMIN_PRIVATE_KEY: {
+										secret: {
+											name: "gateway"
+											key:  "admin-private-key"
 										}
 									}
 								}
@@ -208,7 +242,7 @@ project: {
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
-									tag:  _ @forge(name="GIT_HASH_OR_TAG")
+									tag:  "v3.0.0"
 								}
 								env: {
 									DB_HOST: {
@@ -258,6 +292,9 @@ project: {
 									}
 									WITH_MIGRATIONS: {
 										value: string | *"true"
+									}
+									WITH_SEED_DATA: {
+										value: "."
 									}
 								}
 							}

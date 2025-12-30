@@ -58,7 +58,10 @@ services:
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - INTERNAL_API_KEY=123
       # cspell: disable
-      - SIGNED_DOC_ADMIN_KEY=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
+      - ADMIN_CATALYST_ID=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=cat-gateway
+      - TELEMETRY_ENABLED=true
       # cspell: enable
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
@@ -69,3 +72,31 @@ services:
         condition: service_healthy
       index-db:
         condition: service_healthy
+      jaeger:
+        condition: service_started
+      prometheus:
+        condition: service_started
+
+  jaeger:
+    image: jaegertracing/jaeger:2.12.0
+    container_name: jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    volumes:
+      - ./jaeger.config.yaml:/jaeger/config.yaml
+    ports:
+      - "13133:13133" # Health check
+      - "16685:16685" # gRPC UI
+      - "16686:16686" # Web UI
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8888:8888"   # OTLP Metrics exporter endpoint
+    command: "--config /jaeger/config.yaml"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"

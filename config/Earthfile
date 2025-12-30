@@ -1,9 +1,9 @@
 VERSION 0.8
 
-ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.10 AS python-ci
 
 package:
-    FROM ${REGISTRY}/astral-sh/uv:python3.13-bookworm-slim
+    FROM python-ci+python-base
 
     WORKDIR /app
 
