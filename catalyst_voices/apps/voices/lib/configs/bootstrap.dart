@@ -26,15 +26,19 @@ const ReportingService _reportingService = _shouldUseSentry
 const _shouldUseSentry = kReleaseMode;
 
 var _bootstrapInitState = const _BootstrapState();
+var _initialLocation = Uri();
 
 final _loggerBootstrap = Logger('Bootstrap');
 final _loggerFlutter = Logger('Flutter');
 final _loggerPlatformDispatcher = Logger('PlatformDispatcher');
 final _loggerUncaughtZone = Logger('UncaughtZone');
+
 final _loggingService = LoggingService();
 
 @visibleForTesting
 AppConfig? get appConfig => _bootstrapInitState.appConfig;
+
+Uri get initialLocation => _initialLocation;
 
 @visibleForTesting
 LoggingService get loggingService => _loggingService;
@@ -101,6 +105,7 @@ Future<BootstrapArgs> bootstrap({
   );
 
   final router = buildAppRouter(initialLocation: initialLocation);
+  _initialLocation = router.routeInformationProvider.value.uri;
 
   // Observer is very noisy on Logger. Enable it only if you want to debug something
   Bloc.observer = AppBlocObserver(logOnChange: false);
@@ -111,7 +116,7 @@ Future<BootstrapArgs> bootstrap({
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
 
-  unawaited(_initDocuments(router));
+  unawaited(_initDocuments());
 
   return BootstrapArgs(
     routerConfig: router,
@@ -275,7 +280,7 @@ Future<void> _initCryptoUtils() async {
   CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
 }
 
-Future<void> _initDocuments(GoRouter router) async {
+Future<void> _initDocuments() async {
   try {
     final requests = <DocumentsSyncRequest>[];
 
@@ -286,10 +291,9 @@ Future<void> _initDocuments(GoRouter router) async {
       requests.add(CampaignSyncRequest.periodic(activeCampaign));
     }
 
-    final effectiveInitialLocation = router.routeInformationProvider.value.uri;
-    final isProposalRoute = ProposalRoute.isPath(effectiveInitialLocation);
+    final isProposalRoute = ProposalRoute.isPath(initialLocation);
     if (isProposalRoute) {
-      final route = ProposalRoute.fromPath(effectiveInitialLocation);
+      final route = ProposalRoute.fromPath(initialLocation);
       final routeRef = route.ref;
       if (routeRef.isSigned) {
         requests.insert(0, TargetSyncRequest(routeRef.toSignedDocumentRef()));

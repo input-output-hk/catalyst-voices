@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
+import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_linear_progress_indicator.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_loading_indicator.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -181,7 +184,9 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
 
   Future<void> _handleDocumentsSync(SyncManager syncManager) async {
     final activeRequest = syncManager.activeRequest;
-    if (activeRequest == null) {
+    final isInitialProposalRoute = ProposalRoute.isPath(initialLocation);
+
+    if (activeRequest == null || (isInitialProposalRoute && activeRequest is! TargetSyncRequest)) {
       _isWaitingForDocumentsSync = false;
       return;
     }
