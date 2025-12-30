@@ -382,7 +382,7 @@ final class ProposalServiceImpl implements ProposalService {
     // There is a system requirement to publish fresh documents,
     // where version timestamp is not older than a predefined interval.
     // Because of it we're regenerating a version just before publishing.
-    final freshRef = originalRef.fresh();
+    final freshRef = originalRef.fresh().toSignedDocumentRef();
     final freshDocument = document.copyWithSelfRef(selfRef: freshRef);
 
     await _signerService.useProposerCredentials(
@@ -399,7 +399,7 @@ final class ProposalServiceImpl implements ProposalService {
       await _proposalRepository.deleteDraftProposal(originalRef);
     }
 
-    return freshRef.toSignedDocumentRef();
+    return freshRef;
   }
 
   @override

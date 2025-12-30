@@ -3,6 +3,8 @@ import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign
 import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_timeline.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_timeline.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/fx_static_campaign_categories.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/fx_static_campaign_timeline.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -12,12 +14,12 @@ final class Campaign extends Equatable {
   // They're only used to difference between campaigns.
   static const f14Ref = SignedDocumentRef.first('01997695-e26f-70db-b9d4-92574a806bcd');
   static const f15Ref = SignedDocumentRef.first('0199802c-21b4-7d91-986d-0e913cd81391');
-  static const dynamicF15Ref = SignedDocumentRef.first('019b2c80-47fa-7634-ac50-0b1317313369');
+  static const fXRef = SignedDocumentRef.first('019b4b08-6b39-7ec1-8ae5-6696f28e370c');
 
   static final all = <Campaign>[
     Campaign.f14(),
     Campaign.f15(),
-    Campaign.dynamicF15(),
+    Campaign.fX(),
   ];
 
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
@@ -43,26 +45,6 @@ final class Campaign extends Equatable {
     required this.categories,
     required this.publish,
   });
-
-  factory Campaign.dynamicF15() {
-    return Campaign(
-      selfRef: dynamicF15Ref,
-      name: 'Catalyst Fund15',
-      description: '''TODO''',
-      allFunds: MultiCurrencyAmount.list([
-        Currencies.ada.amount(20000000),
-        Currencies.usdm.amount(250000),
-      ]),
-      totalAsk: MultiCurrencyAmount.list([
-        Money.zero(currency: Currencies.ada),
-        Money.zero(currency: Currencies.usdm),
-      ]),
-      fundNumber: 15,
-      timeline: f15StaticCampaignTimeline,
-      publish: CampaignPublish.published,
-      categories: f15DynamicCampaignCategories,
-    );
-  }
 
   factory Campaign.f14() {
     return Campaign(
@@ -96,6 +78,26 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       timeline: f15StaticCampaignTimeline,
       publish: CampaignPublish.published,
       categories: f15StaticCampaignCategories,
+    );
+  }
+
+  factory Campaign.fX() {
+    return Campaign(
+      selfRef: fXRef,
+      name: 'Catalyst Next Fund',
+      description: '''TODO''',
+      allFunds: MultiCurrencyAmount.list([
+        Currencies.ada.amount(20000000),
+        Currencies.usdm.amount(250000),
+      ]),
+      totalAsk: MultiCurrencyAmount.list([
+        Money.zero(currency: Currencies.ada),
+        Money.zero(currency: Currencies.usdm),
+      ]),
+      fundNumber: 16,
+      timeline: fXStaticCampaignTimeline,
+      publish: CampaignPublish.published,
+      categories: fXStaticCampaignCategories,
     );
   }
 

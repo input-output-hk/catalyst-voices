@@ -96,6 +96,7 @@ final class CoseHeaders extends Equatable {
     var map = _decodeCbor(value);
     map = _migrateCbor1(map);
     map = _migrateCbor2(map);
+    map = _migrateCbor3(map);
 
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
@@ -278,6 +279,21 @@ final class CoseHeaders extends Equatable {
     if (map.containsKey(CoseHeaderKeys.collabs)) {
       final modified = CborMap.fromEntries(map.entries, tags: map.tags, type: map.type);
       modified[CoseHeaderKeys.collaborators] = map.remove(CoseHeaderKeys.collabs)!;
+      return modified;
+    } else {
+      return map;
+    }
+  }
+
+  /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
+  ///
+  /// Migrate "Content-Encoding" into "content-encoding".
+  static CborMap _migrateCbor3(CborMap map) {
+    final oldKey = CborString('Content-Encoding');
+    final newKey = CoseHeaderKeys.contentEncoding;
+    if (map.containsKey(oldKey)) {
+      final modified = CborMap.fromEntries(map.entries, tags: map.tags, type: map.type);
+      modified[newKey] = map.remove(oldKey)!;
       return modified;
     } else {
       return map;

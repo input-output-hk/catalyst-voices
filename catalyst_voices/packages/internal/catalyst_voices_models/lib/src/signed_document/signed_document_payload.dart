@@ -22,6 +22,24 @@ final class SignedDocumentJsonPayload extends SignedDocumentPayload {
   Uint8List toBytes() => Uint8List.fromList(json.fuse(utf8).encode(data));
 }
 
+final class SignedDocumentJsonSchemaPayload extends SignedDocumentPayload {
+  final Map<String, dynamic> data;
+
+  const SignedDocumentJsonSchemaPayload(this.data);
+
+  factory SignedDocumentJsonSchemaPayload.fromBytes(Uint8List bytes) {
+    final decoded = json.fuse(utf8).decode(bytes);
+
+    return SignedDocumentJsonSchemaPayload(decoded! as Map<String, dynamic>);
+  }
+
+  @override
+  List<Object?> get props => [data];
+
+  @override
+  Uint8List toBytes() => Uint8List.fromList(json.fuse(utf8).encode(data));
+}
+
 /// Represents [SignedDocument] payload. Type of payload depends on a
 /// [DocumentDataMetadata.contentType] and subclasses
 /// of [SignedDocumentPayload] are meant to reflect that.
@@ -40,6 +58,7 @@ sealed class SignedDocumentPayload extends Equatable {
   }) {
     return switch (contentType) {
       DocumentContentType.json => SignedDocumentJsonPayload.fromBytes(bytes),
+      DocumentContentType.schemaJson => SignedDocumentJsonSchemaPayload.fromBytes(bytes),
       DocumentContentType.unknown => SignedDocumentUnknownPayload(bytes),
     };
   }
