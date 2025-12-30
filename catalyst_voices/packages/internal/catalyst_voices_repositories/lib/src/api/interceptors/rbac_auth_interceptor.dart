@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 final _logger = Logger('RbacAuthInterceptor');
 
@@ -16,8 +17,10 @@ final _logger = Logger('RbacAuthInterceptor');
 /// - 403: The token is valid, we know who they are but either the timestamp is
 /// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor extends Interceptor {
-  static const _retryCountExtra = 'Rbac-Retry-Count';
-  static const _interceptorAuthExtra = 'Rbac-Interceptor-Auth';
+  @visibleForTesting
+  static const retryCountExtra = 'Rbac-Retry-Count';
+  @visibleForTesting
+  static const interceptorAuthExtra = 'Rbac-Interceptor-Auth';
   static const _retryStatusCodes = [401, 403];
   static const _maxRetries = 1;
 
@@ -37,12 +40,12 @@ final class RbacAuthInterceptor extends Interceptor {
 
     // If authorization came from different source. eg direct token lookup, don't try to
     // force token from _authTokenProvider as it may be locked or null.
-    if (!options.extra.containsKey(_interceptorAuthExtra)) {
+    if (!options.extra.containsKey(interceptorAuthExtra)) {
       handler.next(err);
       return;
     }
 
-    final rawRetryCount = options.extra[_retryCountExtra];
+    final rawRetryCount = options.extra[retryCountExtra];
     final retryCount = int.tryParse(rawRetryCount?.toString() ?? '') ?? 0;
     if (retryCount >= _maxRetries) {
       _logger.severe('Giving up on ${options.uri} auth retry[$retryCount]');
@@ -59,7 +62,7 @@ final class RbacAuthInterceptor extends Interceptor {
       }
 
       options.headers[HttpHeaders.authorization] = newToken.authHeader();
-      options.extra[_retryCountExtra] = '${retryCount + 1}';
+      options.extra[retryCountExtra] = '${retryCount + 1}';
 
       final response = await Dio().fetch<dynamic>(options);
       return handler.resolve(response);
@@ -86,7 +89,7 @@ final class RbacAuthInterceptor extends Interceptor {
     }
 
     options.headers[HttpHeaders.authorization] = token.authHeader();
-    options.extra[_interceptorAuthExtra] = true;
+    options.extra[interceptorAuthExtra] = true;
 
     handler.next(options);
   }
