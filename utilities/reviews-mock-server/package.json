@@ -1,0 +1,25 @@
+{
+  "name": "reviews-mock-server",
+  "version": "0.1.0",
+  "description": "Mock server for the Catalyst Reviews API using Prism + Express overrides.",
+  "main": "server.js",
+  "scripts": {
+    "prism": "prism mock ../../catalyst_voices/packages/internal/catalyst_voices_repositories/openapi/cat-reviews.json -p 4010",
+    "prism:watch": "nodemon --watch ../../catalyst_voices/packages/internal/catalyst_voices_repositories/openapi/cat-reviews.json --ext json --exec \"npm run prism\"",
+    "server": "node server.js",
+    "dev": "concurrently -k \"npm run prism:watch\" \"npm run server\""
+  },
+  "keywords": [],
+  "author": "Catalyst Voices - QA Team",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "concurrently": "^9.2.1",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^3.0.5"
+  },
+  "devDependencies": {
+    "@stoplight/prism-cli": "^5.14.2",
+    "nodemon": "^3.1.11"
+  }
+}

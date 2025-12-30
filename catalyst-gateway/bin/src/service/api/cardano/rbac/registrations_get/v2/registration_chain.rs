@@ -41,8 +41,8 @@ pub struct RbacRegistrationChainV2 {
     #[oai(skip_serializing_if_is_empty)]
     roles: RbacRoleList,
     /// A list of invalid registrations.
-    #[oai(skip_serializing_if_is_empty)]
-    invalid: InvalidRegistrationList,
+    #[oai(skip_serializing_if_is_none)]
+    invalid: Option<InvalidRegistrationList>,
     /// A list of stake addresses of the chain.
     #[oai(skip_serializing_if_is_empty)]
     stake_addresses: StakeAddressInfoList,
@@ -56,7 +56,7 @@ impl Example for RbacRegistrationChainV2 {
             last_persistent_txn: Some(TxnId::example()),
             last_volatile_txn: Some(TxnId::example()),
             roles: RbacRoleList::example(),
-            invalid: InvalidRegistrationList::example(),
+            invalid: Some(InvalidRegistrationList::example()),
             stake_addresses: StakeAddressInfoList::example(),
         }
     }
@@ -73,6 +73,7 @@ impl RbacRegistrationChainV2 {
             return Ok(None);
         }
 
+        let invalid = (!invalid.is_empty()).then_some(invalid);
         let mut last_persistent_txn = None;
         let mut last_volatile_txn = None;
         let mut purpose = Vec::new().into();
