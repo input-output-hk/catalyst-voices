@@ -3,8 +3,20 @@ import 'dart:convert';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:convert/convert.dart';
+import 'package:drift/drift.dart';
 
 final class SignedDocumentMapper {
+  /// A temporary map of [DocumentRef.id] (uuidv7) to [CoseDocumentLocator.cid] (hex).
+  ///
+  /// Allows to map documents to their document locators.
+  // TODO(dt-iohk): instead of hardcoding, parse or calculate the CID
+  // and pass it to the document parameters when publishing a document.
+  static const Map<String, String> _documentIdToCidMap = {
+    '019b2b86-7507-7b95-929e-74e3bffb030d':
+        '015512207fcfec2e5a60f061cf26959c032799cf842bcf94c1fce648a1aec8096a150797',
+  };
+
   SignedDocumentMapper._();
 
   /// Maps domain [DocumentDataMetadata] into [CoseHeaders].
@@ -73,6 +85,15 @@ final class SignedDocumentMapper {
     }
   }
 
+  static CoseDocumentLocator _getDocumentLocatorForRef(DocumentRef ref) {
+    final customCid = _documentIdToCidMap[ref.id];
+    if (customCid != null) {
+      return CoseDocumentLocator(cid: Uint8List.fromList(hex.decode(customCid)));
+    }
+
+    return CoseDocumentLocator.fallback();
+  }
+
   static List<CatalystId>? _mapCollaboratorsFromCose(
     CoseCollaborators? collaborators,
   ) {
@@ -135,7 +156,7 @@ final class SignedDocumentMapper {
     return CoseDocumentRef.optional(
       documentId: ref.id.asUuidV7,
       documentVer: (ref.version ?? ref.id).asUuidV7,
-      documentLocator: CoseDocumentLocator.fallback(),
+      documentLocator: _getDocumentLocatorForRef(ref),
     );
   }
 
