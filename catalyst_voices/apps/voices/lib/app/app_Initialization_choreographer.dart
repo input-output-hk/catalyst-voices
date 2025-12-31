@@ -23,18 +23,18 @@ final class AppInitializationChoreographer {
     final initialDoc = isProposalInitialLocation
         ? ProposalRoute.fromPath(initialLocation).ref
         : null;
-    final prioritiseDoc = initialDoc != null && initialDoc.isSigned
+    final priorityDoc = initialDoc != null && initialDoc.isSigned
         ? initialDoc.toSignedDocumentRef()
         : null;
 
-    await _syncDocuments(prioritiseDoc: prioritiseDoc);
+    await _syncDocuments(priorityDoc: priorityDoc);
   }
 
-  Future<void> _syncDocuments({SignedDocumentRef? prioritiseDoc}) async {
+  Future<void> _syncDocuments({SignedDocumentRef? priorityDoc}) async {
     final requests = <DocumentsSyncRequest>[];
 
-    if (prioritiseDoc != null) {
-      requests.add(TargetSyncRequest(prioritiseDoc));
+    if (priorityDoc != null) {
+      requests.add(TargetSyncRequest(priorityDoc));
     }
 
     final campaignService = Dependencies.instance.get<CampaignService>();
