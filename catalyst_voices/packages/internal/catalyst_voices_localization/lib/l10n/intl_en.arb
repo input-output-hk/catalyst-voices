@@ -89,6 +89,10 @@
   "@acknowledgeToResubmitProposal": {
     "description": "Information for user that he needs to resubmit his proposal. "
   },
+  "actionTypes": "Action Types:",
+  "@actionTypes": {
+    "description": "Label for action types tabs"
+  },
   "active": "Active",
   "@active": {
     "description": "Activated state"
@@ -172,6 +176,10 @@
   "apiErrorUnknown": "Unknown error response",
   "@apiErrorUnknown": {
     "description": "A fallback error message when api returns error code"
+  },
+  "approvals": "Approvals",
+  "@approvals": {
+    "description": "Label for approvals tab"
   },
   "approve": "Approve",
   "@approve": {
@@ -1547,6 +1555,10 @@
   "@exportProposalsIndividually": {
     "description": "Title for section informing user that they can export their proposals individually"
   },
+  "external": "External",
+  "@external": {
+    "description": "label for external tab"
+  },
   "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
   "@failedAuthenticationDescription": {
     "description": "Description for failed authentication reason to not find wallet"
@@ -2028,6 +2040,10 @@
   "myActions": "My Actions",
   "@myActions": {
     "description": "CTA to open My Actions side bar"
+  },
+  "myActionsPageHeader": "Find your place in Catalyst by exploring ways to participate, set up your preferences and help shape Cardano’s future.",
+  "@myActionsPageHeader": {
+    "description": "The header text on the My Actions page."
   },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
@@ -3329,6 +3345,10 @@
   "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
   "@richTextEditorImageSupportInfo": {
     "description": "Information about supported image sources in the editor"
+  },
+  "role": "Role",
+  "@role": {
+    "description": "Label for role tab"
   },
   "safariNotSupportedMessage": "Safari is not supported, please use Chrome or Firefox.",
   "@safariNotSupportedMessage": {

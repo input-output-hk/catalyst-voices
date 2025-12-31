@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/actions/actions_page.dart';
+import 'package:catalyst_voices/pages/actions/actions/actions_page.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/co_proposers_consent_page.dart';
 import 'package:catalyst_voices/pages/actions/proposal_approval/proposal_approval_page.dart';
