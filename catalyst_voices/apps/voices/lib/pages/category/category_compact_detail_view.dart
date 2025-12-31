@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/category/category_brief.dart';
-import 'package:catalyst_voices/pages/category/category_description_expandable_list.dart';
+import 'package:catalyst_voices/pages/category/widgets/category_description_expandable_list.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
