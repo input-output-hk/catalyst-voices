@@ -44,6 +44,11 @@ abstract interface class CatalystDatabase {
 
   ProposalsV2Dao get proposalsV2Dao;
 
+  /// Analyzes the database to gather statistics and potentially optimize it.
+  ///
+  /// This can be a long-running operation, so it should be used judiciously,
+  /// for example, during application startup or in a background process
+  /// for maintenance.
   Future<void> analyze();
 
   /// Removes all data from this db.

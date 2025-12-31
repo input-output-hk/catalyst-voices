@@ -207,7 +207,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       if (isFavorite) {
         await _proposalService.addFavoriteProposal(id: ref);
       } else {
-        await _proposalService.removeFavoriteProposal(ref: ref);
+        await _proposalService.removeFavoriteProposal(id: ref);
       }
     } catch (error, stack) {
       _logger.severe('Updating proposal[$ref] favorite failed', error, stack);

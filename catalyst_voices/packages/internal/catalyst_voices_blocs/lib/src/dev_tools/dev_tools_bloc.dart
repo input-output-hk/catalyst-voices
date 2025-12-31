@@ -82,7 +82,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     final previousCampaign = state.campaign.activeCampaign;
     try {
       emit(state.copyWithActiveCampaign(event.campaign));
-      await _campaignService.setActiveCampaign(event.campaign);
+      await _campaignService.changeActiveCampaign(event.campaign);
     } catch (error, stackTrace) {
       _logger.severe('handleChangeActiveCampaign', error, stackTrace);
       emit(state.copyWithActiveCampaign(previousCampaign));
@@ -221,12 +221,13 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _syncStartsSub = null;
   }
 
-  Future<void> _handleSyncDocuments(SyncDocumentsEvent event, Emitter<DevToolsState> emit) async {
-    try {
-      await _syncManager.start();
-    } catch (error, stack) {
-      _logger.warning('Sync failed', error, stack);
+  void _handleSyncDocuments(SyncDocumentsEvent event, Emitter<DevToolsState> emit) {
+    final activeCampaign = state.campaign.activeCampaign;
+    if (activeCampaign == null) {
+      return;
     }
+    // Non periodic request, no need to cancel periodic one.
+    _syncManager.queue(CampaignSyncRequest(activeCampaign));
   }
 
   void _handleSyncStatsChanged(SyncStatsChangedEvent event, Emitter<DevToolsState> emit) {

@@ -9,6 +9,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/widgets/my_actions_menu_item_tile.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/widgets/menu/voices_raw_popup_menu.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -276,7 +277,7 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with 
       case _Lock():
         unawaited(context.read<SessionCubit>().lock());
       case _MyActionsEvent():
-      // TODO(LynxLynxx): call new My Actions side sheet
+        unawaited(const ActionsRoute().push(context));
     }
   }
 }

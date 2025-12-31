@@ -12,6 +12,7 @@ export 'dev_tools/dev_tools_repository.dart' show DevToolsRepository;
 export 'dev_tools/dev_tools_storage.dart';
 export 'document/document_mapper.dart' show DocumentMapperImpl;
 export 'document/document_repository.dart' show DocumentRepository;
+export 'document/documents_synchronizer.dart' show DocumentsSynchronizer;
 export 'document/exception/document_exception.dart';
 export 'document/source/database_documents_data_source.dart';
 export 'document/source/database_drafts_data_source.dart';

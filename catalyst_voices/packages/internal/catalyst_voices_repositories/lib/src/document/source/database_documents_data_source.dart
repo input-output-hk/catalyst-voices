@@ -117,6 +117,21 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<RawProposal?> getLocalRawProposalData({
+    required DocumentRef id,
+    CatalystId? originalAuthor,
+  }) {
+    // If author is null, return null future as verification that author can see this version
+    if (originalAuthor == null) {
+      return Future.value();
+    }
+
+    return _database.proposalsV2Dao
+        .getLocalRawProposal(id: id, author: originalAuthor)
+        .then((data) => data?.toModel());
+  }
+
+  @override
   Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) {
     return _database.documentsV2Dao.getDocumentMetadata(ref).then((value) => value?.toModel());
   }
@@ -132,6 +147,15 @@ final class DatabaseDocumentsDataSource
     required ProposalsTotalAskFilters filters,
   }) {
     return _database.proposalsV2Dao.getProposalsTotalTask(filters: filters, nodeId: nodeId);
+  }
+
+  @override
+  Future<RawProposal?> getRawProposalData({required DocumentRef id}) {
+    final tr = _profiler.startTransaction('Query proposal: $id');
+    return _database.proposalsV2Dao.getProposal(id: id).then((value) {
+      if (!tr.finished) unawaited(tr.finish());
+      return value?.toModel();
+    });
   }
 
   @override
@@ -224,6 +248,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  }) {
+    return _database.proposalsV2Dao.watchLocalDraftProposalsCount(author: author).distinct();
+  }
+
+  @override
   Stream<RawProposal?> watchLocalRawProposalData({
     required DocumentRef id,
     CatalystId? originalAuthor,
@@ -279,13 +310,6 @@ final class DatabaseDocumentsDataSource
         .watchLocalDraftsProposalsBrief(author: author)
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
-  }
-
-  @override
-  Stream<int> watchLocalDraftProposalsCount({
-    required CatalystId author,
-  }) {
-    return _database.proposalsV2Dao.watchLocalDraftProposalsCount(author: author).distinct();
   }
 
   @override

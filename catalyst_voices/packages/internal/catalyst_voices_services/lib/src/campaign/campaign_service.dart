@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
@@ -21,10 +21,17 @@ abstract interface class CampaignService {
   const factory CampaignService(
     CampaignRepository campaignRepository,
     ProposalRepository proposalRepository,
+    DocumentRepository documentRepository,
     ActiveCampaignObserver activeCampaignObserver,
+    SyncManager syncManager,
   ) = CampaignServiceImpl;
 
   Stream<Campaign?> get watchActiveCampaign;
+
+  Future<void> changeActiveCampaign(
+    Campaign campaign, {
+    bool sync,
+  });
 
   Future<Campaign?> getActiveCampaign();
 
@@ -32,15 +39,13 @@ abstract interface class CampaignService {
 
   Future<List<Campaign>> getAllCampaigns();
 
-  Future<Campaign> getCampaign({
-    required String id,
-  });
+  Future<Campaign> getCampaign({required String id});
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
 
-  Future<void> setActiveCampaign(Campaign campaign);
+  Future<Campaign?> initActiveCampaign();
 
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters});
 
@@ -50,12 +55,16 @@ abstract interface class CampaignService {
 final class CampaignServiceImpl implements CampaignService {
   final CampaignRepository _campaignRepository;
   final ProposalRepository _proposalRepository;
+  final DocumentRepository _documentRepository;
   final ActiveCampaignObserver _activeCampaignObserver;
+  final SyncManager _syncManager;
 
   const CampaignServiceImpl(
     this._campaignRepository,
     this._proposalRepository,
+    this._documentRepository,
     this._activeCampaignObserver,
+    this._syncManager,
   );
 
   @override
@@ -64,6 +73,31 @@ final class CampaignServiceImpl implements CampaignService {
       await _fetchInitialActiveCampaign();
     }
     yield* _activeCampaignObserver.watchCampaign;
+  }
+
+  @override
+  Future<void> changeActiveCampaign(
+    Campaign campaign, {
+    bool sync = true,
+  }) async {
+    final observedCampaignId = _activeCampaignObserver.campaign?.id;
+    final observedCampaignIdChanged = observedCampaignId != campaign.id;
+    _activeCampaignObserver.campaign = campaign;
+
+    await _updateAppActiveCampaign(campaign);
+
+    if (sync && observedCampaignIdChanged) {
+      final activeRequestsForCancellation = {
+        ..._syncManager.pendingRequests.whereType<CampaignSyncRequest>(),
+        ..._syncManager.scheduledRequests.whereType<CampaignSyncRequest>(),
+      };
+
+      for (final request in activeRequestsForCancellation) {
+        _syncManager.cancel(request);
+      }
+
+      _syncManager.queue(CampaignSyncRequest.periodic(campaign));
+    }
   }
 
   @override
@@ -90,16 +124,14 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<List<Campaign>> getAllCampaigns() async {
-    final campaigns = await _campaignRepository.getAllCampaigns();
-    return campaigns.map(_updateSubmissionCloseDate).wait;
+    return _campaignRepository.getAllCampaigns();
   }
 
   @override
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    final campaign = await _campaignRepository.getCampaign(id: id);
-    return _updateSubmissionCloseDate(campaign);
+    return _campaignRepository.getCampaign(id: id);
   }
 
   @override
@@ -110,21 +142,7 @@ final class CampaignServiceImpl implements CampaignService {
         message: 'Did not find category with ref $ref',
       );
     }
-
-    final campaign = await _getCampaignWithCategory(ref);
-    if (campaign == null) {
-      throw NotFoundException(
-        message: 'Did not find campaign which contains the category with ref $ref',
-      );
-    }
-
-    final proposalSubmissionStage = campaign.getPhaseTimeline(
-      CampaignPhaseType.proposalSubmission,
-    );
-
-    return category.copyWith(
-      submissionCloseDate: proposalSubmissionStage.timeline.to,
-    );
+    return category;
   }
 
   @override
@@ -133,8 +151,14 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<void> setActiveCampaign(Campaign campaign) async {
+  Future<Campaign?> initActiveCampaign() async {
+    final campaign = await _fetchInitialActiveCampaign();
+
+    await _updateAppActiveCampaign(campaign);
+
     _activeCampaignObserver.campaign = campaign;
+
+    return campaign;
   }
 
   @override
@@ -216,11 +240,9 @@ final class CampaignServiceImpl implements CampaignService {
     return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
   }
 
-  Future<Campaign?> _fetchInitialActiveCampaign() async {
-    // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = await getCampaign(id: initialActiveCampaignRef.id);
-    _activeCampaignObserver.campaign = campaign;
-    return campaign;
+  // TODO(LynxLynxx): Call backend to get latest active campaign
+  Future<Campaign?> _fetchInitialActiveCampaign() {
+    return getCampaign(id: initialActiveCampaignRef.id);
   }
 
   Future<Campaign?> _getCampaignWithCategory(SignedDocumentRef ref) async {
@@ -228,19 +250,23 @@ final class CampaignServiceImpl implements CampaignService {
     return allCampaigns.firstWhereOrNull((campaign) => campaign.hasCategory(ref.id));
   }
 
-  Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
-    final proposalSubmissionTime = campaign
-        .phaseStateTo(CampaignPhaseType.proposalSubmission)
-        .phase
-        .timeline
-        .to;
+  Future<void> _updateAppActiveCampaign(Campaign? campaign) async {
+    final appActiveCampaignId = await _campaignRepository.getAppActiveCampaignId();
+    if (appActiveCampaignId == campaign?.id) {
+      return;
+    }
 
-    final updatedCategories = campaign.categories
-        .map((e) => e.copyWith(submissionCloseDate: proposalSubmissionTime))
-        .toList();
+    _logger.fine(
+      'Updating active campaign from '
+      '[$appActiveCampaignId] '
+      'to '
+      '[${campaign?.id}]!',
+    );
 
-    return campaign.copyWith(
-      categories: updatedCategories,
+    await _campaignRepository.updateAppActiveCampaignId(id: campaign?.id);
+    await _documentRepository.removeAll(
+      excludeTypes: [DocumentType.proposalTemplate],
+      localDrafts: false,
     );
   }
 }

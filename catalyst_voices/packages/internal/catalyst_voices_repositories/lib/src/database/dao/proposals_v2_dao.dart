@@ -156,19 +156,16 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<DocumentEntityV2?> getProposal(DocumentRef ref) async {
-    final query = select(documentsV2)
-      ..where((tbl) => tbl.id.equals(ref.id) & tbl.type.equals(DocumentType.proposalDocument.uuid));
+  Future<RawProposalEntity?> getLocalRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftRawProposal(id: id, author: author).getSingleOrNull();
+  }
 
-    if (ref.isExact) {
-      query.where((tbl) => tbl.ver.equals(ref.ver!));
-    } else {
-      query
-        ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
-        ..limit(1);
-    }
-
-    return query.getSingleOrNull();
+  @override
+  Future<RawProposalEntity?> getProposal({required DocumentRef id}) async {
+    return _queryProposal(id).getSingleOrNull();
   }
 
   /// Retrieves a paginated list of proposals with resolved status and enriched data.
@@ -1363,23 +1360,14 @@ abstract interface class ProposalsV2Dao {
     required NodeId nodeId,
   });
 
-  /// Retrieves a single proposal by its reference.
-  ///
-  /// Filters by type == proposalDocument.
-  ///
-  /// **Parameters:**
-  ///   - ref: Document reference with id (required) and version (optional)
-  ///
-  /// **Behavior:**
-  ///   - If ref.isExact (has version): Returns specific version
-  ///   - If ref.isLoose (no version): Returns latest version by createdAt
-  ///   - Returns null if no matching proposal found
-  ///
-  /// **Note:** This method does NOT respect proposal actions (draft/final/hide).
-  /// It returns the raw document data. Use getProposalsBriefPage for status-aware queries.
-  ///
-  /// **Returns:** [DocumentEntityV2] or null
-  Future<DocumentEntityV2?> getProposal(DocumentRef ref);
+  /// Same as [watchLocalRawProposal] but returns single Future.
+  Future<RawProposalEntity?> getLocalRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  });
+
+  /// Same as [watchProposal] but returns single Future.
+  Future<RawProposalEntity?> getProposal({required DocumentRef id});
 
   /// Retrieves a paginated page of proposal briefs with filtering and ordering.
   ///
