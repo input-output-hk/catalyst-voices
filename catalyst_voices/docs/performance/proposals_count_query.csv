@@ -35,3 +35,12 @@ docs_count  ,filer              ,avg_duration    ,PR     ,note
 14008       ,categories         ,0:00:00.162824  ,#3622  ,-
 14008       ,categories:drafts  ,0:00:00.278720  ,#3622  ,-
 14008       ,categories:finals  ,0:00:00.439105  ,#3622  ,-
+712         ,categories         ,0:00:00.069571  ,#3924  ,More Indexes and simpler CTE
+712         ,categories:drafts  ,0:00:00.075321  ,#3924  ,-
+712         ,categories:finals  ,0:00:00.085779  ,#3924  ,-
+7008        ,categories         ,0:00:00.149835  ,#3924  ,-
+7008        ,categories:drafts  ,0:00:00.181711  ,#3924  ,-
+7008        ,categories:finals  ,0:00:00.203579  ,#3924  ,-
+14008       ,categories         ,0:00:00.225034  ,#3924  ,-
+14008       ,categories:drafts  ,0:00:00.340730  ,#3924  ,-
+14008       ,categories:finals  ,0:00:00.433020  ,#3924  ,-
