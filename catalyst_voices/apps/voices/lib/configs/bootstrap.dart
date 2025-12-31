@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
-import 'package:catalyst_voices/app/app_Initialization_choreographer.dart';
+import 'package:catalyst_voices/app/app_initialization_choreographer.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/routes.dart';
