@@ -73,7 +73,12 @@ void main() {
 
     test('401 response code triggers force token update', () async {
       // Given
-      final options = RequestOptions(path: '/test');
+      final options = RequestOptions(
+        path: '/test',
+        extra: {
+          RbacAuthInterceptor.interceptorAuthExtra: true,
+        },
+      );
       final dioError = DioException(
         requestOptions: options,
         response: Response(
@@ -87,12 +92,17 @@ void main() {
 
       // Then
       verify(() => authTokenProvider.createRbacToken(forceRefresh: true)).called(1);
-      expect(options.headers['Rbac-Retry-Count'], '1');
+      expect(options.extra[RbacAuthInterceptor.retryCountExtra], '1');
     });
 
     test('403 response code triggers force token update', () async {
       // Given
-      final options = RequestOptions(path: '/test');
+      final options = RequestOptions(
+        path: '/test',
+        extra: {
+          RbacAuthInterceptor.interceptorAuthExtra: true,
+        },
+      );
       final dioError = DioException(
         requestOptions: options,
         response: Response(
@@ -106,14 +116,14 @@ void main() {
 
       // Then
       verify(() => authTokenProvider.createRbacToken(forceRefresh: true)).called(1);
-      expect(options.headers['Rbac-Retry-Count'], '1');
+      expect(options.extra[RbacAuthInterceptor.retryCountExtra], '1');
     });
 
     test('token refresh gives up after 1st try', () async {
       // Given
       final options = RequestOptions(
         path: '/test',
-        headers: {'Rbac-Retry-Count': '1'},
+        extra: {RbacAuthInterceptor.retryCountExtra: '1'},
       );
       final dioError = DioException(
         requestOptions: options,
@@ -129,7 +139,7 @@ void main() {
       // Then
       verify(() => errorHandler.next(dioError)).called(1);
       verifyNever(() => authTokenProvider.createRbacToken(forceRefresh: true));
-      expect(options.headers['Rbac-Retry-Count'], '1');
+      expect(options.extra[RbacAuthInterceptor.retryCountExtra], '1');
     });
   });
 }
