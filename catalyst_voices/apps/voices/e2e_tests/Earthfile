@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.6.8 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.6.10 AS playwright-ci
 
 # Base setup for E2E test runner using catalyst-ci playwright module
 builder:
@@ -38,6 +38,9 @@ all-images:
     
     # Build voices frontend (without debug symbols for e2e tests)
     BUILD ../../../+docker --UPLOAD_DEBUG_SYMBOLS=false
+    
+    # Build reviews mock server
+    BUILD ../../../../utilities/reviews-mock-server+docker
     
     # Build E2E test runner
     BUILD +docker

@@ -50,7 +50,6 @@ export class NufiActions implements WalletActions {
     // Go to wallet
     await this.page.locator("button:has-text('Go to Wallet')").click();
     await this.page.locator("//*[@data-test-id='close-news-button']").click();
-    await this.page.locator("//button[text()='OK']").click();
     await this.page
       .locator("//div[@data-test-id='formatted-portfolio-value']")
       .waitFor({ state: "visible" });
