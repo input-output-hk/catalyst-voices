@@ -184,6 +184,9 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   List<Object?> get props => [_coseSign, payload, metadata, signers];
 
   @override
+  Uint8List get rawPayload => _coseSign.payload;
+
+  @override
   DocumentArtifact toArtifact() {
     final bytes = cbor.encode(_coseSign.toCbor(tagged: false));
     return DocumentArtifact(Uint8List.fromList(bytes));

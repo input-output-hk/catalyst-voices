@@ -52,8 +52,13 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> acceptCollaboratorInvitation() async {
     try {
+      final ref = _cache.ref;
+      if (ref is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $ref');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.ref!,
+        proposalId: ref,
         action: CollaboratorProposalAction.acceptInvitation,
       );
       if (!isClosed) {
@@ -69,8 +74,13 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> acceptFinalProposal() async {
     try {
+      final ref = _cache.ref;
+      if (ref is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept final proposal of a draft: $ref');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.ref!,
+        proposalId: ref,
         action: CollaboratorProposalAction.acceptFinal,
       );
 
@@ -133,8 +143,13 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> rejectCollaboratorInvitation() async {
     try {
+      final ref = _cache.ref;
+      if (ref is! SignedDocumentRef) {
+        throw ArgumentError('Cannot reject collaborator invitation for a draft proposal: $ref');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.ref!,
+        proposalId: ref,
         action: CollaboratorProposalAction.rejectInvitation,
       );
       if (!isClosed) {
@@ -150,8 +165,13 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> rejectFinalProposal() async {
     try {
+      final ref = _cache.ref;
+      if (ref is! SignedDocumentRef) {
+        throw ArgumentError('Cannot reject reject final proposal of a draft: $ref');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.ref!,
+        proposalId: ref,
         action: CollaboratorProposalAction.rejectFinal,
       );
 

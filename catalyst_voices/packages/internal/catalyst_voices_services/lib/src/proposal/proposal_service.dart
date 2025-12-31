@@ -89,7 +89,7 @@ abstract interface class ProposalService {
   });
 
   Future<void> submitCollaboratorProposalAction({
-    required DocumentRef ref,
+    required SignedDocumentRef proposalId,
     required CollaboratorProposalAction action,
   });
 
@@ -209,21 +209,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> forgetProposal({
     required SignedDocumentRef proposalId,
   }) {
-    return _signerService.useProposerCredentials(
-      (catalystId, privateKey) async {
-        final actionId = SignedDocumentRef.generateFirstRef();
-
-        await _proposalRepository.publishProposalAction(
-          actionId: actionId,
-          proposalId: proposalId,
-          action: ProposalSubmissionAction.hide,
-          catalystId: catalystId,
-          privateKey: privateKey,
-        );
-
-        return actionId;
-      },
-    );
+    return _publishProposalAction(proposalId, ProposalSubmissionAction.hide);
   }
 
   @override
@@ -338,11 +324,21 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> submitCollaboratorProposalAction({
-    required DocumentRef ref,
+    required SignedDocumentRef proposalId,
     required CollaboratorProposalAction action,
   }) async {
-    // TODO(dt-iohk): replace by real implementation once data sources are ready
-    await Future<void>.delayed(const Duration(seconds: 2));
+    switch (action) {
+      case CollaboratorProposalAction.acceptInvitation:
+        await _publishProposalAction(proposalId, ProposalSubmissionAction.draft);
+      case CollaboratorProposalAction.rejectInvitation:
+        await _publishProposalAction(proposalId, ProposalSubmissionAction.hide);
+      case CollaboratorProposalAction.leaveProposal:
+        await _leaveProposalAsCollaborator(proposalId);
+      case CollaboratorProposalAction.acceptFinal:
+        await _publishProposalAction(proposalId, ProposalSubmissionAction.aFinal);
+      case CollaboratorProposalAction.rejectFinal:
+        await _publishProposalAction(proposalId, ProposalSubmissionAction.hide);
+    }
   }
 
   @override
@@ -356,21 +352,7 @@ final class ProposalServiceImpl implements ProposalService {
       );
     }
 
-    return _signerService.useProposerCredentials(
-      (catalystId, privateKey) async {
-        final actionId = SignedDocumentRef.generateFirstRef();
-
-        await _proposalRepository.publishProposalAction(
-          actionId: actionId,
-          proposalId: proposalId,
-          action: ProposalSubmissionAction.aFinal,
-          catalystId: catalystId,
-          privateKey: privateKey,
-        );
-
-        return actionId;
-      },
-    );
+    return _publishProposalAction(proposalId, ProposalSubmissionAction.aFinal);
   }
 
   @override
@@ -607,6 +589,16 @@ final class ProposalServiceImpl implements ProposalService {
     return account.catalystId;
   }
 
+  Future<void> _leaveProposalAsCollaborator(SignedDocumentRef proposalId) async {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) => _proposalRepository.removeCollaboratorFromProposal(
+        proposalId: proposalId,
+        collaboratorId: catalystId,
+        collaboratorKey: privateKey,
+      ),
+    );
+  }
+
   ProposalDataV2? _mergePublicAndLocalProposal(
     DocumentRef id,
     ProposalDataV2? localProposal,
@@ -640,5 +632,26 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return documents.values.sorted((a, b) => a.compareTo(b) * -1);
+  }
+
+  Future<SignedDocumentRef> _publishProposalAction(
+    SignedDocumentRef proposalId,
+    ProposalSubmissionAction action,
+  ) async {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) async {
+        final actionId = SignedDocumentRef.generateFirstRef();
+
+        await _proposalRepository.publishProposalAction(
+          actionId: actionId,
+          proposalId: proposalId,
+          action: action,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+
+        return actionId;
+      },
+    );
   }
 }

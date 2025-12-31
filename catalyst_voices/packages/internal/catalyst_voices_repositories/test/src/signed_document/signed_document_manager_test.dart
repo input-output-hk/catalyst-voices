@@ -30,6 +30,7 @@ void main() {
         );
 
         expect(signedDocument.payload, equals(document));
+        expect(signedDocument.rawPayload, isNotEmpty);
 
         final isVerified = await signedDocument.verifySignature(_catalystId);
         expect(isVerified, isTrue);

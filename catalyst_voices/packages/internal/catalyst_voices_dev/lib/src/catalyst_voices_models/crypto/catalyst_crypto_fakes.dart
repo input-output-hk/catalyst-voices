@@ -8,7 +8,7 @@ class FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override
   final Uint8List bytes;
 
-  FakeCatalystPrivateKey({required this.bytes, this.signature});
+  FakeCatalystPrivateKey({Uint8List? bytes, this.signature}) : bytes = bytes ?? Uint8List(0);
 
   @override
   CatalystSignatureAlgorithm get algorithm => CatalystSignatureAlgorithm.ed25519;
@@ -47,9 +47,10 @@ class FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   final Uint8List bytes;
 
   FakeCatalystPublicKey({
-    required this.bytes,
+    Uint8List? bytes,
     Uint8List? signatureBytes,
-  }) : _signatureBytes = signatureBytes ?? Uint8List.fromList(List.filled(32, 2));
+  }) : bytes = bytes ?? Uint8List(0),
+       _signatureBytes = signatureBytes ?? Uint8List.fromList(List.filled(32, 2));
 
   @override
   Uint8List get publicKeyBytes => bytes;
@@ -74,7 +75,7 @@ class FakeCatalystSignature extends Fake implements CatalystSignature {
   @override
   final Uint8List bytes;
 
-  FakeCatalystSignature({required this.bytes});
+  FakeCatalystSignature({Uint8List? bytes}) : bytes = bytes ?? Uint8List(0);
 }
 
 class FakeCatalystSignatureFactory extends Fake implements CatalystSignatureFactory {

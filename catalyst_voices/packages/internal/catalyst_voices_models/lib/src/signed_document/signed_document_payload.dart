@@ -4,6 +4,18 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
+final class SignedDocumentBinaryPayload extends SignedDocumentPayload {
+  final Uint8List data;
+
+  const SignedDocumentBinaryPayload(this.data);
+
+  @override
+  List<Object?> get props => [data];
+
+  @override
+  Uint8List toBytes() => data;
+}
+
 final class SignedDocumentJsonPayload extends SignedDocumentPayload {
   final Map<String, dynamic> data;
 
