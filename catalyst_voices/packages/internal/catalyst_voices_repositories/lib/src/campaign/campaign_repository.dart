@@ -31,7 +31,7 @@ abstract interface class CampaignRepository {
   /// Stores persistently active campaign [id].
   ///
   /// See [getAppActiveCampaignId].
-  Future<void> updateAppActiveCampaignId({required DocumentRef id});
+  Future<void> updateAppActiveCampaignId({required DocumentRef? id});
 
   Stream<ProposalsTotalAsk> watchProposalsTotalTask({
     required NodeId nodeId,
@@ -87,7 +87,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   }
 
   @override
-  Future<void> updateAppActiveCampaignId({required DocumentRef id}) async {
+  Future<void> updateAppActiveCampaignId({required DocumentRef? id}) async {
     final appMeta = await _appMetaStorage.read();
     final updatedAppMeta = appMeta.copyWith(activeCampaign: Optional(id));
     await _appMetaStorage.write(updatedAppMeta);

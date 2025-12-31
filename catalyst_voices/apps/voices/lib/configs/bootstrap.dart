@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/app/app_Initialization_choreographer.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
-import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -107,16 +106,11 @@ Future<BootstrapArgs> bootstrap({
   final router = buildAppRouter(initialLocation: initialLocation);
   _initialLocation = router.routeInformationProvider.value.uri;
 
-  // Observer is very noisy on Logger. Enable it only if you want to debug something
-  Bloc.observer = AppBlocObserver(logOnChange: false);
-
-  if (config.stressTest.isEnabled && config.stressTest.clearDatabase) {
-    await Dependencies.instance.get<CatalystDatabase>().clear();
+  try {
+    await const AppInitializationChoreographer()(config, _initialLocation);
+  } catch (error, stack) {
+    unawaited(_reportBootstrapError(error, stack));
   }
-
-  Dependencies.instance.get<ReportingServiceMediator>().init();
-
-  unawaited(_initDocuments());
 
   return BootstrapArgs(
     routerConfig: router,
@@ -278,37 +272,6 @@ Future<void> _initCryptoUtils() async {
   CatalystPrivateKey.factory = const Bip32Ed25519XCatalystPrivateKeyFactory();
   CatalystPublicKey.factory = const Bip32Ed25519XCatalystPublicKeyFactory();
   CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
-}
-
-Future<void> _initDocuments() async {
-  try {
-    final requests = <DocumentsSyncRequest>[];
-
-    final service = Dependencies.instance.get<CampaignService>();
-    final activeCampaign = await service.getActiveCampaign();
-    if (activeCampaign != null) {
-      await service.changeActiveCampaign(activeCampaign, sync: false);
-      requests.add(CampaignSyncRequest.periodic(activeCampaign));
-    }
-
-    final isProposalRoute = ProposalRoute.isPath(initialLocation);
-    if (isProposalRoute) {
-      final route = ProposalRoute.fromPath(initialLocation);
-      final routeRef = route.ref;
-      if (routeRef.isSigned) {
-        requests.insert(0, TargetSyncRequest(routeRef.toSignedDocumentRef()));
-      }
-    }
-
-    if (requests.isEmpty) return;
-
-    final manager = Dependencies.instance.get<SyncManager>();
-    for (final request in requests) {
-      manager.queue(request);
-    }
-  } catch (error, stack) {
-    unawaited(_reportBootstrapError(error, stack));
-  }
 }
 
 Future<void> _initReportingService(SentryConfig sentryConfig) async {

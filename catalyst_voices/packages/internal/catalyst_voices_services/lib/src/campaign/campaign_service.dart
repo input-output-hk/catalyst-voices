@@ -45,6 +45,8 @@ abstract interface class CampaignService {
 
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
 
+  Future<Campaign?> initActiveCampaign();
+
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters});
 
   Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref});
@@ -82,21 +84,7 @@ final class CampaignServiceImpl implements CampaignService {
     final observedCampaignIdChanged = observedCampaignId != campaign.id;
     _activeCampaignObserver.campaign = campaign;
 
-    final appActiveCampaignId = await _campaignRepository.getAppActiveCampaignId();
-    if (appActiveCampaignId != campaign.id) {
-      _logger.fine(
-        'Updating active campaign from '
-        '[$appActiveCampaignId] '
-        'to '
-        '[${campaign.id}]!',
-      );
-
-      await _campaignRepository.updateAppActiveCampaignId(id: campaign.id);
-      await _documentRepository.removeAll(
-        excludeTypes: [DocumentType.proposalTemplate],
-        localDrafts: false,
-      );
-    }
+    await _updateAppActiveCampaign(campaign);
 
     if (sync && observedCampaignIdChanged) {
       final activeRequestsForCancellation = {
@@ -176,6 +164,17 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref}) {
     return watchCategoryTotalAsk(ref: ref).first;
+  }
+
+  @override
+  Future<Campaign?> initActiveCampaign() async {
+    final campaign = await _fetchInitialActiveCampaign();
+
+    await _updateAppActiveCampaign(campaign);
+
+    _activeCampaignObserver.campaign = campaign;
+
+    return campaign;
   }
 
   @override
@@ -265,6 +264,26 @@ final class CampaignServiceImpl implements CampaignService {
   Future<Campaign?> _getCampaignWithCategory(SignedDocumentRef ref) async {
     final allCampaigns = await getAllCampaigns();
     return allCampaigns.firstWhereOrNull((campaign) => campaign.hasCategory(ref.id));
+  }
+
+  Future<void> _updateAppActiveCampaign(Campaign? campaign) async {
+    final appActiveCampaignId = await _campaignRepository.getAppActiveCampaignId();
+    if (appActiveCampaignId == campaign?.id) {
+      return;
+    }
+
+    _logger.fine(
+      'Updating active campaign from '
+      '[$appActiveCampaignId] '
+      'to '
+      '[${campaign?.id}]!',
+    );
+
+    await _campaignRepository.updateAppActiveCampaignId(id: campaign?.id);
+    await _documentRepository.removeAll(
+      excludeTypes: [DocumentType.proposalTemplate],
+      localDrafts: false,
+    );
   }
 
   Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
