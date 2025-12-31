@@ -19,7 +19,7 @@ loguru = "^0.7.2"
 asyncpg = "^0.30.0"
 requests = "^2.32.3"
 certifi = "^2025.1.31"
-cbor2 = "^5.6.5"
+cbor2 = "^5.8.0"
 httpx = "^0.28.1"
 cryptography = "^46.0.3"
 
