@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/category/widgets/card_information/submission_close_date_category_detail_text.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/cards/voices_leading_icon_card.dart';
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
-import 'package:catalyst_voices/widgets/text/day_at_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -13,7 +13,6 @@ class CreateProposalCard extends StatelessWidget {
   final String categoryName;
   final List<String> categoryDos;
   final List<String> categoryDonts;
-  final DateTime submissionCloseDate;
 
   const CreateProposalCard({
     super.key,
@@ -21,7 +20,6 @@ class CreateProposalCard extends StatelessWidget {
     required this.categoryName,
     required this.categoryDos,
     required this.categoryDonts,
-    required this.submissionCloseDate,
   });
 
   @override
@@ -49,43 +47,11 @@ class CreateProposalCard extends StatelessWidget {
             donts: categoryDonts,
           ),
           const SizedBox(height: 24),
-          _SubmissionCloseAt(submissionCloseDate),
+          const SubmissionCloseDateCategoryDetailText(),
           const SizedBox(height: 24),
           CreateProposalButton(categoryRef: categoryRef),
         ],
       ),
-    );
-  }
-}
-
-class _SubmissionCloseAt extends StatelessWidget {
-  final DateTime dateTime;
-
-  const _SubmissionCloseAt(this.dateTime);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        VoicesAssets.icons.calendar.buildIcon(),
-        const SizedBox(width: 14),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.proposalsSubmissionClose,
-              style: context.textTheme.bodyMedium,
-            ),
-            DayAtTimeText(
-              dateTime: dateTime,
-              showTimezone: true,
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

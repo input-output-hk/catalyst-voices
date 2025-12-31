@@ -1,5 +1,5 @@
+import 'package:catalyst_voices/pages/category/widgets/card_information/create_proposal_card.dart';
 import 'package:catalyst_voices/widgets/cards/category_proposals_details_card.dart';
-import 'package:catalyst_voices/widgets/cards/create_proposal_card.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +40,6 @@ class CardInformation extends StatelessWidget {
               categoryName: category.formattedName,
               categoryDos: category.dos,
               categoryDonts: category.donts,
-              submissionCloseDate: category.submissionCloseDate,
             ),
           ),
         ],

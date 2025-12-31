@@ -7,6 +7,7 @@ final class CategoryDetailCubitCache extends Equatable {
   final SignedDocumentRef? selectedCategoryRef;
   final CampaignCategory? selectedCategory;
   final CampaignCategoryTotalAsk? selectedCategoryTotalAsk;
+  final DateTime? submissionCloseAt;
 
   const CategoryDetailCubitCache({
     this.activeCampaign,
@@ -14,6 +15,7 @@ final class CategoryDetailCubitCache extends Equatable {
     this.selectedCategoryRef,
     this.selectedCategory,
     this.selectedCategoryTotalAsk,
+    this.submissionCloseAt,
   });
 
   @override
@@ -23,6 +25,7 @@ final class CategoryDetailCubitCache extends Equatable {
     selectedCategoryRef,
     selectedCategory,
     selectedCategoryTotalAsk,
+    submissionCloseAt,
   ];
 
   CategoryDetailCubitCache copyWith({
@@ -31,6 +34,7 @@ final class CategoryDetailCubitCache extends Equatable {
     Optional<SignedDocumentRef>? selectedCategoryRef,
     Optional<CampaignCategory>? selectedCategory,
     Optional<CampaignCategoryTotalAsk>? selectedCategoryTotalAsk,
+    Optional<DateTime>? submissionCloseAt,
   }) {
     return CategoryDetailCubitCache(
       activeCampaign: activeCampaign.dataOr(this.activeCampaign),
@@ -38,6 +42,7 @@ final class CategoryDetailCubitCache extends Equatable {
       selectedCategoryRef: selectedCategoryRef.dataOr(this.selectedCategoryRef),
       selectedCategory: selectedCategory.dataOr(this.selectedCategory),
       selectedCategoryTotalAsk: selectedCategoryTotalAsk.dataOr(this.selectedCategoryTotalAsk),
+      submissionCloseAt: submissionCloseAt.dataOr(this.submissionCloseAt),
     );
   }
 }

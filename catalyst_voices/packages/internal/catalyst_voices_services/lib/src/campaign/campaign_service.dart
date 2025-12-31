@@ -124,16 +124,14 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<List<Campaign>> getAllCampaigns() async {
-    final campaigns = await _campaignRepository.getAllCampaigns();
-    return campaigns.map(_updateSubmissionCloseDate).wait;
+    return _campaignRepository.getAllCampaigns();
   }
 
   @override
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    final campaign = await _campaignRepository.getCampaign(id: id);
-    return _updateSubmissionCloseDate(campaign);
+    return _campaignRepository.getCampaign(id: id);
   }
 
   @override
@@ -144,21 +142,7 @@ final class CampaignServiceImpl implements CampaignService {
         message: 'Did not find category with ref $ref',
       );
     }
-
-    final campaign = await _getCampaignWithCategory(ref);
-    if (campaign == null) {
-      throw NotFoundException(
-        message: 'Did not find campaign which contains the category with ref $ref',
-      );
-    }
-
-    final proposalSubmissionStage = campaign.getPhaseTimeline(
-      CampaignPhaseType.proposalSubmission,
-    );
-
-    return category.copyWith(
-      submissionCloseDate: proposalSubmissionStage.timeline.to,
-    );
+    return category;
   }
 
   @override
@@ -283,22 +267,6 @@ final class CampaignServiceImpl implements CampaignService {
     await _documentRepository.removeAll(
       excludeTypes: [DocumentType.proposalTemplate],
       localDrafts: false,
-    );
-  }
-
-  Future<Campaign> _updateSubmissionCloseDate(Campaign campaign) async {
-    final proposalSubmissionTime = campaign
-        .phaseStateTo(CampaignPhaseType.proposalSubmission)
-        .phase
-        .timeline
-        .to;
-
-    final updatedCategories = campaign.categories
-        .map((e) => e.copyWith(submissionCloseDate: proposalSubmissionTime))
-        .toList();
-
-    return campaign.copyWith(
-      categories: updatedCategories,
     );
   }
 }
