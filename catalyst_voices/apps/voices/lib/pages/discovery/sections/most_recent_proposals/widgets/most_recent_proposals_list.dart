@@ -47,14 +47,14 @@ class _MostRecentProposalsList extends StatelessWidget {
       itemCount: proposals.length,
       itemBuilder: (context, index) {
         final proposal = proposals[index];
-        final ref = proposal.id;
+        final id = proposal.id;
         return Padding(
-          key: Key('PendingProposalCard_$ref'),
+          key: Key('PendingProposalCard_$id'),
           padding: EdgeInsets.only(right: index < proposals.length - 1 ? 12 : 0),
           child: ProposalBriefCard(
             proposal: proposal,
-            onTap: () => _onCardTap(context, ref),
-            onFavoriteChanged: (value) => _onCardFavoriteChanged(context, ref, value),
+            onTap: () => _onCardTap(context, id),
+            onFavoriteChanged: (value) => _onCardFavoriteChanged(context, id, value),
           ),
         );
       },
@@ -67,23 +67,18 @@ class _MostRecentProposalsList extends StatelessWidget {
 
   Future<void> _onCardFavoriteChanged(
     BuildContext context,
-    DocumentRef ref,
+    DocumentRef id,
     bool isFavorite,
   ) async {
     final bloc = context.read<DiscoveryCubit>();
     if (isFavorite) {
-      await bloc.addFavorite(ref);
+      await bloc.addFavorite(id);
     } else {
-      await bloc.removeFavorite(ref);
+      await bloc.removeFavorite(id);
     }
   }
 
-  void _onCardTap(BuildContext context, DocumentRef ref) {
-    unawaited(
-      ProposalRoute(
-        proposalId: ref.id,
-        version: ref.ver,
-      ).push(context),
-    );
+  void _onCardTap(BuildContext context, DocumentRef id) {
+    unawaited(ProposalRoute.fromRef(ref: id).push(context));
   }
 }
