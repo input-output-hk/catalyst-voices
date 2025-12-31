@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/routes/routing/account_route.dart' as account;
+import 'package:catalyst_voices/routes/routing/actions_route.dart' as actions;
 import 'package:catalyst_voices/routes/routing/overall_spaces_route.dart' as overall_spaces;
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart' as proposal_builder;
 import 'package:catalyst_voices/routes/routing/proposal_route.dart' as proposal;
@@ -16,6 +17,7 @@ abstract final class Routes {
     ...overall_spaces.$appRoutes,
     ...proposal.$appRoutes,
     ...proposal_builder.$appRoutes,
+    ...actions.$appRoutes,
   ];
 
   static String get initialLocation {
