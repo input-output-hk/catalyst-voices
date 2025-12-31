@@ -34,9 +34,9 @@ class _SubmissionCloseAt extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 14,
       children: [
         VoicesAssets.icons.calendar.buildIcon(),
-        const SizedBox(width: 14),
         Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
