@@ -60,6 +60,7 @@ export 'document/document_mapper.dart';
 export 'document/document_node_id.dart';
 export 'document/document_parameters.dart';
 export 'document/document_ref.dart';
+export 'document/document_sync_request.dart';
 export 'document/enums/document_content_media_type.dart';
 export 'document/enums/document_property_format.dart';
 export 'document/enums/document_property_type.dart';

@@ -34,4 +34,24 @@ class RawProposal extends Equatable {
     isFavorite,
     originalAuthors,
   ];
+
+  RawProposal copyWith({
+    DocumentData? proposal,
+    Optional<DocumentData>? template,
+    Optional<ProposalSubmissionAction>? actionType,
+    List<String>? versionIds,
+    int? commentsCount,
+    bool? isFavorite,
+    List<CatalystId>? originalAuthors,
+  }) {
+    return RawProposal(
+      proposal: proposal ?? this.proposal,
+      template: template.dataOr(this.template),
+      actionType: actionType.dataOr(this.actionType),
+      versionIds: versionIds ?? this.versionIds,
+      commentsCount: commentsCount ?? this.commentsCount,
+      isFavorite: isFavorite ?? this.isFavorite,
+      originalAuthors: originalAuthors ?? this.originalAuthors,
+    );
+  }
 }

@@ -5,6 +5,7 @@ export 'campaign/campaign_builder/campaign_builder.dart';
 export 'campaign/campaign_phase/campaign_phase_aware.dart';
 export 'category/category_detail.dart';
 export 'collaborators/collaborators.dart';
+export 'comments/comments_state.dart';
 export 'common/bloc_error_emitter_mixin.dart';
 export 'common/bloc_event_transformers.dart';
 export 'common/bloc_extensions.dart';

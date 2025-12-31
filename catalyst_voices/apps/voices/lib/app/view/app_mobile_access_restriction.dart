@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/painter/bubble_painter.dart';
@@ -37,8 +38,7 @@ class AppMobileAccessRestriction extends StatelessWidget {
     return ListenableBuilder(
       listenable: provider,
       builder: (context, _) {
-        final currentPath = provider.value.uri.path;
-        final isProposalRoute = currentPath.contains('/proposal/');
+        final isProposalRoute = ProposalRoute.isPath(provider.value.uri);
 
         return FormFactorBuilder<bool>(
           mobile: CatalystPlatform.isWeb && !isProposalRoute,

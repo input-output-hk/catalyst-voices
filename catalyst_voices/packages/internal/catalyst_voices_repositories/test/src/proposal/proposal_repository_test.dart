@@ -17,6 +17,8 @@ void main() {
   group(ProposalRepository, () {
     late _MockSignedDocumentManager mockSignedDocumentManager;
     late _MockDocumentRepository mockDocumentRepository;
+    late _MockDocumentDataRemoteSource mockDocumentDataRemoteSource;
+    late _MockSignedDocumentDataSource mockSignedDocumentDataSource;
     late _MockProposalDocumentDataLocalSource mockProposalsLocalSource;
     late _MockCastedVotesObserver mockCastedVotesObserver;
     late _MockVotingBallotBuilder mockBallotBuilder;
@@ -25,6 +27,8 @@ void main() {
     setUp(() {
       mockSignedDocumentManager = _MockSignedDocumentManager();
       mockDocumentRepository = _MockDocumentRepository();
+      mockDocumentDataRemoteSource = _MockDocumentDataRemoteSource();
+      mockSignedDocumentDataSource = _MockSignedDocumentDataSource();
       mockProposalsLocalSource = _MockProposalDocumentDataLocalSource();
       mockCastedVotesObserver = _MockCastedVotesObserver();
       mockBallotBuilder = _MockVotingBallotBuilder();
@@ -32,6 +36,8 @@ void main() {
       repository = ProposalRepository(
         mockSignedDocumentManager,
         mockDocumentRepository,
+        mockDocumentDataRemoteSource,
+        mockSignedDocumentDataSource,
         mockProposalsLocalSource,
         mockCastedVotesObserver,
         mockBallotBuilder,
@@ -494,10 +500,14 @@ RawProposal _createRawProposal({
 
 class _MockCastedVotesObserver extends Mock implements CastedVotesObserver {}
 
+class _MockDocumentDataRemoteSource extends Mock implements DocumentDataRemoteSource {}
+
 class _MockDocumentRepository extends Mock implements DocumentRepository {}
 
 class _MockProposalDocumentDataLocalSource extends Mock
     implements ProposalDocumentDataLocalSource {}
+
+class _MockSignedDocumentDataSource extends Mock implements SignedDocumentDataSource {}
 
 class _MockSignedDocumentManager extends Mock implements SignedDocumentManager {}
 

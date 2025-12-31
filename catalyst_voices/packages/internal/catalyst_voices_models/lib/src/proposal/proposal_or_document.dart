@@ -52,8 +52,9 @@ sealed class ProposalOrDocument extends Equatable {
   /// The duration of the proposal in months.
   int? get durationInMonths;
 
-  // TODO(damian-molinski): Fund number should come from query but atm those are not documents.
   /// The number of fund this proposal was submitted for.
+  ///
+  /// Fund number should come from query but atm those are not documents.
   int? get fundNumber {
     return Campaign.all
         .firstWhereOrNull((campaign) => campaign.hasAnyParameterId(_parameters))
@@ -62,6 +63,10 @@ sealed class ProposalOrDocument extends Equatable {
 
   /// The amount of funds requested by the proposal.
   Money? get fundsRequested;
+
+  bool get isDocument => this is _Document;
+
+  bool get isProposal => this is _Proposal;
 
   /// The title of the proposal.
   String? get title;
