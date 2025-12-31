@@ -1,17 +1,18 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
 import 'package:flutter/material.dart';
 
-class CoProposersConsentPage extends StatelessWidget {
-  const CoProposersConsentPage({super.key});
+class ProposalApprovalPage extends StatelessWidget {
+  const ProposalApprovalPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         VoicesDrawerHeader(
-          text: 'Co-Proposer Display Consent',
-          onCloseTap: Scaffold.of(context).closeEndDrawer,
+          text: 'Final Proposal Approval',
+          onCloseTap: () => ActionsShellPage.close(context),
           showBackButton: true,
         ),
         const SizedBox(height: 30),

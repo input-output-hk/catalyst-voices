@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/pages/actions/actions_page.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
-import 'package:catalyst_voices/pages/co_proposers_consent/co_proposers_consent_page.dart';
-import 'package:catalyst_voices/pages/proposal_approval/proposal_approval_page.dart';
+import 'package:catalyst_voices/pages/actions/co_proposers_consent/co_proposers_consent_page.dart';
+import 'package:catalyst_voices/pages/actions/proposal_approval/proposal_approval_page.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
