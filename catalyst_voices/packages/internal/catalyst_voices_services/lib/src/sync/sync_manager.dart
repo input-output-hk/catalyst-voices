@@ -84,8 +84,7 @@ final class SyncManagerImpl implements SyncManager {
 
   @override
   Future<bool> get waitForActiveRequest {
-    final activeRequest = _activeRequest;
-    return _requestsCompleters[activeRequest]?.future ?? Future.value(false);
+    return _requestsCompleters[_activeRequest]?.future ?? Future.value(false);
   }
 
   bool get _isActive => _activeRequest != null;
