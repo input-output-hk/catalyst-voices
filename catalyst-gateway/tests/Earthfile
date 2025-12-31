@@ -1,7 +1,7 @@
 # cspell: words unittests socat
 
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.6.3 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.6.10 AS spectral-ci
 IMPORT .. AS gateway
 IMPORT github.com/input-output-hk/catalyst-qa/catalyst-devnet:devnet/v0.0.3 AS devnet
 
