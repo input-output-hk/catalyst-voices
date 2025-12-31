@@ -16,6 +16,7 @@ abstract interface class ProposalService {
     UserService userService,
     SignerService signerService,
     ActiveCampaignObserver activeCampaignObserver,
+    SyncManager syncManager,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -62,6 +63,15 @@ abstract interface class ProposalService {
     required DocumentRef id,
   });
 
+  /// Similar to [watchProposal] but also will synchronize any missing documents for [id].
+  ///
+  /// If document with [id] is not found locally it will try to synchronize and get it remotely and
+  /// when such document is not found remotely null will be returned.
+  ///
+  /// If [id] is a [DraftRef] then [activeAccount] must be non null and author of such document,
+  /// otherwise will return null, even if found.
+  Future<ProposalDataV2?> getProposalV2({required DocumentRef id, CatalystId? activeAccount});
+
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
   ///
   /// The proposal reference will be altered to avoid linking
@@ -85,7 +95,7 @@ abstract interface class ProposalService {
   });
 
   Future<void> removeFavoriteProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   Future<void> submitCollaboratorProposalAction({
@@ -121,6 +131,15 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  /// Stream emits [ProposalDataV2] whenever underlying database changes so it emits newest
+  /// available data.
+  ///
+  /// Returns null if proposal with [id] is not found.
+  /// Be aware if latest proposal submission action is a [ProposalSubmissionAction.hide],
+  /// such document will be returned.
+  ///
+  /// If [id] is a [DraftRef] then such proposal will be returned only if [activeAccount]
+  /// is an author.
   Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount});
 
   /// Streams pages of brief proposal data.
@@ -154,6 +173,7 @@ final class ProposalServiceImpl implements ProposalService {
   final UserService _userService;
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
+  final SyncManager _syncManager;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -161,6 +181,7 @@ final class ProposalServiceImpl implements ProposalService {
     this._userService,
     this._signerService,
     this._activeCampaignObserver,
+    this._syncManager,
   );
 
   @override
@@ -271,6 +292,34 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<ProposalDataV2?> getProposalV2({
+    required DocumentRef id,
+    CatalystId? activeAccount,
+  }) async {
+    final isCached = id.isExact && await _documentRepository.isCached(id: id);
+    if (!isCached) {
+      await _syncManager.complete(TargetSyncRequest(id.toSignedDocumentRef().toLoose()));
+
+      final metadata = await _documentRepository
+          .getDocumentMetadata(id: id)
+          .then<DocumentDataMetadata?>((value) => value)
+          .onError<DocumentNotFoundException>((_, _) => null);
+
+      if (metadata != null && metadata.parameters.isNotEmpty) {
+        await _syncManager.complete(ParametersSyncRequest.commentTemplate(metadata.parameters));
+      }
+    }
+
+    final localProposalData = activeAccount != null
+        ? await _proposalRepository.getLocalProposal(id: id, originalAuthor: activeAccount)
+        : null;
+
+    final proposalData = await _proposalRepository.getProposalV2(id: id);
+
+    return _mergePublicAndLocalProposal(id, localProposalData, proposalData);
+  }
+
+  @override
   Future<DocumentRef> importProposal(Uint8List data) async {
     final allowTemplateRefs =
         _activeCampaignObserver.campaign?.categories.map((e) => e.proposalTemplateRef).toList() ??
@@ -332,8 +381,8 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> removeFavoriteProposal({required DocumentRef ref}) {
-    return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: false);
+  Future<void> removeFavoriteProposal({required DocumentRef id}) {
+    return _proposalRepository.updateProposalFavorite(id: id.id, isFavorite: false);
   }
 
   @override
@@ -493,10 +542,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Stream<ProposalDataV2?> watchProposal({required DocumentRef id, CatalystId? activeAccount}) {
     final localProposalData = activeAccount != null
-        ? _proposalRepository.watchLocalProposal(
-            id: id,
-            originalAuthor: activeAccount,
-          )
+        ? _proposalRepository.watchLocalProposal(id: id, originalAuthor: activeAccount)
         : Stream.value(null);
 
     final proposalData = _proposalRepository.watchProposal(id: id);
@@ -607,18 +653,16 @@ final class ProposalServiceImpl implements ProposalService {
     return account.catalystId;
   }
 
+  /// Returns [ProposalDataV2] with merged versions from both sources.
   ProposalDataV2? _mergePublicAndLocalProposal(
     DocumentRef id,
     ProposalDataV2? localProposal,
     ProposalDataV2? publicProposal,
   ) {
-    // If user is interested in local return it
-    if (localProposal?.id == id) {
-      return localProposal;
-    }
-
-    // Return public proposal with missing versions from local added
-    return publicProposal?.addMissingVersionsFrom(localProposal);
+    return switch (id) {
+      DraftRef() => localProposal?.addMissingVersionsFrom(publicProposal),
+      SignedDocumentRef() => publicProposal?.addMissingVersionsFrom(localProposal),
+    };
   }
 
   List<ProposalBriefData> _mergePublishedAndLocalProposals(

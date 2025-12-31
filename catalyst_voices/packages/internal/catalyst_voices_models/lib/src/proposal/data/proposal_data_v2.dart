@@ -67,6 +67,8 @@ final class ProposalDataV2 extends Equatable {
     );
   }
 
+  bool get isHidden => submissionAction == ProposalSubmissionAction.hide;
+
   @override
   List<Object?> get props => [
     id,
@@ -110,9 +112,8 @@ final class ProposalDataV2 extends Equatable {
       return this;
     }
 
-    return copyWith(
-      versions: [...currentVersions, ...missingVersions],
-    );
+    final effectiveVersions = [...currentVersions, ...missingVersions]..sort();
+    return copyWith(versions: effectiveVersions);
   }
 
   ProposalDataV2 copyWith({

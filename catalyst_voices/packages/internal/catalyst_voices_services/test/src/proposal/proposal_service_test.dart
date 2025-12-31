@@ -14,6 +14,7 @@ void main() {
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
   late MockSignerService mockSignerService;
+  late MockSyncManager mockSyncManager;
 
   late ProposalService proposalService;
 
@@ -23,6 +24,7 @@ void main() {
     mockSignerService = MockSignerService();
     mockUserService = MockUserService();
     mockActiveCampaignObserver = MockActiveCampaignObserver();
+    mockSyncManager = MockSyncManager();
 
     proposalService = ProposalService(
       mockProposalRepository,
@@ -30,6 +32,7 @@ void main() {
       mockUserService,
       mockSignerService,
       mockActiveCampaignObserver,
+      mockSyncManager,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -394,7 +397,8 @@ void main() {
 
         // Local proposal: user is working on a draft edit, so it tracks all versions including the draft
         final localProposal = ProposalDataV2(
-          id: version2, // User is viewing version2, but has a local draft
+          id: version2,
+          // User is viewing version2, but has a local draft
           proposalOrDocument: ProposalOrDocument.data(
             DocumentData(
               metadata: DocumentDataMetadata.proposal(
@@ -622,5 +626,7 @@ void main() {
 class MockActiveCampaignObserver extends Mock implements ActiveCampaignObserver {}
 
 class MockSignerService extends Mock implements SignerService {}
+
+class MockSyncManager extends Mock implements SyncManager {}
 
 class MockUserService extends Mock implements UserService {}

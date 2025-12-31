@@ -2592,6 +2592,10 @@
   "@proposalEditorValidationExitIssueMode": {
     "description": "Button text for exiting the proposal editor validation snackbar."
   },
+  "proposalHidden": "Proposal is hidden",
+  "@proposalHidden": {
+    "description": "Message shown to user when was found but it's hidden"
+  },
   "proposalImportDialogDescription": "Make sure it's a correct Catalyst proposal file.",
   "@proposalImportDialogDescription": {
     "description": "The description of the dialog to import a proposal."
