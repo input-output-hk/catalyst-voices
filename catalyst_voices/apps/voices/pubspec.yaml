@@ -57,7 +57,7 @@ dependencies:
       url: https://github.com/input-output-hk/flutter-quill
       path: flutter_quill_extensions
       ref: 81aa649db3268b0b69440db1b3313af90d393ae7
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^10.0.0
   flutter_web_plugins:
     sdk: flutter
   formz: ^0.8.0

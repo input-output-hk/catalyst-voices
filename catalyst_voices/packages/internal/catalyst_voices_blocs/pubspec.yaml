@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^10.0.0
   result_type: ^1.0.0
   rxdart: ^0.28.0
   uuid_plus: ^0.1.0

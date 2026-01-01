@@ -13,7 +13,7 @@ dependencies:
   file_picker: ^10.3.2
   flutter:
     sdk: flutter
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^10.0.0
   flutter_web_plugins:
     sdk: flutter
   go_router: ^15.1.3
