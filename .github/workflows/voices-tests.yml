@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report
           path: ${{ env.E2E_DIR }}/playwright-report/
@@ -97,7 +97,7 @@ jobs:
 
       - name: Upload test results (JUnit)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-results
           path: ${{ env.E2E_DIR }}/test-results/
