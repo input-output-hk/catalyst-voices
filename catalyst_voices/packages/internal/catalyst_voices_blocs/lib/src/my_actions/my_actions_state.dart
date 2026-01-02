@@ -14,10 +14,10 @@ final class MyActionsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        displayConsentCount,
-        finalProposalCount,
-        proposalSubmissionCloseDate,
-      ];
+    displayConsentCount,
+    finalProposalCount,
+    proposalSubmissionCloseDate,
+  ];
 
   MyActionsState copyWith({
     int? displayConsentCount,

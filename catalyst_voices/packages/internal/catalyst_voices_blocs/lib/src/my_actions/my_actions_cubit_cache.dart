@@ -19,12 +19,12 @@ final class MyActionsCubitCache extends Equatable {
 
   @override
   List<Object?> get props => [
-        activeAccountId,
-        displayConsentCount,
-        finalProposalCount,
-        proposalSubmissionCloseDate,
-        selectedTab,
-      ];
+    activeAccountId,
+    displayConsentCount,
+    finalProposalCount,
+    proposalSubmissionCloseDate,
+    selectedTab,
+  ];
 
   MyActionsCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,
