@@ -509,6 +509,10 @@
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
   },
+  "collaboratorDisplayConsent": "Co-Proposer\nDisplay Consent",
+  "@collaboratorDisplayConsent": {
+    "description": "Generic title to inform user about display consent"
+  },
   "collaboratorFinalProposalAcceptButton": "Approve Final Proposal",
   "@collaboratorFinalProposalAcceptButton": {
     "description": "Dialog button when accepting a final proposal as a collaborator."
@@ -1591,6 +1595,10 @@
   "@finalProposal": {
     "description": "Label indicating final proposal status"
   },
+  "finalProposalApproval": "Final Proposal\nApproval",
+  "@finalProposalApproval": {
+    "description": "Generic title to inform user about proposal approval"
+  },
   "finishAccountButtonLabelText": "Finish account",
   "@finishAccountButtonLabelText": {
     "description": "Label text shown in the FinishAccountButton widget."
@@ -2395,6 +2403,10 @@
       }
     }
   },
+  "participationPreferences": "Participation preferences",
+  "@participationPreferences": {
+    "description": "Title for the participation preferences section in user actions"
+  },
   "passwordDoNotMatch": "Passwords do not match, please correct",
   "@passwordDoNotMatch": {
     "description": "When user confirms password but it does not match original one."
@@ -2458,6 +2470,10 @@
   "proposal": "Proposal",
   "@proposal": {
     "description": "Generic name to describe an type of item."
+  },
+  "proposalApprovals": "Proposal Approvals",
+  "@proposalApprovals": {
+    "description": "CTA to see proposal that needs approval"
   },
   "proposalEditorBackToProposals": "Back to Proposals",
   "@proposalEditorBackToProposals": {
@@ -3247,6 +3263,15 @@
   "reject": "Reject",
   "@reject": {
     "description": "Action label to deny (forbid consent) something."
+  },
+  "remaining": "{duration} remaining",
+  "@remaining": {
+    "description": "Label showing remaining time duration",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
   },
   "removeFromVoteList": "Remove from Vote List",
   "@removeFromVoteList": {
