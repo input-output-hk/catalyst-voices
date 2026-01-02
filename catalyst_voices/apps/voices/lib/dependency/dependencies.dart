@@ -216,6 +216,13 @@ final class Dependencies extends DependencyProvider {
         return AddCollaboratorCubit(
           get<ProposalService>(),
         );
+      })
+      ..registerFactory<MyActionsCubit>(() {
+        return MyActionsCubit(
+          get<ProposalService>(),
+          get<CampaignService>(),
+          get<UserService>(),
+        );
       });
   }
 

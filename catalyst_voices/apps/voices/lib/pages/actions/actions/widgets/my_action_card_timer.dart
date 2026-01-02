@@ -92,6 +92,10 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       setState(() {
         _remainingDuration = _remainingDuration - const Duration(seconds: 1);
         if (_remainingDuration.isNegative) {

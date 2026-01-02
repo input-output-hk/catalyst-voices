@@ -54,6 +54,10 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
     if (widget.text != oldWidget.text) {
       _spans = _calculateSpans();
     }
+
+    if (widget.placeholderSpanBuilder != oldWidget.placeholderSpanBuilder) {
+      _spans = _calculateSpans();
+    }
   }
 
   List<InlineSpan> _calculateSpans() {

@@ -1,4 +1,7 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'dart:async' show unawaited;
+
+import 'package:catalyst_voices/routes/routing/actions_route.dart';
+import 'package:catalyst_voices/widgets/chips/count_indicator_chip.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -20,24 +23,6 @@ class InvitationsApprovalsButton extends StatelessWidget {
   }
 }
 
-class _CountIndicator extends StatelessWidget {
-  final int count;
-
-  const _CountIndicator({required this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesChip.round(
-      backgroundColor: context.colorScheme.error,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      content: Text(
-        count.toString(),
-        style: context.textTheme.labelSmall?.copyWith(color: context.colorScheme.onError),
-      ),
-    );
-  }
-}
-
 class _InvitationsApprovalsButton extends StatelessWidget {
   final int count;
 
@@ -46,11 +31,13 @@ class _InvitationsApprovalsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
-      trailing: count != 0 ? _CountIndicator(count: count) : null,
-      onTap: () {
-        // TODO(LynxLynxx): Call to open action drawer.
-      },
+      trailing: count != 0 ? CountIndicatorChip(count: count) : null,
+      onTap: () => _onTap(context),
       child: Text(context.l10n.invitationsAndApprovals),
     );
+  }
+
+  void _onTap(BuildContext context) {
+    unawaited(const ActionsRoute().push(context));
   }
 }

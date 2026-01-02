@@ -1,13 +1,12 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/actions/actions/widgets/action_cards_list.dart';
-import 'package:catalyst_voices/pages/actions/actions/widgets/actions_tabs_group.dart';
-import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
-import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'dart:async';
+
+import 'package:catalyst_voices/dependency/dependencies.dart';
+import 'package:catalyst_voices/pages/actions/actions/widgets/actions_page_content.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ActionsPage extends StatelessWidget {
+class ActionsPage extends StatefulWidget {
   final ActionsPageTab tab;
 
   const ActionsPage({
@@ -16,92 +15,32 @@ class ActionsPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      spacing: 16,
-      children: [
-        VoicesDrawerHeader(
-          text: context.l10n.myActions,
-          onCloseTap: () => ActionsShellPage.close(context),
-        ),
-        _Content(tab),
-      ],
-    );
-  }
+  State<ActionsPage> createState() => _ActionsPageState();
 }
 
-class _Content extends StatefulWidget {
-  final ActionsPageTab tab;
-
-  const _Content(this.tab);
-
-  @override
-  State<_Content> createState() => _ContentState();
-}
-
-class _ContentState extends State<_Content> {
-  late ActionsPageTab selectedTab;
+class _ActionsPageState extends State<ActionsPage> {
+  late MyActionsCubit _myActionsCubit;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: 20,
-        children: [
-          const _HeaderText(),
-          ActionsTabsGroup(
-            selectedTab: selectedTab,
-            onChanged: _onTabChanged,
-          ),
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                ActionCardsList(selectedTab: selectedTab),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return BlocProvider.value(
+      value: _myActionsCubit,
+      child: ActionsPageContent(tab: widget.tab),
     );
   }
 
   @override
-  void didUpdateWidget(_Content oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void dispose() {
+    unawaited(_myActionsCubit.close());
 
-    if (oldWidget.tab != widget.tab) {
-      _onTabChanged(widget.tab);
-    }
+    super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    _onTabChanged(widget.tab);
-  }
 
-  void _onTabChanged(ActionsPageTab? newTab) {
-    if (newTab != null) {
-      setState(() {
-        selectedTab = newTab;
-      });
-      // TODO(LynxLynxx): Call bloc to update the actions list based on the selected tab
-    }
-  }
-}
-
-class _HeaderText extends StatelessWidget {
-  const _HeaderText();
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      context.l10n.myActionsPageHeader,
-      style: context.textTheme.bodyMedium?.copyWith(
-        color: context.colors.textOnPrimaryLevel1,
-      ),
-    );
+    _myActionsCubit = Dependencies.instance.get<MyActionsCubit>();
+    unawaited(_myActionsCubit.init());
   }
 }

@@ -1,0 +1,88 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter debug_adapter
+
+## exception
+
+RPCError: readyToResume: (-32603) Unexpected DWDS error for resume: WipError -32000 Cannot find context with specified id
+
+```
+#0      new _OutstandingRequest (package:vm_service/src/vm_service.dart:268:34)
+#1      VmService._call.<anonymous closure> (package:vm_service/src/vm_service.dart:1950:25)
+#2      VmService._call (package:vm_service/src/vm_service.dart:1962:8)
+#3      VmService.callServiceExtension (package:vm_service/src/vm_service.dart:1901:14)
+#4      VmService.callMethod (package:vm_service/src/vm_service.dart:1884:12)
+#5      DdsExtension._callHelper (package:dds_service_extensions/dds_service_extensions.dart:365:12)
+#6      DdsExtension.readyToResume (package:dds_service_extensions/dds_service_extensions.dart:323:12)
+<asynchronous suspension>
+#7      IsolateManager._readyToResume (package:dds/src/dap/isolate_manager.dart:425:7)
+<asynchronous suspension>
+#8      IsolateManager.readyToResumeThread (package:dds/src/dap/isolate_manager.dart:306:5)
+<asynchronous suspension>
+#9      IsolateManager._handlePause (package:dds/src/dap/isolate_manager.dart:695:7)
+<asynchronous suspension>
+#10     IsolateManager.handleEvent (package:dds/src/dap/isolate_manager.dart:207:7)
+<asynchronous suspension>
+#11     DartDebugAdapter.handleDebugEvent (package:dds/src/dap/adapters/dart.dart:2470:5)
+<asynchronous suspension>
+#12     DartDebugAdapter._withErrorHandling (package:dds/src/dap/adapters/dart.dart:2832:14)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel stable, 3.35.1, on macOS 26.2 25C56 darwin-arm64, locale en-PL) [4.8s]
+    • Flutter version 3.35.1 on channel stable at /Users/ryszardschossler/Development/flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision 20f8274939 (5 months ago), 2025-08-14 10:53:09 -0700
+    • Engine revision 1e9a811bf8
+    • Dart version 3.9.0
+    • DevTools version 2.48.0
+    • Feature flags: enable-web, enable-linux-desktop, enable-macos-desktop, enable-windows-desktop, enable-android, enable-ios, cli-animations, enable-lldb-debugging
+
+[✓] Android toolchain - develop for Android devices (Android SDK version 35.0.0-rc3) [9.8s]
+    • Android SDK at /Users/ryszardschossler/Library/Android/sdk
+    • Emulator version 35.3.11.0 (build_id 12836668) (CL:N/A)
+    • Platform android-36, build-tools 35.0.0-rc3
+    • Java binary at: /Users/ryszardschossler/Library/Java/JavaVirtualMachines/corretto-17.0.14/Contents/Home/bin/java
+      This JDK is specified in your Flutter configuration.
+      To change the current JDK, run: `flutter config --jdk-dir="path/to/jdk"`.
+    • Java version OpenJDK Runtime Environment Corretto-17.0.14.7.1 (build 17.0.14+7-LTS)
+    • All Android licenses accepted.
+
+[✓] Xcode - develop for iOS and macOS (Xcode 26.2) [9.2s]
+    • Xcode at /Applications/Xcode.app/Contents/Developer
+    • Build 17C52
+    • CocoaPods version 1.16.2
+
+[✓] Chrome - develop for the web [26ms]
+    • Chrome at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+
+[✓] Android Studio (version 2024.2) [23ms]
+    • Android Studio at /Applications/Android Studio.app/Contents
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    • Java version OpenJDK Runtime Environment (build 21.0.4+-12422083-b607.1)
+
+[✓] VS Code (version 1.101.2) [20ms]
+    • VS Code at /Users/ryszardschossler/Downloads/Visual Studio Code.app/Contents
+    • Flutter extension version 3.124.0
+
+[✓] Connected device (3 available) [8.8s]
+    • iPhone (Ryszard) (wireless) (mobile) • 00008140-000651C62146801C • ios            • iOS 26.2 23C55
+    • macOS (desktop)                      • macos                     • darwin-arm64   • macOS 26.2 25C56 darwin-arm64
+    • Chrome (web)                         • chrome                    • web-javascript • Google Chrome 143.0.7499.170
+    ! Error: Browsing on the local area network for iPad (Ryszard). Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+      The device must be opted into Developer Mode to connect wirelessly. (code -27)
+
+[✓] Network resources [1,206ms]
+    • All expected network resources are available.
+
+• No issues found!
+```
