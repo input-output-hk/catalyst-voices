@@ -20,6 +20,10 @@ final class ProposalState extends Equatable {
     this.readOnlyMode = false,
   });
 
+  bool get isViewingLatestVersion {
+    return data.header.proposalRef != null && (data.isCurrentVersionLatest ?? false);
+  }
+
   @override
   List<Object?> get props => [
     isLoading,

@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/app/app_initialization_choreographer.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
-import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -26,15 +25,19 @@ const ReportingService _reportingService = _shouldUseSentry
 const _shouldUseSentry = kReleaseMode;
 
 var _bootstrapInitState = const _BootstrapState();
+var _initialLocation = Uri();
 
 final _loggerBootstrap = Logger('Bootstrap');
 final _loggerFlutter = Logger('Flutter');
 final _loggerPlatformDispatcher = Logger('PlatformDispatcher');
 final _loggerUncaughtZone = Logger('UncaughtZone');
+
 final _loggingService = LoggingService();
 
 @visibleForTesting
 AppConfig? get appConfig => _bootstrapInitState.appConfig;
+
+Uri get initialLocation => _initialLocation;
 
 @visibleForTesting
 LoggingService get loggingService => _loggingService;
@@ -101,17 +104,13 @@ Future<BootstrapArgs> bootstrap({
   );
 
   final router = buildAppRouter(initialLocation: initialLocation);
+  _initialLocation = router.routeInformationProvider.value.uri;
 
-  // Observer is very noisy on Logger. Enable it only if you want to debug
-  // something
-  Bloc.observer = AppBlocObserver(logOnChange: false);
-
-  if (config.stressTest.isEnabled && config.stressTest.clearDatabase) {
-    await Dependencies.instance.get<CatalystDatabase>().clear();
+  try {
+    await const AppInitializationChoreographer()(config, _initialLocation);
+  } catch (error, stack) {
+    unawaited(_reportBootstrapError(error, stack));
   }
-
-  Dependencies.instance.get<ReportingServiceMediator>().init();
-  unawaited(_initSyncManager(startupProfiler));
 
   return BootstrapArgs(
     routerConfig: router,
@@ -285,12 +284,6 @@ Future<void> _initReportingService(SentryConfig sentryConfig) async {
       );
     },
   );
-}
-
-Future<void> _initSyncManager(CatalystStartupProfiler profiler) async {
-  final syncManager = Dependencies.instance.get<SyncManager>();
-  await syncManager.init();
-  await profiler.documentsSync(body: syncManager.start);
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {

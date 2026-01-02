@@ -67,9 +67,17 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     int limit = 100,
     required DocumentIndexFilters filters,
   }) {
+    final id = filters.id;
+    final parameters = filters.parameters;
+
+    // TODO(damian-molinski): Update parameters mapping after merging sync_with_gateway.
     final body = DocumentIndexQueryFilter(
       type: filters.type?.uuid,
-      parameters: IdRefOnly(id: IdSelectorDto.inside(filters.categoriesIds)).toJson(),
+      id: id != null ? IdSelectorDto.eq(id.id) : null,
+      ver: id != null && id.isExact ? EqOrRangedVer.fromJson({'eq': id.ver}) : null,
+      parameters: parameters != null
+          ? IdRefOnly(id: IdSelectorDto.inside(parameters)).toJson()
+          : null,
     );
 
     return _getDocumentIndexList(
@@ -194,11 +202,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 }
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
+  /// Looks up matching signed document according to [ref].
   @override
   Future<DocumentDataWithArtifact?> get(DocumentRef ref);
 
   Future<String?> getLatestVersion(String id);
 
+  /// Looks up all signed document refs according to [filters].
+  ///
+  /// Response is paginated using [page] and [limit].
   Future<DocumentIndex> index({
     int page,
     int limit,
@@ -214,7 +226,17 @@ extension on DocumentRefForFilteredDocuments {
 
 extension on DocumentIndexList {
   Iterable<DocumentIndexListDto> get _docs {
-    return docs.cast<Map<String, dynamic>>().map(DocumentIndexListDto.fromJson);
+    return docs.map((doc) {
+      if (doc is Map<String, dynamic>) {
+        return DocumentIndexListDto.fromJson(doc);
+      }
+
+      if (doc is DocumentIndexListDto) {
+        return doc;
+      }
+
+      return null;
+    }).nonNulls;
   }
 
   DocumentIndex toModel() {

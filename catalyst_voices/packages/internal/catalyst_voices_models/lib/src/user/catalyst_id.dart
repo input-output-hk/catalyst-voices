@@ -276,3 +276,16 @@ enum CatalystIdHost {
     );
   }
 }
+
+extension NullableCatalystId on CatalystId? {
+  /// Helper extension method which makes it easier to compare nullable [CatalystId].
+  ///
+  /// Returns true if both instance are null or [CatalystId.isSameAs] returns true.
+  bool isSameAs(CatalystId? other) {
+    final instance = this;
+    if (instance == null && other == null) return true;
+    if (instance != null && other != null) instance.isSameAs(other);
+
+    return false;
+  }
+}

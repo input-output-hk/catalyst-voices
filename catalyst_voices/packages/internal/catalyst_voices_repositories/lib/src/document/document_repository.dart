@@ -28,13 +28,6 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
-  /// Analyzes the database to gather statistics and potentially optimize it.
-  ///
-  /// This can be a long-running operation, so it should be used judiciously,
-  /// for example, during application startup or in a background process
-  /// for maintenance.
-  Future<void> analyzeDatabase();
-
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef id,
@@ -114,26 +107,7 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
-  /// Gets [DocumentDataWithArtifact] from remote. This method do not access any of cache.
-  // TODO(damian-molinski): refactor documents sync into object which has remote source
-  // so this could be removed from here.
-  Future<DocumentDataWithArtifact> getRemoteDocumentDataWithArtifact({
-    required SignedDocumentRef id,
-  });
-
-  /// Looks up all signed document refs according to [filters].
-  ///
-  /// Response is paginated using [page] and [limit].
-  Future<DocumentIndex> index({
-    required int page,
-    required int limit,
-    required DocumentIndexFilters filters,
-  });
-
-  /// Filters and returns only the DocumentRefs from [ids] which are cached.
-  Future<List<DocumentRef>> isCachedBulk({
-    required List<DocumentRef> ids,
-  });
+  Future<bool> isCached({required DocumentRef id});
 
   Future<bool> isFavorite(DocumentRef id);
 
@@ -162,11 +136,16 @@ abstract interface class DocumentRepository {
 
   /// Removes all locally stored documents.
   ///
-  /// Returns number of deleted rows.
+  /// * [excludeTypes]: If provided, deletes all documents *except* those
+  ///   matching the types in this list.
+  /// * [localDrafts]: if true will delete from local drafts.
+  /// * [localDocuments] if true will delete from local documents.
   ///
-  /// if [keepLocalDrafts] is true local drafts will be kept and related templates.
+  /// Returns number of deleted rows.
   Future<int> removeAll({
-    bool keepLocalDrafts,
+    List<DocumentType>? excludeTypes,
+    bool localDrafts = true,
+    bool localDocuments = true,
   });
 
   /// Saves a pre-parsed and validated document to storage.
@@ -179,14 +158,6 @@ abstract interface class DocumentRepository {
     required DocumentData document,
     required CatalystId authorId,
   });
-
-  /// Saves a list of documents to the local storage.
-  ///
-  /// This method iterates through the provided list of [documents] and saves
-  /// each one based on its reference type.
-  ///
-  /// Method saves only signed documents with artifacts.
-  Future<void> saveSignedDocumentBulk(List<DocumentDataWithArtifact> documents);
 
   /// Creates/updates a local document draft.
   ///
@@ -255,9 +226,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._localDocuments,
     this._remoteDocuments,
   );
-
-  @override
-  Future<void> analyzeDatabase() => _db.analyze();
 
   @override
   Future<void> deleteDocumentDraft({required DraftRef id}) {
@@ -364,7 +332,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
 
-  // TODO(damian-molinski): consider also checking with remote source.
   @override
   Future<DocumentRef?> getLatestOf({required DocumentRef id}) async {
     final draft = await _drafts.getLatestRefOf(id);
@@ -372,7 +339,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       return draft;
     }
 
-    return _localDocuments.getLatestRefOf(id);
+    return _getSignedDocumentAndCacheAs<DocumentRef?>(
+      ref: id.toSignedDocumentRef().toLoose(),
+      fromCache: Future.value,
+      fromDocument: (document) => document.id,
+    );
   }
 
   @override
@@ -405,43 +376,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentDataWithArtifact> getRemoteDocumentDataWithArtifact({
-    required SignedDocumentRef id,
-  }) async {
-    final document = await _remoteDocuments.get(id);
-
-    if (document == null) {
-      throw DocumentNotFoundException(ref: id);
-    }
-
-    return document;
-  }
-
-  @override
-  Future<DocumentIndex> index({
-    required int page,
-    required int limit,
-    required DocumentIndexFilters filters,
-  }) {
-    return _remoteDocuments.index(
-      page: page,
-      limit: limit,
-      filters: filters,
-    );
-  }
-
-  @override
-  Future<List<DocumentRef>> isCachedBulk({required List<DocumentRef> ids}) {
-    final signedRefs = ids.whereType<SignedDocumentRef>().toList();
-    final localDraftsRefs = ids.whereType<DraftRef>().toList();
-
-    final signedDocsSave = _localDocuments.filterExisting(signedRefs);
-    final draftsDocsSave = _drafts.filterExisting(localDraftsRefs);
-
-    return [
-      signedDocsSave,
-      draftsDocsSave,
-    ].wait.then((value) => value.expand((refs) => refs).toList());
+  Future<bool> isCached({required DocumentRef id}) {
+    return switch (id) {
+      DraftRef() => _drafts.exists(id: id),
+      SignedDocumentRef() => _localDocuments.exists(id: id),
+    };
   }
 
   @override
@@ -493,11 +432,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<int> removeAll({
-    bool keepLocalDrafts = false,
+    List<DocumentType>? excludeTypes,
+    bool localDrafts = true,
+    bool localDocuments = true,
   }) async {
-    final deletedDrafts = keepLocalDrafts ? 0 : await _drafts.delete();
-    final excludeTypes = keepLocalDrafts ? [DocumentType.proposalTemplate] : null;
-    final deletedDocuments = await _localDocuments.delete(excludeTypes: excludeTypes);
+    final deletedDrafts = localDrafts ? await _drafts.delete(excludeTypes: excludeTypes) : 0;
+    final deletedDocuments = localDocuments
+        ? await _localDocuments.delete(excludeTypes: excludeTypes)
+        : 0;
 
     return deletedDrafts + deletedDocuments;
   }
@@ -521,16 +463,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _drafts.save(data: newDocument);
 
     return id;
-  }
-
-  @override
-  Future<void> saveSignedDocumentBulk(List<DocumentDataWithArtifact> documents) async {
-    assert(
-      documents.every((element) => element.metadata.id.isSigned),
-      'Only signed documents are supported',
-    );
-
-    return _localDocuments.saveAll(documents);
   }
 
   @override
@@ -699,16 +631,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   /// [getDocumentMetadata].
   Future<T?> _getDocumentByRef<T>({
     required DocumentRef id,
-    bool useCache = true,
     required ValueResolver<SignedDocumentRef, Future<T>> onSignedDocument,
     required ValueResolver<DraftRef, Future<T>> onDraft,
   }) async {
     return switch (id) {
       SignedDocumentRef() => onSignedDocument(id),
-      DraftRef() when !useCache => throw DocumentNotFoundException(
-        ref: id,
-        message: '$id can not be resolved while not using cache',
-      ),
       DraftRef() => onDraft(id),
     };
   }

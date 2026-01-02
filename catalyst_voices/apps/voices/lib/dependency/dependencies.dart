@@ -197,7 +197,6 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<CampaignPhaseAwareCubit>(() {
         return CampaignPhaseAwareCubit(
           get<CampaignService>(),
-          get<SyncManager>(),
         );
       })
       ..registerFactory<VotingBallotBloc>(() {
@@ -283,6 +282,7 @@ final class Dependencies extends DependencyProvider {
         () {
           return CampaignRepository(
             get<DatabaseDocumentsDataSource>(),
+            get<AppMetaStorage>(),
           );
         },
       )
@@ -295,10 +295,19 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())
+      ..registerLazySingleton<DocumentsSynchronizer>(() {
+        return DocumentsSynchronizer(
+          get<CatalystDatabase>(),
+          get<DatabaseDocumentsDataSource>(),
+          get<CatGatewayDocumentDataSource>(),
+        );
+      })
       ..registerLazySingleton<ProposalRepository>(
         () => ProposalRepository(
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
+          get<CatGatewayDocumentDataSource>(),
+          get<DatabaseDocumentsDataSource>(),
           get<DatabaseDocumentsDataSource>(),
           get<CastedVotesObserver>(),
           get<VotingBallotBuilder>(),
@@ -406,7 +415,9 @@ final class Dependencies extends DependencyProvider {
       return CampaignService(
         get<CampaignRepository>(),
         get<ProposalRepository>(),
+        get<DocumentRepository>(),
         get<ActiveCampaignObserver>(),
+        get<SyncManager>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
@@ -416,6 +427,7 @@ final class Dependencies extends DependencyProvider {
         get<UserService>(),
         get<SignerService>(),
         get<ActiveCampaignObserver>(),
+        get<SyncManager>(),
       );
     });
     registerLazySingleton<CommentService>(() {
@@ -540,10 +552,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<SyncManager>(
       () {
         return SyncManager(
-          get<AppMetaStorage>(),
+          get<DocumentsSynchronizer>(),
           get<SyncStatsStorage>(),
-          get<DocumentsService>(),
-          get<CampaignService>(),
           get<CatalystProfiler>(),
         );
       },

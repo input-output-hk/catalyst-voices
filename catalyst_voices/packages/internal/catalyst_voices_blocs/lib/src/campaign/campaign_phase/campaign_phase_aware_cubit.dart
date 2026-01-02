@@ -10,27 +10,18 @@ final _logger = Logger('CampaignPhaseAwareCubit');
 
 final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   final CampaignService _campaignService;
-  final SyncManager _syncManager;
 
   StreamSubscription<Campaign?>? _campaignSubscription;
   Campaign? _activeCampaign;
   Timer? _timer;
-  var _synchronizationCompleter = Completer<bool>();
+  bool _isLoadingActiveCampaign = false;
 
-  CampaignPhaseAwareCubit(this._campaignService, this._syncManager)
-    : super(const LoadingCampaignPhaseAwareState()) {
+  CampaignPhaseAwareCubit(this._campaignService) : super(const LoadingCampaignPhaseAwareState()) {
     _campaignSubscription = _campaignService.watchActiveCampaign.distinct().listen(
       _handleActiveCampaignChange,
     );
-
-    unawaited(getActiveCampaign());
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      _handleTimerTick,
-    );
+    _timer = Timer.periodic(const Duration(seconds: 1), _handleTimerTick);
   }
-
-  Future<bool> get awaitForInitialize => _synchronizationCompleter.future;
 
   CampaignPhaseType? activeCampaignPhaseType() {
     return state.activeCampaignPhaseType;
@@ -47,31 +38,33 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
 
   Future<void> getActiveCampaign() async {
     try {
+      _isLoadingActiveCampaign = true;
+
       emit(const LoadingCampaignPhaseAwareState());
 
-      if (_synchronizationCompleter.isCompleted) {
-        _synchronizationCompleter = Completer();
-      }
-
-      await _syncManager.waitForSync;
-
       final campaign = await _campaignService.getActiveCampaign();
-      if (!isClosed) {
-        _handleActiveCampaignChange(campaign);
-      }
-      _synchronizationCompleter.complete(true);
+      if (isClosed) return;
+
+      _handleActiveCampaignChange(campaign);
     } catch (error, stackTrace) {
       _logger.severe('Error getting active campaign', error, stackTrace);
 
       if (!isClosed) {
         emit(ErrorCampaignPhaseAwareState(error: LocalizedException.create(error)));
       }
+    } finally {
+      _isLoadingActiveCampaign = false;
 
-      _synchronizationCompleter.complete(false);
+      if (!isClosed) emit(_buildState());
     }
   }
 
   CampaignPhaseAwareState _buildState() {
+    final isLoadingActiveCampaign = _isLoadingActiveCampaign;
+    if (isLoadingActiveCampaign) {
+      return const LoadingCampaignPhaseAwareState();
+    }
+
     final activeCampaign = _activeCampaign;
     if (activeCampaign == null) {
       return const NoActiveCampaignPhaseAwareState();
@@ -85,10 +78,10 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   }
 
   void _handleActiveCampaignChange(Campaign? campaign) {
-    if (_activeCampaign?.id != campaign?.id) {
-      _activeCampaign = campaign;
-      emit(_buildState());
-    }
+    if (_activeCampaign?.id == campaign?.id) return;
+
+    _activeCampaign = campaign;
+    emit(_buildState());
   }
 
   void _handleTimerTick(Timer timer) {
@@ -98,19 +91,16 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
 
 extension on Campaign {
   List<CampaignPhaseState> get phasesStates {
-    final phasesStates = <CampaignPhaseState>[];
     final now = DateTimeExt.now();
 
-    for (final phase in timeline.phases) {
-      phasesStates.add(
-        CampaignPhaseState(
+    return timeline.phases.map(
+      (phase) {
+        return CampaignPhaseState(
           phase: phase,
           status: CampaignPhaseStatus.fromRange(phase.timeline, now),
-        ),
-      );
-    }
-
-    return phasesStates;
+        );
+      },
+    ).toList();
   }
 
   CampaignPhaseType? get phaseType {
