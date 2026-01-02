@@ -16,6 +16,7 @@ class ProposalApprovalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MyActionCard(
+      key: const ValueKey(ActionsCardType.proposalApproval),
       type: ActionsCardType.proposalApproval,
       backgroundImagePath: VoicesAssets.images.pixelatedBallot.path,
       actionWidget: const _ActionButton(),

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/actions/actions/widgets/action_cards_list.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/actions_tabs_group.dart';
-import 'package:catalyst_voices/pages/actions/actions/widgets/collaborator_display_consent_card.dart';
-import 'package:catalyst_voices/pages/actions/actions/widgets/proposal_approval_card.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -56,8 +55,13 @@ class _ContentState extends State<_Content> {
             selectedTab: selectedTab,
             onChanged: _onTabChanged,
           ),
-          const ProposalApprovalCard(),
-          const CollaboratorDisplayConsentCard(),
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                ActionCardsList(selectedTab: selectedTab),
+              ],
+            ),
+          ),
         ],
       ),
     );

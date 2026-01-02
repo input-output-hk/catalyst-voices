@@ -16,6 +16,7 @@ class CollaboratorDisplayConsentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MyActionCard(
+      key: const ValueKey(ActionsCardType.displayConsent),
       type: ActionsCardType.displayConsent,
       backgroundImagePath: VoicesAssets.images.pixelatedBallot.path,
       actionWidget: const _ActionButton(),
