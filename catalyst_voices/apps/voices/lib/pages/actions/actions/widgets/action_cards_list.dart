@@ -30,6 +30,7 @@ class ActionCardsList extends StatelessWidget {
     );
   }
 
+  // TODO(LynxLynxx): Move card creation logic to cubit if changing cards dynamically will be required
   Widget? _buildCardForType(ActionsCardType cardType) {
     return switch (cardType) {
       ActionsCardType.proposalApproval => const ProposalApprovalCard(),

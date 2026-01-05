@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class MyActionCardTimer extends StatefulWidget {
@@ -19,6 +20,8 @@ class MyActionCardTimer extends StatefulWidget {
 class _MyActionCardTimerState extends State<MyActionCardTimer> {
   late Duration _remainingDuration;
   Timer? _timer;
+  late final Stopwatch _stopwatch;
+  late Duration _initialDuration;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +42,10 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'duration' => TextSpan(
-              text: _formatDuration(context, _remainingDuration),
+              text: DurationFormatter.formatDurationHHmmss(
+                context.l10n,
+                _remainingDuration,
+              ),
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.colors.textOnPrimaryWhite,
                 fontWeight: FontWeight.w700,
@@ -57,8 +63,10 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.duration != oldWidget.duration) {
+      _initialDuration = widget.duration;
       _remainingDuration = widget.duration;
       _timer?.cancel();
+      _stopwatch.reset();
       _startTimer();
     }
   }
@@ -72,33 +80,19 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
   @override
   void initState() {
     super.initState();
+    _initialDuration = widget.duration;
     _remainingDuration = widget.duration;
+    _stopwatch = Stopwatch();
     _startTimer();
   }
 
-  String _formatDuration(BuildContext context, Duration duration) {
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-
-    if (hours > 0) {
-      return '${hours}h ${minutes}min';
-    } else if (minutes > 0) {
-      return '${minutes}min';
-    } else {
-      final seconds = duration.inSeconds;
-      return '${seconds}s';
-    }
-  }
-
   void _startTimer() {
+    _stopwatch.start();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
       setState(() {
-        _remainingDuration = _remainingDuration - const Duration(seconds: 1);
+        _remainingDuration = _initialDuration - _stopwatch.elapsed;
         if (_remainingDuration.isNegative) {
+          _stopwatch.stop();
           timer.cancel();
         }
       });

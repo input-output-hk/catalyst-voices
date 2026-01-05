@@ -2000,6 +2000,10 @@
       }
     }
   },
+  "minAbbr": "min",
+  "@minAbbr": {
+    "description": "A short abbreviation for minute."
+  },
   "minBudgetRequest": "Min budget request",
   "@minBudgetRequest": {
     "description": "A label for the minimum budget request for a proposal."

@@ -19,7 +19,7 @@ class ActionsPage extends StatefulWidget {
 }
 
 class _ActionsPageState extends State<ActionsPage> {
-  late MyActionsCubit _myActionsCubit;
+  late final MyActionsCubit _myActionsCubit;
 
   @override
   Widget build(BuildContext context) {

@@ -54,7 +54,7 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     unawaited(_setupInvitesApprovalsCountSubscription());
   }
 
-  void _handleActiveCampaignChange(CampaignTimeline? timeline) {
+  void _handleCampaignTimelineChange(CampaignTimeline? timeline) {
     final proposalSubmissionCloseDate = timeline
         ?.phase(CampaignPhaseType.proposalSubmission)
         ?.timeline
@@ -93,19 +93,19 @@ final class MyActionsCubit extends Cubit<MyActionsState>
   Future<void> _setupActiveCampaignSubscription() async {
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.id == next?.id)
         .map((event) => event?.timeline)
-        .listen(_handleActiveCampaignChange);
+        .distinct()
+        .listen(_handleCampaignTimelineChange);
   }
 
   Future<void> _setupInvitesApprovalsCountSubscription() async {
     await _invitesApprovalsCountSub?.cancel();
     final userCatalystId = _cache.activeAccountId;
-    if (userCatalystId != null) {
-      _invitesApprovalsCountSub = _proposalService
-          .watchInvitesApprovalsCount(id: userCatalystId)
-          .distinct()
-          .listen(_handleInvitesApprovalsCountChange);
-    }
+    final invitesApprovalsCountStream = userCatalystId != null
+        ? _proposalService.watchInvitesApprovalsCount(id: userCatalystId)
+        : Stream<AccountInvitesApprovalsCount?>.value(null);
+    _invitesApprovalsCountSub = invitesApprovalsCountStream.distinct().listen(
+      _handleInvitesApprovalsCountChange,
+    );
   }
 }
