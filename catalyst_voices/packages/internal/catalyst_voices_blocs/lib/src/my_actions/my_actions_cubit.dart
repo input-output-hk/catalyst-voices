@@ -29,6 +29,9 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     await _invitesApprovalsCountSub?.cancel();
     _invitesApprovalsCountSub = null;
 
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
+
     return super.close();
   }
 
