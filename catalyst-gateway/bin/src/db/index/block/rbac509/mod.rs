@@ -206,8 +206,6 @@ impl Rbac509InsertQuery {
             cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
         }
 
-        context.remove_addresses(removed_addresses.clone());
-
         self.record_valid_registration(
             txn_hash,
             txn_index,
