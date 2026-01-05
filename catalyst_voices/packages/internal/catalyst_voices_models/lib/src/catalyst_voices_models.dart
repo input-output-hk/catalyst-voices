@@ -17,7 +17,6 @@ export 'campaign/campaign_filters.dart';
 export 'campaign/campaign_phase.dart';
 export 'campaign/campaign_timeline.dart';
 export 'campaign/campaign_total_ask.dart';
-export 'collaborators/collaborator_invitation.dart';
 export 'collaborators/collaborator_proposal_action.dart';
 export 'collaborators/collaborator_validation_result.dart';
 export 'common/hi_lo/hi_lo.dart';
