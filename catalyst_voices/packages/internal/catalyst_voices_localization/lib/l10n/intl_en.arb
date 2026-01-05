@@ -89,6 +89,10 @@
   "@acknowledgeToResubmitProposal": {
     "description": "Information for user that he needs to resubmit his proposal. "
   },
+  "actionTypes": "Action Types:",
+  "@actionTypes": {
+    "description": "Label for action types tabs"
+  },
   "active": "Active",
   "@active": {
     "description": "Activated state"
@@ -172,6 +176,10 @@
   "apiErrorUnknown": "Unknown error response",
   "@apiErrorUnknown": {
     "description": "A fallback error message when api returns error code"
+  },
+  "approvals": "Approvals",
+  "@approvals": {
+    "description": "Label for approvals tab"
   },
   "approve": "Approve",
   "@approve": {
@@ -500,6 +508,10 @@
   "collaborator": "Co-Proposer",
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
+  },
+  "collaboratorDisplayConsent": "Co-Proposer\nDisplay Consent",
+  "@collaboratorDisplayConsent": {
+    "description": "Generic title to inform user about display consent"
   },
   "collaboratorFinalProposalAcceptButton": "Approve Final Proposal",
   "@collaboratorFinalProposalAcceptButton": {
@@ -1547,6 +1559,10 @@
   "@exportProposalsIndividually": {
     "description": "Title for section informing user that they can export their proposals individually"
   },
+  "external": "External",
+  "@external": {
+    "description": "label for external tab"
+  },
   "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
   "@failedAuthenticationDescription": {
     "description": "Description for failed authentication reason to not find wallet"
@@ -1578,6 +1594,10 @@
   "finalProposal": "Final",
   "@finalProposal": {
     "description": "Label indicating final proposal status"
+  },
+  "finalProposalApproval": "Final Proposal\nApproval",
+  "@finalProposalApproval": {
+    "description": "Generic title to inform user about proposal approval"
   },
   "finishAccountButtonLabelText": "Finish account",
   "@finishAccountButtonLabelText": {
@@ -1980,6 +2000,10 @@
       }
     }
   },
+  "minAbbr": "min",
+  "@minAbbr": {
+    "description": "A short abbreviation for minute."
+  },
   "minBudgetRequest": "Min budget request",
   "@minBudgetRequest": {
     "description": "A label for the minimum budget request for a proposal."
@@ -2028,6 +2052,10 @@
   "myActions": "My Actions",
   "@myActions": {
     "description": "CTA to open My Actions side bar"
+  },
+  "myActionsPageHeader": "Find your place in Catalyst by exploring ways to participate, set up your preferences and help shape Cardano’s future.",
+  "@myActionsPageHeader": {
+    "description": "The header text on the My Actions page."
   },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
@@ -2379,6 +2407,10 @@
       }
     }
   },
+  "participationPreferences": "Participation preferences",
+  "@participationPreferences": {
+    "description": "Title for the participation preferences section in user actions"
+  },
   "passwordDoNotMatch": "Passwords do not match, please correct",
   "@passwordDoNotMatch": {
     "description": "When user confirms password but it does not match original one."
@@ -2442,6 +2474,10 @@
   "proposal": "Proposal",
   "@proposal": {
     "description": "Generic name to describe an type of item."
+  },
+  "proposalApprovals": "Proposal Approvals",
+  "@proposalApprovals": {
+    "description": "CTA to see proposal that needs approval"
   },
   "proposalEditorBackToProposals": "Back to Proposals",
   "@proposalEditorBackToProposals": {
@@ -2603,6 +2639,10 @@
   "proposalImportDialogTitle": "Import Proposal",
   "@proposalImportDialogTitle": {
     "description": "The title of the dialog to import a proposal."
+  },
+  "proposalInvitations": "Proposal Invitations",
+  "@proposalInvitations": {
+    "description": "CTA to see proposal invitations"
   },
   "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
   "@proposalIterationPublishUpdateAndTitle": {
@@ -3236,6 +3276,15 @@
   "@reject": {
     "description": "Action label to deny (forbid consent) something."
   },
+  "remaining": "{duration} remaining",
+  "@remaining": {
+    "description": "Label showing remaining time duration",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "removeFromVoteList": "Remove from Vote List",
   "@removeFromVoteList": {
     "description": "When vote is added but not casted yet it can be removed."
@@ -3333,6 +3382,10 @@
   "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
   "@richTextEditorImageSupportInfo": {
     "description": "Information about supported image sources in the editor"
+  },
+  "role": "Role",
+  "@role": {
+    "description": "Label for role tab"
   },
   "safariNotSupportedMessage": "Safari is not supported, please use Chrome or Firefox.",
   "@safariNotSupportedMessage": {

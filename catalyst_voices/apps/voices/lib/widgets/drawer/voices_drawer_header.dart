@@ -31,6 +31,9 @@ class VoicesDrawerHeader extends StatelessWidget {
         ),
         CloseButton(
           onPressed: onCloseTap != null ? onCloseTap!.call : Navigator.maybeOf(context)?.pop,
+          style: IconButton.styleFrom(
+            padding: EdgeInsets.zero,
+          ),
         ),
       ],
     );

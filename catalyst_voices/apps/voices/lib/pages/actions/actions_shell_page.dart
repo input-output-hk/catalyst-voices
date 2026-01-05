@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/actions/actions_page.dart';
+import 'package:catalyst_voices/pages/actions/actions/actions_page.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/co_proposers_consent_page.dart';
 import 'package:catalyst_voices/pages/actions/proposal_approval/proposal_approval_page.dart';
 import 'package:catalyst_voices/routes/routing/actions_route.dart';
@@ -24,7 +24,7 @@ class ActionsShellPage extends StatelessWidget {
     return VoicesDrawer(
       width: 500,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
         child: child,
       ),
     );
