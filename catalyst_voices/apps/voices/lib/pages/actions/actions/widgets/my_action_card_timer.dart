@@ -18,10 +18,10 @@ class MyActionCardTimer extends StatefulWidget {
 }
 
 class _MyActionCardTimerState extends State<MyActionCardTimer> {
-  late Duration _remainingDuration;
+  Duration _remainingDuration = Duration.zero;
   Timer? _timer;
-  late final Stopwatch _stopwatch;
-  late Duration _initialDuration;
+  final Stopwatch _stopwatch = Stopwatch();
+  Duration _initialDuration = Duration.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,6 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
     super.initState();
     _initialDuration = widget.duration;
     _remainingDuration = widget.duration;
-    _stopwatch = Stopwatch();
     _startTimer();
   }
 
