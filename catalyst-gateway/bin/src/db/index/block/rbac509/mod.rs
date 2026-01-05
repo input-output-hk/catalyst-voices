@@ -26,7 +26,7 @@ use tracing::{debug, error};
 
 use crate::{
     db::index::{
-        queries::{FallibleQueryTasks, SizedBatch},
+        queries::{FallibleQueryTasks, SizedBatch, purge},
         session::CassandraSession,
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
@@ -47,6 +47,8 @@ pub(crate) struct Rbac509InsertQuery {
     catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
     /// A Catalyst ID for public key data captured during indexing.
     catalyst_id_for_public_key: Vec<insert_catalyst_id_for_public_key::Params>,
+    /// A Catalyst ID for transaction ID Data to be removed during indexing.
+    delete_catalyst_id_for_stake_address: Vec<purge::catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -58,6 +60,7 @@ impl Rbac509InsertQuery {
             catalyst_id_for_txn_id: Vec::new(),
             catalyst_id_for_stake_address: Vec::new(),
             catalyst_id_for_public_key: Vec::new(),
+            delete_catalyst_id_for_stake_address: Vec::new(),
         }
     }
 
@@ -365,6 +368,18 @@ impl Rbac509InsertQuery {
                 ),
             );
         }
+
+        // Record stake addresses that are marked as removed.
+        for address in removed_stake_addresses {
+            self.delete_catalyst_id_for_stake_address.push(
+                purge::catalyst_id_for_stake_address::Params {
+                    stake_address: address.clone().into(),
+                    slot_no: slot.into(),
+                    txn_index: index.into(),
+                },
+            );
+        }
+
         // Record new public keys.
         for key in public_keys {
             self.catalyst_id_for_public_key
@@ -475,6 +490,17 @@ impl Rbac509InsertQuery {
                 insert_catalyst_id_for_public_key::Params::execute_batch(
                     &inner_session,
                     self.catalyst_id_for_public_key,
+                )
+                .await
+            }));
+        }
+
+        if !self.delete_catalyst_id_for_stake_address.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                purge::catalyst_id_for_stake_address::DeleteQuery::execute(
+                    &inner_session,
+                    self.delete_catalyst_id_for_stake_address,
                 )
                 .await
             }));
