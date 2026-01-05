@@ -33,7 +33,9 @@ final class SessionAccount extends Equatable {
       catalystId: CatalystId(
         host: CatalystIdHost.cardano.host,
         username: 'Account Mocked',
+        /* cSpell:disable */
         role0Key: base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE'),
+        /* cSpell:enable */
       ),
       isAdmin: true,
       isProposer: true,
