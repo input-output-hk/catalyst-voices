@@ -16,14 +16,13 @@ export class WalletConnectedPanel extends OnboardingBasePage {
     this.walletNameValue = page.getByTestId("NameOfWalletValue");
     this.walletBalanceValue = page.getByTestId("WalletBalanceValue");
     this.walletAddressValue = page.getByTestId("WalletAddressValue");
-    this.walletAddressClipboardIcon = page.getByTestId(
-      "WalletAddressClipboardIcon"
-    );
+    this.walletAddressClipboardIcon = page.getByTestId("WalletAddressClipboardIcon");
   }
 
-  async goto() {
+  async goto(): Promise<WalletConnectedPanel> {
     await new WalletListPanel(this.page, this.testModel).goto();
-    await new WalletListPanel(this.page, this.testModel).clickConnectWallet(this.testModel.walletConfig.name);
+    await new WalletListPanel(this.page, this.testModel).connectWallet();
+    return this;
   }
 
   async getWalletNameValue() {
@@ -34,9 +33,7 @@ export class WalletConnectedPanel extends OnboardingBasePage {
   }
   async getWalletAddressValue() {
     await this.click(this.walletAddressClipboardIcon);
-    const address = await this.page.evaluate(async () =>
-      await navigator.clipboard.readText()
-    );
+    const address = await this.page.evaluate(async () => await navigator.clipboard.readText());
     return address;
   }
 }
