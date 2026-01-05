@@ -82,18 +82,9 @@ class _Tab extends StatelessWidget {
     this.onTap,
   });
 
-  Set<WidgetState> get states => {
+  Set<WidgetState> get _states => {
     if (isSelected) WidgetState.selected,
   };
-
-  WidgetStateProperty<Color?> backgroundColor(BuildContext context) {
-    return WidgetStateProperty.resolveWith<Color?>((states) {
-      if (states.contains(WidgetState.selected)) {
-        return context.colors.primaryContainer;
-      }
-      return null;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,12 +96,21 @@ class _Tab extends StatelessWidget {
           color: context.colors.textOnPrimaryLevel0,
         ),
       ),
-      leading: leadingIcon(context).resolve(states),
-      backgroundColor: backgroundColor(context).resolve(states),
+      leading: _leadingIcon(context).resolve(_states),
+      backgroundColor: _backgroundColor(context).resolve(_states),
     );
   }
 
-  WidgetStateProperty<Widget?> leadingIcon(BuildContext context) {
+  WidgetStateProperty<Color?> _backgroundColor(BuildContext context) {
+    return WidgetStateProperty.resolveWith<Color?>((states) {
+      if (states.contains(WidgetState.selected)) {
+        return context.colors.primaryContainer;
+      }
+      return null;
+    });
+  }
+
+  WidgetStateProperty<Widget?> _leadingIcon(BuildContext context) {
     return WidgetStateProperty.resolveWith<Widget?>((states) {
       if (states.contains(WidgetState.selected)) {
         return VoicesAssets.icons.check.buildIcon();

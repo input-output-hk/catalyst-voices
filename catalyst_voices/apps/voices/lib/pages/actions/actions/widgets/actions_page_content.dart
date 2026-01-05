@@ -32,7 +32,6 @@ class _ActionsPageContentState extends State<ActionsPageContent>
         ),
         Expanded(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 20,
             children: [
@@ -75,10 +74,7 @@ class _ActionsPageContentState extends State<ActionsPageContent>
   @override
   void initState() {
     super.initState();
-    // Sync initial tab with cubit cache
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MyActionsCubit>().updatePageTab(widget.tab);
-    });
+    context.read<MyActionsCubit>().updatePageTab(widget.tab);
   }
 
   void _onTabChanged(ActionsPageTab? tab) {

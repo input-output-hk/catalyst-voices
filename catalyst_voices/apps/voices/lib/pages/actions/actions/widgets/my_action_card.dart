@@ -21,6 +21,7 @@ class MyActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(maxWidth: 452, maxHeight: 232),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: DecorationImage(
@@ -32,24 +33,21 @@ class MyActionCard extends StatelessWidget {
           alignment: const Alignment(-1, -0.4),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _LabelText(text: type.labelText(context)),
-                ?timeRemainingWidget,
-              ],
-            ),
-            const SizedBox(height: 12),
-            _TitleText(text: type.title(context)),
-            const SizedBox(height: 36),
-            actionWidget,
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _LabelText(text: type.labelText(context)),
+              ?timeRemainingWidget,
+            ],
+          ),
+          const SizedBox(height: 12),
+          _TitleText(text: type.title(context)),
+          const SizedBox(height: 36),
+          actionWidget,
+        ],
       ),
     );
   }
