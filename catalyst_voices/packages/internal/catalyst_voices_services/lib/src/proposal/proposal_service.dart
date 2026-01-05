@@ -640,7 +640,7 @@ final class ProposalServiceImpl implements ProposalService {
       (catalystId, privateKey) => _proposalRepository.removeCollaboratorFromProposal(
         proposalId: proposalId,
         collaboratorId: catalystId,
-        collaboratorKey: privateKey,
+        privateKey: privateKey,
       ),
     );
   }

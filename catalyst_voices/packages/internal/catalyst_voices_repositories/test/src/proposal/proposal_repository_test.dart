@@ -4,7 +4,6 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -464,17 +463,16 @@ void main() {
             id: DocumentRefFactory.signedDocumentRef(),
           ),
         );
-        registerFallbackValue(DummyCatalystIdFactory.create());
+        registerFallbackValue(CatalystIdFactory.create());
         registerFallbackValue(FakeCatalystPrivateKey());
 
         const proposalId = SignedDocumentRef(id: 'proposal-1', ver: 'v1');
-        final collaboratorId = DummyCatalystIdFactory.create(
+        final collaboratorId = CatalystIdFactory.create(
           username: 'collaborator-1',
-          role0KeyBytes: Uint8List.fromList(List.filled(32, 0)),
         );
-        final otherCollaboratorId = DummyCatalystIdFactory.create(
+        final otherCollaboratorId = CatalystIdFactory.create(
           username: 'other-collaborator',
-          role0KeyBytes: Uint8List.fromList(List.filled(32, 1)),
+          role0KeySeed: 1,
         );
 
         final originalMetadata = DocumentDataMetadata.proposal(
@@ -528,7 +526,7 @@ void main() {
         await repository.removeCollaboratorFromProposal(
           proposalId: proposalId,
           collaboratorId: collaboratorId,
-          collaboratorKey: FakeCatalystPrivateKey(),
+          privateKey: FakeCatalystPrivateKey(),
         );
 
         // Then

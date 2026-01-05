@@ -16,13 +16,9 @@ final class DocumentDataFactory {
     final metadata = document.metadata;
     final content = switch (document.payload) {
       SignedDocumentJsonPayload(:final data) => DocumentDataContent(data),
+      SignedDocumentBinaryPayload() ||
       SignedDocumentUnknownPayload() => throw const UnknownSignedDocumentContentType(
         type: SignedDocumentContentType.unknown,
-      ),
-      SignedDocumentBinaryPayload(:final data) => DocumentDataContent(
-        // Assuming that binary data is UTF-8 encoded string representing a json,
-        // at the moment no other data type is allowed.
-        SignedDocumentJsonPayload.fromBytes(data).data,
       ),
     };
     final artifact = document.toArtifact();

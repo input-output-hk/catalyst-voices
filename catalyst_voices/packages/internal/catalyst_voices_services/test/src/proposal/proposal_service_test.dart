@@ -657,7 +657,7 @@ void main() {
           () => mockProposalRepository.removeCollaboratorFromProposal(
             proposalId: any(named: 'proposalId'),
             collaboratorId: any(named: 'collaboratorId'),
-            collaboratorKey: any(named: 'collaboratorKey'),
+            privateKey: any(named: 'privateKey'),
           ),
         ).thenAnswer((_) async => {});
       });
@@ -721,7 +721,7 @@ void main() {
           () => mockProposalRepository.removeCollaboratorFromProposal(
             proposalId: proposalId,
             collaboratorId: any(named: 'collaboratorId'),
-            collaboratorKey: any(named: 'collaboratorKey'),
+            privateKey: any(named: 'privateKey'),
           ),
         );
       });

@@ -80,7 +80,7 @@ abstract interface class ProposalRepository {
   Future<void> removeCollaboratorFromProposal({
     required SignedDocumentRef proposalId,
     required CatalystId collaboratorId,
-    required CatalystPrivateKey collaboratorKey,
+    required CatalystPrivateKey privateKey,
   });
 
   Future<void> updateProposalFavorite({
@@ -331,7 +331,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<void> removeCollaboratorFromProposal({
     required SignedDocumentRef proposalId,
     required CatalystId collaboratorId,
-    required CatalystPrivateKey collaboratorKey,
+    required CatalystPrivateKey privateKey,
   }) async {
     final artifact = await _documentRepository.getDocumentArtifact(id: proposalId);
     final document = await _signedDocumentManager.parseDocument(artifact);
@@ -351,7 +351,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       SignedDocumentBinaryPayload(document.rawPayload),
       metadata: updatedMetadata,
       catalystId: collaboratorId,
-      privateKey: collaboratorKey,
+      privateKey: privateKey,
     );
 
     await _documentRepository.publishDocument(document: updatedDocument);
