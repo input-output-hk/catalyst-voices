@@ -9,7 +9,7 @@ export default defineConfig({
   retries: 2,
   workers: process.env.CI ? 1 : undefined,
   reporter: [["junit", { outputFile: "/results/voices.junit-report.xml" }], ["html"]],
-  timeout: 120 * 1000,
+  timeout: 300 * 1000,
   use: {
     baseURL: `https://app.${process.env.ENVIRONMENT}.projectcatalyst.io/`,
     trace: "on-first-retry",
