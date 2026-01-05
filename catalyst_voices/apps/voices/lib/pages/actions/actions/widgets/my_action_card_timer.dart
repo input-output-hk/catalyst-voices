@@ -74,6 +74,7 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
   @override
   void dispose() {
     _timer?.cancel();
+    _stopwatch.stop();
     super.dispose();
   }
 
