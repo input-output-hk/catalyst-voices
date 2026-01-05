@@ -19,6 +19,7 @@ version = 2
 ignore = [
     "RUSTSEC-2025-0067",
     "RUSTSEC-2025-0068",
+    "RUSTSEC-2024-0370",
 ]
 
 [bans]
@@ -65,6 +66,8 @@ allow-git = [
     "https://github.com/dariusc93/rust-ipfs",
     # TODO(dt-iohk): remove this when changes from forked flutter_rust_bridge are merged into the official version
     "https://github.com/input-output-hk/catalyst_flutter_rust_bridge",
+    # TODO: remove this when new version `0.6.2` would be published to crates.io
+    "https://github.com/nervosnetwork/sparse-merkle-tree.git",
 ]
 
 [licenses]
