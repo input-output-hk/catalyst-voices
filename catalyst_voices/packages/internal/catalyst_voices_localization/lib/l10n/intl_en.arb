@@ -513,6 +513,14 @@
   "@collaboratorDisplayConsent": {
     "description": "Generic title to inform user about display consent"
   },
+  "collaboratorDisplayConsentHeader": "Co-Proposer Display Consent",
+  "@collaboratorDisplayConsentHeader": {
+    "description": "Header title for Co-Proposer Display Consent page in my actions tab"
+  },
+  "collaboratorDisplayConsentPageHeader": "Co-proposers can choose whether or not to be displayed on a proposal you’ve been invited for. This action allows you to approve or decline your visibility for transparency and collaboration.",
+  "@collaboratorDisplayConsentPageHeader": {
+    "description": "Header text for the collaborator display consent page"
+  },
   "collaboratorFinalProposalAcceptButton": "Approve Final Proposal",
   "@collaboratorFinalProposalAcceptButton": {
     "description": "Dialog button when accepting a final proposal as a collaborator."
@@ -1726,6 +1734,14 @@
   "headsUp": "Heads up",
   "@headsUp": {
     "description": "In context for important information below"
+  },
+  "headsUpDisplayConsentHintContent": "You can agree or disagree to be displayed on any proposal you’re invited to.\n\nChanged your mind? You can update your display consent anytime, just keep the submission deadline in mind. Earlier iterations will still show your previous choice.",
+  "@headsUpDisplayConsentHintContent": {
+    "description": "Content for heads up about co-proposer display consent"
+  },
+  "headsUpDisplayConsentHintTitle": "Heads up on Co-proposer Display consent",
+  "@headsUpDisplayConsentHintTitle": {
+    "description": "Title for heads up about co-proposer display consent"
   },
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {
@@ -4391,9 +4407,5 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
-  },
-  "collaborator_display_consent_header": "Co-Proposer Display Consent",
-  "@collaborator_display_consent_header": {
-    "description": "Header title for Co-Proposer Display Consent page in my actions tab"
   }
 }

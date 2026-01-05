@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/actions/co_proposers_consent/co_proposers_consent_page_content.dart';
 import 'package:flutter/material.dart';
 
 class CoProposersConsentPage extends StatelessWidget {
@@ -5,6 +6,6 @@ class CoProposersConsentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CoProposersConsentPage();
+    return const CoProposersConsentPageContent();
   }
 }
