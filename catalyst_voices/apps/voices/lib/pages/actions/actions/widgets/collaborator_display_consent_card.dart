@@ -40,7 +40,7 @@ class _ActionButton extends StatelessWidget {
         backgroundColor: context.colorScheme.onPrimary,
         foregroundColor: context.colors.textOnPrimaryLevel0,
       ),
-      child: Text(context.l10n.proposalApprovals),
+      child: Text(context.l10n.proposalInvitations),
     );
   }
 

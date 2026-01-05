@@ -2636,6 +2636,10 @@
   "@proposalImportDialogTitle": {
     "description": "The title of the dialog to import a proposal."
   },
+  "proposalInvitations": "Proposal Invitations",
+  "@proposalInvitations": {
+    "description": "CTA to see proposal invitations"
+  },
   "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
   "@proposalIterationPublishUpdateAndTitle": {
     "description": "Title for the proposal iteration card",
