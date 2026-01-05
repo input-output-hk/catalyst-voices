@@ -1,6 +1,3 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
-import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
 import 'package:flutter/material.dart';
 
 class CoProposersConsentPage extends StatelessWidget {
@@ -8,34 +5,6 @@ class CoProposersConsentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        VoicesDrawerHeader(
-          text: 'Co-Proposer Display Consent',
-          onCloseTap: () => ActionsShellPage.close(context),
-          showBackButton: true,
-        ),
-        const SizedBox(height: 30),
-        const _Content(),
-      ],
-    );
-  }
-}
-
-class _Content extends StatelessWidget {
-  const _Content();
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Center(
-        child: Text(
-          'No actions',
-          style: context.textTheme.bodyLarge?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-        ),
-      ),
-    );
+    return const CoProposersConsentPage();
   }
 }

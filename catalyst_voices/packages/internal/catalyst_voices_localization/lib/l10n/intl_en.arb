@@ -4387,5 +4387,9 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
+  },
+  "collaborator_display_consent_header": "Co-Proposer Display Consent",
+  "@collaborator_display_consent_header": {
+    "description": "Header title for Co-Proposer Display Consent page in my actions tab"
   }
 }
