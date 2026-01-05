@@ -19,7 +19,7 @@ class MarkdownToPlainStringEncoder extends Converter<MarkdownData, String> {
     final document = quill.Document.fromDelta(delta);
     final result = document.toPlainText(
       [],
-      _EmptyEmbedBuilder(),
+      const _EmptyEmbedBuilder(),
     );
 
     return result.trim();
@@ -27,15 +27,17 @@ class MarkdownToPlainStringEncoder extends Converter<MarkdownData, String> {
 }
 
 class _EmptyEmbedBuilder extends quill.EmbedBuilder {
+  const _EmptyEmbedBuilder();
+
   @override
   String get key => throw UnsupportedError(
-    'We only need toPlainText() from this builder, key should never be used.',
+    'Only toPlainText() is needed from this builder, `key` should never be used.',
   );
 
   @override
   Widget build(BuildContext context, quill.EmbedContext embedContext) {
     throw UnsupportedError(
-      'We only need toPlainText() from this builder, build() should never be used.',
+      'Only toPlainText() is needed from this builder, `build()` should never be used.',
     );
   }
 
