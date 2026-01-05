@@ -30,7 +30,11 @@ final class SessionAccount extends Equatable {
 
   factory SessionAccount.mocked() {
     return SessionAccount(
-      catalystId: DummyCatalystIdFactory.create(username: 'Account Mocked'),
+      catalystId: CatalystId(
+        host: CatalystIdHost.cardano.host,
+        username: 'Account Mocked',
+        role0Key: base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE'),
+      ),
       isAdmin: true,
       isProposer: true,
     );
