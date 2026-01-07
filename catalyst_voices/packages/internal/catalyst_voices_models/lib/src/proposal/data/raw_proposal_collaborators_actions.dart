@@ -14,14 +14,18 @@ final class RawCollaboratorAction extends Equatable {
   /// The specific action taken by the collaborator.
   final ProposalSubmissionAction action;
 
+  /// A reference to the action document.
+  final SignedDocumentRef actionId;
+
   const RawCollaboratorAction({
     required this.id,
     required this.proposalId,
     required this.action,
+    required this.actionId,
   });
 
   @override
-  List<Object?> get props => [id, proposalId, action];
+  List<Object?> get props => [id, proposalId, action, actionId];
 }
 
 /// A collection of raw collaborator actions on proposals.

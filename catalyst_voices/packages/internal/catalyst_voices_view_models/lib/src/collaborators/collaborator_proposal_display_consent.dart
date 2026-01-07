@@ -54,6 +54,8 @@ class CollaboratorProposalDisplayConsent extends Equatable {
   final String categoryName;
   final CatalystId? originalAuthor;
   final CollaboratorDisplayConsentStatus status;
+  final DateTime invitedAt;
+  final DateTime? lastDisplayConsentUpdate;
 
   const CollaboratorProposalDisplayConsent({
     required this.id,
@@ -61,6 +63,8 @@ class CollaboratorProposalDisplayConsent extends Equatable {
     required this.categoryName,
     required this.originalAuthor,
     required this.status,
+    required this.invitedAt,
+    this.lastDisplayConsentUpdate,
   });
 
   factory CollaboratorProposalDisplayConsent.empty(CollaboratorDisplayConsentStatus status) {
@@ -70,6 +74,8 @@ class CollaboratorProposalDisplayConsent extends Equatable {
       categoryName: 'F16: Cardano Use Cases: Concept',
       originalAuthor: DummyCatalystIdFactory.create(),
       status: status,
+      invitedAt: DateTime(2026),
+      lastDisplayConsentUpdate: DateTime(2026, 03, 31),
     );
   }
 
@@ -77,9 +83,10 @@ class CollaboratorProposalDisplayConsent extends Equatable {
     ProposalBriefData proposal,
     CatalystId activeAccountId,
   ) {
-    final collaboratorStatus = proposal.collaborators
-        ?.firstWhere((collaborator) => collaborator.id.isSameAs(activeAccountId))
-        .status;
+    final collaborator = proposal.collaborators?.firstWhere(
+      (collaborator) => collaborator.id.isSameAs(activeAccountId),
+    );
+    final collaboratorStatus = collaborator?.status;
     final displayConsentStatus = CollaboratorDisplayConsentStatus.fromCollaborationStatus(
       collaboratorStatus,
     );
@@ -90,6 +97,8 @@ class CollaboratorProposalDisplayConsent extends Equatable {
       categoryName: proposal.categoryName ?? '',
       originalAuthor: proposal.author,
       status: displayConsentStatus,
+      invitedAt: proposal.createdAt,
+      lastDisplayConsentUpdate: collaborator?.createdAt,
     );
   }
 

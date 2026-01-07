@@ -1,12 +1,14 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 class ProposalDataCollaborator extends Equatable {
   final CatalystId id;
   final ProposalsCollaborationStatus status;
+  final DateTime? createdAt;
 
-  const ProposalDataCollaborator({required this.id, required this.status});
+  const ProposalDataCollaborator({required this.id, required this.status, required this.createdAt});
 
   /// Creates a collaborator with status derived from the submission action.
   ///
@@ -20,6 +22,7 @@ class ProposalDataCollaborator extends Equatable {
     required CatalystId id,
     required ProposalSubmissionAction? action,
     required bool isProposalFinal,
+    SignedDocumentRef? actionId,
   }) {
     final status = switch (action) {
       null => ProposalsCollaborationStatus.pending,
@@ -30,11 +33,11 @@ class ProposalDataCollaborator extends Equatable {
       ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
     };
 
-    return ProposalDataCollaborator(id: id, status: status);
+    return ProposalDataCollaborator(id: id, status: status, createdAt: actionId?.id.dateTime);
   }
 
   @override
-  List<Object?> get props => [id, status];
+  List<Object?> get props => [id, status, createdAt];
 
   static List<ProposalDataCollaborator> resolveCollaboratorStatuses({
     required bool isProposalFinal,
@@ -42,12 +45,15 @@ class ProposalDataCollaborator extends Equatable {
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
     List<CatalystId> prevCollaborators = const [],
     List<CatalystId> prevAuthors = const [],
+    DateTime? createdAt,
   }) {
     final currentCollaboratorsStatuses = currentCollaborators.map((id) {
+      final collaboratorAction = collaboratorsActions[id.toSignificant()];
       return ProposalDataCollaborator.fromAction(
         id: id,
-        action: collaboratorsActions[id.toSignificant()]?.action,
+        action: collaboratorAction?.action,
         isProposalFinal: isProposalFinal,
+        actionId: collaboratorAction?.actionId,
       );
     });
 
@@ -62,7 +68,7 @@ class ProposalDataCollaborator extends Equatable {
       final status = didAuthorPrevVersion
           ? ProposalsCollaborationStatus.left
           : ProposalsCollaborationStatus.removed;
-      return ProposalDataCollaborator(id: id, status: status);
+      return ProposalDataCollaborator(id: id, status: status, createdAt: createdAt);
     });
 
     return [

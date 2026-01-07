@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/widgets/display_consent_choice_menu.dart';
+import 'package:catalyst_voices/pages/actions/co_proposers_consent/widgets/display_consent_last_update_text.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/widgets/display_consent_proposal_info.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/widgets/invited_by_text.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -53,17 +54,22 @@ class ProposalDisplayConsentCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        spacing: 4,
                         children: [
                           DisplayConsentChoiceMenu(
                             selectedStatus: proposalDisplayConsent.status,
                             onSelected: onSelected,
+                          ),
+                          DisplayConsentLastUpdateText(
+                            date: proposalDisplayConsent.lastDisplayConsentUpdate,
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                InvitedByText(catalystId: proposalDisplayConsent.originalAuthor),
+                InvitedByText(catalystId: proposalDisplayConsent.originalAuthor, invitedAt: proposalDisplayConsent.invitedAt),
               ],
             ),
           ),
