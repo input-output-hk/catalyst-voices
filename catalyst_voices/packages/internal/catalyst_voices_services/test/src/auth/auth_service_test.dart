@@ -61,7 +61,7 @@ void main() {
       test('returns null when keychain is locked', () async {
         // Given
         final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
+          catalystId: CatalystIdFactory.create(),
           keychain: keychain,
           isActive: true,
         );
@@ -80,7 +80,7 @@ void main() {
       test('returns a valid token', () async {
         // Given
         final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
+          catalystId: CatalystIdFactory.create(),
           keychain: keychain,
           isActive: true,
         );
@@ -99,7 +99,7 @@ void main() {
       test('keeps token cached and calls keychain once', () async {
         // Given
         final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
+          catalystId: CatalystIdFactory.create(),
           keychain: keychain,
           isActive: true,
         );
@@ -119,7 +119,7 @@ void main() {
         // Given
         const tokensCount = 4;
         final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
+          catalystId: CatalystIdFactory.create(),
           keychain: keychain,
           isActive: true,
         );
