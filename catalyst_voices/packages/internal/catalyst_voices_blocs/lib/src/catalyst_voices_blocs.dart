@@ -14,6 +14,7 @@ export 'dev_tools/dev_tools.dart';
 export 'dev_tools/document_lookup/document_lookup.dart';
 export 'discovery/discovery.dart';
 export 'feature_flags/feature_flags.dart';
+export 'my_actions/my_actions.dart';
 export 'proposal/proposal.dart';
 export 'proposal_builder/new_proposal/new_proposal.dart';
 export 'proposal_builder/proposal_builder.dart';
