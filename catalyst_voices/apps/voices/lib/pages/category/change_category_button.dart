@@ -14,28 +14,8 @@ class ChangeCategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    return BlocSelector<
-      CategoryDetailCubit,
-      CategoryDetailState,
-      List<DropdownMenuViewModel<ProposalsCategoryFilter>>
-    >(
-      selector: (state) {
-        final selectedCategory = state.category?.ref ?? '';
-        return state.categories
-            .map(
-              (e) => DropdownMenuViewModel(
-                value: ProposalsRefCategoryFilter(ref: e.ref),
-                name: e.formattedName,
-                isSelected: e.ref == selectedCategory,
-              ),
-            )
-            .toList();
-      },
-=======
     return BlocSelector<CategoryDetailCubit, CategoryDetailState, CategoryDetailStatePicker>(
       selector: (state) => state.picker,
->>>>>>> feat/face-performance-optimization-3352
       builder: (context, state) {
         return CampaignCategoryPicker(
           onSelected: (value) => unawaited(_changeCategory(context, value)),

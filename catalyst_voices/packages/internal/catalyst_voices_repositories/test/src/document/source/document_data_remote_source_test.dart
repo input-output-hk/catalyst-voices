@@ -5,23 +5,19 @@ import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
 import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
 import 'package:catalyst_voices_repositories/src/api/models/indexed_document_version.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-<<<<<<< HEAD
-  final CatGatewayService gateway = _MockedCatGateway();
-  final CatReviewsService reviews = _MockedCatReviews();
-  final CatStatusService status = _MockedCatStatus();
-=======
-  final CatGateway gateway = MockCatGateway();
-  final CatReviews reviews = MockCatReviews();
-  final CatStatus status = MockedCatStatus();
+  final CatGatewayService gateway = MockCatGateway();
+  final CatReviewsService reviews = MockCatReviews();
+  final CatStatusService status = MockedCatStatus();
   final AppMetaService appMeta = MockedAppMetaService();
 
->>>>>>> feat/face-performance-optimization-3352
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
@@ -49,48 +45,6 @@ void main() {
 
   group(CatGatewayDocumentDataSource, () {
     group('index', () {
-<<<<<<< HEAD
-      test('loops thru all pages until there is no remaining refs '
-          'and extracts refs from them', () async {
-        final pageZero = DocumentIndexList(
-          docs: List.generate(
-            maxPageSize,
-            (_) => _buildDocumentIndexList(),
-          ),
-          page: const CurrentPage(page: 0, limit: maxPageSize, remaining: 5),
-        );
-        final pageOne = DocumentIndexList(
-          docs: List.generate(
-            5,
-            (_) => _buildDocumentIndexList(),
-          ),
-          page: const CurrentPage(page: 1, limit: maxPageSize, remaining: 0),
-        );
-
-        when(
-          () => gateway.documentIndex(
-            filter: any(named: 'filter'),
-            limit: maxPageSize,
-            page: 0,
-          ),
-        ).thenAnswer((_) async => pageZero);
-
-        when(
-          () => gateway.documentIndex(
-            filter: any(named: 'filter'),
-            limit: maxPageSize,
-            page: 1,
-          ),
-        ).thenAnswer((_) async => pageOne);
-
-        final refs = await source.index(campaign: Campaign.f14());
-
-        expect(refs, isNotEmpty);
-
-        verify(
-          () => gateway.documentIndex(
-            filter: any(named: 'filter'),
-=======
       test('calls API with mapped filters for categories ids', () async {
         // Given
         const filters = DocumentIndexFilters(categoriesIds: ['cat1', 'cat2']);
@@ -98,23 +52,19 @@ void main() {
         const limit = 10;
 
         final responseBody = DocumentIndexList(
-          docs: List.generate(2, (_) => _buildDocumentIndexList().toJson()),
+          docs: List.generate(2, (_) => _buildDocumentIndexList()),
           page: const CurrentPage(page: page, limit: limit, remaining: 0),
         );
-        final response = Response(http.Response('', 200), responseBody);
+        final response = responseBody;
 
         const expectedFiltersQueryBody = DocumentIndexQueryFilter(
-          parameters: {
-            'id': {
-              'in': ['cat1', 'cat2'],
-            },
-          },
+          parameters: IdAndVerRef.idOnly(IdSelector.inside(['cat1', 'cat2'])),
         );
 
         when(
           () {
-            return gateway.apiV1DocumentIndexPost(
-              body: any(named: 'body'),
+            return gateway.documentIndex(
+              filter: any(named: 'filter'),
               limit: limit,
               page: page,
             );
@@ -127,9 +77,8 @@ void main() {
 
         // Then
         final captured = verify(
-          () => gateway.apiV1DocumentIndexPost(
-            body: captureAny(named: 'body'),
->>>>>>> feat/face-performance-optimization-3352
+          () => gateway.documentIndex(
+            filter: captureAny(named: 'filter'),
             limit: any(named: 'limit'),
             page: any(named: 'page'),
           ),
@@ -138,50 +87,6 @@ void main() {
         expect(captured.last, equals(expectedFiltersQueryBody));
       });
 
-<<<<<<< HEAD
-      test('expands all page refs correctly', () async {
-        final proposalId = DocumentRefFactory.randomUuidV7();
-        final proposalRefs = [
-          SignedDocumentRef(id: proposalId, version: DocumentRefFactory.randomUuidV7()),
-          SignedDocumentRef(id: proposalId, version: DocumentRefFactory.randomUuidV7()),
-        ];
-        final templateRef = SignedDocumentRef.first(DocumentRefFactory.randomUuidV7());
-
-        final page = DocumentIndexList(
-          docs: [
-            IndexedDocument(
-              id: proposalId,
-              ver: proposalRefs.map((e) {
-                return IndexedDocumentVersion(
-                  ver: e.version!,
-                  type: DocumentType.proposalDocument.uuid,
-                  id: '01944e87-e68c-7f22-9df1-816863cfa5ff',
-                  template: [
-                    DocumentReference(
-                      id: templateRef.id,
-                      ver: templateRef.version!,
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
-          ],
-          page: const CurrentPage(page: 0, limit: maxPageSize, remaining: 0),
-        );
-
-        final expectedRefs = <TypedDocumentRef>[
-          ...proposalRefs.map((e) => e.toTyped(DocumentType.proposalDocument)),
-          templateRef.toTyped(DocumentType.proposalTemplate),
-        ];
-
-        when(
-          () => gateway.documentIndex(
-            filter: any(named: 'filter'),
-            limit: maxPageSize,
-            page: 0,
-          ),
-        ).thenAnswer((_) async => page);
-=======
       test('handles dynamic json correctly', () async {
         // Given
         const filters = DocumentIndexFilters(categoriesIds: []);
@@ -190,40 +95,30 @@ void main() {
 
         final docs = List.generate(2, (_) => _buildDocumentIndexList());
         final responseBody = DocumentIndexList(
-          docs: docs.map((e) => e.toJson()).toList(),
+          docs: docs.map((e) => e).toList(),
           page: const CurrentPage(page: page, limit: limit, remaining: 0),
         );
-        final responseBodyJson = responseBody.toJson();
-        final response = Response(http.Response('', 200), responseBodyJson);
 
         when(
           () {
-            return gateway.apiV1DocumentIndexPost(
-              body: any(named: 'body'),
+            return gateway.documentIndex(
+              filter: any(named: 'filter'),
               limit: limit,
               page: page,
             );
           },
-        ).thenAnswer((_) => Future.value(response));
->>>>>>> feat/face-performance-optimization-3352
+        ).thenAnswer((_) => Future.value(responseBody));
 
         // When
         // ignore: avoid_redundant_argument_values
         final index = await source.index(page: page, limit: limit, filters: filters);
 
-<<<<<<< HEAD
-        expect(
-          refs,
-          allOf(hasLength(expectedRefs.length), containsAll(expectedRefs)),
-        );
-=======
         // Then
         expect(index.page.page, page);
         expect(index.page.limit, limit);
         expect(index.page.remaining, 0);
         expect(index.docs, hasLength(docs.length));
         expect(index.docs.map((e) => e.id), docs.map((e) => e.id));
->>>>>>> feat/face-performance-optimization-3352
       });
     });
   });
@@ -251,13 +146,4 @@ IndexedDocument _buildDocumentIndexList({
   );
 }
 
-<<<<<<< HEAD
-class _MockedCatGateway extends Mock implements CatGatewayService {}
-
-class _MockedCatReviews extends Mock implements CatReviewsService {}
-
-class _MockedCatStatus extends Mock implements CatStatusService {}
-
-=======
->>>>>>> feat/face-performance-optimization-3352
 class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}

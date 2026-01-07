@@ -71,7 +71,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       return await _proposalService.createDraftProposal(
         content: documentContent,
-        templateRef: template.metadata.selfRef.toSignedDocumentRef(),
+        templateRef: template.metadata.id.toSignedDocumentRef(),
         parameters: parameters,
       );
     } catch (error, stackTrace) {
@@ -183,17 +183,11 @@ class NewProposalCubit extends Cubit<NewProposalState>
     // right now user can start creating proposal without selecting category.
     // Right now every category have the same requirements for title so we can do a fallback for
     // first category from the list.
+    final categoryId = preselectedCategory ?? campaign?.categories.firstOrNull?.id;
     final campaignCategories = campaign?.categories ?? [];
-    final templateRef = campaignCategories
-        .cast<CampaignCategory?>()
-        .firstWhere(
-          (e) => e?.id == preselectedCategory,
-          orElse: () => campaignCategories.firstOrNull,
-        )
-        ?.proposalTemplateRef;
 
-    final template = templateRef != null
-        ? await _proposalService.getProposalTemplate(id: templateRef)
+    final template = categoryId != null
+        ? await _proposalService.getProposalTemplate(category: categoryId)
         : null;
     final titleRange = template?.title?.strLengthRange;
 

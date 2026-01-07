@@ -336,7 +336,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       proposalRef: proposalDocument?.metadata.id,
       title: proposalDocument?.title ?? '',
       authorName: proposalDocument?.authorName,
-      createdAt: proposalDocument?.metadata.id.ver.tryDateTime,
+      createdAt: proposalDocument?.metadata.id.ver?.tryDateTime,
       commentsCount: commentsCount,
       versions: versions,
       isFavorite: isFavorite,

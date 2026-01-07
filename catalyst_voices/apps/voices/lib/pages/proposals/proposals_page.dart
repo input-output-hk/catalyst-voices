@@ -23,7 +23,7 @@ class ProposalsPage extends StatefulWidget {
 
   const ProposalsPage({
     super.key,
-    this.categoryRef,
+    this.categoryId,
     this.tab,
   });
 
@@ -96,7 +96,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   void handleSignal(ProposalsSignal signal) {
     switch (signal) {
       case ChangeCategoryProposalsSignal(:final to):
-        _updateRoute(categoryRef: Optional(to?.id));
+        _updateRoute(categoryId: Optional(to?.id));
       case ChangeTabProposalsSignal(:final tab):
         _updateRoute(tab: tab);
       case ResetPaginationProposalsSignal():
@@ -179,7 +179,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   }
 
   void _updateRoute({
-    Optional<String>? categoryRef,
+    Optional<String>? categoryId,
     ProposalsPageTab? tab,
   }) {
     Router.neglect(context, () {

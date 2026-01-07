@@ -195,6 +195,7 @@ void main() {
         final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
         return UsersProposalOverview(
           id: effectiveId,
+          parameters: DocumentParameters({categoryRef}),
           title: title,
           updateDate: DateTime(2025, 10, 15),
           fundsRequested: Money.zero(currency: Currencies.ada),
@@ -213,7 +214,6 @@ void main() {
           fromActiveCampaign: true,
           commentsCount: commentsCount,
           category: 'Test Category',
-          categoryId: categoryRef,
           fundNumber: 14,
         );
       }
@@ -377,7 +377,7 @@ void main() {
           when(
             () => mockProposalService.forgetProposal(
               proposalRef: any(named: 'proposalRef'),
-              categoryId: any(named: 'categoryId'),
+              proposalParameters: any(named: 'proposalParameters'),
             ),
           ).thenAnswer((_) async => {});
         },
@@ -430,7 +430,7 @@ void main() {
           verify(
             () => mockProposalService.forgetProposal(
               proposalRef: any(named: 'proposalRef'),
-              categoryId: categoryRef,
+              proposalParameters: DocumentParameters({categoryRef}),
             ),
           ).called(1);
         },

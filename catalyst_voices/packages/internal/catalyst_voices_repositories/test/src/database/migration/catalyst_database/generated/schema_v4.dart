@@ -4,1311 +4,6 @@ import 'dart:typed_data' as i2;
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart';
 
-class Documents extends Table with TableInfo<Documents, DocumentsData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  Documents(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<BigInt> idHi = GeneratedColumn<BigInt>(
-    'id_hi',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> idLo = GeneratedColumn<BigInt>(
-    'id_lo',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> verHi = GeneratedColumn<BigInt>(
-    'ver_hi',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> verLo = GeneratedColumn<BigInt>(
-    'ver_lo',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<i2.Uint8List> content =
-      GeneratedColumn<i2.Uint8List>(
-        'content',
-        aliasedName,
-        false,
-        type: DriftSqlType.blob,
-        requiredDuringInsert: true,
-      );
-  late final GeneratedColumn<i2.Uint8List> metadata =
-      GeneratedColumn<i2.Uint8List>(
-        'metadata',
-        aliasedName,
-        false,
-        type: DriftSqlType.blob,
-        requiredDuringInsert: true,
-      );
-  late final GeneratedColumn<String> type = GeneratedColumn<String>(
-    'type',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    idHi,
-    idLo,
-    verHi,
-    verLo,
-    content,
-    metadata,
-    type,
-    createdAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'documents';
-  @override
-  Set<GeneratedColumn> get $primaryKey => {idHi, idLo, verHi, verLo};
-  @override
-  DocumentsData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DocumentsData(
-      idHi: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}id_hi'],
-      )!,
-      idLo: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}id_lo'],
-      )!,
-      verHi: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}ver_hi'],
-      )!,
-      verLo: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}ver_lo'],
-      )!,
-      content: attachedDatabase.typeMapping.read(
-        DriftSqlType.blob,
-        data['${effectivePrefix}content'],
-      )!,
-      metadata: attachedDatabase.typeMapping.read(
-        DriftSqlType.blob,
-        data['${effectivePrefix}metadata'],
-      )!,
-      type: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}type'],
-      )!,
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-    );
-  }
-
-  @override
-  Documents createAlias(String alias) {
-    return Documents(attachedDatabase, alias);
-  }
-}
-
-class DocumentsData extends DataClass implements Insertable<DocumentsData> {
-  final BigInt idHi;
-  final BigInt idLo;
-  final BigInt verHi;
-  final BigInt verLo;
-  final i2.Uint8List content;
-  final i2.Uint8List metadata;
-  final String type;
-  final DateTime createdAt;
-  const DocumentsData({
-    required this.idHi,
-    required this.idLo,
-    required this.verHi,
-    required this.verLo,
-    required this.content,
-    required this.metadata,
-    required this.type,
-    required this.createdAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id_hi'] = Variable<BigInt>(idHi);
-    map['id_lo'] = Variable<BigInt>(idLo);
-    map['ver_hi'] = Variable<BigInt>(verHi);
-    map['ver_lo'] = Variable<BigInt>(verLo);
-    map['content'] = Variable<i2.Uint8List>(content);
-    map['metadata'] = Variable<i2.Uint8List>(metadata);
-    map['type'] = Variable<String>(type);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    return map;
-  }
-
-  factory DocumentsData.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DocumentsData(
-      idHi: serializer.fromJson<BigInt>(json['idHi']),
-      idLo: serializer.fromJson<BigInt>(json['idLo']),
-      verHi: serializer.fromJson<BigInt>(json['verHi']),
-      verLo: serializer.fromJson<BigInt>(json['verLo']),
-      content: serializer.fromJson<i2.Uint8List>(json['content']),
-      metadata: serializer.fromJson<i2.Uint8List>(json['metadata']),
-      type: serializer.fromJson<String>(json['type']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'idHi': serializer.toJson<BigInt>(idHi),
-      'idLo': serializer.toJson<BigInt>(idLo),
-      'verHi': serializer.toJson<BigInt>(verHi),
-      'verLo': serializer.toJson<BigInt>(verLo),
-      'content': serializer.toJson<i2.Uint8List>(content),
-      'metadata': serializer.toJson<i2.Uint8List>(metadata),
-      'type': serializer.toJson<String>(type),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-    };
-  }
-
-  DocumentsData copyWith({
-    BigInt? idHi,
-    BigInt? idLo,
-    BigInt? verHi,
-    BigInt? verLo,
-    i2.Uint8List? content,
-    i2.Uint8List? metadata,
-    String? type,
-    DateTime? createdAt,
-  }) => DocumentsData(
-    idHi: idHi ?? this.idHi,
-    idLo: idLo ?? this.idLo,
-    verHi: verHi ?? this.verHi,
-    verLo: verLo ?? this.verLo,
-    content: content ?? this.content,
-    metadata: metadata ?? this.metadata,
-    type: type ?? this.type,
-    createdAt: createdAt ?? this.createdAt,
-  );
-  DocumentsData copyWithCompanion(DocumentsCompanion data) {
-    return DocumentsData(
-      idHi: data.idHi.present ? data.idHi.value : this.idHi,
-      idLo: data.idLo.present ? data.idLo.value : this.idLo,
-      verHi: data.verHi.present ? data.verHi.value : this.verHi,
-      verLo: data.verLo.present ? data.verLo.value : this.verLo,
-      content: data.content.present ? data.content.value : this.content,
-      metadata: data.metadata.present ? data.metadata.value : this.metadata,
-      type: data.type.present ? data.type.value : this.type,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DocumentsData(')
-          ..write('idHi: $idHi, ')
-          ..write('idLo: $idLo, ')
-          ..write('verHi: $verHi, ')
-          ..write('verLo: $verLo, ')
-          ..write('content: $content, ')
-          ..write('metadata: $metadata, ')
-          ..write('type: $type, ')
-          ..write('createdAt: $createdAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    idHi,
-    idLo,
-    verHi,
-    verLo,
-    $driftBlobEquality.hash(content),
-    $driftBlobEquality.hash(metadata),
-    type,
-    createdAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is DocumentsData &&
-          other.idHi == this.idHi &&
-          other.idLo == this.idLo &&
-          other.verHi == this.verHi &&
-          other.verLo == this.verLo &&
-          $driftBlobEquality.equals(other.content, this.content) &&
-          $driftBlobEquality.equals(other.metadata, this.metadata) &&
-          other.type == this.type &&
-          other.createdAt == this.createdAt);
-}
-
-class DocumentsCompanion extends UpdateCompanion<DocumentsData> {
-  final Value<BigInt> idHi;
-  final Value<BigInt> idLo;
-  final Value<BigInt> verHi;
-  final Value<BigInt> verLo;
-  final Value<i2.Uint8List> content;
-  final Value<i2.Uint8List> metadata;
-  final Value<String> type;
-  final Value<DateTime> createdAt;
-  final Value<int> rowid;
-  const DocumentsCompanion({
-    this.idHi = const Value.absent(),
-    this.idLo = const Value.absent(),
-    this.verHi = const Value.absent(),
-    this.verLo = const Value.absent(),
-    this.content = const Value.absent(),
-    this.metadata = const Value.absent(),
-    this.type = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  DocumentsCompanion.insert({
-    required BigInt idHi,
-    required BigInt idLo,
-    required BigInt verHi,
-    required BigInt verLo,
-    required i2.Uint8List content,
-    required i2.Uint8List metadata,
-    required String type,
-    required DateTime createdAt,
-    this.rowid = const Value.absent(),
-  }) : idHi = Value(idHi),
-       idLo = Value(idLo),
-       verHi = Value(verHi),
-       verLo = Value(verLo),
-       content = Value(content),
-       metadata = Value(metadata),
-       type = Value(type),
-       createdAt = Value(createdAt);
-  static Insertable<DocumentsData> custom({
-    Expression<BigInt>? idHi,
-    Expression<BigInt>? idLo,
-    Expression<BigInt>? verHi,
-    Expression<BigInt>? verLo,
-    Expression<i2.Uint8List>? content,
-    Expression<i2.Uint8List>? metadata,
-    Expression<String>? type,
-    Expression<DateTime>? createdAt,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (idHi != null) 'id_hi': idHi,
-      if (idLo != null) 'id_lo': idLo,
-      if (verHi != null) 'ver_hi': verHi,
-      if (verLo != null) 'ver_lo': verLo,
-      if (content != null) 'content': content,
-      if (metadata != null) 'metadata': metadata,
-      if (type != null) 'type': type,
-      if (createdAt != null) 'created_at': createdAt,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  DocumentsCompanion copyWith({
-    Value<BigInt>? idHi,
-    Value<BigInt>? idLo,
-    Value<BigInt>? verHi,
-    Value<BigInt>? verLo,
-    Value<i2.Uint8List>? content,
-    Value<i2.Uint8List>? metadata,
-    Value<String>? type,
-    Value<DateTime>? createdAt,
-    Value<int>? rowid,
-  }) {
-    return DocumentsCompanion(
-      idHi: idHi ?? this.idHi,
-      idLo: idLo ?? this.idLo,
-      verHi: verHi ?? this.verHi,
-      verLo: verLo ?? this.verLo,
-      content: content ?? this.content,
-      metadata: metadata ?? this.metadata,
-      type: type ?? this.type,
-      createdAt: createdAt ?? this.createdAt,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (idHi.present) {
-      map['id_hi'] = Variable<BigInt>(idHi.value);
-    }
-    if (idLo.present) {
-      map['id_lo'] = Variable<BigInt>(idLo.value);
-    }
-    if (verHi.present) {
-      map['ver_hi'] = Variable<BigInt>(verHi.value);
-    }
-    if (verLo.present) {
-      map['ver_lo'] = Variable<BigInt>(verLo.value);
-    }
-    if (content.present) {
-      map['content'] = Variable<i2.Uint8List>(content.value);
-    }
-    if (metadata.present) {
-      map['metadata'] = Variable<i2.Uint8List>(metadata.value);
-    }
-    if (type.present) {
-      map['type'] = Variable<String>(type.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DocumentsCompanion(')
-          ..write('idHi: $idHi, ')
-          ..write('idLo: $idLo, ')
-          ..write('verHi: $verHi, ')
-          ..write('verLo: $verLo, ')
-          ..write('content: $content, ')
-          ..write('metadata: $metadata, ')
-          ..write('type: $type, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class DocumentsMetadata extends Table
-    with TableInfo<DocumentsMetadata, DocumentsMetadataData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  DocumentsMetadata(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<BigInt> verHi = GeneratedColumn<BigInt>(
-    'ver_hi',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> verLo = GeneratedColumn<BigInt>(
-    'ver_lo',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<String> fieldKey = GeneratedColumn<String>(
-    'field_key',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<String> fieldValue = GeneratedColumn<String>(
-    'field_value',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [verHi, verLo, fieldKey, fieldValue];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'documents_metadata';
-  @override
-  Set<GeneratedColumn> get $primaryKey => {verHi, verLo, fieldKey};
-  @override
-  DocumentsMetadataData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DocumentsMetadataData(
-      verHi: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}ver_hi'],
-      )!,
-      verLo: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}ver_lo'],
-      )!,
-      fieldKey: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}field_key'],
-      )!,
-      fieldValue: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}field_value'],
-      )!,
-    );
-  }
-
-  @override
-  DocumentsMetadata createAlias(String alias) {
-    return DocumentsMetadata(attachedDatabase, alias);
-  }
-}
-
-class DocumentsMetadataData extends DataClass
-    implements Insertable<DocumentsMetadataData> {
-  final BigInt verHi;
-  final BigInt verLo;
-  final String fieldKey;
-  final String fieldValue;
-  const DocumentsMetadataData({
-    required this.verHi,
-    required this.verLo,
-    required this.fieldKey,
-    required this.fieldValue,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['ver_hi'] = Variable<BigInt>(verHi);
-    map['ver_lo'] = Variable<BigInt>(verLo);
-    map['field_key'] = Variable<String>(fieldKey);
-    map['field_value'] = Variable<String>(fieldValue);
-    return map;
-  }
-
-  factory DocumentsMetadataData.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DocumentsMetadataData(
-      verHi: serializer.fromJson<BigInt>(json['verHi']),
-      verLo: serializer.fromJson<BigInt>(json['verLo']),
-      fieldKey: serializer.fromJson<String>(json['fieldKey']),
-      fieldValue: serializer.fromJson<String>(json['fieldValue']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'verHi': serializer.toJson<BigInt>(verHi),
-      'verLo': serializer.toJson<BigInt>(verLo),
-      'fieldKey': serializer.toJson<String>(fieldKey),
-      'fieldValue': serializer.toJson<String>(fieldValue),
-    };
-  }
-
-  DocumentsMetadataData copyWith({
-    BigInt? verHi,
-    BigInt? verLo,
-    String? fieldKey,
-    String? fieldValue,
-  }) => DocumentsMetadataData(
-    verHi: verHi ?? this.verHi,
-    verLo: verLo ?? this.verLo,
-    fieldKey: fieldKey ?? this.fieldKey,
-    fieldValue: fieldValue ?? this.fieldValue,
-  );
-  DocumentsMetadataData copyWithCompanion(DocumentsMetadataCompanion data) {
-    return DocumentsMetadataData(
-      verHi: data.verHi.present ? data.verHi.value : this.verHi,
-      verLo: data.verLo.present ? data.verLo.value : this.verLo,
-      fieldKey: data.fieldKey.present ? data.fieldKey.value : this.fieldKey,
-      fieldValue: data.fieldValue.present
-          ? data.fieldValue.value
-          : this.fieldValue,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DocumentsMetadataData(')
-          ..write('verHi: $verHi, ')
-          ..write('verLo: $verLo, ')
-          ..write('fieldKey: $fieldKey, ')
-          ..write('fieldValue: $fieldValue')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(verHi, verLo, fieldKey, fieldValue);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is DocumentsMetadataData &&
-          other.verHi == this.verHi &&
-          other.verLo == this.verLo &&
-          other.fieldKey == this.fieldKey &&
-          other.fieldValue == this.fieldValue);
-}
-
-class DocumentsMetadataCompanion
-    extends UpdateCompanion<DocumentsMetadataData> {
-  final Value<BigInt> verHi;
-  final Value<BigInt> verLo;
-  final Value<String> fieldKey;
-  final Value<String> fieldValue;
-  final Value<int> rowid;
-  const DocumentsMetadataCompanion({
-    this.verHi = const Value.absent(),
-    this.verLo = const Value.absent(),
-    this.fieldKey = const Value.absent(),
-    this.fieldValue = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  DocumentsMetadataCompanion.insert({
-    required BigInt verHi,
-    required BigInt verLo,
-    required String fieldKey,
-    required String fieldValue,
-    this.rowid = const Value.absent(),
-  }) : verHi = Value(verHi),
-       verLo = Value(verLo),
-       fieldKey = Value(fieldKey),
-       fieldValue = Value(fieldValue);
-  static Insertable<DocumentsMetadataData> custom({
-    Expression<BigInt>? verHi,
-    Expression<BigInt>? verLo,
-    Expression<String>? fieldKey,
-    Expression<String>? fieldValue,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (verHi != null) 'ver_hi': verHi,
-      if (verLo != null) 'ver_lo': verLo,
-      if (fieldKey != null) 'field_key': fieldKey,
-      if (fieldValue != null) 'field_value': fieldValue,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  DocumentsMetadataCompanion copyWith({
-    Value<BigInt>? verHi,
-    Value<BigInt>? verLo,
-    Value<String>? fieldKey,
-    Value<String>? fieldValue,
-    Value<int>? rowid,
-  }) {
-    return DocumentsMetadataCompanion(
-      verHi: verHi ?? this.verHi,
-      verLo: verLo ?? this.verLo,
-      fieldKey: fieldKey ?? this.fieldKey,
-      fieldValue: fieldValue ?? this.fieldValue,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (verHi.present) {
-      map['ver_hi'] = Variable<BigInt>(verHi.value);
-    }
-    if (verLo.present) {
-      map['ver_lo'] = Variable<BigInt>(verLo.value);
-    }
-    if (fieldKey.present) {
-      map['field_key'] = Variable<String>(fieldKey.value);
-    }
-    if (fieldValue.present) {
-      map['field_value'] = Variable<String>(fieldValue.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DocumentsMetadataCompanion(')
-          ..write('verHi: $verHi, ')
-          ..write('verLo: $verLo, ')
-          ..write('fieldKey: $fieldKey, ')
-          ..write('fieldValue: $fieldValue, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class DocumentsFavorites extends Table
-    with TableInfo<DocumentsFavorites, DocumentsFavoritesData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  DocumentsFavorites(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<BigInt> idHi = GeneratedColumn<BigInt>(
-    'id_hi',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> idLo = GeneratedColumn<BigInt>(
-    'id_lo',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<bool> isFavorite = GeneratedColumn<bool>(
-    'is_favorite',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_favorite" IN (0, 1))',
-    ),
-  );
-  late final GeneratedColumn<String> type = GeneratedColumn<String>(
-    'type',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [idHi, idLo, isFavorite, type];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'documents_favorites';
-  @override
-  Set<GeneratedColumn> get $primaryKey => {idHi, idLo};
-  @override
-  DocumentsFavoritesData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DocumentsFavoritesData(
-      idHi: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}id_hi'],
-      )!,
-      idLo: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}id_lo'],
-      )!,
-      isFavorite: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_favorite'],
-      )!,
-      type: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}type'],
-      )!,
-    );
-  }
-
-  @override
-  DocumentsFavorites createAlias(String alias) {
-    return DocumentsFavorites(attachedDatabase, alias);
-  }
-}
-
-class DocumentsFavoritesData extends DataClass
-    implements Insertable<DocumentsFavoritesData> {
-  final BigInt idHi;
-  final BigInt idLo;
-  final bool isFavorite;
-  final String type;
-  const DocumentsFavoritesData({
-    required this.idHi,
-    required this.idLo,
-    required this.isFavorite,
-    required this.type,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id_hi'] = Variable<BigInt>(idHi);
-    map['id_lo'] = Variable<BigInt>(idLo);
-    map['is_favorite'] = Variable<bool>(isFavorite);
-    map['type'] = Variable<String>(type);
-    return map;
-  }
-
-  factory DocumentsFavoritesData.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DocumentsFavoritesData(
-      idHi: serializer.fromJson<BigInt>(json['idHi']),
-      idLo: serializer.fromJson<BigInt>(json['idLo']),
-      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
-      type: serializer.fromJson<String>(json['type']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'idHi': serializer.toJson<BigInt>(idHi),
-      'idLo': serializer.toJson<BigInt>(idLo),
-      'isFavorite': serializer.toJson<bool>(isFavorite),
-      'type': serializer.toJson<String>(type),
-    };
-  }
-
-  DocumentsFavoritesData copyWith({
-    BigInt? idHi,
-    BigInt? idLo,
-    bool? isFavorite,
-    String? type,
-  }) => DocumentsFavoritesData(
-    idHi: idHi ?? this.idHi,
-    idLo: idLo ?? this.idLo,
-    isFavorite: isFavorite ?? this.isFavorite,
-    type: type ?? this.type,
-  );
-  DocumentsFavoritesData copyWithCompanion(DocumentsFavoritesCompanion data) {
-    return DocumentsFavoritesData(
-      idHi: data.idHi.present ? data.idHi.value : this.idHi,
-      idLo: data.idLo.present ? data.idLo.value : this.idLo,
-      isFavorite: data.isFavorite.present
-          ? data.isFavorite.value
-          : this.isFavorite,
-      type: data.type.present ? data.type.value : this.type,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DocumentsFavoritesData(')
-          ..write('idHi: $idHi, ')
-          ..write('idLo: $idLo, ')
-          ..write('isFavorite: $isFavorite, ')
-          ..write('type: $type')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(idHi, idLo, isFavorite, type);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is DocumentsFavoritesData &&
-          other.idHi == this.idHi &&
-          other.idLo == this.idLo &&
-          other.isFavorite == this.isFavorite &&
-          other.type == this.type);
-}
-
-class DocumentsFavoritesCompanion
-    extends UpdateCompanion<DocumentsFavoritesData> {
-  final Value<BigInt> idHi;
-  final Value<BigInt> idLo;
-  final Value<bool> isFavorite;
-  final Value<String> type;
-  final Value<int> rowid;
-  const DocumentsFavoritesCompanion({
-    this.idHi = const Value.absent(),
-    this.idLo = const Value.absent(),
-    this.isFavorite = const Value.absent(),
-    this.type = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  DocumentsFavoritesCompanion.insert({
-    required BigInt idHi,
-    required BigInt idLo,
-    required bool isFavorite,
-    required String type,
-    this.rowid = const Value.absent(),
-  }) : idHi = Value(idHi),
-       idLo = Value(idLo),
-       isFavorite = Value(isFavorite),
-       type = Value(type);
-  static Insertable<DocumentsFavoritesData> custom({
-    Expression<BigInt>? idHi,
-    Expression<BigInt>? idLo,
-    Expression<bool>? isFavorite,
-    Expression<String>? type,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (idHi != null) 'id_hi': idHi,
-      if (idLo != null) 'id_lo': idLo,
-      if (isFavorite != null) 'is_favorite': isFavorite,
-      if (type != null) 'type': type,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  DocumentsFavoritesCompanion copyWith({
-    Value<BigInt>? idHi,
-    Value<BigInt>? idLo,
-    Value<bool>? isFavorite,
-    Value<String>? type,
-    Value<int>? rowid,
-  }) {
-    return DocumentsFavoritesCompanion(
-      idHi: idHi ?? this.idHi,
-      idLo: idLo ?? this.idLo,
-      isFavorite: isFavorite ?? this.isFavorite,
-      type: type ?? this.type,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (idHi.present) {
-      map['id_hi'] = Variable<BigInt>(idHi.value);
-    }
-    if (idLo.present) {
-      map['id_lo'] = Variable<BigInt>(idLo.value);
-    }
-    if (isFavorite.present) {
-      map['is_favorite'] = Variable<bool>(isFavorite.value);
-    }
-    if (type.present) {
-      map['type'] = Variable<String>(type.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DocumentsFavoritesCompanion(')
-          ..write('idHi: $idHi, ')
-          ..write('idLo: $idLo, ')
-          ..write('isFavorite: $isFavorite, ')
-          ..write('type: $type, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class Drafts extends Table with TableInfo<Drafts, DraftsData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  Drafts(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<BigInt> idHi = GeneratedColumn<BigInt>(
-    'id_hi',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> idLo = GeneratedColumn<BigInt>(
-    'id_lo',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> verHi = GeneratedColumn<BigInt>(
-    'ver_hi',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<BigInt> verLo = GeneratedColumn<BigInt>(
-    'ver_lo',
-    aliasedName,
-    false,
-    type: DriftSqlType.bigInt,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<i2.Uint8List> content =
-      GeneratedColumn<i2.Uint8List>(
-        'content',
-        aliasedName,
-        false,
-        type: DriftSqlType.blob,
-        requiredDuringInsert: true,
-      );
-  late final GeneratedColumn<i2.Uint8List> metadata =
-      GeneratedColumn<i2.Uint8List>(
-        'metadata',
-        aliasedName,
-        false,
-        type: DriftSqlType.blob,
-        requiredDuringInsert: true,
-      );
-  late final GeneratedColumn<String> type = GeneratedColumn<String>(
-    'type',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-    'title',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    idHi,
-    idLo,
-    verHi,
-    verLo,
-    content,
-    metadata,
-    type,
-    title,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'drafts';
-  @override
-  Set<GeneratedColumn> get $primaryKey => {idHi, idLo, verHi, verLo};
-  @override
-  DraftsData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DraftsData(
-      idHi: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}id_hi'],
-      )!,
-      idLo: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}id_lo'],
-      )!,
-      verHi: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}ver_hi'],
-      )!,
-      verLo: attachedDatabase.typeMapping.read(
-        DriftSqlType.bigInt,
-        data['${effectivePrefix}ver_lo'],
-      )!,
-      content: attachedDatabase.typeMapping.read(
-        DriftSqlType.blob,
-        data['${effectivePrefix}content'],
-      )!,
-      metadata: attachedDatabase.typeMapping.read(
-        DriftSqlType.blob,
-        data['${effectivePrefix}metadata'],
-      )!,
-      type: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}type'],
-      )!,
-      title: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}title'],
-      )!,
-    );
-  }
-
-  @override
-  Drafts createAlias(String alias) {
-    return Drafts(attachedDatabase, alias);
-  }
-}
-
-class DraftsData extends DataClass implements Insertable<DraftsData> {
-  final BigInt idHi;
-  final BigInt idLo;
-  final BigInt verHi;
-  final BigInt verLo;
-  final i2.Uint8List content;
-  final i2.Uint8List metadata;
-  final String type;
-  final String title;
-  const DraftsData({
-    required this.idHi,
-    required this.idLo,
-    required this.verHi,
-    required this.verLo,
-    required this.content,
-    required this.metadata,
-    required this.type,
-    required this.title,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id_hi'] = Variable<BigInt>(idHi);
-    map['id_lo'] = Variable<BigInt>(idLo);
-    map['ver_hi'] = Variable<BigInt>(verHi);
-    map['ver_lo'] = Variable<BigInt>(verLo);
-    map['content'] = Variable<i2.Uint8List>(content);
-    map['metadata'] = Variable<i2.Uint8List>(metadata);
-    map['type'] = Variable<String>(type);
-    map['title'] = Variable<String>(title);
-    return map;
-  }
-
-  factory DraftsData.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DraftsData(
-      idHi: serializer.fromJson<BigInt>(json['idHi']),
-      idLo: serializer.fromJson<BigInt>(json['idLo']),
-      verHi: serializer.fromJson<BigInt>(json['verHi']),
-      verLo: serializer.fromJson<BigInt>(json['verLo']),
-      content: serializer.fromJson<i2.Uint8List>(json['content']),
-      metadata: serializer.fromJson<i2.Uint8List>(json['metadata']),
-      type: serializer.fromJson<String>(json['type']),
-      title: serializer.fromJson<String>(json['title']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'idHi': serializer.toJson<BigInt>(idHi),
-      'idLo': serializer.toJson<BigInt>(idLo),
-      'verHi': serializer.toJson<BigInt>(verHi),
-      'verLo': serializer.toJson<BigInt>(verLo),
-      'content': serializer.toJson<i2.Uint8List>(content),
-      'metadata': serializer.toJson<i2.Uint8List>(metadata),
-      'type': serializer.toJson<String>(type),
-      'title': serializer.toJson<String>(title),
-    };
-  }
-
-  DraftsData copyWith({
-    BigInt? idHi,
-    BigInt? idLo,
-    BigInt? verHi,
-    BigInt? verLo,
-    i2.Uint8List? content,
-    i2.Uint8List? metadata,
-    String? type,
-    String? title,
-  }) => DraftsData(
-    idHi: idHi ?? this.idHi,
-    idLo: idLo ?? this.idLo,
-    verHi: verHi ?? this.verHi,
-    verLo: verLo ?? this.verLo,
-    content: content ?? this.content,
-    metadata: metadata ?? this.metadata,
-    type: type ?? this.type,
-    title: title ?? this.title,
-  );
-  DraftsData copyWithCompanion(DraftsCompanion data) {
-    return DraftsData(
-      idHi: data.idHi.present ? data.idHi.value : this.idHi,
-      idLo: data.idLo.present ? data.idLo.value : this.idLo,
-      verHi: data.verHi.present ? data.verHi.value : this.verHi,
-      verLo: data.verLo.present ? data.verLo.value : this.verLo,
-      content: data.content.present ? data.content.value : this.content,
-      metadata: data.metadata.present ? data.metadata.value : this.metadata,
-      type: data.type.present ? data.type.value : this.type,
-      title: data.title.present ? data.title.value : this.title,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DraftsData(')
-          ..write('idHi: $idHi, ')
-          ..write('idLo: $idLo, ')
-          ..write('verHi: $verHi, ')
-          ..write('verLo: $verLo, ')
-          ..write('content: $content, ')
-          ..write('metadata: $metadata, ')
-          ..write('type: $type, ')
-          ..write('title: $title')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    idHi,
-    idLo,
-    verHi,
-    verLo,
-    $driftBlobEquality.hash(content),
-    $driftBlobEquality.hash(metadata),
-    type,
-    title,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is DraftsData &&
-          other.idHi == this.idHi &&
-          other.idLo == this.idLo &&
-          other.verHi == this.verHi &&
-          other.verLo == this.verLo &&
-          $driftBlobEquality.equals(other.content, this.content) &&
-          $driftBlobEquality.equals(other.metadata, this.metadata) &&
-          other.type == this.type &&
-          other.title == this.title);
-}
-
-class DraftsCompanion extends UpdateCompanion<DraftsData> {
-  final Value<BigInt> idHi;
-  final Value<BigInt> idLo;
-  final Value<BigInt> verHi;
-  final Value<BigInt> verLo;
-  final Value<i2.Uint8List> content;
-  final Value<i2.Uint8List> metadata;
-  final Value<String> type;
-  final Value<String> title;
-  final Value<int> rowid;
-  const DraftsCompanion({
-    this.idHi = const Value.absent(),
-    this.idLo = const Value.absent(),
-    this.verHi = const Value.absent(),
-    this.verLo = const Value.absent(),
-    this.content = const Value.absent(),
-    this.metadata = const Value.absent(),
-    this.type = const Value.absent(),
-    this.title = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  DraftsCompanion.insert({
-    required BigInt idHi,
-    required BigInt idLo,
-    required BigInt verHi,
-    required BigInt verLo,
-    required i2.Uint8List content,
-    required i2.Uint8List metadata,
-    required String type,
-    required String title,
-    this.rowid = const Value.absent(),
-  }) : idHi = Value(idHi),
-       idLo = Value(idLo),
-       verHi = Value(verHi),
-       verLo = Value(verLo),
-       content = Value(content),
-       metadata = Value(metadata),
-       type = Value(type),
-       title = Value(title);
-  static Insertable<DraftsData> custom({
-    Expression<BigInt>? idHi,
-    Expression<BigInt>? idLo,
-    Expression<BigInt>? verHi,
-    Expression<BigInt>? verLo,
-    Expression<i2.Uint8List>? content,
-    Expression<i2.Uint8List>? metadata,
-    Expression<String>? type,
-    Expression<String>? title,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (idHi != null) 'id_hi': idHi,
-      if (idLo != null) 'id_lo': idLo,
-      if (verHi != null) 'ver_hi': verHi,
-      if (verLo != null) 'ver_lo': verLo,
-      if (content != null) 'content': content,
-      if (metadata != null) 'metadata': metadata,
-      if (type != null) 'type': type,
-      if (title != null) 'title': title,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  DraftsCompanion copyWith({
-    Value<BigInt>? idHi,
-    Value<BigInt>? idLo,
-    Value<BigInt>? verHi,
-    Value<BigInt>? verLo,
-    Value<i2.Uint8List>? content,
-    Value<i2.Uint8List>? metadata,
-    Value<String>? type,
-    Value<String>? title,
-    Value<int>? rowid,
-  }) {
-    return DraftsCompanion(
-      idHi: idHi ?? this.idHi,
-      idLo: idLo ?? this.idLo,
-      verHi: verHi ?? this.verHi,
-      verLo: verLo ?? this.verLo,
-      content: content ?? this.content,
-      metadata: metadata ?? this.metadata,
-      type: type ?? this.type,
-      title: title ?? this.title,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (idHi.present) {
-      map['id_hi'] = Variable<BigInt>(idHi.value);
-    }
-    if (idLo.present) {
-      map['id_lo'] = Variable<BigInt>(idLo.value);
-    }
-    if (verHi.present) {
-      map['ver_hi'] = Variable<BigInt>(verHi.value);
-    }
-    if (verLo.present) {
-      map['ver_lo'] = Variable<BigInt>(verLo.value);
-    }
-    if (content.present) {
-      map['content'] = Variable<i2.Uint8List>(content.value);
-    }
-    if (metadata.present) {
-      map['metadata'] = Variable<i2.Uint8List>(metadata.value);
-    }
-    if (type.present) {
-      map['type'] = Variable<String>(type.value);
-    }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DraftsCompanion(')
-          ..write('idHi: $idHi, ')
-          ..write('idLo: $idLo, ')
-          ..write('verHi: $verHi, ')
-          ..write('verLo: $verLo, ')
-          ..write('content: $content, ')
-          ..write('metadata: $metadata, ')
-          ..write('type: $type, ')
-          ..write('title: $title, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class DocumentsV2 extends Table with TableInfo<DocumentsV2, DocumentsV2Data> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -1329,22 +24,29 @@ class DocumentsV2 extends Table with TableInfo<DocumentsV2, DocumentsV2Data> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  late final GeneratedColumn<String> categoryId = GeneratedColumn<String>(
-    'category_id',
+  late final GeneratedColumn<String> collaborators = GeneratedColumn<String>(
+    'collaborators',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.string,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
   );
-  late final GeneratedColumn<String> categoryVer = GeneratedColumn<String>(
-    'category_ver',
+  late final GeneratedColumn<String> contentType = GeneratedColumn<String>(
+    'content_type',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.string,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> parameters = GeneratedColumn<String>(
+    'parameters',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -1424,9 +126,10 @@ class DocumentsV2 extends Table with TableInfo<DocumentsV2, DocumentsV2Data> {
   List<GeneratedColumn> get $columns => [
     content,
     authors,
-    categoryId,
-    categoryVer,
+    collaborators,
+    contentType,
     id,
+    parameters,
     refId,
     refVer,
     replyId,
@@ -1457,17 +160,21 @@ class DocumentsV2 extends Table with TableInfo<DocumentsV2, DocumentsV2Data> {
         DriftSqlType.string,
         data['${effectivePrefix}authors'],
       )!,
-      categoryId: attachedDatabase.typeMapping.read(
+      collaborators: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}category_id'],
-      ),
-      categoryVer: attachedDatabase.typeMapping.read(
+        data['${effectivePrefix}collaborators'],
+      )!,
+      contentType: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}category_ver'],
-      ),
+        data['${effectivePrefix}content_type'],
+      )!,
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
+      )!,
+      parameters: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parameters'],
       )!,
       refId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -1521,9 +228,10 @@ class DocumentsV2 extends Table with TableInfo<DocumentsV2, DocumentsV2Data> {
 class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
   final i2.Uint8List content;
   final String authors;
-  final String? categoryId;
-  final String? categoryVer;
+  final String collaborators;
+  final String contentType;
   final String id;
+  final String parameters;
   final String? refId;
   final String? refVer;
   final String? replyId;
@@ -1537,9 +245,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
   const DocumentsV2Data({
     required this.content,
     required this.authors,
-    this.categoryId,
-    this.categoryVer,
+    required this.collaborators,
+    required this.contentType,
     required this.id,
+    required this.parameters,
     this.refId,
     this.refVer,
     this.replyId,
@@ -1556,13 +265,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
     final map = <String, Expression>{};
     map['content'] = Variable<i2.Uint8List>(content);
     map['authors'] = Variable<String>(authors);
-    if (!nullToAbsent || categoryId != null) {
-      map['category_id'] = Variable<String>(categoryId);
-    }
-    if (!nullToAbsent || categoryVer != null) {
-      map['category_ver'] = Variable<String>(categoryVer);
-    }
+    map['collaborators'] = Variable<String>(collaborators);
+    map['content_type'] = Variable<String>(contentType);
     map['id'] = Variable<String>(id);
+    map['parameters'] = Variable<String>(parameters);
     if (!nullToAbsent || refId != null) {
       map['ref_id'] = Variable<String>(refId);
     }
@@ -1598,9 +304,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
     return DocumentsV2Data(
       content: serializer.fromJson<i2.Uint8List>(json['content']),
       authors: serializer.fromJson<String>(json['authors']),
-      categoryId: serializer.fromJson<String?>(json['categoryId']),
-      categoryVer: serializer.fromJson<String?>(json['categoryVer']),
+      collaborators: serializer.fromJson<String>(json['collaborators']),
+      contentType: serializer.fromJson<String>(json['contentType']),
       id: serializer.fromJson<String>(json['id']),
+      parameters: serializer.fromJson<String>(json['parameters']),
       refId: serializer.fromJson<String?>(json['refId']),
       refVer: serializer.fromJson<String?>(json['refVer']),
       replyId: serializer.fromJson<String?>(json['replyId']),
@@ -1619,9 +326,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
     return <String, dynamic>{
       'content': serializer.toJson<i2.Uint8List>(content),
       'authors': serializer.toJson<String>(authors),
-      'categoryId': serializer.toJson<String?>(categoryId),
-      'categoryVer': serializer.toJson<String?>(categoryVer),
+      'collaborators': serializer.toJson<String>(collaborators),
+      'contentType': serializer.toJson<String>(contentType),
       'id': serializer.toJson<String>(id),
+      'parameters': serializer.toJson<String>(parameters),
       'refId': serializer.toJson<String?>(refId),
       'refVer': serializer.toJson<String?>(refVer),
       'replyId': serializer.toJson<String?>(replyId),
@@ -1638,9 +346,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
   DocumentsV2Data copyWith({
     i2.Uint8List? content,
     String? authors,
-    Value<String?> categoryId = const Value.absent(),
-    Value<String?> categoryVer = const Value.absent(),
+    String? collaborators,
+    String? contentType,
     String? id,
+    String? parameters,
     Value<String?> refId = const Value.absent(),
     Value<String?> refVer = const Value.absent(),
     Value<String?> replyId = const Value.absent(),
@@ -1654,9 +363,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
   }) => DocumentsV2Data(
     content: content ?? this.content,
     authors: authors ?? this.authors,
-    categoryId: categoryId.present ? categoryId.value : this.categoryId,
-    categoryVer: categoryVer.present ? categoryVer.value : this.categoryVer,
+    collaborators: collaborators ?? this.collaborators,
+    contentType: contentType ?? this.contentType,
     id: id ?? this.id,
+    parameters: parameters ?? this.parameters,
     refId: refId.present ? refId.value : this.refId,
     refVer: refVer.present ? refVer.value : this.refVer,
     replyId: replyId.present ? replyId.value : this.replyId,
@@ -1672,13 +382,16 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
     return DocumentsV2Data(
       content: data.content.present ? data.content.value : this.content,
       authors: data.authors.present ? data.authors.value : this.authors,
-      categoryId: data.categoryId.present
-          ? data.categoryId.value
-          : this.categoryId,
-      categoryVer: data.categoryVer.present
-          ? data.categoryVer.value
-          : this.categoryVer,
+      collaborators: data.collaborators.present
+          ? data.collaborators.value
+          : this.collaborators,
+      contentType: data.contentType.present
+          ? data.contentType.value
+          : this.contentType,
       id: data.id.present ? data.id.value : this.id,
+      parameters: data.parameters.present
+          ? data.parameters.value
+          : this.parameters,
       refId: data.refId.present ? data.refId.value : this.refId,
       refVer: data.refVer.present ? data.refVer.value : this.refVer,
       replyId: data.replyId.present ? data.replyId.value : this.replyId,
@@ -1701,9 +414,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
     return (StringBuffer('DocumentsV2Data(')
           ..write('content: $content, ')
           ..write('authors: $authors, ')
-          ..write('categoryId: $categoryId, ')
-          ..write('categoryVer: $categoryVer, ')
+          ..write('collaborators: $collaborators, ')
+          ..write('contentType: $contentType, ')
           ..write('id: $id, ')
+          ..write('parameters: $parameters, ')
           ..write('refId: $refId, ')
           ..write('refVer: $refVer, ')
           ..write('replyId: $replyId, ')
@@ -1722,9 +436,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
   int get hashCode => Object.hash(
     $driftBlobEquality.hash(content),
     authors,
-    categoryId,
-    categoryVer,
+    collaborators,
+    contentType,
     id,
+    parameters,
     refId,
     refVer,
     replyId,
@@ -1742,9 +457,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
       (other is DocumentsV2Data &&
           $driftBlobEquality.equals(other.content, this.content) &&
           other.authors == this.authors &&
-          other.categoryId == this.categoryId &&
-          other.categoryVer == this.categoryVer &&
+          other.collaborators == this.collaborators &&
+          other.contentType == this.contentType &&
           other.id == this.id &&
+          other.parameters == this.parameters &&
           other.refId == this.refId &&
           other.refVer == this.refVer &&
           other.replyId == this.replyId &&
@@ -1760,9 +476,10 @@ class DocumentsV2Data extends DataClass implements Insertable<DocumentsV2Data> {
 class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
   final Value<i2.Uint8List> content;
   final Value<String> authors;
-  final Value<String?> categoryId;
-  final Value<String?> categoryVer;
+  final Value<String> collaborators;
+  final Value<String> contentType;
   final Value<String> id;
+  final Value<String> parameters;
   final Value<String?> refId;
   final Value<String?> refVer;
   final Value<String?> replyId;
@@ -1777,9 +494,10 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
   const DocumentsV2Companion({
     this.content = const Value.absent(),
     this.authors = const Value.absent(),
-    this.categoryId = const Value.absent(),
-    this.categoryVer = const Value.absent(),
+    this.collaborators = const Value.absent(),
+    this.contentType = const Value.absent(),
     this.id = const Value.absent(),
+    this.parameters = const Value.absent(),
     this.refId = const Value.absent(),
     this.refVer = const Value.absent(),
     this.replyId = const Value.absent(),
@@ -1795,9 +513,10 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
   DocumentsV2Companion.insert({
     required i2.Uint8List content,
     required String authors,
-    this.categoryId = const Value.absent(),
-    this.categoryVer = const Value.absent(),
+    required String collaborators,
+    required String contentType,
     required String id,
+    required String parameters,
     this.refId = const Value.absent(),
     this.refVer = const Value.absent(),
     this.replyId = const Value.absent(),
@@ -1811,16 +530,20 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
     this.rowid = const Value.absent(),
   }) : content = Value(content),
        authors = Value(authors),
+       collaborators = Value(collaborators),
+       contentType = Value(contentType),
        id = Value(id),
+       parameters = Value(parameters),
        type = Value(type),
        ver = Value(ver),
        createdAt = Value(createdAt);
   static Insertable<DocumentsV2Data> custom({
     Expression<i2.Uint8List>? content,
     Expression<String>? authors,
-    Expression<String>? categoryId,
-    Expression<String>? categoryVer,
+    Expression<String>? collaborators,
+    Expression<String>? contentType,
     Expression<String>? id,
+    Expression<String>? parameters,
     Expression<String>? refId,
     Expression<String>? refVer,
     Expression<String>? replyId,
@@ -1836,9 +559,10 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
     return RawValuesInsertable({
       if (content != null) 'content': content,
       if (authors != null) 'authors': authors,
-      if (categoryId != null) 'category_id': categoryId,
-      if (categoryVer != null) 'category_ver': categoryVer,
+      if (collaborators != null) 'collaborators': collaborators,
+      if (contentType != null) 'content_type': contentType,
       if (id != null) 'id': id,
+      if (parameters != null) 'parameters': parameters,
       if (refId != null) 'ref_id': refId,
       if (refVer != null) 'ref_ver': refVer,
       if (replyId != null) 'reply_id': replyId,
@@ -1856,9 +580,10 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
   DocumentsV2Companion copyWith({
     Value<i2.Uint8List>? content,
     Value<String>? authors,
-    Value<String?>? categoryId,
-    Value<String?>? categoryVer,
+    Value<String>? collaborators,
+    Value<String>? contentType,
     Value<String>? id,
+    Value<String>? parameters,
     Value<String?>? refId,
     Value<String?>? refVer,
     Value<String?>? replyId,
@@ -1874,9 +599,10 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
     return DocumentsV2Companion(
       content: content ?? this.content,
       authors: authors ?? this.authors,
-      categoryId: categoryId ?? this.categoryId,
-      categoryVer: categoryVer ?? this.categoryVer,
+      collaborators: collaborators ?? this.collaborators,
+      contentType: contentType ?? this.contentType,
       id: id ?? this.id,
+      parameters: parameters ?? this.parameters,
       refId: refId ?? this.refId,
       refVer: refVer ?? this.refVer,
       replyId: replyId ?? this.replyId,
@@ -1900,14 +626,17 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
     if (authors.present) {
       map['authors'] = Variable<String>(authors.value);
     }
-    if (categoryId.present) {
-      map['category_id'] = Variable<String>(categoryId.value);
+    if (collaborators.present) {
+      map['collaborators'] = Variable<String>(collaborators.value);
     }
-    if (categoryVer.present) {
-      map['category_ver'] = Variable<String>(categoryVer.value);
+    if (contentType.present) {
+      map['content_type'] = Variable<String>(contentType.value);
     }
     if (id.present) {
       map['id'] = Variable<String>(id.value);
+    }
+    if (parameters.present) {
+      map['parameters'] = Variable<String>(parameters.value);
     }
     if (refId.present) {
       map['ref_id'] = Variable<String>(refId.value);
@@ -1950,9 +679,10 @@ class DocumentsV2Companion extends UpdateCompanion<DocumentsV2Data> {
     return (StringBuffer('DocumentsV2Companion(')
           ..write('content: $content, ')
           ..write('authors: $authors, ')
-          ..write('categoryId: $categoryId, ')
-          ..write('categoryVer: $categoryVer, ')
+          ..write('collaborators: $collaborators, ')
+          ..write('contentType: $contentType, ')
           ..write('id: $id, ')
+          ..write('parameters: $parameters, ')
           ..write('refId: $refId, ')
           ..write('refVer: $refVer, ')
           ..write('replyId: $replyId, ')
@@ -1975,23 +705,23 @@ class DocumentAuthors extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   DocumentAuthors(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<String> authorId = GeneratedColumn<String>(
-    'author_id',
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  late final GeneratedColumn<String> authorIdSignificant =
+  late final GeneratedColumn<String> accountSignificantId =
       GeneratedColumn<String>(
-        'author_id_significant',
+        'account_significant_id',
         aliasedName,
         false,
         type: DriftSqlType.string,
         requiredDuringInsert: true,
       );
-  late final GeneratedColumn<String> authorUsername = GeneratedColumn<String>(
-    'author_username',
+  late final GeneratedColumn<String> username = GeneratedColumn<String>(
+    'username',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -2013,9 +743,9 @@ class DocumentAuthors extends Table
   );
   @override
   List<GeneratedColumn> get $columns => [
-    authorId,
-    authorIdSignificant,
-    authorUsername,
+    accountId,
+    accountSignificantId,
+    username,
     documentId,
     documentVer,
   ];
@@ -2025,22 +755,22 @@ class DocumentAuthors extends Table
   String get actualTableName => $name;
   static const String $name = 'document_authors';
   @override
-  Set<GeneratedColumn> get $primaryKey => {documentId, documentVer, authorId};
+  Set<GeneratedColumn> get $primaryKey => {documentId, documentVer, accountId};
   @override
   DocumentAuthorsData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return DocumentAuthorsData(
-      authorId: attachedDatabase.typeMapping.read(
+      accountId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}author_id'],
+        data['${effectivePrefix}account_id'],
       )!,
-      authorIdSignificant: attachedDatabase.typeMapping.read(
+      accountSignificantId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}author_id_significant'],
+        data['${effectivePrefix}account_significant_id'],
       )!,
-      authorUsername: attachedDatabase.typeMapping.read(
+      username: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}author_username'],
+        data['${effectivePrefix}username'],
       ),
       documentId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -2066,25 +796,25 @@ class DocumentAuthors extends Table
 
 class DocumentAuthorsData extends DataClass
     implements Insertable<DocumentAuthorsData> {
-  final String authorId;
-  final String authorIdSignificant;
-  final String? authorUsername;
+  final String accountId;
+  final String accountSignificantId;
+  final String? username;
   final String documentId;
   final String documentVer;
   const DocumentAuthorsData({
-    required this.authorId,
-    required this.authorIdSignificant,
-    this.authorUsername,
+    required this.accountId,
+    required this.accountSignificantId,
+    this.username,
     required this.documentId,
     required this.documentVer,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['author_id'] = Variable<String>(authorId);
-    map['author_id_significant'] = Variable<String>(authorIdSignificant);
-    if (!nullToAbsent || authorUsername != null) {
-      map['author_username'] = Variable<String>(authorUsername);
+    map['account_id'] = Variable<String>(accountId);
+    map['account_significant_id'] = Variable<String>(accountSignificantId);
+    if (!nullToAbsent || username != null) {
+      map['username'] = Variable<String>(username);
     }
     map['document_id'] = Variable<String>(documentId);
     map['document_ver'] = Variable<String>(documentVer);
@@ -2097,11 +827,11 @@ class DocumentAuthorsData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DocumentAuthorsData(
-      authorId: serializer.fromJson<String>(json['authorId']),
-      authorIdSignificant: serializer.fromJson<String>(
-        json['authorIdSignificant'],
+      accountId: serializer.fromJson<String>(json['accountId']),
+      accountSignificantId: serializer.fromJson<String>(
+        json['accountSignificantId'],
       ),
-      authorUsername: serializer.fromJson<String?>(json['authorUsername']),
+      username: serializer.fromJson<String?>(json['username']),
       documentId: serializer.fromJson<String>(json['documentId']),
       documentVer: serializer.fromJson<String>(json['documentVer']),
     );
@@ -2110,38 +840,34 @@ class DocumentAuthorsData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'authorId': serializer.toJson<String>(authorId),
-      'authorIdSignificant': serializer.toJson<String>(authorIdSignificant),
-      'authorUsername': serializer.toJson<String?>(authorUsername),
+      'accountId': serializer.toJson<String>(accountId),
+      'accountSignificantId': serializer.toJson<String>(accountSignificantId),
+      'username': serializer.toJson<String?>(username),
       'documentId': serializer.toJson<String>(documentId),
       'documentVer': serializer.toJson<String>(documentVer),
     };
   }
 
   DocumentAuthorsData copyWith({
-    String? authorId,
-    String? authorIdSignificant,
-    Value<String?> authorUsername = const Value.absent(),
+    String? accountId,
+    String? accountSignificantId,
+    Value<String?> username = const Value.absent(),
     String? documentId,
     String? documentVer,
   }) => DocumentAuthorsData(
-    authorId: authorId ?? this.authorId,
-    authorIdSignificant: authorIdSignificant ?? this.authorIdSignificant,
-    authorUsername: authorUsername.present
-        ? authorUsername.value
-        : this.authorUsername,
+    accountId: accountId ?? this.accountId,
+    accountSignificantId: accountSignificantId ?? this.accountSignificantId,
+    username: username.present ? username.value : this.username,
     documentId: documentId ?? this.documentId,
     documentVer: documentVer ?? this.documentVer,
   );
   DocumentAuthorsData copyWithCompanion(DocumentAuthorsCompanion data) {
     return DocumentAuthorsData(
-      authorId: data.authorId.present ? data.authorId.value : this.authorId,
-      authorIdSignificant: data.authorIdSignificant.present
-          ? data.authorIdSignificant.value
-          : this.authorIdSignificant,
-      authorUsername: data.authorUsername.present
-          ? data.authorUsername.value
-          : this.authorUsername,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      accountSignificantId: data.accountSignificantId.present
+          ? data.accountSignificantId.value
+          : this.accountSignificantId,
+      username: data.username.present ? data.username.value : this.username,
       documentId: data.documentId.present
           ? data.documentId.value
           : this.documentId,
@@ -2154,9 +880,9 @@ class DocumentAuthorsData extends DataClass
   @override
   String toString() {
     return (StringBuffer('DocumentAuthorsData(')
-          ..write('authorId: $authorId, ')
-          ..write('authorIdSignificant: $authorIdSignificant, ')
-          ..write('authorUsername: $authorUsername, ')
+          ..write('accountId: $accountId, ')
+          ..write('accountSignificantId: $accountSignificantId, ')
+          ..write('username: $username, ')
           ..write('documentId: $documentId, ')
           ..write('documentVer: $documentVer')
           ..write(')'))
@@ -2165,9 +891,9 @@ class DocumentAuthorsData extends DataClass
 
   @override
   int get hashCode => Object.hash(
-    authorId,
-    authorIdSignificant,
-    authorUsername,
+    accountId,
+    accountSignificantId,
+    username,
     documentId,
     documentVer,
   );
@@ -2175,52 +901,52 @@ class DocumentAuthorsData extends DataClass
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is DocumentAuthorsData &&
-          other.authorId == this.authorId &&
-          other.authorIdSignificant == this.authorIdSignificant &&
-          other.authorUsername == this.authorUsername &&
+          other.accountId == this.accountId &&
+          other.accountSignificantId == this.accountSignificantId &&
+          other.username == this.username &&
           other.documentId == this.documentId &&
           other.documentVer == this.documentVer);
 }
 
 class DocumentAuthorsCompanion extends UpdateCompanion<DocumentAuthorsData> {
-  final Value<String> authorId;
-  final Value<String> authorIdSignificant;
-  final Value<String?> authorUsername;
+  final Value<String> accountId;
+  final Value<String> accountSignificantId;
+  final Value<String?> username;
   final Value<String> documentId;
   final Value<String> documentVer;
   final Value<int> rowid;
   const DocumentAuthorsCompanion({
-    this.authorId = const Value.absent(),
-    this.authorIdSignificant = const Value.absent(),
-    this.authorUsername = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.accountSignificantId = const Value.absent(),
+    this.username = const Value.absent(),
     this.documentId = const Value.absent(),
     this.documentVer = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   DocumentAuthorsCompanion.insert({
-    required String authorId,
-    required String authorIdSignificant,
-    this.authorUsername = const Value.absent(),
+    required String accountId,
+    required String accountSignificantId,
+    this.username = const Value.absent(),
     required String documentId,
     required String documentVer,
     this.rowid = const Value.absent(),
-  }) : authorId = Value(authorId),
-       authorIdSignificant = Value(authorIdSignificant),
+  }) : accountId = Value(accountId),
+       accountSignificantId = Value(accountSignificantId),
        documentId = Value(documentId),
        documentVer = Value(documentVer);
   static Insertable<DocumentAuthorsData> custom({
-    Expression<String>? authorId,
-    Expression<String>? authorIdSignificant,
-    Expression<String>? authorUsername,
+    Expression<String>? accountId,
+    Expression<String>? accountSignificantId,
+    Expression<String>? username,
     Expression<String>? documentId,
     Expression<String>? documentVer,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (authorId != null) 'author_id': authorId,
-      if (authorIdSignificant != null)
-        'author_id_significant': authorIdSignificant,
-      if (authorUsername != null) 'author_username': authorUsername,
+      if (accountId != null) 'account_id': accountId,
+      if (accountSignificantId != null)
+        'account_significant_id': accountSignificantId,
+      if (username != null) 'username': username,
       if (documentId != null) 'document_id': documentId,
       if (documentVer != null) 'document_ver': documentVer,
       if (rowid != null) 'rowid': rowid,
@@ -2228,17 +954,17 @@ class DocumentAuthorsCompanion extends UpdateCompanion<DocumentAuthorsData> {
   }
 
   DocumentAuthorsCompanion copyWith({
-    Value<String>? authorId,
-    Value<String>? authorIdSignificant,
-    Value<String?>? authorUsername,
+    Value<String>? accountId,
+    Value<String>? accountSignificantId,
+    Value<String?>? username,
     Value<String>? documentId,
     Value<String>? documentVer,
     Value<int>? rowid,
   }) {
     return DocumentAuthorsCompanion(
-      authorId: authorId ?? this.authorId,
-      authorIdSignificant: authorIdSignificant ?? this.authorIdSignificant,
-      authorUsername: authorUsername ?? this.authorUsername,
+      accountId: accountId ?? this.accountId,
+      accountSignificantId: accountSignificantId ?? this.accountSignificantId,
+      username: username ?? this.username,
       documentId: documentId ?? this.documentId,
       documentVer: documentVer ?? this.documentVer,
       rowid: rowid ?? this.rowid,
@@ -2248,16 +974,16 @@ class DocumentAuthorsCompanion extends UpdateCompanion<DocumentAuthorsData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (authorId.present) {
-      map['author_id'] = Variable<String>(authorId.value);
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
     }
-    if (authorIdSignificant.present) {
-      map['author_id_significant'] = Variable<String>(
-        authorIdSignificant.value,
+    if (accountSignificantId.present) {
+      map['account_significant_id'] = Variable<String>(
+        accountSignificantId.value,
       );
     }
-    if (authorUsername.present) {
-      map['author_username'] = Variable<String>(authorUsername.value);
+    if (username.present) {
+      map['username'] = Variable<String>(username.value);
     }
     if (documentId.present) {
       map['document_id'] = Variable<String>(documentId.value);
@@ -2274,11 +1000,810 @@ class DocumentAuthorsCompanion extends UpdateCompanion<DocumentAuthorsData> {
   @override
   String toString() {
     return (StringBuffer('DocumentAuthorsCompanion(')
-          ..write('authorId: $authorId, ')
-          ..write('authorIdSignificant: $authorIdSignificant, ')
-          ..write('authorUsername: $authorUsername, ')
+          ..write('accountId: $accountId, ')
+          ..write('accountSignificantId: $accountSignificantId, ')
+          ..write('username: $username, ')
           ..write('documentId: $documentId, ')
           ..write('documentVer: $documentVer, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class DocumentArtifacts extends Table
+    with TableInfo<DocumentArtifacts, DocumentArtifactsData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  DocumentArtifacts(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumn<i2.Uint8List> data = GeneratedColumn<i2.Uint8List>(
+    'data',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> ver = GeneratedColumn<String>(
+    'ver',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [data, id, ver];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'document_artifacts';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id, ver};
+  @override
+  DocumentArtifactsData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentArtifactsData(
+      data: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}data'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      ver: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ver'],
+      )!,
+    );
+  }
+
+  @override
+  DocumentArtifacts createAlias(String alias) {
+    return DocumentArtifacts(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'FOREIGN KEY (id, ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
+  ];
+}
+
+class DocumentArtifactsData extends DataClass
+    implements Insertable<DocumentArtifactsData> {
+  final i2.Uint8List data;
+  final String id;
+  final String ver;
+  const DocumentArtifactsData({
+    required this.data,
+    required this.id,
+    required this.ver,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['data'] = Variable<i2.Uint8List>(data);
+    map['id'] = Variable<String>(id);
+    map['ver'] = Variable<String>(ver);
+    return map;
+  }
+
+  factory DocumentArtifactsData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentArtifactsData(
+      data: serializer.fromJson<i2.Uint8List>(json['data']),
+      id: serializer.fromJson<String>(json['id']),
+      ver: serializer.fromJson<String>(json['ver']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'data': serializer.toJson<i2.Uint8List>(data),
+      'id': serializer.toJson<String>(id),
+      'ver': serializer.toJson<String>(ver),
+    };
+  }
+
+  DocumentArtifactsData copyWith({
+    i2.Uint8List? data,
+    String? id,
+    String? ver,
+  }) => DocumentArtifactsData(
+    data: data ?? this.data,
+    id: id ?? this.id,
+    ver: ver ?? this.ver,
+  );
+  DocumentArtifactsData copyWithCompanion(DocumentArtifactsCompanion data) {
+    return DocumentArtifactsData(
+      data: data.data.present ? data.data.value : this.data,
+      id: data.id.present ? data.id.value : this.id,
+      ver: data.ver.present ? data.ver.value : this.ver,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentArtifactsData(')
+          ..write('data: $data, ')
+          ..write('id: $id, ')
+          ..write('ver: $ver')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash($driftBlobEquality.hash(data), id, ver);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentArtifactsData &&
+          $driftBlobEquality.equals(other.data, this.data) &&
+          other.id == this.id &&
+          other.ver == this.ver);
+}
+
+class DocumentArtifactsCompanion
+    extends UpdateCompanion<DocumentArtifactsData> {
+  final Value<i2.Uint8List> data;
+  final Value<String> id;
+  final Value<String> ver;
+  final Value<int> rowid;
+  const DocumentArtifactsCompanion({
+    this.data = const Value.absent(),
+    this.id = const Value.absent(),
+    this.ver = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DocumentArtifactsCompanion.insert({
+    required i2.Uint8List data,
+    required String id,
+    required String ver,
+    this.rowid = const Value.absent(),
+  }) : data = Value(data),
+       id = Value(id),
+       ver = Value(ver);
+  static Insertable<DocumentArtifactsData> custom({
+    Expression<i2.Uint8List>? data,
+    Expression<String>? id,
+    Expression<String>? ver,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (data != null) 'data': data,
+      if (id != null) 'id': id,
+      if (ver != null) 'ver': ver,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DocumentArtifactsCompanion copyWith({
+    Value<i2.Uint8List>? data,
+    Value<String>? id,
+    Value<String>? ver,
+    Value<int>? rowid,
+  }) {
+    return DocumentArtifactsCompanion(
+      data: data ?? this.data,
+      id: id ?? this.id,
+      ver: ver ?? this.ver,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (data.present) {
+      map['data'] = Variable<i2.Uint8List>(data.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (ver.present) {
+      map['ver'] = Variable<String>(ver.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentArtifactsCompanion(')
+          ..write('data: $data, ')
+          ..write('id: $id, ')
+          ..write('ver: $ver, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class DocumentCollaborators extends Table
+    with TableInfo<DocumentCollaborators, DocumentCollaboratorsData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  DocumentCollaborators(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> accountSignificantId =
+      GeneratedColumn<String>(
+        'account_significant_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  late final GeneratedColumn<String> username = GeneratedColumn<String>(
+    'username',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  late final GeneratedColumn<String> documentId = GeneratedColumn<String>(
+    'document_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> documentVer = GeneratedColumn<String>(
+    'document_ver',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    accountId,
+    accountSignificantId,
+    username,
+    documentId,
+    documentVer,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'document_collaborators';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {documentId, documentVer, accountId};
+  @override
+  DocumentCollaboratorsData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentCollaboratorsData(
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_id'],
+      )!,
+      accountSignificantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_significant_id'],
+      )!,
+      username: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}username'],
+      ),
+      documentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}document_id'],
+      )!,
+      documentVer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}document_ver'],
+      )!,
+    );
+  }
+
+  @override
+  DocumentCollaborators createAlias(String alias) {
+    return DocumentCollaborators(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
+  ];
+}
+
+class DocumentCollaboratorsData extends DataClass
+    implements Insertable<DocumentCollaboratorsData> {
+  final String accountId;
+  final String accountSignificantId;
+  final String? username;
+  final String documentId;
+  final String documentVer;
+  const DocumentCollaboratorsData({
+    required this.accountId,
+    required this.accountSignificantId,
+    this.username,
+    required this.documentId,
+    required this.documentVer,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['account_id'] = Variable<String>(accountId);
+    map['account_significant_id'] = Variable<String>(accountSignificantId);
+    if (!nullToAbsent || username != null) {
+      map['username'] = Variable<String>(username);
+    }
+    map['document_id'] = Variable<String>(documentId);
+    map['document_ver'] = Variable<String>(documentVer);
+    return map;
+  }
+
+  factory DocumentCollaboratorsData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentCollaboratorsData(
+      accountId: serializer.fromJson<String>(json['accountId']),
+      accountSignificantId: serializer.fromJson<String>(
+        json['accountSignificantId'],
+      ),
+      username: serializer.fromJson<String?>(json['username']),
+      documentId: serializer.fromJson<String>(json['documentId']),
+      documentVer: serializer.fromJson<String>(json['documentVer']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'accountId': serializer.toJson<String>(accountId),
+      'accountSignificantId': serializer.toJson<String>(accountSignificantId),
+      'username': serializer.toJson<String?>(username),
+      'documentId': serializer.toJson<String>(documentId),
+      'documentVer': serializer.toJson<String>(documentVer),
+    };
+  }
+
+  DocumentCollaboratorsData copyWith({
+    String? accountId,
+    String? accountSignificantId,
+    Value<String?> username = const Value.absent(),
+    String? documentId,
+    String? documentVer,
+  }) => DocumentCollaboratorsData(
+    accountId: accountId ?? this.accountId,
+    accountSignificantId: accountSignificantId ?? this.accountSignificantId,
+    username: username.present ? username.value : this.username,
+    documentId: documentId ?? this.documentId,
+    documentVer: documentVer ?? this.documentVer,
+  );
+  DocumentCollaboratorsData copyWithCompanion(
+    DocumentCollaboratorsCompanion data,
+  ) {
+    return DocumentCollaboratorsData(
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      accountSignificantId: data.accountSignificantId.present
+          ? data.accountSignificantId.value
+          : this.accountSignificantId,
+      username: data.username.present ? data.username.value : this.username,
+      documentId: data.documentId.present
+          ? data.documentId.value
+          : this.documentId,
+      documentVer: data.documentVer.present
+          ? data.documentVer.value
+          : this.documentVer,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentCollaboratorsData(')
+          ..write('accountId: $accountId, ')
+          ..write('accountSignificantId: $accountSignificantId, ')
+          ..write('username: $username, ')
+          ..write('documentId: $documentId, ')
+          ..write('documentVer: $documentVer')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    accountId,
+    accountSignificantId,
+    username,
+    documentId,
+    documentVer,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentCollaboratorsData &&
+          other.accountId == this.accountId &&
+          other.accountSignificantId == this.accountSignificantId &&
+          other.username == this.username &&
+          other.documentId == this.documentId &&
+          other.documentVer == this.documentVer);
+}
+
+class DocumentCollaboratorsCompanion
+    extends UpdateCompanion<DocumentCollaboratorsData> {
+  final Value<String> accountId;
+  final Value<String> accountSignificantId;
+  final Value<String?> username;
+  final Value<String> documentId;
+  final Value<String> documentVer;
+  final Value<int> rowid;
+  const DocumentCollaboratorsCompanion({
+    this.accountId = const Value.absent(),
+    this.accountSignificantId = const Value.absent(),
+    this.username = const Value.absent(),
+    this.documentId = const Value.absent(),
+    this.documentVer = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DocumentCollaboratorsCompanion.insert({
+    required String accountId,
+    required String accountSignificantId,
+    this.username = const Value.absent(),
+    required String documentId,
+    required String documentVer,
+    this.rowid = const Value.absent(),
+  }) : accountId = Value(accountId),
+       accountSignificantId = Value(accountSignificantId),
+       documentId = Value(documentId),
+       documentVer = Value(documentVer);
+  static Insertable<DocumentCollaboratorsData> custom({
+    Expression<String>? accountId,
+    Expression<String>? accountSignificantId,
+    Expression<String>? username,
+    Expression<String>? documentId,
+    Expression<String>? documentVer,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (accountId != null) 'account_id': accountId,
+      if (accountSignificantId != null)
+        'account_significant_id': accountSignificantId,
+      if (username != null) 'username': username,
+      if (documentId != null) 'document_id': documentId,
+      if (documentVer != null) 'document_ver': documentVer,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DocumentCollaboratorsCompanion copyWith({
+    Value<String>? accountId,
+    Value<String>? accountSignificantId,
+    Value<String?>? username,
+    Value<String>? documentId,
+    Value<String>? documentVer,
+    Value<int>? rowid,
+  }) {
+    return DocumentCollaboratorsCompanion(
+      accountId: accountId ?? this.accountId,
+      accountSignificantId: accountSignificantId ?? this.accountSignificantId,
+      username: username ?? this.username,
+      documentId: documentId ?? this.documentId,
+      documentVer: documentVer ?? this.documentVer,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
+    }
+    if (accountSignificantId.present) {
+      map['account_significant_id'] = Variable<String>(
+        accountSignificantId.value,
+      );
+    }
+    if (username.present) {
+      map['username'] = Variable<String>(username.value);
+    }
+    if (documentId.present) {
+      map['document_id'] = Variable<String>(documentId.value);
+    }
+    if (documentVer.present) {
+      map['document_ver'] = Variable<String>(documentVer.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentCollaboratorsCompanion(')
+          ..write('accountId: $accountId, ')
+          ..write('accountSignificantId: $accountSignificantId, ')
+          ..write('username: $username, ')
+          ..write('documentId: $documentId, ')
+          ..write('documentVer: $documentVer, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class DocumentParameters extends Table
+    with TableInfo<DocumentParameters, DocumentParametersData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  DocumentParameters(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumn<String> documentId = GeneratedColumn<String>(
+    'document_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> documentVer = GeneratedColumn<String>(
+    'document_ver',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> ver = GeneratedColumn<String>(
+    'ver',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [documentId, documentVer, id, ver];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'document_parameters';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id, ver, documentId, documentVer};
+  @override
+  DocumentParametersData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentParametersData(
+      documentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}document_id'],
+      )!,
+      documentVer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}document_ver'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      ver: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ver'],
+      )!,
+    );
+  }
+
+  @override
+  DocumentParameters createAlias(String alias) {
+    return DocumentParameters(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
+  ];
+}
+
+class DocumentParametersData extends DataClass
+    implements Insertable<DocumentParametersData> {
+  final String documentId;
+  final String documentVer;
+  final String id;
+  final String ver;
+  const DocumentParametersData({
+    required this.documentId,
+    required this.documentVer,
+    required this.id,
+    required this.ver,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['document_id'] = Variable<String>(documentId);
+    map['document_ver'] = Variable<String>(documentVer);
+    map['id'] = Variable<String>(id);
+    map['ver'] = Variable<String>(ver);
+    return map;
+  }
+
+  factory DocumentParametersData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentParametersData(
+      documentId: serializer.fromJson<String>(json['documentId']),
+      documentVer: serializer.fromJson<String>(json['documentVer']),
+      id: serializer.fromJson<String>(json['id']),
+      ver: serializer.fromJson<String>(json['ver']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'documentId': serializer.toJson<String>(documentId),
+      'documentVer': serializer.toJson<String>(documentVer),
+      'id': serializer.toJson<String>(id),
+      'ver': serializer.toJson<String>(ver),
+    };
+  }
+
+  DocumentParametersData copyWith({
+    String? documentId,
+    String? documentVer,
+    String? id,
+    String? ver,
+  }) => DocumentParametersData(
+    documentId: documentId ?? this.documentId,
+    documentVer: documentVer ?? this.documentVer,
+    id: id ?? this.id,
+    ver: ver ?? this.ver,
+  );
+  DocumentParametersData copyWithCompanion(DocumentParametersCompanion data) {
+    return DocumentParametersData(
+      documentId: data.documentId.present
+          ? data.documentId.value
+          : this.documentId,
+      documentVer: data.documentVer.present
+          ? data.documentVer.value
+          : this.documentVer,
+      id: data.id.present ? data.id.value : this.id,
+      ver: data.ver.present ? data.ver.value : this.ver,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentParametersData(')
+          ..write('documentId: $documentId, ')
+          ..write('documentVer: $documentVer, ')
+          ..write('id: $id, ')
+          ..write('ver: $ver')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(documentId, documentVer, id, ver);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentParametersData &&
+          other.documentId == this.documentId &&
+          other.documentVer == this.documentVer &&
+          other.id == this.id &&
+          other.ver == this.ver);
+}
+
+class DocumentParametersCompanion
+    extends UpdateCompanion<DocumentParametersData> {
+  final Value<String> documentId;
+  final Value<String> documentVer;
+  final Value<String> id;
+  final Value<String> ver;
+  final Value<int> rowid;
+  const DocumentParametersCompanion({
+    this.documentId = const Value.absent(),
+    this.documentVer = const Value.absent(),
+    this.id = const Value.absent(),
+    this.ver = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DocumentParametersCompanion.insert({
+    required String documentId,
+    required String documentVer,
+    required String id,
+    required String ver,
+    this.rowid = const Value.absent(),
+  }) : documentId = Value(documentId),
+       documentVer = Value(documentVer),
+       id = Value(id),
+       ver = Value(ver);
+  static Insertable<DocumentParametersData> custom({
+    Expression<String>? documentId,
+    Expression<String>? documentVer,
+    Expression<String>? id,
+    Expression<String>? ver,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (documentId != null) 'document_id': documentId,
+      if (documentVer != null) 'document_ver': documentVer,
+      if (id != null) 'id': id,
+      if (ver != null) 'ver': ver,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DocumentParametersCompanion copyWith({
+    Value<String>? documentId,
+    Value<String>? documentVer,
+    Value<String>? id,
+    Value<String>? ver,
+    Value<int>? rowid,
+  }) {
+    return DocumentParametersCompanion(
+      documentId: documentId ?? this.documentId,
+      documentVer: documentVer ?? this.documentVer,
+      id: id ?? this.id,
+      ver: ver ?? this.ver,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (documentId.present) {
+      map['document_id'] = Variable<String>(documentId.value);
+    }
+    if (documentVer.present) {
+      map['document_ver'] = Variable<String>(documentVer.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (ver.present) {
+      map['ver'] = Variable<String>(ver.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentParametersCompanion(')
+          ..write('documentId: $documentId, ')
+          ..write('documentVer: $documentVer, ')
+          ..write('id: $id, ')
+          ..write('ver: $ver, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2498,22 +2023,29 @@ class LocalDocumentsDrafts extends Table
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  late final GeneratedColumn<String> categoryId = GeneratedColumn<String>(
-    'category_id',
+  late final GeneratedColumn<String> collaborators = GeneratedColumn<String>(
+    'collaborators',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.string,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
   );
-  late final GeneratedColumn<String> categoryVer = GeneratedColumn<String>(
-    'category_ver',
+  late final GeneratedColumn<String> contentType = GeneratedColumn<String>(
+    'content_type',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.string,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> parameters = GeneratedColumn<String>(
+    'parameters',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -2582,6 +2114,21 @@ class LocalDocumentsDrafts extends Table
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  late final GeneratedColumn<String> authorsNames = GeneratedColumn<String>(
+    'authors_names',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> authorsSignificant =
+      GeneratedColumn<String>(
+        'authors_significant',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
     'created_at',
     aliasedName,
@@ -2593,9 +2140,10 @@ class LocalDocumentsDrafts extends Table
   List<GeneratedColumn> get $columns => [
     content,
     authors,
-    categoryId,
-    categoryVer,
+    collaborators,
+    contentType,
     id,
+    parameters,
     refId,
     refVer,
     replyId,
@@ -2605,6 +2153,8 @@ class LocalDocumentsDrafts extends Table
     templateVer,
     type,
     ver,
+    authorsNames,
+    authorsSignificant,
     createdAt,
   ];
   @override
@@ -2629,17 +2179,21 @@ class LocalDocumentsDrafts extends Table
         DriftSqlType.string,
         data['${effectivePrefix}authors'],
       )!,
-      categoryId: attachedDatabase.typeMapping.read(
+      collaborators: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}category_id'],
-      ),
-      categoryVer: attachedDatabase.typeMapping.read(
+        data['${effectivePrefix}collaborators'],
+      )!,
+      contentType: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}category_ver'],
-      ),
+        data['${effectivePrefix}content_type'],
+      )!,
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
+      )!,
+      parameters: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parameters'],
       )!,
       refId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -2677,6 +2231,14 @@ class LocalDocumentsDrafts extends Table
         DriftSqlType.string,
         data['${effectivePrefix}ver'],
       )!,
+      authorsNames: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}authors_names'],
+      )!,
+      authorsSignificant: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}authors_significant'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -2694,9 +2256,10 @@ class LocalDocumentsDraftsData extends DataClass
     implements Insertable<LocalDocumentsDraftsData> {
   final i2.Uint8List content;
   final String authors;
-  final String? categoryId;
-  final String? categoryVer;
+  final String collaborators;
+  final String contentType;
   final String id;
+  final String parameters;
   final String? refId;
   final String? refVer;
   final String? replyId;
@@ -2706,13 +2269,16 @@ class LocalDocumentsDraftsData extends DataClass
   final String? templateVer;
   final String type;
   final String ver;
+  final String authorsNames;
+  final String authorsSignificant;
   final DateTime createdAt;
   const LocalDocumentsDraftsData({
     required this.content,
     required this.authors,
-    this.categoryId,
-    this.categoryVer,
+    required this.collaborators,
+    required this.contentType,
     required this.id,
+    required this.parameters,
     this.refId,
     this.refVer,
     this.replyId,
@@ -2722,6 +2288,8 @@ class LocalDocumentsDraftsData extends DataClass
     this.templateVer,
     required this.type,
     required this.ver,
+    required this.authorsNames,
+    required this.authorsSignificant,
     required this.createdAt,
   });
   @override
@@ -2729,13 +2297,10 @@ class LocalDocumentsDraftsData extends DataClass
     final map = <String, Expression>{};
     map['content'] = Variable<i2.Uint8List>(content);
     map['authors'] = Variable<String>(authors);
-    if (!nullToAbsent || categoryId != null) {
-      map['category_id'] = Variable<String>(categoryId);
-    }
-    if (!nullToAbsent || categoryVer != null) {
-      map['category_ver'] = Variable<String>(categoryVer);
-    }
+    map['collaborators'] = Variable<String>(collaborators);
+    map['content_type'] = Variable<String>(contentType);
     map['id'] = Variable<String>(id);
+    map['parameters'] = Variable<String>(parameters);
     if (!nullToAbsent || refId != null) {
       map['ref_id'] = Variable<String>(refId);
     }
@@ -2759,6 +2324,8 @@ class LocalDocumentsDraftsData extends DataClass
     }
     map['type'] = Variable<String>(type);
     map['ver'] = Variable<String>(ver);
+    map['authors_names'] = Variable<String>(authorsNames);
+    map['authors_significant'] = Variable<String>(authorsSignificant);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2771,9 +2338,10 @@ class LocalDocumentsDraftsData extends DataClass
     return LocalDocumentsDraftsData(
       content: serializer.fromJson<i2.Uint8List>(json['content']),
       authors: serializer.fromJson<String>(json['authors']),
-      categoryId: serializer.fromJson<String?>(json['categoryId']),
-      categoryVer: serializer.fromJson<String?>(json['categoryVer']),
+      collaborators: serializer.fromJson<String>(json['collaborators']),
+      contentType: serializer.fromJson<String>(json['contentType']),
       id: serializer.fromJson<String>(json['id']),
+      parameters: serializer.fromJson<String>(json['parameters']),
       refId: serializer.fromJson<String?>(json['refId']),
       refVer: serializer.fromJson<String?>(json['refVer']),
       replyId: serializer.fromJson<String?>(json['replyId']),
@@ -2783,6 +2351,10 @@ class LocalDocumentsDraftsData extends DataClass
       templateVer: serializer.fromJson<String?>(json['templateVer']),
       type: serializer.fromJson<String>(json['type']),
       ver: serializer.fromJson<String>(json['ver']),
+      authorsNames: serializer.fromJson<String>(json['authorsNames']),
+      authorsSignificant: serializer.fromJson<String>(
+        json['authorsSignificant'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -2792,9 +2364,10 @@ class LocalDocumentsDraftsData extends DataClass
     return <String, dynamic>{
       'content': serializer.toJson<i2.Uint8List>(content),
       'authors': serializer.toJson<String>(authors),
-      'categoryId': serializer.toJson<String?>(categoryId),
-      'categoryVer': serializer.toJson<String?>(categoryVer),
+      'collaborators': serializer.toJson<String>(collaborators),
+      'contentType': serializer.toJson<String>(contentType),
       'id': serializer.toJson<String>(id),
+      'parameters': serializer.toJson<String>(parameters),
       'refId': serializer.toJson<String?>(refId),
       'refVer': serializer.toJson<String?>(refVer),
       'replyId': serializer.toJson<String?>(replyId),
@@ -2804,6 +2377,8 @@ class LocalDocumentsDraftsData extends DataClass
       'templateVer': serializer.toJson<String?>(templateVer),
       'type': serializer.toJson<String>(type),
       'ver': serializer.toJson<String>(ver),
+      'authorsNames': serializer.toJson<String>(authorsNames),
+      'authorsSignificant': serializer.toJson<String>(authorsSignificant),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -2811,9 +2386,10 @@ class LocalDocumentsDraftsData extends DataClass
   LocalDocumentsDraftsData copyWith({
     i2.Uint8List? content,
     String? authors,
-    Value<String?> categoryId = const Value.absent(),
-    Value<String?> categoryVer = const Value.absent(),
+    String? collaborators,
+    String? contentType,
     String? id,
+    String? parameters,
     Value<String?> refId = const Value.absent(),
     Value<String?> refVer = const Value.absent(),
     Value<String?> replyId = const Value.absent(),
@@ -2823,13 +2399,16 @@ class LocalDocumentsDraftsData extends DataClass
     Value<String?> templateVer = const Value.absent(),
     String? type,
     String? ver,
+    String? authorsNames,
+    String? authorsSignificant,
     DateTime? createdAt,
   }) => LocalDocumentsDraftsData(
     content: content ?? this.content,
     authors: authors ?? this.authors,
-    categoryId: categoryId.present ? categoryId.value : this.categoryId,
-    categoryVer: categoryVer.present ? categoryVer.value : this.categoryVer,
+    collaborators: collaborators ?? this.collaborators,
+    contentType: contentType ?? this.contentType,
     id: id ?? this.id,
+    parameters: parameters ?? this.parameters,
     refId: refId.present ? refId.value : this.refId,
     refVer: refVer.present ? refVer.value : this.refVer,
     replyId: replyId.present ? replyId.value : this.replyId,
@@ -2839,6 +2418,8 @@ class LocalDocumentsDraftsData extends DataClass
     templateVer: templateVer.present ? templateVer.value : this.templateVer,
     type: type ?? this.type,
     ver: ver ?? this.ver,
+    authorsNames: authorsNames ?? this.authorsNames,
+    authorsSignificant: authorsSignificant ?? this.authorsSignificant,
     createdAt: createdAt ?? this.createdAt,
   );
   LocalDocumentsDraftsData copyWithCompanion(
@@ -2847,13 +2428,16 @@ class LocalDocumentsDraftsData extends DataClass
     return LocalDocumentsDraftsData(
       content: data.content.present ? data.content.value : this.content,
       authors: data.authors.present ? data.authors.value : this.authors,
-      categoryId: data.categoryId.present
-          ? data.categoryId.value
-          : this.categoryId,
-      categoryVer: data.categoryVer.present
-          ? data.categoryVer.value
-          : this.categoryVer,
+      collaborators: data.collaborators.present
+          ? data.collaborators.value
+          : this.collaborators,
+      contentType: data.contentType.present
+          ? data.contentType.value
+          : this.contentType,
       id: data.id.present ? data.id.value : this.id,
+      parameters: data.parameters.present
+          ? data.parameters.value
+          : this.parameters,
       refId: data.refId.present ? data.refId.value : this.refId,
       refVer: data.refVer.present ? data.refVer.value : this.refVer,
       replyId: data.replyId.present ? data.replyId.value : this.replyId,
@@ -2867,6 +2451,12 @@ class LocalDocumentsDraftsData extends DataClass
           : this.templateVer,
       type: data.type.present ? data.type.value : this.type,
       ver: data.ver.present ? data.ver.value : this.ver,
+      authorsNames: data.authorsNames.present
+          ? data.authorsNames.value
+          : this.authorsNames,
+      authorsSignificant: data.authorsSignificant.present
+          ? data.authorsSignificant.value
+          : this.authorsSignificant,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -2876,9 +2466,10 @@ class LocalDocumentsDraftsData extends DataClass
     return (StringBuffer('LocalDocumentsDraftsData(')
           ..write('content: $content, ')
           ..write('authors: $authors, ')
-          ..write('categoryId: $categoryId, ')
-          ..write('categoryVer: $categoryVer, ')
+          ..write('collaborators: $collaborators, ')
+          ..write('contentType: $contentType, ')
           ..write('id: $id, ')
+          ..write('parameters: $parameters, ')
           ..write('refId: $refId, ')
           ..write('refVer: $refVer, ')
           ..write('replyId: $replyId, ')
@@ -2888,6 +2479,8 @@ class LocalDocumentsDraftsData extends DataClass
           ..write('templateVer: $templateVer, ')
           ..write('type: $type, ')
           ..write('ver: $ver, ')
+          ..write('authorsNames: $authorsNames, ')
+          ..write('authorsSignificant: $authorsSignificant, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -2897,9 +2490,10 @@ class LocalDocumentsDraftsData extends DataClass
   int get hashCode => Object.hash(
     $driftBlobEquality.hash(content),
     authors,
-    categoryId,
-    categoryVer,
+    collaborators,
+    contentType,
     id,
+    parameters,
     refId,
     refVer,
     replyId,
@@ -2909,6 +2503,8 @@ class LocalDocumentsDraftsData extends DataClass
     templateVer,
     type,
     ver,
+    authorsNames,
+    authorsSignificant,
     createdAt,
   );
   @override
@@ -2917,9 +2513,10 @@ class LocalDocumentsDraftsData extends DataClass
       (other is LocalDocumentsDraftsData &&
           $driftBlobEquality.equals(other.content, this.content) &&
           other.authors == this.authors &&
-          other.categoryId == this.categoryId &&
-          other.categoryVer == this.categoryVer &&
+          other.collaborators == this.collaborators &&
+          other.contentType == this.contentType &&
           other.id == this.id &&
+          other.parameters == this.parameters &&
           other.refId == this.refId &&
           other.refVer == this.refVer &&
           other.replyId == this.replyId &&
@@ -2929,6 +2526,8 @@ class LocalDocumentsDraftsData extends DataClass
           other.templateVer == this.templateVer &&
           other.type == this.type &&
           other.ver == this.ver &&
+          other.authorsNames == this.authorsNames &&
+          other.authorsSignificant == this.authorsSignificant &&
           other.createdAt == this.createdAt);
 }
 
@@ -2936,9 +2535,10 @@ class LocalDocumentsDraftsCompanion
     extends UpdateCompanion<LocalDocumentsDraftsData> {
   final Value<i2.Uint8List> content;
   final Value<String> authors;
-  final Value<String?> categoryId;
-  final Value<String?> categoryVer;
+  final Value<String> collaborators;
+  final Value<String> contentType;
   final Value<String> id;
+  final Value<String> parameters;
   final Value<String?> refId;
   final Value<String?> refVer;
   final Value<String?> replyId;
@@ -2948,14 +2548,17 @@ class LocalDocumentsDraftsCompanion
   final Value<String?> templateVer;
   final Value<String> type;
   final Value<String> ver;
+  final Value<String> authorsNames;
+  final Value<String> authorsSignificant;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const LocalDocumentsDraftsCompanion({
     this.content = const Value.absent(),
     this.authors = const Value.absent(),
-    this.categoryId = const Value.absent(),
-    this.categoryVer = const Value.absent(),
+    this.collaborators = const Value.absent(),
+    this.contentType = const Value.absent(),
     this.id = const Value.absent(),
+    this.parameters = const Value.absent(),
     this.refId = const Value.absent(),
     this.refVer = const Value.absent(),
     this.replyId = const Value.absent(),
@@ -2965,15 +2568,18 @@ class LocalDocumentsDraftsCompanion
     this.templateVer = const Value.absent(),
     this.type = const Value.absent(),
     this.ver = const Value.absent(),
+    this.authorsNames = const Value.absent(),
+    this.authorsSignificant = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LocalDocumentsDraftsCompanion.insert({
     required i2.Uint8List content,
     required String authors,
-    this.categoryId = const Value.absent(),
-    this.categoryVer = const Value.absent(),
+    required String collaborators,
+    required String contentType,
     required String id,
+    required String parameters,
     this.refId = const Value.absent(),
     this.refVer = const Value.absent(),
     this.replyId = const Value.absent(),
@@ -2983,20 +2589,28 @@ class LocalDocumentsDraftsCompanion
     this.templateVer = const Value.absent(),
     required String type,
     required String ver,
+    required String authorsNames,
+    required String authorsSignificant,
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   }) : content = Value(content),
        authors = Value(authors),
+       collaborators = Value(collaborators),
+       contentType = Value(contentType),
        id = Value(id),
+       parameters = Value(parameters),
        type = Value(type),
        ver = Value(ver),
+       authorsNames = Value(authorsNames),
+       authorsSignificant = Value(authorsSignificant),
        createdAt = Value(createdAt);
   static Insertable<LocalDocumentsDraftsData> custom({
     Expression<i2.Uint8List>? content,
     Expression<String>? authors,
-    Expression<String>? categoryId,
-    Expression<String>? categoryVer,
+    Expression<String>? collaborators,
+    Expression<String>? contentType,
     Expression<String>? id,
+    Expression<String>? parameters,
     Expression<String>? refId,
     Expression<String>? refVer,
     Expression<String>? replyId,
@@ -3006,15 +2620,18 @@ class LocalDocumentsDraftsCompanion
     Expression<String>? templateVer,
     Expression<String>? type,
     Expression<String>? ver,
+    Expression<String>? authorsNames,
+    Expression<String>? authorsSignificant,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (content != null) 'content': content,
       if (authors != null) 'authors': authors,
-      if (categoryId != null) 'category_id': categoryId,
-      if (categoryVer != null) 'category_ver': categoryVer,
+      if (collaborators != null) 'collaborators': collaborators,
+      if (contentType != null) 'content_type': contentType,
       if (id != null) 'id': id,
+      if (parameters != null) 'parameters': parameters,
       if (refId != null) 'ref_id': refId,
       if (refVer != null) 'ref_ver': refVer,
       if (replyId != null) 'reply_id': replyId,
@@ -3024,6 +2641,8 @@ class LocalDocumentsDraftsCompanion
       if (templateVer != null) 'template_ver': templateVer,
       if (type != null) 'type': type,
       if (ver != null) 'ver': ver,
+      if (authorsNames != null) 'authors_names': authorsNames,
+      if (authorsSignificant != null) 'authors_significant': authorsSignificant,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3032,9 +2651,10 @@ class LocalDocumentsDraftsCompanion
   LocalDocumentsDraftsCompanion copyWith({
     Value<i2.Uint8List>? content,
     Value<String>? authors,
-    Value<String?>? categoryId,
-    Value<String?>? categoryVer,
+    Value<String>? collaborators,
+    Value<String>? contentType,
     Value<String>? id,
+    Value<String>? parameters,
     Value<String?>? refId,
     Value<String?>? refVer,
     Value<String?>? replyId,
@@ -3044,15 +2664,18 @@ class LocalDocumentsDraftsCompanion
     Value<String?>? templateVer,
     Value<String>? type,
     Value<String>? ver,
+    Value<String>? authorsNames,
+    Value<String>? authorsSignificant,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
     return LocalDocumentsDraftsCompanion(
       content: content ?? this.content,
       authors: authors ?? this.authors,
-      categoryId: categoryId ?? this.categoryId,
-      categoryVer: categoryVer ?? this.categoryVer,
+      collaborators: collaborators ?? this.collaborators,
+      contentType: contentType ?? this.contentType,
       id: id ?? this.id,
+      parameters: parameters ?? this.parameters,
       refId: refId ?? this.refId,
       refVer: refVer ?? this.refVer,
       replyId: replyId ?? this.replyId,
@@ -3062,6 +2685,8 @@ class LocalDocumentsDraftsCompanion
       templateVer: templateVer ?? this.templateVer,
       type: type ?? this.type,
       ver: ver ?? this.ver,
+      authorsNames: authorsNames ?? this.authorsNames,
+      authorsSignificant: authorsSignificant ?? this.authorsSignificant,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -3076,14 +2701,17 @@ class LocalDocumentsDraftsCompanion
     if (authors.present) {
       map['authors'] = Variable<String>(authors.value);
     }
-    if (categoryId.present) {
-      map['category_id'] = Variable<String>(categoryId.value);
+    if (collaborators.present) {
+      map['collaborators'] = Variable<String>(collaborators.value);
     }
-    if (categoryVer.present) {
-      map['category_ver'] = Variable<String>(categoryVer.value);
+    if (contentType.present) {
+      map['content_type'] = Variable<String>(contentType.value);
     }
     if (id.present) {
       map['id'] = Variable<String>(id.value);
+    }
+    if (parameters.present) {
+      map['parameters'] = Variable<String>(parameters.value);
     }
     if (refId.present) {
       map['ref_id'] = Variable<String>(refId.value);
@@ -3112,6 +2740,12 @@ class LocalDocumentsDraftsCompanion
     if (ver.present) {
       map['ver'] = Variable<String>(ver.value);
     }
+    if (authorsNames.present) {
+      map['authors_names'] = Variable<String>(authorsNames.value);
+    }
+    if (authorsSignificant.present) {
+      map['authors_significant'] = Variable<String>(authorsSignificant.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -3126,9 +2760,10 @@ class LocalDocumentsDraftsCompanion
     return (StringBuffer('LocalDocumentsDraftsCompanion(')
           ..write('content: $content, ')
           ..write('authors: $authors, ')
-          ..write('categoryId: $categoryId, ')
-          ..write('categoryVer: $categoryVer, ')
+          ..write('collaborators: $collaborators, ')
+          ..write('contentType: $contentType, ')
           ..write('id: $id, ')
+          ..write('parameters: $parameters, ')
           ..write('refId: $refId, ')
           ..write('refVer: $refVer, ')
           ..write('replyId: $replyId, ')
@@ -3138,6 +2773,8 @@ class LocalDocumentsDraftsCompanion
           ..write('templateVer: $templateVer, ')
           ..write('type: $type, ')
           ..write('ver: $ver, ')
+          ..write('authorsNames: $authorsNames, ')
+          ..write('authorsSignificant: $authorsSignificant, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -3147,40 +2784,16 @@ class LocalDocumentsDraftsCompanion
 
 class DatabaseAtV4 extends GeneratedDatabase {
   DatabaseAtV4(QueryExecutor e) : super(e);
-  late final Documents documents = Documents(this);
-  late final DocumentsMetadata documentsMetadata = DocumentsMetadata(this);
-  late final DocumentsFavorites documentsFavorites = DocumentsFavorites(this);
-  late final Drafts drafts = Drafts(this);
   late final DocumentsV2 documentsV2 = DocumentsV2(this);
   late final DocumentAuthors documentAuthors = DocumentAuthors(this);
+  late final DocumentArtifacts documentArtifacts = DocumentArtifacts(this);
+  late final DocumentCollaborators documentCollaborators =
+      DocumentCollaborators(this);
+  late final DocumentParameters documentParameters = DocumentParameters(this);
   late final DocumentsLocalMetadata documentsLocalMetadata =
       DocumentsLocalMetadata(this);
   late final LocalDocumentsDrafts localDocumentsDrafts = LocalDocumentsDrafts(
     this,
-  );
-  late final Index idxDocType = Index(
-    'idx_doc_type',
-    'CREATE INDEX idx_doc_type ON documents (type)',
-  );
-  late final Index idxUniqueVer = Index(
-    'idx_unique_ver',
-    'CREATE UNIQUE INDEX idx_unique_ver ON documents (ver_hi, ver_lo)',
-  );
-  late final Index idxDocMetadataKeyValue = Index(
-    'idx_doc_metadata_key_value',
-    'CREATE INDEX idx_doc_metadata_key_value ON documents_metadata (field_key, field_value)',
-  );
-  late final Index idxFavType = Index(
-    'idx_fav_type',
-    'CREATE INDEX idx_fav_type ON documents_favorites (type)',
-  );
-  late final Index idxFavUniqueId = Index(
-    'idx_fav_unique_id',
-    'CREATE UNIQUE INDEX idx_fav_unique_id ON documents_favorites (id_hi, id_lo)',
-  );
-  late final Index idxDraftType = Index(
-    'idx_draft_type',
-    'CREATE INDEX idx_draft_type ON drafts (type)',
   );
   late final Index idxDocumentsV2TypeId = Index(
     'idx_documents_v2_type_id',
@@ -3206,56 +2819,94 @@ class DatabaseAtV4 extends GeneratedDatabase {
     'idx_documents_v2_type_id_created_at',
     'CREATE INDEX idx_documents_v2_type_id_created_at ON documents_v2 (type, id, created_at)',
   );
-  late final Index idxDocumentsV2TypeCategoryId = Index(
-    'idx_documents_v2_type_category_id',
-    'CREATE INDEX idx_documents_v2_type_category_id ON documents_v2 (type, category_id)',
-  );
   late final Index idxDocumentsV2TypeRefIdRefVer = Index(
     'idx_documents_v2_type_ref_id_ref_ver',
     'CREATE INDEX idx_documents_v2_type_ref_id_ref_ver ON documents_v2 (type, ref_id, ref_ver)',
   );
+  late final Index idxDocumentsV2TypeCreatedAt = Index(
+    'idx_documents_v2_type_created_at',
+    'CREATE INDEX idx_documents_v2_type_created_at ON documents_v2 (type, created_at)',
+  );
+  late final Index idxDocumentsV2TypeTemplate = Index(
+    'idx_documents_v2_type_template',
+    'CREATE INDEX idx_documents_v2_type_template ON documents_v2 (type, template_id, template_ver)',
+  );
   late final Index idxDocumentAuthorsComposite = Index(
     'idx_document_authors_composite',
-    'CREATE INDEX idx_document_authors_composite ON document_authors (document_id, document_ver, author_id_significant)',
+    'CREATE INDEX idx_document_authors_composite ON document_authors (document_id, document_ver, account_significant_id)',
   );
   late final Index idxDocumentAuthorsIdentity = Index(
     'idx_document_authors_identity',
-    'CREATE INDEX idx_document_authors_identity ON document_authors (author_id_significant)',
+    'CREATE INDEX idx_document_authors_identity ON document_authors (account_significant_id)',
   );
   late final Index idxDocumentAuthorsUsername = Index(
     'idx_document_authors_username',
-    'CREATE INDEX idx_document_authors_username ON document_authors (author_username)',
+    'CREATE INDEX idx_document_authors_username ON document_authors (username)',
+  );
+  late final Index idxDocumentCollaboratorsComposite = Index(
+    'idx_document_collaborators_composite',
+    'CREATE INDEX idx_document_collaborators_composite ON document_collaborators (document_id, document_ver, account_significant_id)',
+  );
+  late final Index idxDocumentCollaboratorsIdentity = Index(
+    'idx_document_collaborators_identity',
+    'CREATE INDEX idx_document_collaborators_identity ON document_collaborators (account_significant_id)',
+  );
+  late final Index idxDocumentCollaboratorsUsername = Index(
+    'idx_document_collaborators_username',
+    'CREATE INDEX idx_document_collaborators_username ON document_collaborators (username)',
+  );
+  late final Index idxDocumentParametersComposite = Index(
+    'idx_document_parameters_composite',
+    'CREATE INDEX idx_document_parameters_composite ON document_parameters (document_id, document_ver, id, ver)',
+  );
+  late final Index idxLocalMetadataFavorite = Index(
+    'idx_local_metadata_favorite',
+    'CREATE INDEX idx_local_metadata_favorite ON documents_local_metadata (is_favorite)',
+  );
+  late final Index idxLocalDraftsTypeAuthors = Index(
+    'idx_local_drafts_type_authors',
+    'CREATE INDEX idx_local_drafts_type_authors ON local_documents_drafts (type, authors_significant)',
+  );
+  late final Index idxLocalDraftsTypeId = Index(
+    'idx_local_drafts_type_id',
+    'CREATE INDEX idx_local_drafts_type_id ON local_documents_drafts (type, id)',
+  );
+  late final Index idxLocalDraftsCreatedAt = Index(
+    'idx_local_drafts_created_at',
+    'CREATE INDEX idx_local_drafts_created_at ON local_documents_drafts (created_at)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-    documents,
-    documentsMetadata,
-    documentsFavorites,
-    drafts,
     documentsV2,
     documentAuthors,
+    documentArtifacts,
+    documentCollaborators,
+    documentParameters,
     documentsLocalMetadata,
     localDocumentsDrafts,
-    idxDocType,
-    idxUniqueVer,
-    idxDocMetadataKeyValue,
-    idxFavType,
-    idxFavUniqueId,
-    idxDraftType,
     idxDocumentsV2TypeId,
     idxDocumentsV2TypeIdVer,
     idxDocumentsV2TypeRefId,
     idxDocumentsV2TypeRefIdVer,
     idxDocumentsV2RefIdVer,
     idxDocumentsV2TypeIdCreatedAt,
-    idxDocumentsV2TypeCategoryId,
     idxDocumentsV2TypeRefIdRefVer,
+    idxDocumentsV2TypeCreatedAt,
+    idxDocumentsV2TypeTemplate,
     idxDocumentAuthorsComposite,
     idxDocumentAuthorsIdentity,
     idxDocumentAuthorsUsername,
+    idxDocumentCollaboratorsComposite,
+    idxDocumentCollaboratorsIdentity,
+    idxDocumentCollaboratorsUsername,
+    idxDocumentParametersComposite,
+    idxLocalMetadataFavorite,
+    idxLocalDraftsTypeAuthors,
+    idxLocalDraftsTypeId,
+    idxLocalDraftsCreatedAt,
   ];
   @override
   int get schemaVersion => 4;

@@ -96,7 +96,7 @@ final class NewProposalStateCategories extends Equatable {
   ];
 
   CampaignCategoryDetailsViewModel? get selected =>
-      categories?.firstWhereOrNull((element) => element.ref.id == selectedRef?.id);
+      categories?.firstWhereOrNull((element) => element.id.id == selectedRef?.id);
 
   NewProposalStateCategories copyWith({
     Optional<List<CampaignCategoryDetailsViewModel>>? categories,

@@ -2346,7 +2346,7 @@ void main() {
             final otherDoc = _createTestDocumentEntity(
               id: 'other1',
               ver: otherDocVer,
-              type: DocumentType.reviewDocument,
+              type: DocumentType.brandParametersDocument,
               refId: proposal.doc.id,
               refVer: proposal.doc.ver,
             );

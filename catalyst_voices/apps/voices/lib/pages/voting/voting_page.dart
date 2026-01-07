@@ -24,7 +24,7 @@ class VotingPage extends StatefulWidget {
 
   const VotingPage({
     super.key,
-    this.categoryRef,
+    this.categoryId,
     this.tab,
   });
 
@@ -76,7 +76,7 @@ class _VotingPageState extends State<VotingPage>
 
     final tab = widget.tab ?? VotingPageTab.total;
 
-    if (widget.categoryRef != oldWidget.categoryRef || widget.tab != oldWidget.tab) {
+    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<VotingCubit>().changeFilters(
         categoryId: Optional(widget.categoryId),
         tab: Optional(tab),

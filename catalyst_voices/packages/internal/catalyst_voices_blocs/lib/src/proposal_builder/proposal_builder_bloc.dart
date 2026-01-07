@@ -470,7 +470,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         throw StateError('Cannot load proposal, active campaign not found');
       }
       final category = campaign.categories.first;
-      final categoryRef = category.selfRef;
+      final categoryRef = category.id;
       final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
 
       final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryRef);
@@ -537,11 +537,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         emitSignal(const NewProposalAndEmailNotVerifiedSignal());
       }
 
-      final categoryRef = proposal.categoryRef;
       final category = await _campaignService.getCategory(proposal.parameters);
-      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryRef);
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
       final campaign = await _campaignService.getActiveCampaign();
-      final fromActiveCampaign = campaign?.hasCategory(category.selfRef.id) ?? false;
+      final fromActiveCampaign = campaign?.hasCategory(category.id.id) ?? false;
 
       return _cacheAndCreateState(
         proposalDocument: proposalData.document.document,
@@ -581,7 +580,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalDocument: documentBuilder.build(),
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
-          templateRef: proposalTemplate.metadata.selfRef.toSignedDocumentRef(),
+          templateRef: proposalTemplate.metadata.id.toSignedDocumentRef(),
           parameters: templateParameters,
         ),
         category: category,
@@ -1062,8 +1061,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final comment = CommentDocument(
       metadata: CommentMetadata(
         id: commentRef,
-        ref: originalProposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.id as SignedDocumentRef,
+        proposalRef: originalProposalRef! as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: event.reply,
         parameters: state.metadata.parameters!,
         authorId: activeAccountId!,

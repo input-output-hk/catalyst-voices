@@ -6,16 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-<<<<<<< HEAD
-  final CatGatewayService gateway = _MockedCatGateway();
-  final CatReviewsService reviews = _MockedCatReviews();
-  final CatStatusService status = _MockedCatStatus();
-=======
-  final CatGateway gateway = MockCatGateway();
-  final CatReviews reviews = MockCatReviews();
-  final CatStatus status = MockedCatStatus();
+  final CatGatewayService gateway = MockCatGateway();
+  final CatReviewsService reviews = MockCatReviews();
+  final CatStatusService status = MockedCatStatus();
   final AppMetaService appMeta = MockedAppMetaService();
->>>>>>> feat/face-performance-optimization-3352
 
   late final ApiServices apiServices;
   late final ApiConfigSource source;
@@ -81,12 +75,3 @@ void main() {
     });
   });
 }
-<<<<<<< HEAD
-
-class _MockedCatGateway extends Mock implements CatGatewayService {}
-
-class _MockedCatReviews extends Mock implements CatReviewsService {}
-
-class _MockedCatStatus extends Mock implements CatStatusService {}
-=======
->>>>>>> feat/face-performance-optimization-3352

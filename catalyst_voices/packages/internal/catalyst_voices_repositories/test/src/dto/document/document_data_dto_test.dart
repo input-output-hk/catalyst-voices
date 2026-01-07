@@ -264,22 +264,22 @@ void main() {
           'type': DocumentType.proposalDocument.uuid,
           'selfRef': {
             'id': selfRef.id,
-            'version': selfRef.version,
+            'version': selfRef.ver,
             'type': 'signed',
           },
           'brandId': {
             'id': brandRef.id,
-            'version': brandRef.version,
+            'version': brandRef.ver,
             'type': 'signed',
           },
           'campaignId': {
             'id': campaignRef.id,
-            'version': campaignRef.version,
+            'version': campaignRef.ver,
             'type': 'signed',
           },
           'categoryId': {
             'id': categoryRef.id,
-            'version': categoryRef.version,
+            'version': categoryRef.ver,
             'type': 'signed',
           },
         };
@@ -304,13 +304,13 @@ void main() {
           'type': DocumentType.proposalDocument.uuid,
           'selfRef': {
             'id': selfRef.id,
-            'version': selfRef.version,
+            'version': selfRef.ver,
             'type': 'signed',
           },
           'parameters': [
             {
               'id': categoryRef.id,
-              'version': categoryRef.version,
+              'version': categoryRef.ver,
               'type': 'signed',
             },
           ],
@@ -333,13 +333,13 @@ void main() {
           'type': DocumentType.proposalTemplate.uuid,
           'selfRef': {
             'id': selfRef.id,
-            'version': selfRef.version,
+            'version': selfRef.ver,
             'type': 'signed',
           },
           'parameters': [
             {
               'id': categoryRef.id,
-              'version': categoryRef.version,
+              'version': categoryRef.ver,
               'type': 'signed',
             },
           ],

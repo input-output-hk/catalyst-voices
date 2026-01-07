@@ -56,16 +56,6 @@ void main() {
 
         final templateRef = SignedDocumentRef.first(DocumentRefFactory.randomUuidV7());
         final template = DocumentDataFactory.build(
-<<<<<<< HEAD
-          metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
-          content: DocumentDataContent(templateData),
-        );
-        final proposal = DocumentDataFactory.build(
-          metadata: DocumentDataMetadataFactory.proposal(
-            selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
-            template: templateRef,
-          ),
-=======
           id: templateRef,
           type: DocumentType.proposalTemplate,
           content: DocumentDataContent(templateData),
@@ -73,7 +63,6 @@ void main() {
         final proposal = DocumentDataFactory.build(
           id: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
           template: templateRef,
->>>>>>> feat/face-performance-optimization-3352
           content: DocumentDataContent(proposalData),
         );
 
@@ -105,14 +94,8 @@ void main() {
         // Given
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final proposal = DocumentDataFactory.build(
-<<<<<<< HEAD
-          metadata: DocumentDataMetadataFactory.proposal(
-            template: templateRef,
-          ),
-=======
           id: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
           template: templateRef,
->>>>>>> feat/face-performance-optimization-3352
         );
 
         when(() => remoteDocuments.get(templateRef)).thenAnswer(
@@ -146,13 +129,7 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-<<<<<<< HEAD
-            metadata: DocumentDataMetadataFactory.proposal(
-              selfRef: SignedDocumentRef(id: id, version: version),
-            ),
-=======
             id: SignedDocumentRef(id: id, ver: version),
->>>>>>> feat/face-performance-optimization-3352
           );
 
           final ref = documentData.id;
@@ -177,13 +154,7 @@ void main() {
           final version = id;
 
           final documentData = DocumentDataFactory.build(
-<<<<<<< HEAD
-            metadata: DocumentDataMetadataFactory.proposal(
-              selfRef: SignedDocumentRef(id: id, version: version),
-            ),
-=======
             id: SignedDocumentRef(id: id, ver: version),
->>>>>>> feat/face-performance-optimization-3352
           );
 
           final ref = SignedDocumentRef(id: id);
@@ -213,16 +184,10 @@ void main() {
           // Given
           final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
-<<<<<<< HEAD
-            metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
-          );
-          final proposal = DocumentDataFactory.build(
-            metadata: DocumentDataMetadataFactory.proposal(template: templateRef),
-=======
             type: DocumentType.proposalTemplate,
             id: templateRef,
->>>>>>> feat/face-performance-optimization-3352
           );
+          final proposal = DocumentDataFactory.build(template: templateRef);
 
           when(
             () => remoteDocuments.get(template.id),
@@ -262,21 +227,11 @@ void main() {
           // Given
           final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
-<<<<<<< HEAD
-            metadata: DocumentDataMetadataFactory.proposalTemplate(
-              selfRef: templateRef,
-            ),
-          );
-          final proposal1 = DocumentDataFactory.build(
-            metadata: DocumentDataMetadataFactory.proposal(template: templateRef),
-          );
-          final proposal2 = DocumentDataFactory.build(
-            metadata: DocumentDataMetadataFactory.proposal(template: templateRef),
-=======
             type: DocumentType.proposalTemplate,
             id: templateRef,
->>>>>>> feat/face-performance-optimization-3352
           );
+          final proposal1 = DocumentDataFactory.build(template: templateRef);
+          final proposal2 = DocumentDataFactory.build(template: templateRef);
 
           when(
             () => remoteDocuments.get(template.id),
@@ -314,18 +269,6 @@ void main() {
       );
     });
 
-<<<<<<< HEAD
-    group('insertDocument', () {
-      test(
-        'draft document data is saved',
-        () async {
-          // Given
-          final documentDataToSave = DocumentDataFactory.build(
-            metadata: DocumentDataMetadataFactory.proposal(
-              selfRef: DocumentRefFactory.draftRef(),
-            ),
-          );
-=======
     group(
       'insertDocument',
       () {
@@ -335,7 +278,6 @@ void main() {
             // Given
             final id = DocumentRefFactory.draftRef();
             final documentDataToSave = DocumentDataFactory.buildDraft(id: id);
->>>>>>> feat/face-performance-optimization-3352
 
             // When
             await repository.upsertLocalDraftDocument(document: documentDataToSave);
@@ -343,229 +285,12 @@ void main() {
             // Then
             final savedDocumentData = await repository.getDocumentData(id: id);
 
-<<<<<<< HEAD
-          expect(savedDocumentData, equals(documentDataToSave));
-        },
-        onPlatform: driftOnPlatforms,
-      );
-    });
-
-    group('getAllDocumentsRefs', () {
-      test(
-        'duplicated refs are filtered out',
-        () async {
-          // Given
-          const categoryType = DocumentType.categoryParametersDocument;
-          final refs = List.generate(
-            10,
-            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
-          );
-          final remoteRefs = [...refs, ...refs];
-          final expectedRefs = <TypedDocumentRef>[
-            ...constantDocumentRefsPerCampaign(Campaign.f14Ref).expand(
-              (e) {
-                return e.allTyped.where((element) => element.type != categoryType);
-              },
-            ),
-            ...refs,
-          ];
-
-          when(
-            () => remoteDocuments.index(campaign: Campaign.f14()),
-          ).thenAnswer((_) => Future.value(remoteRefs));
-
-          // When
-          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
-
-          // Then
-          expect(
-            allRefs,
-            allOf(hasLength(expectedRefs.length), containsAll(expectedRefs)),
-          );
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
-        'does not call get latest version when '
-        'all refs are exact',
-        () async {
-          // Given
-          final refs = List.generate(
-            10,
-            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
-          );
-
-          // When
-          when(
-            () => remoteDocuments.index(campaign: Campaign.f14()),
-          ).thenAnswer((_) => Future.value(refs));
-
-          await repository.getAllDocumentsRefs(campaign: Campaign.f14());
-
-          // Then
-          verifyNever(() => remoteDocuments.getLatestVersion(any()));
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
-        'loose refs are are specified to latest version',
-        () async {
-          // Given
-          final exactRefs = List.generate(
-            10,
-            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
-          );
-          final looseRefs = List.generate(
-            10,
-            (_) => SignedDocumentRef.loose(
-              id: DocumentRefFactory.randomUuidV7(),
-            ).toTyped(DocumentType.proposalDocument),
-          );
-          final refs = [...exactRefs, ...looseRefs];
-
-          // When
-          when(
-            () => remoteDocuments.index(campaign: Campaign.f14()),
-          ).thenAnswer((_) => Future.value(refs));
-          when(
-            () => remoteDocuments.getLatestVersion(any()),
-          ).thenAnswer((_) => Future(DocumentRefFactory.randomUuidV7));
-
-          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
-
-          // Then
-          verify(() => remoteDocuments.getLatestVersion(any())).called(looseRefs.length);
-
-          expect(allRefs.every((element) => element.ref.isExact), isTrue);
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
-        'remote loose refs to const documents are removed',
-        () async {
-          // Given
-          final constTemplatesRefs = constantDocumentRefsPerCampaign(Campaign.f14Ref)
-              .expand(
-                (element) => [
-                  element.proposal?.toTyped(DocumentType.proposalTemplate),
-                ],
-              )
-              .nonNulls
-              .toList();
-
-          final docsRefs = List.generate(
-            10,
-            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
-          );
-          final looseTemplatesRefs = constTemplatesRefs
-              .map((e) => e.copyWith(ref: e.ref.toLoose()))
-              .toList();
-          final refs = [
-            ...docsRefs,
-            ...looseTemplatesRefs,
-          ];
-
-          // When
-          when(
-            () => remoteDocuments.index(campaign: Campaign.f14()),
-          ).thenAnswer((_) => Future.value(refs));
-
-          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
-
-          // Then
-          if (constTemplatesRefs.isNotEmpty) {
-            expect(allRefs, isNot(containsAll(looseTemplatesRefs)));
-            expect(allRefs, containsAll(constTemplatesRefs));
-          }
-
-          verifyNever(() => remoteDocuments.getLatestVersion(any()));
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
-        'categories refs are filtered out',
-        () async {
-          // Given
-          final categoriesRefs = constantDocumentRefsPerCampaign(Campaign.f14Ref)
-              .expand(
-                (element) => [
-                  element.category.toTyped(DocumentType.categoryParametersDocument),
-                ],
-              )
-              .toList();
-          final categoriesIds = categoriesRefs.map((e) => e.ref.id).toList();
-
-          final docsRefs = List.generate(
-            10,
-            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
-          );
-          final looseCategoriesRefs = categoriesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
-          final refs = [
-            ...docsRefs,
-            ...looseCategoriesRefs,
-          ];
-
-          // When
-          when(
-            () => remoteDocuments.index(campaign: Campaign.f14()),
-          ).thenAnswer((_) => Future.value(refs));
-
-          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
-
-          // Then
-          expect(allRefs, isNot(containsAll(categoriesRefs)));
-          expect(allRefs.none((e) => categoriesIds.contains(e.ref.id)), isTrue);
-
-          verifyNever(() => remoteDocuments.getLatestVersion(any()));
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
-        'unknown ref types are removed if same ref found if not unknown type',
-        () async {
-          // Given
-          const categoryType = DocumentType.categoryParametersDocument;
-
-          final ref = DocumentRefFactory.signedDocumentRef();
-          final docsRefs = <TypedDocumentRef>[
-            TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),
-            TypedDocumentRef(ref: ref, type: DocumentType.unknown),
-          ];
-          final expectedRefs = <TypedDocumentRef>[
-            ...constantDocumentRefsPerCampaign(Campaign.f14Ref).expand(
-              (refs) => refs.allTyped.where((e) => e.type != categoryType),
-            ),
-            TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),
-          ];
-
-          // When
-          when(
-            () => remoteDocuments.index(campaign: Campaign.f14()),
-          ).thenAnswer((_) => Future.value(docsRefs));
-
-          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
-
-          // Then
-          expect(allRefs, containsAll(expectedRefs));
-
-          verifyNever(() => remoteDocuments.getLatestVersion(any()));
-        },
-        onPlatform: driftOnPlatforms,
-      );
-    });
-=======
             expect(savedDocumentData, equals(documentDataToSave));
           },
           onPlatform: driftOnPlatforms,
         );
       },
     );
->>>>>>> feat/face-performance-optimization-3352
 
     test(
       'updating proposal draft '
@@ -576,24 +301,6 @@ void main() {
 
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
-<<<<<<< HEAD
-          metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
-        );
-
-        final draftRef = DocumentRefFactory.draftRef();
-        final draftData = DocumentDataFactory.build(
-          metadata: DocumentDataMetadataFactory.proposal(
-            selfRef: draftRef,
-            template: templateRef,
-          ),
-        );
-
-        final updatedData = DocumentDataFactory.build(
-          metadata: DocumentDataMetadataFactory.proposal(
-            selfRef: draftRef,
-            template: templateRef,
-          ),
-=======
           id: templateRef,
           type: DocumentType.proposalTemplate,
         );
@@ -607,7 +314,6 @@ void main() {
         final updatedData = DocumentDataFactory.buildDraft(
           id: draftRef,
           template: templateRef,
->>>>>>> feat/face-performance-optimization-3352
           content: updatedContent,
         );
 
@@ -643,27 +349,16 @@ void main() {
       () async {
         final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
-<<<<<<< HEAD
-          metadata: DocumentDataMetadataFactory.proposalTemplate(selfRef: templateRef),
-=======
           id: templateRef,
           type: DocumentType.proposalTemplate,
->>>>>>> feat/face-performance-optimization-3352
         );
 
         const publicDraftContent = DocumentDataContent({'title': 'My proposal'});
         final publicDraftRef = DocumentRefFactory.signedDocumentRef();
         final publicDraftData = DocumentDataFactory.build(
-<<<<<<< HEAD
-          metadata: DocumentDataMetadataFactory.proposal(
-            selfRef: publicDraftRef,
-            template: templateRef,
-          ),
-=======
           id: publicDraftRef,
           template: templateRef,
           parameters: DocumentParameters({DocumentRefFactory.signedDocumentRef()}),
->>>>>>> feat/face-performance-optimization-3352
           content: publicDraftContent,
         );
 
