@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
@@ -6,7 +7,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fixture/voices_document_templates.dart';
-import '../utils/test_factories.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +32,7 @@ void main() {
 
         return ProposalDocument(
           metadata: ProposalMetadata(
-            selfRef: DocumentRefFactory.draftRef(),
+            id: DocumentRefFactory.draftRef(),
             templateRef: DocumentRefFactory.signedDocumentRef(),
             parameters: DocumentParameters({categoryRef}),
             authors: const [],

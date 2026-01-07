@@ -82,6 +82,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color votingNegativeHover;
   final Color votingNegativeVoted;
   final Color votingOverlay;
+  final Color discoveryPrimary;
+  final Color discoveryTextOnPrimary;
+  final Color discoveryOnPrimary;
+  final Color discoveryTextOnPrimaryWhite;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -159,6 +163,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.votingNegativeHover,
     required this.votingNegativeVoted,
     required this.votingOverlay,
+    required this.discoveryPrimary,
+    required this.discoveryOnPrimary,
+    required this.discoveryTextOnPrimary,
+    required this.discoveryTextOnPrimaryWhite,
   });
 
   @visibleForTesting
@@ -238,6 +246,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.votingNegativeHover = Colors.black,
     this.votingNegativeVoted = Colors.black,
     this.votingOverlay = Colors.black,
+    this.discoveryPrimary = Colors.black,
+    this.discoveryOnPrimary = Colors.black,
+    this.discoveryTextOnPrimary = Colors.black,
+    this.discoveryTextOnPrimaryWhite = Colors.black,
   });
 
   @override
@@ -317,6 +329,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? votingNegativeHover,
     Color? votingNegativeVoted,
     Color? votingOverlay,
+    Color? discoveryPrimary,
+    Color? discoveryOnPrimary,
+    Color? discoveryTextOnPrimary,
+    Color? discoveryTextOnPrimaryWhite,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -398,6 +414,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       votingNegativeHover: votingNegativeHover ?? this.votingNegativeHover,
       votingNegativeVoted: votingNegativeVoted ?? this.votingNegativeVoted,
       votingOverlay: votingOverlay ?? this.votingOverlay,
+      discoveryPrimary: discoveryPrimary ?? this.discoveryPrimary,
+      discoveryOnPrimary: discoveryOnPrimary ?? this.discoveryOnPrimary,
+      discoveryTextOnPrimary: discoveryTextOnPrimary ?? this.discoveryTextOnPrimary,
+      discoveryTextOnPrimaryWhite: discoveryTextOnPrimaryWhite ?? this.discoveryTextOnPrimaryWhite,
     );
   }
 
@@ -550,6 +570,14 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       votingNegativeHover: Color.lerp(votingNegativeHover, other.votingNegativeHover, t)!,
       votingNegativeVoted: Color.lerp(votingNegativeVoted, other.votingNegativeVoted, t)!,
       votingOverlay: Color.lerp(votingOverlay, other.votingOverlay, t)!,
+      discoveryPrimary: Color.lerp(discoveryPrimary, other.discoveryPrimary, t)!,
+      discoveryOnPrimary: Color.lerp(discoveryOnPrimary, other.discoveryOnPrimary, t)!,
+      discoveryTextOnPrimary: Color.lerp(discoveryTextOnPrimary, other.discoveryTextOnPrimary, t)!,
+      discoveryTextOnPrimaryWhite: Color.lerp(
+        discoveryTextOnPrimaryWhite,
+        other.discoveryTextOnPrimaryWhite,
+        t,
+      )!,
     );
   }
 }

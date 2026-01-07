@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
-import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/pre_voting_content.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/voting_background.dart';
@@ -21,15 +19,13 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class VotingPage extends StatefulWidget {
-  final SignedDocumentRef? categoryRef;
+  final String? categoryId;
   final VotingPageTab? tab;
-  final bool keychainDeleted;
 
   const VotingPage({
     super.key,
     this.categoryRef,
     this.tab,
-    this.keychainDeleted = false,
   });
 
   @override
@@ -42,7 +38,7 @@ class _VotingPageState extends State<VotingPage>
         ErrorHandlerStateMixin<VotingCubit, VotingPage>,
         SignalHandlerStateMixin<VotingCubit, VotingSignal, VotingPage> {
   late VoicesTabController<VotingPageTab> _tabController;
-  late final PagingController<ProposalBriefVoting> _pagingController;
+  late final PagingController<ProposalBrief> _pagingController;
   late final StreamSubscription<List<VotingPageTab>> _tabsSubscription;
 
   @override
@@ -82,9 +78,8 @@ class _VotingPageState extends State<VotingPage>
 
     if (widget.categoryRef != oldWidget.categoryRef || widget.tab != oldWidget.tab) {
       context.read<VotingCubit>().changeFilters(
-        onlyMy: Optional(tab == VotingPageTab.my),
-        category: Optional(widget.categoryRef),
-        type: tab.filter,
+        categoryId: Optional(widget.categoryId),
+        tab: Optional(tab),
       );
 
       _doResetPagination();
@@ -92,13 +87,6 @@ class _VotingPageState extends State<VotingPage>
 
     if (widget.tab != oldWidget.tab) {
       _tabController.animateToTab(tab);
-    }
-
-    if (showKeychainDeletedDialog) {
-      showKeychainDeletedDialog = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
     }
   }
 
@@ -114,7 +102,7 @@ class _VotingPageState extends State<VotingPage>
   void handleSignal(VotingSignal signal) {
     switch (signal) {
       case ChangeCategoryVotingSignal(:final to):
-        _updateRoute(categoryId: Optional(to?.id));
+        _updateRoute(categoryId: Optional(to));
       case ChangeTabVotingSignal(:final tab):
         _updateRoute(tab: tab);
       case ResetPaginationVotingSignal():
@@ -157,23 +145,13 @@ class _VotingPageState extends State<VotingPage>
     ).distinct().listen(_updateTabsIfNeeded);
 
     votingCubit.init(
-      onlyMyProposals: selectedTab == VotingPageTab.my,
-      category: widget.categoryRef,
-      type: selectedTab.filter,
+      categoryId: widget.categoryId,
+      tab: selectedTab,
     );
 
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)
       ..notifyPageRequestListeners(0);
-
-    // TODO(damian-molinski): same behavior already exists in DiscoveryPage because
-    // of way confirmation dialog is shown. Refactor it.
-    if (showKeychainDeletedDialog) {
-      showKeychainDeletedDialog = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
-    }
   }
 
   VotingPageTab _determineTab(
@@ -201,14 +179,10 @@ class _VotingPageState extends State<VotingPage>
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
-    ProposalBriefVoting? lastProposalId,
+    ProposalBrief? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<VotingCubit>().getProposals(request);
-  }
-
-  Future<void> _showKeychainDeletedDialog(BuildContext context) async {
-    await KeychainDeletedDialog.show(context);
   }
 
   void _updateRoute({
@@ -216,7 +190,7 @@ class _VotingPageState extends State<VotingPage>
     VotingPageTab? tab,
   }) {
     Router.neglect(context, () {
-      final effectiveCategoryId = categoryId.dataOr(widget.categoryRef?.id);
+      final effectiveCategoryId = categoryId.dataOr(widget.categoryId);
       final effectiveTab = tab?.name ?? widget.tab?.name;
 
       VotingRoute(

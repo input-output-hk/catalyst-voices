@@ -3,7 +3,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final DocumentParameters parameters;
   final String title;
   final String description;
@@ -14,7 +14,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
   final int commentsCount;
 
   const CoreProposal({
-    required this.selfRef,
+    required this.id,
     required this.parameters,
     required this.title,
     required this.description,
@@ -27,7 +27,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     parameters,
     title,
     description,
@@ -38,7 +38,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
     commentsCount,
   ];
 
-  DateTime get updateDate => selfRef.version!.dateTime;
+  DateTime get updateDate => id.ver!.dateTime;
 
   @override
   int compareTo(CoreProposal other) {
@@ -52,7 +52,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
   }
 
   CoreProposal copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
     DocumentParameters? parameters,
     String? title,
     String? description,
@@ -64,7 +64,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
     int? commentsCount,
   }) {
     return CoreProposal(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       parameters: parameters ?? this.parameters,
       title: title ?? this.title,
       description: description ?? this.description,

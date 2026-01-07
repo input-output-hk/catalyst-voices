@@ -3,10 +3,9 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
@@ -30,19 +29,6 @@ abstract interface class ProposalRepository {
 
   Future<ProposalPublish?> getProposalPublishForRef({
     required DocumentRef ref,
-  });
-
-  Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
-  });
-
-  /// Fetches all proposals for page matching [request] as well as
-  /// [filters].
-  Future<Page<ProposalData>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
   });
 
   /// Returns [ProposalTemplate] which belongs to [category].
@@ -70,31 +56,40 @@ abstract interface class ProposalRepository {
     bool includeLocalDrafts = false,
   });
 
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  });
+
   Future<void> upsertDraftProposal({required DocumentData document});
 
   Stream<int> watchCommentsCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   });
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
 
-  /// Watches for [ProposalSubmissionAction] that were made on [refTo] document.
+  /// Watches for [ProposalSubmissionAction] that were made on [referencing] document.
   ///
   /// As making action on document not always creates a new document ref
   /// we need to watch for actions on a document that has a reference to
-  /// [refTo] document.
+  /// [referencing] document.
   Stream<ProposalPublish?> watchProposalPublish({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
   });
 
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  });
-
-  Stream<Page<ProposalData>> watchProposalsPage({
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
+    ProposalsOrder order,
+    ProposalsFiltersV2 filters,
+  });
+
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
+  });
+
+  Stream<List<ProposalTemplate>> watchProposalTemplates({
+    required CampaignFilters campaign,
   });
 
   Stream<List<ProposalDocument>> watchUserProposals({
@@ -115,7 +110,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> deleteDraftProposal(DraftRef ref) {
-    return _documentRepository.deleteDocumentDraft(ref: ref);
+    return _documentRepository.deleteDocumentDraft(id: ref);
   }
 
   @override
@@ -131,9 +126,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(ref: ref);
+    final documentData = await _documentRepository.getDocumentData(id: ref);
     final commentsCount = await _documentRepository.getRefCount(
-      ref: ref,
+      referencing: ref,
       type: DocumentType.commentDocument,
     );
     final proposalPublish = await getProposalPublishForRef(ref: ref);
@@ -141,7 +136,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       throw const NotFoundException(message: 'Proposal is hidden');
     }
     final templateRef = documentData.metadata.template!;
-    final documentTemplate = await _documentRepository.getDocumentData(ref: templateRef);
+    final documentTemplate = await _documentRepository.getDocumentData(id: templateRef);
     final proposalDocument = _buildProposalDocument(
       documentData: documentData,
       templateData: documentTemplate,
@@ -159,7 +154,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required DocumentRef ref,
   }) async {
     final data = await _documentRepository.getRefToDocumentData(
-      refTo: ref,
+      referencing: ref,
       type: DocumentType.proposalActionDocument,
     );
 
@@ -168,40 +163,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
-  }) async {
-    return _proposalsLocalSource
-        .getProposals(type: type, categoryRef: categoryRef)
-        .then((value) => value.map(_buildProposalData).toList());
-  }
-
-  @override
-  Future<Page<ProposalData>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) {
-    return _proposalsLocalSource
-        .getProposalsPage(request: request, filters: filters, order: order)
-        .then((value) => value.map(_buildProposalData));
-  }
-
-  @override
-  Future<ProposalTemplate?> getProposalTemplate({
+  Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef category,
   }) async {
-    final document = await _documentRepository.getLatestDocument(
-      type: DocumentType.proposalTemplate,
-      category: category,
-    );
+    // TODO(damian-molinski): Implement it
+    final documentData = await _documentRepository.getDocumentData(id: ref);
 
-    if (document == null) {
-      return null;
-    }
-
-    return _buildProposalTemplate(documentData: document);
+    return ProposalTemplateFactory.create(documentData);
   }
 
   @override
@@ -262,16 +230,24 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) {
+    return _proposalsLocalSource.updateProposalFavorite(id: id, isFavorite: isFavorite);
+  }
+
+  @override
   Future<void> upsertDraftProposal({required DocumentData document}) {
-    return _documentRepository.upsertDocument(document: document);
+    return _documentRepository.upsertLocalDraftDocument(document: document);
   }
 
   @override
   Stream<int> watchCommentsCount({
-    DocumentRef? refTo,
+    DocumentRef? referencing,
   }) {
     return _documentRepository.watchCount(
-      refTo: refTo,
+      referencing: referencing,
       type: DocumentType.commentDocument,
     );
   }
@@ -301,36 +277,47 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Stream<ProposalPublish?> watchProposalPublish({
-    required DocumentRef refTo,
+    required DocumentRef referencing,
   }) {
     return _documentRepository
         .watchRefToDocumentData(
-          refTo: refTo,
+          referencing: referencing,
           type: DocumentType.proposalActionDocument,
         )
         .map((data) {
           final action = _buildProposalActionData(data);
 
-          return _getProposalPublish(ref: refTo, action: action);
+          return _getProposalPublish(ref: referencing, action: action);
         });
   }
 
   @override
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalsLocalSource.watchProposalsCount(filters: filters);
+    return _proposalsLocalSource.watchProposalsBriefPage(
+      request: request,
+      order: order,
+      filters: filters,
+    );
   }
 
   @override
-  Stream<Page<ProposalData>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return _proposalsLocalSource.watchProposalsCountV2(filters: filters);
+  }
+
+  @override
+  Stream<List<ProposalTemplate>> watchProposalTemplates({
+    required CampaignFilters campaign,
   }) {
     return _proposalsLocalSource
-        .watchProposalsPage(request: request, filters: filters, order: order)
-        .map((value) => value.map(_buildProposalData));
+        .watchProposalTemplates(campaign: campaign)
+        .map((event) => event.map(ProposalTemplateFactory.create).toList());
   }
 
   @override
@@ -370,78 +357,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return dto.action.toModel();
   }
 
-  ProposalData _buildProposalData(ProposalDocumentData data) {
-    final action = _buildProposalActionData(data.action);
-
-    final publish = switch (action) {
-      ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
-      ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
-      ProposalSubmissionAction.hide => throw ArgumentError(
-        'Proposal(${data.proposal.metadata.selfRef}) is '
-        'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
-        'out hidden proposals before this code is reached.',
-      ),
-    };
-
-    final document = _buildProposalDocument(
-      documentData: data.proposal,
-      templateData: data.template,
-    );
-
-    return ProposalData(
-      document: document,
-      publish: publish,
-      commentsCount: data.commentsCount,
-    );
-  }
-
   ProposalDocument _buildProposalDocument({
     required DocumentData documentData,
     required DocumentData templateData,
   }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalDocument,
-      'Not a proposalDocument document data type',
-    );
-
-    final metadata = ProposalMetadata(
-      selfRef: documentData.metadata.selfRef,
-      templateRef: documentData.metadata.template!,
-      parameters: documentData.metadata.parameters,
-      authors: documentData.metadata.authors ?? [],
-    );
-
-    final template = _buildProposalTemplate(documentData: templateData);
-    final schema = template.schema;
-    final content = DocumentDataContentDto.fromModel(documentData.content);
-    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
-
-    return ProposalDocument(
-      metadata: metadata,
-      document: document,
-    );
-  }
-
-  ProposalTemplate _buildProposalTemplate({
-    required DocumentData documentData,
-  }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalTemplate,
-      'Not a proposalTemplate document data type',
-    );
-
-    final metadata = ProposalTemplateMetadata(
-      selfRef: documentData.metadata.selfRef,
-      parameters: documentData.metadata.parameters,
-    );
-
-    final contentData = documentData.content.data;
-    final schema = DocumentSchemaDto.fromJson(contentData).toModel();
-
-    return ProposalTemplate(
-      metadata: metadata,
-      schema: schema,
-    );
+    final template = ProposalTemplateFactory.create(templateData);
+    final proposal = ProposalDocumentFactory.create(documentData, template: template);
+    return proposal;
   }
 
   ProposalPublish? _getProposalPublish({

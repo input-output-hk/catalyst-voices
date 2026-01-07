@@ -1,4 +1,4 @@
-import 'package:catalyst_compression/catalyst_compression.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:flutter/foundation.dart';
@@ -8,38 +8,31 @@ import '../../fixture/signed_document/signed_document_test_data.dart';
 import '../utils/test_factories.dart';
 
 void main() {
-  group(SignedDocumentManager, () {
-    const documentManager = SignedDocumentManager(
-      brotli: _FakeCompressor(),
-      zstd: _FakeCompressor(),
-    );
-
-    setUpAll(() {
-      CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
-      CatalystSignature.factory = _FakeCatalystSignatureFactory();
-    });
-
-    test('signDocument creates a signed document '
-        'that can be converted from/to bytes', () async {
-      const document = SignedDocumentJsonPayload({'title': 'hey'});
-
-      final signedDocument = await documentManager.signDocument(
-        document,
-        catalystId: _catalystId,
-        metadata: _metadata,
-        privateKey: _privateKey,
+  group(
+    SignedDocumentManager,
+    () {
+      const documentManager = SignedDocumentManager(
+        brotli: FakeCompressor(),
+        zstd: FakeCompressor(),
       );
 
-      expect(signedDocument.payload, equals(document));
+      setUpAll(() {
+        CatalystPublicKey.factory = FakeCatalystPublicKeyFactory();
+        CatalystSignature.factory = FakeCatalystSignatureFactory();
+      });
 
-      final isVerified = await signedDocument.verifySignature(_catalystId);
-      expect(isVerified, isTrue);
+      test('signDocument creates a signed document '
+          'that can be converted from/to bytes', () async {
+        const document = SignedDocumentJsonPayload({'title': 'hey'});
 
-      final signedDocumentBytes = signedDocument.toBytes();
-      final parsedDocument = await documentManager.parseDocument(
-        signedDocumentBytes,
-      );
+        final signedDocument = await documentManager.signDocument(
+          document,
+          catalystId: _catalystId,
+          metadata: _metadata,
+          privateKey: _privateKey,
+        );
 
+<<<<<<< HEAD
       expect(parsedDocument, equals(signedDocument));
       expect(parsedDocument.signers, [_catalystId]);
     });
@@ -62,6 +55,22 @@ void main() {
       expect(document.metadata.parameters, isNotEmpty);
     });
   });
+=======
+        expect(signedDocument.payload, equals(document));
+
+        final isVerified = await signedDocument.verifySignature(_catalystId);
+        expect(isVerified, isTrue);
+
+        final signedDocumentArtifact = signedDocument.toArtifact();
+        final parsedDocument = await documentManager.parseDocument(signedDocumentArtifact);
+
+        expect(parsedDocument, equals(signedDocument));
+        expect(parsedDocument.signers, [_catalystId]);
+      });
+    },
+    skip: 'Waiting for sync with gateway merge',
+  );
+>>>>>>> feat/face-performance-optimization-3352
 }
 
 final _catalystId = CatalystId(
@@ -72,88 +81,23 @@ final _catalystId = CatalystId(
 final _categoryRef = DocumentRefFactory.signedDocumentRef();
 
 final _metadata = DocumentDataMetadata.proposal(
+<<<<<<< HEAD
   selfRef: DocumentRefFactory.signedDocumentRef(),
+=======
+  id: DocumentRefFactory.signedDocumentRef(),
+>>>>>>> feat/face-performance-optimization-3352
   parameters: DocumentParameters({_categoryRef}),
   template: DocumentRefFactory.signedDocumentRef(),
   authors: [_catalystId],
 );
 
+<<<<<<< HEAD
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
+=======
+final _privateKey = FakeCatalystPrivateKey(bytes: _privateKeyBytes, signature: _signature);
+>>>>>>> feat/face-performance-optimization-3352
 final _privateKeyBytes = Uint8List.fromList(List.filled(32, 0));
-final _publicKey = _FakeCatalystPublicKey(bytes: _publicKeyBytes);
+final _publicKey = FakeCatalystPublicKey(bytes: _publicKeyBytes, signatureBytes: _signatureBytes);
 final _publicKeyBytes = Uint8List.fromList(List.filled(32, 1));
-final _signature = _FakeCatalystSignature(bytes: _signatureBytes);
+final _signature = FakeCatalystSignature(bytes: _signatureBytes);
 final _signatureBytes = Uint8List.fromList(List.filled(32, 2));
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-
-  @override
-  Future<CatalystPrivateKey> derivePrivateKey({
-    required String path,
-  }) async {
-    return _FakeCatalystPrivateKey(bytes: Uint8List.fromList(path.codeUnits));
-  }
-
-  @override
-  Future<CatalystPublicKey> derivePublicKey() async {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-
-  @override
-  Future<CatalystSignature> sign(Uint8List data) async {
-    return _signature;
-  }
-}
-
-class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPublicKey({required this.bytes});
-
-  @override
-  Uint8List get publicKeyBytes => bytes;
-
-  @override
-  Future<bool> verify(
-    Uint8List data, {
-    required CatalystSignature signature,
-  }) async {
-    return listEquals(signature.bytes, _signatureBytes);
-  }
-}
-
-class _FakeCatalystPublicKeyFactory extends Fake implements CatalystPublicKeyFactory {
-  @override
-  CatalystPublicKey create(Uint8List bytes) {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-}
-
-class _FakeCatalystSignature extends Fake implements CatalystSignature {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystSignature({required this.bytes});
-}
-
-class _FakeCatalystSignatureFactory extends Fake implements CatalystSignatureFactory {
-  @override
-  CatalystSignature create(Uint8List bytes) {
-    return _FakeCatalystSignature(bytes: bytes);
-  }
-}
-
-final class _FakeCompressor implements CatalystCompressor {
-  const _FakeCompressor();
-
-  @override
-  Future<List<int>> compress(List<int> bytes) async => bytes;
-
-  @override
-  Future<List<int>> decompress(List<int> bytes) async => bytes;
-}

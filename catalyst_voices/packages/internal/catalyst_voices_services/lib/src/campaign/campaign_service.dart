@@ -1,7 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
+
+final _logger = Logger('CampaignService');
 
 Campaign? _mockedActiveCampaign;
 
@@ -12,6 +16,11 @@ Campaign? _mockedActiveCampaign;
 set mockedActiveCampaign(Campaign? campaign) {
   _mockedActiveCampaign = campaign;
 }
+
+typedef _ProposalTemplateCategoryAndMoneyFormat = ({
+  SignedDocumentRef? category,
+  MoneyFormat? moneyFormat,
+});
 
 /// CampaignService provides campaign-related functionality.
 ///
@@ -36,6 +45,12 @@ abstract interface class CampaignService {
   Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(DocumentParameters parameters);
+
+  Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
+
+  Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters});
+
+  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref});
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -68,22 +83,17 @@ final class CampaignServiceImpl implements CampaignService {
     required String id,
   }) async {
     final campaign = await _campaignRepository.getCampaign(id: id);
-    final campaignProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-    );
     final proposalSubmissionTime = campaign
         .phaseStateTo(CampaignPhaseType.proposalSubmission)
         .phase
         .timeline
         .to;
-    final totalAsk = _calculateTotalAsk(campaignProposals);
-    final updatedCategories = await _updateCategories(
-      campaign.categories,
-      proposalSubmissionTime,
-    );
+
+    final updatedCategories = campaign.categories
+        .map((e) => e.copyWith(submissionCloseDate: proposalSubmissionTime))
+        .toList();
 
     return campaign.copyWith(
-      totalAsk: totalAsk,
       categories: updatedCategories,
     );
   }
@@ -97,7 +107,7 @@ final class CampaignServiceImpl implements CampaignService {
 
     final timelineStage = campaign.timeline.phases.firstWhere(
       (element) => element.type == type,
-      orElse: () => throw (StateError('Type $type not found')),
+      orElse: () => throw StateError('Type $type not found'),
     );
     return timelineStage;
   }
@@ -111,57 +121,99 @@ final class CampaignServiceImpl implements CampaignService {
       );
     }
 
-    return _loadCampaignCategoryDetails(category);
-  }
-
-  MultiCurrencyAmount _calculateTotalAsk(List<ProposalData> proposals) {
-    final totalAmount = MultiCurrencyAmount();
-    for (final proposal in proposals) {
-      final fundsRequested = proposal.document.fundsRequested;
-      if (fundsRequested != null) {
-        totalAmount.add(fundsRequested);
-      }
-    }
-    return totalAmount;
-  }
-
-  Future<CampaignCategory> _loadCampaignCategoryDetails(CampaignCategory base) async {
-    final categoryProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-      categoryRef: base.selfRef,
-    );
     final proposalSubmissionStage = await getCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
-    final totalAsk = _calculateTotalAsk(categoryProposals);
 
-    return base.copyWith(
-      totalAsk: totalAsk,
-      proposalsCount: categoryProposals.length,
+    return category.copyWith(
       submissionCloseDate: proposalSubmissionStage.timeline.to,
     );
   }
 
-  Future<List<CampaignCategory>> _updateCategories(
-    List<CampaignCategory> categories,
-    DateTime? proposalSubmissionTime,
-  ) async {
-    final updatedCategories = <CampaignCategory>[];
+  @override
+  Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref}) {
+    return watchCategoryTotalAsk(ref: ref).first;
+  }
 
-    for (final category in categories) {
-      final categoryProposals = await _proposalRepository.getProposals(
-        type: ProposalsFilterType.finals,
-        categoryRef: category.selfRef,
-      );
-      final totalAsk = _calculateTotalAsk(categoryProposals);
+  @override
+  Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters}) {
+    return _proposalRepository
+        .watchProposalTemplates(campaign: filters.campaign ?? CampaignFilters.active())
+        .map((templates) => templates.map((template) => template.toMapEntry()))
+        .map(Map.fromEntries)
+        .switchMap((templatesMoneyFormat) {
+          // This could come from templates
+          final nodeId = ProposalDocument.requestedFundsNodeId;
 
-      final updatedCategory = category.copyWith(
-        totalAsk: totalAsk,
-        proposalsCount: categoryProposals.length,
-        submissionCloseDate: proposalSubmissionTime,
+          return _campaignRepository
+              .watchProposalsTotalTask(nodeId: nodeId, filters: filters)
+              .map((totalAsk) => _calculateCampaignTotalAsk(templatesMoneyFormat, totalAsk));
+        });
+  }
+
+  @override
+  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) {
+    final activeCampaign = _activeCampaignObserver.campaign;
+    final campaignFilters = activeCampaign != null ? CampaignFilters.from(activeCampaign) : null;
+
+    final filters = ProposalsTotalAskFilters(
+      categoryId: ref.id,
+      campaign: campaignFilters,
+    );
+
+    return watchCampaignTotalAsk(
+      filters: filters,
+    ).map((campaignTotalAsk) => campaignTotalAsk.categoryOrZero(ref));
+  }
+
+  CampaignTotalAsk _calculateCampaignTotalAsk(
+    Map<DocumentRef, _ProposalTemplateCategoryAndMoneyFormat> templatesMoneyFormat,
+    ProposalsTotalAsk totalAsk,
+  ) {
+    final categoriesAsks = <DocumentRef, CampaignCategoryTotalAsk>{};
+
+    for (final entry in totalAsk.data.entries) {
+      final templateRef = entry.key;
+      final categoryRef = templatesMoneyFormat[templateRef]?.category;
+      final moneyFormat = templatesMoneyFormat[templateRef]?.moneyFormat;
+
+      if (categoryRef == null || moneyFormat == null) {
+        if (categoryRef == null) _logger.info('Template[$templateRef] do not have category');
+        if (moneyFormat == null) _logger.info('Template[$templateRef] do not have moneyFormat');
+        continue;
+      }
+
+      final proposalTotalAsk = entry.value;
+      final finalProposalsCount = proposalTotalAsk.finalProposalsCount;
+      final money = Money.fromUnits(
+        currency: moneyFormat.currency,
+        amount: BigInt.from(proposalTotalAsk.totalAsk),
+        moneyUnits: moneyFormat.moneyUnits,
       );
-      updatedCategories.add(updatedCategory);
+
+      final ask = CampaignCategoryTotalAsk(
+        ref: categoryRef,
+        finalProposalsCount: finalProposalsCount,
+        money: [money],
+      );
+
+      categoriesAsks.update(categoryRef, (value) => value + ask, ifAbsent: () => ask);
     }
-    return updatedCategories;
+
+    return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
+  }
+}
+
+extension on ProposalTemplate {
+  MapEntry<DocumentRef, _ProposalTemplateCategoryAndMoneyFormat> toMapEntry() {
+    final ref = metadata.id;
+    final category = metadata.parameters?.set.first;
+
+    final currencySchema = requestedFunds;
+    final moneyFormat = currencySchema != null
+        ? MoneyFormat(currency: currencySchema.currency, moneyUnits: currencySchema.moneyUnits)
+        : null;
+
+    return MapEntry(ref, (category: category, moneyFormat: moneyFormat));
   }
 }

@@ -1,6 +1,7 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' show AppEnvironmentType;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' show ApiConfig;
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/dio_interceptor_factory.dart';
+import 'package:catalyst_voices_repositories/src/api/local/local_cat_gateway.dart';
 import 'package:catalyst_voices_repositories/src/common/content_types.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dio/dio.dart';
@@ -18,9 +19,10 @@ final class ApiServices {
   final CatGatewayService gateway;
   final CatReviewsService reviews;
   final CatStatusService status;
+  final AppMetaService appMeta;
 
   factory ApiServices.dio({
-    required AppEnvironmentType env,
+    required ApiConfig config,
     DioInterceptorFactory? interceptorFactory,
     AuthTokenProvider? authTokenProvider,
     InterceptClient? interceptClient,
@@ -32,18 +34,23 @@ final class ApiServices {
     final retryInterceptor = interceptorFactory.retryInterceptor(authInterceptor);
     final logInterceptor = interceptorFactory.logInterceptor(Logger('CatApiServices'));
 
-    final gateway = CatGatewayService.dio(
-      baseUrl: env.app.replace(path: '/api/gateway').toString(),
-      options: catDioOptions,
-      interceptClient: interceptClient,
-      interceptors: [
-        ?authInterceptor,
-        retryInterceptor,
-        ?logInterceptor,
-      ],
-    );
+    final CatGatewayService gateway = config.localGateway.isEnabled
+        ? LocalCatGateway.create(
+            initialProposalsCount: config.localGateway.proposalsCount,
+            decompressedDocuments: config.localGateway.decompressedDocuments,
+          )
+        : CatGatewayService.dio(
+            baseUrl: config.env.app.replace(path: '/api/gateway').toString(),
+            options: catDioOptions,
+            interceptClient: interceptClient,
+            interceptors: [
+              ?authInterceptor,
+              retryInterceptor,
+              ?logInterceptor,
+            ],
+          );
     final reviews = CatReviewsService.dio(
-      baseUrl: env.app.replace(path: '/api/reviews').toString(),
+      baseUrl: config.env.app.replace(path: '/api/reviews').toString(),
       options: catDioOptions,
       interceptClient: interceptClient,
       interceptors: [
@@ -53,7 +60,7 @@ final class ApiServices {
       ],
     );
     final status = CatStatusService.dio(
-      baseUrl: env.status.toString(),
+      baseUrl: config.env.status.toString(),
       interceptClient: interceptClient,
       interceptors: [
         retryInterceptor,
@@ -61,10 +68,13 @@ final class ApiServices {
       ],
     );
 
+    final appMeta = AppMetaService();
+
     return ApiServices.internal(
       gateway: gateway,
       reviews: reviews,
       status: status,
+      appMeta: appMeta,
     );
   }
 
@@ -73,11 +83,13 @@ final class ApiServices {
     required this.gateway,
     required this.reviews,
     required this.status,
+    required this.appMeta,
   });
 
-  void dispose() {
+  Future<void> dispose() async {
     gateway.close();
     reviews.close();
     status.close();
+    appMeta.close();
   }
 }

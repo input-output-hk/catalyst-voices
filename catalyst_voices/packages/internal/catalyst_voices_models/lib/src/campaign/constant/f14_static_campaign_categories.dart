@@ -8,7 +8,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 /// See [CampaignCategory].
 final f14StaticCampaignCategories = [
   CampaignCategory(
-    selfRef: f14ConstDocumentsRefs[0].category,
+    id: f14ConstDocumentsRefs[0].category,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Use Case:',
     categorySubname: 'Partners & Products',
@@ -16,10 +16,8 @@ final f14StaticCampaignCategories = [
         '''Cardano Use Cases: Partners & Products empowers exceptional applications and enterprise collaborations to enhance products and services with capabilities that drive high-volume transactions and accelerates mainstream adoption.''',
     shortDescription:
         'For Tier-1 collaborations and real-world pilots that scale Cardano adoption through high-impact use cases.',
-    proposalsCount: 0,
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(8500000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: Range(
       min: Currencies.ada.amount(250000),
       max: Currencies.ada.amount(1000000),
@@ -91,7 +89,7 @@ The following will **not** be funded:
     submissionCloseDate: DateTimeExt.now(),
   ),
   CampaignCategory(
-    selfRef: f14ConstDocumentsRefs[1].category,
+    id: f14ConstDocumentsRefs[1].category,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Use Case:',
     categorySubname: 'Concept',
@@ -99,10 +97,8 @@ The following will **not** be funded:
         '''Cardano Use Cases: Concepts funds novel, early-stage Cardano-based concepts developing proof of concept prototypes through deploying minimum viable products (MVP) to validate innovative products, services, or business models driving Cardano adoption.''',
     shortDescription:
         'For early-stage ideas to create, test, and validate Cardano-based prototypes to MVP innovations.',
-    proposalsCount: 0,
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(4000000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(100000),
@@ -173,7 +169,7 @@ The following will **not** be funded:
     submissionCloseDate: DateTimeExt.now(),
   ),
   CampaignCategory(
-    selfRef: f14ConstDocumentsRefs[2].category,
+    id: f14ConstDocumentsRefs[2].category,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Developers',
@@ -182,10 +178,8 @@ Funds open source tools and environments to enhance the Cardano developer experi
 ''',
     shortDescription:
         'For developers to build open-source tools that enhance the Cardano developer experience.',
-    proposalsCount: 0,
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(3100000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(100000),
@@ -257,7 +251,7 @@ The following will **not** be funded:
     submissionCloseDate: DateTimeExt.now(),
   ),
   CampaignCategory(
-    selfRef: f14ConstDocumentsRefs[3].category,
+    id: f14ConstDocumentsRefs[3].category,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',
@@ -266,10 +260,8 @@ Funds non-technical initiatives like marketing, education, and community buildin
 ''',
     shortDescription:
         'For non-tech projects like marketing, education, or community growth to expand Cardano’s reach.',
-    proposalsCount: 0,
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(3000000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(60000),

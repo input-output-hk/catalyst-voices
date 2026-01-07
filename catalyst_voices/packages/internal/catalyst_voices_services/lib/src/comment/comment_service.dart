@@ -57,7 +57,7 @@ final class CommentServiceImpl implements CommentService {
   Future<SignedDocumentRef> submitComment({
     required DocumentData document,
   }) async {
-    if (document.metadata.selfRef is! SignedDocumentRef) {
+    if (document.metadata.id is! SignedDocumentRef) {
       throw ArgumentError('Drafts not supported for comments');
     }
 
@@ -71,7 +71,7 @@ final class CommentServiceImpl implements CommentService {
 
     await _commentRepository.saveComment(document: document);
 
-    return document.ref as SignedDocumentRef;
+    return document.id as SignedDocumentRef;
   }
 
   @override

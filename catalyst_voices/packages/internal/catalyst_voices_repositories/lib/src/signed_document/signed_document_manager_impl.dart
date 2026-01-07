@@ -5,25 +5,41 @@ import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_mapper.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
   final CatalystCompressor brotli;
   final CatalystCompressor zstd;
+  final CatalystProfiler profiler;
 
   const SignedDocumentManagerImpl({
     required this.brotli,
     required this.zstd,
+    this.profiler = const CatalystNoopProfiler(),
   });
 
   @override
-  Future<SignedDocument> parseDocument(Uint8List bytes) async {
-    final coseSign = CoseSign.fromCbor(cbor.decode(bytes));
+  Future<SignedDocument> parseDocument(DocumentArtifact artifact) async {
+    final cborValue = await profiler.timeWithResult(
+      'cbor_decode_doc',
+      () => cbor.decode(artifact.value),
+      debounce: true,
+    );
+    final coseSign = await profiler.timeWithResult(
+      'cose_decode',
+      () => CoseSign.fromCbor(cborValue),
+      debounce: true,
+    );
 
     final rawPayload = await _decompressPayload(coseSign);
 
-    return _CoseSignedDocument.fromCose(coseSign, rawPayload: rawPayload);
+    return _CoseSignedDocument.fromCose(
+      coseSign,
+      rawPayload: rawPayload,
+    );
   }
 
   @override
@@ -36,11 +52,17 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     try {
       final compressedPayload = await _compressPayload(document.toBytes());
 
-      final coseSign = await CoseSign.sign(
-        protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
-        unprotectedHeaders: const CoseHeaders.unprotected(),
-        payload: compressedPayload,
-        signers: [_CatalystSigner(catalystId, privateKey)],
+      final coseSign = await profiler.timeWithResult(
+        'cose_sign_doc',
+        () {
+          return CoseSign.sign(
+            protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
+            unprotectedHeaders: const CoseHeaders.unprotected(),
+            payload: compressedPayload,
+            signers: [_CatalystSigner(catalystId, privateKey)],
+          );
+        },
+        debounce: true,
       );
 
       return _CoseSignedDocument(
@@ -55,13 +77,21 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   Future<Uint8List> _compressPayload(Uint8List payload) async {
-    final compressed = await brotli.compress(payload);
+    final compressed = await profiler.timeWithResult(
+      'brotli_compress',
+      () => brotli.compress(payload),
+      debounce: true,
+    );
     return Uint8List.fromList(compressed);
   }
 
   Future<Uint8List> _decompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == CoseHttpContentEncoding.brotli) {
-      final decompressed = await brotli.decompress(coseSign.payload);
+      final decompressed = await profiler.timeWithResult(
+        'brotli_decompress',
+        () => brotli.decompress(coseSign.payload),
+        debounce: true,
+      );
       return Uint8List.fromList(decompressed);
     } else {
       return coseSign.payload;
@@ -166,9 +196,9 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   List<Object?> get props => [_coseSign, payload, metadata, signers];
 
   @override
-  Uint8List toBytes() {
+  DocumentArtifact toArtifact() {
     final bytes = cbor.encode(_coseSign.toCbor(tagged: false));
-    return Uint8List.fromList(bytes);
+    return DocumentArtifact(Uint8List.fromList(bytes));
   }
 
   @override

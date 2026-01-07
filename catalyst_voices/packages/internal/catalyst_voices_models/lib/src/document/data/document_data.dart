@@ -11,7 +11,7 @@ import 'package:equatable/equatable.dart';
 ///
 /// [DocumentData] can be created from [SignedDocument] which comes from
 /// backend or locally as work in progress.
-final class DocumentData extends Equatable implements Comparable<DocumentData> {
+base class DocumentData extends Equatable implements Comparable<DocumentData> {
   final DocumentDataMetadata metadata;
   final DocumentDataContent content;
 
@@ -20,25 +20,60 @@ final class DocumentData extends Equatable implements Comparable<DocumentData> {
     required this.content,
   });
 
+  /// Syntax sugar. Should use [DocumentDataMetadata.id].
+  DocumentRef get id => metadata.id;
+
   @override
   List<Object?> get props => [
     metadata,
     content,
   ];
 
-  /// Syntax sugar. Should use [DocumentDataMetadata.selfRef].
-  DocumentRef get ref => metadata.selfRef;
-
   @override
   int compareTo(DocumentData other) {
-    return metadata.selfRef.compareTo(other.metadata.selfRef);
+    return metadata.id.compareTo(other.metadata.id);
   }
 
-  /// Update document data with a new [ref].
-  DocumentData copyWithSelfRef({required DocumentRef selfRef}) {
+  /// Standard copyWith method.
+  DocumentData copyWith({
+    DocumentDataMetadata? metadata,
+    DocumentDataContent? content,
+  }) {
     return DocumentData(
-      metadata: metadata.copyWith(selfRef: selfRef),
-      content: content,
+      metadata: metadata ?? this.metadata,
+      content: content ?? this.content,
+    );
+  }
+
+  /// Shorthand for [copyWith].
+  DocumentData copyWithId(DocumentRef id) => copyWith(metadata: metadata.copyWith(id: id));
+}
+
+/// A Signed version of [DocumentData] that also holds its source [DocumentArtifact].
+///
+/// This is used when the raw proof is required.
+final class DocumentDataWithArtifact extends DocumentData {
+  final DocumentArtifact artifact;
+
+  const DocumentDataWithArtifact({
+    required super.metadata,
+    required super.content,
+    required this.artifact,
+  });
+
+  @override
+  List<Object?> get props => super.props + [artifact];
+
+  @override
+  DocumentDataWithArtifact copyWith({
+    DocumentDataMetadata? metadata,
+    DocumentDataContent? content,
+    DocumentArtifact? artifact,
+  }) {
+    return DocumentDataWithArtifact(
+      metadata: metadata ?? this.metadata,
+      content: content ?? this.content,
+      artifact: artifact ?? this.artifact,
     );
   }
 }

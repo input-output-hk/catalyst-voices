@@ -12,7 +12,7 @@ void main() {
   late VoicesColorScheme voicesColors;
 
   final draftCampaignTest = CampaignInfo(
-    selfRef: SignedDocumentRef.generateFirstRef(),
+    id: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.draft,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),
@@ -20,7 +20,7 @@ void main() {
   );
 
   final scheduledCampaignTest = CampaignInfo(
-    selfRef: SignedDocumentRef.generateFirstRef(),
+    id: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.scheduled,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),
@@ -28,7 +28,7 @@ void main() {
   );
 
   final liveCampaignTest = CampaignInfo(
-    selfRef: SignedDocumentRef.generateFirstRef(),
+    id: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.live,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),
@@ -36,7 +36,7 @@ void main() {
   );
 
   final completedCampaignText = CampaignInfo(
-    selfRef: SignedDocumentRef.generateFirstRef(),
+    id: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.completed,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),

@@ -30,7 +30,7 @@ final class DocumentNodeTraverser {
   /// the paths defined in the [nodeId]. If the specified path exists, the
   /// corresponding property value is returned. If the path is invalid or does
   /// not exist, the method returns `null`.
-  static Object? getValue(DocumentNodeId nodeId, Map<String, dynamic> data) {
+  static T? getValue<T extends Object>(DocumentNodeId nodeId, Map<String, dynamic> data) {
     Object? object = data;
     for (final path in nodeId.paths) {
       if (object is Map<String, dynamic>) {
@@ -47,6 +47,6 @@ final class DocumentNodeTraverser {
       }
     }
 
-    return object;
+    return object is T ? object : null;
   }
 }

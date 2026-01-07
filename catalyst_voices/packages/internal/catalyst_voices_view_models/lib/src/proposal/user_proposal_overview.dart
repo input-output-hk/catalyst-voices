@@ -3,7 +3,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class UsersProposalOverview extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final DocumentParameters parameters;
   final String title;
   final DateTime updateDate;
@@ -16,7 +16,7 @@ final class UsersProposalOverview extends Equatable {
   final bool fromActiveCampaign;
 
   const UsersProposalOverview({
-    required this.selfRef,
+    required this.id,
     required this.parameters,
     required this.title,
     required this.updateDate,
@@ -36,7 +36,7 @@ final class UsersProposalOverview extends Equatable {
     required bool fromActiveCampaign,
   }) {
     return UsersProposalOverview(
-      selfRef: proposal.selfRef,
+      id: proposal.id,
       parameters: proposal.parameters,
       title: proposal.title,
       updateDate: proposal.updateDate,
@@ -58,12 +58,12 @@ final class UsersProposalOverview extends Equatable {
   int get iteration {
     if (versions.isEmpty) return DocumentVersion.firstNumber;
 
-    return versions.firstWhere((version) => version.selfRef == selfRef).versionNumber;
+    return versions.firstWhere((version) => version.id == id).versionNumber;
   }
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     parameters,
     title,
     updateDate,
@@ -77,7 +77,7 @@ final class UsersProposalOverview extends Equatable {
   ];
 
   UsersProposalOverview copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
     DocumentParameters? parameters,
     String? title,
     DateTime? updateDate,
@@ -90,7 +90,7 @@ final class UsersProposalOverview extends Equatable {
     bool? fromActiveCampaign,
   }) {
     return UsersProposalOverview(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       parameters: parameters ?? this.parameters,
       title: title ?? this.title,
       updateDate: updateDate ?? this.updateDate,

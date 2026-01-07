@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_data_dto.g.dart';
@@ -87,7 +87,7 @@ final class DocumentDataMetadataDto {
     fromJson: DocumentType.fromJson,
   )
   final DocumentType type;
-  final DocumentRefDto selfRef;
+  final DocumentRefDto id;
   final DocumentRefDto? ref;
   final DocumentRefDto? template;
   final DocumentRefDto? reply;
@@ -99,7 +99,7 @@ final class DocumentDataMetadataDto {
   DocumentDataMetadataDto({
     required this.contentType,
     required this.type,
-    required this.selfRef,
+    required this.id,
     this.ref,
     this.template,
     this.reply,
@@ -110,10 +110,11 @@ final class DocumentDataMetadataDto {
   });
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
-    var migrated = _migrateJson1(json);
-    migrated = _migrateJson2(migrated);
-    migrated = _migrateJson3(migrated);
-    migrated = _migrateJson4(migrated);
+    var migrated = migrateJson1(json);
+    migrated = migrateJson2(migrated);
+    migrated = migrateJson3(migrated);
+    migrated = migrateJson4(migrated);
+    migrated = migrateJson5(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
@@ -122,7 +123,7 @@ final class DocumentDataMetadataDto {
     : this(
         contentType: data.contentType,
         type: data.type,
-        selfRef: data.selfRef.toDto(),
+        id: data.id.toDto(),
         ref: data.ref?.toDto(),
         template: data.template?.toDto(),
         reply: data.reply?.toDto(),
@@ -138,7 +139,7 @@ final class DocumentDataMetadataDto {
     return DocumentDataMetadata(
       contentType: contentType,
       type: type,
-      selfRef: selfRef.toModel(),
+      id: id.toModel(),
       ref: ref?.toModel(),
       template: template?.toModel().toSignedDocumentRef(),
       reply: reply?.toModel().toSignedDocumentRef(),
@@ -147,14 +148,20 @@ final class DocumentDataMetadataDto {
       parameters: DocumentParameters(
         parameters.map((e) => e.toModel().toSignedDocumentRef()).toSet(),
       ),
-      authors: authors?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
+      authors: authors?.map(CatalystId.parse).toList(),
     );
   }
 
-  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson1(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('id') && json.containsKey('version');
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
-    if (modified.containsKey('id') && modified.containsKey('version')) {
+    if (needsMigration) {
       final id = modified.remove('id') as String;
       final version = modified.remove('version') as String;
 
@@ -168,7 +175,13 @@ final class DocumentDataMetadataDto {
     return modified;
   }
 
-  static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson2(Map<String, dynamic> json) {
+    final needsMigration = json['brandId'] is String || json['campaignId'] is String;
+    if (!needsMigration) {
+      return json;
+    }
+
     final modified = Map.of(json);
 
     if (modified['brandId'] is String) {
@@ -192,38 +205,57 @@ final class DocumentDataMetadataDto {
   }
 
   /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
-  static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson3(Map<String, dynamic> json) {
     final parametersKeys = ['brandId', 'campaignId', 'categoryId'];
-
-    if (parametersKeys.none(json.containsKey)) {
+    final needsMigration = parametersKeys.any(json.containsKey);
+    if (!needsMigration) {
       return json;
-    } else {
-      final modified = Map.of(json);
-      final parameters = <DocumentRefDto>[];
-
-      for (final key in parametersKeys) {
-        final value = modified.remove(key);
-        if (value is Map<String, dynamic>) {
-          parameters.add(DocumentRefDto.fromJson(value));
-        }
-      }
-
-      modified['parameters'] = parameters.map((e) => e.toJson()).toList();
-      return modified;
     }
+
+    final modified = Map.of(json);
+    final parameters = <DocumentRefDto>[];
+
+    for (final key in parametersKeys) {
+      final value = modified.remove(key);
+      if (value is Map<String, dynamic>) {
+        parameters.add(DocumentRefDto.fromJson(value));
+      }
+    }
+
+    modified['parameters'] = parameters.map((e) => e.toJson()).toList();
+    return modified;
   }
 
   /// Adds missing contentType field.
-  static Map<String, dynamic> _migrateJson4(Map<String, dynamic> json) {
-    if (json.containsKey('contentType')) {
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson4(Map<String, dynamic> json) {
+    final needsMigration = !json.containsKey('contentType');
+    if (!needsMigration) {
       return json;
-    } else {
-      final modified = Map.of(json);
-      final type = _tryParseDocumentType(json['type']);
-      final contentType = type?.contentType ?? DocumentContentType.json;
-      modified['contentType'] = DocumentContentType.toJson(contentType);
-      return modified;
     }
+
+    final modified = Map.of(json);
+    final type = _tryParseDocumentType(json['type']);
+    final contentType = type?.contentType ?? DocumentContentType.json;
+    modified['contentType'] = DocumentContentType.toJson(contentType);
+    return modified;
+  }
+
+  @visibleForTesting
+  static Map<String, dynamic> migrateJson5(Map<String, dynamic> json) {
+    final needsMigration = json.containsKey('selfRef');
+    if (!needsMigration) {
+      return json;
+    }
+
+    final modified = Map.of(json);
+
+    if (modified.containsKey('selfRef')) {
+      modified['id'] = modified.remove('selfRef');
+    }
+
+    return modified;
   }
 
   static DocumentType? _tryParseDocumentType(Object? object) {

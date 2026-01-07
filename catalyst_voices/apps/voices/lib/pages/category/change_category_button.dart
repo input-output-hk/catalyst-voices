@@ -14,6 +14,7 @@ class ChangeCategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return BlocSelector<
       CategoryDetailCubit,
       CategoryDetailState,
@@ -31,10 +32,22 @@ class ChangeCategoryButton extends StatelessWidget {
             )
             .toList();
       },
+=======
+    return BlocSelector<CategoryDetailCubit, CategoryDetailState, CategoryDetailStatePicker>(
+      selector: (state) => state.picker,
+>>>>>>> feat/face-performance-optimization-3352
       builder: (context, state) {
         return CampaignCategoryPicker(
           onSelected: (value) => unawaited(_changeCategory(context, value)),
-          items: state,
+          items: state.items.map(
+            (item) {
+              return DropdownMenuViewModel(
+                value: ProposalsRefCategoryFilter(ref: item.ref),
+                name: item.name,
+                isSelected: item.isSelected,
+              );
+            },
+          ).toList(),
           buttonBuilder:
               (
                 context,

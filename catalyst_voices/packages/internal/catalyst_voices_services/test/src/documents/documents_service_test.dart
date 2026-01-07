@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -8,13 +8,17 @@ import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  final DocumentRepository documentRepository = _MockDocumentRepository();
-  late final DocumentsService service;
+  late DocumentRepository documentRepository;
+  late DocumentsService service;
 
   setUpAll(() {
-    service = DocumentsService(documentRepository);
+    registerFallbackValue(const DocumentIndexFilters(categoriesIds: []));
+    registerFallbackValue(SignedDocumentRef(id: const Uuid().v7()));
+  });
 
-    registerFallbackValue(SignedDocumentRef.first(const Uuid().v7()));
+  setUp(() {
+    documentRepository = _MockDocumentRepository();
+    service = DocumentsService(documentRepository);
   });
 
   tearDown(() {
@@ -22,138 +26,177 @@ void main() {
   });
 
   group(DocumentsService, () {
-    test('calls cache documents exactly number '
-        'of times are all refs count', () async {
-      // Given
-      final allRefs = List.generate(
-        10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
-      );
-      final cachedRefs = <TypedDocumentRef>[];
+    group('sync', () {
+      test(
+        'given no documents in index, '
+        'when sync is called, '
+        'then it returns zero counts and does not save anything',
+        () async {
+          // Given
+          final campaign = Campaign.f15().copyWith(categories: []);
 
-      // When
-      when(
-        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
-      ).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
-
-      await service.sync(campaign: Campaign.f14());
-
-      // Then
-      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(allRefs.length);
-    });
-
-    test('calls cache documents only for missing refs', () async {
-      // Given
-      final allRefs = List.generate(
-        10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
-      );
-      final cachedRefs = allRefs.sublist(0, (allRefs.length / 2).floor());
-      final expectedCalls = allRefs.length - cachedRefs.length;
-
-      // When
-      when(
-        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
-      ).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
-
-      await service.sync(campaign: Campaign.f14());
-
-      // Then
-      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(expectedCalls);
-    });
-
-    test('when have more cached refs it returns normally', () async {
-      // Given
-      final allRefs = List.generate(
-        10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
-      );
-      final cachedRefs =
-          allRefs +
-          List.generate(
-            5,
-            (_) =>
-                SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+          // Mock index to return empty results for all 3 sync steps
+          when(
+            () => documentRepository.index(
+              page: any(named: 'page'),
+              limit: any(named: 'limit'),
+              filters: any(named: 'filters'),
+            ),
+          ).thenAnswer(
+            (_) async => const DocumentIndex(
+              page: DocumentIndexPage(page: 0, limit: 100, remaining: 0),
+              docs: [],
+            ),
           );
+          when(
+            () => documentRepository.isCachedBulk(ids: any(named: 'ids')),
+          ).thenAnswer((_) async => []);
 
-      // When
-      when(
-        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
-      ).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
+          // When
+          final result = await service.sync(campaign: campaign);
 
-      await service.sync(campaign: Campaign.f14());
+          // Then
+          expect(result.newDocumentsCount, 0);
+          expect(result.failedDocumentsCount, 0);
 
-      // Then
-      verifyNever(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      );
-    });
+          // Verify index was called at least 3 times (once for each sync step)
+          verify(
+            () => documentRepository.index(
+              page: 0,
+              limit: any(named: 'limit'),
+              filters: any(named: 'filters'),
+            ),
+          ).called(3);
 
-    test('emits progress as expected', () async {
-      // Given
-      final allRefs = List.generate(
-        10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
-      );
-      final cachedRefs = <TypedDocumentRef>[];
-      var progress = 0.0;
-
-      // When
-      when(
-        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
-      ).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
-
-      // Then
-      await service.sync(
-        campaign: Campaign.f14(),
-        onProgress: (value) {
-          progress = value;
+          verifyNever(() => documentRepository.saveSignedDocumentBulk(any()));
         },
       );
 
-      expect(progress, 1.0);
-    });
+      test(
+        'given new documents in index, '
+        'when sync is called, '
+        'then it fetches and saves documents',
+        () async {
+          // Given
+          final campaign = Campaign.f15().copyWith(categories: []);
+          final docRef = SignedDocumentRef.first(const Uuid().v7());
+          final indexDoc = DocumentIndexDoc(
+            id: docRef.id,
+            ver: [
+              DocumentIndexDocVersion(ver: docRef.ver!, type: DocumentType.proposalTemplate),
+            ],
+          );
+          final docData = DocumentDataWithArtifact(
+            metadata: DocumentDataMetadata(
+              contentType: DocumentContentType.json,
+              type: DocumentType.proposalTemplate,
+              id: docRef,
+            ),
+            content: const DocumentDataContent({}),
+            artifact: DocumentArtifact(Uint8List(0)),
+          );
 
-    test('returns list of new successfully cached refs', () async {
-      // Given
-      final allRefs = List.generate(
-        10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+          // Step 1: Index returns 1 doc
+          when(
+            () => documentRepository.index(
+              page: 0,
+              limit: any(named: 'limit'),
+              filters: any(named: 'filters'),
+            ),
+          ).thenAnswer((invocation) async {
+            // Only return a doc for the first step to simplify test
+            final filters = invocation.namedArguments[#filters] as DocumentIndexFilters;
+
+            if (filters.type == DocumentType.proposalTemplate) {
+              return DocumentIndex(
+                page: const DocumentIndexPage(page: 0, limit: 100, remaining: 0),
+                docs: [indexDoc],
+              );
+            }
+            return const DocumentIndex(
+              page: DocumentIndexPage(page: 0, limit: 100, remaining: 0),
+              docs: [],
+            );
+          });
+
+          // Not cached
+          when(
+            () => documentRepository.isCachedBulk(ids: any(named: 'ids')),
+          ).thenAnswer((_) async => []);
+
+          // Fetch succeeds
+          when(
+            () => documentRepository.getRemoteDocumentDataWithArtifact(id: any(named: 'id')),
+          ).thenAnswer((_) async => docData);
+
+          // Save succeeds
+          when(() => documentRepository.saveSignedDocumentBulk(any())).thenAnswer((_) async {});
+
+          // When
+          final result = await service.sync(campaign: campaign);
+
+          // Then
+          expect(result.newDocumentsCount, 1);
+          expect(result.failedDocumentsCount, 0);
+
+          verify(() => documentRepository.getRemoteDocumentDataWithArtifact(id: docRef)).called(1);
+          verify(() => documentRepository.saveSignedDocumentBulk(any())).called(1);
+        },
       );
-      final cachedRefs = allRefs.sublist(0, (allRefs.length / 2).floor());
-      final expectedNewRefs = allRefs.sublist(cachedRefs.length);
 
-      // When
-      when(
-        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
-      ).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
+      test(
+        'given documents are already cached, '
+        'when sync is called, '
+        'then it skips fetching them',
+        () async {
+          // Given
+          final campaign = Campaign.f15().copyWith(categories: []);
+          final docRef = SignedDocumentRef.first(const Uuid().v7());
+          final indexDoc = DocumentIndexDoc(
+            id: docRef.id,
+            ver: [
+              DocumentIndexDocVersion(ver: docRef.ver!, type: DocumentType.proposalTemplate),
+            ],
+          );
 
-      // Then
-      final newRefs = await service.sync(campaign: Campaign.f14());
+          // Index returns doc
+          when(
+            () => documentRepository.index(
+              page: any(named: 'page'),
+              limit: any(named: 'limit'),
+              filters: any(named: 'filters'),
+            ),
+          ).thenAnswer((invocation) async {
+            final filters = invocation.namedArguments[#filters] as DocumentIndexFilters;
+            // Only return for one specific step
+            if (filters.type == DocumentType.proposalTemplate) {
+              return DocumentIndex(
+                page: const DocumentIndexPage(page: 0, limit: 100, remaining: 0),
+                docs: [indexDoc],
+              );
+            }
+            return const DocumentIndex(
+              page: DocumentIndexPage(page: 0, limit: 100, remaining: 0),
+              docs: [],
+            );
+          });
 
-      expect(
-        newRefs,
-        allOf(hasLength(expectedNewRefs.length), containsAll(expectedNewRefs)),
+          // Cached!
+          when(
+            () => documentRepository.isCachedBulk(ids: any(named: 'ids')),
+          ).thenAnswer((_) async => [docRef]);
+
+          // When
+          final result = await service.sync(campaign: campaign);
+
+          // Then
+          expect(result.newDocumentsCount, 0);
+
+          // Verify fetch was NEVER called
+          verifyNever(
+            () => documentRepository.getRemoteDocumentDataWithArtifact(id: any(named: 'id')),
+          );
+        },
       );
     });
   });

@@ -28,8 +28,8 @@ final class SignedDocumentMapper {
       mediaType: _mapContentTypeToCose(metadata.contentType),
       contentEncoding: CoseHttpContentEncoding.brotli,
       type: CoseDocumentType(metadata.type.uuid.asUuidV4),
-      id: CoseDocumentId(metadata.id.asUuidV7),
-      ver: CoseDocumentVer(metadata.version.asUuidV7),
+      id: CoseDocumentId(metadata.id.id.asUuidV7),
+      ver: CoseDocumentVer(metadata.id.ver!.asUuidV7),
       ref: _mapRefToCoseList(metadata.ref),
       template: _mapRefToCoseList(metadata.template),
       reply: _mapRefToCoseList(metadata.reply),
@@ -61,7 +61,7 @@ final class SignedDocumentMapper {
     return DocumentDataMetadata(
       contentType: _mapContentTypeFromCose(protectedHeaders.mediaType),
       type: typeStr == null ? DocumentType.unknown : DocumentType.fromJson(typeStr),
-      selfRef: SignedDocumentRef(id: idStr!, version: verStr),
+      id: SignedDocumentRef(id: idStr!, ver: verStr),
       // The domain model expects single references for these fields,
       // even though COSE supports lists.
       ref: _mapRefsFromCose(protectedHeaders.ref).firstOrNull,
@@ -142,7 +142,7 @@ final class SignedDocumentMapper {
     return coseRefs.refs.map((e) {
       return SignedDocumentRef(
         id: e.documentId.format(),
-        version: e.documentVer.format(),
+        ver: e.documentVer.format(),
       );
     }).toList();
   }
@@ -155,7 +155,7 @@ final class SignedDocumentMapper {
   static CoseDocumentRef _mapRefToCose(DocumentRef ref) {
     return CoseDocumentRef.optional(
       documentId: ref.id.asUuidV7,
-      documentVer: (ref.version ?? ref.id).asUuidV7,
+      documentVer: (ref.ver ?? ref.id).asUuidV7,
       documentLocator: _getDocumentLocatorForRef(ref),
     );
   }

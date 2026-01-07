@@ -43,7 +43,7 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   DocumentRef? get _ref => _isValid
       ? DocumentRef.build(
           id: _id.value,
-          version: _ver.value.isNotEmpty ? _ver.value : null,
+          ver: _ver.value.isNotEmpty ? _ver.value : null,
           isDraft: _isLocal,
         )
       : null;
@@ -124,7 +124,7 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
     final ref = controller.value;
 
     _id = Uuid.pure(value: ref?.id ?? '');
-    _ver = Uuid.pure(value: ref?.version ?? '', isEmptyAllowed: true);
+    _ver = Uuid.pure(value: ref?.ver ?? '', isEmptyAllowed: true);
     _isLocal = ref is DraftRef;
 
     _idController = TextEditingController(text: _id.value)..addListener(_onPartControllerChanged);
@@ -144,7 +144,7 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
 
   void _syncPartsWithRef(DocumentRef? ref) {
     _id = Uuid.pure(value: ref?.id ?? '');
-    _ver = Uuid.pure(value: ref?.version ?? '', isEmptyAllowed: true);
+    _ver = Uuid.pure(value: ref?.ver ?? '', isEmptyAllowed: true);
     _isLocal = ref is DraftRef;
 
     _idController.removeListener(_onPartControllerChanged);

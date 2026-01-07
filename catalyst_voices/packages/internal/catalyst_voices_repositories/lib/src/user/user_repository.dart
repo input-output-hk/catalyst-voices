@@ -171,7 +171,7 @@ final class UserRepositoryImpl implements UserRepository {
   }) {
     final significantId = catalystId.toSignificant();
     return _documentRepository
-        .getLatestDocument(authorId: significantId)
+        .getLatestDocument(originalAuthorId: significantId)
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {

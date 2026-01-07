@@ -5,6 +5,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -23,7 +24,7 @@ void main() {
 
     final documentData = DocumentData(
       metadata: DocumentDataMetadata.proposal(
-        selfRef: proposalRef,
+        id: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),
         parameters: DocumentParameters({categoryRef}),
         authors: [authorId],
@@ -35,6 +36,7 @@ void main() {
       registerFallbackValue(SignedDocumentRef.generateFirstRef());
       registerFallbackValue(documentData);
       registerFallbackValue(Uint8List(0));
+      registerFallbackValue(const DraftRef(id: 'fallback'));
     });
 
     setUp(() async {
@@ -63,26 +65,23 @@ void main() {
       setUp: () async {
         when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
           (_) async => Campaign(
-            selfRef: SignedDocumentRef.generateFirstRef(),
+            id: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
             fundNumber: 14,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                id: categoryRef,
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',
                 description: 'Test description',
                 shortDescription: 'Test short description',
-                proposalsCount: 0,
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
@@ -117,26 +116,24 @@ void main() {
       setUp: () async {
         when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
           (_) async => Campaign(
-            selfRef: SignedDocumentRef.generateFirstRef(),
+            id: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
-            fundNumber: 14,
+            // TODO(LynxLynxx): refactor it when _mapProposalToViewModel will be refactored
+            fundNumber: 0,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                id: categoryRef,
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
                 categorySubname: 'Test Subname',
                 description: 'Test description',
                 shortDescription: 'Test short description',
-                proposalsCount: 0,
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
@@ -166,7 +163,7 @@ void main() {
         isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', true),
         isA<WorkspaceState>()
             .having((s) => s.isLoading, 'isLoading', false)
-            .having((s) => s.userProposals.length, 'proposals count', 2),
+            .having((s) => s.userProposals.localProposals.items.length, 'proposals count', 2),
       ],
     );
 
@@ -186,6 +183,286 @@ void main() {
             .having((s) => s.error, 'has error', isNotNull),
       ],
     );
+
+    group('Proposal sync tests', () {
+      UsersProposalOverview createProposal({
+        required String title,
+        required ProposalPublish publish,
+        required int commentsCount,
+        bool isLatestLocal = false,
+        DocumentRef? id,
+      }) {
+        final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
+        return UsersProposalOverview(
+          id: effectiveId,
+          title: title,
+          updateDate: DateTime(2025, 10, 15),
+          fundsRequested: Money.zero(currency: Currencies.ada),
+          publish: publish,
+          versions: [
+            ProposalVersionViewModel(
+              title: title,
+              id: effectiveId,
+              createdAt: DateTime(2025, 10, 15),
+              publish: publish,
+              isLatest: true,
+              isLatestLocal: isLatestLocal,
+              versionNumber: 1,
+            ),
+          ],
+          fromActiveCampaign: true,
+          commentsCount: commentsCount,
+          category: 'Test Category',
+          categoryId: categoryRef,
+          fundNumber: 14,
+        );
+      }
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
+        'loading proposals all derived properties stay in sync',
+        build: () => workspaceBloc,
+        act: (bloc) {
+          final proposals = [
+            createProposal(
+              title: 'Local 1',
+              publish: ProposalPublish.localDraft,
+              commentsCount: 0,
+              isLatestLocal: true,
+            ),
+            createProposal(
+              title: 'Local 2 with comments',
+              publish: ProposalPublish.localDraft,
+              commentsCount: 3,
+              isLatestLocal: true,
+            ),
+          ];
+          bloc.add(LoadProposalsEvent(proposals));
+        },
+        expect: () => [
+          isA<WorkspaceState>()
+              .having(
+                (s) => s.userProposals.finalProposals.items.length,
+                'There is no finalProposals',
+                0,
+              )
+              .having(
+                (s) => s.userProposals.draftProposals.items.length,
+                'There is no draftProposals',
+                0,
+              )
+              .having(
+                (s) => s.userProposals.localProposals.items.length,
+                'There is 2 localProposals',
+                2,
+              )
+              .having(
+                (s) => s.userProposals.notPublished.items.length,
+                'There is 2 notPublished (both locals have isLatestLocal)',
+                2,
+              )
+              .having(
+                (s) => s.userProposals.hasComments,
+                'hasComments is true because local2 has comments',
+                true,
+              ),
+        ],
+      );
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
+        'loadProposals - all derived properties stay in sync',
+        build: () => workspaceBloc,
+        act: (bloc) {
+          final proposals = [
+            createProposal(
+              title: 'Local 1',
+              publish: ProposalPublish.localDraft,
+              commentsCount: 0,
+              isLatestLocal: true,
+            ),
+            createProposal(
+              title: 'Local 2 with comments',
+              publish: ProposalPublish.localDraft,
+              commentsCount: 3,
+              isLatestLocal: true,
+            ),
+            createProposal(
+              title: 'Draft',
+              publish: ProposalPublish.publishedDraft,
+              commentsCount: 5,
+            ),
+            createProposal(
+              title: 'Final',
+              publish: ProposalPublish.submittedProposal,
+              commentsCount: 0,
+            ),
+          ];
+          bloc.add(LoadProposalsEvent(proposals));
+        },
+        expect: () => [
+          isA<WorkspaceState>()
+              .having((s) => s.isLoading, 'isLoading', false)
+              .having((s) => s.userProposals.localProposals.items.length, 'local count', 2)
+              .having((s) => s.userProposals.draftProposals.items.length, 'draft count', 1)
+              .having((s) => s.userProposals.finalProposals.items.length, 'final count', 1)
+              // published includes draft and final (both have isPublished or isDraft)
+              .having((s) => s.userProposals.published.items.length, 'published count', 2)
+              // notPublished includes locals with isLatestLocal
+              .having((s) => s.userProposals.notPublished.items.length, 'notPublished count', 2)
+              // hasComments is true because local2 and draft have comments
+              .having((s) => s.userProposals.hasComments, 'hasComments', true),
+        ],
+      );
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
+        'deleteProposal - derived properties stay in sync after deletion',
+        setUp: () {
+          when(() => mockProposalService.deleteDraftProposal(any())).thenAnswer((_) async => {});
+        },
+        build: () => workspaceBloc,
+        act: (bloc) {
+          final local = createProposal(
+            title: 'Local',
+            publish: ProposalPublish.localDraft,
+            commentsCount: 0,
+            isLatestLocal: true,
+          );
+          const draftRef = DraftRef(id: 'draft-123');
+          final draft = createProposal(
+            title: 'Draft',
+            publish: ProposalPublish.publishedDraft,
+            commentsCount: 5,
+            id: draftRef,
+          );
+          final final$ = createProposal(
+            title: 'Final',
+            publish: ProposalPublish.submittedProposal,
+            commentsCount: 0,
+          );
+
+          // Load initial proposals and delete the draft proposal
+          bloc
+            ..add(LoadProposalsEvent([local, draft, final$]))
+            ..add(const DeleteDraftProposalEvent(ref: draftRef));
+        },
+        expect: () => [
+          // After load
+          isA<WorkspaceState>()
+              .having((s) => s.userProposals.draftProposals.items.length, 'draft count before', 1)
+              .having((s) => s.userProposals.hasComments, 'hasComments before', true),
+          // Delete starts - loading
+          isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', true),
+          // Still loading but proposals rebuilt from cache
+          isA<WorkspaceState>()
+              .having((s) => s.isLoading, 'isLoading', true)
+              .having((s) => s.userProposals.localProposals.items.length, 'local count', 1)
+              .having((s) => s.userProposals.draftProposals.items.length, 'draft count after', 0)
+              .having((s) => s.userProposals.finalProposals.items.length, 'final count', 1)
+              .having((s) => s.userProposals.published.items.length, 'published count', 1)
+              .having((s) => s.userProposals.notPublished.items.length, 'notPublished count', 1)
+              // hasComments should be false after deleting the only proposal with comments
+              .having((s) => s.userProposals.hasComments, 'hasComments after', false),
+          // Delete completes - loading done
+          isA<WorkspaceState>()
+              .having((s) => s.isLoading, 'isLoading', false)
+              .having((s) => s.userProposals.draftProposals.items.length, 'draft count still', 0),
+        ],
+        verify: (_) {
+          verify(() => mockProposalService.deleteDraftProposal(any())).called(1);
+        },
+      );
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
+        'forgetProposal - derived properties stay in sync after forgetting',
+        setUp: () {
+          when(
+            () => mockProposalService.forgetProposal(
+              proposalRef: any(named: 'proposalRef'),
+              categoryId: any(named: 'categoryId'),
+            ),
+          ).thenAnswer((_) async => {});
+        },
+        build: () => workspaceBloc,
+        act: (bloc) {
+          final local1 = createProposal(
+            title: 'Local 1',
+            publish: ProposalPublish.localDraft,
+            commentsCount: 0,
+            isLatestLocal: true,
+          );
+          final local2 = createProposal(
+            title: 'Local 2 with comments',
+            publish: ProposalPublish.localDraft,
+            commentsCount: 3,
+            isLatestLocal: true,
+          );
+          final draft = createProposal(
+            title: 'Draft',
+            publish: ProposalPublish.publishedDraft,
+            commentsCount: 5,
+          );
+
+          // Load initial proposals
+          bloc
+            ..add(LoadProposalsEvent([local1, local2, draft]))
+            ..add(ForgetProposalEvent(local2.id));
+        },
+        expect: () => [
+          // After load
+          isA<WorkspaceState>()
+              .having((s) => s.userProposals.localProposals.items.length, 'local count before', 2)
+              .having((s) => s.userProposals.hasComments, 'hasComments before', true),
+          // Forget starts - loading
+          isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', true),
+          // Still loading but proposals rebuilt from cache
+          isA<WorkspaceState>()
+              .having((s) => s.isLoading, 'isLoading', true)
+              .having((s) => s.userProposals.localProposals.items.length, 'local count after', 1)
+              .having((s) => s.userProposals.draftProposals.items.length, 'draft count', 1)
+              .having((s) => s.userProposals.notPublished.items.length, 'notPublished count', 1)
+              // hasComments should still be true because draft still has comments
+              .having((s) => s.userProposals.hasComments, 'hasComments after', true),
+          // Forget completes - loading done
+          isA<WorkspaceState>()
+              .having((s) => s.isLoading, 'isLoading', false)
+              .having((s) => s.userProposals.localProposals.items.length, 'local count still', 1),
+        ],
+        verify: (_) {
+          verify(
+            () => mockProposalService.forgetProposal(
+              proposalRef: any(named: 'proposalRef'),
+              categoryId: categoryRef,
+            ),
+          ).called(1);
+        },
+      );
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
+        'hasComments is false when no proposals have comments',
+        build: () => workspaceBloc,
+        act: (bloc) {
+          final proposals = [
+            createProposal(
+              title: 'Local',
+              publish: ProposalPublish.localDraft,
+              commentsCount: 0,
+              isLatestLocal: true,
+            ),
+            createProposal(
+              title: 'Final',
+              publish: ProposalPublish.submittedProposal,
+              commentsCount: 0,
+            ),
+          ];
+          bloc.add(LoadProposalsEvent(proposals));
+        },
+        expect: () => [
+          isA<WorkspaceState>()
+              .having((s) => s.userProposals.hasComments, 'hasComments', false)
+              .having((s) => s.userProposals.localProposals.items.length, 'local count', 1)
+              .having((s) => s.userProposals.finalProposals.items.length, 'final count', 1),
+        ],
+      );
+    });
   });
 }
 

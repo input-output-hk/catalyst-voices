@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/config/app_config_factory.dart';
 import 'package:catalyst_voices_repositories/src/config/remote_config_source.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Allows to get app configuration from the server.
 /// Contains a method which returns [AppConfig].
@@ -27,10 +28,28 @@ final class ConfigRepositoryImpl implements ConfigRepository {
   Future<AppConfig> getConfig({
     required AppEnvironmentType env,
   }) async {
-    final remoteConfig = await remoteSource.get().onError(
+    var remoteConfig = await remoteSource.get().onError(
       (error, stackTrace) => const RemoteConfig(),
     );
 
+    // Validate Sentry DSN and clear sentry config if invalid
+    final dsn = remoteConfig.sentry?.dsn;
+    if (dsn?.tryParseDsn() == null) {
+      remoteConfig = remoteConfig.copyWith(
+        sentry: const Optional(null),
+      );
+    }
+
     return AppConfigFactory.build(remoteConfig, env: env);
+  }
+}
+
+extension on String? {
+  Dsn? tryParseDsn() {
+    try {
+      return Dsn.parse(this ?? '');
+    } catch (e) {
+      return null;
+    }
   }
 }

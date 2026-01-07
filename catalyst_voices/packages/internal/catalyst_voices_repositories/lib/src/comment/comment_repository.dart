@@ -80,7 +80,7 @@ final class DocumentsCommentRepository implements CommentRepository {
   Future<void> saveComment({
     required DocumentData document,
   }) async {
-    await _documentRepository.upsertDocument(document: document);
+    await _documentRepository.upsertLocalDraftDocument(document: document);
   }
 
   @override
@@ -91,7 +91,7 @@ final class DocumentsCommentRepository implements CommentRepository {
         .watchDocuments(
           type: DocumentType.commentDocument,
           refGetter: (data) => data.metadata.template!,
-          refTo: ref,
+          referencing: ref,
         )
         .map(
           (documents) {
@@ -117,7 +117,7 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentDocument document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment only supports signed documents',
     );
     assert(
@@ -129,9 +129,9 @@ final class DocumentsCommentRepository implements CommentRepository {
 
     final authors = documentData.metadata.authors;
     final metadata = CommentMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
       proposalRef: documentData.metadata.ref! as SignedDocumentRef,
-      commentTemplate: templateData.metadata.selfRef as SignedDocumentRef,
+      commentTemplate: templateData.metadata.id as SignedDocumentRef,
       reply: documentData.metadata.reply,
       parameters: documentData.metadata.parameters,
       authorId: authors!.single,
@@ -156,12 +156,12 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentTemplate document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment template only supports signed documents',
     );
 
     final metadata = CommentTemplateMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
       parameters: documentData.metadata.parameters,
     );
 

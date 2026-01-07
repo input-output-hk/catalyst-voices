@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_appbar.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_end_drawer.dart';
+import 'package:catalyst_voices/pages/spaces/spaces_shell_bloc_provider.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -65,40 +66,42 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AdminToolsCubit, AdminToolsState>(
-      listenWhen: (previous, current) => previous.enabled != current.enabled,
-      listener: (context, state) {
-        if (state.enabled) {
-          _insertAdminToolsOverlay();
-        } else {
-          _removeAdminToolsOverlay();
-        }
-      },
-      child: _Shortcuts(
-        onToggleAdminTools: _toggleAdminTools,
-        child: BlocSelector<SessionCubit, SessionState, _SessionStateData>(
-          selector: (state) => (
-            isActive: state.isActive,
-            isProposer: state.account?.isProposer ?? false,
+    return SpacesShellBlocProvider(
+      child: BlocListener<AdminToolsCubit, AdminToolsState>(
+        listenWhen: (previous, current) => previous.enabled != current.enabled,
+        listener: (context, state) {
+          if (state.enabled) {
+            _insertAdminToolsOverlay();
+          } else {
+            _removeAdminToolsOverlay();
+          }
+        },
+        child: _Shortcuts(
+          onToggleAdminTools: _toggleAdminTools,
+          child: BlocSelector<SessionCubit, SessionState, _SessionStateData>(
+            selector: (state) => (
+              isActive: state.isActive,
+              isProposer: state.account?.isProposer ?? false,
+            ),
+            builder: (context, state) {
+              return Scaffold(
+                appBar: SpacesAppbar(
+                  space: widget.space,
+                  isAppUnlock: state.isActive,
+                  isProposer: state.isProposer,
+                ),
+                drawer: state.isActive
+                    ? SpacesDrawer(
+                        space: widget.space,
+                        spacesShortcutsActivators: AccessControl.allSpacesShortcutsActivators,
+                        isUnlocked: state.isActive,
+                      )
+                    : null,
+                endDrawer: SpacesEndDrawer(space: widget.space),
+                body: widget.child,
+              );
+            },
           ),
-          builder: (context, state) {
-            return Scaffold(
-              appBar: SpacesAppbar(
-                space: widget.space,
-                isAppUnlock: state.isActive,
-                isProposer: state.isProposer,
-              ),
-              drawer: state.isActive
-                  ? SpacesDrawer(
-                      space: widget.space,
-                      spacesShortcutsActivators: AccessControl.allSpacesShortcutsActivators,
-                      isUnlocked: state.isActive,
-                    )
-                  : null,
-              endDrawer: SpacesEndDrawer(space: widget.space),
-              body: widget.child,
-            );
-          },
         ),
       ),
     );
@@ -118,12 +121,6 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     _removeAdminToolsOverlay();
     unawaited(_selectedSpaceSC.close());
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    context.read<WorkspaceBloc>().add(const WatchUserProposalsEvent());
   }
 
   OverlayEntry _createAdminToolsOverlay() {
