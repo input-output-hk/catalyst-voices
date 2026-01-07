@@ -29,7 +29,7 @@ void main() {
       final store = InMemorySharedPreferencesAsync.empty();
       SharedPreferencesAsyncPlatform.instance = store;
       FlutterSecureStorage.setMockInitialValues({});
-      DummyCatalystIdFactory.registerDummyKeyFactory();
+      CatalystIdFactory.registerDummyKeyFactory();
 
       keychainProvider = VaultKeychainProvider(
         secureStorage: const FlutterSecureStorage(),
@@ -69,7 +69,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final account = Account.dummy(
-        catalystId: DummyCatalystIdFactory.create(),
+        catalystId: CatalystIdFactory.create(),
         keychain: keychain,
       );
 
@@ -89,7 +89,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final account = Account.dummy(
-        catalystId: DummyCatalystIdFactory.create(),
+        catalystId: CatalystIdFactory.create(),
         keychain: keychain,
       );
 
@@ -107,7 +107,7 @@ void main() {
       // Given
       final oldKeychainId = const Uuid().v4();
       final newKeychainId = const Uuid().v4();
-      final catalystId = DummyCatalystIdFactory.create();
+      final catalystId = CatalystIdFactory.create();
 
       // When
       final oldKeychain = await keychainProvider.create(oldKeychainId);
@@ -141,10 +141,8 @@ void main() {
       // When
       final keychainOne = await keychainProvider.create(keychainIdOne);
       final keychainTwo = await keychainProvider.create(keychainIdTwo);
-      final catalystIdOne = DummyCatalystIdFactory.create(
-        host: CatalystIdHost.cardanoPreprod,
-      );
-      final catalystIdTwo = DummyCatalystIdFactory.create(
+      final catalystIdOne = CatalystIdFactory.create();
+      final catalystIdTwo = CatalystIdFactory.create(
         host: CatalystIdHost.cardanoPreview,
       );
 
@@ -191,7 +189,7 @@ void main() {
         for (final id in ids) {
           final keychain = await keychainProvider.create(id);
           final account = Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
+            catalystId: CatalystIdFactory.create(),
             keychain: keychain,
           );
 
@@ -217,7 +215,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final lastAccount = Account.dummy(
-        catalystId: DummyCatalystIdFactory.create(),
+        catalystId: CatalystIdFactory.create(),
         keychain: keychain,
         isActive: true,
       );
@@ -248,7 +246,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final account = Account.dummy(
-        catalystId: DummyCatalystIdFactory.create(),
+        catalystId: CatalystIdFactory.create(),
         keychain: keychain,
         isActive: true,
       );
@@ -347,7 +345,7 @@ void main() {
 
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final account = Account.dummy(
           catalystId: catalystId,
           keychain: keychain,
@@ -372,7 +370,7 @@ void main() {
 
         // When
         final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(username: 'account1'),
+          catalystId: CatalystIdFactory.create(username: 'account1'),
           keychain: await keychainProvider.create(keychainId),
         );
 
@@ -393,12 +391,12 @@ void main() {
 
         // When
         final account1 = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(username: 'account1'),
+          catalystId: CatalystIdFactory.create(username: 'account1'),
           keychain: await keychainProvider.create(keychainId1),
         );
 
         final account2 = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(username: 'account2'),
+          catalystId: CatalystIdFactory.create(username: 'account2'),
           keychain: await keychainProvider.create(keychainId2),
         );
 
@@ -424,7 +422,7 @@ void main() {
         final keychain1 = await keychainProvider.create(keychainId1);
         final keychain2 = await keychainProvider.create(keychainId2);
         final account1 = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(username: 'account1'),
+          catalystId: CatalystIdFactory.create(username: 'account1'),
           keychain: keychain1,
         );
         final account2 = account1.copyWith(
@@ -480,7 +478,7 @@ void main() {
 
         final keychain = await keychainProvider.create(keychainId);
         final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
+          catalystId: CatalystIdFactory.create(),
           keychain: keychain,
           isActive: true,
         ).copyWith(publicStatus: publicStatus);
@@ -508,7 +506,7 @@ void main() {
         final keychain = await keychainProvider.create(keychainId);
         final account =
             Account.dummy(
-              catalystId: DummyCatalystIdFactory.create(),
+              catalystId: CatalystIdFactory.create(),
               keychain: keychain,
               isActive: true,
             ).copyWith(
@@ -546,7 +544,7 @@ void main() {
         final keychain = await keychainProvider.create(keychainId);
         final account =
             Account.dummy(
-              catalystId: DummyCatalystIdFactory.create(),
+              catalystId: CatalystIdFactory.create(),
               keychain: keychain,
               isActive: true,
             ).copyWith(
@@ -591,7 +589,7 @@ void main() {
         final keychain = await keychainProvider.create(keychainId);
         final account =
             Account.dummy(
-              catalystId: DummyCatalystIdFactory.create(),
+              catalystId: CatalystIdFactory.create(),
               keychain: keychain,
               isActive: true,
             ).copyWith(
@@ -631,7 +629,7 @@ void main() {
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'dev@iohk.com';
 
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
         final account =
@@ -659,7 +657,7 @@ void main() {
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'dev@iohk.com';
 
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
         final account =
@@ -694,7 +692,7 @@ void main() {
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'dev@iohk.com';
 
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
         final account =
@@ -725,7 +723,7 @@ void main() {
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'otherDev@iohk.com';
 
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
         final account =
@@ -766,7 +764,7 @@ void main() {
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'otherDev@iohk.com';
 
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
         final account =
@@ -810,7 +808,7 @@ void main() {
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'otherDev@iohk.com';
 
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
         final account =
@@ -874,7 +872,7 @@ void main() {
 
       test('emits null when active account keychain is locked', () async {
         // Given
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
         final account = Account.dummy(
@@ -900,7 +898,7 @@ void main() {
 
       test('emits account when active account keychain is unlocked', () async {
         // Given
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         const lock = PasswordLockFactor('Test1234');
         final keychain = await keychainProvider.create(keychainId);
@@ -928,7 +926,7 @@ void main() {
 
       test('emits null then account when keychain unlocks', () async {
         // Given
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         const lock = PasswordLockFactor('Test1234');
         final keychain = await keychainProvider.create(keychainId);
@@ -961,7 +959,7 @@ void main() {
 
       test('emits account then null when keychain locks', () async {
         // Given
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         const lock = PasswordLockFactor('Test1234');
         final keychain = await keychainProvider.create(keychainId);
@@ -995,7 +993,7 @@ void main() {
 
       test('does not emit duplicate values when account state does not change', () async {
         // Given
-        final catalystId = DummyCatalystIdFactory.create();
+        final catalystId = CatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         const lock = PasswordLockFactor('Test1234');
         final keychain = await keychainProvider.create(keychainId);
