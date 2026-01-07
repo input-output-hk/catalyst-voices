@@ -58,13 +58,13 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
 
   @override
   Future<SignedDocument> signDocument(
-    SignedDocumentPayload document, {
+    SignedDocumentPayload payload, {
     required DocumentDataMetadata metadata,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
     try {
-      final compressedPayload = await _brotliCompressPayload(document.toBytes());
+      final compressedPayload = await _brotliCompressPayload(payload.toBytes());
 
       final coseSign = await profiler.timeWithResult(
         'cose_sign_doc',
@@ -81,7 +81,46 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
 
       return _CoseSignedDocument(
         coseSign: coseSign,
-        payload: document,
+        payload: payload,
+        metadata: metadata,
+        signers: [catalystId],
+      );
+    } on CoseSignException catch (error) {
+      throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
+    }
+  }
+
+  @override
+  Future<SignedDocument> signRawDocument(
+    SignedDocumentRawPayload payload, {
+    required DocumentDataMetadata metadata,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  }) async {
+    try {
+      final parsedPayload = SignedDocumentPayload.fromBytes(
+        payload.bytes,
+        // TODO(dt-iohk): Convert the content type from model to what's expected here.
+        // The `SignedDocumentMapper` which should do that is not on this branch yet.
+        contentType: SignedDocumentContentType.json,
+      );
+
+      final coseSign = await profiler.timeWithResult(
+        'cose_sign_doc',
+        () {
+          return CoseSign.sign(
+            protectedHeaders: const CoseHeaders.protected(),
+            unprotectedHeaders: const CoseHeaders.unprotected(),
+            payload: payload.bytes,
+            signers: [_CatalystSigner(catalystId, privateKey)],
+          );
+        },
+        debounce: true,
+      );
+
+      return _CoseSignedDocument(
+        coseSign: coseSign,
+        payload: parsedPayload,
         metadata: metadata,
         signers: [catalystId],
       );
@@ -184,7 +223,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   List<Object?> get props => [_coseSign, payload, metadata, signers];
 
   @override
-  Uint8List get rawPayload => _coseSign.payload;
+  SignedDocumentRawPayload get rawPayload => SignedDocumentRawPayload(_coseSign.payload);
 
   @override
   DocumentArtifact toArtifact() {

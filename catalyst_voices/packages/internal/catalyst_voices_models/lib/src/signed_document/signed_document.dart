@@ -21,7 +21,7 @@ abstract interface class SignedDocument {
   SignedDocumentPayload get payload;
 
   /// A binary representation of the [payload].
-  Uint8List get rawPayload;
+  SignedDocumentRawPayload get rawPayload;
 
   /// Returns a list of [CatalystId] that signed the document.
   List<CatalystId> get signers;

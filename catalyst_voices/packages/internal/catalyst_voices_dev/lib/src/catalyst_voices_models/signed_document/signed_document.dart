@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -20,7 +18,7 @@ final class FakeSignedDocument extends Fake implements SignedDocument {
   });
 
   @override
-  Uint8List get rawPayload => payload.toBytes();
+  SignedDocumentRawPayload get rawPayload => SignedDocumentRawPayload(payload.toBytes());
 
   @override
   DocumentArtifact toArtifact() {

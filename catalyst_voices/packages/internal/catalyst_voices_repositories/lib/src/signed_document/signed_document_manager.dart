@@ -18,12 +18,29 @@ abstract interface class SignedDocumentManager {
   /// The implementation of this method must be able to understand the [DocumentArtifact].
   Future<SignedDocument> parseDocument(DocumentArtifact artifact);
 
-  /// Signs the [document] with a single [privateKey].
+  /// Signs the [payload] with a single [privateKey].
+  ///
+  /// Returns the [SignedDocument] which wraps the [payload] with
+  /// a secure cryptographic signature created with [privateKey].
   ///
   /// The [catalystId] will be added as metadata in the signed document
   /// so that it's easier to identify who signed it.
   Future<SignedDocument> signDocument(
-    SignedDocumentPayload document, {
+    SignedDocumentPayload payload, {
+    required DocumentDataMetadata metadata,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  });
+
+  /// Signs the raw [payload] with a single [privateKey].
+  ///
+  /// Returns the [SignedDocument] which wraps the [payload] with
+  /// a secure cryptographic signature created with [privateKey].
+  ///
+  /// The [catalystId] will be added as metadata in the signed document
+  /// so that it's easier to identify who signed it.
+  Future<SignedDocument> signRawDocument(
+    SignedDocumentRawPayload payload, {
     required DocumentDataMetadata metadata,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,

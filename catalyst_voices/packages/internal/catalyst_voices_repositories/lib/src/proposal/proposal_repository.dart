@@ -347,8 +347,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       collaborators: Optional(updatedCollaborators),
     );
 
-    final updatedDocument = await _signedDocumentManager.signDocument(
-      SignedDocumentBinaryPayload(document.rawPayload),
+    final updatedDocument = await _signedDocumentManager.signRawDocument(
+      document.rawPayload,
       metadata: updatedMetadata,
       catalystId: collaboratorId,
       privateKey: privateKey,
