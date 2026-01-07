@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -74,18 +73,6 @@ class CollaboratorProposalDisplayConsent extends Equatable {
     this.lastDisplayConsentUpdate,
   });
 
-  factory CollaboratorProposalDisplayConsent.empty(CollaboratorDisplayConsentStatus status) {
-    return CollaboratorProposalDisplayConsent(
-      id: SignedDocumentRef.generateFirstRef(),
-      title: 'A Proposal for which you still have to decide if you want to be displayed yes or no.',
-      categoryName: 'F16: Cardano Use Cases: Concept',
-      originalAuthor: DummyCatalystIdFactory.create(),
-      status: status,
-      invitedAt: DateTime(2026),
-      lastDisplayConsentUpdate: DateTime(2026, 03, 31),
-    );
-  }
-
   factory CollaboratorProposalDisplayConsent.fromBrief(
     ProposalBriefData proposal,
     CatalystId activeAccountId,
@@ -110,7 +97,35 @@ class CollaboratorProposalDisplayConsent extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, title, categoryName, originalAuthor, status];
+  List<Object?> get props => [
+    id,
+    title,
+    categoryName,
+    originalAuthor,
+    status,
+    invitedAt,
+    lastDisplayConsentUpdate,
+  ];
+
+  CollaboratorProposalDisplayConsent copyWith({
+    DocumentRef? id,
+    String? title,
+    String? categoryName,
+    Optional<CatalystId>? originalAuthor,
+    CollaboratorDisplayConsentStatus? status,
+    DateTime? invitedAt,
+    Optional<DateTime>? lastDisplayConsentUpdate,
+  }) {
+    return CollaboratorProposalDisplayConsent(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      categoryName: categoryName ?? this.categoryName,
+      originalAuthor: originalAuthor.dataOr(this.originalAuthor),
+      status: status ?? this.status,
+      invitedAt: invitedAt ?? this.invitedAt,
+      lastDisplayConsentUpdate: lastDisplayConsentUpdate.dataOr(this.lastDisplayConsentUpdate),
+    );
+  }
 }
 
 extension CollaboratorDisplayConsentStatusAllowedOptions on CollaboratorDisplayConsentStatus {

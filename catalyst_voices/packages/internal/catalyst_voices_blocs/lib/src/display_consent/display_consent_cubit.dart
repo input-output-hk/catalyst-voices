@@ -6,7 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
-final class DisplayConsentCubit extends Cubit<DisplayConsentState> {
+final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErrorEmitterMixin {
   final UserService _userService;
   final ProposalService _proposalService;
 
@@ -24,8 +24,38 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> {
   }) async {
     // TODO(LynxLynxx): Test it when available
     final collaboratorAction = displayConsentStatus.toCollaboratorAction();
+
+    final indexOfProposalConsent = _cache.proposalsDisplayConsent.indexWhere(
+      (proposal) => proposal.id == id,
+    );
+
+    if (indexOfProposalConsent == -1) {
+      return;
+    }
+
+    final updatedProposalsDisplayConsent = List<CollaboratorProposalDisplayConsent>.from(
+      _cache.proposalsDisplayConsent,
+    );
+    updatedProposalsDisplayConsent[indexOfProposalConsent] =
+        updatedProposalsDisplayConsent[indexOfProposalConsent].copyWith(
+          lastDisplayConsentUpdate: Optional(DateTime.now()),
+          status: displayConsentStatus,
+        );
+
+    emit(state.copyWith(items: updatedProposalsDisplayConsent));
+
     if (collaboratorAction != null) {
-      await _proposalService.submitCollaboratorProposalAction(ref: id, action: collaboratorAction);
+      try {
+        await _proposalService.submitCollaboratorProposalAction(
+          ref: id,
+          action: collaboratorAction,
+        );
+        _cache = _cache.copyWith(proposalsDisplayConsent: updatedProposalsDisplayConsent);
+      } catch (e) {
+        emit(state.copyWith(items: _cache.proposalsDisplayConsent));
+
+        emitError(LocalizedException.create(e));
+      }
     }
   }
 
@@ -65,8 +95,7 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> {
   }
 
   void _rebuildState() {
-    final newCosents = state.consents.copyWith(items: _cache.proposalsDisplayConsent);
-    emit(state.copyWith(consents: newCosents));
+    emit(state.copyWith(items: _cache.proposalsDisplayConsent));
   }
 
   Future<void> _setupActiveAccountIdSubscription() async {

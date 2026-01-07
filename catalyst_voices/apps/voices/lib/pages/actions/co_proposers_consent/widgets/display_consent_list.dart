@@ -17,19 +17,19 @@ class DisplayConsentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionsDecoratedSliverPanel(
-      sliver: BlocSelector<DisplayConsentCubit, DisplayConsentState, ProposalsDisplayConsent>(
+      sliver: BlocSelector<DisplayConsentCubit, DisplayConsentState, DisplayConsentState>(
         selector: (state) {
-          return state.consents;
+          return state;
         },
-        builder: (context, consents) {
-          if (consents.items.isEmpty) {
+        builder: (context, state) {
+          if (state.items.isEmpty) {
             return const _EmptyState();
           }
           return SliverList.separated(
-            itemCount: consents.items.length,
+            itemCount: state.items.length,
             separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
-              final item = consents.items[index];
+              final item = state.items[index];
 
               return ProposalDisplayConsentCard(
                 key: ValueKey(item.id),
