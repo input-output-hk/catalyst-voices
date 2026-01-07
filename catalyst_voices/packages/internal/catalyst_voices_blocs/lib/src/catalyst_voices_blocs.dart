@@ -13,6 +13,7 @@ export 'common/bloc_signal_emitter_mixin.dart';
 export 'dev_tools/dev_tools.dart';
 export 'dev_tools/document_lookup/document_lookup.dart';
 export 'discovery/discovery.dart';
+export 'display_consent/display_consent.dart';
 export 'feature_flags/feature_flags.dart';
 export 'my_actions/my_actions.dart';
 export 'proposal/proposal.dart';
