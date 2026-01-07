@@ -5,8 +5,6 @@ import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
-import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
-import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
 import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
 import 'package:catalyst_voices_repositories/src/api/models/indexed_document_version.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,10 +55,6 @@ void main() {
         );
         final response = responseBody;
 
-        const expectedFiltersQueryBody = DocumentIndexQueryFilter(
-          parameters: IdAndVerRef.idOnly(IdSelector.inside(['cat1', 'cat2'])),
-        );
-
         when(
           () {
             return gateway.documentIndex(
@@ -76,15 +70,17 @@ void main() {
         await source.index(page: page, limit: limit, filters: filters);
 
         // Then
-        final captured = verify(
-          () => gateway.documentIndex(
-            filter: captureAny(named: 'filter'),
-            limit: any(named: 'limit'),
-            page: any(named: 'page'),
-          ),
-        ).captured;
+        final captured =
+            verify(
+                  () => gateway.documentIndex(
+                    filter: captureAny(named: 'filter'),
+                    limit: any(named: 'limit'),
+                    page: any(named: 'page'),
+                  ),
+                ).captured.last
+                as DocumentIndexQueryFilter;
 
-        expect(captured.last, equals(expectedFiltersQueryBody));
+        expect(captured.parameters?.id?.inside, equals(filters.categoriesIds));
       });
 
       test('handles dynamic json correctly', () async {

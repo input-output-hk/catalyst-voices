@@ -153,7 +153,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalPublish?> getProposalPublishForRef({
     required DocumentRef ref,
   }) async {
-    final data = await _documentRepository.getRefToDocumentData(
+    final data = await _documentRepository.findFirst(
       referencing: ref,
       type: DocumentType.proposalActionDocument,
     );
@@ -166,8 +166,17 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef category,
   }) async {
-    // TODO(damian-molinski): Implement it
-    final documentData = await _documentRepository.getDocumentData(id: ref);
+    final documentData = await _documentRepository.findFirst(
+      parameter: category,
+      type: DocumentType.proposalTemplate,
+    );
+
+    if (documentData == null) {
+      throw DocumentNotFoundException(
+        ref: category,
+        message: 'Proposal template with parameter not found',
+      );
+    }
 
     return ProposalTemplateFactory.create(documentData);
   }

@@ -15,6 +15,7 @@ abstract interface class SignedDocumentDataSource implements DocumentDataLocalSo
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? originalAuthorId,
   });
 

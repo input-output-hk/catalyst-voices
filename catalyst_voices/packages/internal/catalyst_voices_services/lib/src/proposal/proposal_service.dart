@@ -270,18 +270,20 @@ final class ProposalServiceImpl implements ProposalService {
       throw const ActiveCampaignNotFoundException();
     }
 
-    final campaignFilters = CampaignFilters.from(activeCampaign);
-    // TODO(damian-molinski): Implement it
-    final allowTemplateRefs = await _documentRepository.getRefs(
-      type: DocumentType.proposalTemplate,
-      campaign: campaignFilters,
-    );
-
     final parsedDocument = await _documentRepository.parseDocumentForImport(data: data);
+    final template = parsedDocument.metadata.template;
+    final templateParameters =
+        // TODO(damian-molinski): replace with getDocumentMetadata
+        await (template != null
+                ? _documentRepository.getDocumentData(id: template)
+                : Future<DocumentData?>.value())
+            .then((value) => value?.metadata.parameters)
+            .onError<DocumentNotFoundException>((_, _) => null)
+            .then((value) => value ?? const DocumentParameters());
 
     // Validate template before any DB operations
     // TODO(LynxLynxx): Remove after we support multiple fund templates
-    if (!allowTemplateRefs.contains(parsedDocument.metadata.template)) {
+    if (activeCampaign.categories.none((category) => templateParameters.contains(category.id))) {
       throw const DocumentImportInvalidDataException(
         DocumentMetadataMalformedException(
           reasons: ['template ref is not allowed to be imported'],

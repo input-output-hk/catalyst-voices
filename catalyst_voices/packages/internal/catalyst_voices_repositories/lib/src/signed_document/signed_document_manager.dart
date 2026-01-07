@@ -17,7 +17,7 @@ abstract interface class SignedDocumentManager {
   /// Parses the document from the [DocumentArtifact].
   ///
   /// The implementation of this method must be able to understand the [DocumentArtifact]
-  /// that are obtained from the [SignedDocument.toBytes] method.
+  /// that are obtained from the [SignedDocument.toArtifact] method.
   ///
   /// Throws [DocumentMetadataMalformedException] in case of any required fields
   /// missing.

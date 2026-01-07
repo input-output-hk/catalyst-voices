@@ -67,6 +67,7 @@ abstract interface class DocumentsV2Dao {
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? author,
     CatalystId? originalAuthor,
   });
@@ -250,6 +251,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? author,
     CatalystId? originalAuthor,
   }) {
@@ -257,6 +259,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       type: type,
       id: id,
       referencing: referencing,
+      parameter: parameter,
       author: author,
       originalAuthor: originalAuthor,
     ).getSingleOrNull();
@@ -459,6 +462,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? author,
     CatalystId? originalAuthor,
   }) {
@@ -478,6 +482,23 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       if (referencing.isExact) {
         query.where((tbl) => tbl.refVer.equals(referencing.ver!));
       }
+    }
+
+    if (parameter != null) {
+      query.where((tbl) {
+        final dp = alias(documentParameters, 'dp');
+        final dpQuery = selectOnly(dp)
+          ..addColumns([const Constant(1)])
+          ..where(dp.documentId.equalsExp(tbl.id))
+          ..where(dp.documentVer.equalsExp(tbl.ver))
+          ..where(dp.id.equals(parameter.id));
+
+        if (parameter.isExact) {
+          dpQuery.where(dp.ver.equals(parameter.ver!));
+        }
+
+        return existsQuery(dpQuery);
+      });
     }
 
     if (type != null) {

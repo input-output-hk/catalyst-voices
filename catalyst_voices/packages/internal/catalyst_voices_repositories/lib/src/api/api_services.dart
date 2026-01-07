@@ -34,7 +34,7 @@ final class ApiServices {
     final retryInterceptor = interceptorFactory.retryInterceptor(authInterceptor);
     final logInterceptor = interceptorFactory.logInterceptor(Logger('CatApiServices'));
 
-    final CatGatewayService gateway = config.localGateway.isEnabled
+    final gateway = config.localGateway.isEnabled
         ? LocalCatGateway.create(
             initialProposalsCount: config.localGateway.proposalsCount,
             decompressedDocuments: config.localGateway.decompressedDocuments,

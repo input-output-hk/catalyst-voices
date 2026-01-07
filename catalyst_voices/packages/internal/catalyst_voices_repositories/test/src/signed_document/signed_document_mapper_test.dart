@@ -132,7 +132,7 @@ void main() {
 
         // Assert
         expect(metadata.contentType, DocumentContentType.json);
-        expect(metadata.id, signedDocRef.id);
+        expect(metadata.id.id, signedDocRef.id);
         expect(metadata.id.ver, signedDocRef.ver);
 
         // Verify single item extraction from lists

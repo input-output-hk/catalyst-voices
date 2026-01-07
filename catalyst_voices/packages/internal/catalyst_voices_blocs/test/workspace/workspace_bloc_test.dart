@@ -37,6 +37,7 @@ void main() {
       registerFallbackValue(documentData);
       registerFallbackValue(Uint8List(0));
       registerFallbackValue(const DraftRef(id: 'fallback'));
+      registerFallbackValue(const DocumentParameters());
     });
 
     setUp(() async {

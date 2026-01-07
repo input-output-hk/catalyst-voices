@@ -43,9 +43,9 @@ final class DocumentsCommentRepository implements CommentRepository {
   Future<CommentTemplate?> getCommentTemplate({
     required DocumentRef category,
   }) async {
-    final document = await _documentRepository.getLatestDocument(
+    final document = await _documentRepository.findFirst(
       type: DocumentType.commentTemplate,
-      category: category,
+      parameter: category,
     );
 
     if (document == null) {
