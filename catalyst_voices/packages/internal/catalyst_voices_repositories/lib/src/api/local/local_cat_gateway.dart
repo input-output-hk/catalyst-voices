@@ -284,99 +284,93 @@ final class LocalCatGateway implements CatGatewayService {
   }
 
   Future<void> _populateIndex() async {
-    try {
-      final activeConstantDocumentRefs = constantDocumentRefsPerCampaign(activeCampaignRef);
-      if (activeConstantDocumentRefs.isEmpty) return;
+    final activeConstantDocumentRefs = constantDocumentRefsPerCampaign(activeCampaignRef);
+    if (activeConstantDocumentRefs.isEmpty) return;
 
-      for (final constRefs in activeConstantDocumentRefs) {
-        final proposal = constRefs.proposal;
-        final comment = constRefs.comment;
-        if (proposal != null) {
-          _cache[proposal.id] = [
-            DocumentDataMetadata.proposalTemplate(
-              id: SignedDocumentRef(id: proposal.id, ver: proposal.ver),
-              parameters: DocumentParameters({constRefs.category}),
-            ),
-          ];
-        }
-
-        if (comment != null) {
-          _cache[comment.id] = [
-            DocumentDataMetadata.commentTemplate(
-              id: SignedDocumentRef(id: comment.id, ver: comment.ver),
-              parameters: DocumentParameters({constRefs.category}),
-            ),
-          ];
-        }
+    for (final constRefs in activeConstantDocumentRefs) {
+      final proposal = constRefs.proposal;
+      final comment = constRefs.comment;
+      if (proposal != null) {
+        _cache[proposal.id] = [
+          DocumentDataMetadata.proposalTemplate(
+            id: SignedDocumentRef(id: proposal.id, ver: proposal.ver),
+            parameters: DocumentParameters({constRefs.category}),
+          ),
+        ];
       }
 
-      for (var i = 0; i < proposalsCount; i++) {
-        final id = _v7();
-        const versionsCount = 2;
-
-        // only first 4 are used
-        final categoryConstRefs = activeConstantDocumentRefs[3 & i];
-        final proposal = categoryConstRefs.proposal;
-        if (proposal == null) {
-          continue;
-        }
-
-        for (var j = 0; j < versionsCount; j++) {
-          final ver = j == 0 ? id : _v7();
-
-          final proposalId = SignedDocumentRef(id: id, ver: ver);
-          final proposalMetadata = DocumentDataMetadata.proposal(
-            id: proposalId,
-            template: proposal,
-            parameters: DocumentParameters({categoryConstRefs.category}),
-            authors: const [],
-          );
-          _cache.update(
-            id,
-            (value) => value..add(proposalMetadata),
-            ifAbsent: () => [proposalMetadata],
-          );
-
-          final comment = categoryConstRefs.proposal;
-          if (comment != null) {
-            const commentsCount = 2;
-            for (var c = 0; c < commentsCount; c++) {
-              final commentId = _v7();
-              _cache[commentId] = [
-                DocumentDataMetadata.comment(
-                  id: SignedDocumentRef(id: commentId, ver: commentId),
-                  template: comment,
-                  proposalRef: proposalId,
-                  parameters: DocumentParameters({categoryConstRefs.category}),
-                  authors: const [],
-                ),
-              ];
-            }
-          }
-
-          final actionIndex = (ProposalSubmissionAction.values.length + 1) & i;
-          final action = ProposalSubmissionAction.values.elementAtOrNull(actionIndex);
-          if (action != null) {
-            final actionId = _v7();
-
-            final actionMetadata = DocumentDataMetadata.proposalAction(
-              id: SignedDocumentRef(id: actionId, ver: actionId),
-              proposalRef: proposalId,
-              parameters: DocumentParameters({categoryConstRefs.category}),
-            );
-
-            _cache[actionId] = [actionMetadata];
-            _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
-          }
-        }
+      if (comment != null) {
+        _cache[comment.id] = [
+          DocumentDataMetadata.commentTemplate(
+            id: SignedDocumentRef(id: comment.id, ver: comment.ver),
+            parameters: DocumentParameters({constRefs.category}),
+          ),
+        ];
       }
-
-      _cachePopulateCompleter.complete(true);
-    } catch (error, stack) {
-      print('populate index failed');
-      print('$error');
-      print('$stack');
     }
+
+    for (var i = 0; i < proposalsCount; i++) {
+      final id = _v7();
+      const versionsCount = 2;
+
+      // only first 4 are used
+      final categoryConstRefs = activeConstantDocumentRefs[3 & i];
+      final proposal = categoryConstRefs.proposal;
+      if (proposal == null) {
+        continue;
+      }
+
+      for (var j = 0; j < versionsCount; j++) {
+        final ver = j == 0 ? id : _v7();
+
+        final proposalId = SignedDocumentRef(id: id, ver: ver);
+        final proposalMetadata = DocumentDataMetadata.proposal(
+          id: proposalId,
+          template: proposal,
+          parameters: DocumentParameters({categoryConstRefs.category}),
+          authors: const [],
+        );
+        _cache.update(
+          id,
+          (value) => value..add(proposalMetadata),
+          ifAbsent: () => [proposalMetadata],
+        );
+
+        final comment = categoryConstRefs.proposal;
+        if (comment != null) {
+          const commentsCount = 2;
+          for (var c = 0; c < commentsCount; c++) {
+            final commentId = _v7();
+            _cache[commentId] = [
+              DocumentDataMetadata.comment(
+                id: SignedDocumentRef(id: commentId, ver: commentId),
+                template: comment,
+                proposalRef: proposalId,
+                parameters: DocumentParameters({categoryConstRefs.category}),
+                authors: const [],
+              ),
+            ];
+          }
+        }
+
+        final actionIndex = (ProposalSubmissionAction.values.length + 1) & i;
+        final action = ProposalSubmissionAction.values.elementAtOrNull(actionIndex);
+        if (action != null) {
+          final actionId = _v7();
+
+          final actionMetadata = DocumentDataMetadata.proposalAction(
+            id: SignedDocumentRef(id: actionId, ver: actionId),
+            proposalRef: proposalId,
+            parameters: DocumentParameters({categoryConstRefs.category}),
+          );
+
+          _cache[actionId] = [actionMetadata];
+          _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
+        }
+      }
+    }
+
+    _cachePopulateCompleter.complete(true);
   }
 }
 
