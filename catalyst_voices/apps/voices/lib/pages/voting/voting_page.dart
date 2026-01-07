@@ -21,13 +21,13 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class VotingPage extends StatefulWidget {
-  final SignedDocumentRef? categoryId;
+  final SignedDocumentRef? categoryRef;
   final VotingPageTab? tab;
   final bool keychainDeleted;
 
   const VotingPage({
     super.key,
-    this.categoryId,
+    this.categoryRef,
     this.tab,
     this.keychainDeleted = false,
   });
@@ -80,10 +80,10 @@ class _VotingPageState extends State<VotingPage>
 
     final tab = widget.tab ?? VotingPageTab.total;
 
-    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
+    if (widget.categoryRef != oldWidget.categoryRef || widget.tab != oldWidget.tab) {
       context.read<VotingCubit>().changeFilters(
         onlyMy: Optional(tab == VotingPageTab.my),
-        category: Optional(widget.categoryId),
+        category: Optional(widget.categoryRef),
         type: tab.filter,
       );
 
@@ -158,7 +158,7 @@ class _VotingPageState extends State<VotingPage>
 
     votingCubit.init(
       onlyMyProposals: selectedTab == VotingPageTab.my,
-      category: widget.categoryId,
+      category: widget.categoryRef,
       type: selectedTab.filter,
     );
 
@@ -216,7 +216,7 @@ class _VotingPageState extends State<VotingPage>
     VotingPageTab? tab,
   }) {
     Router.neglect(context, () {
-      final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
+      final effectiveCategoryId = categoryId.dataOr(widget.categoryRef?.id);
       final effectiveTab = tab?.name ?? widget.tab?.name;
 
       VotingRoute(

@@ -24,8 +24,8 @@ abstract interface class ProposalService {
   /// Creates a new proposal draft locally.
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
-    required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef templateRef,
+    required DocumentParameters parameters,
   });
 
   /// Delete a draft proposal from local storage.
@@ -45,7 +45,7 @@ abstract interface class ProposalService {
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<void> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   });
 
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
@@ -68,7 +68,7 @@ abstract interface class ProposalService {
   });
 
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef category,
   });
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
@@ -102,21 +102,21 @@ abstract interface class ProposalService {
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> submitProposalForReview({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   });
 
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> unlockProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   });
 
   /// Upserts a proposal draft in the local storage.
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
     required DocumentDataContent content,
-    required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef templateRef,
+    required DocumentParameters parameters,
   });
 
   /// Fetches favorites proposals ids of the user
@@ -174,18 +174,18 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
-    required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef templateRef,
+    required DocumentParameters parameters,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
-    final catalystId = _getUserCatalystId();
+    final catalystId = _userService.activeAccountId;
+
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
-        metadata: DocumentDataMetadata(
-          type: DocumentType.proposalDocument,
+        metadata: DocumentDataMetadata.proposal(
           selfRef: draftRef,
-          template: template,
-          categoryId: categoryId,
+          template: templateRef,
+          parameters: parameters,
           authors: [catalystId],
         ),
         content: content,
@@ -212,16 +212,18 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   }) {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          categoryId: categoryId,
+          metadata: DocumentDataMetadata.proposalAction(
+            selfRef: actionRef,
+            proposalRef: proposalRef,
+            parameters: proposalParameters,
+          ),
           action: ProposalSubmissionAction.hide,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -302,27 +304,14 @@ final class ProposalServiceImpl implements ProposalService {
           .toList();
     }
 
-    final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
-
     // If we are getting proposals then campaign needs to be active
     // Getting whole campaign with list of categories saves time then calling to get each category separately
     // for each proposal
-    final activeCampaign = _activeCampaignObserver.campaign;
-
-    final categories = Map<String, CampaignCategory>.fromEntries(
-      categoriesRefs.map((ref) {
-        final category = activeCampaign!.categories.firstWhere(
-          (category) => category.selfRef == ref,
-        );
-        return MapEntry(ref.id, category);
-      }),
-    );
-
     final proposalsWithContext = proposals
         .map(
           (proposal) => ProposalWithContext(
             proposal: proposal,
-            category: categories[proposal.categoryRef.id]!,
+            category: _findActiveCampaignCategory(proposal.parameters),
             user: const ProposalUserContext(),
           ),
         )
@@ -333,20 +322,28 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef category,
   }) async {
-    final proposalTemplate = await _proposalRepository.getProposalTemplate(
-      ref: ref,
-    );
+    final template = await _proposalRepository.getProposalTemplate(category: category);
+    if (template == null) {
+      throw ProposalTemplateNotFoundException(category: category);
+    }
 
-    return proposalTemplate;
+    return template;
   }
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) async {
-    final allowTemplateRefs =
-        _activeCampaignObserver.campaign?.categories.map((e) => e.proposalTemplateRef).toList() ??
-        [];
+    final activeCampaign = _activeCampaignObserver.campaign;
+    if (activeCampaign == null) {
+      throw const ActiveCampaignNotFoundException();
+    }
+
+    final campaignFilters = CampaignFilters.from(activeCampaign);
+    final allowTemplateRefs = await _documentRepository.getRefs(
+      type: DocumentType.proposalTemplate,
+      campaign: campaignFilters,
+    );
 
     final parsedDocument = await _documentRepository.parseDocumentForImport(data: data);
 
@@ -354,11 +351,13 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(LynxLynxx): Remove after we support multiple fund templates
     if (!allowTemplateRefs.contains(parsedDocument.metadata.template)) {
       throw const DocumentImportInvalidDataException(
-        SignedDocumentMetadataMalformed(reasons: ['template ref is not allowed to be imported']),
+        DocumentMetadataMalformedException(
+          reasons: ['template ref is not allowed to be imported'],
+        ),
       );
     }
 
-    final authorId = _getUserCatalystId();
+    final authorId = _userService.activeAccountId;
     final newRef = await _documentRepository.saveImportedDocument(
       document: parsedDocument,
       authorId: authorId,
@@ -383,7 +382,7 @@ final class ProposalServiceImpl implements ProposalService {
     // There is a system requirement to publish fresh documents,
     // where version timestamp is not older than a predefined interval.
     // Because of it we're regenerating a version just before publishing.
-    final freshRef = originalRef.freshVersion();
+    final freshRef = originalRef.fresh().toSignedDocumentRef();
     final freshDocument = document.copyWithSelfRef(selfRef: freshRef);
 
     await _signerService.useProposerCredentials(
@@ -400,7 +399,7 @@ final class ProposalServiceImpl implements ProposalService {
       await _proposalRepository.deleteDraftProposal(originalRef);
     }
 
-    return freshRef.toSignedDocumentRef();
+    return freshRef;
   }
 
   @override
@@ -415,7 +414,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> submitProposalForReview({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   }) async {
     if (await isMaxProposalsLimitReached()) {
       throw const ProposalLimitReachedException(
@@ -428,9 +427,11 @@ final class ProposalServiceImpl implements ProposalService {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          categoryId: categoryId,
+          metadata: DocumentDataMetadata.proposalAction(
+            selfRef: actionRef,
+            proposalRef: proposalRef,
+            parameters: proposalParameters,
+          ),
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -444,16 +445,18 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> unlockProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   }) async {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          categoryId: categoryId,
+          metadata: DocumentDataMetadata.proposalAction(
+            selfRef: actionRef,
+            proposalRef: proposalRef,
+            parameters: proposalParameters,
+          ),
           action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -468,21 +471,20 @@ final class ProposalServiceImpl implements ProposalService {
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
     required DocumentDataContent content,
-    required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef templateRef,
+    required DocumentParameters parameters,
   }) async {
     // TODO(LynxLynxx): when we start supporting multiple authors
     // we need to get the list of authors actually stored in the db and
     // add them to the authors list if they are not already there
-    final catalystId = _getUserCatalystId();
+    final catalystId = _userService.activeAccountId;
 
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
-        metadata: DocumentDataMetadata(
-          type: DocumentType.proposalDocument,
+        metadata: DocumentDataMetadata.proposal(
           selfRef: selfRef,
-          template: template,
-          categoryId: categoryId,
+          template: templateRef,
+          parameters: parameters,
           authors: [catalystId],
         ),
         content: content,
@@ -652,6 +654,13 @@ final class ProposalServiceImpl implements ProposalService {
     );
   }
 
+  CampaignCategory _findActiveCampaignCategory(DocumentParameters parameters) {
+    final activeCampaign = _activeCampaignObserver.campaign;
+    return activeCampaign!.categories.firstWhere(
+      (category) => parameters.contains(category.selfRef),
+    );
+  }
+
   // Helper method to fetch versions for a proposal
   Future<List<ProposalVersion>> _getDetailVersionsOfProposal(ProposalData proposal) async {
     final versions = await _proposalRepository.queryVersionsOfId(
@@ -678,17 +687,6 @@ final class ProposalServiceImpl implements ProposalService {
     )).whereType<ProposalData>().toList();
 
     return versionsData.map((e) => e.toProposalVersion()).toList();
-  }
-
-  CatalystId _getUserCatalystId() {
-    final account = _userService.user.activeAccount;
-    if (account == null) {
-      throw StateError(
-        'Cannot obtain proposer credentials, account missing',
-      );
-    }
-
-    return account.catalystId;
   }
 
   bool _isProposer(User user) {

@@ -87,10 +87,8 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
-      final category = await _campaignService.getCategory(proposal.document.metadata.categoryId);
-      final commentTemplate = await _commentService.getCommentTemplateFor(
-        category: proposal.document.metadata.categoryId,
-      );
+      final category = await _campaignService.getCategory(proposal.document.metadata.parameters);
+      final commentTemplate = await _commentService.getCommentTemplate(category: category.selfRef);
       final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _cache = _cache.copyWith(
@@ -157,12 +155,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     SignedDocumentRef? reply,
   }) async {
     final proposalRef = _cache.ref;
-    final proposalCategoryId = _cache.proposal?.document.metadata.categoryId;
+    final proposalParameters = _cache.proposal?.document.metadata.parameters;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
-    assert(
-      proposalRef is SignedDocumentRef,
-      'Can comment only on signed documents',
-    );
+    assert(proposalRef is SignedDocumentRef, 'Can comment only on signed documents');
+    assert(proposalParameters != null, 'Proposal parameters not found!');
 
     final activeAccountId = _cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
@@ -170,16 +166,14 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentTemplate = _cache.commentTemplate;
     assert(commentTemplate != null, 'No comment template found!');
 
-    assert(proposalCategoryId != null, 'Proposal categoryId not found!');
-
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: commentRef,
-        ref: proposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        proposalRef: proposalRef! as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
-        categoryId: proposalCategoryId,
+        parameters: proposalParameters!,
         authorId: activeAccountId!,
       ),
       document: document,
