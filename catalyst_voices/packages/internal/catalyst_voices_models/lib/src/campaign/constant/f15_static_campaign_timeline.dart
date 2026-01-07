@@ -46,7 +46,7 @@ final f15StaticCampaignTimeline = CampaignTimeline(
       title: 'Community Voting',
       description: '''Community members cast their votes using the Catalyst Voting app.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 05, 18),
+        from: DateTime.utc(2026, 07, 05, 18),
         to: DateTime.utc(2027, 07, 12, 10),
       ),
       type: CampaignPhaseType.communityVoting,

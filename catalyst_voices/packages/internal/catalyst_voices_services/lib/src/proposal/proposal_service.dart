@@ -642,7 +642,7 @@ final class ProposalServiceImpl implements ProposalService {
       fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
       createdAt: proposal.id.ver!.dateTime,
       iteration: data.iteration,
-      commentsCount: isFinal ? null : data.commentsCount,
+      commentsCount: data.commentsCount,
       isFinal: isFinal,
       isFavorite: data.isFavorite,
       votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
