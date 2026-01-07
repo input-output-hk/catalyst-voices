@@ -630,7 +630,7 @@ void main() {
         ).thenAnswer((invocation) async {
           final callback =
               invocation.positionalArguments.first as RoleCredentialsCallback<SignedDocumentRef>;
-          await callback(DummyCatalystIdFactory.create(), FakeCatalystPrivateKey());
+          await callback(CatalystIdFactory.create(), FakeCatalystPrivateKey());
           return DocumentRefFactory.signedDocumentRef();
         });
 
@@ -638,7 +638,7 @@ void main() {
           () => mockSignerService.useProposerCredentials<void>(any()),
         ).thenAnswer((invocation) async {
           final callback = invocation.positionalArguments.first as RoleCredentialsCallback<void>;
-          await callback(DummyCatalystIdFactory.create(), FakeCatalystPrivateKey());
+          await callback(CatalystIdFactory.create(), FakeCatalystPrivateKey());
           return;
         });
 
