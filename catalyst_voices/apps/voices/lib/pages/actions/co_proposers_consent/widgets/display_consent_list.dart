@@ -17,10 +17,7 @@ class DisplayConsentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionsDecoratedSliverPanel(
-      sliver: BlocSelector<DisplayConsentCubit, DisplayConsentState, DisplayConsentState>(
-        selector: (state) {
-          return state;
-        },
+      sliver: BlocBuilder<DisplayConsentCubit, DisplayConsentState>(
         builder: (context, state) {
           if (state.items.isEmpty) {
             return const _EmptyState();

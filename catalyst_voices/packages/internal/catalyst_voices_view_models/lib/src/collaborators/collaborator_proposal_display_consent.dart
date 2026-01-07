@@ -21,6 +21,7 @@ enum CollaboratorDisplayConsentStatus {
       _ => CollaboratorDisplayConsentStatus.pending,
     };
   }
+
   SvgGenImage get icons {
     return switch (this) {
       pending => VoicesAssets.icons.clock,

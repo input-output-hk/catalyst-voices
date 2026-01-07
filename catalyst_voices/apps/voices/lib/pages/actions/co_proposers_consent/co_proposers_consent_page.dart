@@ -40,6 +40,6 @@ class _CoProposersConsentPageState extends State<CoProposersConsentPage> {
     super.initState();
 
     _cubit = Dependencies.instance.get<DisplayConsentCubit>();
-    unawaited(_cubit.init());
+    _cubit.init();
   }
 }

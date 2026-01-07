@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ActionsDecoratedSliverPanel extends StatelessWidget {
   final EdgeInsets padding;
-  final BorderRadius? borderRadius;
+  final BorderRadius borderRadius;
   final Color? backgroundColor;
   final Widget? sliver;
 
@@ -11,7 +11,7 @@ class ActionsDecoratedSliverPanel extends StatelessWidget {
     super.key,
     this.sliver,
     this.padding = const EdgeInsets.all(16),
-    this.borderRadius,
+    this.borderRadius = const BorderRadius.all(Radius.circular(16)),
     this.backgroundColor,
   });
 
@@ -20,7 +20,7 @@ class ActionsDecoratedSliverPanel extends StatelessWidget {
     return DecoratedSliver(
       decoration: BoxDecoration(
         color: backgroundColor ?? context.colors.elevationsOnSurfaceNeutralLv1Grey,
-        borderRadius: borderRadius ?? BorderRadius.circular(16),
+        borderRadius: borderRadius,
       ),
       sliver: SliverPadding(
         padding: padding,

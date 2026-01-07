@@ -10,11 +10,13 @@ class ProposalDisplayConsentCard extends StatelessWidget {
   final CollaboratorProposalDisplayConsent proposalDisplayConsent;
   final ValueChanged<CollaboratorDisplayConsentStatus> onSelected;
   final VoidCallback? onTap;
+  final BorderRadius borderRadius;
 
   const ProposalDisplayConsentCard({
     super.key,
     required this.proposalDisplayConsent,
     required this.onSelected,
+    this.borderRadius = const BorderRadius.all(Radius.circular(12)),
     this.onTap,
   });
 
@@ -22,7 +24,7 @@ class ProposalDisplayConsentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: borderRadius,
         boxShadow: [
           BoxShadow(
             color: context.colors.onSurfaceNeutral016,
@@ -32,42 +34,22 @@ class ProposalDisplayConsentCard extends StatelessWidget {
       ),
       child: Material(
         color: context.colors.elevationsOnSurfaceNeutralLv1White,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: borderRadius,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: borderRadius,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Column(
               spacing: 8,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: DisplayConsentProposalInfo(
-                        categoryName: proposalDisplayConsent.categoryName,
-                        proposalTitle: proposalDisplayConsent.title,
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        spacing: 4,
-                        children: [
-                          DisplayConsentChoiceMenu(
-                            selectedStatus: proposalDisplayConsent.status,
-                            onSelected: onSelected,
-                          ),
-                          DisplayConsentLastUpdateText(
-                            date: proposalDisplayConsent.lastDisplayConsentUpdate,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                _ProposalConsentInfo(
+                  categoryName: proposalDisplayConsent.categoryName,
+                  proposalTitle: proposalDisplayConsent.title,
+                  selectedStatus: proposalDisplayConsent.status,
+                  lastDisplayConsentUpdate: proposalDisplayConsent.lastDisplayConsentUpdate,
+                  onSelected: onSelected,
                 ),
                 InvitedByText(
                   catalystId: proposalDisplayConsent.originalAuthor,
@@ -78,6 +60,53 @@ class ProposalDisplayConsentCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ProposalConsentInfo extends StatelessWidget {
+  final String categoryName;
+  final String proposalTitle;
+  final CollaboratorDisplayConsentStatus selectedStatus;
+  final DateTime? lastDisplayConsentUpdate;
+  final ValueChanged<CollaboratorDisplayConsentStatus> onSelected;
+
+  const _ProposalConsentInfo({
+    required this.categoryName,
+    required this.proposalTitle,
+    required this.selectedStatus,
+    required this.lastDisplayConsentUpdate,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 2,
+          child: DisplayConsentProposalInfo(
+            categoryName: categoryName,
+            proposalTitle: proposalTitle,
+          ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            spacing: 4,
+            children: [
+              DisplayConsentChoiceMenu(
+                selectedStatus: selectedStatus,
+                onSelected: onSelected,
+              ),
+              DisplayConsentLastUpdateText(
+                date: lastDisplayConsentUpdate,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

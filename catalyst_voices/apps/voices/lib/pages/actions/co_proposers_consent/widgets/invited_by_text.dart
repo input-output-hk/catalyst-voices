@@ -14,43 +14,44 @@ class InvitedByText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (catalystId != null) {
-      return Row(
-        spacing: 4,
-        children: [
-          PlaceholderRichText(
-            context.l10n.invitedBy('{username}'),
-            style: context.textTheme.labelMedium?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-              fontWeight: FontWeight.w700,
-            ),
-            placeholderSpanBuilder: (context, placeholder) {
-              return switch (placeholder) {
-                'username' => TextSpan(
-                  text: catalystId?.username,
-                  style: context.textTheme.labelMedium?.copyWith(
-                    color: context.colors.textOnPrimaryLevel1,
-                  ),
-                ),
-                _ => throw ArgumentError('Unknown placeholder', placeholder),
-              };
-            },
-          ),
-          CatalystIdText(
-            catalystId!,
-            isCompact: true,
-            showCopy: false,
-            showUsername: true,
-          ),
-          DayMonthTimeText(
-            dateTime: invitedAt,
-            showTimezone: true,
-            timestampTextStyle: context.textTheme.bodySmall,
-            timezoneTextStyle: context.textTheme.bodySmall,
-          ),
-        ],
-      );
+    if (catalystId == null) {
+      return const SizedBox.shrink();
     }
-    return const SizedBox.shrink();
+
+    return Row(
+      spacing: 4,
+      children: [
+        PlaceholderRichText(
+          context.l10n.invitedBy('{username}'),
+          style: context.textTheme.labelMedium?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+            fontWeight: FontWeight.w700,
+          ),
+          placeholderSpanBuilder: (context, placeholder) {
+            return switch (placeholder) {
+              'username' => TextSpan(
+                text: catalystId?.username,
+                style: context.textTheme.labelMedium?.copyWith(
+                  color: context.colors.textOnPrimaryLevel1,
+                ),
+              ),
+              _ => throw ArgumentError('Unknown placeholder', placeholder),
+            };
+          },
+        ),
+        CatalystIdText(
+          catalystId!,
+          isCompact: true,
+          showCopy: false,
+          showUsername: true,
+        ),
+        DayMonthTimeText(
+          dateTime: invitedAt,
+          showTimezone: true,
+          timestampTextStyle: context.textTheme.bodySmall,
+          timezoneTextStyle: context.textTheme.bodySmall,
+        ),
+      ],
+    );
   }
 }

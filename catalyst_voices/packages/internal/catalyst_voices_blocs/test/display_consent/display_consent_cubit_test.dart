@@ -67,7 +67,7 @@ void main() {
           return cubit;
         },
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
         },
         verify: (_) {
           verify(() => userService.watchUnlockedActiveAccount).called(1);
@@ -87,7 +87,7 @@ void main() {
           return cubit;
         },
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
           final catalystId = CatalystIdFactory.create();
           final mockKeychain = _MockKeychain();
           when(() => mockKeychain.id).thenReturn('test-keychain');
@@ -147,7 +147,7 @@ void main() {
           return cubit;
         },
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
           accountController.add(null);
         },
         verify: (_) {
@@ -197,7 +197,7 @@ void main() {
         build: () => cubit,
         act: (cubit) async {
           // Initialize and populate the cubit
-          await cubit.init();
+          cubit.init();
           final mockKeychain = _MockKeychain();
           when(() => mockKeychain.id).thenReturn('test-keychain');
           final account = Account.dummy(
@@ -251,7 +251,7 @@ void main() {
         'changes consent status to denied and submits action',
         build: () => cubit,
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
           final mockKeychain = _MockKeychain();
           when(() => mockKeychain.id).thenReturn('test-keychain');
           final account = Account.dummy(
@@ -304,7 +304,7 @@ void main() {
         'updates lastDisplayConsentUpdate when changing status',
         build: () => cubit,
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
           final mockKeychain = _MockKeychain();
           when(() => mockKeychain.id).thenReturn('test-keychain');
           final account = Account.dummy(
@@ -349,7 +349,7 @@ void main() {
           return cubit;
         },
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
           final mockKeychain = _MockKeychain();
           when(() => mockKeychain.id).thenReturn('test-keychain');
           final account = Account.dummy(
@@ -397,7 +397,7 @@ void main() {
         'does nothing when proposal is not found',
         build: () => cubit,
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
           final mockKeychain = _MockKeychain();
           when(() => mockKeychain.id).thenReturn('test-keychain');
           final account = Account.dummy(
@@ -437,7 +437,7 @@ void main() {
         'handles multiple proposals correctly',
         build: () => cubit,
         act: (cubit) async {
-          await cubit.init();
+          cubit.init();
           final mockKeychain = _MockKeychain();
           when(() => mockKeychain.id).thenReturn('test-keychain');
           final account = Account.dummy(
@@ -524,7 +524,7 @@ void main() {
           ),
         ).thenAnswer((_) => proposalController.stream);
 
-        await cubit.init();
+        cubit.init();
         await cubit.close();
 
         // Controllers won't have listeners after close

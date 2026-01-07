@@ -10,9 +10,11 @@ class DisplayConsentLastUpdateText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final date = this.date;
+
     if (date != null) {
       return DayMonthTimeText(
-        dateTime: date!,
+        dateTime: date,
         showTimezone: true,
         timestampTextStyle: context.textTheme.labelSmall,
         timezoneTextStyle: context.textTheme.labelSmall,

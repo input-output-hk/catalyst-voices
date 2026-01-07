@@ -52,9 +52,11 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
         );
         _cache = _cache.copyWith(proposalsDisplayConsent: updatedProposalsDisplayConsent);
       } catch (e) {
-        emit(state.copyWith(items: _cache.proposalsDisplayConsent));
+        if (!isClosed) {
+          emit(state.copyWith(items: _cache.proposalsDisplayConsent));
 
-        emitError(LocalizedException.create(e));
+          emitError(LocalizedException.create(e));
+        }
       }
     }
   }
@@ -70,9 +72,9 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
     return super.close();
   }
 
-  Future<void> init() async {
-    await _setupActiveAccountIdSubscription();
-    await _setupProposalDisplayConsentSubscription();
+  void init() {
+    unawaited(_setupActiveAccountIdSubscription());
+    unawaited(_setupProposalDisplayConsentSubscription());
   }
 
   void _handleActiveAccountIdChange(CatalystId? catalystId) {
