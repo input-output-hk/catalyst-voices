@@ -10,23 +10,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-  setUpAll(() {
-    registerFallbackValue(const PageRequest(page: 0, size: 999));
-    registerFallbackValue(
-      CollaboratorInvitationsProposalsFilter(
-        CatalystIdFactory.create(),
-      ),
-    );
-    registerFallbackValue(DocumentRefFactory.signedDocumentRef());
-    registerFallbackValue(CollaboratorProposalAction.acceptInvitation);
-  });
-
   group(DisplayConsentCubit, () {
     late _MockUserService userService;
     late _MockProposalService proposalService;
     late DisplayConsentCubit cubit;
     late StreamController<Account?> accountController;
     late StreamController<Page<ProposalBriefData>> proposalController;
+
+    setUpAll(() {
+      registerFallbackValue(const PageRequest(page: 0, size: 999));
+      registerFallbackValue(
+        CollaboratorInvitationsProposalsFilter(
+          CatalystIdFactory.create(),
+        ),
+      );
+      registerFallbackValue(DocumentRefFactory.signedDocumentRef());
+      registerFallbackValue(CollaboratorProposalAction.acceptInvitation);
+    });
 
     setUp(() {
       userService = _MockUserService();
