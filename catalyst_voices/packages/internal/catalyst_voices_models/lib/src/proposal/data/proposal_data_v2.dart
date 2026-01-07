@@ -54,7 +54,7 @@ final class ProposalDataV2 extends Equatable {
       collaboratorsActions: collaboratorsActions,
       prevCollaborators: prevCollaborators,
       prevAuthors: prevAuthors,
-      createdAt: id.ver?.dateTime,
+      createdAt: id.ver?.tryDateTime,
     );
 
     return ProposalDataV2(
