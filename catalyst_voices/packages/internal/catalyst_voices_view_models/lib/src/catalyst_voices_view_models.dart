@@ -21,6 +21,7 @@ export 'category/dropdown_menu_view_model.dart';
 export 'collaborators/collaborator.dart';
 export 'collaborators/collaborator_catalyst_id.dart';
 export 'collaborators/collaborator_invitation_state.dart';
+export 'collaborators/collaborator_proposal_display_consent.dart';
 export 'collaborators/collaborator_state.dart';
 export 'collaborators/collaborator_validation_result_localization.dart';
 export 'collaborators/collaborators.dart';

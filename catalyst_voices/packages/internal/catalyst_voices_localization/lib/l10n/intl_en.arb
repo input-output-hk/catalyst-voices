@@ -145,6 +145,14 @@
   "@allProposals": {
     "description": "text indicating to view all proposals"
   },
+  "allow": "Allow",
+  "@allow": {
+    "description": "new status to be set for display consent"
+  },
+  "allowed": "Allowed",
+  "@allowed": {
+    "description": "status of user action for display consent"
+  },
   "andSign": "&",
   "@andSign": {
     "description": "Generic and sign"
@@ -1020,6 +1028,14 @@
   "deleteLocalVersionIfWantToPublishThisVersion": "If you want to publish this iteration as final, please delete the local draft.",
   "@deleteLocalVersionIfWantToPublishThisVersion": {
     "description": "Message shown when user tries to publish a draft proposal as final proposal but there is a newer local draft proposal."
+  },
+  "denied": "Denied",
+  "@denied": {
+    "description": "status of user action for display consent"
+  },
+  "deny": "Deny",
+  "@deny": {
+    "description": "new status to be set for display consent"
   },
   "description": "Description",
   "@description": {
@@ -1901,6 +1917,15 @@
   "invitationsAndApprovals": "Invitations & Approvals",
   "@invitationsAndApprovals": {
     "description": "CTA to show Invitations and Approvals"
+  },
+  "invitedBy": "Invited by {username}",
+  "@invitedBy": {
+    "description": "Information about who invited user",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
   },
   "joinNewsletter": "Join Newsletter",
   "@joinNewsletter": {

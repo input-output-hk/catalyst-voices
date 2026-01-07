@@ -1,4 +1,6 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/actions/co_proposers_consent/widgets/proposal_display_consent_card.dart';
+import 'package:catalyst_voices/pages/actions/widgets/actions_decorated_sliver_panel.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DisplayConsentList extends StatelessWidget {
@@ -6,30 +8,20 @@ class DisplayConsentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cards = [1, 2, 3, 4, 5];
-    return SliverPadding(
-      padding: const EdgeInsets.only(top: 8, bottom: 16),
-      sliver: DecoratedSliver(
-        decoration: BoxDecoration(
-          color: context.colors.elevationsOnSurfaceNeutralLv1Grey,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        sliver: SliverPadding(
-          padding: const EdgeInsets.all(16),
-          sliver: SliverList.separated(
-            itemCount: cards.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              return Container(
-                height: 120,
-                color: Colors.grey[300],
-                child: Center(
-                  child: Text('Card ${cards[index]}'),
-                ),
-              );
-            },
-          ),
-        ),
+    final cards = [1, 2, 3];
+    return ActionsDecoratedSliverPanel(
+      sliver: SliverList.separated(
+        itemCount: cards.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          return ProposalDisplayConsentCard(
+            proposalDisplayConsent: CollaboratorProposalDisplayConsent.empty(
+              CollaboratorDisplayConsentStatus.values[index],
+            ),
+            // onTap: () => ProposalRoute(proposalId: proposalId).go(context),
+            onSelected: (val) {},
+          );
+        },
       ),
     );
   }
