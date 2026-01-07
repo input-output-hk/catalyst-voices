@@ -1,6 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 abstract final class CatalystIdFactory {
   CatalystIdFactory._();
@@ -17,5 +17,45 @@ abstract final class CatalystIdFactory {
       role0Key: role0Key,
       username: username,
     );
+  }
+
+  static void registerDummyKeyFactory() {
+    CatalystPublicKey.factory = _DummyCatalystPublicKeyFactory();
+  }
+}
+
+@immutable
+class _DummyCatalystPublicKey implements CatalystPublicKey {
+  @override
+  final Uint8List bytes;
+
+  const _DummyCatalystPublicKey({required this.bytes});
+
+  @override
+  int get hashCode => const DeepCollectionEquality().hash(bytes);
+
+  @override
+  Uint8List get publicKeyBytes => bytes;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! _DummyCatalystPublicKey) return false;
+
+    return const DeepCollectionEquality().equals(other.bytes, bytes);
+  }
+
+  @override
+  Future<bool> verify(
+    Uint8List data, {
+    required CatalystSignature signature,
+  }) {
+    return Future(() => true);
+  }
+}
+
+class _DummyCatalystPublicKeyFactory implements CatalystPublicKeyFactory {
+  @override
+  CatalystPublicKey create(Uint8List bytes) {
+    return _DummyCatalystPublicKey(bytes: bytes);
   }
 }

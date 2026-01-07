@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -54,7 +53,7 @@ void main() {
         '$ProposalLimitReachedException when over limit', () async {
       final proposalRef = SignedDocumentRef.generateFirstRef();
       final categoryId = SignedDocumentRef.generateFirstRef();
-      final catalystId = DummyCatalystIdFactory.create();
+      final catalystId = CatalystIdFactory.create();
       final account = Account.dummy(
         catalystId: catalystId,
         keychain: MockKeychain(),
