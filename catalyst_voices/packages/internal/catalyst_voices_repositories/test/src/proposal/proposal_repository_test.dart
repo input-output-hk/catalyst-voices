@@ -509,7 +509,7 @@ void main() {
         ).thenAnswer((_) async => mockOriginalDocument);
 
         when(
-          () => mockSignedDocumentManager.signDocument(
+          () => mockSignedDocumentManager.signRawDocument(
             any(),
             metadata: any(named: 'metadata'),
             catalystId: any(named: 'catalystId'),
@@ -531,7 +531,7 @@ void main() {
 
         // Then
         verify(
-          () => mockSignedDocumentManager.signDocument(
+          () => mockSignedDocumentManager.signRawDocument(
             any(),
             metadata: any(
               named: 'metadata',

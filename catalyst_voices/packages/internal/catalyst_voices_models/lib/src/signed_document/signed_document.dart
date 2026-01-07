@@ -21,7 +21,7 @@ abstract interface class SignedDocument {
   SignedDocumentPayload get payload;
 
   /// A binary representation of the [payload].
-  /// 
+  ///
   /// Might be compressed.
   SignedDocumentRawPayload get rawPayload;
 
