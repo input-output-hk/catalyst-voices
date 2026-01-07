@@ -65,6 +65,7 @@ ciphertext
 ciphertexts
 CIPs
 CNFT
+COAP
 COCOAPODS
 codegen
 codepoints
@@ -151,8 +152,8 @@ hackathon
 Hackathons
 headful
 headlessui
-healthz
 healthcheckv
+healthz
 HIDPI
 hotfixes
 hotspots
@@ -177,6 +178,7 @@ iohk
 IPFS
 iphoneos
 iphonesimulator
+IPLD
 jaegertracing
 jdbc
 jetbrains

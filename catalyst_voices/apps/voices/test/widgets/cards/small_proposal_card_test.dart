@@ -30,6 +30,7 @@ void main() {
       localVersion = const Uuid().v7();
       mockProposal = UsersProposalOverview(
         selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+        parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
         title: 'Test Proposal',
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),
@@ -66,7 +67,6 @@ void main() {
         fundNumber: 14,
         commentsCount: 0,
         category: 'Cardano Use Cases: Concept',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         fromActiveCampaign: true,
       );
     });

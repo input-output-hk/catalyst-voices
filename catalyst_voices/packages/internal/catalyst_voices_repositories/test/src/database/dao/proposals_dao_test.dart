@@ -411,19 +411,19 @@ void main() {
           () async {
             // Given
             final userId = DummyCatalystIdFactory.create(username: 'damian');
-            final categoryId = _getCategoryId();
+            final categoryRef = _getCategoryRef();
 
             final proposalOneRef = DocumentRefFactory.signedDocumentRef();
             final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(
                 selfRef: proposalOneRef,
-                categoryId: _getCategoryId(index: 1),
+                categoryRef: _getCategoryRef(index: 1),
               ),
               _buildProposal(
                 selfRef: proposalTwoRef,
                 author: userId,
-                categoryId: categoryId,
+                categoryRef: categoryRef,
               ),
             ];
             final favorites = [
@@ -433,10 +433,11 @@ void main() {
               _buildProposalAction(
                 action: ProposalSubmissionActionDto.aFinal,
                 proposalRef: proposalTwoRef,
+                categoryRef: categoryRef,
               ),
             ];
 
-            final filters = ProposalsCountFilters(category: categoryId);
+            final filters = ProposalsCountFilters(category: categoryRef);
             const expectedCount = ProposalsCount(
               total: 1,
               finals: 1,
@@ -761,7 +762,7 @@ void main() {
         () async {
           // Given
           final templateRef = DocumentRefFactory.signedDocumentRef();
-          final categoryId = _getCategoryId();
+          final categoryRef = _getCategoryRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -771,21 +772,21 @@ void main() {
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4)),
               template: templateRef,
-              categoryId: categoryId,
+              categoryRef: categoryRef,
             ),
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 2)),
               template: templateRef,
-              categoryId: categoryId,
+              categoryRef: categoryRef,
             ),
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 3)),
               template: templateRef,
-              categoryId: categoryId,
+              categoryRef: categoryRef,
             ),
             _buildProposal(
               template: templateRef,
-              categoryId: _getCategoryId(index: 1),
+              categoryRef: _getCategoryRef(index: 1),
             ),
           ];
 
@@ -794,7 +795,7 @@ void main() {
               .map((proposal) => proposal.document.ref)
               .toList();
 
-          final filters = ProposalsFilters(category: categoryId);
+          final filters = ProposalsFilters(category: categoryRef);
           const order = UpdateDate(isAscending: true);
 
           // When
@@ -1671,18 +1672,18 @@ void main() {
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 2)),
               template: templateRef,
-              categoryId: _getCategoryId(index: 1),
+              categoryRef: _getCategoryRef(index: 1),
             ),
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 3)),
               template: templateRef,
-              categoryId: _getCategoryId(index: 1),
+              categoryRef: _getCategoryRef(index: 1),
             ),
           ];
 
           final expectedRefs = proposals
               .where(
-                (p) => p.document.metadata.categoryId == _getCategoryId(index: 1),
+                (p) => p.document.metadata.parameters.contains(_getCategoryRef(index: 1)),
               )
               .map((proposal) => proposal.document.ref)
               .toList();
@@ -1692,7 +1693,7 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            categoryRef: _getCategoryId(index: 1),
+            categoryRef: _getCategoryRef(index: 1),
             filters: const ProposalsFilters(),
           );
 
@@ -2001,17 +2002,16 @@ DocumentEntityWithMetadata _buildProposal({
   String? title,
   CatalystId? author,
   String? contentAuthorName,
-  SignedDocumentRef? categoryId,
+  SignedDocumentRef? categoryRef,
   Coin? requestedFunds,
 }) {
-  final metadata = DocumentDataMetadata(
-    type: DocumentType.proposalDocument,
-    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-    template: template ?? DocumentRefFactory.signedDocumentRef(),
+  final metadata = DocumentDataMetadataFactory.proposal(
+    selfRef: selfRef,
+    template: template,
     authors: [
       if (author != null) author,
     ],
-    categoryId: categoryId ?? _getCategoryId(),
+    parameters: DocumentParameters({categoryRef ?? _getCategoryRef()}),
   );
   final content = DocumentDataContent({
     if (title != null || contentAuthorName != null)
@@ -2051,14 +2051,15 @@ DocumentEntityWithMetadata _buildProposal({
 }
 
 DocumentEntityWithMetadata _buildProposalAction({
-  DocumentRef? selfRef,
+  SignedDocumentRef? selfRef,
   required ProposalSubmissionActionDto action,
-  required DocumentRef proposalRef,
+  required SignedDocumentRef proposalRef,
+  SignedDocumentRef? categoryRef,
 }) {
-  final metadata = DocumentDataMetadata(
-    type: DocumentType.proposalActionDocument,
-    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-    ref: proposalRef,
+  final metadata = DocumentDataMetadataFactory.proposalAction(
+    selfRef: selfRef,
+    proposalRef: proposalRef,
+    parameters: DocumentParameters({categoryRef ?? _getCategoryRef()}),
   );
   final dto = ProposalSubmissionActionDocumentDto(action: action);
   final content = DocumentDataContent(dto.toJson());
@@ -2075,12 +2076,11 @@ DocumentEntityWithMetadata _buildProposalAction({
 
 DocumentEntityWithMetadata _buildProposalComment({
   SignedDocumentRef? selfRef,
-  required DocumentRef proposalRef,
+  required SignedDocumentRef proposalRef,
 }) {
-  final metadata = DocumentDataMetadata(
-    type: DocumentType.commentDocument,
+  final metadata = DocumentDataMetadataFactory.comment(
     selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-    ref: proposalRef,
+    proposalRef: proposalRef,
   );
   const content = DocumentDataContent({});
 
@@ -2109,10 +2109,7 @@ DocumentFavoriteEntity _buildProposalFavorite({
 DocumentEntityWithMetadata _buildProposalTemplate({
   SignedDocumentRef? selfRef,
 }) {
-  final metadata = DocumentDataMetadata(
-    type: DocumentType.proposalTemplate,
-    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-  );
+  final metadata = DocumentDataMetadataFactory.proposalTemplate(selfRef: selfRef);
   const content = DocumentDataContent({});
 
   final document = DocumentFactory.build(
@@ -2134,10 +2131,11 @@ String _buildUuidAt(DateTime dateTime) {
   return const Uuid().v7(config: config);
 }
 
-SignedDocumentRef _getCategoryId({
+SignedDocumentRef _getCategoryRef({
+  DocumentRef campaignRef = Campaign.f14Ref,
   int index = 0,
 }) {
-  return activeConstantDocumentRefs.elementAtOrNull(index)?.category ??
+  return constantDocumentRefsPerCampaign(campaignRef).elementAtOrNull(index)?.category ??
       _dummyCategoriesCache.putIfAbsent(index, DocumentRefFactory.signedDocumentRef);
 }
 

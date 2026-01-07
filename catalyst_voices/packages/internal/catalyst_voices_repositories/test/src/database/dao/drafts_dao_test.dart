@@ -75,14 +75,12 @@ void main() {
 
           final drafts = <DocumentDraftEntity>[
             DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
+              metadata: DocumentDataMetadataFactory.proposal(
                 selfRef: DraftRef(id: id, version: firstVersionId),
               ),
             ),
             DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
+              metadata: DocumentDataMetadataFactory.proposal(
                 selfRef: DraftRef(id: id, version: secondVersionId),
               ),
             ),
@@ -134,8 +132,7 @@ void main() {
           );
           final drafts = refs.map((ref) {
             return DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
+              metadata: DocumentDataMetadataFactory.proposal(
                 selfRef: ref,
               ),
             );
@@ -165,8 +162,7 @@ void main() {
           final ref = DocumentRefFactory.draftRef();
           // Given
           final draft = DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
+            metadata: DocumentDataMetadataFactory.proposal(
               selfRef: ref,
               authors: [
                 authorId1,
@@ -197,8 +193,7 @@ void main() {
           final ref = DocumentRefFactory.draftRef();
           // Given
           final draft = DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
+            metadata: DocumentDataMetadataFactory.proposal(
               selfRef: ref,
               authors: [
                 authorId1,
@@ -246,15 +241,13 @@ void main() {
           final updatedId = originalId.copyWith(username: const Optional('dev'));
 
           final draft1 = DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
+            metadata: DocumentDataMetadataFactory.proposal(
               selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [originalId],
             ),
           );
           final draft2 = DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
+            metadata: DocumentDataMetadataFactory.proposal(
               selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [updatedId],
             ),
@@ -297,8 +290,7 @@ void main() {
             2,
             (index) {
               return DraftFactory.build(
-                metadata: DocumentDataMetadata(
-                  type: DocumentType.proposalDocument,
+                metadata: DocumentDataMetadataFactory.proposal(
                   selfRef: DraftRef(
                     id: id,
                     version: DocumentRefFactory.randomUuidV7(),
@@ -328,14 +320,12 @@ void main() {
           final version = DocumentRefFactory.randomUuidV7();
           final drafts = <DocumentDraftEntity>[
             DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
+              metadata: DocumentDataMetadataFactory.proposal(
                 selfRef: DraftRef(id: id, version: version),
               ),
             ),
             DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
+              metadata: DocumentDataMetadataFactory.proposal(
                 selfRef: DraftRef.first(id),
               ),
             ),
@@ -413,8 +403,7 @@ void main() {
           final drafts = List.generate(
             5,
             (index) => DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
+              metadata: DocumentDataMetadataFactory.proposal(
                 selfRef: DraftRef(id: id, version: const Uuid().v7()),
               ),
             ),
@@ -450,8 +439,7 @@ void main() {
           final ref = DocumentRefFactory.draftRef();
 
           final draft = DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
+            metadata: DocumentDataMetadataFactory.proposal(
               selfRef: ref,
             ),
           );

@@ -51,14 +51,14 @@ final class LoadDefaultProposalCategoryEvent extends ProposalBuilderEvent {
 }
 
 final class LoadProposalCategoryEvent extends ProposalBuilderEvent {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
 
   const LoadProposalCategoryEvent({
-    required this.categoryId,
+    required this.categoryRef,
   });
 
   @override
-  List<Object?> get props => [categoryId];
+  List<Object?> get props => [categoryRef];
 }
 
 final class LoadProposalEvent extends ProposalBuilderEvent {

@@ -8,13 +8,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class CategoryProposalsDetailsCard extends StatelessWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
   final String categoryName;
   final int categoryProposalsCount;
 
   const CategoryProposalsDetailsCard({
     super.key,
-    required this.categoryId,
+    required this.categoryRef,
     required this.categoryName,
     required this.categoryProposalsCount,
   });
@@ -45,7 +45,7 @@ class CategoryProposalsDetailsCard extends StatelessWidget {
             child: VoicesOutlinedButton(
               child: Text(context.l10n.viewProposals),
               onTap: () {
-                ProposalsRoute.fromRef(categoryRef: categoryId).go(context);
+                ProposalsRoute.fromRef(categoryRef: categoryRef).go(context);
               },
             ),
           ),
