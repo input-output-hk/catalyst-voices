@@ -85,13 +85,23 @@ abstract interface class DocumentRepository {
   /// latest [DocumentData] which of [authorId] and check
   /// username used in [CatalystId] in that document.
   Future<DocumentData?> getLatestDocument({
+    DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? category,
   });
 
   /// Returns count of documents matching [ref] id and [type].
   Future<int> getRefCount({
     required DocumentRef ref,
     required DocumentType type,
+  });
+
+  /// Returns list of known refs given provided filters.
+  Future<List<DocumentRef>> getRefs({
+    DocumentType? type,
+    CampaignFilters? campaign,
+    int limit,
+    int offset,
   });
 
   Future<DocumentData?> getRefToDocumentData({
@@ -273,7 +283,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required Campaign campaign,
   }) async {
     final allRefs = await _remoteDocuments.index(campaign: campaign).then(_uniqueTypedRefs);
-    final allConstRefs = allConstantDocumentRefs.expand((element) => element.all);
+    final allConstRefs = constantDocumentRefsPerCampaign(
+      campaign.selfRef,
+    ).expand((element) => element.all);
 
     final nonConstRefs = allRefs
         .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
@@ -294,7 +306,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
-      ...activeConstantDocumentRefs.expand(
+      ...constantDocumentRefsPerCampaign(campaign.selfRef).expand(
         (element) => element.allTyped.where((e) => !e.type.isCategory),
       ),
       ...allLatestRefs,
@@ -328,11 +340,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     };
   }
 
+  // TODO(damian-molinski): this will be removed and replaced on performance branch so
+  // i'm not implementing drafts now.
   @override
   Future<DocumentData?> getLatestDocument({
+    DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? category,
   }) async {
-    final latestDocument = await _localDocuments.getLatest(authorId: authorId);
+    final latestDocument = await _localDocuments.getLatest(
+      type: type,
+      authorId: authorId,
+      category: category,
+    );
     final latestDraft = await _drafts.getLatest(authorId: authorId);
 
     return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
@@ -344,6 +364,21 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
   }) {
     return _localDocuments.getRefCount(ref: ref, type: type);
+  }
+
+  @override
+  Future<List<DocumentRef>> getRefs({
+    DocumentType? type,
+    CampaignFilters? campaign,
+    int limit = 100,
+    int offset = 0,
+  }) {
+    return _localDocuments.getRefs(
+      type: type,
+      campaign: campaign,
+      limit: limit,
+      offset: offset,
+    );
   }
 
   @override
@@ -658,13 +693,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   bool _isDocumentMetadataValid(DocumentData document) {
     final template = document.metadata.template;
-    final category = document.metadata.categoryId;
     final documentType = document.metadata.type;
 
     final isInvalidTemplate = template == null || !template.isValid;
-    final isInvalidCategory = category == null || !category.isValid;
     final isInvalidType = documentType == DocumentType.unknown;
-    final isInvalidProposal = isInvalidTemplate || isInvalidType || isInvalidCategory;
+    final isInvalidProposal = isInvalidTemplate || isInvalidType;
 
     return !isInvalidProposal;
   }
@@ -736,7 +769,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   void _validateDocumentMetadata(DocumentData document) {
     if (!_isDocumentMetadataValid(document)) {
-      throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformed);
+      throw const DocumentImportInvalidDataException(DocumentMetadataMalformedException);
     }
   }
 

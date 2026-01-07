@@ -18,6 +18,9 @@ abstract interface class UserService implements ActiveAware {
     RegistrationStatusPoller registrationStatusPoller,
   ) = UserServiceImpl;
 
+  /// Returns the active account's id from the current [user].
+  CatalystId get activeAccountId;
+
   User get user;
 
   /// Returns [Account] when keychain is unlocked, otherwise returns `null`.
@@ -112,6 +115,18 @@ final class UserServiceImpl implements UserService {
     this._userObserver,
     this._registrationStatusPoller,
   );
+
+  @override
+  CatalystId get activeAccountId {
+    final account = user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain activeAccountId , account missing',
+      );
+    }
+
+    return account.catalystId;
+  }
 
   @override
   bool get isActive => _userObserver.isActive;

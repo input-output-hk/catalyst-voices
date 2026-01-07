@@ -9,7 +9,7 @@ abstract interface class CampaignRepository {
     required String id,
   });
 
-  Future<CampaignCategory?> getCategory(SignedDocumentRef ref);
+  Future<CampaignCategory?> getCategory(DocumentParameters parameters);
 }
 
 final class CampaignRepositoryImpl implements CampaignRepository {
@@ -19,19 +19,18 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    if (id == Campaign.f15Ref.id) {
-      return Campaign.f15();
-    }
-    if (id == Campaign.f14Ref.id) {
-      return Campaign.f14();
+    for (final campaign in Campaign.all) {
+      if (id == campaign.selfRef.id) {
+        return campaign;
+      }
     }
     throw NotFoundException(message: 'Campaign $id not found');
   }
 
   @override
-  Future<CampaignCategory?> getCategory(SignedDocumentRef ref) async {
+  Future<CampaignCategory?> getCategory(DocumentParameters parameters) async {
     return Campaign.all
         .expand((element) => element.categories)
-        .firstWhereOrNull((e) => e.selfRef.id == ref.id);
+        .firstWhereOrNull((e) => parameters.containsId(e.selfRef.id));
   }
 }

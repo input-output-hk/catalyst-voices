@@ -45,11 +45,11 @@ abstract interface class ProposalRepository {
     required ProposalsOrder order,
   });
 
-  /// Returns [ProposalTemplate] for matching [ref].
+  /// Returns [ProposalTemplate] which belongs to [category].
   ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+  /// Returns null if no matching template is found.
+  Future<ProposalTemplate?> getProposalTemplate({
+    required DocumentRef category,
   });
 
   Future<void> publishProposal({
@@ -59,9 +59,7 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentDataMetadata metadata,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -191,12 +189,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+  Future<ProposalTemplate?> getProposalTemplate({
+    required DocumentRef category,
   }) async {
-    final proposalDocument = await _documentRepository.getDocumentData(ref: ref);
+    final document = await _documentRepository.getLatestDocument(
+      type: DocumentType.proposalTemplate,
+      category: category,
+    );
 
-    return _buildProposalTemplate(documentData: proposalDocument);
+    if (document == null) {
+      return null;
+    }
+
+    return _buildProposalTemplate(documentData: document);
   }
 
   @override
@@ -207,7 +212,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) async {
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(document.content.data),
-      metadata: _createProposalMetadata(document.metadata),
+      metadata: document.metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -217,9 +222,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentDataMetadata metadata,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -227,16 +230,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
-      metadata: SignedDocumentMetadata(
-        contentType: SignedDocumentContentType.json,
-        documentType: DocumentType.proposalActionDocument,
-        id: actionRef.id,
-        ver: actionRef.version,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
-      ),
+      metadata: metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -410,7 +407,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
-      categoryId: documentData.metadata.categoryId!,
+      parameters: documentData.metadata.parameters,
       authors: documentData.metadata.authors ?? [],
     );
 
@@ -435,6 +432,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final metadata = ProposalTemplateMetadata(
       selfRef: documentData.metadata.selfRef,
+      parameters: documentData.metadata.parameters,
     );
 
     final contentData = documentData.content.data;
@@ -443,22 +441,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return ProposalTemplate(
       metadata: metadata,
       schema: schema,
-    );
-  }
-
-  SignedDocumentMetadata _createProposalMetadata(
-    DocumentDataMetadata metadata,
-  ) {
-    final template = metadata.template;
-    final categoryId = metadata.categoryId;
-
-    return SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-      documentType: DocumentType.proposalDocument,
-      id: metadata.id,
-      ver: metadata.version,
-      template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
-      categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );
   }
 
