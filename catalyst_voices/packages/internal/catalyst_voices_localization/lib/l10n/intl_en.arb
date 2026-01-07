@@ -2193,6 +2193,14 @@
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
   },
+  "noInvitesYet": "No invites yet",
+  "@noInvitesYet": {
+    "description": "Title for empty state when user has no invites"
+  },
+  "noInvitesYetDescription": "Once you’re invited to a proposal, it will appear here.",
+  "@noInvitesYetDescription": {
+    "description": "Description for empty state when user has no invites"
+  },
   "noLocalUserProposals": "No Local proposals found",
   "@noLocalUserProposals": {
     "description": "Title shown when user has no local proposals in workspace"

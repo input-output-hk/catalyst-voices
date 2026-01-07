@@ -223,6 +223,12 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<UserService>(),
         );
+      })
+      ..registerFactory<DisplayConsentCubit>(() {
+        return DisplayConsentCubit(
+          get<UserService>(),
+          get<ProposalService>(),
+        );
       });
   }
 

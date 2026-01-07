@@ -18,6 +18,17 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> {
   DisplayConsentCubit(this._userService, this._proposalService)
     : super(const DisplayConsentState());
 
+  Future<void> changeDisplayConsent({
+    required DocumentRef id,
+    required CollaboratorDisplayConsentStatus displayConsentStatus,
+  }) async {
+    // TODO(LynxLynxx): Test it when available
+    final collaboratorAction = displayConsentStatus.toCollaboratorAction();
+    if (collaboratorAction != null) {
+      await _proposalService.submitCollaboratorProposalAction(ref: id, action: collaboratorAction);
+    }
+  }
+
   @override
   Future<void> close() async {
     await _activeAccountIdSub?.cancel();
@@ -54,7 +65,8 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> {
   }
 
   void _rebuildState() {
-    emit(state.copyWith(items: _cache.proposalsDisplayConsent));
+    final newCosents = state.consents.copyWith(items: _cache.proposalsDisplayConsent);
+    emit(state.copyWith(consents: newCosents));
   }
 
   Future<void> _setupActiveAccountIdSubscription() async {

@@ -69,7 +69,10 @@ class ProposalDisplayConsentCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                InvitedByText(catalystId: proposalDisplayConsent.originalAuthor, invitedAt: proposalDisplayConsent.invitedAt),
+                InvitedByText(
+                  catalystId: proposalDisplayConsent.originalAuthor,
+                  invitedAt: proposalDisplayConsent.invitedAt,
+                ),
               ],
             ),
           ),

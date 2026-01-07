@@ -22,7 +22,6 @@ enum CollaboratorDisplayConsentStatus {
       _ => CollaboratorDisplayConsentStatus.pending,
     };
   }
-
   SvgGenImage get icons {
     return switch (this) {
       pending => VoicesAssets.icons.clock,
@@ -44,6 +43,14 @@ enum CollaboratorDisplayConsentStatus {
       pending => context.l10n.collaboratorInvitationStatusPending,
       allowed => context.l10n.allowed,
       denied => context.l10n.denied,
+    };
+  }
+
+  CollaboratorProposalAction? toCollaboratorAction() {
+    return switch (this) {
+      CollaboratorDisplayConsentStatus.allowed => CollaboratorProposalAction.acceptInvitation,
+      CollaboratorDisplayConsentStatus.denied => CollaboratorProposalAction.rejectInvitation,
+      _ => null,
     };
   }
 }
