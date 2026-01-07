@@ -155,7 +155,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
 
     return _CoseSignedDocument(
       coseSign: coseSign,
-      payload: payload,
+      payload: parsedPayload,
       metadata: metadata,
       signers: [catalystId],
     );
