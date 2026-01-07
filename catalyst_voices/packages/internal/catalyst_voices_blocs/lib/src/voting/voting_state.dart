@@ -75,7 +75,7 @@ class VotingState extends Equatable {
     categorySelectorItems,
   ];
 
-  SignedDocumentRef? get selectedCategoryRef {
+  SignedDocumentRef? get selectedCategoryId {
     return categorySelectorItems.singleWhereOrNull((element) => element.isSelected)?.ref;
   }
 

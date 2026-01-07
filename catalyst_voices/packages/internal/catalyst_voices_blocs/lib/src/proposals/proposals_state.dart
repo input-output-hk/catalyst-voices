@@ -11,7 +11,7 @@ final class ProposalsCategoryState extends Equatable {
   @override
   List<Object?> get props => [items];
 
-  SignedDocumentRef? get selectedCategoryRef {
+  SignedDocumentRef? get selectedCategoryId {
     return items.singleWhereOrNull((element) => element.isSelected)?.ref;
   }
 }

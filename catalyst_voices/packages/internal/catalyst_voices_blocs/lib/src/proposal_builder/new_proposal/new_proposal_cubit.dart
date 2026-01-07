@@ -49,13 +49,13 @@ class NewProposalCubit extends Cubit<NewProposalState>
       emit(state.copyWith(isCreatingProposal: true));
 
       final title = state.title.value;
-      final categoryRef = state.categoryRef;
+      final categoryId = state.categoryRef;
 
-      if (categoryRef == null) {
+      if (categoryId == null) {
         throw StateError('Cannot create draft, category not selected');
       }
 
-      final template = await _proposalService.getProposalTemplate(category: categoryRef);
+      final template = await _proposalService.getProposalTemplate(category: categoryId);
       final parameters = template.metadata.parameters;
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
@@ -177,13 +177,12 @@ class NewProposalCubit extends Cubit<NewProposalState>
   Future<void> _updateCampaignCategoriesState() async {
     final campaign = _cache.activeCampaign;
     final campaignTotalAsk = _cache.campaignTotalAsk ?? const CampaignTotalAsk(categoriesAsks: {});
-    final preselectedCategory = _cache.categoryRef;
 
     // TODO(LynxLynxx): when we have separate proposal template for generic questions use it here
     // right now user can start creating proposal without selecting category.
     // Right now every category have the same requirements for title so we can do a fallback for
     // first category from the list.
-    final categoryId = preselectedCategory ?? campaign?.categories.firstOrNull?.id;
+    final categoryId = _cache.categoryRef ?? campaign?.categories.firstOrNull?.id;
     final campaignCategories = campaign?.categories ?? [];
 
     final template = categoryId != null

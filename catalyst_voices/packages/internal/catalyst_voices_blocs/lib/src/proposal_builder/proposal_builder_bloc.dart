@@ -470,10 +470,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         throw StateError('Cannot load proposal, active campaign not found');
       }
       final category = campaign.categories.first;
-      final categoryRef = category.id;
       final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
 
-      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryRef);
+      final proposalTemplate = await _proposalService.getProposalTemplate(category: category.id);
       final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
@@ -564,15 +563,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     LoadProposalCategoryEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final categoryRef = event.categoryRef;
-    _logger.info('Loading proposal category: $categoryRef');
+    final categoryId = event.categoryId;
+    _logger.info('Loading proposal category: $categoryId');
 
     await _loadState(emit, () async {
-      final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
-      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryRef);
+      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
+      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryId);
       final templateParameters = proposalTemplate.metadata.parameters;
 
-      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryRef);
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryId);
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
