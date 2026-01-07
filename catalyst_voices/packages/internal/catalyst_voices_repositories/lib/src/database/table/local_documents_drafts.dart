@@ -10,6 +10,9 @@ import 'package:drift/drift.dart';
 ///
 /// [content] will be encrypted in future.
 @DataClassName('LocalDocumentDraftEntity')
+@TableIndex(name: 'idx_local_drafts_type_authors', columns: {#type, #authorsSignificant})
+@TableIndex(name: 'idx_local_drafts_type_id', columns: {#type, #id})
+@TableIndex(name: 'idx_local_drafts_created_at', columns: {#createdAt})
 class LocalDocumentsDrafts extends Table
     with DocumentTableContentMixin, DocumentTableMetadataMixin, DocumentTableMixin {
   /// Keeps usernames of [authors].
