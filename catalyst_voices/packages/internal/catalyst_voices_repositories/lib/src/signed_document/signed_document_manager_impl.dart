@@ -66,24 +66,14 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     try {
       final compressedPayload = await _brotliCompressPayload(payload.toBytes());
 
-      final coseSign = await profiler.timeWithResult(
-        'cose_sign_doc',
-        () {
-          return CoseSign.sign(
-            protectedHeaders: const CoseHeaders.protected(),
-            unprotectedHeaders: const CoseHeaders.unprotected(),
-            payload: compressedPayload,
-            signers: [_CatalystSigner(catalystId, privateKey)],
-          );
-        },
-        debounce: true,
-      );
-
-      return _CoseSignedDocument(
-        coseSign: coseSign,
-        payload: payload,
+      return _signDocument(
         metadata: metadata,
-        signers: [catalystId],
+        protectedHeaders: const CoseHeaders.protected(),
+        unprotectedHeaders: const CoseHeaders.unprotected(),
+        rawPayload: compressedPayload,
+        parsedPayload: payload,
+        catalystId: catalystId,
+        signers: [_CatalystSigner(catalystId, privateKey)],
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
@@ -105,37 +95,27 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
         contentType: SignedDocumentContentType.json,
       );
 
-      final coseSign = await profiler.timeWithResult(
-        'cose_sign_doc',
-        () {
-          return CoseSign.sign(
-            protectedHeaders: const CoseHeaders.protected(),
-            unprotectedHeaders: const CoseHeaders.unprotected(),
-            payload: payload.bytes,
-            signers: [_CatalystSigner(catalystId, privateKey)],
-          );
-        },
-        debounce: true,
-      );
-
-      return _CoseSignedDocument(
-        coseSign: coseSign,
-        payload: parsedPayload,
+      return _signDocument(
         metadata: metadata,
-        signers: [catalystId],
+        protectedHeaders: const CoseHeaders.protected(),
+        unprotectedHeaders: const CoseHeaders.unprotected(),
+        rawPayload: payload,
+        parsedPayload: parsedPayload,
+        catalystId: catalystId,
+        signers: [_CatalystSigner(catalystId, privateKey)],
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
     }
   }
 
-  Future<Uint8List> _brotliCompressPayload(Uint8List payload) async {
+  Future<SignedDocumentRawPayload> _brotliCompressPayload(Uint8List payload) async {
     final compressed = await profiler.timeWithResult(
       'brotli_compress',
       () => brotli.compress(payload),
       debounce: true,
     );
-    return Uint8List.fromList(compressed);
+    return SignedDocumentRawPayload(Uint8List.fromList(compressed));
   }
 
   Future<Uint8List> _brotliDecompressPayload(CoseSign coseSign) async {
@@ -149,6 +129,36 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     } else {
       return coseSign.payload;
     }
+  }
+
+  Future<SignedDocument> _signDocument({
+    required DocumentDataMetadata metadata,
+    required CoseHeaders protectedHeaders,
+    required CoseHeaders unprotectedHeaders,
+    required SignedDocumentRawPayload rawPayload,
+    required SignedDocumentPayload parsedPayload,
+    required CatalystId catalystId,
+    required List<CatalystCoseSigner> signers,
+  }) async {
+    final coseSign = await profiler.timeWithResult(
+      'cose_sign_doc',
+      () {
+        return CoseSign.sign(
+          protectedHeaders: const CoseHeaders.protected(),
+          unprotectedHeaders: const CoseHeaders.unprotected(),
+          payload: rawPayload.bytes,
+          signers: signers,
+        );
+      },
+      debounce: true,
+    );
+
+    return _CoseSignedDocument(
+      coseSign: coseSign,
+      payload: payload,
+      metadata: metadata,
+      signers: [catalystId],
+    );
   }
 }
 
