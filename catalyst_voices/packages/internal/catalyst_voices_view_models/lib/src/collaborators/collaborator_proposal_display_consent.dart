@@ -80,6 +80,10 @@ class CollaboratorProposalDisplayConsent extends Equatable {
   ) {
     final collaborator = proposal.collaborators?.firstWhere(
       (collaborator) => collaborator.id.isSameAs(activeAccountId),
+      orElse: () => throw StateError(
+        'Active account is not in collaborators list. '
+        'This indicates that filters used to retrieve this proposal brief data are not correct.',
+      ),
     );
     final collaboratorStatus = collaborator?.status;
     final displayConsentStatus = CollaboratorDisplayConsentStatus.fromCollaborationStatus(
