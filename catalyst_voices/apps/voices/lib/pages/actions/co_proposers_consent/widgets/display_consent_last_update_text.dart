@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class DisplayConsentLastUpdateText extends StatelessWidget {
   final DateTime? date;
+
   const DisplayConsentLastUpdateText({super.key, this.date});
 
   @override

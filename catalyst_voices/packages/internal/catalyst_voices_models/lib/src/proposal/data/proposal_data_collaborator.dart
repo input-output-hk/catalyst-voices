@@ -8,7 +8,11 @@ class ProposalDataCollaborator extends Equatable {
   final ProposalsCollaborationStatus status;
   final DateTime? createdAt;
 
-  const ProposalDataCollaborator({required this.id, required this.status, required this.createdAt});
+  const ProposalDataCollaborator({
+    required this.id,
+    required this.status,
+    required this.createdAt,
+  });
 
   /// Creates a collaborator with status derived from the submission action.
   ///
@@ -33,7 +37,11 @@ class ProposalDataCollaborator extends Equatable {
       ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
     };
 
-    return ProposalDataCollaborator(id: id, status: status, createdAt: actionId?.id.dateTime);
+    return ProposalDataCollaborator(
+      id: id,
+      status: status,
+      createdAt: actionId?.id.dateTime,
+    );
   }
 
   @override
@@ -68,7 +76,12 @@ class ProposalDataCollaborator extends Equatable {
       final status = didAuthorPrevVersion
           ? ProposalsCollaborationStatus.left
           : ProposalsCollaborationStatus.removed;
-      return ProposalDataCollaborator(id: id, status: status, createdAt: createdAt);
+
+      return ProposalDataCollaborator(
+        id: id,
+        status: status,
+        createdAt: createdAt,
+      );
     });
 
     return [

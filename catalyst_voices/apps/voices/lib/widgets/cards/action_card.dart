@@ -47,7 +47,10 @@ class ActionCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _IconContainer(iconBackgroundColor: iconBackgroundColor, child: icon),
+            _IconContainer(
+              iconBackgroundColor: iconBackgroundColor,
+              child: icon,
+            ),
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
