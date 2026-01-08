@@ -144,8 +144,8 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       'cose_sign_doc',
       () {
         return CoseSign.sign(
-          protectedHeaders: const CoseHeaders.protected(),
-          unprotectedHeaders: const CoseHeaders.unprotected(),
+          protectedHeaders: protectedHeaders,
+          unprotectedHeaders: unprotectedHeaders,
           payload: rawPayload.bytes,
           signers: signers,
         );
