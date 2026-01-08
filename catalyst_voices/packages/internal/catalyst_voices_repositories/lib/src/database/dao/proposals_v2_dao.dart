@@ -725,12 +725,12 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// 1. `latest_proposals`: Finds the newest `ver` for every proposal `id` by creation time.
   /// 2. `valid_actions`: Finds all action documents that are structurally valid
   ///    (have ref_id/ref_ver) AND are signed by the *original author* of the proposal.
-  /// 3. `latest_actions_ver`: Finds the newest action `ver` for each proposal `ref_id`.
-  /// 4. `action_status`: Joins valid actions to determine the latest `action_type`.
-  /// 5. `effective_proposals`:
-  ///    - Applies 'Final' logic (use specific `ref_ver`).
-  ///    - Applies 'Draft' logic (use `latest_proposals.max_ver`).
-  ///    - Applies 'Hide' logic (WHERE NOT EXISTS ... 'hide').
+  /// 3. `latest_action_per_proposal`: Uses a Window Function (`ROW_NUMBER()`) to
+  ///    efficiently identify the single most recent valid action for each proposal ID.
+  /// 4. `effective_proposals`:
+  ///    - Applies 'Final' logic (pins to the specific `ref_ver` from the latest action).
+  ///    - Applies 'Draft' logic (falls back to `latest_proposals.max_ver`).
+  ///    - Applies 'Hide' logic (filters out proposals where the latest action is 'hide').
   String _getEffectiveProposalsCTE() {
     return '''
     latest_proposals AS (
@@ -740,35 +740,25 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       GROUP BY id
     ),
     ${_getValidActionsCTE()},
-    latest_actions_ver AS (
-      SELECT ref_id, MAX(ver) as max_action_ver
-      FROM valid_actions
-      GROUP BY ref_id
-    ),
-    action_status AS (
+    latest_action_per_proposal AS (
       SELECT 
         va.ref_id,
         va.ref_ver,
-        COALESCE(json_extract(va.content, '\$.action'), 'draft') as action_type
+        COALESCE(json_extract(va.content, '\$.action'), 'draft') as action_type,
+        ROW_NUMBER() OVER (PARTITION BY va.ref_id ORDER BY va.ver DESC) as rn
       FROM valid_actions va
-      INNER JOIN latest_actions_ver lav 
-        ON va.ref_id = lav.ref_id 
-        AND va.ver = lav.max_action_ver
     ),
     effective_proposals AS (
       SELECT 
         lp.id,
         CASE 
-          WHEN ast.action_type = 'final' THEN ast.ref_ver
+          WHEN lap.action_type = 'final' THEN lap.ref_ver
           ELSE lp.max_ver
         END as ver,
-        ast.action_type
+        lap.action_type
       FROM latest_proposals lp
-      LEFT JOIN action_status ast ON lp.id = ast.ref_id
-      WHERE NOT EXISTS (
-        SELECT 1 FROM action_status hidden 
-        WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
-      )
+      LEFT JOIN latest_action_per_proposal lap ON lp.id = lap.ref_id AND lap.rn = 1
+      WHERE lap.action_type IS NOT 'hide' OR lap.action_type IS NULL
     )
     '''
         .trim();
