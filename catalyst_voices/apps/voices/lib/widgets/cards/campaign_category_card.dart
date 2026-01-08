@@ -61,7 +61,7 @@ class CampaignCategoryCard extends StatelessWidget {
                     ),
                   ),
                   _Buttons(
-                    categoryRef: category.ref,
+                    categoryRef: category.id,
                   ),
                 ],
               ),

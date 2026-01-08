@@ -25,6 +25,7 @@ void main() {
       localVersion = DocumentRefFactory.randomUuidV7();
       mockProposal = UsersProposalOverview(
         id: SignedDocumentRef(id: proposalId, ver: latestVersion),
+        parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
         title: 'Test Proposal',
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),
@@ -61,7 +62,6 @@ void main() {
         fundNumber: 14,
         commentsCount: 0,
         category: 'Cardano Use Cases: Concept',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         fromActiveCampaign: true,
       );
     });

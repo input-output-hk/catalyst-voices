@@ -44,7 +44,7 @@ abstract interface class CampaignService {
 
   Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
+  Future<CampaignCategory> getCategory(DocumentParameters parameters);
 
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
 
@@ -113,11 +113,11 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    final category = await _campaignRepository.getCategory(ref);
+  Future<CampaignCategory> getCategory(DocumentParameters parameters) async {
+    final category = await _campaignRepository.getCategory(parameters);
     if (category == null) {
       throw NotFoundException(
-        message: 'Did not find category with ref $ref',
+        message: 'Did not find category with parameters $parameters',
       );
     }
 
@@ -207,7 +207,7 @@ final class CampaignServiceImpl implements CampaignService {
 extension on ProposalTemplate {
   MapEntry<DocumentRef, _ProposalTemplateCategoryAndMoneyFormat> toMapEntry() {
     final ref = metadata.id;
-    final category = metadata.parameters?.set.first;
+    final category = metadata.parameters.set.first;
 
     final currencySchema = requestedFunds;
     final moneyFormat = currencySchema != null

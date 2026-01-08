@@ -8,7 +8,6 @@ import 'package:catalyst_voices_repositories/src/document/document_data_factory.
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
@@ -54,6 +53,14 @@ abstract interface class DocumentRepository {
     required DocumentRef id,
   });
 
+  Future<DocumentData?> findFirst({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+    DocumentRef? parameter,
+    CatalystId? originalAuthorId,
+  });
+
   /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
   Future<List<DocumentData>> getAllVersionsOfId({
@@ -81,23 +88,11 @@ abstract interface class DocumentRepository {
     required DocumentRef id,
   });
 
-  /// Useful when recovering account and we want to lookup
-  /// latest [DocumentData] which of [originalAuthorId] and check
-  /// username used in [CatalystId] in that document.
-  Future<DocumentData?> getLatestDocument({
-    CatalystId? originalAuthorId,
-  });
-
   /// Returns latest matching [DocumentRef] version with same id as [id].
   Future<DocumentRef?> getLatestOf({required DocumentRef id});
 
   /// Returns count of documents matching [referencing] id and [type].
   Future<int> getRefCount({
-    required DocumentRef referencing,
-    required DocumentType type,
-  });
-
-  Future<DocumentData?> getRefToDocumentData({
     required DocumentRef referencing,
     required DocumentType type,
   });
@@ -109,9 +104,6 @@ abstract interface class DocumentRepository {
     required SignedDocumentRef id,
   });
 
-  /// Looks up all signed document refs according to [filters].
-  ///
-  /// Response is paginated using [page] and [limit].
   Future<DocumentIndex> index({
     required int page,
     required int limit,
@@ -272,6 +264,23 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<DocumentData?> findFirst({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+    DocumentRef? parameter,
+    CatalystId? originalAuthorId,
+  }) {
+    return _localDocuments.findFirst(
+      type: type,
+      id: id,
+      referencing: referencing,
+      parameter: parameter,
+      originalAuthorId: originalAuthorId,
+    );
+  }
+
+  @override
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   }) async {
@@ -312,16 +321,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return documentData;
   }
 
-  @override
-  Future<DocumentData?> getLatestDocument({
-    CatalystId? originalAuthorId,
-  }) async {
-    final latestDocument = await _localDocuments.findFirst(originalAuthorId: originalAuthorId);
-    final latestDraft = await _drafts.findFirst();
-
-    return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
-  }
-
   // TODO(damian-molinski): consider also checking with remote source.
   @override
   Future<DocumentRef?> getLatestOf({required DocumentRef id}) async {
@@ -339,14 +338,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
   }) {
     return _localDocuments.count(referencing: referencing, type: type);
-  }
-
-  @override
-  Future<DocumentData?> getRefToDocumentData({
-    required DocumentRef referencing,
-    required DocumentType type,
-  }) {
-    return _localDocuments.findFirst(referencing: referencing, type: type);
   }
 
   @override
@@ -756,7 +747,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   void _validateDocumentMetadata(DocumentData document) {
     if (!_isDocumentMetadataValid(document)) {
-      throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformed);
+      throw const DocumentImportInvalidDataException(DocumentMetadataMalformedException);
     }
   }
 

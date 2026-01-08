@@ -89,10 +89,8 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposalDetail(id: ref);
-      final category = await _campaignService.getCategory(
-        proposal.document.metadata.parameters.set.first,
-      );
-      final commentTemplate = await _commentService.getCommentTemplateFor(
+      final category = await _campaignService.getCategory(proposal.document.metadata.parameters);
+      final commentTemplate = await _commentService.getCommentTemplate(
         category: proposal.document.metadata.parameters.set.first,
       );
       final isFavorite = await _documentsService.isFavorite(ref);
@@ -161,12 +159,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     SignedDocumentRef? reply,
   }) async {
     final proposalRef = _cache.ref;
-    final proposalCategoryId = _cache.proposal?.document.metadata.parameters.set.first;
+    final proposalParameters = _cache.proposal?.document.metadata.parameters;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
-    assert(
-      proposalRef is SignedDocumentRef,
-      'Can comment only on signed documents',
-    );
+    assert(proposalRef is SignedDocumentRef, 'Can comment only on signed documents');
+    assert(proposalParameters != null, 'Proposal parameters not found!');
 
     final activeAccountId = _cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
@@ -174,16 +170,14 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentTemplate = _cache.commentTemplate;
     assert(commentTemplate != null, 'No comment template found!');
 
-    assert(proposalCategoryId != null, 'Proposal categoryId not found!');
-
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
         id: commentRef,
-        ref: proposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.id as SignedDocumentRef,
+        proposalRef: proposalRef! as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: reply,
-        parameters: DocumentParameters({?proposalCategoryId}),
+        parameters: proposalParameters!,
         authorId: activeAccountId!,
       ),
       document: document,
@@ -339,10 +333,10 @@ final class ProposalCubit extends Cubit<ProposalState>
         : const <Segment>[];
 
     final header = ProposalViewHeader(
-      proposalRef: proposalDocumentRef,
+      proposalRef: proposalDocument?.metadata.id,
       title: proposalDocument?.title ?? '',
       authorName: proposalDocument?.authorName,
-      createdAt: proposalDocumentRef?.ver?.tryDateTime,
+      createdAt: proposalDocument?.metadata.id.ver?.tryDateTime,
       commentsCount: commentsCount,
       versions: versions,
       isFavorite: isFavorite,

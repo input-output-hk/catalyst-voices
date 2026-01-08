@@ -29,13 +29,8 @@ final class ProposalTemplate extends Equatable {
 }
 
 final class ProposalTemplateMetadata extends DocumentMetadata {
-  final DocumentParameters? parameters;
-
   ProposalTemplateMetadata({
     required super.id,
-    this.parameters,
+    required super.parameters,
   });
-
-  @override
-  List<Object?> get props => super.props + [parameters];
 }

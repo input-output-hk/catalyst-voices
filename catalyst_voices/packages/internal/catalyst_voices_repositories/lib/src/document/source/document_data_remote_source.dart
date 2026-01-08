@@ -1,11 +1,15 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/common/content_types.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document_version.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
 import 'package:collection/collection.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
@@ -20,11 +24,8 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentDataWithArtifact> get(DocumentRef ref) async {
     final artifact = await _api.gateway
-        .apiV1DocumentDocumentIdGet(
-          documentId: ref.id,
-          version: ref.ver,
-        )
-        .successBodyBytesOrThrow()
+        .getDocument(documentId: ref.id, version: ref.ver)
+        .successBodyOrThrow()
         .then(DocumentArtifact.new);
 
     final signedDocument = await _signedDocumentManager.parseDocument(artifact);
@@ -55,10 +56,10 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     return _getDocumentIndexList(
           page: 0,
           limit: 1,
-          body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
+          filter: DocumentIndexQueryFilter(id: IdSelector.eq(id)),
         )
         .then(_mapDynamicResponseValue)
-        .then((response) => response._docs.firstOrNull?.ver.firstOrNull?.ver);
+        .then((response) => response.docs.firstOrNull?.ver.firstOrNull?.ver);
   }
 
   @override
@@ -67,26 +68,21 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     int limit = 100,
     required DocumentIndexFilters filters,
   }) {
-    final body = DocumentIndexQueryFilter(
-      type: filters.type?.uuid,
-      parameters: IdRefOnly(id: IdSelectorDto.inside(filters.categoriesIds)).toJson(),
+    final filter = DocumentIndexQueryFilter(
+      type: filters.type?.map((e) => e.uuid).toList(),
+      parameters: IdAndVerRef.idOnly(IdSelector.inside(filters.categoriesIds)),
     );
 
     return _getDocumentIndexList(
       page: page,
       limit: limit,
-      body: body,
+      filter: filter,
     ).then((value) => value.toModel());
   }
 
   @override
   Future<void> publish(DocumentArtifact artifact) async {
-    await _api.gateway
-        .apiV1DocumentPut(
-          body: artifact.value,
-          contentType: ContentTypes.applicationCbor,
-        )
-        .successOrThrow();
+    await _api.gateway.uploadDocument(body: artifact.value).successBodyOrThrow();
   }
 
   // TODO(damian-molinski): Remove this when backend can serve const documents
@@ -98,21 +94,16 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }) {
     final skip = page * limit;
 
-    final docs = refs
-        .skip(skip)
-        .take(limit)
-        .map(
-          (e) {
-            return DocumentIndexListDto(
-              id: e.id,
-              ver: [
-                IndividualDocumentVersion(ver: e.ver!, type: type.uuid),
-              ],
-            );
-          },
-        )
-        .map((e) => e.toJson())
-        .toList();
+    final docs = refs.skip(skip).take(limit).map(
+      (e) {
+        return IndexedDocument(
+          id: e.id,
+          ver: [
+            IndexedDocumentVersion(ver: e.ver!, type: type.uuid, id: e.id),
+          ],
+        );
+      },
+    ).toList();
 
     final remaining = skip + docs.length - refs.length;
 
@@ -129,55 +120,35 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
-    required DocumentIndexQueryFilter body,
+    required DocumentIndexQueryFilter filter,
   }) async {
     // TODO(damian-molinski): Remove this when backend can serve const documents
-    if (body.type == DocumentType.proposalTemplate.uuid) {
+    if ((filter.type ?? const []).contains(DocumentType.proposalTemplate.uuid)) {
       return _forConstRefs(
         page: page,
         limit: limit,
-        refs: activeConstantDocumentRefs.map((e) => e.proposal),
+        refs: constantDocumentRefsPerCampaign(activeCampaignRef).map((e) => e.proposal).nonNulls,
         type: DocumentType.proposalTemplate,
       );
     }
     // TODO(damian-molinski): Remove this when backend can serve const documents
-    if (body.type == DocumentType.commentTemplate.uuid) {
+    if ((filter.type ?? const []).contains(DocumentType.commentTemplate.uuid)) {
       return _forConstRefs(
         page: page,
         limit: limit,
-        refs: activeConstantDocumentRefs.map((e) => e.comment),
+        refs: constantDocumentRefsPerCampaign(activeCampaignRef).map((e) => e.comment).nonNulls,
         type: DocumentType.commentTemplate,
       );
     }
 
     return _api.gateway
-        .apiV1DocumentIndexPost(
-          body: body,
+        .documentIndex(
+          filter: filter,
           limit: limit,
           page: page,
         )
         .successBodyOrThrow()
-        .then(_mapDynamicResponseValue)
-        .then(
-          (response) {
-            // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-            // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-            final remaining = response.docs.length < limit ? 0 : response.page.remaining;
-            final page = response.page.copyWith(remaining: remaining);
-
-            return response.copyWith(page: page);
-          },
-        )
-        // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-        // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-        .onError<NotFoundException>(
-          (_, _) {
-            return DocumentIndexList(
-              docs: [],
-              page: CurrentPage(page: page, limit: limit, remaining: 0),
-            );
-          },
-        );
+        .then(_mapDynamicResponseValue);
   }
 
   DocumentIndexList _mapDynamicResponseValue(dynamic value) {
@@ -208,17 +179,13 @@ abstract interface class DocumentDataRemoteSource implements DocumentDataSource 
   Future<void> publish(DocumentArtifact artifact);
 }
 
-extension on DocumentRefForFilteredDocuments {
+extension on DocumentReference {
   SignedDocumentRef toRef() => SignedDocumentRef(id: id, ver: ver);
 }
 
 extension on DocumentIndexList {
-  Iterable<DocumentIndexListDto> get _docs {
-    return docs.cast<Map<String, dynamic>>().map(DocumentIndexListDto.fromJson);
-  }
-
   DocumentIndex toModel() {
-    final docs = _docs.map((e) => e.toModel()).toList();
+    final docs = this.docs.map((e) => e.toModel()).toList();
     final page = this.page.toModel();
 
     return DocumentIndex(docs: docs, page: page);
@@ -235,7 +202,7 @@ extension on CurrentPage {
   }
 }
 
-extension on DocumentIndexListDto {
+extension on IndexedDocument {
   DocumentIndexDoc toModel() {
     return DocumentIndexDoc(
       id: id,
@@ -244,15 +211,10 @@ extension on DocumentIndexListDto {
           return DocumentIndexDocVersion(
             ver: e.ver,
             type: DocumentType.fromJson(e.type),
-            ref: e.ref?.toRef(),
-            reply: e.reply?.toRef(),
-            parameters: [
-              if (e.parameters case final value?) value.toRef(),
-            ],
-            template: e.template?.toRef(),
-            brand: e.brand?.toRef(),
-            campaign: e.campaign?.toRef(),
-            category: e.category?.toRef(),
+            ref: e.ref?.map((e) => e.toRef()).toList(),
+            reply: e.reply?.map((e) => e.toRef()).toList(),
+            template: e.template?.map((e) => e.toRef()).toList(),
+            parameters: e.parameters?.map((e) => e.toRef()).toList(),
           );
         },
       ).toList(),

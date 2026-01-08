@@ -53,7 +53,7 @@ void main() {
     test('submitProposalForReview throws '
         '$ProposalLimitReachedException when over limit', () async {
       final proposalRef = SignedDocumentRef.generateFirstRef();
-      final categoryId = SignedDocumentRef.generateFirstRef();
+      final categoryRef = SignedDocumentRef.generateFirstRef();
       final catalystId = DummyCatalystIdFactory.create();
       final account = Account.dummy(
         catalystId: catalystId,
@@ -79,7 +79,7 @@ void main() {
       expect(
         () async => proposalService.submitProposalForReview(
           proposalRef: proposalRef,
-          categoryId: categoryId,
+          proposalParameters: DocumentParameters({categoryRef}),
         ),
         throwsA(isA<ProposalLimitReachedException>()),
       );

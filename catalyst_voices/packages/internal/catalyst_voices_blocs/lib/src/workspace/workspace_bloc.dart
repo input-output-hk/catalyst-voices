@@ -105,7 +105,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final documentContent = _buildDocumentContent(docData.document.document);
 
       final encodedProposal = await _proposalService.encodeProposalForExport(
-        document: DocumentData(metadata: docMetadata, content: documentContent),
+        document: DocumentData(
+          metadata: docMetadata,
+          content: documentContent,
+        ),
       );
 
       final filename = '${event.prefix}_${event.ref.id}';
@@ -129,7 +132,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       emit(state.copyWith(isLoading: true));
       await _proposalService.forgetProposal(
         proposalRef: proposal.id as SignedDocumentRef,
-        categoryId: proposal.categoryId,
+        proposalParameters: proposal.parameters,
       );
 
       // Remove proposal from cache and rebuild state
@@ -203,7 +206,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
       final categories = campaigns.expand((element) => element.categories);
       final category = categories.firstWhereOrNull(
-        (e) => e.id.id == proposal.categoryRef.id,
+        (e) => proposal.parameters.containsId(e.id.id),
       );
 
       // TODO(damian-molinski): refactor it
@@ -262,7 +265,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     }
     await _proposalService.unlockProposal(
       proposalRef: proposal.id as SignedDocumentRef,
-      categoryId: proposal.categoryId,
+      proposalParameters: proposal.parameters,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
   }

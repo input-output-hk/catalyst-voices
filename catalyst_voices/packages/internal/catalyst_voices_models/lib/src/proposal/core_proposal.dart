@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
   final DocumentRef id;
-  final SignedDocumentRef categoryRef;
+  final DocumentParameters parameters;
   final String title;
   final String description;
   final Money fundsRequested;
@@ -15,7 +15,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
 
   const CoreProposal({
     required this.id,
-    required this.categoryRef,
+    required this.parameters,
     required this.title,
     required this.description,
     required this.fundsRequested,
@@ -28,7 +28,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
   @override
   List<Object?> get props => [
     id,
-    categoryRef,
+    parameters,
     title,
     description,
     fundsRequested,
@@ -53,7 +53,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
 
   CoreProposal copyWith({
     DocumentRef? id,
-    SignedDocumentRef? categoryRef,
+    DocumentParameters? parameters,
     String? title,
     String? description,
     DateTime? updateDate,
@@ -65,7 +65,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
   }) {
     return CoreProposal(
       id: id ?? this.id,
-      categoryRef: categoryRef ?? this.categoryRef,
+      parameters: parameters ?? this.parameters,
       title: title ?? this.title,
       description: description ?? this.description,
       fundsRequested: fundsRequested ?? this.fundsRequested,

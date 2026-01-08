@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// A set of filters to be applied when querying for campaign proposals.
@@ -13,7 +14,12 @@ final class ProposalsCampaignFilters extends Equatable {
 
   /// Currently hardcoded active campaign helper constructor.
   factory ProposalsCampaignFilters.active() {
-    final categoriesIds = activeConstantDocumentRefs.map((e) => e.category.id).toSet();
+    final categoriesIds = Campaign.all
+        .where((campaign) => campaign.id == activeCampaignRef)
+        .map((campaign) => campaign.categories.map((category) => category.id.id))
+        .flattened
+        .toSet();
+
     return ProposalsCampaignFilters(categoriesIds: categoriesIds);
   }
 

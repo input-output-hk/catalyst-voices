@@ -50,11 +50,14 @@ class _Author extends StatelessWidget {
             size: 32,
             username: author,
           ),
-          UsernameText(
-            key: const Key('Author'),
-            author,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+          Flexible(
+            child: UsernameText(
+              key: const Key('Author'),
+              author,
+              maxLines: 1,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
             ),
           ),
         ],

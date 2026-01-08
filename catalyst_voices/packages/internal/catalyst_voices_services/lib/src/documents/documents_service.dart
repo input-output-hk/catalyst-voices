@@ -110,7 +110,7 @@ final class DocumentsServiceImpl implements DocumentsService {
         // to handle all remaining documents not covered by the explicit syncOrder.
         final documentType = syncOrder.elementAtOrNull(stepIndex);
         final filters = DocumentIndexFilters(
-          type: documentType,
+          type: documentType != null ? [documentType] : null,
           categoriesIds: categoriesIds,
         );
 

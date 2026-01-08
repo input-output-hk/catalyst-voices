@@ -41,6 +41,7 @@ dev_dependencies:
 
 # TODO(dt-iohk): revert when flutter_secure_storage pulls transitively these or newer versions
 dependency_overrides:
+  test_api: 0.7.8
   flutter_secure_storage_web: ^2.0.0
   flutter_secure_storage_platform_interface: ^2.0.1
 
@@ -76,6 +77,12 @@ melos:
       description: |
         Run `dart analyze` in every package.
 
+    flutter-clean:
+      run: |
+        melos exec -c 1 -- flutter clean
+      description: |
+        Run `flutter clean` sequentially in every Flutter package.
+
     l10n:
       run: |
         melos exec --scope="catalyst_voices_localization" -- dart lib/src/manage_l10n.dart --sort && \
@@ -104,20 +111,9 @@ melos:
 
     build-runner:
       run: |
-        melos exec --depends-on="build_runner" --ignore="catalyst_voices_repositories" --order-dependents -- \
-            dart run build_runner build --delete-conflicting-outputs
+        melos exec --depends-on="build_runner" --order-dependents -- dart run build_runner build --delete-conflicting-outputs --force-aot
       description: |
         Run `build_runner` in every package which contains the build_runner dependency.
-        The catalyst_voices_repositories is skipped because to run a build_runner there you
-        must generate first swagger docs (see related Earthfile).
-
-    build-runner-repository:
-      run: |
-        melos exec --scope="catalyst_voices_repositories" -- dart run build_runner clean && \
-        melos exec --scope="catalyst_voices_repositories" -- dart run process_openapi.dart && \
-        melos exec --scope="catalyst_voices_repositories" -- dart run build_runner build --delete-conflicting-outputs
-      description: |
-        Run `build_runner` in catalyst_voices_repositories package
 
     build-db-schema:
       run: |
@@ -279,13 +275,10 @@ melos:
           lcov --remove {} -o {} --ignore-errors unused,unused \
           '*.g.dart' \
           '*.freezed.dart' \
-          '*.chopper.dart' \
-          '*.swagger.dart' \
-          '*.openapi.dart' \
           '*.gen.dart' \
-          '*.swagger.*.dart' \
           '*.drift.dart' \
-          'lib/generated/**' \;
+          'generated/catalyst_voices_localizations_*.dart' \
+          'generated/catalyst_voices_localizations.dart' \;
 
         # merges all coverage reports into a single one and puts it in /coverage/lcov.info
         dart pub global run combine_coverage --repo-path=.
@@ -341,13 +334,10 @@ melos:
           lcov --remove {} -o {} --ignore-errors unused,unused \
           '*.g.dart' \
           '*.freezed.dart' \
-          '*.chopper.dart' \
-          '*.swagger.dart' \
-          '*.openapi.dart' \
           '*.gen.dart' \
-          '*.swagger.*.dart' \
           '*.drift.dart' \
-          'lib/generated/**' \;
+          'generated/catalyst_voices_localizations_*.dart' \
+          'generated/catalyst_voices_localizations.dart' \;
 
         # merges all coverage reports into a single one and puts it in /coverage/lcov.info
         dart pub global run combine_coverage --repo-path=.

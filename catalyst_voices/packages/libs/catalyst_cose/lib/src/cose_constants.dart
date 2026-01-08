@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:catalyst_cose/src/types/string_or_int.dart';
+import 'package:catalyst_cose/src/types/cose_custom_types.dart';
+import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
 import 'package:cbor/cbor.dart';
 
 /// The interface for the data signer callback.
@@ -8,11 +9,11 @@ import 'package:cbor/cbor.dart';
 abstract interface class CatalystCoseSigner {
   /// Returns the alg identifier that should refer
   /// to the cryptographic algorithm used to [sign] the data.
-  StringOrInt? get alg;
+  CoseStringOrInt? get alg;
 
   /// Returns a key identifier that typically should refer to the public key
   /// of the private key used to sign the data.
-  Future<Uint8List?> get kid;
+  Future<CatalystIdKid?> get kid;
 
   /// The [data] should be signed with a private key
   /// and the resulting signature returned as [Uint8List].
@@ -24,7 +25,7 @@ abstract interface class CatalystCoseSigner {
 abstract interface class CatalystCoseVerifier {
   /// Returns a key identifier that typically should refer to the public key
   /// of the private key used to sign the data.
-  Future<Uint8List?> get kid;
+  Future<CatalystIdKid?> get kid;
 
   /// The [signature] should be verified against
   /// a known public/private key over the [data].
@@ -36,14 +37,14 @@ final class CoseHeaderKeys {
   /// The header key describing the signature algorithm.
   static const alg = CborSmallInt(1);
 
-  /// The header key describing the content-type of the payload.
-  static const contentType = CborSmallInt(3);
+  /// The header key describing the media-type of the payload.
+  static const mediaType = CborSmallInt(3);
 
   /// The header key describing the key identifier.
   static const kid = CborSmallInt(4);
 
   /// The header key for "content encoding".
-  static final contentEncoding = CborString('Content-Encoding');
+  static final contentEncoding = CborString('content-encoding');
 
   /// The header key for "type".
   static final type = CborString('type');
@@ -57,9 +58,6 @@ final class CoseHeaderKeys {
   /// The header key for "ref".
   static final ref = CborString('ref');
 
-  /// The header key for "ref_hash".
-  static final refHash = CborString('ref_hash');
-
   /// The header key for "template".
   static final template = CborString('template');
 
@@ -70,19 +68,34 @@ final class CoseHeaderKeys {
   static final section = CborString('section');
 
   /// The header key for "collabs".
+  ///
+  /// Replaced by [collaborators].
   static final collabs = CborString('collabs');
 
+  /// The header key for "collaborators".
+  ///
+  /// Replaces [collabs].
+  static final collaborators = CborString('collaborators');
+
   /// The header key for "brand_id".
+  ///
+  /// Replaced by [parameters].
   static final brandId = CborString('brand_id');
 
   /// The header key for "campaign_id".
+  ///
+  /// Replaced by [parameters].
   static final campaignId = CborString('campaign_id');
 
-  /// The header key for "election_id".
-  static final electionId = CborString('election_id');
-
   /// The header key for "category_id".
+  ///
+  /// Replaced by [parameters].
   static final categoryId = CborString('category_id');
+
+  /// The header key for "parameters".
+  ///
+  /// Replaces [brandId], [campaignId], [categoryId].
+  static final parameters = CborString('parameters');
 
   const CoseHeaderKeys._();
 }
@@ -102,9 +115,6 @@ abstract final class CoseTags {
 final class CoseValues {
   /// The Edwards-Curve Digital Signature Algorithm (EdDSA).
   static const eddsaAlg = -8;
-
-  /// The json content type value.
-  static const jsonContentType = 50;
 
   /// The brotli compression content encoding.
   static const brotliContentEncoding = 'br';

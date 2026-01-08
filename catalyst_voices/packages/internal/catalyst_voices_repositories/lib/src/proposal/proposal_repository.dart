@@ -31,11 +31,11 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
-  /// Returns [ProposalTemplate] for matching [ref].
+  /// Returns [ProposalTemplate] which belongs to [category].
   ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+  /// Returns null if no matching template is found.
+  Future<ProposalTemplate?> getProposalTemplate({
+    required DocumentRef category,
   });
 
   Future<void> publishProposal({
@@ -45,9 +45,7 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentDataMetadata metadata,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -155,7 +153,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalPublish?> getProposalPublishForRef({
     required DocumentRef ref,
   }) async {
-    final data = await _documentRepository.getRefToDocumentData(
+    final data = await _documentRepository.findFirst(
       referencing: ref,
       type: DocumentType.proposalActionDocument,
     );
@@ -166,9 +164,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef category,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(id: ref);
+    final documentData = await _documentRepository.findFirst(
+      parameter: category,
+      type: DocumentType.proposalTemplate,
+    );
+
+    if (documentData == null) {
+      throw DocumentNotFoundException(
+        ref: category,
+        message: 'Proposal template with parameter not found',
+      );
+    }
 
     return ProposalTemplateFactory.create(documentData);
   }
@@ -191,9 +199,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentDataMetadata metadata,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -201,13 +207,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
-      metadata: DocumentDataMetadata.proposalAction(
-        id: actionRef,
-        proposalRef: proposalRef,
-        parameters: DocumentParameters({categoryId}),
-      ),
+      metadata: metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );

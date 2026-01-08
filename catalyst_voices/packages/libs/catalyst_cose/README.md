@@ -15,6 +15,9 @@ This package exposes a CBOR Object Signing and Encryption
 [RFC-9052](https://datatracker.ietf.org/doc/html/rfc9052),
 [RFC-9053](https://datatracker.ietf.org/doc/html/rfc9053) implementation.
 
+Implements Signed Doc spec
+[v0.0.4](https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85).
+
 ## Requirements
 
 * Dart: 3.9.0+

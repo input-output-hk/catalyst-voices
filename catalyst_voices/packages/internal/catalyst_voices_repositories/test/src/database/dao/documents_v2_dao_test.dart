@@ -2093,7 +2093,7 @@ void main() {
             _createTestDocumentEntity(
               id: 'id-3',
               ver: 'ver-3',
-              type: DocumentType.reviewDocument,
+              type: DocumentType.brandParametersDocument,
             ),
             _createTestDocumentEntity(
               id: 'id-4',

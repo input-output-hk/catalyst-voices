@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class DocumentIndexFilters extends Equatable {
-  final DocumentType? type;
+  final List<DocumentType>? type;
   final List<String> categoriesIds;
 
   const DocumentIndexFilters({

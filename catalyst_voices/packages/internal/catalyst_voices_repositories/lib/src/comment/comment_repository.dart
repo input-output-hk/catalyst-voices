@@ -11,8 +11,8 @@ abstract interface class CommentRepository {
     DocumentRepository documentRepository,
   ) = DocumentsCommentRepository;
 
-  Future<CommentTemplate> getCommentTemplate({
-    required SignedDocumentRef ref,
+  Future<CommentTemplate?> getCommentTemplate({
+    required DocumentRef category,
   });
 
   Future<void> publishComment({
@@ -40,12 +40,19 @@ final class DocumentsCommentRepository implements CommentRepository {
   );
 
   @override
-  Future<CommentTemplate> getCommentTemplate({
-    required SignedDocumentRef ref,
+  Future<CommentTemplate?> getCommentTemplate({
+    required DocumentRef category,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(id: ref);
+    final document = await _documentRepository.findFirst(
+      type: DocumentType.commentTemplate,
+      parameter: category,
+    );
 
-    return _buildCommentTemplate(documentData: documentData);
+    if (document == null) {
+      return null;
+    }
+
+    return _buildCommentTemplate(documentData: document);
   }
 
   @override
@@ -54,33 +61,6 @@ final class DocumentsCommentRepository implements CommentRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
-    /*
-    final ref = document.metadata.ref;
-    final reply = document.metadata.reply;
-    final categoryId = document.metadata.categoryId;
-
-    assert(ref != null, 'CommentDocument have to have a ref to other document');
-    // TODO(damian-molinski): creating SignedDocumentMetadata with correct refs
-    // have to be captured single place.
-    assert(
-      categoryId != null,
-      'CommentDocument have to have categoryId because proposals always have categoryId',
-    );
-
-    final payload = SignedDocumentJsonPayload(document.content.data);
-    final metadata = SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-      documentType: DocumentType.commentDocument,
-      id: document.metadata.id.id,
-      ver: document.metadata.id.ver,
-      ref: SignedDocumentMetadataRef.fromDocumentRef(ref!),
-      template: SignedDocumentMetadataRef.fromDocumentRef(
-        document.metadata.template!,
-      ),
-      reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
-      categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId!),
-    );
-*/
     assert(
       document.metadata.ref != null,
       'CommentDocument have to have a ref to other document',
@@ -150,8 +130,8 @@ final class DocumentsCommentRepository implements CommentRepository {
     final authors = documentData.metadata.authors;
     final metadata = CommentMetadata(
       id: documentData.metadata.id as SignedDocumentRef,
-      ref: documentData.metadata.ref! as SignedDocumentRef,
-      template: templateData.metadata.id as SignedDocumentRef,
+      proposalRef: documentData.metadata.ref! as SignedDocumentRef,
+      commentTemplate: templateData.metadata.id as SignedDocumentRef,
       reply: documentData.metadata.reply,
       parameters: documentData.metadata.parameters,
       authorId: authors!.single,
@@ -182,6 +162,7 @@ final class DocumentsCommentRepository implements CommentRepository {
 
     final metadata = CommentTemplateMetadata(
       id: documentData.metadata.id as SignedDocumentRef,
+      parameters: documentData.metadata.parameters,
     );
 
     final contentData = documentData.content.data;

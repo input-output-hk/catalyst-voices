@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:core';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
@@ -262,7 +263,7 @@ Future<AppConfig> _getAppConfig({
   required AppEnvironmentType env,
 }) async {
   final config = ApiConfig(env: env);
-  final api = ApiServices(config: config);
+  final api = ApiServices.dio(config: config);
   final source = ApiConfigSource(api);
   final service = ConfigService(ConfigRepository(source));
   return service.getAppConfig(env: env);
