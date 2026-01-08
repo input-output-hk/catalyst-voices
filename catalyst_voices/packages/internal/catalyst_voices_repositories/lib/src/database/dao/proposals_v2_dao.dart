@@ -829,10 +829,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         final actionData = doc.content.data;
         final action = ProposalSubmissionActionDocumentDto.fromJson(actionData).action.toModel();
 
+        final actionDocumentRef = SignedDocumentRef(id: doc.id, ver: doc.ver);
+
         final rawCollaboratorAction = RawCollaboratorAction(
           id: signerFullId ?? signerId,
           proposalId: ref,
           action: action,
+          actionId: actionDocumentRef,
         );
 
         proposalActions[signerId] = rawCollaboratorAction;

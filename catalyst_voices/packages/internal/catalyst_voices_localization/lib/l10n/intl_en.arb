@@ -145,6 +145,14 @@
   "@allProposals": {
     "description": "text indicating to view all proposals"
   },
+  "allow": "Allow",
+  "@allow": {
+    "description": "new status to be set for display consent"
+  },
+  "allowed": "Allowed",
+  "@allowed": {
+    "description": "status of user action for display consent"
+  },
   "andSign": "&",
   "@andSign": {
     "description": "Generic and sign"
@@ -512,6 +520,14 @@
   "collaboratorDisplayConsent": "Co-Proposer\nDisplay Consent",
   "@collaboratorDisplayConsent": {
     "description": "Generic title to inform user about display consent"
+  },
+  "collaboratorDisplayConsentHeader": "Co-Proposer Display Consent",
+  "@collaboratorDisplayConsentHeader": {
+    "description": "Header title for Co-Proposer Display Consent page in my actions tab"
+  },
+  "collaboratorDisplayConsentPageHeader": "Co-proposers can choose whether or not to be displayed on a proposal you’ve been invited for. This action allows you to approve or decline your visibility for transparency and collaboration.",
+  "@collaboratorDisplayConsentPageHeader": {
+    "description": "Header text for the collaborator display consent page"
   },
   "collaboratorFinalProposalAcceptButton": "Approve Final Proposal",
   "@collaboratorFinalProposalAcceptButton": {
@@ -1012,6 +1028,14 @@
   "deleteLocalVersionIfWantToPublishThisVersion": "If you want to publish this iteration as final, please delete the local draft.",
   "@deleteLocalVersionIfWantToPublishThisVersion": {
     "description": "Message shown when user tries to publish a draft proposal as final proposal but there is a newer local draft proposal."
+  },
+  "denied": "Denied",
+  "@denied": {
+    "description": "status of user action for display consent"
+  },
+  "deny": "Deny",
+  "@deny": {
+    "description": "new status to be set for display consent"
   },
   "description": "Description",
   "@description": {
@@ -1727,6 +1751,14 @@
   "@headsUp": {
     "description": "In context for important information below"
   },
+  "headsUpDisplayConsentHintContent": "You can agree or disagree to be displayed on any proposal you’re invited to.\n\nChanged your mind? You can update your display consent anytime, just keep the submission deadline in mind. Earlier iterations will still show your previous choice.",
+  "@headsUpDisplayConsentHintContent": {
+    "description": "Content for heads up about co-proposer display consent"
+  },
+  "headsUpDisplayConsentHintTitle": "Heads up on Co-proposer Display consent",
+  "@headsUpDisplayConsentHintTitle": {
+    "description": "Title for heads up about co-proposer display consent"
+  },
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {
     "description": "Text to tell user that something important is happening"
@@ -1885,6 +1917,15 @@
   "invitationsAndApprovals": "Invitations & Approvals",
   "@invitationsAndApprovals": {
     "description": "CTA to show Invitations and Approvals"
+  },
+  "invitedBy": "Invited by {username}",
+  "@invitedBy": {
+    "description": "Information about who invited user",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
   },
   "joinNewsletter": "Join Newsletter",
   "@joinNewsletter": {
@@ -2151,6 +2192,14 @@
   "noGuidanceForThisSection": "There is no guidance for this section.",
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
+  },
+  "noInvitesYet": "No invites yet",
+  "@noInvitesYet": {
+    "description": "Title for empty state when user has no invites"
+  },
+  "noInvitesYetDescription": "Once you’re invited to a proposal, it will appear here.",
+  "@noInvitesYetDescription": {
+    "description": "Description for empty state when user has no invites"
   },
   "noLocalUserProposals": "No Local proposals found",
   "@noLocalUserProposals": {

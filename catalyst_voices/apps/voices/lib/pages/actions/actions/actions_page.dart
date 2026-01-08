@@ -25,7 +25,10 @@ class _ActionsPageState extends State<ActionsPage> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _myActionsCubit,
-      child: ActionsPageContent(tab: widget.tab),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+        child: ActionsPageContent(tab: widget.tab),
+      ),
     );
   }
 
