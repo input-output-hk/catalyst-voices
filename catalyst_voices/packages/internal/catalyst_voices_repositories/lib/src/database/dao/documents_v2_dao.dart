@@ -149,6 +149,7 @@ abstract interface class DocumentsV2Dao {
     DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? campaign,
+    CatalystId? originalAuthor,
     bool latestOnly,
     int limit,
     int offset,
@@ -411,6 +412,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    CatalystId? originalAuthor,
     CampaignFilters? campaign,
     bool latestOnly = false,
     int limit = 200,
@@ -420,6 +422,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       type: type,
       id: id,
       referencing: referencing,
+      originalAuthor: originalAuthor,
       campaign: campaign,
       latestOnly: latestOnly,
       limit: limit,
@@ -543,6 +546,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    CatalystId? originalAuthor,
     CampaignFilters? campaign,
     required bool latestOnly,
     required int limit,
@@ -571,6 +575,19 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       }
     }
 
+    if (originalAuthor != null) {
+      final significant = originalAuthor.toSignificant();
+      query.where((tbl) {
+        final originalAuthorQuery = selectOnly(documentAuthors)
+          ..addColumns([const Constant(1)])
+          ..where(documentAuthors.documentId.equalsExp(tbl.id))
+          /// Check against tbl.id to target the first version (where id == ver)
+          ..where(documentAuthors.documentVer.equalsExp(tbl.id))
+          ..where(documentAuthors.accountSignificantId.equals(significant.toUri().toString()));
+        return existsQuery(originalAuthorQuery);
+      });
+    }
+
     if (campaign != null) {
       query.where((tbl) {
         final dp = alias(documentParameters, 'dp');
@@ -588,12 +605,12 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final inner = alias(documentsV2, 'inner');
 
       query.where((tbl) {
-        final maxCreatedAt = subqueryExpression<DateTime>(
+        final maxVer = subqueryExpression<String>(
           selectOnly(inner)
-            ..addColumns([inner.createdAt.max()])
+            ..addColumns([inner.ver.max()])
             ..where(inner.id.equalsExp(tbl.id)),
         );
-        return tbl.createdAt.equalsExp(maxCreatedAt);
+        return tbl.ver.equalsExp(maxVer);
       });
     }
 

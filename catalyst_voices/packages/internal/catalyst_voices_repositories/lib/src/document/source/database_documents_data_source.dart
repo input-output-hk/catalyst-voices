@@ -168,6 +168,7 @@ final class DatabaseDocumentsDataSource
           type: type,
           id: id,
           referencing: referencing,
+          originalAuthor: originalAuthorId,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
