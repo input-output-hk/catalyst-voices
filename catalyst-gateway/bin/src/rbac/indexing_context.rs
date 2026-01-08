@@ -91,13 +91,12 @@ impl RbacBlockIndexingContext {
         self.addresses.get(address)
     }
 
-    /// Marks the given stake addresses as removed so they will be excluded from
-    /// `find_address` lookups.
+    /// Removes multiple addresses from the context.
     pub fn remove_addresses(
         &mut self,
-        addresses: HashSet<StakeAddress>,
+        addresses: &HashSet<StakeAddress>,
     ) {
-        for address in addresses.iter() {
+        for address in addresses {
             self.addresses.remove(address);
         }
     }

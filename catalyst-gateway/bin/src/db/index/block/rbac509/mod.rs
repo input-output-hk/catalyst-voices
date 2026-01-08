@@ -34,6 +34,15 @@ use crate::{
     settings::cassandra_db::EnvVars,
 };
 
+/// Represents a database operation on a stake address.
+#[derive(Debug)]
+enum StakeAddressOperation {
+    /// Inserts or updates the Catalyst ID associated with a stake address.
+    Insert(insert_catalyst_id_for_stake_address::Params),
+    /// Removes the Catalyst ID mapping for a stake address.
+    Delete(purge::catalyst_id_for_stake_address::Params),
+}
+
 /// Index RBAC 509 Registration Query Parameters
 #[derive(Debug)]
 pub(crate) struct Rbac509InsertQuery {
@@ -43,12 +52,11 @@ pub(crate) struct Rbac509InsertQuery {
     pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
     /// A Catalyst ID for transaction ID Data captured during indexing.
     catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
-    /// A Catalyst ID for stake address data captured during indexing.
-    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    /// Append-only events Catalyst ID for stake address transitions captured
+    /// during indexing.
+    catalyst_id_for_stake_address: Vec<StakeAddressOperation>,
     /// A Catalyst ID for public key data captured during indexing.
     catalyst_id_for_public_key: Vec<insert_catalyst_id_for_public_key::Params>,
-    /// A Catalyst ID for stake address Data to be removed during indexing.
-    delete_catalyst_id_for_stake_address: Vec<purge::catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -60,7 +68,6 @@ impl Rbac509InsertQuery {
             catalyst_id_for_txn_id: Vec::new(),
             catalyst_id_for_stake_address: Vec::new(),
             catalyst_id_for_public_key: Vec::new(),
-            delete_catalyst_id_for_stake_address: Vec::new(),
         }
     }
 
@@ -337,7 +344,7 @@ impl Rbac509InsertQuery {
     ) {
         context.insert_transaction(txn_hash, catalyst_id.clone());
         context.insert_addresses(added_stake_addresses.clone(), &catalyst_id);
-        context.remove_addresses(removed_stake_addresses.clone());
+        context.remove_addresses(removed_stake_addresses);
         context.insert_public_keys(public_keys.clone(), &catalyst_id);
         context.insert_registration(
             catalyst_id.clone(),
@@ -359,25 +366,27 @@ impl Rbac509InsertQuery {
             .difference(removed_stake_addresses)
             .cloned()
         {
-            self.catalyst_id_for_stake_address.push(
-                insert_catalyst_id_for_stake_address::Params::new(
-                    address,
-                    slot,
-                    index,
-                    catalyst_id.clone(),
-                ),
-            );
+            self.catalyst_id_for_stake_address
+                .push(StakeAddressOperation::Insert(
+                    insert_catalyst_id_for_stake_address::Params::new(
+                        address,
+                        slot,
+                        index,
+                        catalyst_id.clone(),
+                    ),
+                ));
         }
 
         // Record stake addresses that are marked as removed.
         for address in removed_stake_addresses {
-            self.delete_catalyst_id_for_stake_address.push(
-                purge::catalyst_id_for_stake_address::Params {
-                    stake_address: address.clone().into(),
-                    slot_no: slot.into(),
-                    txn_index: index.into(),
-                },
-            );
+            self.catalyst_id_for_stake_address
+                .push(StakeAddressOperation::Delete(
+                    purge::catalyst_id_for_stake_address::Params {
+                        stake_address: address.clone().into(),
+                        slot_no: slot.into(),
+                        txn_index: index.into(),
+                    },
+                ));
         }
 
         // Record new public keys.
@@ -476,11 +485,31 @@ impl Rbac509InsertQuery {
         if !self.catalyst_id_for_stake_address.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                insert_catalyst_id_for_stake_address::Params::execute_batch(
-                    &inner_session,
-                    self.catalyst_id_for_stake_address,
-                )
-                .await
+                let mut results = Vec::with_capacity(self.catalyst_id_for_stake_address.len());
+
+                // execute in sequence to prevent data race
+                for entry in self.catalyst_id_for_stake_address {
+                    let result = match entry {
+                        StakeAddressOperation::Insert(entry) => {
+                            insert_catalyst_id_for_stake_address::Params::execute_batch(
+                                &inner_session,
+                                vec![entry],
+                            )
+                            .await?
+                        },
+                        StakeAddressOperation::Delete(entry) => {
+                            purge::catalyst_id_for_stake_address::DeleteQuery::execute(
+                                &inner_session,
+                                vec![entry],
+                            )
+                            .await?
+                        },
+                    };
+
+                    results.extend(result);
+                }
+
+                Ok(results)
             }));
         }
 
@@ -490,17 +519,6 @@ impl Rbac509InsertQuery {
                 insert_catalyst_id_for_public_key::Params::execute_batch(
                     &inner_session,
                     self.catalyst_id_for_public_key,
-                )
-                .await
-            }));
-        }
-
-        if !self.delete_catalyst_id_for_stake_address.is_empty() {
-            let inner_session = session.clone();
-            query_handles.push(tokio::spawn(async move {
-                purge::catalyst_id_for_stake_address::DeleteQuery::execute(
-                    &inner_session,
-                    self.delete_catalyst_id_for_stake_address,
                 )
                 .await
             }));
