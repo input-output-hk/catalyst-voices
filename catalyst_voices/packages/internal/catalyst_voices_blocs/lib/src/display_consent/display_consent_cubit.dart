@@ -116,7 +116,7 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
     final proposalDisplayConsentStream = activeCatalystId != null
         ? _proposalService.watchProposalsBriefPageV2(
             request: signedProposalsPageRequest,
-            filters: CollaboratorInvitationsProposalsFilter(activeCatalystId),
+            filters: CollaboratorProposalDisplayConsentFilter(activeCatalystId),
           )
         : Stream<Page<ProposalBriefData>>.value(const Page.empty());
     _proposalDisplayConsentSub = proposalDisplayConsentStream.distinct().listen(

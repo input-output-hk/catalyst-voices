@@ -31,8 +31,8 @@ void main() {
     setUp(() {
       userService = _MockUserService();
       proposalService = _MockProposalService();
-      accountController = StreamController<Account?>.broadcast();
-      proposalController = StreamController<Page<ProposalBriefData>>.broadcast();
+      accountController = StreamController<Account?>.broadcast(sync: true);
+      proposalController = StreamController<Page<ProposalBriefData>>.broadcast(sync: true);
 
       when(
         () => userService.watchUnlockedActiveAccount,
@@ -98,7 +98,6 @@ void main() {
           );
 
           accountController.add(account);
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           final proposal = ProposalBriefData(
             id: DocumentRefFactory.signedDocumentRef(),
@@ -125,7 +124,6 @@ void main() {
           );
         },
         expect: () => [
-          isA<DisplayConsentState>(),
           isA<DisplayConsentState>().having(
             (s) => s.items.length,
             'items length',
@@ -206,8 +204,6 @@ void main() {
           );
           accountController.add(account);
 
-          await Future<void>.delayed(const Duration(milliseconds: 50));
-
           proposalController.add(
             Page(
               items: [proposal],
@@ -216,7 +212,6 @@ void main() {
               maxPerPage: 999,
             ),
           );
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           // Perform the action
           await cubit.changeDisplayConsent(
@@ -224,7 +219,6 @@ void main() {
             displayConsentStatus: CollaboratorDisplayConsentStatus.allowed,
           );
         },
-        skip: 1, // Skip the first emission from init
         expect: () => [
           isA<DisplayConsentState>().having(
             (s) => s.items.first.status,
@@ -260,8 +254,6 @@ void main() {
           );
           accountController.add(account);
 
-          await Future<void>.delayed(const Duration(milliseconds: 50));
-
           proposalController.add(
             Page(
               items: [proposal],
@@ -270,14 +262,12 @@ void main() {
               maxPerPage: 999,
             ),
           );
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           await cubit.changeDisplayConsent(
             id: proposal.id,
             displayConsentStatus: CollaboratorDisplayConsentStatus.denied,
           );
         },
-        skip: 1,
         expect: () => [
           isA<DisplayConsentState>().having(
             (s) => s.items.first.status,
@@ -312,7 +302,6 @@ void main() {
             keychain: mockKeychain,
           );
           accountController.add(account);
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           proposalController.add(
             Page(
@@ -322,7 +311,6 @@ void main() {
               maxPerPage: 999,
             ),
           );
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           await cubit.changeDisplayConsent(
             id: proposal.id,
@@ -357,7 +345,7 @@ void main() {
             keychain: mockKeychain,
           );
           accountController.add(account);
-          await Future<void>.delayed(const Duration(milliseconds: 50));
+
           proposalController.add(
             Page(
               items: [proposal],
@@ -366,14 +354,12 @@ void main() {
               maxPerPage: 999,
             ),
           );
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           await cubit.changeDisplayConsent(
             id: proposal.id,
             displayConsentStatus: CollaboratorDisplayConsentStatus.allowed,
           );
         },
-        skip: 1,
         expect: () => [
           isA<DisplayConsentState>().having(
             (s) => s.items.first.status,
@@ -405,6 +391,7 @@ void main() {
             keychain: mockKeychain,
           );
           accountController.add(account);
+
           proposalController.add(
             Page(
               items: [proposal],
@@ -413,7 +400,6 @@ void main() {
               maxPerPage: 999,
             ),
           );
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           // Try to change consent for a non-existent proposal
           await cubit.changeDisplayConsent(
@@ -461,7 +447,7 @@ void main() {
           );
 
           accountController.add(account);
-          await Future<void>.delayed(const Duration(milliseconds: 50));
+
           proposalController.add(
             Page(
               items: [proposal, proposal2],
@@ -470,14 +456,12 @@ void main() {
               maxPerPage: 999,
             ),
           );
-          await Future<void>.delayed(const Duration(milliseconds: 50));
 
           await cubit.changeDisplayConsent(
             id: proposal.id,
             displayConsentStatus: CollaboratorDisplayConsentStatus.allowed,
           );
         },
-        skip: 1,
         expect: () => [
           isA<DisplayConsentState>()
               .having(

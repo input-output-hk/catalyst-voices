@@ -10,6 +10,15 @@ final class CollaboratorInvitationsProposalsFilter extends ProposalsFiltersV2 {
       );
 }
 
+final class CollaboratorProposalDisplayConsentFilter extends ProposalsFiltersV2 {
+  CollaboratorProposalDisplayConsentFilter(CatalystId id)
+    : super(
+        relationships: {
+          CollaborationInvitation.any(id),
+        },
+      );
+}
+
 final class CollaboratorProposalApprovalsFilter extends ProposalsFiltersV2 {
   CollaboratorProposalApprovalsFilter(CatalystId id)
     : super(

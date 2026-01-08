@@ -31,7 +31,7 @@ class DisplayConsentList extends StatelessWidget {
               return ProposalDisplayConsentCard(
                 key: ValueKey(item.id),
                 proposalDisplayConsent: item,
-                onTap: () => ProposalRoute.fromRef(ref: item.id).go(context),
+                onTap: () async => ProposalRoute.fromRef(ref: item.id).push(context),
                 onSelected: (value) {
                   unawaited(
                     context.read<DisplayConsentCubit>().changeDisplayConsent(
