@@ -22,8 +22,6 @@ pub struct RbacBlockIndexingContext {
     /// A map contains pending data that will be written in the
     /// `catalyst_id_for_stake_address` table.
     addresses: HashMap<StakeAddress, CatalystId>,
-    /// A set contains removed stake addresses during indexing.
-    removed_addresses: HashSet<StakeAddress>,
     /// A map containing pending data that will be written in the
     /// `catalyst_id_for_public_key` table.
     public_keys: HashMap<VerifyingKey, CatalystId>,
@@ -37,14 +35,12 @@ impl RbacBlockIndexingContext {
     pub fn new() -> Self {
         let transactions = HashMap::new();
         let addresses = HashMap::new();
-        let removed_addresses = HashSet::new();
         let public_keys = HashMap::new();
         let registrations = HashMap::new();
 
         Self {
             transactions,
             addresses,
-            removed_addresses,
             public_keys,
             registrations,
         }
@@ -92,20 +88,18 @@ impl RbacBlockIndexingContext {
         &self,
         address: &StakeAddress,
     ) -> Option<&CatalystId> {
-        if self.removed_addresses.contains(address) {
-            None
-        } else {
-            self.addresses.get(address)
-        }
+        self.addresses.get(address)
     }
 
     /// Marks the given stake addresses as removed so they will be excluded from
     /// `find_address` lookups.
     pub fn remove_addresses(
         &mut self,
-        address: HashSet<StakeAddress>,
+        addresses: HashSet<StakeAddress>,
     ) {
-        self.removed_addresses.extend(address);
+        for address in addresses.iter() {
+            self.addresses.remove(address);
+        }
     }
 
     /// Adds a public key to the context.

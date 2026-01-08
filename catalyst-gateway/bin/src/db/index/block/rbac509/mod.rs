@@ -47,7 +47,7 @@ pub(crate) struct Rbac509InsertQuery {
     catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
     /// A Catalyst ID for public key data captured during indexing.
     catalyst_id_for_public_key: Vec<insert_catalyst_id_for_public_key::Params>,
-    /// A Catalyst ID for transaction ID Data to be removed during indexing.
+    /// A Catalyst ID for stake address Data to be removed during indexing.
     delete_catalyst_id_for_stake_address: Vec<purge::catalyst_id_for_stake_address::Params>,
 }
 
