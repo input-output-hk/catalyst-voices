@@ -73,14 +73,14 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
   }
 
   void init() {
-    unawaited(_setupActiveAccountIdSubscription());
-    unawaited(_setupProposalDisplayConsentSubscription());
+    _setupActiveAccountIdSubscription();
+    _setupProposalDisplayConsentSubscription();
   }
 
   void _handleActiveAccountIdChange(CatalystId? catalystId) {
     _cache = _cache.copyWith(activeAccountId: Optional(catalystId));
 
-    unawaited(_setupProposalDisplayConsentSubscription());
+    _setupProposalDisplayConsentSubscription();
   }
 
   void _handleProposalDisplayConsentListChange(Page<ProposalBriefData> page) {
@@ -100,18 +100,18 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
     emit(state.copyWith(items: _cache.proposalsDisplayConsent));
   }
 
-  Future<void> _setupActiveAccountIdSubscription() async {
-    await _activeAccountIdSub?.cancel();
+  void _setupActiveAccountIdSubscription() {
+    unawaited(_activeAccountIdSub?.cancel());
     _activeAccountIdSub = _userService.watchUnlockedActiveAccount
         .map((event) => event?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChange);
   }
 
-  Future<void> _setupProposalDisplayConsentSubscription() async {
+  void _setupProposalDisplayConsentSubscription() {
     const signedProposalsPageRequest = PageRequest(page: 0, size: 999);
 
-    await _proposalDisplayConsentSub?.cancel();
+    unawaited(_proposalDisplayConsentSub?.cancel());
     final activeCatalystId = _cache.activeAccountId;
     final proposalDisplayConsentStream = activeCatalystId != null
         ? _proposalService.watchProposalsBriefPageV2(
