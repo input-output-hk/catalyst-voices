@@ -69,8 +69,6 @@ final class CommentServiceImpl implements CommentService {
       );
     });
 
-    await _commentRepository.saveComment(document: document);
-
     return document.id as SignedDocumentRef;
   }
 
