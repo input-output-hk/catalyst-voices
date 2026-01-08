@@ -10,8 +10,7 @@ final f15StaticCampaignCategories = <CampaignCategory>[
   //Tier-1 Enterprise Integrations
   CampaignCategory(
     selfRef: f15ConstDocumentsRefs[0].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[0].proposal,
-    campaignRef: f15ConstDocumentsRefs[0].comment,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Tier-1 Enterprise Integrations',
     description:
@@ -139,8 +138,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
   //Cardano Use Cases: Prototype & Launch
   CampaignCategory(
     selfRef: f15ConstDocumentsRefs[1].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[1].proposal,
-    campaignRef: f15ConstDocumentsRefs[1].comment,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Prototype & Launch',
     description:
@@ -247,8 +245,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
   //   //Cardano Open: Ecosystem
   CampaignCategory(
     selfRef: f15ConstDocumentsRefs[2].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[2].proposal,
-    campaignRef: f15ConstDocumentsRefs[2].comment,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',
     description:
@@ -354,8 +351,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
   //Midnight: Compact DApps
   CampaignCategory(
     selfRef: f15ConstDocumentsRefs[3].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[3].proposal,
-    campaignRef: f15ConstDocumentsRefs[3].comment,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Midnight:',
     categorySubname: 'Compact DApps',
     description:

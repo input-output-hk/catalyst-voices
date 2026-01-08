@@ -1,11 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_status.swagger.dart' as swagger;
+import 'package:catalyst_voices_repositories/src/api/models/component.dart';
+import 'package:catalyst_voices_repositories/src/api/models/component_status.dart' as api_enum;
 
-extension ComponentExt on swagger.Component {
+extension ComponentExt on Component {
   ComponentStatus toModel() {
     return ComponentStatus(
       name: name,
-      isOperational: status == swagger.ComponentStatus.operational,
+      isOperational: status == api_enum.ComponentStatus.operational,
     );
   }
 }

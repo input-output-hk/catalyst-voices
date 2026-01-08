@@ -28,12 +28,13 @@ void main() {
           DocumentSchemaDto.fromJson(schemaJson).toModel(),
         );
         final document = documentDto.toModel();
+        final categoryRef = DocumentRefFactory.signedDocumentRef();
 
         return ProposalDocument(
           metadata: ProposalMetadata(
             selfRef: DocumentRefFactory.draftRef(),
             templateRef: DocumentRefFactory.signedDocumentRef(),
-            categoryId: DocumentRefFactory.signedDocumentRef(),
+            parameters: DocumentParameters({categoryRef}),
             authors: const [],
           ),
           document: document,

@@ -2,35 +2,12 @@ targets:
   $default:
     sources:
       - lib/**
-      - openapi/**
       - $package$
       - pubspec.*
     builders:
-      swagger_dart_code_generator:
-        options:
-          input_folder: "openapi/processed"
-          output_folder: "lib/generated/api"
-          separate_models: true
-          include_if_null: false
-          exclude_paths:
-            - /api/draft/*
-            - /api/v1/health/*
-          # turn it off when we can get rid of vit. atm its generating classes incorrectly with it.
-          use_path_for_request_names: true
-          additional_headers:
-            - "Authorization"
-            - "Content-Type"
-          response_override_value_map:
-            - url: /api/gateway/v1/document/index
-              method: post
-              overridden_value: "DocumentIndexList"
       json_serializable:
         options:
           explicit_to_json: true
-      chopper_generator:
-        options:
-          header: "// Generated code"
-
       drift_dev:
         # disable drift's default builder, we're using the modular setup instead.
         enabled: false
