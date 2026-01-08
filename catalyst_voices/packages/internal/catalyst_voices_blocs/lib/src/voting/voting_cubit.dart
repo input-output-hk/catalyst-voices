@@ -303,7 +303,7 @@ final class VotingCubit extends Cubit<VotingState>
     _proposalsCountSub = Rx.combineLatest(
       streams,
       Map<VotingPageTab, int>.fromEntries,
-    ).startWith({}).listen(_handleProposalsCountChange);
+    ).startWith(state.count).listen(_handleProposalsCountChange);
   }
 
   VotingState _rebuildState() {

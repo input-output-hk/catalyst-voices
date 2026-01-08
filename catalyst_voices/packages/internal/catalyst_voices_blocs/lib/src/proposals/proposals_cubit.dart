@@ -341,7 +341,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _proposalsCountSub = Rx.combineLatest(
       streams,
       Map<ProposalsPageTab, int>.fromEntries,
-    ).startWith({}).listen(_handleProposalsCountChange);
+    ).startWith(state.count).listen(_handleProposalsCountChange);
   }
 
   void _resetCache() {
