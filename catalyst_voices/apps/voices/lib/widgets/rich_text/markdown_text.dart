@@ -1,9 +1,10 @@
+import 'package:catalyst_voices/common/codecs/markdown_to_plain_codec.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-class MarkdownText extends StatelessWidget with LaunchUrlMixin {
+class MarkdownText extends StatefulWidget {
   final MarkdownData markdownData;
   final bool selectable;
   final Color? pColor;
@@ -18,21 +19,27 @@ class MarkdownText extends StatelessWidget with LaunchUrlMixin {
   });
 
   @override
+  State<MarkdownText> createState() => _MarkdownTextState();
+}
+
+class _MarkdownTextState extends State<MarkdownText> with LaunchUrlMixin {
+  late String _label;
+
+  @override
   Widget build(BuildContext context) {
-    final pColor = this.pColor;
+    final pColor = widget.pColor;
 
     return Semantics(
       identifier: 'MarkdownText',
       container: true,
-      // TODO(dt-iohk): clean markdown to select clear-text without formatting characters
-      label: markdownData.data,
+      label: _label,
       child: ExcludeSemantics(
         child: MarkdownBody(
-          data: markdownData.data,
-          selectable: selectable,
+          data: widget.markdownData.data,
+          selectable: widget.selectable,
           styleSheet: MarkdownStyleSheet(
             p:
-                pStyle?.copyWith(color: pColor) ??
+                widget.pStyle?.copyWith(color: pColor) ??
                 (pColor != null ? TextStyle(color: pColor) : null),
           ),
           onTapLink: (text, href, title) async {
@@ -43,5 +50,25 @@ class MarkdownText extends StatelessWidget with LaunchUrlMixin {
         ),
       ),
     );
+  }
+
+  @override
+  void didUpdateWidget(MarkdownText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.markdownData != widget.markdownData) {
+      _convertLabel();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _convertLabel();
+  }
+
+  void _convertLabel() {
+    _label = const MarkdownToPlainStringEncoder().convert(widget.markdownData);
   }
 }

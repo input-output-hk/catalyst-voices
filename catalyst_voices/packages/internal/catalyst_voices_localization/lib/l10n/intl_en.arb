@@ -133,6 +133,14 @@
   "@anonymousUsername": {
     "description": "When account does not have specified username this text is shown"
   },
+  "apiErrorBadCertificate": "Bad certificate",
+  "@apiErrorBadCertificate": {
+    "description": "Generic message when incorrect certificate is used for api requests"
+  },
+  "apiErrorConnectionError": "Connection error",
+  "@apiErrorConnectionError": {
+    "description": "Message of an error when api is not reachable."
+  },
   "apiErrorInternalServerError": "Internal server error",
   "@apiErrorInternalServerError": {
     "description": "Message of an error when api returns matching status code."
@@ -145,9 +153,17 @@
   "@apiErrorNotFound": {
     "description": "Message of an error when api returns not found status code, depends on context."
   },
+  "apiErrorRequestCancelled": "Request cancelled",
+  "@apiErrorRequestCancelled": {
+    "description": "Message of an error when api request is cancelled."
+  },
   "apiErrorServiceUnavailable": "Service Unavailable",
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
+  },
+  "apiErrorTimeout": "Connection timeout",
+  "@apiErrorTimeout": {
+    "description": "Message of an error when api request times out."
   },
   "apiErrorTooManyRequests": "Too many requests, please try again in 10 minutes.",
   "@apiErrorTooManyRequests": {
@@ -1290,6 +1306,10 @@
   "errorValidationTokenNotParsed": "Invalid input. Could not parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
+  },
+  "errorWalletBalance": "Couldn't find wallet balance",
+  "@errorWalletBalance": {
+    "description": "Error message shown when trying to find wallet balance but got error response."
   },
   "errorWalletLinkAccountChange": "Wallet account change",
   "@errorWalletLinkAccountChange": {

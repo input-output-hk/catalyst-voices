@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Document;
 import 'package:catalyst_voices_repositories/src/database/database.dart';
@@ -7,20 +8,71 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 abstract final class DocumentDataFactory {
   static DocumentData build({
-    DocumentType type = DocumentType.proposalDocument,
-    DocumentRef? selfRef,
-    SignedDocumentRef? template,
-    SignedDocumentRef? categoryId,
-    DocumentDataContent content = const DocumentDataContent({}),
+    DocumentDataMetadata? metadata,
+    DocumentDataContent? content,
   }) {
     return DocumentData(
-      metadata: DocumentDataMetadata(
-        type: type,
-        selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-        template: template,
-        categoryId: categoryId,
-      ),
-      content: content,
+      metadata: metadata ?? DocumentDataMetadataFactory.proposal(),
+      content: content ?? const DocumentDataContent({}),
+    );
+  }
+}
+
+abstract final class DocumentDataMetadataFactory {
+  static final _categoryRef = DocumentRefFactory.signedDocumentRef();
+  static final _commentTemplateRef = DocumentRefFactory.signedDocumentRef();
+  static final _proposalTemplateRef = DocumentRefFactory.signedDocumentRef();
+  static final _catalystId = CatalystId(host: 'test', role0Key: Uint8List(32));
+
+  static DocumentDataMetadata comment({
+    SignedDocumentRef? selfRef,
+    SignedDocumentRef? proposalRef,
+    SignedDocumentRef? template,
+    DocumentParameters? parameters,
+    List<CatalystId>? authors,
+  }) {
+    return DocumentDataMetadata.comment(
+      selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+      proposalRef: proposalRef ?? DocumentRefFactory.signedDocumentRef(),
+      template: template ?? _commentTemplateRef,
+      parameters: parameters ?? DocumentParameters({_categoryRef}),
+      authors: authors ?? [_catalystId],
+    );
+  }
+
+  static DocumentDataMetadata proposal({
+    DocumentRef? selfRef,
+    SignedDocumentRef? template,
+    DocumentParameters? parameters,
+    List<CatalystId>? authors,
+  }) {
+    return DocumentDataMetadata.proposal(
+      selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+      template: template ?? _proposalTemplateRef,
+      parameters: parameters ?? DocumentParameters({_categoryRef}),
+      authors: authors ?? [_catalystId],
+    );
+  }
+
+  static DocumentDataMetadata proposalAction({
+    SignedDocumentRef? selfRef,
+    SignedDocumentRef? proposalRef,
+    DocumentParameters? parameters,
+  }) {
+    return DocumentDataMetadata.proposalAction(
+      selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+      proposalRef: proposalRef ?? DocumentRefFactory.signedDocumentRef(),
+      parameters: parameters ?? DocumentParameters({_categoryRef}),
+    );
+  }
+
+  static DocumentDataMetadata proposalTemplate({
+    DocumentRef? selfRef,
+    DocumentParameters? parameters,
+  }) {
+    return DocumentDataMetadata.proposalTemplate(
+      selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+      parameters: parameters ?? DocumentParameters({_categoryRef}),
     );
   }
 }
@@ -32,11 +84,7 @@ abstract final class DocumentFactory {
     DateTime? createdAt,
   }) {
     content ??= const DocumentDataContent({});
-
-    metadata ??= DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
-      selfRef: DocumentRefFactory.signedDocumentRef(),
-    );
+    metadata ??= DocumentDataMetadataFactory.proposal();
 
     final id = UuidHiLo.from(metadata.id);
     final ver = UuidHiLo.from(metadata.version);
@@ -142,11 +190,7 @@ abstract final class DraftFactory {
     String? title,
   }) {
     content ??= const DocumentDataContent({});
-
-    metadata ??= DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
-      selfRef: DocumentRefFactory.draftRef(),
-    );
+    metadata ??= DocumentDataMetadataFactory.proposal();
 
     title ??= 'Draft[${metadata.id}] title';
 

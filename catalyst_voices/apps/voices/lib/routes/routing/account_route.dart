@@ -15,7 +15,7 @@ part 'account_route.g.dart';
   name: 'account',
 )
 final class AccountRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $AccountRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const AccountRoute();
 
   @override

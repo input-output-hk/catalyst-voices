@@ -1,9 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-/// Describes what [DocumentDataContent] is about. It only makes sens in
-/// context of [type].
+/// Describes what [DocumentDataContent] is about. It only makes sense in
+/// the context of [type].
 final class DocumentDataMetadata extends Equatable {
+  /// The content type of the document payload this metadata is attached to.
+  final DocumentContentType contentType;
+
   /// Type of this signed document
   final DocumentType type;
 
@@ -13,9 +16,6 @@ final class DocumentDataMetadata extends Equatable {
   /// Reference to another document. The purpose of the ref will vary depending
   /// on the document type.
   final DocumentRef? ref;
-
-  /// This is a cryptographically secured reference to another document.
-  final SecuredDocumentRef? refHash;
 
   /// If the document was formed from a template, this is a reference to that
   /// template document
@@ -27,93 +27,154 @@ final class DocumentDataMetadata extends Equatable {
   /// A reference to a section of a document.
   final String? section;
 
-  /// uuid-v4
-  /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
-  final SignedDocumentRef? brandId;
+  /// A list of allowed Collaborators on the next subsequent version of a document.
+  final List<CatalystId>? collaborators;
 
-  /// uuid-v4
-  /// Defines a "campaign" of voting, e.g. "treasury campaign".
-  final SignedDocumentRef? campaignId;
+  /// A list of referenced parameters like brand, category or campaign.
+  final DocumentParameters parameters;
 
-  /// uuid-v4
-  /// Defines an election, e.g. "Catalyst Fund 1", "Catalyst Fund 2".
-  final String? electionId;
-
-  /// uuid-v4
-  /// Defines a voting category as a collection of proposals, e.g.
-  /// "Development & Infrastructure",
-  /// "Products & Integrations".
-  final SignedDocumentRef? categoryId;
-
-  /// List of authors represented by CatalystId
+  /// List of authors represented by CatalystId.
+  ///
+  /// Note. This list just represents who signed this version
+  /// Note. Can change from version to version when [collaborators] are non empty.
   final List<CatalystId>? authors;
 
-  // TODO(damian-molinski): refactor with factory constructors for
-  //  proposal/comment to centralize required fields for each type.
+  /// The default constructor for the [DocumentDataMetadata].
   DocumentDataMetadata({
+    required this.contentType,
     required this.type,
     required this.selfRef,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.brandId,
-    this.campaignId,
-    this.electionId,
-    this.categoryId,
+    this.collaborators,
+    this.parameters = const DocumentParameters(),
     this.authors,
   }) : assert(
          selfRef.isExact,
          'selfRef have to be exact. Make sure version is not null',
        );
 
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.commentDocument].
+  ///
+  /// The [parameters] should be the ones assigned to the [proposalRef].
+  factory DocumentDataMetadata.comment({
+    required SignedDocumentRef selfRef,
+    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef template,
+    required DocumentParameters parameters,
+    required List<CatalystId> authors,
+    SignedDocumentRef? reply,
+  }) {
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.json,
+      type: DocumentType.commentDocument,
+      selfRef: selfRef,
+      ref: proposalRef,
+      template: template,
+      reply: reply,
+      parameters: parameters,
+      authors: authors,
+    );
+  }
+
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalDocument].
+  ///
+  /// The [parameters] should be the ones assigned to the [template].
+  factory DocumentDataMetadata.proposal({
+    required DocumentRef selfRef,
+    required SignedDocumentRef template,
+    required DocumentParameters parameters,
+    required List<CatalystId> authors,
+    List<CatalystId>? collaborators,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      contentType: DocumentContentType.json,
+      selfRef: selfRef,
+      template: template,
+      parameters: parameters,
+      authors: authors,
+      collaborators: collaborators,
+    );
+  }
+
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalActionDocument].
+  ///
+  /// The [parameters] should be the ones assigned to the [proposalRef].
+  factory DocumentDataMetadata.proposalAction({
+    required SignedDocumentRef selfRef,
+    required SignedDocumentRef proposalRef,
+    required DocumentParameters parameters,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalActionDocument,
+      contentType: DocumentContentType.json,
+      selfRef: selfRef,
+      ref: proposalRef,
+      parameters: parameters,
+    );
+  }
+
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalTemplate].
+  ///
+  /// The [parameters] should be the ones assigned to template's parent, most likely the category.
+  factory DocumentDataMetadata.proposalTemplate({
+    required DocumentRef selfRef,
+    required DocumentParameters parameters,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalTemplate,
+      contentType: DocumentContentType.schemaJson,
+      selfRef: selfRef,
+      parameters: parameters,
+    );
+  }
+
   String get id => selfRef.id;
 
   @override
   List<Object?> get props => [
+    contentType,
     type,
     selfRef,
     ref,
-    refHash,
     template,
     reply,
     section,
-    brandId,
-    campaignId,
-    electionId,
-    categoryId,
+    collaborators,
+    parameters,
     authors,
   ];
+
+  /// Who signed this document version. Can change from version to version.
+  List<CatalystId>? get signers => authors;
 
   String get version => selfRef.version!;
 
   DocumentDataMetadata copyWith({
+    DocumentContentType? contentType,
     DocumentType? type,
     DocumentRef? selfRef,
     Optional<DocumentRef>? ref,
-    Optional<SecuredDocumentRef>? refHash,
     Optional<SignedDocumentRef>? template,
     Optional<SignedDocumentRef>? reply,
     Optional<String>? section,
-    Optional<SignedDocumentRef>? brandId,
-    Optional<SignedDocumentRef>? campaignId,
-    Optional<String>? electionId,
-    Optional<SignedDocumentRef>? categoryId,
+    Optional<List<CatalystId>>? collaborators,
+    DocumentParameters? parameters,
     Optional<List<CatalystId>>? authors,
   }) {
     return DocumentDataMetadata(
+      contentType: contentType ?? this.contentType,
       type: type ?? this.type,
       selfRef: selfRef ?? this.selfRef,
       ref: ref.dataOr(this.ref),
-      refHash: refHash.dataOr(this.refHash),
       template: template.dataOr(this.template),
       reply: reply.dataOr(this.reply),
       section: section.dataOr(this.section),
-      brandId: brandId.dataOr(this.brandId),
-      campaignId: campaignId.dataOr(this.campaignId),
-      electionId: electionId.dataOr(this.electionId),
-      categoryId: categoryId.dataOr(this.categoryId),
+      collaborators: collaborators.dataOr(this.collaborators),
+      parameters: parameters ?? this.parameters,
       authors: authors.dataOr(this.authors),
     );
   }

@@ -35,12 +35,12 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalBuilderPage extends StatelessWidget {
   final DocumentRef? proposalId;
-  final SignedDocumentRef? categoryId;
+  final SignedDocumentRef? categoryRef;
 
   const ProposalBuilderPage({
     super.key,
     this.proposalId,
-    this.categoryId,
+    this.categoryRef,
   });
 
   @override
@@ -49,7 +49,7 @@ class ProposalBuilderPage extends StatelessWidget {
       create: (context) => Dependencies.instance.get<ProposalBuilderBloc>(),
       child: _ProposalBuilderBody(
         proposalId: proposalId,
-        categoryId: categoryId,
+        categoryRef: categoryRef,
       ),
     );
   }
@@ -57,11 +57,11 @@ class ProposalBuilderPage extends StatelessWidget {
 
 class _ProposalBuilderBody extends StatefulWidget {
   final DocumentRef? proposalId;
-  final SignedDocumentRef? categoryId;
+  final SignedDocumentRef? categoryRef;
 
   const _ProposalBuilderBody({
     this.proposalId,
-    this.categoryId,
+    this.categoryRef,
   });
 
   @override
@@ -115,7 +115,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   void didUpdateWidget(_ProposalBuilderBody oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.proposalId != oldWidget.proposalId || widget.categoryId != oldWidget.categoryId) {
+    if (widget.proposalId != oldWidget.proposalId || widget.categoryRef != oldWidget.categoryRef) {
       _loadProposal();
     }
   }
@@ -244,11 +244,11 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     bloc ??= context.read<ProposalBuilderBloc>();
 
     final proposalId = widget.proposalId;
-    final categoryId = widget.categoryId;
+    final categoryRef = widget.categoryRef;
     if (proposalId != null) {
       bloc.add(LoadProposalEvent(proposalId: proposalId));
-    } else if (categoryId != null) {
-      bloc.add(LoadProposalCategoryEvent(categoryId: categoryId));
+    } else if (categoryRef != null) {
+      bloc.add(LoadProposalCategoryEvent(categoryRef: categoryRef));
     } else {
       bloc.add(const LoadDefaultProposalCategoryEvent());
     }

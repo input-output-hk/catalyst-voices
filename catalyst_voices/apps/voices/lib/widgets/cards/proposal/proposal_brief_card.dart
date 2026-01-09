@@ -16,6 +16,7 @@ class ProposalBriefCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
+
   // TODO(LynxxLynx): This should come from campaign settings
   final bool readOnly;
 
@@ -51,11 +52,14 @@ class _Author extends StatelessWidget {
             size: 32,
             username: author,
           ),
-          UsernameText(
-            key: const Key('Author'),
-            author,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+          Flexible(
+            child: UsernameText(
+              key: const Key('Author'),
+              author,
+              maxLines: 1,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
             ),
           ),
         ],

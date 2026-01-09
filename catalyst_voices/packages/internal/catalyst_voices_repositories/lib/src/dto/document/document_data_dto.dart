@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_data_dto.g.dart';
@@ -77,57 +78,57 @@ final class DocumentDataDto {
 @JsonSerializable()
 final class DocumentDataMetadataDto {
   @JsonKey(
+    toJson: DocumentContentType.toJson,
+    fromJson: DocumentContentType.fromJson,
+  )
+  final DocumentContentType contentType;
+  @JsonKey(
     toJson: DocumentType.toJson,
     fromJson: DocumentType.fromJson,
   )
   final DocumentType type;
   final DocumentRefDto selfRef;
   final DocumentRefDto? ref;
-  final SecuredDocumentRefDto? refHash;
   final DocumentRefDto? template;
   final DocumentRefDto? reply;
   final String? section;
-  final DocumentRefDto? brandId;
-  final DocumentRefDto? campaignId;
-  final String? electionId;
-  final DocumentRefDto? categoryId;
+  final List<String>? collaborators;
+  final List<DocumentRefDto> parameters;
   final List<String>? authors;
 
   DocumentDataMetadataDto({
+    required this.contentType,
     required this.type,
     required this.selfRef,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.brandId,
-    this.campaignId,
-    this.electionId,
-    this.categoryId,
+    this.collaborators,
+    this.parameters = const [],
     this.authors,
   });
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
     var migrated = _migrateJson1(json);
     migrated = _migrateJson2(migrated);
+    migrated = _migrateJson3(migrated);
+    migrated = _migrateJson4(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
 
   DocumentDataMetadataDto.fromModel(DocumentDataMetadata data)
     : this(
+        contentType: data.contentType,
         type: data.type,
         selfRef: data.selfRef.toDto(),
         ref: data.ref?.toDto(),
-        refHash: data.refHash?.toDto(),
         template: data.template?.toDto(),
         reply: data.reply?.toDto(),
         section: data.section,
-        brandId: data.brandId?.toDto(),
-        campaignId: data.campaignId?.toDto(),
-        electionId: data.electionId,
-        categoryId: data.categoryId?.toDto(),
+        collaborators: data.collaborators?.map((e) => e.toString()).toList(),
+        parameters: data.parameters.set.map((e) => e.toDto()).toList(),
         authors: data.authors?.map((e) => e.toString()).toList(),
       );
 
@@ -135,23 +136,23 @@ final class DocumentDataMetadataDto {
 
   DocumentDataMetadata toModel() {
     return DocumentDataMetadata(
+      contentType: contentType,
       type: type,
       selfRef: selfRef.toModel(),
       ref: ref?.toModel(),
-      refHash: refHash?.toModel(),
       template: template?.toModel().toSignedDocumentRef(),
       reply: reply?.toModel().toSignedDocumentRef(),
       section: section,
-      brandId: brandId?.toModel().toSignedDocumentRef(),
-      campaignId: campaignId?.toModel().toSignedDocumentRef(),
-      electionId: electionId,
-      categoryId: categoryId?.toModel().toSignedDocumentRef(),
+      collaborators: collaborators?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
+      parameters: DocumentParameters(
+        parameters.map((e) => e.toModel().toSignedDocumentRef()).toSet(),
+      ),
       authors: authors?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
     );
   }
 
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+    final modified = Map.of(json);
 
     if (modified.containsKey('id') && modified.containsKey('version')) {
       final id = modified.remove('id') as String;
@@ -168,7 +169,7 @@ final class DocumentDataMetadataDto {
   }
 
   static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+    final modified = Map.of(json);
 
     if (modified['brandId'] is String) {
       final id = modified.remove('brandId') as String;
@@ -189,14 +190,51 @@ final class DocumentDataMetadataDto {
 
     return modified;
   }
+
+  /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
+  static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+    final parametersKeys = ['brandId', 'campaignId', 'categoryId'];
+
+    if (parametersKeys.none(json.containsKey)) {
+      return json;
+    } else {
+      final modified = Map.of(json);
+      final parameters = <DocumentRefDto>[];
+
+      for (final key in parametersKeys) {
+        final value = modified.remove(key);
+        if (value is Map<String, dynamic>) {
+          parameters.add(DocumentRefDto.fromJson(value));
+        }
+      }
+
+      modified['parameters'] = parameters.map((e) => e.toJson()).toList();
+      return modified;
+    }
+  }
+
+  /// Adds missing contentType field.
+  static Map<String, dynamic> _migrateJson4(Map<String, dynamic> json) {
+    if (json.containsKey('contentType')) {
+      return json;
+    } else {
+      final modified = Map.of(json);
+      final type = _tryParseDocumentType(json['type']);
+      final contentType = type?.contentType ?? DocumentContentType.json;
+      modified['contentType'] = DocumentContentType.toJson(contentType);
+      return modified;
+    }
+  }
+
+  static DocumentType? _tryParseDocumentType(Object? object) {
+    if (object is String) {
+      return DocumentType.fromJson(object);
+    }
+
+    return null;
+  }
 }
 
 extension on DocumentRef {
   DocumentRefDto toDto() => DocumentRefDto.fromModel(this);
-}
-
-extension on SecuredDocumentRef {
-  SecuredDocumentRefDto toDto() {
-    return SecuredDocumentRefDto.fromModel(this);
-  }
 }
