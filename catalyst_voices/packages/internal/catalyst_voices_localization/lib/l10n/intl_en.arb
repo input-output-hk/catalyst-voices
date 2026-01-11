@@ -2224,6 +2224,15 @@
       }
     }
   },
+  "noOfDecide": "Decide · {count}",
+  "@noOfDecide": {
+    "description": "Tab label for \"Decide\" proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfDraft": "Draft proposals · {count}",
   "@noOfDraft": {
     "description": "Tab label for draft proposals in voting space",
@@ -2244,7 +2253,7 @@
   },
   "noOfFinal": "Final proposals · {count}",
   "@noOfFinal": {
-    "description": "Tab label for final proposals in voting space",
+    "description": "Tab label for final proposals",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2523,6 +2532,34 @@
   "proposal": "Proposal",
   "@proposal": {
     "description": "Generic name to describe an type of item."
+  },
+  "proposalApprovalDecideEmptySubtitle": "Approval requests will appear here.",
+  "@proposalApprovalDecideEmptySubtitle": {
+    "description": "Header for final proposal approval page empty state for proposals to decide tab"
+  },
+  "proposalApprovalDecideEmptyTitle": "No final approval requests yet",
+  "@proposalApprovalDecideEmptyTitle": {
+    "description": "Header for final proposal approval page empty state for proposals to decide tab"
+  },
+  "proposalApprovalFinalProposalsEmptySubtitle": "Final proposals will appear here.",
+  "@proposalApprovalFinalProposalsEmptySubtitle": {
+    "description": "Header for final proposal approval page empty state for final proposals tab"
+  },
+  "proposalApprovalFinalProposalsEmptyTitle": "No final proposals yet",
+  "@proposalApprovalFinalProposalsEmptyTitle": {
+    "description": "Header for final proposal approval page empty state for final proposals tab"
+  },
+  "proposalApprovalHeader": "Final Proposal Approval",
+  "@proposalApprovalHeader": {
+    "description": "Header for final proposal approval page"
+  },
+  "proposalApprovalSubheader": "Once the proposal draft is finalised, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
+  "@proposalApprovalSubheader": {
+    "description": "Subheader for final proposal approval page"
+  },
+  "proposalApprovalTabDecide": "Decide",
+  "@proposalApprovalTabDecide": {
+    "description": "Label for \"decide\" tab"
   },
   "proposalApprovals": "Proposal Approvals",
   "@proposalApprovals": {
