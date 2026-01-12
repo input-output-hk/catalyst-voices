@@ -43,6 +43,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_dropzone: ^4.2.1
+  # TODO(LynxLynxx): Update to stable version when available.
   flutter_inappwebview: ^6.2.0-beta.2
   flutter_localized_locales: ^2.0.5
   flutter_markdown: ^0.7.7+1
