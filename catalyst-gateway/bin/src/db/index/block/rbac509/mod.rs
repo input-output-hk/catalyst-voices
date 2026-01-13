@@ -26,22 +26,13 @@ use tracing::{debug, error};
 
 use crate::{
     db::index::{
-        queries::{FallibleQueryTasks, SizedBatch, purge},
+        queries::{FallibleQueryTasks, SizedBatch},
         session::CassandraSession,
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
     rbac::{RbacBlockIndexingContext, cache_persistent_rbac_chain, provider::RbacChainsProvider},
     settings::cassandra_db::EnvVars,
 };
-
-/// Represents a database operation on a stake address.
-#[derive(Debug)]
-enum StakeAddressOperation {
-    /// Inserts or updates the Catalyst ID associated with a stake address.
-    Insert(insert_catalyst_id_for_stake_address::Params),
-    /// Removes the Catalyst ID mapping for a stake address.
-    Delete(purge::catalyst_id_for_stake_address::Params),
-}
 
 /// Index RBAC 509 Registration Query Parameters
 #[derive(Debug)]
@@ -52,9 +43,8 @@ pub(crate) struct Rbac509InsertQuery {
     pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
     /// A Catalyst ID for transaction ID Data captured during indexing.
     catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
-    /// Append-only events Catalyst ID for stake address transitions captured
-    /// during indexing.
-    catalyst_id_for_stake_address: Vec<StakeAddressOperation>,
+    /// A Catalyst ID for stake address data captured during indexing.
+    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
     /// A Catalyst ID for public key data captured during indexing.
     catalyst_id_for_public_key: Vec<insert_catalyst_id_for_public_key::Params>,
 }
@@ -366,27 +356,14 @@ impl Rbac509InsertQuery {
             .difference(removed_stake_addresses)
             .cloned()
         {
-            self.catalyst_id_for_stake_address
-                .push(StakeAddressOperation::Insert(
-                    insert_catalyst_id_for_stake_address::Params::new(
-                        address,
-                        slot,
-                        index,
-                        catalyst_id.clone(),
-                    ),
-                ));
-        }
-
-        // Record stake addresses that are marked as removed.
-        for address in removed_stake_addresses {
-            self.catalyst_id_for_stake_address
-                .push(StakeAddressOperation::Delete(
-                    purge::catalyst_id_for_stake_address::Params {
-                        stake_address: address.clone().into(),
-                        slot_no: slot.into(),
-                        txn_index: index.into(),
-                    },
-                ));
+            self.catalyst_id_for_stake_address.push(
+                insert_catalyst_id_for_stake_address::Params::new(
+                    address,
+                    slot,
+                    index,
+                    catalyst_id.clone(),
+                ),
+            );
         }
 
         // Record new public keys.
@@ -485,31 +462,11 @@ impl Rbac509InsertQuery {
         if !self.catalyst_id_for_stake_address.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                let mut results = Vec::with_capacity(self.catalyst_id_for_stake_address.len());
-
-                // execute in sequence to prevent data race
-                for entry in self.catalyst_id_for_stake_address {
-                    let result = match entry {
-                        StakeAddressOperation::Insert(entry) => {
-                            insert_catalyst_id_for_stake_address::Params::execute_batch(
-                                &inner_session,
-                                vec![entry],
-                            )
-                            .await?
-                        },
-                        StakeAddressOperation::Delete(entry) => {
-                            purge::catalyst_id_for_stake_address::DeleteQuery::execute(
-                                &inner_session,
-                                vec![entry],
-                            )
-                            .await?
-                        },
-                    };
-
-                    results.extend(result);
-                }
-
-                Ok(results)
+                insert_catalyst_id_for_stake_address::Params::execute_batch(
+                    &inner_session,
+                    self.catalyst_id_for_stake_address,
+                )
+                .await
             }));
         }
 
