@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.6.10 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.6.12 AS playwright-ci
 
 # Base setup for E2E test runner using catalyst-ci playwright module
 builder:
