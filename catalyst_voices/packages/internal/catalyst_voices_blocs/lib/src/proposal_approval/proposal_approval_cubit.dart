@@ -1,22 +1,22 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/display_consent/display_consent_cubit_cache.dart';
+import 'package:catalyst_voices_blocs/src/proposal_approval/proposal_approval_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
-final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErrorEmitterMixin {
+final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with BlocErrorEmitterMixin {
   final UserService _userService;
   final ProposalService _proposalService;
 
-  DisplayConsentCubitCache _cache = const DisplayConsentCubitCache();
+  ProposalApprovalCubitCache _cache = const ProposalApprovalCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<Page<ProposalBriefData>>? _proposalDisplayConsentSub;
 
-  DisplayConsentCubit(this._userService, this._proposalService)
-    : super(const DisplayConsentState());
+  ProposalApprovalCubit(this._userService, this._proposalService)
+    : super(const ProposalApprovalState());
 
   Future<void> changeDisplayConsent({
     required DocumentRef id,

@@ -78,16 +78,20 @@ final class UsersProposalOverview extends Equatable {
   ///
   /// If the `collaborators` list is empty, an empty list is returned, even if
   /// an `author` is present.
-  List<Collaborator> get contributors {
+  List<Contributor> get contributors {
     final mainProposer = author != null
-        ? Collaborator(id: author!, status: ProposalsCollaborationStatus.mainProposer)
+        ? Contributor(
+            id: author!,
+            status: ProposalsCollaborationStatus.mainProposer,
+            isAuthor: true,
+          )
         : null;
 
     if (collaborators.isEmpty) return [];
 
     return [
       ?mainProposer,
-      ...collaborators,
+      ...collaborators.map(Contributor.fromCollaborator),
     ];
   }
 

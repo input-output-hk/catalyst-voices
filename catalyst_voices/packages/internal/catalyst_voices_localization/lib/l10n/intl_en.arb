@@ -517,6 +517,14 @@
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
   },
+  "collaboratorApprovedFinal": "Approved final",
+  "@collaboratorApprovedFinal": {
+    "description": "Collaborator approved final proposal"
+  },
+  "collaboratorAwaitingApproval": "Awaiting approval",
+  "@collaboratorAwaitingApproval": {
+    "description": "Collaborator awaiting approval for a proposal"
+  },
   "collaboratorDisplayConsent": "Co-Proposer\nDisplay Consent",
   "@collaboratorDisplayConsent": {
     "description": "Generic title to inform user about display consent"
@@ -2533,16 +2541,16 @@
   "@proposal": {
     "description": "Generic name to describe an type of item."
   },
-  "proposalApprovalDecideEmptySubtitle": "Approval requests will appear here.",
-  "@proposalApprovalDecideEmptySubtitle": {
+  "proposalApprovalDecideEmptyDescription": "Approval requests will appear here.",
+  "@proposalApprovalDecideEmptyDescription": {
     "description": "Header for final proposal approval page empty state for proposals to decide tab"
   },
   "proposalApprovalDecideEmptyTitle": "No final approval requests yet",
   "@proposalApprovalDecideEmptyTitle": {
     "description": "Header for final proposal approval page empty state for proposals to decide tab"
   },
-  "proposalApprovalFinalProposalsEmptySubtitle": "Final proposals will appear here.",
-  "@proposalApprovalFinalProposalsEmptySubtitle": {
+  "proposalApprovalFinalProposalsEmptyDescription": "Final proposals will appear here.",
+  "@proposalApprovalFinalProposalsEmptyDescription": {
     "description": "Header for final proposal approval page empty state for final proposals tab"
   },
   "proposalApprovalFinalProposalsEmptyTitle": "No final proposals yet",
@@ -4469,6 +4477,10 @@
   "yesterday": "Yesterday",
   "@yesterday": {
     "description": "Refers to date which is yesterday."
+  },
+  "you": "You",
+  "@you": {
+    "description": "You (referring to the current app user)"
   },
   "youAreSettingFinalToDraft": "You are setting your final proposal back to draft.",
   "@youAreSettingFinalToDraft": {
