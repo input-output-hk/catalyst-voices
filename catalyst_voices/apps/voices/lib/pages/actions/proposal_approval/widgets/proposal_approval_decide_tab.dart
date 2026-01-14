@@ -22,6 +22,7 @@ class ProposalApprovalDecideTab extends StatelessWidget {
     }
 
     return ListView.separated(
+      shrinkWrap: true,
       padding: const EdgeInsets.symmetric(vertical: 12),
       itemCount: items.length,
       separatorBuilder: (context, index) => const SizedBox(height: 12),

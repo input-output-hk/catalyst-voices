@@ -1776,11 +1776,19 @@
   },
   "headsUpDisplayConsentHintContent": "You can agree or disagree to be displayed on any proposal you’re invited to.\n\nChanged your mind? You can update your display consent anytime, just keep the submission deadline in mind. Earlier iterations will still show your previous choice.",
   "@headsUpDisplayConsentHintContent": {
-    "description": "Content for heads up about co-proposer display consent"
+    "description": "Content for heads up about final proposals approval"
   },
   "headsUpDisplayConsentHintTitle": "Heads up on Co-proposer Display consent",
   "@headsUpDisplayConsentHintTitle": {
     "description": "Title for heads up about co-proposer display consent"
+  },
+  "headsUpProposalApprovalHintContent": "Final proposals are published to Voting space, do keep in mind that Drafts are not eligible for funding.",
+  "@headsUpProposalApprovalHintContent": {
+    "description": "Content for heads up about co-proposer display consent"
+  },
+  "headsUpProposalApprovalHintTitle": "Heads up on Final Proposals",
+  "@headsUpProposalApprovalHintTitle": {
+    "description": "Title for heads up about final proposals approval"
   },
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {

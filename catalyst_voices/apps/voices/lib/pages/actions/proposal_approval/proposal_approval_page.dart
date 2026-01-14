@@ -4,9 +4,12 @@ import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/actions/proposal_approval/widgets/proposal_approval_tabs.dart';
 import 'package:catalyst_voices/pages/actions/widgets/actions_header_text.dart';
+import 'package:catalyst_voices/pages/actions/widgets/actions_hint_card.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalApprovalPage extends StatefulWidget {
@@ -17,14 +20,39 @@ class ProposalApprovalPage extends StatefulWidget {
 }
 
 class _Content extends StatelessWidget {
-  const _Content();
+  final VoicesTabController<ProposalApprovalTabType> tabController;
+
+  const _Content({required this.tabController});
 
   @override
   Widget build(BuildContext context) {
-    return const Flexible(
+    return Flexible(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24),
-        child: ProposalApprovalTabs(),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: ProposalApprovalTabs(tabController: tabController),
+      ),
+    );
+  }
+}
+
+class _FooterHint extends StatelessWidget {
+  final VoicesTabController<ProposalApprovalTabType> tabController;
+
+  const _FooterHint({required this.tabController});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: tabController,
+      builder: (context, child) {
+        return Offstage(
+          offstage: tabController.tab != ProposalApprovalTabType.finalProposals,
+          child: child,
+        );
+      },
+      child: ActionsHintCard(
+        title: context.l10n.headsUpProposalApprovalHintTitle,
+        description: context.l10n.headsUpProposalApprovalHintContent,
       ),
     );
   }
@@ -46,22 +74,35 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _ProposalApprovalPageState extends State<ProposalApprovalPage> {
+class _ProposalApprovalPageState extends State<ProposalApprovalPage>
+    with SingleTickerProviderStateMixin {
   late final ProposalApprovalCubit _cubit;
+  late final VoicesTabController<ProposalApprovalTabType> _tabController;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _cubit,
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
-          _Header(),
-          SizedBox(height: 16),
-          _Subheader(),
-          SizedBox(height: 20),
-          _Content(),
+          Positioned.fill(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const _Header(),
+                const SizedBox(height: 16),
+                const _Subheader(),
+                const SizedBox(height: 20),
+                _Content(tabController: _tabController),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _FooterHint(tabController: _tabController),
+          ),
         ],
       ),
     );
@@ -69,6 +110,7 @@ class _ProposalApprovalPageState extends State<ProposalApprovalPage> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     unawaited(_cubit.close());
 
     super.dispose();
@@ -80,6 +122,12 @@ class _ProposalApprovalPageState extends State<ProposalApprovalPage> {
 
     _cubit = Dependencies.instance.get<ProposalApprovalCubit>();
     _cubit.init();
+
+    _tabController = VoicesTabController(
+      initialTab: ProposalApprovalTabType.decide,
+      vsync: this,
+      tabs: ProposalApprovalTabType.values,
+    );
   }
 }
 

@@ -8,7 +8,12 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalApprovalTabs extends StatelessWidget {
-  const ProposalApprovalTabs({super.key});
+  final TabController tabController;
+
+  const ProposalApprovalTabs({
+    super.key,
+    required this.tabController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,23 +23,22 @@ class ProposalApprovalTabs extends StatelessWidget {
           final decideItems = state.decideItems;
           final finalItems = state.finalItems;
 
-          return DefaultTabController(
-            length: ProposalApprovalTabType.values.length,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _TabBar(
-                  decideCount: decideItems.length,
-                  finalCount: finalItems.length,
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _TabBar(
+                tabController: tabController,
+                decideCount: decideItems.length,
+                finalCount: finalItems.length,
+              ),
+              Flexible(
+                child: _TabBarView(
+                  tabController: tabController,
+                  decideItems: decideItems,
+                  finalItems: finalItems,
                 ),
-                Flexible(
-                  child: _TabBarView(
-                    decideItems: decideItems,
-                    finalItems: finalItems,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -43,10 +47,12 @@ class ProposalApprovalTabs extends StatelessWidget {
 }
 
 class _TabBar extends StatelessWidget {
+  final TabController tabController;
   final int decideCount;
   final int finalCount;
 
   const _TabBar({
+    required this.tabController,
     required this.decideCount,
     required this.finalCount,
   });
@@ -54,6 +60,7 @@ class _TabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesTabBar(
+      controller: tabController,
       tabs: [
         VoicesTab(
           data: ProposalApprovalTabType.decide,
@@ -69,10 +76,12 @@ class _TabBar extends StatelessWidget {
 }
 
 class _TabBarView extends StatelessWidget {
+  final TabController tabController;
   final List<UsersProposalOverview> decideItems;
   final List<UsersProposalOverview> finalItems;
 
   const _TabBarView({
+    required this.tabController,
     required this.decideItems,
     required this.finalItems,
   });
@@ -80,6 +89,7 @@ class _TabBarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TabBarStackView(
+      controller: tabController,
       children: [
         ProposalApprovalDecideTab(items: decideItems),
         ProposalApprovalFinalTab(items: finalItems),
