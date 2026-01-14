@@ -6,14 +6,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalApprovalContributors extends StatelessWidget {
-  final List<Contributor> contributors;
+class ProposalApprovalCollaborators extends StatelessWidget {
+  final List<Collaborator> collaborators;
   final ProposalApprovalTabType tab;
   final CatalystId? activeAccountId;
 
-  const ProposalApprovalContributors({
+  const ProposalApprovalCollaborators({
     super.key,
-    required this.contributors,
+    required this.collaborators,
     required this.tab,
     required this.activeAccountId,
   });
@@ -28,9 +28,9 @@ class ProposalApprovalContributors extends StatelessWidget {
       child: Column(
         spacing: 16,
         children: [
-          for (final contributor in contributors)
-            _Contributor(
-              contributor: contributor,
+          for (final collaborator in collaborators)
+            _Collaborator(
+              collaborator: collaborator,
               tab: tab,
               activeAccountId: activeAccountId,
             ),
@@ -40,13 +40,13 @@ class ProposalApprovalContributors extends StatelessWidget {
   }
 }
 
-class _Contributor extends StatelessWidget {
-  final Contributor contributor;
+class _Collaborator extends StatelessWidget {
+  final Collaborator collaborator;
   final ProposalApprovalTabType tab;
   final CatalystId? activeAccountId;
 
-  const _Contributor({
-    required this.contributor,
+  const _Collaborator({
+    required this.collaborator,
     required this.tab,
     required this.activeAccountId,
   });
@@ -56,17 +56,17 @@ class _Contributor extends StatelessWidget {
     return Row(
       spacing: 12,
       children: [
-        _StatusIcon(status: contributor.status),
+        _StatusIcon(status: collaborator.status),
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              _NameAndCatalystId(catalystId: contributor.id),
+              _NameAndCatalystId(catalystId: collaborator.id),
               _StatusText(
-                status: contributor.status,
-                createdAt: contributor.createdAt,
-                isCurrentUser: activeAccountId.isSameAs(contributor.id),
+                status: collaborator.status,
+                createdAt: collaborator.createdAt,
+                isCurrentUser: activeAccountId.isSameAs(collaborator.id),
                 isFinalTab: tab == ProposalApprovalTabType.finalProposals,
               ),
             ],

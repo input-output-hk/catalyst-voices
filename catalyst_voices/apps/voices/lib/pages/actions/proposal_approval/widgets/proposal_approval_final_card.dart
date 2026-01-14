@@ -20,7 +20,7 @@ class ProposalApprovalFinalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contributors = proposal.contributors;
+    final collaborators = proposal.collaborators;
 
     return Container(
       clipBehavior: Clip.antiAlias,
@@ -39,9 +39,9 @@ class ProposalApprovalFinalCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Header(proposal: proposal),
-          if (contributors.isNotEmpty)
-            ProposalApprovalContributors(
-              contributors: contributors,
+          if (collaborators.isNotEmpty)
+            ProposalApprovalCollaborators(
+              collaborators: collaborators,
               tab: ProposalApprovalTabType.finalProposals,
               activeAccountId: activeAccountId,
             ),

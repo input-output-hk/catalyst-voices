@@ -23,7 +23,7 @@ class ProposalApprovalDecideCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contributors = proposal.contributors;
+    final collaborators = proposal.collaborators;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -42,9 +42,9 @@ class ProposalApprovalDecideCard extends StatelessWidget {
         children: [
           _Header(proposal: proposal),
           const Divider(),
-          if (contributors.isNotEmpty) ...[
-            ProposalApprovalContributors(
-              contributors: contributors,
+          if (collaborators.isNotEmpty) ...[
+            ProposalApprovalCollaborators(
+              collaborators: collaborators,
               tab: ProposalApprovalTabType.decide,
               activeAccountId: activeAccountId,
             ),
