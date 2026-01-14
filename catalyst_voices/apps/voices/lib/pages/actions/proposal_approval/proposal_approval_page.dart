@@ -27,8 +27,20 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Flexible(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: ListenableBuilder(
+        listenable: tabController,
+        builder: (context, child) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              // there's a stack which displays a footer above the list, reserve some extra space
+              // so that the last list item can be scrolled upwards enough to be fully visible
+              bottom: tabController.tab == ProposalApprovalTabType.finalProposals ? 120 : 0,
+            ),
+            child: child,
+          );
+        },
         child: ProposalApprovalTabs(tabController: tabController),
       ),
     );

@@ -18,7 +18,6 @@ class ActionsHintCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 182,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: context.colors.elevationsOnSurfaceNeutralLv1White,
