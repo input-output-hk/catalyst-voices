@@ -79,10 +79,10 @@ class _TabBarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const TabBarStackView(
+    return TabBarStackView(
       children: [
-        ProposalApprovalDecideTab(items: []),
-        ProposalApprovalFinalTab(items: []),
+        ProposalApprovalDecideTab(items: decideItems),
+        ProposalApprovalFinalTab(items: finalItems),
       ],
     );
   }

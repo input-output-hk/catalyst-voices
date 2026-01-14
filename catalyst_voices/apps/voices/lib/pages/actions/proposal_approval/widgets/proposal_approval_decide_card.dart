@@ -22,11 +22,11 @@ class ProposalApprovalDecideCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final contributors = proposal.contributors;
-    const borderRadius = BorderRadius.all(Radius.circular(12));
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: borderRadius,
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        color: context.colors.elevationsOnSurfaceNeutralLv1White,
         boxShadow: [
           BoxShadow(
             color: context.colors.onSurfaceNeutral016,
@@ -34,22 +34,18 @@ class ProposalApprovalDecideCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Material(
-        color: context.colors.elevationsOnSurfaceNeutralLv1White,
-        borderRadius: borderRadius,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _Header(proposal: proposal),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _Header(proposal: proposal),
+          const Divider(),
+          if (contributors.isNotEmpty) ...[
+            ProposalApprovalContributors(contributors: contributors),
             const Divider(),
-            if (contributors.isNotEmpty) ...[
-              ProposalApprovalContributors(contributors: contributors),
-              const Divider(),
-            ],
-            _Footer(proposalId: proposal.id),
           ],
-        ),
+          _Footer(proposalId: proposal.id),
+        ],
       ),
     );
   }

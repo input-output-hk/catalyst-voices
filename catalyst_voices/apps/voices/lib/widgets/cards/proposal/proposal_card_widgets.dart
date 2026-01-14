@@ -96,20 +96,20 @@ class ProposalCommentsChip extends StatelessWidget {
 class ProposalIterationStageChip extends StatelessWidget {
   final ProposalPublish status;
   final int versionNumber;
-  final bool useInternalBackground;
+  final Color? foregroundColor;
 
   const ProposalIterationStageChip({
     super.key,
     required this.status,
     required this.versionNumber,
-    this.useInternalBackground = true,
+    this.foregroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesChip.rectangular(
       leading: status.workspaceIcon.buildIcon(
-        color: useInternalBackground ? null : context.colors.iconsBackground,
+        color: foregroundColor,
       ),
       content: Text(
         context.l10n.proposalStageAndIteration(
@@ -117,9 +117,7 @@ class ProposalIterationStageChip extends StatelessWidget {
           versionNumber,
         ),
         style: context.textTheme.labelLarge?.copyWith(
-          color: useInternalBackground
-              ? Theme.of(context).colors.textOnPrimaryLevel1
-              : context.colors.iconsBackground,
+          color: foregroundColor ?? Theme.of(context).colors.textOnPrimaryLevel1,
         ),
       ),
     );
@@ -146,12 +144,12 @@ class ProposalPublishChip extends StatelessWidget {
 
 class ProposalVersionChip extends StatelessWidget {
   final String version;
-  final bool useInternalBackground;
+  final Color? foregroundColor;
 
   const ProposalVersionChip({
     super.key,
     required this.version,
-    this.useInternalBackground = true,
+    this.foregroundColor,
   });
 
   @override
@@ -162,15 +160,13 @@ class ProposalVersionChip extends StatelessWidget {
         children: [
           VoicesAssets.icons.documentText.buildIcon(
             size: 18,
-            color: useInternalBackground ? null : context.colors.iconsBackground,
+            color: foregroundColor,
           ),
           Text(
             version,
             key: const Key('Version'),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: useInternalBackground
-                  ? Theme.of(context).colors.textOnPrimaryLevel1
-                  : context.colors.iconsBackground,
+              color: foregroundColor ?? Theme.of(context).colors.textOnPrimaryLevel1,
             ),
           ),
         ],

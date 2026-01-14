@@ -29,7 +29,7 @@ class _LargeScreen extends StatelessWidget {
               ProposalIterationStageChip(
                 status: proposal.publish,
                 versionNumber: proposal.iteration,
-                useInternalBackground: !isSubmitted,
+                foregroundColor: isSubmitted ? context.colors.iconsBackground : null,
               ),
             ],
           ),
@@ -92,7 +92,7 @@ class _MediumScreen extends StatelessWidget {
             ProposalIterationStageChip(
               status: proposal.publish,
               versionNumber: proposal.iteration,
-              useInternalBackground: !isSubmitted,
+              foregroundColor: isSubmitted ? context.colors.iconsBackground : null,
             ),
           ],
         ),
@@ -150,7 +150,7 @@ class _SmallScreen extends StatelessWidget {
         ProposalIterationStageChip(
           status: proposal.publish,
           versionNumber: proposal.iteration,
-          useInternalBackground: !isSubmitted,
+          foregroundColor: isSubmitted ? context.colors.iconsBackground : null,
         ),
         Wrap(
           alignment: WrapAlignment.spaceBetween,

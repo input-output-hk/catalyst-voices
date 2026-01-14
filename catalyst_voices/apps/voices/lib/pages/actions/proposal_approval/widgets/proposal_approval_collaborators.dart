@@ -16,10 +16,17 @@ class ProposalApprovalContributors extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (final contributor in contributors) _Contributor(contributor: contributor),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 14,
+        horizontal: 22,
+      ),
+      child: Column(
+        spacing: 16,
+        children: [
+          for (final contributor in contributors) _Contributor(contributor: contributor),
+        ],
+      ),
     );
   }
 }
@@ -40,6 +47,7 @@ class _Contributor extends StatelessWidget {
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 4,
             children: [
               _NameAndCatalystId(catalystId: contributor.id),
               _StatusText(
