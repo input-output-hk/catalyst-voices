@@ -5,7 +5,7 @@ final class DetailProposal extends CoreProposal {
 
   factory DetailProposal({
     required DocumentRef id,
-    required SignedDocumentRef categoryRef,
+    required DocumentParameters parameters,
     required String title,
     required String description,
     required Money fundsRequested,
@@ -19,7 +19,7 @@ final class DetailProposal extends CoreProposal {
 
     return DetailProposal._(
       id: id,
-      categoryRef: categoryRef,
+      parameters: parameters,
       title: title,
       description: description,
       fundsRequested: fundsRequested,
@@ -37,7 +37,7 @@ final class DetailProposal extends CoreProposal {
   ) {
     return DetailProposal(
       id: data.document.metadata.id,
-      categoryRef: data.document.metadata.parameters.set.first,
+      parameters: data.document.metadata.parameters,
       title: data.document.title ?? '',
       description: data.document.description ?? '',
       fundsRequested: data.document.fundsRequested ?? Money.zero(currency: Currencies.fallback),
@@ -51,7 +51,7 @@ final class DetailProposal extends CoreProposal {
 
   const DetailProposal._({
     required super.id,
-    required super.categoryRef,
+    required super.parameters,
     required super.title,
     required super.description,
     required super.fundsRequested,
@@ -78,7 +78,7 @@ extension ProposalWithVersionX on DetailProposal {
           id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
           ver: '019584be-2321-7a1a-9b68-ad33a97a7e84',
         ),
-        categoryRef: categoryRef ?? SignedDocumentRef.generateFirstRef(),
+        parameters: DocumentParameters({categoryRef ?? SignedDocumentRef.generateFirstRef()}),
         title: 'Dummy Proposal ver 2',
         description: 'Dummy description',
         fundsRequested: Money(currency: Currencies.ada, minorUnits: BigInt.from(100)),

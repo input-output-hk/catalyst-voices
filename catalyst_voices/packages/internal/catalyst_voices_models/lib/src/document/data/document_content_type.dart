@@ -5,6 +5,9 @@ enum DocumentContentType {
   /// The document's content type is JSON.
   json('application/json'),
 
+  /// The document's content type is JSON schema.
+  schemaJson('application/json+schema'),
+
   /// Unrecognized content type.
   unknown('unknown');
 

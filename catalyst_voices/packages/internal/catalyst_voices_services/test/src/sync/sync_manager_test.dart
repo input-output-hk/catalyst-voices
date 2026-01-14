@@ -13,7 +13,6 @@ import 'package:test/test.dart';
 void main() {
   late DocumentsSynchronizer synchronizer;
   late SyncStatsStorage statsStorage;
-
   late SyncManager syncManager;
 
   setUpAll(() async {

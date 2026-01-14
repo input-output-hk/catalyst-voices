@@ -7,17 +7,15 @@ final class DocumentDataFactory {
 
   /// Creates correct [DocumentData] from [document].
   ///
-  /// Throws [SignedDocumentMetadataMalformed] in case of any required fields
-  /// missing.
-  ///
-  /// Throws [UnknownSignedDocumentContentType] in case of not supported
+  /// Throws [UnknownDocumentContentTypeException] in case of not supported
   /// [document] contentType.
   static DocumentDataWithArtifact create(SignedDocument document) {
     final metadata = document.metadata;
     final content = switch (document.payload) {
       SignedDocumentJsonPayload(:final data) => DocumentDataContent(data),
-      SignedDocumentUnknownPayload() => throw const UnknownSignedDocumentContentType(
-        type: SignedDocumentContentType.unknown,
+      SignedDocumentJsonSchemaPayload(:final data) => DocumentDataContent(data),
+      SignedDocumentUnknownPayload() => throw UnknownDocumentContentTypeException(
+        type: document.metadata.contentType,
       ),
     };
     final artifact = document.toArtifact();

@@ -9,7 +9,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 final f14StaticCampaignCategories = [
   CampaignCategory(
     id: f14ConstDocumentsRefs[0].category,
-    proposalTemplateRef: f14ConstDocumentsRefs[0].proposal,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Use Case:',
     categorySubname: 'Partners & Products',
@@ -90,7 +89,6 @@ The following will **not** be funded:
   ),
   CampaignCategory(
     id: f14ConstDocumentsRefs[1].category,
-    proposalTemplateRef: f14ConstDocumentsRefs[1].proposal,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Use Case:',
     categorySubname: 'Concept',
@@ -170,7 +168,6 @@ The following will **not** be funded:
   ),
   CampaignCategory(
     id: f14ConstDocumentsRefs[2].category,
-    proposalTemplateRef: f14ConstDocumentsRefs[2].proposal,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Developers',
@@ -252,7 +249,6 @@ The following will **not** be funded:
   ),
   CampaignCategory(
     id: f14ConstDocumentsRefs[3].category,
-    proposalTemplateRef: f14ConstDocumentsRefs[3].proposal,
     campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',

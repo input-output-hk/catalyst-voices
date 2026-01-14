@@ -52,8 +52,8 @@ void main() {
     test('submitProposalForReview throws '
         '$ProposalLimitReachedException when over limit', () async {
       final proposalRef = SignedDocumentRef.generateFirstRef();
-      final categoryId = SignedDocumentRef.generateFirstRef();
       final catalystId = CatalystIdFactory.create();
+
       final account = Account.dummy(
         catalystId: catalystId,
         keychain: MockKeychain(),
@@ -76,10 +76,7 @@ void main() {
       ).thenAnswer((_) => Stream.value(proposalsCount));
 
       expect(
-        () async => proposalService.submitProposalForReview(
-          proposalId: proposalRef,
-          categoryId: categoryId,
-        ),
+        () async => proposalService.submitProposalForReview(proposalId: proposalRef),
         throwsA(isA<ProposalLimitReachedException>()),
       );
     });
@@ -107,6 +104,7 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
+          parameters: const DocumentParameters(),
           versions: [
             ProposalBriefDataVersion(
               ref: signedDocId,
@@ -122,6 +120,7 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
           title: 'New Standalone Draft',
           author: authorId,
+          parameters: const DocumentParameters(),
         );
 
         // Mock signed proposals page
@@ -180,6 +179,7 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
+          parameters: const DocumentParameters(),
           versions: [
             ProposalBriefDataVersion(
               ref: signedDocId,
@@ -195,6 +195,7 @@ void main() {
           createdAt: DateTime.now(),
           title: 'Draft Edit of Published',
           author: authorId,
+          parameters: const DocumentParameters(),
         );
 
         // A completely new local draft
@@ -203,6 +204,7 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
           title: 'New Standalone Draft',
           author: authorId,
+          parameters: const DocumentParameters(),
         );
 
         // Mock signed proposals

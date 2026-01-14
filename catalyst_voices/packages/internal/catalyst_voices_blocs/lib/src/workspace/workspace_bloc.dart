@@ -172,7 +172,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final documentContent = _buildDocumentContent(docData.document.document);
 
       final encodedProposal = await _proposalService.encodeProposalForExport(
-        document: DocumentData(metadata: docMetadata, content: documentContent),
+        document: DocumentData(
+          metadata: docMetadata,
+          content: documentContent,
+        ),
       );
 
       final filename = '${event.prefix}_${event.ref.id}';
@@ -216,7 +219,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     final campaign = await _campaign;
-
     if (campaign == null) {
       return emitError(const LocalizedUnknownException());
     }
@@ -276,9 +278,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     if (proposal == null || proposal.id is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }
-    await _proposalService.unlockProposal(
-      proposalId: proposal.id as SignedDocumentRef,
-    );
+    await _proposalService.unlockProposal(proposalId: proposal.id as SignedDocumentRef);
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
   }
 

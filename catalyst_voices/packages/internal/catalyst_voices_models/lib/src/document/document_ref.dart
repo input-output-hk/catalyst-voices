@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:uuid_plus/uuid_plus.dart';
 
 /// Represents ref to any kind of document. Documents often have refs to other document
@@ -41,6 +40,8 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
 
   /// Whether the ref specifies the document [ver].
   bool get isExact => ver != null;
+
+  bool get isGenesis => id == ver;
 
   bool get isLoose => !isExact;
 
@@ -106,8 +107,15 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
 
   /// Generates a new (fresh) draft version of the document reference.
   ///
-  /// The timestamp of the version will be set to DateTime.now().
-  DraftRef freshVersion() {
+  /// If the [id] == [ver] then a new [id] will be generated since it's considered the
+  /// first version of the document. The [ver] will be the same as [id].
+  ///
+  /// If [id] != [ver] then only a new version is generated equalling to [DateTime.now].
+  DraftRef fresh() {
+    if (isGenesis) {
+      return DraftRef.generateFirstRef();
+    }
+
     return DraftRef(
       id: id,
       ver: const Uuid().v7(),
@@ -177,20 +185,6 @@ final class DraftRef extends DocumentRef {
 
   @override
   String toString() => isExact ? 'ExactDraftRef($id.v$ver)' : 'LooseDraftRef($id)';
-}
-
-///
-final class SecuredDocumentRef extends Equatable {
-  final DocumentRef ref;
-  final Uint8List hash;
-
-  const SecuredDocumentRef({
-    required this.ref,
-    required this.hash,
-  });
-
-  @override
-  List<Object?> get props => [ref, hash];
 }
 
 /// Ref to published document.

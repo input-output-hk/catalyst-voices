@@ -78,10 +78,17 @@ final class DatabaseDocumentsDataSource
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? originalAuthorId,
   }) {
     return _database.documentsV2Dao
-        .getDocument(type: type, id: id, referencing: referencing, originalAuthor: originalAuthorId)
+        .getDocument(
+          type: type,
+          id: id,
+          referencing: referencing,
+          parameter: parameter,
+          originalAuthor: originalAuthorId,
+        )
         .then((value) => value?.toModel());
   }
 
@@ -224,6 +231,7 @@ final class DatabaseDocumentsDataSource
           type: type,
           id: id,
           referencing: referencing,
+          originalAuthor: originalAuthorId,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,

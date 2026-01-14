@@ -252,9 +252,9 @@ class DocumentDataMetadataDtoDbV3 {
     }
 
     final modified = Map.of(json);
-
-    modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
-
+    final type = _tryParseDocumentType(json['type']);
+    final contentType = type?.contentType ?? DocumentContentType.json;
+    modified['contentType'] = DocumentContentType.toJson(contentType);
     return modified;
   }
 
@@ -271,6 +271,14 @@ class DocumentDataMetadataDtoDbV3 {
     }
 
     return modified;
+  }
+
+  static DocumentType? _tryParseDocumentType(Object? object) {
+    if (object is String) {
+      return DocumentType.fromJson(object);
+    }
+
+    return null;
   }
 }
 

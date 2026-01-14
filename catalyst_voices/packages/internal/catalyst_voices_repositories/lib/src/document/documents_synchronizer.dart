@@ -73,10 +73,10 @@ final class DocumentsSynchronizerImpl implements DocumentsSynchronizer {
             DocumentBaseType.category,
           },
           excludeIds: _syncExcludeIds(
-            stepsDocumentTypes,
+            stepsDocumentTypes.expand((element) => element).toList(),
             excludeTypes: [
               // Current document type should not be excluded from sync
-              ?filters.type,
+              ...?filters.type,
             ],
             additionalTypes: [
               // Category parameters are not documents so have to be excluded,

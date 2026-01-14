@@ -69,6 +69,7 @@ abstract interface class DocumentsV2Dao {
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? author,
     CatalystId? originalAuthor,
   });
@@ -170,6 +171,7 @@ abstract interface class DocumentsV2Dao {
     DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? campaign,
+    CatalystId? originalAuthor,
     bool latestOnly,
     int limit,
     int offset,
@@ -275,6 +277,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? author,
     CatalystId? originalAuthor,
   }) {
@@ -282,6 +285,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       type: type,
       id: id,
       referencing: referencing,
+      parameter: parameter,
       author: author,
       originalAuthor: originalAuthor,
     ).getSingleOrNull();
@@ -475,6 +479,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    CatalystId? originalAuthor,
     CampaignFilters? campaign,
     bool latestOnly = false,
     int limit = 200,
@@ -484,6 +489,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       type: type,
       id: id,
       referencing: referencing,
+      originalAuthor: originalAuthor,
       campaign: campaign,
       latestOnly: latestOnly,
       limit: limit,
@@ -526,6 +532,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    DocumentRef? parameter,
     CatalystId? author,
     CatalystId? originalAuthor,
   }) {
@@ -545,6 +552,23 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       if (referencing.isExact) {
         query.where((tbl) => tbl.refVer.equals(referencing.ver!));
       }
+    }
+
+    if (parameter != null) {
+      query.where((tbl) {
+        final dp = alias(documentParameters, 'dp');
+        final dpQuery = selectOnly(dp)
+          ..addColumns([const Constant(1)])
+          ..where(dp.documentId.equalsExp(tbl.id))
+          ..where(dp.documentVer.equalsExp(tbl.ver))
+          ..where(dp.id.equals(parameter.id));
+
+        if (parameter.isExact) {
+          dpQuery.where(dp.ver.equals(parameter.ver!));
+        }
+
+        return existsQuery(dpQuery);
+      });
     }
 
     if (type != null) {
@@ -591,6 +615,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentRef? referencing,
     CampaignFilters? campaign,
     List<CatalystId>? authors,
+    CatalystId? originalAuthor,
     required bool latestOnly,
     required int limit,
     required int offset,
@@ -616,6 +641,19 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       if (referencing.isExact) {
         query.where((tbl) => tbl.refVer.equals(referencing.ver!));
       }
+    }
+
+    if (originalAuthor != null) {
+      final significant = originalAuthor.toSignificant();
+      query.where((tbl) {
+        final originalAuthorQuery = selectOnly(documentAuthors)
+          ..addColumns([const Constant(1)])
+          ..where(documentAuthors.documentId.equalsExp(tbl.id))
+          /// Check against tbl.id to target the first version (where id == ver)
+          ..where(documentAuthors.documentVer.equalsExp(tbl.id))
+          ..where(documentAuthors.accountSignificantId.equals(significant.toUri().toString()));
+        return existsQuery(originalAuthorQuery);
+      });
     }
 
     if (campaign != null) {
@@ -649,12 +687,12 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final inner = alias(documentsV2, 'inner');
 
       query.where((tbl) {
-        final maxCreatedAt = subqueryExpression<DateTime>(
+        final maxVer = subqueryExpression<String>(
           selectOnly(inner)
-            ..addColumns([inner.createdAt.max()])
+            ..addColumns([inner.ver.max()])
             ..where(inner.id.equalsExp(tbl.id)),
         );
-        return tbl.createdAt.equalsExp(maxCreatedAt);
+        return tbl.ver.equalsExp(maxVer);
       });
     }
 

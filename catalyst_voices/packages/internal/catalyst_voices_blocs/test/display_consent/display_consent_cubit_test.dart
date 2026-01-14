@@ -112,6 +112,7 @@ void main() {
                 createdAt: DateTime(2024, 1, 2),
               ),
             ],
+            parameters: const DocumentParameters(),
           );
 
           proposalController.add(
@@ -173,6 +174,7 @@ void main() {
               createdAt: DateTime(2024, 1, 2),
             ),
           ],
+          parameters: const DocumentParameters(),
         );
 
         when(
@@ -444,6 +446,7 @@ void main() {
                 createdAt: DateTime(2024, 1, 4),
               ),
             ],
+            parameters: const DocumentParameters(),
           );
 
           accountController.add(account);

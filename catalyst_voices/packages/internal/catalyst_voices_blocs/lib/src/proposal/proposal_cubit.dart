@@ -132,6 +132,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: _cache.id!,
         action: CollaboratorProposalAction.rejectInvitation,
       );
+
       if (!isClosed) {
         emit(state.copyWith(collaborator: const RejectedCollaboratorInvitationState()));
       }
@@ -179,7 +180,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       'Can comment only on signed documents',
     );
 
-    final proposalCategoryId = _cache.proposalData?.proposalOrDocument.category?.id;
+    final proposalParameters = _cache.proposalData?.proposalOrDocument.parameters;
 
     final activeAccountId = _cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
@@ -187,16 +188,14 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentTemplate = _cache.commentTemplate;
     assert(commentTemplate != null, 'No comment template found!');
 
-    assert(proposalCategoryId != null, 'Proposal categoryId not found!');
-
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
         id: commentRef,
-        ref: proposalId! as SignedDocumentRef,
-        template: commentTemplate!.metadata.id as SignedDocumentRef,
+        proposalRef: proposalId! as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: reply,
-        parameters: DocumentParameters({?proposalCategoryId}),
+        parameters: proposalParameters!,
         authorId: activeAccountId!,
       ),
       document: document,
@@ -529,7 +528,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   Future<void> _getCommentBuilderTemplate() async {
     final categoryId = _cache.proposalData?.proposalOrDocument.category?.id;
     final commentTemplate = categoryId != null
-        ? await _commentService.getCommentTemplateFor(category: categoryId)
+        ? await _commentService.getCommentTemplate(category: categoryId)
         : null;
 
     _cache = _cache.copyWith(commentTemplate: Optional(commentTemplate));

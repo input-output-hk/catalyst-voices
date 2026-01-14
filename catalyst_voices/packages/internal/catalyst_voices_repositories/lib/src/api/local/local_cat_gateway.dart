@@ -1,20 +1,29 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.enums.swagger.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/api/local/fixture/fixtures.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart'
-    show IdSelectorDto;
+import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/api/models/full_stake_info.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document_version.dart';
+import 'package:catalyst_voices_repositories/src/api/models/key_data.dart';
+import 'package:catalyst_voices_repositories/src/api/models/network.dart';
+import 'package:catalyst_voices_repositories/src/api/models/payment_data.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_role_data.dart';
+import 'package:catalyst_voices_repositories/src/api/models/stake_info.dart';
+import 'package:catalyst_voices_repositories/src/dto/config/remote_config.dart';
+import 'package:catalyst_voices_repositories/src/signed_document/signed_document_mapper.dart';
 import 'package:cbor/cbor.dart';
-import 'package:chopper/chopper.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' as http;
 import 'package:uuid_plus/uuid_plus.dart' as u;
 
 /* cSpell:disable */
@@ -24,9 +33,7 @@ const _collabId =
 var _time = DateTime.utc(2025, 12, 19, 20, 3).millisecondsSinceEpoch;
 
 String _testAccountAuthorGetter(DocumentRef ref) {
-  /* cSpell:disable */
   return 'id.catalyst://Test@preprod.cardano/kouGJuMn6o18rRpDAZ1oiZadK171f5_-hgcHTYDGbo0=';
-  /* cSpell:enable */
 }
 /* cSpell:enable */
 
@@ -38,12 +45,9 @@ String _v7() {
 
 typedef DocumentAuthorGetter = String Function(DocumentRef ref);
 
-final class LocalCatGateway implements CatGateway {
-  @override
-  ChopperClient client;
-
-  final _cache = <String, List<SignedDocumentMetadata>>{};
-  final _docs = <SignedDocumentMetadata, Uint8List>{};
+final class LocalCatGateway implements CatGatewayService {
+  final _cache = <String, List<DocumentDataMetadata>>{};
+  final _docs = <DocumentDataMetadata, Uint8List>{};
   final _cachePopulateCompleter = Completer<bool>();
 
   final int proposalsCount;
@@ -56,15 +60,13 @@ final class LocalCatGateway implements CatGateway {
     DocumentAuthorGetter authorGetter = _testAccountAuthorGetter,
   }) {
     return LocalCatGateway._(
-      ChopperClient(),
       proposalsCount: initialProposalsCount,
       decompressedDocuments: decompressedDocuments,
       authorGetter: authorGetter,
     );
   }
 
-  LocalCatGateway._(
-    this.client, {
+  LocalCatGateway._({
     required this.proposalsCount,
     required this.decompressedDocuments,
     required this.authorGetter,
@@ -73,17 +75,148 @@ final class LocalCatGateway implements CatGateway {
   }
 
   @override
-  Type get definitionType => CatGateway;
+  void close() {}
 
   @override
-  Future<Response<FullStakeInfo>> apiV1CardanoAssetsStakeAddressGet({
-    required String? stakeAddress,
-    Network? network,
-    String? asat,
+  Future<DocumentIndexList> documentIndex({
+    required DocumentIndexQueryFilter filter,
+    int? limit,
+    int? page,
+  }) async {
+    page ??= 0;
+    limit ??= 10;
+
+    await _cachePopulateCompleter.future;
+
+    final id = filter.id;
+    final eq = id?.eq;
+    if (eq != null) {
+      final versions = _cache[eq] ?? [];
+
+      return DocumentIndexList(
+        docs: [versions.asIndex(eq)],
+        page: CurrentPage(
+          page: page,
+          limit: limit,
+          remaining: 0,
+        ),
+      );
+    }
+
+    final docs = _cache.entries
+        .skip(page * limit)
+        .take(limit)
+        .map((e) => e.value.asIndex(e.key))
+        .toList();
+
+    final currentPage = CurrentPage(
+      page: page,
+      limit: limit,
+      remaining: _cache.length - (page * limit + docs.length),
+    );
+
+    return DocumentIndexList(
+      docs: docs,
+      page: currentPage,
+    );
+  }
+
+  @override
+  Future<RemoteConfig> frontendConfig({
     dynamic authorization,
     dynamic contentType,
   }) async {
-    const body = FullStakeInfo(
+    return const RemoteConfig();
+  }
+
+  @override
+  Future<Uint8List> getDocument({
+    required String documentId,
+    String? version,
+  }) async {
+    await _cachePopulateCompleter.future;
+
+    if (!_cache.containsKey(documentId)) {
+      throw const NotFoundException();
+    }
+
+    final versions = _cache[documentId]!;
+    final metadata = version != null
+        ? versions.firstWhereOrNull((e) => e.id.ver == version)
+        : versions.last;
+    if (metadata == null) {
+      throw const NotFoundException();
+    }
+
+    final bytes = _docs[metadata] ?? _buildDoc(metadata);
+
+    return bytes;
+  }
+
+  @override
+  Future<RbacRegistrationChain> rbacRegistration({
+    String? lookup,
+    bool? showAllInvalid = false,
+  }) async {
+    /* cSpell:disable */
+    return RbacRegistrationChain(
+      catalystId: lookup!,
+      lastPersistentTxn: '0x784433f2735daf8d2cc28c383c49f195cbe7913c8e242cc47d900a11407e3ced',
+      purpose: ['ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c'],
+      roles: [
+        RbacRoleData(
+          roleId: 0,
+          signingKeys: [
+            KeyData(
+              isPersistent: true,
+              time: DateTime.parse('2025-10-08T12:31:35+00:00'),
+              slot: 1,
+              txnIndex: 1,
+              keyType: CertificateType.x509,
+            ),
+          ],
+          paymentAddresses: [
+            PaymentData(
+              isPersistent: true,
+              time: DateTime.parse('2025-10-08T12:31:35+00:00'),
+              slot: 1,
+              txnIndex: 1,
+            ),
+          ],
+        ),
+        RbacRoleData(
+          roleId: 3,
+          signingKeys: [
+            KeyData(
+              isPersistent: true,
+              time: DateTime.parse('2025-10-08T12:31:35+00:00'),
+              slot: 1,
+              txnIndex: 1,
+              keyType: CertificateType.x509,
+            ),
+          ],
+          paymentAddresses: [
+            PaymentData(
+              isPersistent: true,
+              time: DateTime.parse('2025-10-08T12:31:35+00:00'),
+              slot: 1,
+              txnIndex: 1,
+            ),
+          ],
+        ),
+      ],
+    );
+    /* cSpell:enable */
+  }
+
+  @override
+  Future<FullStakeInfo> stakeAssets({
+    String? stakeAddress,
+    Network? network,
+    String? asat,
+    String? authorization,
+  }) async {
+    return const FullStakeInfo(
       volatile: StakeInfo(
         adaAmount: 9992646426,
         slotNumber: 104243495,
@@ -95,182 +228,21 @@ final class LocalCatGateway implements CatGateway {
         assets: [],
       ),
     );
-    return Response<FullStakeInfo>(http.Response('{}', 200), body);
   }
 
   @override
-  Future<Response<Object>> apiV1ConfigFrontendGet({
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    return Response<Object>(http.Response('{}', 200), const <String, dynamic>{});
-  }
-
-  @override
-  Future<Response<String>> apiV1DocumentDocumentIdGet({
-    required String? documentId,
-    String? version,
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    await _cachePopulateCompleter.future;
-
-    if (documentId == null || !_cache.containsKey(documentId)) {
-      return Response(http.Response.bytes([], 404), '');
-    }
-
-    final versions = _cache[documentId]!;
-    final metadata = version != null
-        ? versions.firstWhereOrNull((e) => e.ver == version)
-        : versions.last;
-    if (metadata == null) {
-      return Response(http.Response.bytes([], 404), '');
-    }
-
-    final bytes = _docs[metadata] ?? _buildDoc(metadata);
-
-    return Response(http.Response.bytes(bytes, 200), '');
-  }
-
-  @override
-  Future<Response<DocumentIndexList>> apiV1DocumentIndexPost({
-    int? page,
-    int? limit,
-    dynamic authorization,
-    dynamic contentType,
-    required DocumentIndexQueryFilter? body,
-  }) async {
-    page ??= 0;
-    limit ??= 10;
-
-    await _cachePopulateCompleter.future;
-
-    final id = body?.id as IdSelectorDto?;
-    final eq = id?.eq;
-    if (eq != null) {
-      final versions = _cache[eq] ?? [];
-      return Response(
-        http.Response('{}', 200),
-        DocumentIndexList(
-          docs: [versions.asIndex(eq)],
-          page: CurrentPage(
-            page: page,
-            limit: limit,
-            remaining: 0,
-          ),
-        ),
-      );
-    }
-
-    final docs = _cache.entries
-        .skip(page * limit)
-        .take(limit)
-        .map((e) => e.value.asIndex(e.key))
-        .map((e) => e.toJson())
-        .toList();
-
-    final currentPage = CurrentPage(
-      page: page,
-      limit: limit,
-      remaining: _cache.length - (page * limit + docs.length),
-    );
-
-    final rBody = DocumentIndexList(
-      docs: docs,
-      page: currentPage,
-    );
-    return Response(http.Response('{}', 200), rBody);
-  }
-
-  @override
-  Future<Response<dynamic>> apiV1DocumentPut({
-    dynamic authorization,
-    dynamic contentType,
-    required Object? body,
-  }) async {
-    return Response(http.Response('{}', 200), 'ok');
-  }
-
-  @override
-  Future<Response<RbacRegistrationChain>> apiV1RbacRegistrationGet({
-    String? lookup,
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    /* cSpell:disable */
-    final body = RbacRegistrationChain(
-      catalystId: lookup!,
-      lastPersistentTxn: '0x784433f2735daf8d2cc28c383c49f195cbe7913c8e242cc47d900a11407e3ced',
-      purpose: ['ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c'],
-      roles: {
-        '0': {
-          'payment_addresses': [
-            {
-              'address':
-                  'addr_test1qpmezqgmgrpr79yltv05nrxzcfz4x5cmq936wftp5zvdz34fe77rv376n6wqpuf77es9t2xlwx5cmf0grv47ted2m3yqdfy2ra',
-              'is_persistent': true,
-              'time': '2025-10-08T12:31:35+00:00',
-            },
-          ],
-          'signing_keys': [
-            {
-              'is_persistent': true,
-              'key_type': 'x509',
-              'key_value':
-                  '0x308201173081caa00302010202046c59e362300506032b657030003022180f32303235313030383132333130375a180f39393939313233313233353935395a3000302a300506032b65700321007acd769a3df35a98921901b8bba58b0c7d284a1a439c5b4aba7e68de3b1195f6a3623060305e0603551d110457305586537765622b63617264616e6f3a2f2f616464722f7374616b655f7465737431757a35756c30706b676c64666138717137796c3076637a343472306872327664356835706b326c39756b3464636a71706b63736d37300506032b657003410045a38c8c40ec45786d9add539853cd461b7b98ae150b07c61f5f954647d95b358b35e7b96a1cc4d047b41b491c27d19306f682f7c3fcbc48318b13742b93da0d',
-              'time': '2025-10-08T12:31:35+00:00',
-            },
-          ],
-        },
-        '3': {
-          'payment_addresses': [
-            {
-              'address':
-                  'addr_test1qpmezqgmgrpr79yltv05nrxzcfz4x5cmq936wftp5zvdz34fe77rv376n6wqpuf77es9t2xlwx5cmf0grv47ted2m3yqdfy2ra',
-              'is_persistent': true,
-              'time': '2025-10-08T12:31:35+00:00',
-            },
-          ],
-          'signing_keys': [
-            {
-              'is_persistent': true,
-              'key_type': 'pubkey',
-              'key_value': '0x4dc09a04607b6915424f22ee815dcc9b18213f49d8ed4bd231bc9d040eb248ae',
-              'time': '2025-10-08T12:31:35+00:00',
-            },
-          ],
-        },
-      },
-    );
-    /* cSpell:enable */
-    return Response<RbacRegistrationChain>(
-      http.Response('{}', 200),
-      body,
-    );
-  }
+  Future<void> uploadDocument({required Uint8List body}) async {}
 
   Uint8List _buildDoc(
-    SignedDocumentMetadata metadata, {
+    DocumentDataMetadata metadata, {
     ProposalSubmissionAction? action,
     DocumentAuthorGetter? authorGetter,
   }) {
-    final protectedHeaders = CoseHeaders.protected(
-      contentType: const IntValue(CoseValues.jsonContentType),
-      // ignore: avoid_redundant_argument_values
-      contentEncoding: decompressedDocuments
-          ? null
-          : const StringValue(CoseValues.brotliContentEncoding),
-      type: metadata.documentType.uuid.asCose,
-      id: metadata.id!.asCose,
-      ver: metadata.ver!.asCose,
-      ref: metadata.ref?.asCose,
-      template: metadata.template?.asCose,
-      reply: metadata.reply?.asCose,
-      collabs: metadata.collabs,
-      categoryId: metadata.categoryId?.asCose,
-    );
+    authorGetter ??= this.authorGetter;
 
-    final payload = switch (metadata.documentType) {
+    final protectedHeaders = SignedDocumentMapper.buildCoseProtectedHeaders(metadata);
+
+    final payload = switch (metadata.type) {
       DocumentType.proposalDocument when decompressedDocuments => decompressedProposalPayload,
       DocumentType.proposalDocument => compressedProposalPayload,
       DocumentType.proposalTemplate when decompressedDocuments =>
@@ -290,8 +262,6 @@ final class LocalCatGateway implements CatGateway {
         ProposalSubmissionAction.draft => compressedProposalActionDraftPayload,
         ProposalSubmissionAction.hide => compressedProposalActionHidePayload,
       },
-      DocumentType.reviewDocument ||
-      DocumentType.reviewTemplate ||
       DocumentType.categoryParametersDocument ||
       DocumentType.categoryParametersTemplate ||
       DocumentType.campaignParametersDocument ||
@@ -301,10 +271,10 @@ final class LocalCatGateway implements CatGateway {
       DocumentType.unknown => throw UnimplementedError(),
     };
 
-    final ref = SignedDocumentRef(id: metadata.id!, ver: metadata.ver);
+    final ref = SignedDocumentRef(id: metadata.id.id, ver: metadata.id.ver);
     final signature = CoseSignature(
       protectedHeaders: CoseHeaders.protected(
-        kid: utf8.encode((authorGetter ?? this.authorGetter)(ref)),
+        kid: CatalystIdKid(utf8.encode(authorGetter(ref))),
       ),
       unprotectedHeaders: const CoseHeaders.unprotected(),
       signature: Uint8List.fromList([]),
@@ -321,26 +291,29 @@ final class LocalCatGateway implements CatGateway {
   }
 
   Future<void> _populateIndex() async {
-    for (final constRefs in activeConstantDocumentRefs) {
-      _cache[constRefs.proposal.id] = [
-        SignedDocumentMetadata(
-          contentType: SignedDocumentContentType.json,
-          documentType: DocumentType.proposalTemplate,
-          id: constRefs.proposal.id,
-          ver: constRefs.proposal.ver,
-          categoryId: constRefs.category.asMetadataRef,
-        ),
-      ];
+    final activeConstantDocumentRefs = constantDocumentRefsPerCampaign(activeCampaignRef);
+    if (activeConstantDocumentRefs.isEmpty) return;
 
-      _cache[constRefs.comment.id] = [
-        SignedDocumentMetadata(
-          contentType: SignedDocumentContentType.json,
-          documentType: DocumentType.commentTemplate,
-          id: constRefs.comment.id,
-          ver: constRefs.comment.ver,
-          categoryId: constRefs.category.asMetadataRef,
-        ),
-      ];
+    for (final constRefs in activeConstantDocumentRefs) {
+      final proposal = constRefs.proposal;
+      final comment = constRefs.comment;
+      if (proposal != null) {
+        _cache[proposal.id] = [
+          DocumentDataMetadata.proposalTemplate(
+            id: SignedDocumentRef(id: proposal.id, ver: proposal.ver),
+            parameters: DocumentParameters({constRefs.category}),
+          ),
+        ];
+      }
+
+      if (comment != null) {
+        _cache[comment.id] = [
+          DocumentDataMetadata.commentTemplate(
+            id: SignedDocumentRef(id: comment.id, ver: comment.ver),
+            parameters: DocumentParameters({constRefs.category}),
+          ),
+        ];
+      }
     }
 
     for (var i = 0; i < proposalsCount; i++) {
@@ -349,18 +322,21 @@ final class LocalCatGateway implements CatGateway {
 
       // only first 4 are used
       final categoryConstRefs = activeConstantDocumentRefs[3 & i];
+      final proposal = categoryConstRefs.proposal;
+      if (proposal == null) {
+        continue;
+      }
 
       for (var j = 0; j < versionsCount; j++) {
         final ver = j == 0 ? id : _v7();
 
-        final proposalMetadata = SignedDocumentMetadata(
-          contentType: SignedDocumentContentType.json,
-          documentType: DocumentType.proposalDocument,
-          id: id,
-          ver: ver,
-          template: categoryConstRefs.proposal.asMetadataRef,
-          categoryId: categoryConstRefs.category.asMetadataRef,
-          collabs: const [_collabId],
+        final proposalId = SignedDocumentRef(id: id, ver: ver);
+        final proposalMetadata = DocumentDataMetadata.proposal(
+          id: proposalId,
+          template: proposal,
+          parameters: DocumentParameters({categoryConstRefs.category}),
+          authors: const [],
+          collaborators: const [],
         );
         _cache.update(
           id,
@@ -368,20 +344,21 @@ final class LocalCatGateway implements CatGateway {
           ifAbsent: () => [proposalMetadata],
         );
 
-        const commentsCount = 2;
-        for (var c = 0; c < commentsCount; c++) {
-          final commentId = _v7();
-          _cache[commentId] = [
-            SignedDocumentMetadata(
-              contentType: SignedDocumentContentType.json,
-              documentType: DocumentType.commentDocument,
-              id: commentId,
-              ver: commentId,
-              ref: SignedDocumentMetadataRef(id: id, ver: ver),
-              template: categoryConstRefs.comment.asMetadataRef,
-              categoryId: categoryConstRefs.category.asMetadataRef,
-            ),
-          ];
+        final comment = categoryConstRefs.proposal;
+        if (comment != null) {
+          const commentsCount = 2;
+          for (var c = 0; c < commentsCount; c++) {
+            final commentId = _v7();
+            _cache[commentId] = [
+              DocumentDataMetadata.comment(
+                id: SignedDocumentRef(id: commentId, ver: commentId),
+                template: comment,
+                proposalRef: proposalId,
+                parameters: DocumentParameters({categoryConstRefs.category}),
+                authors: const [],
+              ),
+            ];
+          }
         }
 
         final actionIndex = (ProposalSubmissionAction.values.length + 1) & i;
@@ -389,41 +366,32 @@ final class LocalCatGateway implements CatGateway {
         if (action != null) {
           final actionId = _v7();
 
-          final actionMetadata = SignedDocumentMetadata(
-            contentType: SignedDocumentContentType.json,
-            documentType: DocumentType.proposalActionDocument,
-            id: actionId,
-            ver: actionId,
-            ref: SignedDocumentMetadataRef(id: id, ver: ver),
-            categoryId: categoryConstRefs.category.asMetadataRef,
+          final actionMetadata = DocumentDataMetadata.proposalAction(
+            id: SignedDocumentRef(id: actionId, ver: actionId),
+            proposalRef: proposalId,
+            parameters: DocumentParameters({categoryConstRefs.category}),
           );
 
           _cache[actionId] = [actionMetadata];
-          _docs[actionMetadata] = _buildDoc(
-            actionMetadata,
-            action: action,
-          );
-        }
+          _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
 
-        for (final collab in proposalMetadata.collabs ?? <String>[]) {
-          final collabActionId = _v7();
-          const collabAction = ProposalSubmissionAction.draft;
+          for (final collab in proposalMetadata.collaborators ?? <CatalystId>[]) {
+            final collabActionId = _v7();
+            const collabAction = ProposalSubmissionAction.draft;
 
-          final collabActionMetadata = SignedDocumentMetadata(
-            contentType: SignedDocumentContentType.json,
-            documentType: DocumentType.proposalActionDocument,
-            id: collabActionId,
-            ver: collabActionId,
-            ref: SignedDocumentMetadataRef(id: id, ver: ver),
-            categoryId: categoryConstRefs.category.asMetadataRef,
-          );
+            final collabActionMetadata = DocumentDataMetadata.proposalAction(
+              id: SignedDocumentRef(id: collabActionId, ver: collabActionId),
+              proposalRef: SignedDocumentRef(id: id, ver: ver),
+              parameters: DocumentParameters({categoryConstRefs.category}),
+            );
 
-          _cache[collabActionId] = [collabActionMetadata];
-          _docs[collabActionMetadata] = _buildDoc(
-            collabActionMetadata,
-            action: collabAction,
-            authorGetter: (_) => collab,
-          );
+            _cache[collabActionId] = [collabActionMetadata];
+            _docs[collabActionMetadata] = _buildDoc(
+              collabActionMetadata,
+              action: collabAction,
+              authorGetter: (_) => collab.toString(),
+            );
+          }
         }
       }
     }
@@ -432,46 +400,38 @@ final class LocalCatGateway implements CatGateway {
   }
 }
 
-extension on SignedDocumentMetadataRef {
-  ReferenceUuid get asCose => ReferenceUuid(
-    id: id.asCose,
-    ver: ver?.asCose,
-  );
-
-  DocumentRefForFilteredDocuments get asIndex {
-    return DocumentRefForFilteredDocuments(id: id, ver: ver);
-  }
-}
-
-extension on String {
-  Uuid get asCose => Uuid(this);
-}
-
-extension on SignedDocumentMetadata {
-  IndividualDocumentVersion get asIndex {
-    return IndividualDocumentVersion(
-      ver: ver!,
-      type: documentType.uuid,
-      ref: ref?.asIndex,
-      reply: reply?.asIndex,
-      template: template?.asIndex,
-      category: categoryId?.asIndex,
-      parameters: categoryId?.asIndex,
-    );
-  }
-}
-
-extension on List<SignedDocumentMetadata> {
-  DocumentIndexListDto asIndex(String id) {
-    return DocumentIndexListDto(
+extension on List<DocumentDataMetadata> {
+  IndexedDocument asIndex(String id) {
+    return IndexedDocument(
       id: id,
-      ver: map((e) => e.asIndex).toList(),
+      ver: map((e) => e.toIndexVersion()).toList(),
     );
   }
 }
 
-extension on SignedDocumentRef {
-  SignedDocumentMetadataRef get asMetadataRef {
-    return SignedDocumentMetadataRef(id: id, ver: ver);
+extension on DocumentDataMetadata {
+  IndexedDocumentVersion toIndexVersion() {
+    return IndexedDocumentVersion(
+      id: id.id,
+      ver: id.ver!,
+      type: type.uuid,
+      ref: [
+        ?ref?.toRef(),
+      ],
+      reply: [
+        ?reply?.toRef(),
+      ],
+      template: [
+        ?template?.toRef(),
+      ],
+      parameters: parameters.set.map((e) => e.toRef()).toList(),
+      collaborators: collaborators?.map((e) => e.toString()).toList(),
+    );
+  }
+}
+
+extension on DocumentRef {
+  DocumentReference toRef() {
+    return DocumentReference(id: id, ver: ver!);
   }
 }

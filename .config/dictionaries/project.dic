@@ -35,6 +35,7 @@ bech
 bimap
 bindgen
 bkioshn
+Blockquotes
 bluefireteam
 bridgefor
 BROTLI
@@ -65,6 +66,7 @@ ciphertext
 ciphertexts
 CIPs
 CNFT
+COAP
 COCOAPODS
 codegen
 codepoints
@@ -181,6 +183,7 @@ IPFS
 iphoneos
 iphonesimulator
 isready
+IPLD
 jaegertracing
 jdbc
 jetbrains

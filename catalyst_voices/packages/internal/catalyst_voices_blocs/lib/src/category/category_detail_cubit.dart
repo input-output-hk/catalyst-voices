@@ -79,7 +79,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState>
     }
 
     try {
-      final category = await _campaignService.getCategory(categoryRef);
+      final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
       _cache = _cache.copyWith(selectedCategory: Optional(category));
 
       _watchCategoryTotalAsk(categoryRef);

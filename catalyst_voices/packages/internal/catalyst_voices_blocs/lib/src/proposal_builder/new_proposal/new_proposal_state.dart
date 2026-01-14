@@ -84,13 +84,19 @@ final class NewProposalStateCategories extends Equatable {
   final List<CampaignCategoryDetailsViewModel>? categories;
   final SignedDocumentRef? selectedRef;
 
-  CampaignCategoryDetailsViewModel? get selected =>
-      categories?.firstWhereOrNull((element) => element.ref.id == selectedRef?.id);
-
   const NewProposalStateCategories({
     this.categories,
     this.selectedRef,
   });
+
+  @override
+  List<Object?> get props => [
+    categories,
+    selectedRef,
+  ];
+
+  CampaignCategoryDetailsViewModel? get selected =>
+      categories?.firstWhereOrNull((element) => element.id.id == selectedRef?.id);
 
   NewProposalStateCategories copyWith({
     Optional<List<CampaignCategoryDetailsViewModel>>? categories,
@@ -101,10 +107,4 @@ final class NewProposalStateCategories extends Equatable {
       selectedRef: selectedRef.dataOr(this.selectedRef),
     );
   }
-
-  @override
-  List<Object?> get props => [
-    categories,
-    selectedRef,
-  ];
 }

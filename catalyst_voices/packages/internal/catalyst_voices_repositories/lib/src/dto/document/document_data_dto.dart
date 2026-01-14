@@ -204,6 +204,7 @@ final class DocumentDataMetadataDto {
     return modified;
   }
 
+  /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
   @visibleForTesting
   static Map<String, dynamic> migrateJson3(Map<String, dynamic> json) {
     final parametersKeys = ['brandId', 'campaignId', 'categoryId'];
@@ -235,9 +236,9 @@ final class DocumentDataMetadataDto {
     }
 
     final modified = Map.of(json);
-
-    modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
-
+    final type = _tryParseDocumentType(json['type']);
+    final contentType = type?.contentType ?? DocumentContentType.json;
+    modified['contentType'] = DocumentContentType.toJson(contentType);
     return modified;
   }
 
@@ -255,6 +256,14 @@ final class DocumentDataMetadataDto {
     }
 
     return modified;
+  }
+
+  static DocumentType? _tryParseDocumentType(Object? object) {
+    if (object is String) {
+      return DocumentType.fromJson(object);
+    }
+
+    return null;
   }
 }
 
