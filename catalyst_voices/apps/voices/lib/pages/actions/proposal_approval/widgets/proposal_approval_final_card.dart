@@ -4,15 +4,18 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalApprovalFinalCard extends StatelessWidget {
   final UsersProposalOverview proposal;
+  final CatalystId? activeAccountId;
 
   const ProposalApprovalFinalCard({
     super.key,
     required this.proposal,
+    required this.activeAccountId,
   });
 
   @override
@@ -36,7 +39,11 @@ class ProposalApprovalFinalCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Header(proposal: proposal),
-          if (contributors.isNotEmpty) ProposalApprovalContributors(contributors: contributors),
+          if (contributors.isNotEmpty)
+            ProposalApprovalContributors(
+              contributors: contributors,
+              activeAccountId: activeAccountId,
+            ),
         ],
       ),
     );

@@ -13,10 +13,12 @@ import 'package:flutter/material.dart';
 
 class ProposalApprovalDecideCard extends StatelessWidget {
   final UsersProposalOverview proposal;
+  final CatalystId? activeAccountId;
 
   const ProposalApprovalDecideCard({
     super.key,
     required this.proposal,
+    required this.activeAccountId,
   });
 
   @override
@@ -41,7 +43,10 @@ class ProposalApprovalDecideCard extends StatelessWidget {
           _Header(proposal: proposal),
           const Divider(),
           if (contributors.isNotEmpty) ...[
-            ProposalApprovalContributors(contributors: contributors),
+            ProposalApprovalContributors(
+              contributors: contributors,
+              activeAccountId: activeAccountId,
+            ),
             const Divider(),
           ],
           _Footer(proposalId: proposal.id),

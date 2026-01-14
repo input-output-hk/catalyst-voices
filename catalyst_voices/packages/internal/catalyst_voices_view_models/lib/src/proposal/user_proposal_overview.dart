@@ -91,7 +91,7 @@ final class UsersProposalOverview extends Equatable {
 
     return [
       ?mainProposer,
-      ...collaborators.map(Contributor.fromCollaborator),
+      ...collaborators.map((e) => Contributor.fromCollaborator(e, author)),
     ];
   }
 

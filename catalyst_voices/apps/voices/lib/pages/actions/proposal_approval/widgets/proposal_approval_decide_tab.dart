@@ -1,15 +1,18 @@
 import 'package:catalyst_voices/pages/actions/proposal_approval/widgets/proposal_approval_decide_card.dart';
 import 'package:catalyst_voices/pages/actions/proposal_approval/widgets/proposal_approval_empty_state.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalApprovalDecideTab extends StatelessWidget {
   final List<UsersProposalOverview> items;
+  final CatalystId? activeAccountId;
 
   const ProposalApprovalDecideTab({
     super.key,
     required this.items,
+    required this.activeAccountId,
   });
 
   @override
@@ -32,6 +35,7 @@ class ProposalApprovalDecideTab extends StatelessWidget {
         return ProposalApprovalDecideCard(
           key: ValueKey(item.id),
           proposal: item,
+          activeAccountId: activeAccountId,
         );
       },
     );

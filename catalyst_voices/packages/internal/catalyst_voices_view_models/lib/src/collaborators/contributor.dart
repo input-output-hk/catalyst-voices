@@ -16,20 +16,11 @@ final class Contributor extends Equatable {
     this.createdAt,
   });
 
-  factory Contributor.fromBriefData(ProposalDataCollaborator briefData, CatalystId? authorId) {
-    return Contributor(
-      id: briefData.id,
-      status: briefData.status,
-      isAuthor: authorId?.isSameAs(briefData.id) ?? false,
-      createdAt: briefData.createdAt,
-    );
-  }
-
-  factory Contributor.fromCollaborator(Collaborator collaborator) {
+  factory Contributor.fromCollaborator(Collaborator collaborator, CatalystId? authorId) {
     return Contributor(
       id: collaborator.id,
       status: collaborator.status,
-      isAuthor: false,
+      isAuthor: authorId.isSameAs(collaborator.id),
       createdAt: collaborator.createdAt,
     );
   }

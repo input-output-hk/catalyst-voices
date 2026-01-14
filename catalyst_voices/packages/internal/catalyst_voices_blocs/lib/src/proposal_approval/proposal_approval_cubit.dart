@@ -5,6 +5,7 @@ import 'package:catalyst_voices_blocs/src/proposal_approval/proposal_approval_cu
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with BlocErrorEmitterMixin {
@@ -53,8 +54,33 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
     _setupProposalsSubscription();
   }
 
+  List<UsersProposalOverview> _filterDecideItems(
+    List<UsersProposalOverview> items,
+    CatalystId? activeAccountId,
+  ) {
+    return items.where((proposal) {
+      final collaborator = proposal.collaborators.firstWhereOrNull(
+        (collab) => activeAccountId.isSameAs(collab.id),
+      );
+      return collaborator != null && collaborator.status == ProposalsCollaborationStatus.pending;
+    }).toList();
+  }
+
+  List<UsersProposalOverview> _filterFinalItems(
+    List<UsersProposalOverview> items,
+    CatalystId? activeAccountId,
+  ) {
+    return items.where((proposal) {
+      final collaborator = proposal.collaborators.firstWhereOrNull(
+        (collab) => activeAccountId.isSameAs(collab.id),
+      );
+      return collaborator != null && collaborator.status != ProposalsCollaborationStatus.pending;
+    }).toList();
+  }
+
   void _handleActiveAccountIdChange(CatalystId? catalystId) {
     _cache = _cache.copyWith(activeAccountId: Optional(catalystId));
+    emit(state.copyWith(activeAccountId: Optional(catalystId)));
     _setupProposalsSubscription();
   }
 
@@ -69,7 +95,12 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
 
   void _handleProposalsChange(List<UsersProposalOverview> items) {
     _cache = _cache.copyWith(items: Optional(items));
-    emit(state.copyWith(items: _cache.items));
+    emit(
+      state.copyWith(
+        decideItems: _filterDecideItems(items, _cache.activeAccountId),
+        finalItems: _filterFinalItems(items, _cache.activeAccountId),
+      ),
+    );
   }
 
   ProposalsFiltersV2 _proposalFilters() {

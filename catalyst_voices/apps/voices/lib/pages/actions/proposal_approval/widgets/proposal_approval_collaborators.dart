@@ -8,10 +8,12 @@ import 'package:flutter/material.dart';
 
 class ProposalApprovalContributors extends StatelessWidget {
   final List<Contributor> contributors;
+  final CatalystId? activeAccountId;
 
   const ProposalApprovalContributors({
     super.key,
     required this.contributors,
+    required this.activeAccountId,
   });
 
   @override
@@ -24,7 +26,11 @@ class ProposalApprovalContributors extends StatelessWidget {
       child: Column(
         spacing: 16,
         children: [
-          for (final contributor in contributors) _Contributor(contributor: contributor),
+          for (final contributor in contributors)
+            _Contributor(
+              contributor: contributor,
+              activeAccountId: activeAccountId,
+            ),
         ],
       ),
     );
@@ -33,9 +39,11 @@ class ProposalApprovalContributors extends StatelessWidget {
 
 class _Contributor extends StatelessWidget {
   final Contributor contributor;
+  final CatalystId? activeAccountId;
 
   const _Contributor({
     required this.contributor,
+    required this.activeAccountId,
   });
 
   @override
@@ -52,8 +60,8 @@ class _Contributor extends StatelessWidget {
               _NameAndCatalystId(catalystId: contributor.id),
               _StatusText(
                 status: contributor.status,
-                dateTime: contributor.createdAt,
-                isAuthor: contributor.isAuthor,
+                createdAt: contributor.createdAt,
+                isCurrentUser: activeAccountId.isSameAs(contributor.id),
               ),
             ],
           ),
@@ -111,13 +119,13 @@ class _StatusIcon extends StatelessWidget {
 
 class _StatusText extends StatelessWidget {
   final ProposalsCollaborationStatus status;
-  final DateTime? dateTime;
-  final bool isAuthor;
+  final DateTime? createdAt;
+  final bool isCurrentUser;
 
   const _StatusText({
     required this.status,
-    required this.dateTime,
-    required this.isAuthor,
+    required this.createdAt,
+    required this.isCurrentUser,
   });
 
   @override
@@ -135,11 +143,11 @@ class _StatusText extends StatelessWidget {
   String _format(BuildContext context) {
     final buffer = StringBuffer(status.proposalApprovalLabel(context));
 
-    if (dateTime case final dateTime?) {
-      buffer.write(' · ${DateFormatter.formatDayMonthTime(dateTime)}');
+    if (createdAt case final createdAt?) {
+      buffer.write(' · ${DateFormatter.formatDayMonthTime(createdAt)}');
     }
 
-    if (isAuthor) {
+    if (isCurrentUser) {
       buffer.write(' · ${context.l10n.you}');
     } else if (status == ProposalsCollaborationStatus.mainProposer) {
       buffer.write(' · ${context.l10n.mainProposer}');

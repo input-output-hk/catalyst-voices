@@ -4,6 +4,7 @@ import 'package:catalyst_voices/pages/actions/widgets/actions_decorated_panel.da
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -40,6 +41,7 @@ class ProposalApprovalTabs extends StatelessWidget {
                   tabController: tabController,
                   decideItems: decideItems,
                   finalItems: finalItems,
+                  activeAccountId: state.activeAccountId,
                 ),
               ),
             ],
@@ -83,11 +85,13 @@ class _TabBarView extends StatelessWidget {
   final TabController tabController;
   final List<UsersProposalOverview> decideItems;
   final List<UsersProposalOverview> finalItems;
+  final CatalystId? activeAccountId;
 
   const _TabBarView({
     required this.tabController,
     required this.decideItems,
     required this.finalItems,
+    required this.activeAccountId,
   });
 
   @override
@@ -95,8 +99,14 @@ class _TabBarView extends StatelessWidget {
     return TabBarStackView(
       controller: tabController,
       children: [
-        ProposalApprovalDecideTab(items: decideItems),
-        ProposalApprovalFinalTab(items: finalItems),
+        ProposalApprovalDecideTab(
+          items: decideItems,
+          activeAccountId: activeAccountId,
+        ),
+        ProposalApprovalFinalTab(
+          items: finalItems,
+          activeAccountId: activeAccountId,
+        ),
       ],
     );
   }
