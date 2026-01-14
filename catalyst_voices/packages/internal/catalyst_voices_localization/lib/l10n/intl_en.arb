@@ -2592,7 +2592,7 @@
   "@proposalApprovalHeader": {
     "description": "Header for final proposal approval page"
   },
-  "proposalApprovalSubheader": "Once the proposal draft is finalised, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
+  "proposalApprovalSubheader": "Once the proposal draft is finalized, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
   "@proposalApprovalSubheader": {
     "description": "Subheader for final proposal approval page"
   },
