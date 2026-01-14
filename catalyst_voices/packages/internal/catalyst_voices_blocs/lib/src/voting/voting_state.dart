@@ -3,9 +3,35 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+final class VotingHeaderCategoryData extends Equatable {
+  final String formattedName;
+  final String description;
+  final String imageUrl;
+
+  const VotingHeaderCategoryData({
+    required this.formattedName,
+    required this.description,
+    required this.imageUrl,
+  });
+
+  VotingHeaderCategoryData.fromModel(CampaignCategory data)
+    : this(
+        formattedName: data.formattedCategoryName,
+        description: data.description,
+        imageUrl: data.imageUrl,
+      );
+
+  @override
+  List<Object?> get props => [
+    formattedName,
+    description,
+    imageUrl,
+  ];
+}
+
 final class VotingHeaderData extends Equatable {
   final bool showCategoryPicker;
-  final CampaignCategoryDetailsViewModel? category;
+  final VotingHeaderCategoryData? category;
 
   const VotingHeaderData({
     this.showCategoryPicker = false,
@@ -18,66 +44,56 @@ final class VotingHeaderData extends Equatable {
 
 /// The state of available proposals in the voting page.
 class VotingState extends Equatable {
-  final CampaignCategoryDetailsViewModel? selectedCategory;
+  final VotingHeaderData header;
   final int? fundNumber;
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
   final bool hasSearchQuery;
-  final List<String> favoritesIds;
-  final ProposalsCount count;
+  final Map<VotingPageTab, int> count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
   const VotingState({
-    this.selectedCategory,
+    this.header = const VotingHeaderData(),
     this.fundNumber,
     this.votingPower = const VotingPowerViewModel(),
     this.votingPhase,
     this.hasSearchQuery = false,
-    this.favoritesIds = const [],
-    this.count = const ProposalsCount(),
+    this.count = const {},
     this.categorySelectorItems = const [],
   });
 
-  VotingHeaderData get header {
-    return VotingHeaderData(
-      showCategoryPicker: votingPhase?.status.isActive ?? false,
-      category: selectedCategory,
-    );
-  }
+  bool get hasSelectedCategory => categorySelectorItems.any((element) => element.isSelected);
 
   @override
   List<Object?> get props => [
-    selectedCategory,
+    header,
     fundNumber,
     votingPower,
     votingPhase,
     hasSearchQuery,
-    favoritesIds,
     count,
     categorySelectorItems,
   ];
 
-  SignedDocumentRef? get selectedCategoryRef {
+  SignedDocumentRef? get selectedCategoryId {
     return categorySelectorItems.singleWhereOrNull((element) => element.isSelected)?.ref;
   }
 
   VotingState copyWith({
-    Optional<CampaignCategoryDetailsViewModel>? selectedCategory,
+    VotingHeaderData? header,
     Optional<int>? fundNumber,
     VotingPowerViewModel? votingPower,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     bool? hasSearchQuery,
-    List<String>? favoritesIds,
-    ProposalsCount? count,
+    Map<VotingPageTab, int>? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
     return VotingState(
-      selectedCategory: selectedCategory.dataOr(this.selectedCategory),
+      header: header ?? this.header,
       fundNumber: fundNumber.dataOr(this.fundNumber),
       votingPower: votingPower ?? this.votingPower,
       votingPhase: votingPhase.dataOr(this.votingPhase),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
-      favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );

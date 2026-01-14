@@ -11,8 +11,8 @@ final class CampaignFilters extends Equatable {
 
   factory CampaignFilters.active() {
     final categoriesIds = Campaign.all
-        .where((campaign) => campaign.selfRef == activeCampaignRef)
-        .map((campaign) => campaign.categories.map((category) => category.selfRef.id))
+        .where((campaign) => campaign.id == activeCampaignRef)
+        .map((campaign) => campaign.categories.map((category) => category.id.id))
         .flattened
         .toSet()
         .toList();
@@ -21,10 +21,13 @@ final class CampaignFilters extends Equatable {
   }
 
   factory CampaignFilters.from(Campaign campaign) {
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet().toList();
+    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet().toList();
     return CampaignFilters(categoriesIds: categoriesIds);
   }
 
   @override
   List<Object?> get props => [categoriesIds];
+
+  @override
+  String toString() => 'CampaignFilters($categoriesIds)';
 }

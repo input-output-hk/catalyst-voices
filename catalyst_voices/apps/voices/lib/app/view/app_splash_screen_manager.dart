@@ -4,7 +4,9 @@ import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_linear_progress_indicator.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_loading_indicator.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -43,12 +45,60 @@ class AppSplashScreenManager extends StatefulWidget {
   }
 }
 
+class _AnimatedProgressSection extends StatelessWidget {
+  final String message;
+  final double progress;
+  final bool showProgressBar;
+
+  const _AnimatedProgressSection({
+    required this.message,
+    required this.progress,
+    required this.showProgressBar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: showProgressBar ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 300),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 16,
+        children: [
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(
+            width: 360,
+            child: AnimatedVoicesLinearProgressIndicator(
+              value: progress,
+              animationDuration: const Duration(milliseconds: 800),
+              animationCurve: Curves.easeInOutCubic,
+              weight: VoicesProgressIndicatorWeight.heavy,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     with SingleTickerProviderStateMixin {
   bool _areDocumentsSynced = false;
   bool _areImagesAndVideosCached = false;
   bool _messageShownEnoughTime = true;
   bool _fontsAreReady = false;
+
+  final Stopwatch _loadingStopwatch = Stopwatch();
+  bool _showProgressIndicator = false;
+  Timer? _minimumVisibilityTimer;
+
+  late final SyncManager _syncManager;
 
   bool get _isReady =>
       _areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime && _fontsAreReady;
@@ -59,16 +109,42 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
       return widget.child;
     }
 
-    return _InAppLoading(
-      key: const Key('AppLoadingScreen'),
-      message: context.l10n.settingThingsAppInSplashScreen,
-      messageShownEnoughTime: _handleMessageShownEnoughTime,
+    // Throttle progress updates to reduce rebuilds
+    final throttledStream = _syncManager.progressStream.distinct((prev, curr) {
+      if (prev <= 0 || curr >= 1.0) return false;
+
+      return (curr - prev).abs() < 0.008; // ~0.8% minimum change
+    });
+
+    return StreamBuilder<double>(
+      stream: throttledStream,
+      initialData: 0,
+      builder: (context, snapshot) {
+        final progress = snapshot.data ?? 0;
+        final shouldShow = _handleProgressBarVisibility(progress);
+
+        return _InAppLoading(
+          key: const Key('AppLoadingScreen'),
+          message: context.l10n.settingThingsAppInSplashScreen,
+          progress: progress,
+          showProgressBar: shouldShow,
+        );
+      },
     );
+  }
+
+  @override
+  void dispose() {
+    _minimumVisibilityTimer?.cancel();
+    super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+
+    _syncManager = Dependencies.instance.get<SyncManager>();
+    _loadingStopwatch.start();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -95,10 +171,9 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   }
 
   Future<void> _handleDocumentsSync() async {
-    final syncManager = Dependencies.instance.get<SyncManager>();
     final campaignPhaseAwareCubit = context.read<CampaignPhaseAwareCubit>();
 
-    await syncManager.waitForSync;
+    await _syncManager.waitForSync;
     await campaignPhaseAwareCubit.awaitForInitialize;
 
     if (mounted) {
@@ -111,7 +186,8 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
 
   Future<void> _handleFonts() async {
     try {
-      await GoogleFonts.pendingFonts();
+      final profiler = Dependencies.instance.get<CatalystStartupProfiler>();
+      await profiler.awaitingFonts(body: () async => GoogleFonts.pendingFonts());
     } catch (error, stackTrace) {
       _logger.warning('Load pending google fonts', error, stackTrace);
     } finally {
@@ -140,34 +216,57 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     }
   }
 
-  void _handleMessageShownEnoughTime(bool value) {
-    if (mounted) {
-      setState(() {
-        _messageShownEnoughTime = value;
-        _finishStartupProfilerIfReady();
-      });
+  bool _handleProgressBarVisibility(double progress) {
+    final elapsed = _loadingStopwatch.elapsedMilliseconds;
+    var showProgressBar = false;
+
+    if (progress > 0 && progress < 1.0) {
+      final estimatedTotal = elapsed / progress;
+      final estimatedTimeRemaining = estimatedTotal - elapsed;
+      showProgressBar = elapsed > 500 && estimatedTimeRemaining > 500;
+
+      if (showProgressBar && !_showProgressIndicator) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_showProgressIndicator) {
+            setState(() {
+              _showProgressIndicator = true;
+            });
+            _startMinimumVisibilityTimer();
+          }
+        });
+      }
     }
+
+    return showProgressBar || _showProgressIndicator;
+  }
+
+  void _startMinimumVisibilityTimer() {
+    _minimumVisibilityTimer?.cancel();
+
+    // After 2 seconds, hide progress indicator and mark message as shown long enough
+    _minimumVisibilityTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _showProgressIndicator = false;
+          _messageShownEnoughTime = true;
+          _finishStartupProfilerIfReady();
+        });
+      }
+    });
   }
 }
 
-class _InAppLoading extends StatefulWidget {
+class _InAppLoading extends StatelessWidget {
   final String message;
-  final ValueChanged<bool> messageShownEnoughTime;
+  final double progress;
+  final bool showProgressBar;
 
   const _InAppLoading({
     super.key,
     required this.message,
-    required this.messageShownEnoughTime,
+    this.progress = 0,
+    this.showProgressBar = false,
   });
-
-  @override
-  State<_InAppLoading> createState() => _InAppLoadingState();
-}
-
-class _InAppLoadingState extends State<_InAppLoading> {
-  bool _showMessage = false;
-  Timer? _messageTimer;
-  Timer? _minimumLoadingTimer;
 
   @override
   Widget build(BuildContext context) {
@@ -185,16 +284,10 @@ class _InAppLoadingState extends State<_InAppLoading> {
                 const VoicesLoadingIndicator(
                   key: Key('PersistentLoadingIndicator'),
                 ),
-                AnimatedOpacity(
-                  opacity: _showMessage ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(
-                    widget.message,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                _AnimatedProgressSection(
+                  message: message,
+                  progress: progress,
+                  showProgressBar: showProgressBar,
                 ),
               ],
             ),
@@ -202,34 +295,5 @@ class _InAppLoadingState extends State<_InAppLoading> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _messageTimer?.cancel();
-    _messageTimer = null;
-
-    _minimumLoadingTimer?.cancel();
-    _minimumLoadingTimer = null;
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _messageTimer = Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _showMessage = true;
-        });
-
-        _minimumLoadingTimer = Timer(const Duration(seconds: 2), () {
-          if (mounted) {
-            widget.messageShownEnoughTime(true);
-          }
-        });
-      }
-    });
   }
 }

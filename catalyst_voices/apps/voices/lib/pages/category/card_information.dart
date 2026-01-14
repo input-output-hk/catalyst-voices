@@ -28,15 +28,15 @@ class CardInformation extends StatelessWidget {
         padding: padding,
         children: [
           CategoryProposalsDetailsCard(
-            categoryRef: category.ref,
+            categoryRef: category.id,
             categoryName: category.formattedName,
-            categoryProposalsCount: category.proposalsCount,
+            categoryFinalProposalsCount: category.finalProposalsCount,
           ),
           const SizedBox(height: 16),
           Offstage(
             offstage: !isActiveProposer,
             child: CreateProposalCard(
-              categoryRef: category.ref,
+              categoryRef: category.id,
               categoryName: category.formattedName,
               categoryDos: category.dos,
               categoryDonts: category.donts,

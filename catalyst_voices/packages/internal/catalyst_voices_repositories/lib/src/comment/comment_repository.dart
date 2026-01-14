@@ -21,10 +21,6 @@ abstract interface class CommentRepository {
     required CatalystPrivateKey privateKey,
   });
 
-  Future<void> saveComment({
-    required DocumentData document,
-  });
-
   Stream<List<CommentDocument>> watchCommentsWith({
     required DocumentRef ref,
   });
@@ -43,9 +39,9 @@ final class DocumentsCommentRepository implements CommentRepository {
   Future<CommentTemplate?> getCommentTemplate({
     required DocumentRef category,
   }) async {
-    final document = await _documentRepository.getLatestDocument(
+    final document = await _documentRepository.findFirst(
       type: DocumentType.commentTemplate,
-      category: category,
+      parameter: category,
     );
 
     if (document == null) {
@@ -77,13 +73,6 @@ final class DocumentsCommentRepository implements CommentRepository {
   }
 
   @override
-  Future<void> saveComment({
-    required DocumentData document,
-  }) async {
-    await _documentRepository.upsertDocument(document: document);
-  }
-
-  @override
   Stream<List<CommentDocument>> watchCommentsWith({
     required DocumentRef ref,
   }) {
@@ -91,7 +80,7 @@ final class DocumentsCommentRepository implements CommentRepository {
         .watchDocuments(
           type: DocumentType.commentDocument,
           refGetter: (data) => data.metadata.template!,
-          refTo: ref,
+          referencing: ref,
         )
         .map(
           (documents) {
@@ -117,7 +106,7 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentDocument document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment only supports signed documents',
     );
     assert(
@@ -129,9 +118,9 @@ final class DocumentsCommentRepository implements CommentRepository {
 
     final authors = documentData.metadata.authors;
     final metadata = CommentMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
       proposalRef: documentData.metadata.ref! as SignedDocumentRef,
-      commentTemplate: templateData.metadata.selfRef as SignedDocumentRef,
+      commentTemplate: templateData.metadata.id as SignedDocumentRef,
       reply: documentData.metadata.reply,
       parameters: documentData.metadata.parameters,
       authorId: authors!.single,
@@ -156,12 +145,12 @@ final class DocumentsCommentRepository implements CommentRepository {
       'Not a commentTemplate document data type',
     );
     assert(
-      documentData.metadata.selfRef is SignedDocumentRef,
+      documentData.metadata.id is SignedDocumentRef,
       'Comment template only supports signed documents',
     );
 
     final metadata = CommentTemplateMetadata(
-      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      id: documentData.metadata.id as SignedDocumentRef,
       parameters: documentData.metadata.parameters,
     );
 

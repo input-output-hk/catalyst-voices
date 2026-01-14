@@ -25,11 +25,22 @@ final class DocumentMetadataMalformedException implements DocumentException {
 /// Exception thrown when document is not found.
 final class DocumentNotFoundException implements DocumentException {
   final DocumentRef ref;
+  final String? message;
 
-  const DocumentNotFoundException({required this.ref});
+  const DocumentNotFoundException({
+    required this.ref,
+    this.message,
+  });
 
   @override
-  String toString() => 'Document matching $ref not found';
+  String toString() {
+    final message = this.message;
+    if (message != null) {
+      return message;
+    }
+
+    return 'Document matching $ref not found';
+  }
 }
 
 /// Exception thrown when draft is not found.

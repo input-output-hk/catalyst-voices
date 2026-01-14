@@ -39,8 +39,11 @@ dependencies:
 dev_dependencies:
   melos: ^7.1.1
 
+# TODO(dt-iohk): revert when flutter_secure_storage pulls transitively these or newer versions
 dependency_overrides:
   test_api: 0.7.8
+  flutter_secure_storage_web: ^2.0.0
+  flutter_secure_storage_platform_interface: ^2.0.1
 
 melos:
   repository: https://github.com/input-output-hk/catalyst-voices
@@ -99,18 +102,42 @@ melos:
       description: |
         Clean up unused translation keys and sort them alphabetically in .arb files.
 
+    version-web-assets:
+      run: |
+        dart run scripts/version_web_assets/version_web_assets.dart --build-dir=apps/voices/build/web
+      description: |
+        Version web assets with content-based MD5 hashes for cache busting.
+        Run this after 'flutter build web' to add version query parameters to assets.
+
     build-runner:
       run: |
         melos exec --depends-on="build_runner" --order-dependents -- dart run build_runner build --delete-conflicting-outputs --force-aot
       description: |
         Run `build_runner` in every package which contains the build_runner dependency.
 
-    db-make-migration:
+    build-db-schema:
       run: |
         melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
       description: |
         Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
         classes
+
+    build-db-migration:
+      run: |
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema steps drift_schemas/catalyst_database lib/src/database/migration/schema_versions.g.dart
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate drift_schemas/catalyst_database test/src/database/migration/catalyst_database/generated/
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate --data-classes --companions drift_schemas/catalyst_database/ test/src/database/migration/catalyst_database/generated/
+      description: |
+        Run `drift_dev schema steps` in catalyst_voices_repositories package and generates schema migration steps
+        classes
+
+    compile_svg:
+      run: |
+        cd packages/internal/catalyst_voices_assets && \
+        dart run compile_svg.dart
+      description: |
+        Compile copied SVGs into vector_graphics binary format assets via packages/internal/catalyst_voices_assets/compile_svg.dart.
+        Temporary workaround see packages/internal/catalyst_voices_assets/README.md for context.
 
     metrics:
       run: |

@@ -40,7 +40,7 @@ final class CommentMetadata extends DocumentMetadata {
 
   CommentMetadata({
     // Note. no drafts for comments
-    required SignedDocumentRef super.selfRef,
+    required SignedDocumentRef super.id,
     required super.parameters,
     required this.proposalRef,
     required this.commentTemplate,
@@ -52,6 +52,9 @@ final class CommentMetadata extends DocumentMetadata {
        );
 
   @override
+  SignedDocumentRef get id => super.id as SignedDocumentRef;
+
+  @override
   List<Object?> get props =>
       super.props +
       [
@@ -61,12 +64,9 @@ final class CommentMetadata extends DocumentMetadata {
         authorId,
       ];
 
-  @override
-  SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;
-
   DocumentDataMetadata toDocumentMetadata() {
     return DocumentDataMetadata.comment(
-      selfRef: selfRef,
+      id: id,
       proposalRef: proposalRef,
       template: commentTemplate,
       reply: reply,

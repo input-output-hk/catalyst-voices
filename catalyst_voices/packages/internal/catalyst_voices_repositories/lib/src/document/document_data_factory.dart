@@ -9,7 +9,8 @@ final class DocumentDataFactory {
   ///
   /// Throws [UnknownDocumentContentTypeException] in case of not supported
   /// [document] contentType.
-  static DocumentData create(SignedDocument document) {
+  static DocumentDataWithArtifact create(SignedDocument document) {
+    final metadata = document.metadata;
     final content = switch (document.payload) {
       SignedDocumentJsonPayload(:final data) => DocumentDataContent(data),
       SignedDocumentJsonSchemaPayload(:final data) => DocumentDataContent(data),
@@ -17,10 +18,12 @@ final class DocumentDataFactory {
         type: document.metadata.contentType,
       ),
     };
+    final artifact = document.toArtifact();
 
-    return DocumentData(
-      metadata: document.metadata,
+    return DocumentDataWithArtifact(
+      metadata: metadata,
       content: content,
+      artifact: artifact,
     );
   }
 }

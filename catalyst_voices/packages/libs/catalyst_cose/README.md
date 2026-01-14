@@ -40,7 +40,7 @@ import 'dart:typed_data';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_plus/cryptography_plus.dart';
 
 Future<void> main() async {
   await _coseSign1();

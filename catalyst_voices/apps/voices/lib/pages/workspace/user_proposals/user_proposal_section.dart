@@ -36,22 +36,25 @@ class _ListOfProposals extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 22),
-        child: Text(emptyTextMessage),
-      );
-    } else {
-      return Column(
-        children: items
-            .map(
-              (e) => WorkspaceProposalCard(
-                key: ValueKey(e.selfRef),
-                proposal: e,
-              ),
-            )
-            .toList(),
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 22),
+          child: Text(emptyTextMessage),
+        ),
       );
     }
+
+    return SliverList.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+
+        return WorkspaceProposalCard(
+          key: ValueKey(item.id),
+          proposal: item,
+        );
+      },
+    );
   }
 }
 
@@ -68,22 +71,13 @@ class _ProposalVisibility extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      reverseDuration: const Duration(milliseconds: 200),
-      transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
-      },
-      child: Offstage(
-        offstage: !isExpanded,
-        child: _ListOfProposals(
-          items: items,
-          emptyTextMessage: emptyTextMessage,
-        ),
-      ),
+    if (!isExpanded) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+
+    return _ListOfProposals(
+      items: items,
+      emptyTextMessage: emptyTextMessage,
     );
   }
 }
@@ -93,16 +87,16 @@ class _UserProposalSectionState extends State<UserProposalSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionLearnMoreHeader(
-          title: widget.title,
-          info: widget.info,
-          learnMoreUrl: widget.learnMoreUrl,
-          isExpanded: _isExpanded,
-          onExpandedChanged: _onExpandedChanged,
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverToBoxAdapter(
+          child: SectionLearnMoreHeader(
+            title: widget.title,
+            info: widget.info,
+            learnMoreUrl: widget.learnMoreUrl,
+            isExpanded: _isExpanded,
+            onExpandedChanged: _onExpandedChanged,
+          ),
         ),
         _ProposalVisibility(
           isExpanded: _isExpanded,

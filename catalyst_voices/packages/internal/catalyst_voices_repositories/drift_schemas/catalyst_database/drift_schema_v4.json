@@ -1,0 +1,1140 @@
+{
+  "_meta": {
+    "description": "This file contains a serialized version of schema entities for drift.",
+    "version": "1.2.0"
+  },
+  "options": {
+    "store_date_time_values_as_text": true
+  },
+  "entities": [
+    {
+      "id": 0,
+      "references": [
+      ],
+      "type": "table",
+      "data": {
+        "name": "documents_v2",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "content",
+            "getter_name": "content",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.content",
+              "dart_type_name": "DocumentDataContent"
+            }
+          },
+          {
+            "name": "authors",
+            "getter_name": "authors",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
+          },
+          {
+            "name": "collaborators",
+            "getter_name": "collaborators",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
+          },
+          {
+            "name": "content_type",
+            "getter_name": "contentType",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "parameters",
+            "getter_name": "parameters",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.parameters",
+              "dart_type_name": "DocumentParameters"
+            }
+          },
+          {
+            "name": "ref_id",
+            "getter_name": "refId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ref_ver",
+            "getter_name": "refVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "reply_id",
+            "getter_name": "replyId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "reply_ver",
+            "getter_name": "replyVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "section",
+            "getter_name": "section",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "template_id",
+            "getter_name": "templateId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "template_ver",
+            "getter_name": "templateVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "type",
+            "getter_name": "type",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.type",
+              "dart_type_name": "DocumentType"
+            }
+          },
+          {
+            "name": "ver",
+            "getter_name": "ver",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+        ],
+        "explicit_pk": [
+          "id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "document_authors",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "account_id",
+            "getter_name": "accountId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "account_significant_id",
+            "getter_name": "accountSignificantId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "username",
+            "getter_name": "username",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "document_id",
+            "getter_name": "documentId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "document_ver",
+            "getter_name": "documentVer",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+          "FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE"
+        ],
+        "explicit_pk": [
+          "document_id",
+          "document_ver",
+          "account_id"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "document_artifacts",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "data",
+            "getter_name": "data",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver",
+            "getter_name": "ver",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+          "FOREIGN KEY (id, ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE"
+        ],
+        "explicit_pk": [
+          "id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "document_collaborators",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "account_id",
+            "getter_name": "accountId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "account_significant_id",
+            "getter_name": "accountSignificantId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "username",
+            "getter_name": "username",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "document_id",
+            "getter_name": "documentId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "document_ver",
+            "getter_name": "documentVer",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+          "FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE"
+        ],
+        "explicit_pk": [
+          "document_id",
+          "document_ver",
+          "account_id"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "document_parameters",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "document_id",
+            "getter_name": "documentId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "document_ver",
+            "getter_name": "documentVer",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ver",
+            "getter_name": "ver",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+          "FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE"
+        ],
+        "explicit_pk": [
+          "id",
+          "ver",
+          "document_id",
+          "document_ver"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "references": [
+      ],
+      "type": "table",
+      "data": {
+        "name": "documents_local_metadata",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "is_favorite",
+            "getter_name": "isFavorite",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "CHECK (\"is_favorite\" IN (0, 1))",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "CHECK (\"is_favorite\" IN (0, 1))"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+        ],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "references": [
+      ],
+      "type": "table",
+      "data": {
+        "name": "local_documents_drafts",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "content",
+            "getter_name": "content",
+            "moor_type": "blob",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.content",
+              "dart_type_name": "DocumentDataContent"
+            }
+          },
+          {
+            "name": "authors",
+            "getter_name": "authors",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
+          },
+          {
+            "name": "collaborators",
+            "getter_name": "collaborators",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
+          },
+          {
+            "name": "content_type",
+            "getter_name": "contentType",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "parameters",
+            "getter_name": "parameters",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.parameters",
+              "dart_type_name": "DocumentParameters"
+            }
+          },
+          {
+            "name": "ref_id",
+            "getter_name": "refId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "ref_ver",
+            "getter_name": "refVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "reply_id",
+            "getter_name": "replyId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "reply_ver",
+            "getter_name": "replyVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "section",
+            "getter_name": "section",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "template_id",
+            "getter_name": "templateId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "template_ver",
+            "getter_name": "templateVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "type",
+            "getter_name": "type",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.type",
+              "dart_type_name": "DocumentType"
+            }
+          },
+          {
+            "name": "ver",
+            "getter_name": "ver",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "authors_names",
+            "getter_name": "authorsNames",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.strings",
+              "dart_type_name": "List<String?>"
+            }
+          },
+          {
+            "name": "authors_significant",
+            "getter_name": "authorsSignificant",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ],
+            "type_converter": {
+              "dart_expr": "DocumentConverters.catId",
+              "dart_type_name": "List<CatalystId>"
+            }
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+        ],
+        "explicit_pk": [
+          "id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_id",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_id_ver",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_ref_id",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "ref_id"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_ref_id_ver",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "ref_id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_ref_id_ver",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "ref_id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_id_created_at",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "id",
+          "created_at"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_ref_id_ref_ver",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "ref_id",
+          "ref_ver"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_created_at",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "created_at"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "references": [
+        0
+      ],
+      "type": "index",
+      "data": {
+        "on": 0,
+        "name": "idx_documents_v2_type_template",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "template_id",
+          "template_ver"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_document_authors_composite",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "document_id",
+          "document_ver",
+          "account_significant_id"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_document_authors_identity",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "account_significant_id"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_document_authors_username",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "username"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "references": [
+        3
+      ],
+      "type": "index",
+      "data": {
+        "on": 3,
+        "name": "idx_document_collaborators_composite",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "document_id",
+          "document_ver",
+          "account_significant_id"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "references": [
+        3
+      ],
+      "type": "index",
+      "data": {
+        "on": 3,
+        "name": "idx_document_collaborators_identity",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "account_significant_id"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "references": [
+        3
+      ],
+      "type": "index",
+      "data": {
+        "on": 3,
+        "name": "idx_document_collaborators_username",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "username"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "references": [
+        4
+      ],
+      "type": "index",
+      "data": {
+        "on": 4,
+        "name": "idx_document_parameters_composite",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "document_id",
+          "document_ver",
+          "id",
+          "ver"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "references": [
+        5
+      ],
+      "type": "index",
+      "data": {
+        "on": 5,
+        "name": "idx_local_metadata_favorite",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "is_favorite"
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_local_drafts_type_authors",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "authors_significant"
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_local_drafts_type_id",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_local_drafts_created_at",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "created_at"
+        ]
+      }
+    }
+  ]
+}

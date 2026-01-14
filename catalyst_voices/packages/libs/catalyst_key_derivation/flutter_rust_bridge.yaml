@@ -1,7 +1,7 @@
 rust_input: crate::key_derivation
 rust_root: rust/
 dart_output: lib/src/rust
-default_external_library_loader_web_prefix: /assets/packages/catalyst_key_derivation/assets/js/
+default_external_library_loader_web_prefix: /assets/packages/catalyst_key_derivation/assets/js/v1/
 wasm_bindgen_name: key_derivation_wasm_bindgen
 # TODO(dt-iohk): allow to auto-upgrade when we're no longer using the forked flutter_rust_bridge
 auto_upgrade_dependency: false

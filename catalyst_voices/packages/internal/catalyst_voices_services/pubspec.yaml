@@ -53,6 +53,8 @@ dependencies:
 dev_dependencies:
   catalyst_analysis: ^3.0.0
   catalyst_compression: ^1.0.0
+  catalyst_voices_dev:
+    path: ../catalyst_voices_dev
   mocktail: ^1.0.4
   shared_preferences_platform_interface: ^2.4.1
   test: ^1.27.0
