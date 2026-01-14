@@ -3,24 +3,23 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalApprovalState extends Equatable {
   final ProposalApprovalTabType selectedTab;
-
-  final List<CollaboratorProposalDisplayConsent> items;
+  final List<UsersProposalOverview> items;
 
   const ProposalApprovalState({
     this.selectedTab = ProposalApprovalTabType.decide,
     this.items = const [],
   });
 
-  int get decideCount => 0;
+  List<UsersProposalOverview> get decideItems => items;
 
-  int get finalCount => 0;
+  List<UsersProposalOverview> get finalItems => items;
 
   @override
   List<Object?> get props => [selectedTab, items];
 
   ProposalApprovalState copyWith({
     ProposalApprovalTabType? selectedTab,
-    List<CollaboratorProposalDisplayConsent>? items,
+    List<UsersProposalOverview>? items,
   }) {
     return ProposalApprovalState(
       selectedTab: selectedTab ?? this.selectedTab,

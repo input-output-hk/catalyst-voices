@@ -365,6 +365,10 @@
   "@cancelCommit": {
     "description": "Cancel comment submission"
   },
+  "candidateFinalProposal": "Candidate Final",
+  "@candidateFinalProposal": {
+    "description": "Label indicating a candidate for a final proposal status"
+  },
   "cantEditThisProposal": "Can't edit this proposal",
   "@cantEditThisProposal": {
     "description": "Message shown when user tries to edit a proposal that should not be editable."
@@ -1703,6 +1707,17 @@
     "description": "Generic text about nr. of fund / campaign",
     "placeholders": {
       "fundNumber": {
+        "description": "Number of fund",
+        "type": "int"
+      }
+    }
+  },
+  "fundXAbbr": "F{fundNumber}",
+  "@fundXAbbr": {
+    "description": "Abbreviated title for fund number.",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
         "type": "int"
       }
     }
@@ -2416,6 +2431,10 @@
   "openAppSettings": "Open App Settings",
   "@openAppSettings": {
     "description": "CTA to open app settings"
+  },
+  "openForDecision": "Open for Decision",
+  "@openForDecision": {
+    "description": "Navigate to the details of the proposal to take a decision about it"
   },
   "openInEditor": "Open in editor",
   "@openInEditor": {

@@ -15,16 +15,24 @@ class ProposalApprovalTabs extends StatelessWidget {
     return ActionsDecoratedPanel(
       child: BlocBuilder<ProposalApprovalCubit, ProposalApprovalState>(
         builder: (context, state) {
+          final decideItems = state.decideItems;
+          final finalItems = state.finalItems;
+
           return DefaultTabController(
             length: ProposalApprovalTabType.values.length,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _TabBar(
-                  decideCount: state.decideCount,
-                  finalCount: state.finalCount,
+                  decideCount: decideItems.length,
+                  finalCount: finalItems.length,
                 ),
-                const Flexible(child: _TabBarView()),
+                Flexible(
+                  child: _TabBarView(
+                    decideItems: decideItems,
+                    finalItems: finalItems,
+                  ),
+                ),
               ],
             ),
           );
@@ -61,7 +69,13 @@ class _TabBar extends StatelessWidget {
 }
 
 class _TabBarView extends StatelessWidget {
-  const _TabBarView();
+  final List<UsersProposalOverview> decideItems;
+  final List<UsersProposalOverview> finalItems;
+
+  const _TabBarView({
+    required this.decideItems,
+    required this.finalItems,
+  });
 
   @override
   Widget build(BuildContext context) {

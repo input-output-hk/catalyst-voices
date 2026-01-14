@@ -5,58 +5,32 @@ import 'package:catalyst_voices_blocs/src/proposal_approval/proposal_approval_cu
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 
 final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with BlocErrorEmitterMixin {
   final UserService _userService;
+  final CampaignService _campaignService;
   final ProposalService _proposalService;
 
   ProposalApprovalCubitCache _cache = const ProposalApprovalCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
-  StreamSubscription<Page<ProposalBriefData>>? _proposalDisplayConsentSub;
+  StreamSubscription<Campaign?>? _activeCampaignSub;
+  StreamSubscription<List<UsersProposalOverview>>? _dataPageSub;
 
-  ProposalApprovalCubit(this._userService, this._proposalService)
+  ProposalApprovalCubit(this._userService, this._campaignService, this._proposalService)
     : super(const ProposalApprovalState());
 
-  Future<void> changeDisplayConsent({
-    required DocumentRef id,
-    required CollaboratorDisplayConsentStatus displayConsentStatus,
-  }) async {
-    // TODO(LynxLynxx): Test it when available
-    final collaboratorAction = displayConsentStatus.toCollaboratorAction();
-
-    final indexOfProposalConsent = _cache.proposalsDisplayConsent.indexWhere(
-      (proposal) => proposal.id == id,
-    );
-
-    if (indexOfProposalConsent == -1) {
-      return;
+  Future<Campaign?> get _campaign async {
+    final cachedCampaign = _cache.campaign;
+    if (cachedCampaign != null) {
+      return cachedCampaign;
     }
 
-    final updatedProposalsDisplayConsent = List.of(_cache.proposalsDisplayConsent);
-    updatedProposalsDisplayConsent[indexOfProposalConsent] =
-        updatedProposalsDisplayConsent[indexOfProposalConsent].copyWith(
-          lastDisplayConsentUpdate: Optional(DateTime.now()),
-          status: displayConsentStatus,
-        );
+    final campaign = await _campaignService.getActiveCampaign();
+    _cache = _cache.copyWith(campaign: Optional(campaign));
 
-    emit(state.copyWith(items: updatedProposalsDisplayConsent));
-
-    if (collaboratorAction != null) {
-      try {
-        await _proposalService.submitCollaboratorProposalAction(
-          ref: id,
-          action: collaboratorAction,
-        );
-        _cache = _cache.copyWith(proposalsDisplayConsent: updatedProposalsDisplayConsent);
-      } catch (e) {
-        if (!isClosed) {
-          emit(state.copyWith(items: _cache.proposalsDisplayConsent));
-
-          emitError(LocalizedException.create(e));
-        }
-      }
-    }
+    return campaign;
   }
 
   @override
@@ -64,38 +38,47 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
     await _activeAccountIdSub?.cancel();
     _activeAccountIdSub = null;
 
-    await _proposalDisplayConsentSub?.cancel();
-    _proposalDisplayConsentSub = null;
+    await _dataPageSub?.cancel();
+    _dataPageSub = null;
+
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
 
     return super.close();
   }
 
   void init() {
     _setupActiveAccountIdSubscription();
-    _setupProposalDisplayConsentSubscription();
+    _setupActiveCampaignSubscription();
+    _setupProposalsSubscription();
   }
 
   void _handleActiveAccountIdChange(CatalystId? catalystId) {
     _cache = _cache.copyWith(activeAccountId: Optional(catalystId));
-
-    _setupProposalDisplayConsentSubscription();
+    _setupProposalsSubscription();
   }
 
-  void _handleProposalDisplayConsentListChange(Page<ProposalBriefData> page) {
-    final proposalsDisplayConsent = page.items
-        .map(
-          // If this handle was called then catalystId is not null because it was check at setup level
-          (item) => CollaboratorProposalDisplayConsent.fromBrief(item, _cache.activeAccountId!),
-        )
-        .toList();
+  void _handleActiveCampaignChange(Campaign? campaign) {
+    if (_cache.campaign?.id == campaign?.id) {
+      return;
+    }
 
-    _cache = _cache.copyWith(proposalsDisplayConsent: proposalsDisplayConsent);
-
-    _rebuildState();
+    _cache = _cache.copyWith(campaign: Optional(campaign));
+    _setupProposalsSubscription();
   }
 
-  void _rebuildState() {
-    emit(state.copyWith(items: _cache.proposalsDisplayConsent));
+  void _handleProposalsChange(List<UsersProposalOverview> items) {
+    _cache = _cache.copyWith(items: Optional(items));
+    emit(state.copyWith(items: _cache.items));
+  }
+
+  ProposalsFiltersV2 _proposalFilters() {
+    final activeAccountId = _cache.activeAccountId;
+    if (activeAccountId == null) {
+      return const ProposalsFiltersV2();
+    }
+
+    return CollaboratorProposalApprovalsFilter(activeAccountId);
   }
 
   void _setupActiveAccountIdSubscription() {
@@ -106,19 +89,32 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
         .listen(_handleActiveAccountIdChange);
   }
 
-  void _setupProposalDisplayConsentSubscription() {
-    const signedProposalsPageRequest = PageRequest(page: 0, size: 999);
+  void _setupActiveCampaignSubscription() {
+    unawaited(_activeCampaignSub?.cancel());
 
-    unawaited(_proposalDisplayConsentSub?.cancel());
-    final activeCatalystId = _cache.activeAccountId;
-    final proposalDisplayConsentStream = activeCatalystId != null
-        ? _proposalService.watchProposalsBriefPageV2(
-            request: signedProposalsPageRequest,
-            filters: CollaboratorProposalDisplayConsentFilter(activeCatalystId),
-          )
-        : Stream<Page<ProposalBriefData>>.value(const Page.empty());
-    _proposalDisplayConsentSub = proposalDisplayConsentStream.distinct().listen(
-      _handleProposalDisplayConsentListChange,
-    );
+    _activeCampaignSub = _campaignService.watchActiveCampaign
+        .distinct((previous, next) => previous?.id == next?.id)
+        .listen(_handleActiveCampaignChange);
+  }
+
+  void _setupProposalsSubscription() {
+    const pageRequest = PageRequest(page: 0, size: 999);
+    final proposalsFilters = _proposalFilters();
+
+    unawaited(_dataPageSub?.cancel());
+    _dataPageSub = _proposalService
+        .watchProposalsBriefPageV2(request: pageRequest, filters: proposalsFilters)
+        .asyncMap((page) async {
+          final activeCampaign = await _campaign;
+          return page.items.map((brief) {
+            return UsersProposalOverview.fromProposalBriefData(
+              proposalData: brief,
+              fromActiveCampaign: activeCampaign?.fundNumber == brief.fundNumber,
+              activeAccountId: _cache.activeAccountId,
+            );
+          }).toList();
+        })
+        .distinct(listEquals)
+        .listen(_handleProposalsChange);
   }
 }

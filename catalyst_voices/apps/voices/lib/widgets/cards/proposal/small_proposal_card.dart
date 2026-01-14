@@ -109,7 +109,8 @@ class _Details extends StatelessWidget {
           offstage: proposal.commentsCount == 0,
           child: ProposalCommentsChip(
             commentsCount: proposal.commentsCount,
-            useInternalBackground: !isPublished,
+            foregroundColor: !isPublished ? context.colors.textOnPrimaryLevel1 : null,
+            backgroundColor: !isPublished ? context.colors.elevationsOnSurfaceNeutralLv1Grey : null,
           ),
         ),
       ],

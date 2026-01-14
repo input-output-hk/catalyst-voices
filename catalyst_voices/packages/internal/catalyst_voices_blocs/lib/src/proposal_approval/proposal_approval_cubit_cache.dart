@@ -4,26 +4,31 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalApprovalCubitCache extends Equatable {
   final CatalystId? activeAccountId;
-  final List<CollaboratorProposalDisplayConsent> proposalsDisplayConsent;
+  final Campaign? campaign;
+  final List<UsersProposalOverview>? items;
 
   const ProposalApprovalCubitCache({
     this.activeAccountId,
-    this.proposalsDisplayConsent = const [],
+    this.campaign,
+    this.items,
   });
 
   @override
   List<Object?> get props => [
     activeAccountId,
-    proposalsDisplayConsent,
+    campaign,
+    items,
   ];
 
   ProposalApprovalCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,
-    List<CollaboratorProposalDisplayConsent>? proposalsDisplayConsent,
+    Optional<Campaign>? campaign,
+    Optional<List<UsersProposalOverview>>? items,
   }) {
     return ProposalApprovalCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
-      proposalsDisplayConsent: proposalsDisplayConsent ?? this.proposalsDisplayConsent,
+      campaign: campaign.dataOr(this.campaign),
+      items: items.dataOr(this.items),
     );
   }
 }

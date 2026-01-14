@@ -65,30 +65,28 @@ class PrivateProposalChip extends StatelessWidget {
 
 class ProposalCommentsChip extends StatelessWidget {
   final int commentsCount;
-  final bool useInternalBackground;
+  final Color? foregroundColor;
+  final Color? backgroundColor;
 
   const ProposalCommentsChip({
     super.key,
     required this.commentsCount,
-    this.useInternalBackground = true,
+    this.foregroundColor,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesChip.rectangular(
-      backgroundColor: useInternalBackground
-          ? context.colors.elevationsOnSurfaceNeutralLv1Grey
-          : null,
+      backgroundColor: backgroundColor,
       leading: VoicesAssets.icons.chatAlt2.buildIcon(
-        color: useInternalBackground ? null : context.colors.iconsBackground,
+        color: foregroundColor,
       ),
       content: Text(
         key: const Key('CommentsCount'),
         commentsCount.toString(),
         style: context.textTheme.labelLarge?.copyWith(
-          color: useInternalBackground
-              ? Theme.of(context).colors.textOnPrimaryLevel1
-              : context.colors.iconsBackground,
+          color: foregroundColor,
         ),
       ),
     );
