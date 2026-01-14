@@ -151,16 +151,21 @@ class _StatusText extends StatelessWidget {
     final buffer = StringBuffer(status.proposalApprovalLabel(context));
 
     final secondaryLabel = status.proposalApprovalFinalSecondaryLabel(context);
+    final hasSecondaryLabel = isFinalTab && secondaryLabel != null;
     if (isFinalTab && secondaryLabel != null) {
       buffer.write(' · $secondaryLabel');
-    } else if (createdAt case final createdAt?) {
-      buffer.write(' · ${DateFormatter.formatDayMonthTime(createdAt)}');
     }
 
-    if (isCurrentUser) {
-      buffer.write(' · ${context.l10n.you}');
-    } else if (status == ProposalsCollaborationStatus.mainProposer) {
-      buffer.write(' · ${context.l10n.mainProposer}');
+    if (!hasSecondaryLabel) {
+      if (createdAt case final createdAt?) {
+        buffer.write(' · ${DateFormatter.formatDayMonthTime(createdAt)}');
+      }
+
+      if (isCurrentUser) {
+        buffer.write(' · ${context.l10n.you}');
+      } else if (status == ProposalsCollaborationStatus.mainProposer) {
+        buffer.write(' · ${context.l10n.mainProposer}');
+      }
     }
 
     return buffer.toString();
