@@ -45,6 +45,7 @@ class ProposalApprovalDecideCard extends StatelessWidget {
           if (contributors.isNotEmpty) ...[
             ProposalApprovalContributors(
               contributors: contributors,
+              tab: ProposalApprovalTabType.decide,
               activeAccountId: activeAccountId,
             ),
             const Divider(),

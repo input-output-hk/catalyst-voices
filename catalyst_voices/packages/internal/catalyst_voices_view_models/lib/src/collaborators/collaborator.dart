@@ -64,9 +64,19 @@ extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
     };
   }
 
+  String? proposalApprovalFinalSecondaryLabel(BuildContext context) {
+    return switch (this) {
+      ProposalsCollaborationStatus.accepted || ProposalsCollaborationStatus.mainProposer => null,
+      ProposalsCollaborationStatus.pending ||
+      ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.left ||
+      ProposalsCollaborationStatus.removed => context.l10n.notShownOnFinalProposal,
+    };
+  }
+
   String proposalApprovalLabel(BuildContext context) {
     return switch (this) {
-      ProposalsCollaborationStatus.pending => context.l10n.collaboratorApprovedFinal,
+      ProposalsCollaborationStatus.pending => context.l10n.collaboratorAwaitingApproval,
       ProposalsCollaborationStatus.accepted => context.l10n.collaboratorApprovedFinal,
       ProposalsCollaborationStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
       ProposalsCollaborationStatus.left => context.l10n.collaboratorInvitationStatusLeft,

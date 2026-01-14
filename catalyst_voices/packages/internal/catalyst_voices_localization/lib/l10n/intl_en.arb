@@ -2403,6 +2403,10 @@
   "@notPublishedProposals": {
     "description": "Title for section to show not published proposals"
   },
+  "notShownOnFinalProposal": "Not shown on final proposal",
+  "@notShownOnFinalProposal": {
+    "description": "Text explaining that given piece of information is not shown on final proposal."
+  },
   "notVerified": "Not verified",
   "@notVerified": {
     "description": "Message of account status chip next to email. Meaning Account is not verified."

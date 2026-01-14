@@ -42,6 +42,7 @@ class ProposalApprovalFinalCard extends StatelessWidget {
           if (contributors.isNotEmpty)
             ProposalApprovalContributors(
               contributors: contributors,
+              tab: ProposalApprovalTabType.finalProposals,
               activeAccountId: activeAccountId,
             ),
         ],

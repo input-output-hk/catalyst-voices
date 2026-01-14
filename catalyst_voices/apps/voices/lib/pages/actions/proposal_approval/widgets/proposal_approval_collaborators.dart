@@ -8,11 +8,13 @@ import 'package:flutter/material.dart';
 
 class ProposalApprovalContributors extends StatelessWidget {
   final List<Contributor> contributors;
+  final ProposalApprovalTabType tab;
   final CatalystId? activeAccountId;
 
   const ProposalApprovalContributors({
     super.key,
     required this.contributors,
+    required this.tab,
     required this.activeAccountId,
   });
 
@@ -29,6 +31,7 @@ class ProposalApprovalContributors extends StatelessWidget {
           for (final contributor in contributors)
             _Contributor(
               contributor: contributor,
+              tab: tab,
               activeAccountId: activeAccountId,
             ),
         ],
@@ -39,10 +42,12 @@ class ProposalApprovalContributors extends StatelessWidget {
 
 class _Contributor extends StatelessWidget {
   final Contributor contributor;
+  final ProposalApprovalTabType tab;
   final CatalystId? activeAccountId;
 
   const _Contributor({
     required this.contributor,
+    required this.tab,
     required this.activeAccountId,
   });
 
@@ -62,6 +67,7 @@ class _Contributor extends StatelessWidget {
                 status: contributor.status,
                 createdAt: contributor.createdAt,
                 isCurrentUser: activeAccountId.isSameAs(contributor.id),
+                isFinalTab: tab == ProposalApprovalTabType.finalProposals,
               ),
             ],
           ),
@@ -121,11 +127,13 @@ class _StatusText extends StatelessWidget {
   final ProposalsCollaborationStatus status;
   final DateTime? createdAt;
   final bool isCurrentUser;
+  final bool isFinalTab;
 
   const _StatusText({
     required this.status,
     required this.createdAt,
     required this.isCurrentUser,
+    required this.isFinalTab,
   });
 
   @override
@@ -139,11 +147,13 @@ class _StatusText extends StatelessWidget {
     );
   }
 
-  // TODO(dt-iohk): check this against the figma
   String _format(BuildContext context) {
     final buffer = StringBuffer(status.proposalApprovalLabel(context));
 
-    if (createdAt case final createdAt?) {
+    final secondaryLabel = status.proposalApprovalFinalSecondaryLabel(context);
+    if (isFinalTab && secondaryLabel != null) {
+      buffer.write(' · $secondaryLabel');
+    } else if (createdAt case final createdAt?) {
       buffer.write(' · ${DateFormatter.formatDayMonthTime(createdAt)}');
     }
 
