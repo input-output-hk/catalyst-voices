@@ -5,10 +5,10 @@ import 'package:catalyst_voices_models/src/signed_document/signed_document_paylo
 import 'package:catalyst_voices_models/src/signed_document/signed_document_raw_payload.dart';
 
 /// The direct binary representation of [SignedDocumentPayload].
-/// 
-/// This type can be directly translated to the model class 
+///
+/// This type can be directly translated to the model class
 /// via [SignedDocumentPayload.fromBytes] if the [DocumentContentType] is known.
-/// 
+///
 /// It differs from [SignedDocumentRawPayload] since that type might be compressed
 /// and further transformed thus making the conversion back to [SignedDocumentPayload]
 /// impossible without reversing the compression and other transformations.
