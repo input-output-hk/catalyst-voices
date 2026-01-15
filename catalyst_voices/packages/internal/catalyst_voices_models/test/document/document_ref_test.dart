@@ -105,4 +105,21 @@ void main() {
       expect(invalidSignedRef.isValid, isFalse);
     });
   });
+
+  test('fresh generates new id and version for first document', () {
+    final originalRef = DraftRef.generateFirstRef();
+    final freshRef = originalRef.fresh();
+
+    expect(originalRef.id, isNot(freshRef.id));
+    expect(originalRef.ver, isNot(freshRef.ver));
+  });
+
+  test('fresh generates new version only for subsequent document', () {
+    final originalRef = DraftRef.generateFirstRef();
+    final subsequentRef = DraftRef(id: originalRef.id, ver: const Uuid().v7());
+    final freshRef = subsequentRef.fresh();
+
+    expect(originalRef.id, equals(freshRef.id));
+    expect(originalRef.ver, isNot(freshRef.ver));
+  });
 }

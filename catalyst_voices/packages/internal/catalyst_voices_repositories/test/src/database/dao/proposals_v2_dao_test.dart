@@ -2629,7 +2629,28 @@ void main() {
 
             expect(result.items, hasLength(1));
             expect(result.items.first.proposal.ver, proposalVer);
+            expect(result.items.first.proposal.ver, proposalVer);
           });
+
+          test(
+            'returns all versions ordered by ver ASC for proposal with multiple versions',
+            () async {
+              final ver1 = _buildUuidV7At(earliest);
+              final ver2 = _buildUuidV7At(middle);
+              final ver3 = _buildUuidV7At(latest);
+
+              final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
+              final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
+              final proposal3 = _createTestDocumentEntity(id: 'p1', ver: ver3);
+              await db.documentsV2Dao.saveAll([proposal3, proposal1, proposal2]);
+
+              const request = PageRequest(page: 0, size: 10);
+              final result = await dao.getProposalsBriefPage(request: request);
+
+              expect(result.items, hasLength(1));
+              expect(result.items.first.proposal.ver, ver3);
+            },
+          );
         });
 
         group('CommentsCount', () {
@@ -2860,7 +2881,7 @@ void main() {
             final otherDoc = _createTestDocumentEntity(
               id: 'other1',
               ver: otherDocVer,
-              type: DocumentType.reviewDocument,
+              type: DocumentType.brandParametersDocument,
               refId: proposal.doc.id,
               refVer: proposal.doc.ver,
             );
@@ -7776,12 +7797,17 @@ void main() {
 
           await db.documentsV2Dao.saveAll([
             proposal1,
-            proposal2, // Draft proposal 2
-            collaboratorHideActionProposal2, // Reject invite collaborator for proposal 2
+            proposal2,
+            // Draft proposal 2
+            collaboratorHideActionProposal2,
+            // Reject invite collaborator for proposal 2
             proposal2Ver2,
-            authorFinalActionProposal2Ver2, // Author makes proposal2 final
-            proposal3, // Draft proposal3
-            authorFinalActionProposal3, //Author makes proposal final which collaborator has pending status
+            authorFinalActionProposal2Ver2,
+            // Author makes proposal2 final
+            proposal3,
+            // Draft proposal3
+            authorFinalActionProposal3,
+            //Author makes proposal final which collaborator has pending status
             proposal4Ver1,
             collaboratorAcceptInviteProposal4Ver1,
             proposal4Ver2,

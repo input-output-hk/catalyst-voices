@@ -65,9 +65,7 @@ class _Body extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: _WorkspaceProposalCardResponsiveness(proposal),
-        ),
+        Expanded(child: _WorkspaceProposalCardResponsiveness(proposal)),
         _ActionButton(proposal: proposal),
       ],
     );

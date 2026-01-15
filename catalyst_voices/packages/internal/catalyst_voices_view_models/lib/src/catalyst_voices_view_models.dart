@@ -77,6 +77,7 @@ export 'proposals/proposals_dropdown_order_item.dart';
 export 'proposals/proposals_page_tab.dart';
 export 'registration/exception/localized_registration_email_already_used_exception.dart';
 export 'registration/exception/localized_registration_exception.dart';
+export 'registration/exception/localized_wallet_balance_exception.dart';
 export 'registration/network_id_ext.dart';
 export 'registration/receive_emails.dart';
 export 'registration/registration.dart';

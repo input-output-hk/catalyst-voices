@@ -54,7 +54,9 @@ final class Account extends Equatable {
     this.isActive = false,
     required this.registrationStatus,
   }) : assert(
-         (email == null && publicStatus == AccountPublicStatus.notSetup) ||
+         (email == null &&
+                 (publicStatus == AccountPublicStatus.notSetup ||
+                     publicStatus == AccountPublicStatus.unknown)) ||
              (email != null && publicStatus != AccountPublicStatus.notSetup),
          'Account publicStatus have to be notSetup only when email is not set',
        );

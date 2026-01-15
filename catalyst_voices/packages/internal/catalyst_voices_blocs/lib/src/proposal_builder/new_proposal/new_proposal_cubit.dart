@@ -55,11 +55,8 @@ class NewProposalCubit extends Cubit<NewProposalState>
         throw StateError('Cannot create draft, category not selected');
       }
 
-      final category = await _campaignService.getCategory(categoryId);
-      final templateRef = category.proposalTemplateRef;
-      final template = await _proposalService.getProposalTemplate(
-        id: templateRef,
-      );
+      final template = await _proposalService.getProposalTemplate(category: categoryId);
+      final parameters = template.metadata.parameters;
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
         ..addChange(
@@ -74,8 +71,8 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       return await _proposalService.createDraftProposal(
         content: documentContent,
-        template: templateRef,
-        categoryId: categoryId,
+        templateRef: template.metadata.id.toSignedDocumentRef(),
+        parameters: parameters,
       );
     } catch (error, stackTrace) {
       _logger.severe('Create draft', error, stackTrace);
@@ -185,23 +182,16 @@ class NewProposalCubit extends Cubit<NewProposalState>
   Future<void> _updateCampaignCategoriesState() async {
     final campaign = _cache.activeCampaign;
     final campaignTotalAsk = _cache.campaignTotalAsk ?? const CampaignTotalAsk(categoriesAsks: {});
-    final preselectedCategory = _cache.categoryRef;
 
     // TODO(LynxLynxx): when we have separate proposal template for generic questions use it here
     // right now user can start creating proposal without selecting category.
     // Right now every category have the same requirements for title so we can do a fallback for
     // first category from the list.
+    final categoryId = _cache.categoryRef ?? campaign?.categories.firstOrNull?.id;
     final campaignCategories = campaign?.categories ?? [];
-    final templateRef = campaignCategories
-        .cast<CampaignCategory?>()
-        .firstWhere(
-          (e) => e?.id == preselectedCategory,
-          orElse: () => campaignCategories.firstOrNull,
-        )
-        ?.proposalTemplateRef;
 
-    final template = templateRef != null
-        ? await _proposalService.getProposalTemplate(id: templateRef)
+    final template = categoryId != null
+        ? await _proposalService.getProposalTemplate(category: categoryId)
         : null;
     final titleRange = template?.title?.strLengthRange;
 

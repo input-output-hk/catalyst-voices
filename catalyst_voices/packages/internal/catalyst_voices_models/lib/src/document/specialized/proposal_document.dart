@@ -167,28 +167,30 @@ final class ProposalDocument extends Equatable {
 }
 
 final class ProposalMetadata extends DocumentMetadata {
+  /// Proposal parameters like brand, campaign or category.
+  ///
+  /// Legacy documents stored them in separate fields, see [categoryIdNode].
+  static const parametersNode = NodeId('parameters');
+
+  /// The id part of the [parametersNode].
+  static const parametersIdNode = NodeId('parameters.*.id');
+
+  /// Legacy parameter name for the category. New format of the metadata uses [parameters].
   static const categoryIdNode = NodeId('categoryId.id');
   static const authorsNode = NodeId('authors');
 
   final SignedDocumentRef templateRef;
-  final DocumentParameters parameters;
   final List<CatalystId> authors;
   final List<CatalystId>? collaborators;
 
   ProposalMetadata({
     required super.id,
+    required super.parameters,
     required this.templateRef,
-    required this.parameters,
     required this.authors,
     this.collaborators,
   });
 
   @override
-  List<Object?> get props => [
-    ...super.props,
-    templateRef,
-    parameters,
-    authors,
-    collaborators,
-  ];
+  List<Object?> get props => super.props + [templateRef, authors, collaborators];
 }

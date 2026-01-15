@@ -111,7 +111,7 @@ void main() {
           // Only return a doc for the first step to simplify test
           final filters = invocation.namedArguments[#filters] as DocumentIndexFilters;
 
-          if (filters.type == DocumentType.proposalTemplate) {
+          if ((filters.type ?? []).contains(DocumentType.proposalTemplate)) {
             return DocumentIndex(
               page: const DocumentIndexPage(page: 0, limit: 100, remaining: 0),
               docs: [indexDoc],
@@ -169,7 +169,7 @@ void main() {
         ).thenAnswer((invocation) async {
           final filters = invocation.namedArguments[#filters] as DocumentIndexFilters;
           // Only return for one specific step
-          if (filters.type == DocumentType.proposalTemplate) {
+          if ((filters.type ?? []).contains(DocumentType.proposalTemplate)) {
             return DocumentIndex(
               page: const DocumentIndexPage(page: 0, limit: 100, remaining: 0),
               docs: [indexDoc],

@@ -31,14 +31,14 @@ sealed class ProposalOrDocument extends Equatable {
   };
 
   Campaign? get campaign {
-    return Campaign.all.firstWhereOrNull((campaign) => campaign.hasAnyParameterId(_parameters));
+    return Campaign.all.firstWhereOrNull((campaign) => campaign.hasAnyParameterId(parameters));
   }
 
   CampaignCategory? get category {
     return Campaign.all
         .map((e) => e.categories)
         .flattened
-        .firstWhereOrNull((category) => _parameters.containsId(category.id.id));
+        .firstWhereOrNull((category) => parameters.containsId(category.id.id));
   }
 
   /// The name of the proposal's category.
@@ -57,12 +57,15 @@ sealed class ProposalOrDocument extends Equatable {
   /// Fund number should come from query but atm those are not documents.
   int? get fundNumber {
     return Campaign.all
-        .firstWhereOrNull((campaign) => campaign.hasAnyParameterId(_parameters))
+        .firstWhereOrNull((campaign) => campaign.hasAnyParameterId(parameters))
         ?.fundNumber;
   }
 
   /// The amount of funds requested by the proposal.
   Money? get fundsRequested;
+
+  /// A reference to the document itself.
+  DocumentRef get id;
 
   bool get isDocument => this is _Document;
 
@@ -73,7 +76,7 @@ sealed class ProposalOrDocument extends Equatable {
 
   /// A private getter for the category reference, used to find the
   /// [categoryName].
-  DocumentParameters get _parameters;
+  DocumentParameters get parameters;
 }
 
 final class _Document extends ProposalOrDocument {
@@ -93,13 +96,16 @@ final class _Document extends ProposalOrDocument {
   Money? get fundsRequested => null;
 
   @override
+  DocumentRef get id => data.metadata.id;
+
+  @override
   List<Object?> get props => [data];
 
   @override
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
 
   @override
-  DocumentParameters get _parameters => data.metadata.parameters;
+  DocumentParameters get parameters => data.metadata.parameters;
 }
 
 final class _Proposal extends ProposalOrDocument {
@@ -117,13 +123,16 @@ final class _Proposal extends ProposalOrDocument {
   Money? get fundsRequested => data.fundsRequested;
 
   @override
+  DocumentRef get id => data.metadata.id;
+
+  @override
   List<Object?> get props => [data];
 
   @override
   String? get title => data.title;
 
   @override
-  DocumentParameters get _parameters => data.metadata.parameters;
+  DocumentParameters get parameters => data.metadata.parameters;
 }
 
 extension on DocumentNodeId {

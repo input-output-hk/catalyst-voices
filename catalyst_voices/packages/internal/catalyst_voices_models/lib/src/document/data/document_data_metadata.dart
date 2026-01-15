@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-/// Describes what [DocumentDataContent] is about. It only makes sens in
-/// context of [type].
+/// Describes what [DocumentDataContent] is about. It only makes sense in
+/// the context of [type].
 final class DocumentDataMetadata extends Equatable {
   /// The content type of the document payload this metadata is attached to.
   final DocumentContentType contentType;
@@ -79,6 +79,21 @@ final class DocumentDataMetadata extends Equatable {
     );
   }
 
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.commentTemplate].
+  ///
+  /// The [parameters] should be the ones assigned to template's parent, most likely the category.
+  factory DocumentDataMetadata.commentTemplate({
+    required DocumentRef id,
+    required DocumentParameters parameters,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.commentTemplate,
+      contentType: DocumentContentType.schemaJson,
+      id: id,
+      parameters: parameters,
+    );
+  }
+
   /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalDocument].
   ///
   /// The [parameters] should be the ones assigned to the [template].
@@ -100,6 +115,7 @@ final class DocumentDataMetadata extends Equatable {
     );
   }
 
+  // TODO(damian-molinski): authors?
   /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalActionDocument].
   ///
   /// The [parameters] should be the ones assigned to the [proposalRef].
@@ -126,7 +142,7 @@ final class DocumentDataMetadata extends Equatable {
   }) {
     return DocumentDataMetadata(
       type: DocumentType.proposalTemplate,
-      contentType: DocumentContentType.json,
+      contentType: DocumentContentType.schemaJson,
       id: id,
       parameters: parameters,
     );

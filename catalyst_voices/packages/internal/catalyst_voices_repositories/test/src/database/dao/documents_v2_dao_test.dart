@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../utils/document_composite_factory.dart';
@@ -2386,7 +2387,7 @@ void main() {
             _createTestDocumentEntity(
               id: 'id-3',
               ver: 'ver-3',
-              type: DocumentType.reviewDocument,
+              type: DocumentType.brandParametersDocument,
             ),
             _createTestDocumentEntity(
               id: 'id-4',

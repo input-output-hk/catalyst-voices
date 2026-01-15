@@ -14,7 +14,7 @@ import 'package:go_router/go_router.dart';
 
 part 'actions_route.g.dart';
 
-final class ActionsRoute extends GoRouteData with CompositeRouteGuardMixin {
+final class ActionsRoute extends GoRouteData with $ActionsRoute, CompositeRouteGuardMixin {
   final String? tab;
 
   const ActionsRoute({this.tab});
@@ -69,7 +69,7 @@ final class ActionsShellRoute extends ShellRouteData with EndDrawerShellPageTran
 }
 
 final class CoProposersConsentRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $CoProposersConsentRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const CoProposersConsentRoute();
 
   @override
@@ -85,7 +85,7 @@ final class CoProposersConsentRoute extends GoRouteData
 }
 
 final class ProposalApprovalRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $ProposalApprovalRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const ProposalApprovalRoute();
 
   @override

@@ -109,6 +109,11 @@ final class VotingCubit extends Cubit<VotingState>
     }
     _proposalsRequestCompleter = null;
 
+    if (_proposalsRequestCompleter != null && !_proposalsRequestCompleter!.isCompleted) {
+      _proposalsRequestCompleter!.complete();
+    }
+    _proposalsRequestCompleter = null;
+
     return super.close();
   }
 
@@ -286,9 +291,7 @@ final class VotingCubit extends Cubit<VotingState>
 
     _logger.finest('Active campaign changed: ${campaign?.id}');
 
-    _cache = _cache.copyWith(
-      campaign: Optional(campaign),
-    );
+    _cache = _cache.copyWith(campaign: Optional(campaign));
 
     if (_cache.filters.categoryId != null) {
       changeSelectedCategory(null);
@@ -347,7 +350,7 @@ final class VotingCubit extends Cubit<VotingState>
     _proposalsCountSub = Rx.combineLatest(
       streams,
       Map<VotingPageTab, int>.fromEntries,
-    ).startWith({}).listen(_handleProposalsCountChange);
+    ).startWith(state.count).listen(_handleProposalsCountChange);
   }
 
   VotingState _rebuildState() {
@@ -388,8 +391,10 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
+    final filters = ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active());
 
     _cache = VotingCubitCache(
+      filters: filters,
       votingPower: activeAccount?.votingPower,
       activeAccountId: activeAccount?.catalystId,
     );

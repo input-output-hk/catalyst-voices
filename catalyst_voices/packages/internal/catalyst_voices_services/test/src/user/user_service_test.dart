@@ -4,8 +4,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart'
-    show RbacRegistrationChain;
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -100,6 +99,7 @@ void main() {
 
       expect(currentAccount?.catalystId, account.catalystId);
       expect(currentAccount?.isActive, isTrue);
+      expect(service.activeAccountId, equals(account.catalystId));
     });
 
     test('when using a new account with the same catalystId '
@@ -131,6 +131,7 @@ void main() {
 
       expect(currentAccount, equals(newAccount));
       expect(currentAccount, isNot(oldAccount));
+      expect(service.activeAccountId, equals(newAccount.catalystId));
     });
 
     test('using different account emits update in stream', () async {
@@ -454,11 +455,7 @@ void main() {
           () => userRepository.getRbacRegistration(catalystId: any(named: 'catalystId')),
         ).thenAnswer(
           (_) {
-            const rbac = RbacRegistrationChain(
-              catalystId: '',
-              purpose: [],
-              roles: '',
-            );
+            const rbac = RbacRegistrationChain(catalystId: '');
             return Future.value(rbac);
           },
         );

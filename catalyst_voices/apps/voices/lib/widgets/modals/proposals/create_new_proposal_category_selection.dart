@@ -98,8 +98,8 @@ class _CreateNewProposalCategorySelectionState extends State<CreateNewProposalCa
               itemBuilder: (context, index) => _CategoryCard(
                 name: categories[index].formattedName,
                 description: categories[index].shortDescription,
-                ref: categories[index].ref,
-                isSelected: categories[index].ref == selected?.ref,
+                ref: categories[index].id,
+                isSelected: categories[index].id == selected?.id,
                 onCategorySelected: widget.onCategorySelected,
               ),
               separatorBuilder: (context, index) => const SizedBox(height: 16),

@@ -29,7 +29,7 @@ final class VotingMockService implements VotingService {
     final campaign = await _campaignService.getActiveCampaign();
 
     final category = campaign!.categories.firstWhere(
-      (category) => category.id == proposal.categoryRef,
+      (category) => proposal.parameters.contains(category.id),
       orElse: () => throw NotFoundException(message: 'Category not found in ${campaign.id}'),
     );
 

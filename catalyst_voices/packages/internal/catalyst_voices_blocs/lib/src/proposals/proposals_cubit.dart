@@ -23,7 +23,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   final CampaignService _campaignService;
   final ProposalService _proposalService;
 
-  ProposalsCubitCache _cache = const ProposalsCubitCache();
+  ProposalsCubitCache _cache = ProposalsCubitCache(
+    filters: ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active()),
+  );
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
@@ -378,13 +380,17 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _proposalsCountSub = Rx.combineLatest(
       streams,
       Map<ProposalsPageTab, int>.fromEntries,
-    ).startWith({}).listen(_handleProposalsCountChange);
+    ).startWith(state.count).listen(_handleProposalsCountChange);
   }
 
   void _resetCache() {
     final activeAccountId = _userService.user.activeAccount?.catalystId;
+    final filters = ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active());
 
-    _cache = ProposalsCubitCache(activeAccountId: activeAccountId);
+    _cache = ProposalsCubitCache(
+      filters: filters,
+      activeAccountId: activeAccountId,
+    );
   }
 
   ProposalsOrder _resolveEffectiveOrder() {

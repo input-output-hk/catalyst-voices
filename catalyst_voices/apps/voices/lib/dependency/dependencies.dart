@@ -250,10 +250,10 @@ final class Dependencies extends DependencyProvider {
           localGateway: LocalGatewayConfig.stressTest(appConfig.stressTest),
         );
 
-        return ApiServices(
+        return ApiServices.dio(
           config: config,
           authTokenProvider: get<AuthTokenProvider>(),
-          httpClient: () => get<ReportingService>().buildHttpClient(),
+          interceptClient: get<ReportingService>().registerDio,
         );
       },
       dispose: (api) => api.dispose(),

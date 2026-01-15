@@ -9,7 +9,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final DocumentRef? documentRef;
   final DocumentRef? originalDocumentRef;
   final SignedDocumentRef? templateRef;
-  final SignedDocumentRef? categoryId;
+  final DocumentParameters? parameters;
   final List<DocumentVersion> versions;
   final bool fromActiveCampaign;
   final CatalystId? authorId;
@@ -20,7 +20,7 @@ final class ProposalBuilderMetadata extends Equatable {
     this.documentRef,
     this.originalDocumentRef,
     this.templateRef,
-    this.categoryId,
+    this.parameters,
     this.versions = const [],
     this.fromActiveCampaign = true,
     this.authorId,
@@ -29,13 +29,13 @@ final class ProposalBuilderMetadata extends Equatable {
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters parameters,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
       documentRef: firstRef,
       templateRef: templateRef,
-      categoryId: categoryId,
+      parameters: parameters,
     );
   }
 
@@ -47,7 +47,7 @@ final class ProposalBuilderMetadata extends Equatable {
     documentRef,
     originalDocumentRef,
     templateRef,
-    categoryId,
+    parameters,
     versions,
     fromActiveCampaign,
     authorId,
@@ -59,7 +59,7 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<DocumentRef>? documentRef,
     Optional<DocumentRef>? originalDocumentRef,
     Optional<SignedDocumentRef>? templateRef,
-    Optional<SignedDocumentRef>? categoryId,
+    Optional<DocumentParameters>? parameters,
     List<DocumentVersion>? versions,
     bool? fromActiveCampaign,
     Optional<CatalystId>? authorId,
@@ -70,7 +70,7 @@ final class ProposalBuilderMetadata extends Equatable {
       documentRef: documentRef.dataOr(this.documentRef),
       originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
-      categoryId: categoryId.dataOr(this.categoryId),
+      parameters: parameters.dataOr(this.parameters),
       versions: versions ?? this.versions,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
       authorId: authorId.dataOr(this.authorId),

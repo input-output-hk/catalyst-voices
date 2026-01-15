@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class DocumentIndexFilters extends Equatable {
-  final DocumentType? type;
+  final List<DocumentType>? type;
   final SignedDocumentRef? id;
   final List<String>? parameters;
 
@@ -14,8 +14,9 @@ final class DocumentIndexFilters extends Equatable {
 
   DocumentIndexFilters.forCampaign({
     required Campaign campaign,
-    this.type,
+    DocumentType? type,
   }) : id = null,
+       type = type != null ? [type] : null,
        parameters = campaign.categories.map((e) => e.id.id).toSet().toList();
 
   const DocumentIndexFilters.forTarget(SignedDocumentRef this.id) : type = null, parameters = null;
@@ -28,7 +29,7 @@ final class DocumentIndexFilters extends Equatable {
   ];
 
   DocumentIndexFilters copyWith({
-    Optional<DocumentType>? type,
+    Optional<List<DocumentType>>? type,
     Optional<SignedDocumentRef>? id,
     Optional<List<String>>? parameters,
   }) {
