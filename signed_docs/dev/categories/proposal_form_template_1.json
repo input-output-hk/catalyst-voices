@@ -993,7 +993,8 @@
          "x-icon":"view-grid",
          "x-order":[
             "title",
-            "proposer"
+            "proposer",
+            "collaborators"
          ]
       },
       "summary":{
