@@ -184,9 +184,13 @@ impl Rbac509InsertQuery {
         };
 
         let previous_addresses = chain.stake_addresses();
-        let stake_addresses: HashSet<_> = new_chain
-            .stake_addresses()
+        let new_addresses = new_chain.stake_addresses();
+        let added_addresses: HashSet<_> = new_addresses
             .difference(&previous_addresses)
+            .cloned()
+            .collect();
+        let removed_addresses: HashSet<_> = previous_addresses
+            .difference(&new_addresses)
             .cloned()
             .collect();
         let public_keys = reg
@@ -208,7 +212,8 @@ impl Rbac509InsertQuery {
             slot,
             catalyst_id.clone(),
             Some(previous_txn),
-            stake_addresses,
+            &added_addresses,
+            &removed_addresses,
             public_keys,
             modified_chains,
             purpose,
@@ -300,7 +305,8 @@ impl Rbac509InsertQuery {
             slot,
             catalyst_id.clone(),
             None,
-            stake_addresses,
+            &stake_addresses,
+            &HashSet::new(),
             public_keys,
             modified_chains,
             purpose,
@@ -319,14 +325,16 @@ impl Rbac509InsertQuery {
         slot: Slot,
         catalyst_id: CatalystId,
         previous_transaction: Option<TransactionId>,
-        stake_addresses: HashSet<StakeAddress>,
+        added_stake_addresses: &HashSet<StakeAddress>,
+        removed_stake_addresses: &HashSet<StakeAddress>,
         public_keys: HashSet<VerifyingKey>,
         modified_chains: HashMap<CatalystId, HashSet<StakeAddress>>,
         purpose: Option<UuidV4>,
         context: &mut RbacBlockIndexingContext,
     ) {
         context.insert_transaction(txn_hash, catalyst_id.clone());
-        context.insert_addresses(stake_addresses.clone(), &catalyst_id);
+        context.insert_addresses(added_stake_addresses.clone(), &catalyst_id);
+        context.remove_addresses(removed_stake_addresses);
         context.insert_public_keys(public_keys.clone(), &catalyst_id);
         context.insert_registration(
             catalyst_id.clone(),
@@ -343,8 +351,11 @@ impl Rbac509InsertQuery {
                 txn_hash,
                 slot,
             ));
-        // Record new stake addresses.
-        for address in stake_addresses {
+        // Record new stake addresses that are not marked as removed.
+        for address in added_stake_addresses
+            .difference(removed_stake_addresses)
+            .cloned()
+        {
             self.catalyst_id_for_stake_address.push(
                 insert_catalyst_id_for_stake_address::Params::new(
                     address,
@@ -354,6 +365,7 @@ impl Rbac509InsertQuery {
                 ),
             );
         }
+
         // Record new public keys.
         for key in public_keys {
             self.catalyst_id_for_public_key

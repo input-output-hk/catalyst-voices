@@ -1,6 +1,6 @@
 //! A RBAC context used during indexing.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use cardano_chain_follower::{Slot, StakeAddress, TxnIndex, hashes::TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
@@ -89,6 +89,16 @@ impl RbacBlockIndexingContext {
         address: &StakeAddress,
     ) -> Option<&CatalystId> {
         self.addresses.get(address)
+    }
+
+    /// Removes multiple addresses from the context.
+    pub fn remove_addresses(
+        &mut self,
+        addresses: &HashSet<StakeAddress>,
+    ) {
+        for address in addresses {
+            self.addresses.remove(address);
+        }
     }
 
     /// Adds a public key to the context.
