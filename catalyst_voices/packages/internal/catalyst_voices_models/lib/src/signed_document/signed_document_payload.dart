@@ -13,7 +13,7 @@ final class SignedDocumentBinaryPayload extends SignedDocumentPayload {
   List<Object?> get props => [data];
 
   @override
-  Uint8List toBytes() => data;
+  SignedDocumentPayloadBytes toBytes() => SignedDocumentPayloadBytes(data);
 }
 
 final class SignedDocumentJsonPayload extends SignedDocumentPayload {
@@ -21,8 +21,8 @@ final class SignedDocumentJsonPayload extends SignedDocumentPayload {
 
   const SignedDocumentJsonPayload(this.data);
 
-  factory SignedDocumentJsonPayload.fromBytes(Uint8List bytes) {
-    final decoded = json.fuse(utf8).decode(bytes);
+  factory SignedDocumentJsonPayload.fromBytes(SignedDocumentPayloadBytes payload) {
+    final decoded = json.fuse(utf8).decode(payload.bytes);
 
     return SignedDocumentJsonPayload(decoded! as Map<String, dynamic>);
   }
@@ -31,7 +31,8 @@ final class SignedDocumentJsonPayload extends SignedDocumentPayload {
   List<Object?> get props => [data];
 
   @override
-  Uint8List toBytes() => Uint8List.fromList(json.fuse(utf8).encode(data));
+  SignedDocumentPayloadBytes toBytes() =>
+      SignedDocumentPayloadBytes(Uint8List.fromList(json.fuse(utf8).encode(data)));
 }
 
 final class SignedDocumentJsonSchemaPayload extends SignedDocumentPayload {
@@ -39,8 +40,8 @@ final class SignedDocumentJsonSchemaPayload extends SignedDocumentPayload {
 
   const SignedDocumentJsonSchemaPayload(this.data);
 
-  factory SignedDocumentJsonSchemaPayload.fromBytes(Uint8List bytes) {
-    final decoded = json.fuse(utf8).decode(bytes);
+  factory SignedDocumentJsonSchemaPayload.fromBytes(SignedDocumentPayloadBytes payload) {
+    final decoded = json.fuse(utf8).decode(payload.bytes);
 
     return SignedDocumentJsonSchemaPayload(decoded! as Map<String, dynamic>);
   }
@@ -49,7 +50,8 @@ final class SignedDocumentJsonSchemaPayload extends SignedDocumentPayload {
   List<Object?> get props => [data];
 
   @override
-  Uint8List toBytes() => Uint8List.fromList(json.fuse(utf8).encode(data));
+  SignedDocumentPayloadBytes toBytes() =>
+      SignedDocumentPayloadBytes(Uint8List.fromList(json.fuse(utf8).encode(data)));
 }
 
 /// Represents [SignedDocument] payload. Type of payload depends on a
@@ -65,18 +67,18 @@ sealed class SignedDocumentPayload extends Equatable {
   /// In case of unknown type falling back to [SignedDocumentUnknownPayload]
   /// which keeps [bytes] as is.
   factory SignedDocumentPayload.fromBytes(
-    Uint8List bytes, {
+    SignedDocumentPayloadBytes bytes, {
     required DocumentContentType contentType,
   }) {
     return switch (contentType) {
       DocumentContentType.json => SignedDocumentJsonPayload.fromBytes(bytes),
       DocumentContentType.schemaJson => SignedDocumentJsonSchemaPayload.fromBytes(bytes),
-      DocumentContentType.unknown => SignedDocumentUnknownPayload(bytes),
+      DocumentContentType.unknown => SignedDocumentUnknownPayload.fromBytes(bytes),
     };
   }
 
   /// Converts the document into a binary representation.
-  Uint8List toBytes();
+  SignedDocumentPayloadBytes toBytes();
 }
 
 final class SignedDocumentUnknownPayload extends SignedDocumentPayload {
@@ -84,9 +86,13 @@ final class SignedDocumentUnknownPayload extends SignedDocumentPayload {
 
   const SignedDocumentUnknownPayload(this.data);
 
+  factory SignedDocumentUnknownPayload.fromBytes(SignedDocumentPayloadBytes payload) {
+    return SignedDocumentUnknownPayload(payload.bytes);
+  }
+
   @override
   List<Object?> get props => [data];
 
   @override
-  Uint8List toBytes() => data;
+  SignedDocumentPayloadBytes toBytes() => SignedDocumentPayloadBytes(data);
 }

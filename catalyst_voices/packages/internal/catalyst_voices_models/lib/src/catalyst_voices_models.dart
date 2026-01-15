@@ -130,6 +130,7 @@ export 'share/share_channel.dart';
 export 'share/share_data.dart';
 export 'signed_document/signed_document.dart';
 export 'signed_document/signed_document_payload.dart';
+export 'signed_document/signed_document_payload_bytes.dart';
 export 'signed_document/signed_document_raw_payload.dart';
 export 'sync/documents_sync_result.dart';
 export 'sync/sync_stats.dart';

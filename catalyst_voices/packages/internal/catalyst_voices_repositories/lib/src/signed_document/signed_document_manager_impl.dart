@@ -104,25 +104,25 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     }
   }
 
-  Future<CosePayload> _compressPayload(Uint8List payload) async {
+  Future<CosePayload> _compressPayload(SignedDocumentPayloadBytes payload) async {
     final compressed = await profiler.timeWithResult(
       'brotli_compress',
-      () => brotli.compress(payload),
+      () => brotli.compress(payload.bytes),
       debounce: true,
     );
     return CosePayload(Uint8List.fromList(compressed));
   }
 
-  Future<Uint8List> _decompressPayload(CoseSign coseSign) async {
+  Future<SignedDocumentPayloadBytes> _decompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == CoseHttpContentEncoding.brotli) {
       final decompressed = await profiler.timeWithResult(
         'brotli_decompress',
         () => brotli.decompress(coseSign.payload.bytes),
         debounce: true,
       );
-      return Uint8List.fromList(decompressed);
+      return SignedDocumentPayloadBytes(Uint8List.fromList(decompressed));
     } else {
-      return coseSign.payload.bytes;
+      return SignedDocumentPayloadBytes(coseSign.payload.bytes);
     }
   }
 }
@@ -194,7 +194,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
 
   factory _CoseSignedDocument.fromCose(
     CoseSign coseSign, {
-    required Uint8List rawPayload,
+    required SignedDocumentPayloadBytes rawPayload,
   }) {
     final signers = coseSign.signatures
         .map((e) => e.protectedHeaders.kid)

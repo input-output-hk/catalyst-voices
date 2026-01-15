@@ -18,7 +18,7 @@ final class FakeSignedDocument extends Fake implements SignedDocument {
   });
 
   @override
-  SignedDocumentRawPayload get rawPayload => SignedDocumentRawPayload(payload.toBytes());
+  SignedDocumentRawPayload get rawPayload => SignedDocumentRawPayload(payload.toBytes().bytes);
 
   @override
   DocumentArtifact toArtifact() {
