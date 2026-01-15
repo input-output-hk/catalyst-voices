@@ -27,6 +27,11 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
 
+  /// Protected subscription for watching document changes.
+  /// Subclasses should manage this subscription in their syncAndWatchDocument implementation.
+  @protected
+  StreamSubscription<DocumentData?>? documentSub;
+
   DocumentViewerCubit(
     super.initialState,
     this.proposalService,
@@ -51,7 +56,30 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
   Future<void> close() async {
     await _activeAccountIdSub?.cancel();
     _activeAccountIdSub = null;
+
+    await documentSub?.cancel();
+    documentSub = null;
+
     return super.close();
+  }
+
+  /// Handles active account ID changes.
+  ///
+  /// Subclasses can override this to customize behavior when the active account changes.
+  /// The default implementation updates the cache and triggers a document reload.
+  @protected
+  void handleActiveAccountIdChanged(CatalystId? newAccountId) {
+    final previousAccountId = cache.activeAccountId;
+    if (previousAccountId == newAccountId) {
+      return;
+    }
+
+    cache = cache.copyWith(activeAccountId: Optional(newAccountId));
+
+    // If account changed significantly, reload the document
+    if (!previousAccountId.isSameAs(newAccountId)) {
+      unawaited(retryLastRef());
+    }
   }
 
   /// Loads a document by reference.
@@ -100,23 +128,4 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
   Future<void> syncAndWatchDocument();
 
   Future<void> updateIsFavorite({required bool value});
-
-  /// Handles active account ID changes.
-  ///
-  /// Subclasses can override this to customize behavior when the active account changes.
-  /// The default implementation updates the cache and triggers a document reload.
-  @protected
-  void handleActiveAccountIdChanged(CatalystId? newAccountId) {
-    final previousAccountId = cache.activeAccountId;
-    if (previousAccountId == newAccountId) {
-      return;
-    }
-
-    cache = cache.copyWith(activeAccountId: Optional(newAccountId));
-
-    // If account changed significantly, reload the document
-    if (!previousAccountId.isSameAs(newAccountId)) {
-      unawaited(retryLastRef());
-    }
-  }
 }

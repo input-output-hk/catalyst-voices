@@ -51,6 +51,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         .listen(_handleActiveAccountIdChanged);
   }
 
+  // Exported to DocumentViewerCollaboratorMixin
   Future<void> acceptCollaboratorInvitation() async {
     try {
       await _proposalService.submitCollaboratorProposalAction(
@@ -68,6 +69,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
+  // Exported to DocumentViewerCollaboratorMixin
   Future<void> acceptFinalProposal() async {
     try {
       await _proposalService.submitCollaboratorProposalAction(
@@ -108,6 +110,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     return super.close();
   }
 
+  // Exported to DocumentViewerCollaboratorMixin
   Future<void> dismissCollaboratorBanner() async {
     emit(state.copyWith(collaborator: const NoneCollaboratorProposalState()));
   }
@@ -126,6 +129,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     await _syncAndWatchProposal();
   }
 
+  // Exported to DocumentViewerCollaboratorMixin
   Future<void> rejectCollaboratorInvitation() async {
     try {
       await _proposalService.submitCollaboratorProposalAction(
@@ -144,6 +148,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
+  // Exported to DocumentViewerCollaboratorMixin
   Future<void> rejectFinalProposal() async {
     try {
       await _proposalService.submitCollaboratorProposalAction(
