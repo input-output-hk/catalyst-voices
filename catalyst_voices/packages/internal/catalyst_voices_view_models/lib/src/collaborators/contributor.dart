@@ -16,6 +16,14 @@ final class Contributor extends Equatable {
     this.createdAt,
   });
 
+  factory Contributor.author({required CatalystId id}) {
+    return Contributor(
+      id: id,
+      status: ProposalsCollaborationStatus.mainProposer,
+      isAuthor: true,
+    );
+  }
+
   factory Contributor.fromCollaborator(Collaborator collaborator, CatalystId? authorId) {
     return Contributor(
       id: collaborator.id,

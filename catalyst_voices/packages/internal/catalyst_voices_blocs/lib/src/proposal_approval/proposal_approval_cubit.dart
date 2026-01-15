@@ -17,22 +17,10 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
-  StreamSubscription<List<UsersProposalOverview>>? _dataPageSub;
+  StreamSubscription<List<ProposalBriefData>>? _dataPageSub;
 
   ProposalApprovalCubit(this._userService, this._campaignService, this._proposalService)
     : super(const ProposalApprovalState());
-
-  Future<Campaign?> get _campaign async {
-    final cachedCampaign = _cache.campaign;
-    if (cachedCampaign != null) {
-      return cachedCampaign;
-    }
-
-    final campaign = await _campaignService.getActiveCampaign();
-    _cache = _cache.copyWith(campaign: Optional(campaign));
-
-    return campaign;
-  }
 
   @override
   Future<void> close() async {
@@ -52,6 +40,15 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
     _setupActiveAccountIdSubscription();
     _setupActiveCampaignSubscription();
     _setupProposalsSubscription();
+  }
+
+  ProposalsFiltersV2? _activeAccountProposalFilters() {
+    final activeAccountId = _cache.activeAccountId;
+    if (activeAccountId == null) {
+      return null;
+    }
+
+    return CollaboratorProposalApprovalsFilter(activeAccountId);
   }
 
   List<UsersProposalOverview> _filterDecideItems(
@@ -90,26 +87,33 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
     }
 
     _cache = _cache.copyWith(campaign: Optional(campaign));
-    _setupProposalsSubscription();
+    _rebuildState();
   }
 
-  void _handleProposalsChange(List<UsersProposalOverview> items) {
+  void _handleProposalsChange(List<ProposalBriefData> items) {
     _cache = _cache.copyWith(items: Optional(items));
+    _rebuildState();
+  }
+
+  void _rebuildState() {
+    final activeAccountId = _cache.activeAccountId;
+    final campaign = _cache.campaign;
+    final proposals = _cache.items ?? const [];
+
+    final items = proposals.map((brief) {
+      return UsersProposalOverview.fromProposalBriefData(
+        proposalData: brief,
+        fromActiveCampaign: campaign?.fundNumber == brief.fundNumber,
+        activeAccountId: _cache.activeAccountId,
+      );
+    }).toList();
+
     emit(
       state.copyWith(
-        decideItems: _filterDecideItems(items, _cache.activeAccountId),
-        finalItems: _filterFinalItems(items, _cache.activeAccountId),
+        decideItems: _filterDecideItems(items, activeAccountId),
+        finalItems: _filterFinalItems(items, activeAccountId),
       ),
     );
-  }
-
-  ProposalsFiltersV2 _proposalFilters() {
-    final activeAccountId = _cache.activeAccountId;
-    if (activeAccountId == null) {
-      return const ProposalsFiltersV2();
-    }
-
-    return CollaboratorProposalApprovalsFilter(activeAccountId);
   }
 
   void _setupActiveAccountIdSubscription() {
@@ -130,22 +134,18 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
 
   void _setupProposalsSubscription() {
     const pageRequest = PageRequest(page: 0, size: 999);
-    final proposalsFilters = _proposalFilters();
+    final proposalsFilters = _activeAccountProposalFilters();
 
     unawaited(_dataPageSub?.cancel());
-    _dataPageSub = _proposalService
-        .watchProposalsBriefPageV2(request: pageRequest, filters: proposalsFilters)
-        .asyncMap((page) async {
-          final activeCampaign = await _campaign;
-          return page.items.map((brief) {
-            return UsersProposalOverview.fromProposalBriefData(
-              proposalData: brief,
-              fromActiveCampaign: activeCampaign?.fundNumber == brief.fundNumber,
-              activeAccountId: _cache.activeAccountId,
-            );
-          }).toList();
-        })
-        .distinct(listEquals)
-        .listen(_handleProposalsChange);
+    _dataPageSub =
+        (proposalsFilters == null
+                ? Stream<Page<ProposalBriefData>>.value(const Page.empty())
+                : _proposalService.watchProposalsBriefPageV2(
+                    request: pageRequest,
+                    filters: proposalsFilters,
+                  ))
+            .map((page) => page.items)
+            .distinct(listEquals)
+            .listen(_handleProposalsChange);
   }
 }

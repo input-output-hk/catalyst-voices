@@ -7,12 +7,10 @@ class HeadsUpDisplayConsentHintCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 182,
-      child: ActionsHintCard(
-        title: context.l10n.headsUpDisplayConsentHintTitle,
-        description: context.l10n.headsUpDisplayConsentHintContent,
-      ),
+    return ActionsHintCard(
+      constraints: const BoxConstraints.tightFor(height: 182),
+      title: context.l10n.headsUpDisplayConsentHintTitle,
+      description: context.l10n.headsUpDisplayConsentHintContent,
     );
   }
 }

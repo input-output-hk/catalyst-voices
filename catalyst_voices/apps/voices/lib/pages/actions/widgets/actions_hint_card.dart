@@ -7,17 +7,20 @@ class ActionsHintCard extends StatelessWidget {
   final String? title;
   final Widget? icon;
   final String description;
+  final BoxConstraints? constraints;
 
   const ActionsHintCard({
     super.key,
     this.title,
     this.icon,
     required this.description,
+    this.constraints,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: constraints,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: context.colors.elevationsOnSurfaceNeutralLv1White,
