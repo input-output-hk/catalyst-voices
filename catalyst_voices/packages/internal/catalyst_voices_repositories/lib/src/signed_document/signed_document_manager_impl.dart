@@ -50,14 +50,22 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     try {
       final compressedPayload = await _compressPayload(payload.toBytes());
 
-      return _signDocument(
-        metadata: metadata,
-        protectedHeaders: const CoseHeaders.protected(),
-        unprotectedHeaders: const CoseHeaders.unprotected(),
-        rawPayload: compressedPayload,
-        parsedPayload: payload,
-        catalystId: catalystId,
-        signers: [_CatalystSigner(catalystId, privateKey)],
+      final coseSign = await profiler.timeWithResult(
+        'cose_sign_doc',
+        () {
+          return CoseSign.sign(
+            protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
+            unprotectedHeaders: const CoseHeaders.unprotected(),
+            payload: compressedPayload.bytes,
+            signers: [_CatalystSigner(catalystId, privateKey)],
+          );
+        },
+        debounce: true,
+      );
+
+      return _CoseSignedDocument.fromCose(
+        coseSign,
+        rawPayload: payload.toBytes(),
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
@@ -72,21 +80,24 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     required CatalystPrivateKey privateKey,
   }) async {
     try {
-      final parsedPayload = SignedDocumentPayload.fromBytes(
-        payload.bytes,
-        // TODO(dt-iohk): Convert the content type from model to what's expected here.
-        // The `SignedDocumentMapper` which should do that is not on this branch yet.
-        contentType: DocumentContentType.json,
+      final coseSign = await profiler.timeWithResult(
+        'cose_sign_doc',
+        () {
+          return CoseSign.sign(
+            protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
+            unprotectedHeaders: const CoseHeaders.unprotected(),
+            payload: payload.bytes,
+            signers: [_CatalystSigner(catalystId, privateKey)],
+          );
+        },
+        debounce: true,
       );
 
-      return _signDocument(
-        metadata: metadata,
-        protectedHeaders: const CoseHeaders.protected(),
-        unprotectedHeaders: const CoseHeaders.unprotected(),
-        rawPayload: payload,
-        parsedPayload: parsedPayload,
-        catalystId: catalystId,
-        signers: [_CatalystSigner(catalystId, privateKey)],
+      final rawPayload = await _decompressPayload(coseSign);
+
+      return _CoseSignedDocument.fromCose(
+        coseSign,
+        rawPayload: rawPayload,
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
@@ -113,36 +124,6 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     } else {
       return coseSign.payload;
     }
-  }
-
-  Future<SignedDocument> _signDocument({
-    required DocumentDataMetadata metadata,
-    required CoseHeaders protectedHeaders,
-    required CoseHeaders unprotectedHeaders,
-    required SignedDocumentRawPayload rawPayload,
-    required SignedDocumentPayload parsedPayload,
-    required CatalystId catalystId,
-    required List<CatalystCoseSigner> signers,
-  }) async {
-    final coseSign = await profiler.timeWithResult(
-      'cose_sign_doc',
-      () {
-        return CoseSign.sign(
-          protectedHeaders: protectedHeaders,
-          unprotectedHeaders: unprotectedHeaders,
-          payload: rawPayload.bytes,
-          signers: signers,
-        );
-      },
-      debounce: true,
-    );
-
-    return _CoseSignedDocument(
-      coseSign: coseSign,
-      payload: parsedPayload,
-      metadata: metadata,
-      signers: [catalystId],
-    );
   }
 }
 
