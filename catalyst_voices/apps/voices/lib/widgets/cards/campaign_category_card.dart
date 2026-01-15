@@ -136,7 +136,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('CategoryDetailsBtn'),
           onTap: () {
-            CategoryDetailRoute.fromRef(categoryRef: categoryId).go(context);
+            CategoryDetailRoute.fromRef(categoryId: categoryId).go(context);
           },
           child: Text(context.l10n.categoryDetails),
         ),

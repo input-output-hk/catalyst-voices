@@ -57,7 +57,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState>
     );
 
     emit(state.copyWith(selectedCategoryRef: Optional(categoryRef)));
-    emitSignal(ChangeCategoryRefSignal(categoryRef: categoryRef));
+    emitSignal(ChangeCategoryRefSignal(categoryId: categoryRef));
     _updateCategoriesState();
 
     // Try to find category in cached categories list first
