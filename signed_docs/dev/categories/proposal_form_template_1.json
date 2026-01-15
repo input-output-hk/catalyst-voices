@@ -978,7 +978,12 @@
                   "title"
                ],
                "title":"Proposal title"
-            }
+            },
+            "collaborators": {
+               "$ref": "#/definitions/section",
+               "title": "Co-Proposers",
+               "x-guidance": "Co-Proposers will be notified via email upon proposal publishing. If they accept the invitation to join your proposal they will be shown as named co-proposer(s) on the published proposal. Co-proposers will not be able to edit any part of the proposal.\n\nIt's like a multi sig for your proposal, but not everyone needs to sign right away. You'll publish your new version right away, and your collaborators will be added to the proposal once they accept.\n\nBe sure to give your collaborators time to sign any final drafts before the proposal submission deadline!"
+            }            
          },
          "required":[
             "title",
@@ -1470,6 +1475,9 @@
    "title":"F15 Midnight: Compact DApps",
    "type":"object",
    "x-changelog":{
+      "2026-01-15":[
+         "Co-Proposers section"
+      ],
       "2025-10-08":[
          "F15 Template Setup"
       ],
