@@ -34,17 +34,6 @@ final class VotingCubit extends Cubit<VotingState>
     this._proposalService,
   ) : super(const VotingState());
 
-  Future<Campaign?> get _campaign async {
-    final cachedCampaign = _cache.campaign;
-    if (cachedCampaign != null) {
-      return cachedCampaign;
-    }
-
-    final campaign = await _campaignService.getActiveCampaign();
-    _cache = _cache.copyWith(campaign: Optional(campaign));
-    return campaign;
-  }
-
   void changeFilters({
     Optional<String>? categoryId,
     Optional<VotingPageTab>? tab,
@@ -302,9 +291,7 @@ final class VotingCubit extends Cubit<VotingState>
 
     _logger.finest('Active campaign changed: ${campaign?.id}');
 
-    _cache = _cache.copyWith(
-      campaign: Optional(campaign),
-    );
+    _cache = _cache.copyWith(campaign: Optional(campaign));
 
     if (_cache.filters.categoryId != null) {
       changeSelectedCategory(null);

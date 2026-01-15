@@ -104,7 +104,6 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          parameters: const DocumentParameters(),
           versions: [
             ProposalBriefDataVersion(
               ref: signedDocId,
@@ -120,7 +119,6 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
           title: 'New Standalone Draft',
           author: authorId,
-          parameters: const DocumentParameters(),
         );
 
         // Mock signed proposals page
@@ -179,7 +177,6 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           title: 'Published Proposal',
           author: authorId,
-          parameters: const DocumentParameters(),
           versions: [
             ProposalBriefDataVersion(
               ref: signedDocId,
@@ -195,7 +192,6 @@ void main() {
           createdAt: DateTime.now(),
           title: 'Draft Edit of Published',
           author: authorId,
-          parameters: const DocumentParameters(),
         );
 
         // A completely new local draft
@@ -204,7 +200,6 @@ void main() {
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
           title: 'New Standalone Draft',
           author: authorId,
-          parameters: const DocumentParameters(),
         );
 
         // Mock signed proposals

@@ -27,8 +27,11 @@ import 'package:collection/collection.dart';
 import 'package:uuid_plus/uuid_plus.dart' as u;
 
 /* cSpell:disable */
-const _collabId =
-    'id.catalyst://CollabA@preprod.cardano/AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=';
+final _collabId = CatalystId(
+  host: CatalystIdHost.cardanoPreprod.host,
+  username: 'Collab',
+  role0Key: Uint8List.fromList(List.filled(32, 1)),
+);
 
 var _time = DateTime.utc(2025, 12, 19, 20, 3).millisecondsSinceEpoch;
 
@@ -336,7 +339,7 @@ final class LocalCatGateway implements CatGatewayService {
           template: proposal,
           parameters: DocumentParameters({categoryConstRefs.category}),
           authors: const [],
-          collaborators: const [],
+          collaborators: [_collabId],
         );
         _cache.update(
           id,
