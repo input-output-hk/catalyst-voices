@@ -22,6 +22,9 @@ class VoicesDrawerHeader extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: context.pop,
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.only(right: 8),
+            ),
           ),
         Expanded(
           child: Text(

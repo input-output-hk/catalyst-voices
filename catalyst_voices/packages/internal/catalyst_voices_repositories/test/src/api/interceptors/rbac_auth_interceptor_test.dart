@@ -2,297 +2,150 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
-import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
-import 'package:chopper/chopper.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-import '../matcher/request_matchers.dart';
-import 'mock_chain.dart';
-import 'mock_response.dart';
-
 void main() {
   group(RbacAuthInterceptor, () {
-    late final AuthTokenProvider authTokenProvider;
-    late final RbacAuthInterceptor interceptor;
-    late final Chain<String> chain;
-
-    setUpAll(() {
-      authTokenProvider = _MockAuthTokenProvider();
-      interceptor = RbacAuthInterceptor(authTokenProvider);
-
-      chain = MockChain<String>();
-
-      registerFallbackValue(Request('X', Uri(), Uri()));
-    });
+    late AuthTokenProvider authTokenProvider;
+    late RbacAuthInterceptor interceptor;
+    late RequestInterceptorHandler requestHandler;
+    late ErrorInterceptorHandler errorHandler;
 
     setUp(() {
+      authTokenProvider = _MockAuthTokenProvider();
+      interceptor = RbacAuthInterceptor(authTokenProvider);
+      requestHandler = _MockRequestInterceptorHandler();
+      errorHandler = _MockErrorInterceptorHandler();
+
       when(
-        // ignore: discarded_futures
         () => authTokenProvider.createRbacToken(
           forceRefresh: any(named: 'forceRefresh'),
         ),
       ).thenAnswer((_) => Future(() => RbacToken(const Uuid().v4())));
     });
 
-    tearDown(() {
-      reset(chain);
-    });
+    test(
+      'when active account keychain is '
+      'unlocked auth header is added',
+      () async {
+        // Given
+        final options = RequestOptions(path: '/test');
 
-    test('when active account keychain is '
-        'unlocked auth header is added', () async {
-      // Given
-      final request = Request('GET', Uri(), Uri());
-      final requestResponse = MockResponse<String>();
+        // When
+        await interceptor.onRequest(options, requestHandler);
 
-      // When
-      when(() => chain.request).thenReturn(request);
-      when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
-      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      await interceptor.intercept(chain);
-
-      // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(
-        (captured.single as Request).headers.containsKey(HttpHeaders.authorization),
-        isTrue,
-      );
-    });
+        // Then
+        verify(() => requestHandler.next(options)).called(1);
+        expect(options.headers[HttpHeaders.authorization], isNotNull);
+      },
+    );
 
     test('auth header value start with bearer', () async {
       // Given
-      final request = Request('GET', Uri(), Uri());
-      final requestResponse = MockResponse<String>();
+      final options = RequestOptions(path: '/test');
 
       // When
-      when(() => chain.request).thenReturn(request);
-      when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
-      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      await interceptor.intercept(chain);
+      await interceptor.onRequest(options, requestHandler);
 
       // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(
-        (captured.single as Request).headers[HttpHeaders.authorization],
-        startsWith('Bearer'),
-      );
+      expect(options.headers[HttpHeaders.authorization], startsWith('Bearer '));
     });
 
-    test('when active account keychain is '
-        'locked auth header is not added', () async {
-      // Given
-      final request = Request('GET', Uri(), Uri());
-      final requestResponse = MockResponse<String>();
+    test(
+      'when active account keychain is '
+      'locked auth header is not added',
+      () async {
+        // Given
+        final options = RequestOptions(path: '/test');
 
-      // When
-      when(() => authTokenProvider.createRbacToken()).thenAnswer((_) => Future.value());
-      when(() => chain.request).thenReturn(request);
-      when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
-      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
+        // When
+        when(() => authTokenProvider.createRbacToken()).thenAnswer((_) async => null);
+        await interceptor.onRequest(options, requestHandler);
 
-      await interceptor.intercept(chain);
-
-      // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(
-        (captured.single as Request).headers.containsKey(HttpHeaders.authorization),
-        isFalse,
-      );
-    });
+        // Then
+        verify(() => requestHandler.next(options)).called(1);
+        expect(options.headers.containsKey(HttpHeaders.authorization), isFalse);
+      },
+    );
 
     test('401 response code triggers force token update', () async {
       // Given
-      const originalToken = RbacToken('expired_token');
-      const refreshedToken = RbacToken('refreshed_token');
-
-      final request = Request('GET', Uri(), Uri());
-
-      final originalResponse = MockResponse<String>();
-      final retryResponse = MockResponse<String>();
+      final options = RequestOptions(
+        path: '/test',
+        extra: {
+          RbacAuthInterceptor.interceptorAuthExtra: true,
+        },
+      );
+      final dioError = DioException(
+        requestOptions: options,
+        response: Response(
+          requestOptions: options,
+          statusCode: 401,
+        ),
+      );
 
       // When
-      when(() => chain.request).thenReturn(request);
-
-      // Original token
-      when(
-        () => authTokenProvider.createRbacToken(
-          forceRefresh: any(named: 'forceRefresh'),
-        ),
-      ).thenAnswer((_) => Future.value(originalToken));
-      when(() {
-        return chain.proceed(
-          any(
-            that: containsHeaderValue(originalToken.authHeader()),
-          ),
-        );
-      }).thenAnswer((_) => originalResponse);
-
-      // Refreshed token
-      when(
-        () => authTokenProvider.createRbacToken(forceRefresh: true),
-      ).thenAnswer((_) => Future.value(refreshedToken));
-      when(() {
-        return chain.proceed(
-          any(
-            that: containsHeaderValue(refreshedToken.authHeader()),
-          ),
-        );
-      }).thenAnswer((_) => retryResponse);
-
-      // Responses
-      when(() => originalResponse.statusCode).thenAnswer((_) => 401);
-      when(() => retryResponse.statusCode).thenAnswer((_) => 200);
-
-      await interceptor.intercept(chain);
+      await interceptor.onError(dioError, errorHandler);
 
       // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(captured, hasLength(2));
-
-      expect(
-        captured.first,
-        allOf(
-          isA<Request>(),
-          containsHeaderValue(originalToken.authHeader()),
-          isNot(containsHeaderKey('Retry-Count')),
-        ),
-      );
-      expect(
-        captured[1],
-        allOf(
-          isA<Request>(),
-          containsHeaderValue(refreshedToken.authHeader()),
-          containsHeaderKey('Retry-Count'),
-          containsHeaderValue('1'),
-        ),
-      );
+      verify(() => authTokenProvider.createRbacToken(forceRefresh: true)).called(1);
+      expect(options.extra[RbacAuthInterceptor.retryCountExtra], '1');
     });
 
     test('403 response code triggers force token update', () async {
       // Given
-      const originalToken = RbacToken('expired_token');
-      const refreshedToken = RbacToken('refreshed_token');
-
-      final request = Request('GET', Uri(), Uri());
-
-      final originalResponse = MockResponse<String>();
-      final retryResponse = MockResponse<String>();
+      final options = RequestOptions(
+        path: '/test',
+        extra: {
+          RbacAuthInterceptor.interceptorAuthExtra: true,
+        },
+      );
+      final dioError = DioException(
+        requestOptions: options,
+        response: Response(
+          requestOptions: options,
+          statusCode: 403,
+        ),
+      );
 
       // When
-      when(() => chain.request).thenReturn(request);
-
-      // Original token
-      when(
-        () => authTokenProvider.createRbacToken(
-          forceRefresh: any(named: 'forceRefresh'),
-        ),
-      ).thenAnswer((_) => Future.value(originalToken));
-      when(() {
-        return chain.proceed(
-          any(
-            that: containsHeaderValue(originalToken.authHeader()),
-          ),
-        );
-      }).thenAnswer((_) => originalResponse);
-
-      // Refreshed token
-      when(
-        () => authTokenProvider.createRbacToken(forceRefresh: true),
-      ).thenAnswer((_) => Future.value(refreshedToken));
-      when(() {
-        return chain.proceed(
-          any(
-            that: containsHeaderValue(refreshedToken.authHeader()),
-          ),
-        );
-      }).thenAnswer((_) => retryResponse);
-
-      // Responses
-      when(() => originalResponse.statusCode).thenAnswer((_) => 403);
-      when(() => retryResponse.statusCode).thenAnswer((_) => 200);
-
-      await interceptor.intercept(chain);
+      await interceptor.onError(dioError, errorHandler);
 
       // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(captured, hasLength(2));
-
-      expect(
-        captured.first,
-        allOf(
-          isA<Request>(),
-          containsHeaderValue(originalToken.authHeader()),
-          isNot(containsHeaderKey('Retry-Count')),
-        ),
-      );
-      expect(
-        captured[1],
-        allOf(
-          isA<Request>(),
-          containsHeaderValue(refreshedToken.authHeader()),
-          containsHeaderKey('Retry-Count'),
-          containsHeaderValue('1'),
-        ),
-      );
+      verify(() => authTokenProvider.createRbacToken(forceRefresh: true)).called(1);
+      expect(options.extra[RbacAuthInterceptor.retryCountExtra], '1');
     });
 
     test('token refresh gives up after 1st try', () async {
       // Given
-      const originalToken = RbacToken('expired_token');
-      final request = Request(
-        'GET',
-        Uri(),
-        Uri(),
-        headers: {'Retry-Count': '1'},
+      final options = RequestOptions(
+        path: '/test',
+        extra: {RbacAuthInterceptor.retryCountExtra: '1'},
       );
-      final originalResponse = MockResponse<String>();
+      final dioError = DioException(
+        requestOptions: options,
+        response: Response(
+          requestOptions: options,
+          statusCode: 401,
+        ),
+      );
 
       // When
-      when(() => chain.request).thenReturn(request);
-
-      // Original token
-      when(
-        () => authTokenProvider.createRbacToken(
-          forceRefresh: any(named: 'forceRefresh'),
-        ),
-      ).thenAnswer((_) => Future.value(originalToken));
-      when(() {
-        return chain.proceed(
-          any(
-            that: containsHeaderValue(originalToken.authHeader()),
-          ),
-        );
-      }).thenAnswer((_) => originalResponse);
-
-      // Responses
-      when(() => originalResponse.statusCode).thenAnswer((_) => 403);
-
-      await interceptor.intercept(chain);
+      await interceptor.onError(dioError, errorHandler);
 
       // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(captured, hasLength(1));
-
-      expect(
-        captured.first,
-        allOf(
-          isA<Request>(),
-          containsHeaderValue(originalToken.authHeader()),
-          containsHeaderKey('Retry-Count'),
-          containsHeaderValue('1'),
-        ),
-      );
+      verify(() => errorHandler.next(dioError)).called(1);
+      verifyNever(() => authTokenProvider.createRbacToken(forceRefresh: true));
+      expect(options.extra[RbacAuthInterceptor.retryCountExtra], '1');
     });
   });
 }
 
 class _MockAuthTokenProvider extends Mock implements AuthTokenProvider {}
+
+class _MockErrorInterceptorHandler extends Mock implements ErrorInterceptorHandler {}
+
+class _MockRequestInterceptorHandler extends Mock implements RequestInterceptorHandler {}

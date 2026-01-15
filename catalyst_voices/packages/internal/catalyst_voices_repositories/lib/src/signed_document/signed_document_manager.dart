@@ -1,5 +1,6 @@
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/document/exception/document_exception.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager_impl.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
@@ -15,7 +16,11 @@ abstract interface class SignedDocumentManager {
 
   /// Parses the document from the [DocumentArtifact].
   ///
-  /// The implementation of this method must be able to understand the [DocumentArtifact].
+  /// The implementation of this method must be able to understand the [DocumentArtifact]
+  /// that are obtained from the [SignedDocument.toArtifact] method.
+  ///
+  /// Throws [DocumentMetadataMalformedException] in case of any required fields
+  /// missing.
   Future<SignedDocument> parseDocument(DocumentArtifact artifact);
 
   /// Signs the [payload] with a single [privateKey].

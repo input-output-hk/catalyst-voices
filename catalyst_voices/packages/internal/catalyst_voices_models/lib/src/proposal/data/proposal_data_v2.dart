@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalDataV2 extends Equatable {
@@ -53,6 +54,7 @@ final class ProposalDataV2 extends Equatable {
       collaboratorsActions: collaboratorsActions,
       prevCollaborators: prevCollaborators,
       prevAuthors: prevAuthors,
+      createdAt: id.ver?.tryDateTime,
     );
 
     return ProposalDataV2(

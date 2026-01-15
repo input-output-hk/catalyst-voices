@@ -261,11 +261,13 @@ final class UserServiceImpl implements UserService {
     }
 
     if (!account.publicStatus.isNotSetup && account.registrationStatus.isIndexed) {
-      final publicProfile = await _userRepository.getAccountPublicProfile();
-      final publicProfileStatus = publicProfile?.status ?? AccountPublicStatus.unknown;
+      final publicProfile = await _userRepository
+          .getAccountPublicProfile()
+          .onError<NotFoundException>((_, _) => AccountPublicProfile.fromAccountUnknown(account));
+
       account = account.copyWith(
         email: Optional(publicProfile?.email),
-        publicStatus: publicProfileStatus,
+        publicStatus: publicProfile?.status ?? AccountPublicStatus.unknown,
       );
     }
 

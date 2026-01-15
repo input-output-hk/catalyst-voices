@@ -48,11 +48,11 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
-  /// Returns [ProposalTemplate] for matching [ref].
+  /// Returns [ProposalTemplate] which belongs to [category].
   ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+  /// Returns null if no matching template is found.
+  Future<ProposalTemplate?> getProposalTemplate({
+    required DocumentRef category,
   });
 
   /// Similar to [watchProposal] but returns single Future.
@@ -246,9 +246,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
+    required DocumentRef category,
   }) async {
-    final documentData = await _documentRepository.getDocumentData(id: ref);
+    final documentData = await _documentRepository.findFirst(
+      parameter: category,
+      type: DocumentType.proposalTemplate,
+    );
+
+    if (documentData == null) {
+      throw DocumentNotFoundException(
+        ref: category,
+        message: 'Proposal template with parameter not found',
+      );
+    }
 
     return ProposalTemplateFactory.create(documentData);
   }
@@ -336,7 +346,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final artifact = await _documentRepository.getDocumentArtifact(id: proposalId);
     final document = await _signedDocumentManager.parseDocument(artifact);
 
-    final updatedDocumentId = document.metadata.id.freshVersion().toSignedDocumentRef();
+    final updatedDocumentId = document.metadata.id.fresh().toSignedDocumentRef();
 
     final updatedCollaborators = document.metadata.collaborators
         ?.whereNot((e) => e.isSameAs(collaboratorId))

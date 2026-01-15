@@ -12,12 +12,12 @@ sealed class CategoryDetailSignal extends Equatable {
 
 /// Signal emitted by [CategoryDetailCubit]. Tells the UI that the category ref has changed.
 final class ChangeCategoryRefSignal extends CategoryDetailSignal {
-  final DocumentRef? categoryRef;
+  final DocumentRef? categoryId;
 
   const ChangeCategoryRefSignal({
-    this.categoryRef,
+    this.categoryId,
   });
 
   @override
-  List<Object?> get props => [categoryRef];
+  List<Object?> get props => [categoryId];
 }

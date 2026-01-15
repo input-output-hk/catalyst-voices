@@ -488,7 +488,7 @@ void main() {
           payload: SignedDocumentBinaryPayload(Uint8List(0)),
         );
 
-        final expectedUpdatedId = proposalId.freshVersion().toSignedDocumentRef();
+        final expectedUpdatedId = proposalId.fresh().toSignedDocumentRef();
         final expectedUpdatedMetadata = originalMetadata.copyWith(
           id: expectedUpdatedId,
           collaborators: Optional([otherCollaboratorId]),

@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/action_cards_list.dart';
-import 'package:catalyst_voices/pages/actions/actions/widgets/actions_header_text.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/actions_tabs_group.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
+import 'package:catalyst_voices/pages/actions/widgets/actions_header_text.dart';
 import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -35,7 +35,7 @@ class _ActionsPageContentState extends State<ActionsPageContent>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 20,
             children: [
-              const ActionsHeaderText(),
+              ActionsHeaderText(text: context.l10n.myActionsPageHeader),
               ActionsTabsGroup(
                 selectedTab: widget.tab,
                 onChanged: _onTabChanged,

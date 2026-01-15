@@ -32,7 +32,7 @@ class CategoryDetailView extends StatelessWidget {
           _CategoryBrief(
             categoryName: category.formattedName,
             categoryDescription: category.description,
-            categoryRef: category.ref,
+            categoryRef: category.id,
             image: category.image,
             finalProposalsCount: category.finalProposalsCount,
           ),

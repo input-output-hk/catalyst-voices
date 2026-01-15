@@ -63,11 +63,13 @@ void main() {
           id: collaboratorA,
           proposalId: id,
           action: ProposalSubmissionAction.draft,
+          actionId: SignedDocumentRef.generateFirstRef(),
         );
         final collaboratorBAction = RawCollaboratorAction(
           id: collaboratorB,
           proposalId: id,
           action: ProposalSubmissionAction.hide,
+          actionId: SignedDocumentRef.generateFirstRef(),
         );
 
         final collaboratorsActions = {

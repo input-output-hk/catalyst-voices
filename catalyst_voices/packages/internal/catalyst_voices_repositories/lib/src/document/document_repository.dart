@@ -8,7 +8,6 @@ import 'package:catalyst_voices_repositories/src/document/document_data_factory.
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
@@ -47,6 +46,14 @@ abstract interface class DocumentRepository {
     required DocumentRef id,
   });
 
+  Future<DocumentData?> findFirst({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+    DocumentRef? parameter,
+    CatalystId? originalAuthorId,
+  });
+
   /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
   Future<List<DocumentData>> getAllVersionsOfId({
@@ -79,13 +86,6 @@ abstract interface class DocumentRepository {
   /// If document does not exist it will throw [DocumentNotFoundException].
   Future<DocumentDataMetadata> getDocumentMetadata({
     required DocumentRef id,
-  });
-
-  /// Useful when recovering account and we want to lookup
-  /// latest [DocumentData] which of [originalAuthorId] and check
-  /// username used in [CatalystId] in that document.
-  Future<DocumentData?> getLatestDocument({
-    CatalystId? originalAuthorId,
   });
 
   /// Returns latest matching [DocumentRef] version with same id as [id].
@@ -252,6 +252,23 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<DocumentData?> findFirst({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+    DocumentRef? parameter,
+    CatalystId? originalAuthorId,
+  }) {
+    return _localDocuments.findFirst(
+      type: type,
+      id: id,
+      referencing: referencing,
+      parameter: parameter,
+      originalAuthorId: originalAuthorId,
+    );
+  }
+
+  @override
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   }) async {
@@ -320,16 +337,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     return metadata;
-  }
-
-  @override
-  Future<DocumentData?> getLatestDocument({
-    CatalystId? originalAuthorId,
-  }) async {
-    final latestDocument = await _localDocuments.findFirst(originalAuthorId: originalAuthorId);
-    final latestDraft = await _drafts.findFirst();
-
-    return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
 
   @override
@@ -729,7 +736,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   void _validateDocumentMetadata(DocumentData document) {
     if (!_isDocumentMetadataValid(document)) {
-      throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformed);
+      throw const DocumentImportInvalidDataException(DocumentMetadataMalformedException);
     }
   }
 

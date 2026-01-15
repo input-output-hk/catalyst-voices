@@ -25,6 +25,7 @@ void main() {
       localVersion = DocumentRefFactory.randomUuidV7();
       mockProposal = UsersProposalOverview(
         id: SignedDocumentRef(id: proposalId, ver: latestVersion),
+        parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
         title: 'Test Proposal',
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),

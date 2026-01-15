@@ -223,6 +223,12 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<UserService>(),
         );
+      })
+      ..registerFactory<DisplayConsentCubit>(() {
+        return DisplayConsentCubit(
+          get<UserService>(),
+          get<ProposalService>(),
+        );
       });
   }
 
@@ -237,10 +243,10 @@ final class Dependencies extends DependencyProvider {
           localGateway: LocalGatewayConfig.stressTest(appConfig.stressTest),
         );
 
-        return ApiServices(
+        return ApiServices.dio(
           config: config,
           authTokenProvider: get<AuthTokenProvider>(),
-          httpClient: () => get<ReportingService>().buildHttpClient(),
+          interceptClient: get<ReportingService>().registerDio,
         );
       },
       dispose: (api) => api.dispose(),

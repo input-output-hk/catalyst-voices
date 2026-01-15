@@ -7,7 +7,6 @@ import 'package:equatable/equatable.dart';
 /// Should have factory constructor from document representation.
 class CampaignCategory extends Equatable {
   final SignedDocumentRef id;
-  final SignedDocumentRef proposalTemplateRef;
   final SignedDocumentRef campaignRef;
   final String categoryName;
   final String categorySubname;
@@ -23,7 +22,6 @@ class CampaignCategory extends Equatable {
 
   const CampaignCategory({
     required this.id,
-    required this.proposalTemplateRef,
     required this.campaignRef,
     required this.categoryName,
     required this.categorySubname,
@@ -43,7 +41,6 @@ class CampaignCategory extends Equatable {
   @override
   List<Object?> get props => [
     id,
-    proposalTemplateRef,
     campaignRef,
     categoryName,
     categorySubname,
@@ -59,7 +56,6 @@ class CampaignCategory extends Equatable {
 
   CampaignCategory copyWith({
     SignedDocumentRef? id,
-    SignedDocumentRef? proposalTemplateRef,
     SignedDocumentRef? campaignRef,
     String? categoryName,
     String? categorySubname,
@@ -75,7 +71,6 @@ class CampaignCategory extends Equatable {
   }) {
     return CampaignCategory(
       id: id ?? this.id,
-      proposalTemplateRef: proposalTemplateRef ?? this.proposalTemplateRef,
       campaignRef: campaignRef ?? this.campaignRef,
       categoryName: categoryName ?? this.categoryName,
       categorySubname: categorySubname ?? this.categorySubname,

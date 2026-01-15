@@ -41,6 +41,7 @@ void main() {
       registerFallbackValue(const DraftRef(id: 'fallback'));
       registerFallbackValue(const ProposalsFiltersV2());
       registerFallbackValue(authorId);
+      registerFallbackValue(const DocumentParameters());
     });
 
     setUp(() async {
@@ -431,6 +432,7 @@ UsersProposalOverview _createProposal({
     fundNumber: 14,
     iteration: 1,
     ownership: const AuthorProposalOwnership(),
+    parameters: const DocumentParameters(),
   );
 }
 

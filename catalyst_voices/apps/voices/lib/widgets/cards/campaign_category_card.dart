@@ -60,9 +60,7 @@ class CampaignCategoryCard extends StatelessWidget {
                       key: const Key('Description'),
                     ),
                   ),
-                  _Buttons(
-                    categoryRef: category.ref,
-                  ),
+                  _Buttons(categoryId: category.id),
                 ],
               ),
             ),
@@ -123,10 +121,10 @@ class _Background extends StatelessWidget {
 }
 
 class _Buttons extends StatelessWidget {
-  final SignedDocumentRef categoryRef;
+  final SignedDocumentRef categoryId;
 
   const _Buttons({
-    required this.categoryRef,
+    required this.categoryId,
   });
 
   @override
@@ -138,7 +136,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('CategoryDetailsBtn'),
           onTap: () {
-            CategoryDetailRoute.fromRef(categoryRef: categoryRef).go(context);
+            CategoryDetailRoute.fromRef(categoryId: categoryId).go(context);
           },
           child: Text(context.l10n.categoryDetails),
         ),
@@ -146,7 +144,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('ViewProposalsBtn'),
           onTap: () {
-            final route = ProposalsRoute.fromRef(categoryRef: categoryRef);
+            final route = ProposalsRoute.fromRef(categoryRef: categoryId);
             unawaited(route.push(context));
           },
           style: FilledButton.styleFrom(

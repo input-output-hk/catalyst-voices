@@ -83,10 +83,10 @@ final class RegistrationData extends Equatable implements CborEncodable {
   /// Un-ordered List of DER encoded x509 certificates.
   final List<RbacField<X509DerCertificate>>? derCerts;
 
-  /// Un-ordered List of CBOR encoded C509 certificates
-  /// (or metadatum references).
+  /// Un-ordered List of CBOR encoded C509 certificates.
   //
-  // TODO(dt-iohk): support C509CertInMetadatumReference
+  // The metadatum references to certs (`C509CertInMetadatumReference`) are not supported,
+  // they were not needed for the initial implementation for the RBAC registration.
   final List<RbacField<C509Certificate>>? cborCerts;
 
   /// Ordered list of simple public keys that are registered.

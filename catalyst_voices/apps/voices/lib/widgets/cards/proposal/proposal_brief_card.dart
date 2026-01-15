@@ -54,6 +54,7 @@ class _AuthorAndCollaborators extends StatelessWidget {
           ),
           Flexible(
             child: AccountsText(
+              key: const Key('Author'),
               ids: [?author, ...?collaborators],
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

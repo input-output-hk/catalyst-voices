@@ -96,10 +96,11 @@ final class ParametersSyncRequest extends DocumentsSyncRequest {
 
   @override
   List<DocumentIndexFilters> steps() {
+    final type = this.type;
     return [
       DocumentIndexFilters(
         parameters: parameters.set.map((e) => e.id).toList(),
-        type: type,
+        type: type != null ? [type] : null,
       ),
     ];
   }

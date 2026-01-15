@@ -36,10 +36,4 @@ import 'package:drift/drift.dart';
 @TableIndex(name: 'idx_documents_v2_type_created_at', columns: {#type, #createdAt})
 @TableIndex(name: 'idx_documents_v2_type_template', columns: {#type, #templateId, #templateVer})
 class DocumentsV2 extends Table
-    with DocumentTableContentMixin, DocumentTableMetadataMixin, DocumentTableMixin {
-  /// Composite primary key: ([id], [ver])
-  /// This allows multiple versions of the same document to coexist.
-  /// SQLite enforces uniqueness on this combination.
-  @override
-  Set<Column<Object>>? get primaryKey => {id, ver};
-}
+    with DocumentTableContentMixin, DocumentTableMetadataMixin, DocumentTableMixin {}

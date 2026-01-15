@@ -7,6 +7,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
   final DocumentRef id;
   final int fundNumber;
   final CatalystId? author;
+  final DocumentParameters parameters;
   final String? title;
   final String? description;
   final String? categoryName;
@@ -25,6 +26,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     required this.id,
     this.fundNumber = 0,
     this.author,
+    this.parameters = const DocumentParameters(),
     this.title,
     this.description,
     this.categoryName,
@@ -81,6 +83,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
       id: id,
       fundNumber: proposal.fundNumber ?? 0,
       author: data.originalAuthors.firstOrNull,
+      parameters: proposal.parameters,
       title: proposal.title,
       description: proposal.description,
       categoryName: proposal.categoryName,
@@ -102,6 +105,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     id,
     fundNumber,
     author,
+    parameters,
     title,
     description,
     categoryName,
@@ -142,6 +146,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     DocumentRef? id,
     int? fundNumber,
     Optional<CatalystId>? author,
+    DocumentParameters? parameters,
     Optional<String>? title,
     Optional<String>? description,
     Optional<String>? categoryName,
@@ -160,6 +165,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
       id: id ?? this.id,
       fundNumber: fundNumber ?? this.fundNumber,
       author: author.dataOr(this.author),
+      parameters: parameters ?? this.parameters,
       title: title.dataOr(this.title),
       description: description.dataOr(this.description),
       categoryName: categoryName.dataOr(this.categoryName),

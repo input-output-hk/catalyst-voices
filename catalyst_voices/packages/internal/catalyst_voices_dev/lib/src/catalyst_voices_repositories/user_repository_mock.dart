@@ -1,7 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:mocktail/mocktail.dart';
 
 class FakeUserRepository extends Fake implements UserRepository {
@@ -21,13 +20,6 @@ class FakeUserRepository extends Fake implements UserRepository {
     throw UnimplementedError(
       'previousRegistrationTransactionId not configured',
     );
-  }
-
-  @override
-  Future<RbacRegistrationChain> getRbacRegistration({
-    CatalystId? catalystId,
-  }) async {
-    throw const UnauthorizedException();
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,7 +22,7 @@ void main() {
         );
 
         // When
-        final publicCatId = CatalystIDPublic.fromJson(json);
+        final publicCatId = CatalystIdPublic.fromJson(json);
         final publicProfile = publicCatId.toModel();
 
         // Then
@@ -35,7 +35,7 @@ void main() {
           // Given
           const sourceUsername = 'First%20Last';
           const expectedUsername = 'First Last';
-          const id = CatalystIDPublic(username: sourceUsername);
+          const id = CatalystIdPublic(username: sourceUsername);
 
           // When
           final model = id.toModel();
@@ -48,7 +48,7 @@ void main() {
           // Given
           const sourceUsername = 'First Ląst';
           const expectedUsername = 'First Ląst';
-          const id = CatalystIDPublic(username: sourceUsername);
+          const id = CatalystIdPublic(username: sourceUsername);
 
           // When
           final model = id.toModel();
@@ -61,7 +61,7 @@ void main() {
           // Given
           const sourceUsername = 'First%20Ląst';
           const expectedUsername = 'First Ląst';
-          const id = CatalystIDPublic(username: sourceUsername);
+          const id = CatalystIdPublic(username: sourceUsername);
 
           // When
           final model = id.toModel();
