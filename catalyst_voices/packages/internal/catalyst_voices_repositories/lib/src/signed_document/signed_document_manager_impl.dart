@@ -56,7 +56,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
           return CoseSign.sign(
             protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
             unprotectedHeaders: const CoseHeaders.unprotected(),
-            payload: compressedPayload.bytes,
+            payload: compressedPayload,
             signers: [_CatalystSigner(catalystId, privateKey)],
           );
         },
@@ -86,7 +86,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
           return CoseSign.sign(
             protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
             unprotectedHeaders: const CoseHeaders.unprotected(),
-            payload: payload.bytes,
+            payload: CosePayload(payload.bytes),
             signers: [_CatalystSigner(catalystId, privateKey)],
           );
         },
@@ -104,25 +104,25 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     }
   }
 
-  Future<SignedDocumentRawPayload> _compressPayload(Uint8List payload) async {
+  Future<CosePayload> _compressPayload(Uint8List payload) async {
     final compressed = await profiler.timeWithResult(
       'brotli_compress',
       () => brotli.compress(payload),
       debounce: true,
     );
-    return SignedDocumentRawPayload(Uint8List.fromList(compressed));
+    return CosePayload(Uint8List.fromList(compressed));
   }
 
   Future<Uint8List> _decompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == CoseHttpContentEncoding.brotli) {
       final decompressed = await profiler.timeWithResult(
         'brotli_decompress',
-        () => brotli.decompress(coseSign.payload),
+        () => brotli.decompress(coseSign.payload.bytes),
         debounce: true,
       );
       return Uint8List.fromList(decompressed);
     } else {
-      return coseSign.payload;
+      return coseSign.payload.bytes;
     }
   }
 }
@@ -224,7 +224,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   List<Object?> get props => [_coseSign, payload, metadata, signers];
 
   @override
-  SignedDocumentRawPayload get rawPayload => SignedDocumentRawPayload(_coseSign.payload);
+  SignedDocumentRawPayload get rawPayload => SignedDocumentRawPayload(_coseSign.payload.bytes);
 
   @override
   DocumentArtifact toArtifact() {
