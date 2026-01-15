@@ -95,9 +95,9 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
 
-    final publicProfile = await _getAccountPublicProfile(
-      token: rbacToken,
-    ).onError<ForbiddenException>((_, _) => null);
+    final publicProfile = await _getAccountPublicProfile(token: rbacToken)
+        .onError<NotFoundException>((error, stackTrace) => null)
+        .onError<ForbiddenException>((error, stackTrace) => null);
 
     final username =
         publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
@@ -173,7 +173,6 @@ final class UserRepositoryImpl implements UserRepository {
         .getPublicProfile(authorization: token?.authHeader())
         .successBodyOrThrow()
         .then<CatalystIdPublic?>((value) => value)
-        .onError<NotFoundException>((error, stackTrace) => null)
         // Review module returns 401 Registration not found for the auth token
         .onError<UnauthorizedException>((error, stackTrace) => null)
         .then((value) => value?.toModel());
