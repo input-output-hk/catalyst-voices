@@ -30,20 +30,6 @@ void main() {
       expect(multi[ada.code], ada200);
     });
 
-    test('adding money sums amounts for same currency', () {
-      final multi = MultiCurrencyAmount.single(usdm100)..add(usdm50);
-      final total = multi[usdm.code]!;
-      expect(total.minorUnits, usdm100.minorUnits + usdm50.minorUnits);
-    });
-
-    test('subtracting money decreases amount and removes zero amounts', () {
-      final multi = MultiCurrencyAmount.single(usdm100)..subtract(usdm50);
-      expect(multi[usdm.code]!.minorUnits, usdm50.minorUnits);
-
-      multi.subtract(usdm50);
-      expect(multi[usdm.code], isNull);
-    });
-
     test('operator[] returns null for missing currency', () {
       final multi = MultiCurrencyAmount();
       expect(multi[usdm.code], isNull);
@@ -51,24 +37,28 @@ void main() {
 
     test('deepCopy produces independent copy', () {
       final multi = MultiCurrencyAmount.list([usdm100, ada200]);
-      final copy = multi.deepCopy()
-        ..add(Money.fromMajorUnits(currency: usdm, majorUnits: BigInt.from(10)));
+      final copy = MultiCurrencyAmount.list([
+        ...multi.deepCopy().list,
+        Money.fromMajorUnits(currency: usdm, majorUnits: BigInt.from(10)),
+      ]);
 
       expect(copy[usdm.code]!.minorUnits, usdm100.minorUnits + BigInt.from(10 * 100));
       expect(multi[usdm.code]!.minorUnits, usdm100.minorUnits); // original unchanged
     });
 
     test('adding multiple currencies works independently', () {
-      final multi = MultiCurrencyAmount()
-        ..add(usdm100)
-        ..add(ada200);
+      final multi = MultiCurrencyAmount.list([usdm100, ada200]);
 
       expect(multi[usdm.code]!.minorUnits, usdm100.minorUnits);
       expect(multi[ada.code]!.minorUnits, ada200.minorUnits);
     });
 
     test('zero amounts are automatically removed', () {
-      final multi = MultiCurrencyAmount.single(usdm50)..subtract(usdm50);
+      final negativeUsdm50 = Money.fromMajorUnits(
+        currency: usdm,
+        majorUnits: usdm50.majorUnits * BigInt.from(-1),
+      );
+      final multi = MultiCurrencyAmount.list([usdm50, negativeUsdm50]);
       expect(multi.list, isEmpty);
     });
   });

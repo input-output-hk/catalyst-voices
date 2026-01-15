@@ -101,10 +101,49 @@ class _BodySmall extends StatelessWidget {
   }
 }
 
-class _CategoryDetailErrorSelector extends StatelessWidget {
+class _CategoryDetailContent extends StatelessWidget {
+  const _CategoryDetailContent();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO(damian-molinski): refactor it into single class object in category_detail_state.dart
+    // and do not rely on context.select<SessionCubit> here.
+    return BlocSelector<
+      CategoryDetailCubit,
+      CategoryDetailState,
+      DataVisibilityState<CampaignCategoryDetailsViewModel>
+    >(
+      selector: (state) {
+        return (
+          show: state.isLoading,
+          data: state.selectedCategoryDetails ?? CampaignCategoryDetailsViewModel.placeholder(),
+        );
+      },
+      builder: (context, state) {
+        final isActiveProposer = context.select<SessionCubit, bool>(
+          (cubit) => cubit.state.isProposerUnlock,
+        );
+        return ResponsiveChildBuilder(
+          sm: (_) => _BodySmall(
+            category: state.data,
+            isLoading: state.show,
+            isActiveProposer: isActiveProposer,
+          ),
+          md: (_) => _Body(
+            category: state.data,
+            isLoading: state.show,
+            isActiveProposer: isActiveProposer,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CategoryDetailError extends StatelessWidget {
   final SignedDocumentRef categoryRef;
 
-  const _CategoryDetailErrorSelector({required this.categoryRef});
+  const _CategoryDetailError({required this.categoryRef});
 
   @override
   Widget build(BuildContext context) {
@@ -140,43 +179,6 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
   }
 }
 
-class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
-  const _CategoryDetailLoadingOrDataSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<
-      CategoryDetailCubit,
-      CategoryDetailState,
-      DataVisibilityState<CampaignCategoryDetailsViewModel>
-    >(
-      selector: (state) {
-        return (
-          show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.dummy(),
-        );
-      },
-      builder: (context, state) {
-        final isActiveProposer = context.select<SessionCubit, bool>(
-          (cubit) => cubit.state.isProposerUnlock,
-        );
-        return ResponsiveChildBuilder(
-          sm: (_) => _BodySmall(
-            category: state.data,
-            isLoading: state.show,
-            isActiveProposer: isActiveProposer,
-          ),
-          md: (_) => _Body(
-            category: state.data,
-            isLoading: state.show,
-            isActiveProposer: isActiveProposer,
-          ),
-        );
-      },
-    );
-  }
-}
-
 class _CategoryPageState extends State<CategoryPage> {
   StreamSubscription<DocumentRef?>? _categoryRefSub;
 
@@ -185,8 +187,8 @@ class _CategoryPageState extends State<CategoryPage> {
     return ProposalSubmissionPhaseAware(
       activeChild: Stack(
         children: [
-          const _CategoryDetailLoadingOrDataSelector(),
-          _CategoryDetailErrorSelector(
+          const _CategoryDetailContent(),
+          _CategoryDetailError(
             categoryRef: widget.categoryRef,
           ),
         ].constrainedDelegate(),
@@ -215,17 +217,16 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<CategoryDetailCubit>().getCategories());
-    unawaited(
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryRef),
-    );
-    _listenForProposalRef(context.read<CategoryDetailCubit>());
+    final cubit = context.read<CategoryDetailCubit>()..watchActiveCampaignCategories();
+    unawaited(cubit.getCategoryDetail(widget.categoryRef));
+    _listenForProposalRef(cubit);
   }
 
+  // TODO(damian-molinski): refactor it to signal pattern
   void _listenForProposalRef(CategoryDetailCubit cubit) {
     // listen for updates
     _categoryRefSub = cubit.stream
-        .map((event) => event.category?.ref)
+        .map((event) => event.selectedCategoryRef)
         .distinct()
         .listen(_onCategoryRefChanged);
   }

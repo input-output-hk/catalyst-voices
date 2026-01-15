@@ -39,7 +39,7 @@ final class DocumentLookupBloc extends Bloc<DocumentLookupEvent, DocumentLookupS
     final content = encoder.convert(data.content.data);
 
     return DocumentLookupTileData(
-      ref: data.ref,
+      ref: data.id,
       metadata: metadata,
       content: content,
     );

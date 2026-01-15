@@ -1,8 +1,8 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide Uuid;
@@ -16,10 +16,10 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
-  late final _FakeUserRepository userRepository;
+  late final FakeUserRepository userRepository;
   late final UserObserver userObserver;
   late final RegistrationStatusPoller poller;
-  late final _FakeFeatureFlagsRepository featureFlagsRepository;
+  late final FakeFeatureFlagsRepository featureFlagsRepository;
 
   late final UserService userService;
   late final RegistrationService registrationService;
@@ -44,9 +44,9 @@ void main() {
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: AppConfig.dev().cache,
-      keychainSigner: _FakeKeychainSigner(),
+      keychainSigner: FakeKeychainSigner(),
     );
-    userRepository = _FakeUserRepository();
+    userRepository = FakeUserRepository();
     userObserver = StreamUserObserver();
     poller = _NoOpPoller();
 
@@ -64,7 +64,7 @@ void main() {
     );
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
-    featureFlagsRepository = _FakeFeatureFlagsRepository();
+    featureFlagsRepository = FakeFeatureFlagsRepository();
     featureFlagService = FeatureFlagsService(featureFlagsRepository);
   });
 
@@ -312,42 +312,6 @@ void main() {
       });
     });
   });
-}
-
-class _FakeFeatureFlagsRepository extends Fake implements FeatureFlagsRepository {
-  @override
-  bool isEnabled(FeatureFlag featureFlag) => true;
-}
-
-class _FakeKeychainSigner extends Fake implements KeychainSigner {}
-
-class _FakeUserRepository extends Fake implements UserRepository {
-  User? _user;
-
-  @override
-  Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId}) {
-    throw const UnauthorizedException();
-  }
-
-  @override
-  Future<User> getUser() async => _user ?? const User.empty();
-
-  @override
-  Future<AccountPublicProfile> publishUserProfile({
-    required CatalystId catalystId,
-    required String email,
-  }) async {
-    return AccountPublicProfile(email: email, status: AccountPublicStatus.verifying);
-  }
-
-  void reset() {
-    _user = null;
-  }
-
-  @override
-  Future<void> saveUser(User user) async {
-    _user = user;
-  }
 }
 
 class _MockCardanoWallet extends Mock implements CardanoWallet {

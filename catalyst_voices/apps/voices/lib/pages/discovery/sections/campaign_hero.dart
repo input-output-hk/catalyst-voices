@@ -1,10 +1,10 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
-import 'package:catalyst_voices_assets/generated/assets.gen.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -20,6 +20,10 @@ class CampaignHeroSection extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 450),
       child: HeroSection(
         asset: VideoCacheKey(name: VoicesAssets.videos.heroDesktop),
+        errorBuilder: (context, error, stackTrace) => CatalystImage.asset(
+          VoicesAssets.images.discoveryFallback.path,
+          fit: BoxFit.cover,
+        ),
         child: ResponsivePadding(
           xs: const EdgeInsets.only(left: 20, bottom: 16, top: 8, right: 20),
           sm: const EdgeInsets.only(left: 80, bottom: 32, top: 18),
@@ -50,7 +54,7 @@ class _CampaignBrief extends StatelessWidget {
           key: const Key('CampaignBriefTitle'),
           context.l10n.heroSectionTitle,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-            color: ThemeBuilder.buildTheme().colorScheme.primary,
+            color: context.colors.discoveryPrimary,
           ),
         ),
         const SizedBox(height: 32),
@@ -58,7 +62,7 @@ class _CampaignBrief extends StatelessWidget {
           key: const Key('CampaignBriefDescription'),
           context.l10n.projectCatalystDescription,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: ThemeBuilder.buildTheme().colors.textOnPrimaryLevel0,
+            color: context.colors.discoveryTextOnPrimary,
           ),
         ),
         const SizedBox(height: 32),
@@ -70,8 +74,8 @@ class _CampaignBrief extends StatelessWidget {
                 const ProposalsRoute().go(context);
               },
               style: FilledButton.styleFrom(
-                backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
-                foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+                backgroundColor: context.colors.discoveryPrimary,
+                foregroundColor: context.colors.discoveryOnPrimary,
               ),
               child: Text(context.l10n.viewProposals),
             ),
@@ -99,8 +103,8 @@ class _DiscoveryMyProposalsButton extends StatelessWidget {
               const WorkspaceRoute().go(context);
             },
             style: OutlinedButton.styleFrom(
-              backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
-              foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+              backgroundColor: context.colors.discoveryPrimary,
+              foregroundColor: context.colors.discoveryOnPrimary,
             ),
             child: Text(context.l10n.myProposals),
           ),

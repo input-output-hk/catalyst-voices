@@ -120,6 +120,10 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   votingNegativeHover: Color(0xFFFF6666),
   votingNegativeVoted: Color(0xFFFF6666),
   votingOverlay: Color(0xA6000000),
+  discoveryPrimary: VoicesColors.lightPrimary,
+  discoveryOnPrimary: VoicesColors.lightOnPrimary,
+  discoveryTextOnPrimary: VoicesColors.lightTextOnPrimaryLevel0,
+  discoveryTextOnPrimaryWhite: VoicesColors.lightTextOnPrimaryWhite,
 );
 
 const BrandAssets lightBrandAssets = BrandAssets(
@@ -231,7 +235,18 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   votingNegativeHover: Color(0xFFF50000),
   votingNegativeVoted: Color(0xFFFF6666),
   votingOverlay: Color(0x33000000),
+  discoveryPrimary: VoicesColors.lightPrimary,
+  discoveryOnPrimary: VoicesColors.lightOnPrimary,
+  discoveryTextOnPrimary: VoicesColors.lightTextOnPrimaryLevel0,
+  discoveryTextOnPrimaryWhite: VoicesColors.lightTextOnPrimaryWhite,
 );
+
+/// A safe font family set to act as a fallback in case
+/// a glyph cannot be rendered with the default font.
+const List<String> _fontFamilyFallback = [
+  'sans-serif',
+  'Arial',
+];
 
 /// [ThemeData] for the `catalyst` brand.
 final ThemeData catalyst = _buildThemeData(
@@ -246,13 +261,6 @@ final ThemeData darkCatalyst = _buildThemeData(
   darkVoicesColorScheme,
   darkBrandAssets,
 );
-
-/// A safe font family set to act as a fallback in case
-/// a glyph cannot be rendered with the default font.
-const List<String> _fontFamilyFallback = [
-  'sans-serif',
-  'Arial',
-];
 
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
   return TextTheme(

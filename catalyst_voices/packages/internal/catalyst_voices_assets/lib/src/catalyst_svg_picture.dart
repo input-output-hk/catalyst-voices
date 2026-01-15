@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:vector_graphics/vector_graphics.dart';
 
 /// [CatalystSvgPicture] extends [SvgPicture] to have an asset constructor
 /// tat sets the package property to `catalyst_voices_assets` by default.
@@ -20,14 +22,16 @@ final class CatalystSvgPicture extends SvgPicture {
     super.semanticsLabel,
     super.excludeFromSemantics,
     super.clipBehavior,
+    super.errorBuilder,
+    super.renderingStrategy,
   }) : super();
 
   CatalystSvgPicture.asset(
-    super.name, {
+    String name, {
     super.key,
     super.matchTextDirection,
-    super.bundle,
-    super.package = 'catalyst_voices_assets',
+    AssetBundle? bundle,
+    String? package = 'catalyst_voices_assets',
     super.width,
     super.height,
     super.fit,
@@ -37,7 +41,14 @@ final class CatalystSvgPicture extends SvgPicture {
     super.semanticsLabel,
     super.excludeFromSemantics,
     super.clipBehavior,
-    super.theme,
+    super.errorBuilder,
     super.colorFilter,
-  }) : super.asset();
+    super.renderingStrategy,
+  }) : super(
+         AssetBytesLoader(
+           name,
+           packageName: package,
+           assetBundle: bundle,
+         ),
+       );
 }

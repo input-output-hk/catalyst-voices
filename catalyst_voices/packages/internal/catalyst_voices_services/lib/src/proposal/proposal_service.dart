@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -15,10 +16,11 @@ abstract interface class ProposalService {
     SignerService signerService,
     ActiveCampaignObserver activeCampaignObserver,
     CastedVotesObserver castedVotesObserver,
+    VotingBallotBuilder ballotBuilder,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   /// Creates a new proposal draft locally.
@@ -31,7 +33,7 @@ abstract interface class ProposalService {
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
-  Future<void> deleteDraftProposal(DraftRef ref);
+  Future<void> deleteDraftProposal(DraftRef id);
 
   /// Encodes the [document] to exportable format.
   ///
@@ -48,23 +50,14 @@ abstract interface class ProposalService {
     required DocumentParameters proposalParameters,
   });
 
-  /// Similar to [watchFavoritesProposalsIds] stops after first emit.
-  Future<List<String>> getFavoritesProposalsIds();
-
-  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref});
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef id});
 
   Future<DetailProposal> getProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   });
 
   Future<ProposalDetailData> getProposalDetail({
-    required DocumentRef ref,
-  });
-
-  Future<Page<ProposalWithContext>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
+    required DocumentRef id,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
@@ -113,36 +106,26 @@ abstract interface class ProposalService {
 
   /// Upserts a proposal draft in the local storage.
   Future<void> upsertDraftProposal({
-    required DraftRef selfRef,
+    required DraftRef id,
     required DocumentDataContent content,
     required SignedDocumentRef templateRef,
     required DocumentParameters parameters,
   });
 
-  /// Fetches favorites proposals ids of the user
-  Stream<List<String>> watchFavoritesProposalsIds();
-
-  /// Emits when proposal fav status changes.
-  Stream<bool> watchIsFavoritesProposal({
-    required DocumentRef ref,
-  });
-
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPageV2({
+    required PageRequest request,
+    ProposalsOrder order,
+    ProposalsFiltersV2 filters,
   });
 
-  Stream<Page<Proposal>> watchProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
   });
 
   Stream<List<DetailProposal>> watchUserProposals();
-
-  Stream<ProposalsCount> watchUserProposalsCount();
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -152,6 +135,7 @@ final class ProposalServiceImpl implements ProposalService {
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
   final CastedVotesObserver _castedVotesObserver;
+  final VotingBallotBuilder _ballotBuilder;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -160,15 +144,12 @@ final class ProposalServiceImpl implements ProposalService {
     this._signerService,
     this._activeCampaignObserver,
     this._castedVotesObserver,
+    this._ballotBuilder,
   );
 
   @override
-  Future<void> addFavoriteProposal({required DocumentRef ref}) {
-    return _documentRepository.updateDocumentFavorite(
-      ref: ref.toLoose(),
-      type: DocumentType.proposalDocument,
-      isFavorite: true,
-    );
+  Future<void> addFavoriteProposal({required DocumentRef id}) {
+    return _proposalRepository.updateProposalFavorite(id: id.id, isFavorite: true);
   }
 
   @override
@@ -183,7 +164,7 @@ final class ProposalServiceImpl implements ProposalService {
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata.proposal(
-          selfRef: draftRef,
+          id: draftRef,
           template: templateRef,
           parameters: parameters,
           authors: [catalystId],
@@ -196,8 +177,8 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> deleteDraftProposal(DraftRef ref) {
-    return _proposalRepository.deleteDraftProposal(ref);
+  Future<void> deleteDraftProposal(DraftRef id) {
+    return _proposalRepository.deleteDraftProposal(id);
   }
 
   @override
@@ -220,7 +201,7 @@ final class ProposalServiceImpl implements ProposalService {
 
         await _proposalRepository.publishProposalAction(
           metadata: DocumentDataMetadata.proposalAction(
-            selfRef: actionRef,
+            id: actionRef,
             proposalRef: proposalRef,
             parameters: proposalParameters,
           ),
@@ -235,39 +216,28 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<String>> getFavoritesProposalsIds() {
-    return _documentRepository
-        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
-        .first;
-  }
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef id}) async {
+    final latest = await _documentRepository.getLatestOf(id: id);
+    if (latest == null) {
+      throw DocumentNotFoundException(ref: id);
+    }
 
-  @override
-  Future<DocumentRef> getLatestProposalVersion({
-    required DocumentRef ref,
-  }) async {
-    final proposalVersions = await _documentRepository.getAllVersionsOfId(
-      id: ref.id,
-    );
-    final refList = List<DocumentRef>.from(
-      proposalVersions.map((e) => e.metadata.selfRef).toList(),
-    )..sort();
-
-    return refList.last;
+    return latest;
   }
 
   @override
   Future<DetailProposal> getProposal({
-    required DocumentRef ref,
+    required DocumentRef id,
   }) async {
-    final proposalData = await _proposalRepository.getProposal(ref: ref);
+    final proposalData = await _proposalRepository.getProposal(ref: id);
     final versions = await _getDetailVersionsOfProposal(proposalData);
 
     return DetailProposal.fromData(proposalData, versions);
   }
 
   @override
-  Future<ProposalDetailData> getProposalDetail({required DocumentRef ref}) async {
-    final proposalData = await _proposalRepository.getProposal(ref: ref);
+  Future<ProposalDetailData> getProposalDetail({required DocumentRef id}) async {
+    final proposalData = await _proposalRepository.getProposal(ref: id);
     final version = await _getDetailVersionsOfProposal(proposalData);
 
     return ProposalDetailData(
@@ -279,57 +249,18 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<Page<ProposalWithContext>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) async {
-    // TODO(LynxxLynx): Only for mocking! Remove this when we start supporting writing votes to the database
-    final originalFilters = filters;
-    if (filters.type == ProposalsFilterType.voted) {
-      filters = filters.copyWith(type: ProposalsFilterType.total);
-    }
-
-    final proposalsPage = await _proposalRepository
-        .getProposalsPage(request: request, filters: filters, order: order)
-        .then(_mapProposalDataPage);
-    var proposals = proposalsPage.items;
-
-    // TODO(LynxxLynx): Only for mocking! Remove this when we start supporting writing votes to the database
-    if (originalFilters.type == ProposalsFilterType.voted) {
-      final votedProposals = _castedVotesObserver.votes;
-      final votedProposalIds = votedProposals.map((vote) => vote.proposal).toSet();
-      proposals = proposals
-          .where((proposal) => votedProposalIds.contains(proposal.selfRef))
-          .toList();
-    }
-
-    // If we are getting proposals then campaign needs to be active
-    // Getting whole campaign with list of categories saves time then calling to get each category separately
-    // for each proposal
-    final proposalsWithContext = proposals
-        .map(
-          (proposal) => ProposalWithContext(
-            proposal: proposal,
-            category: _findActiveCampaignCategory(proposal.parameters),
-            user: const ProposalUserContext(),
-          ),
-        )
-        .toList();
-
-    return proposalsPage.copyWithItems(proposalsWithContext);
-  }
-
-  @override
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef category,
   }) async {
-    final template = await _proposalRepository.getProposalTemplate(category: category);
-    if (template == null) {
-      throw ProposalTemplateNotFoundException(category: category);
+    final proposalTemplate = await _proposalRepository.getProposalTemplate(
+      category: category,
+    );
+
+    if (proposalTemplate == null) {
+      throw DocumentNotFoundException(ref: category);
     }
 
-    return template;
+    return proposalTemplate;
   }
 
   @override
@@ -339,17 +270,20 @@ final class ProposalServiceImpl implements ProposalService {
       throw const ActiveCampaignNotFoundException();
     }
 
-    final campaignFilters = CampaignFilters.from(activeCampaign);
-    final allowTemplateRefs = await _documentRepository.getRefs(
-      type: DocumentType.proposalTemplate,
-      campaign: campaignFilters,
-    );
-
     final parsedDocument = await _documentRepository.parseDocumentForImport(data: data);
+    final template = parsedDocument.metadata.template;
+    final templateParameters =
+        // TODO(damian-molinski): replace with getDocumentMetadata
+        await (template != null
+                ? _documentRepository.getDocumentData(id: template)
+                : Future<DocumentData?>.value())
+            .then((value) => value?.metadata.parameters)
+            .onError<DocumentNotFoundException>((_, _) => null)
+            .then((value) => value ?? const DocumentParameters());
 
     // Validate template before any DB operations
     // TODO(LynxLynxx): Remove after we support multiple fund templates
-    if (!allowTemplateRefs.contains(parsedDocument.metadata.template)) {
+    if (activeCampaign.categories.none((category) => templateParameters.contains(category.id))) {
       throw const DocumentImportInvalidDataException(
         DocumentMetadataMalformedException(
           reasons: ['template ref is not allowed to be imported'],
@@ -377,13 +311,13 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
-    final originalRef = document.ref;
+    final originalRef = document.id;
 
     // There is a system requirement to publish fresh documents,
     // where version timestamp is not older than a predefined interval.
     // Because of it we're regenerating a version just before publishing.
     final freshRef = originalRef.fresh().toSignedDocumentRef();
-    final freshDocument = document.copyWithSelfRef(selfRef: freshRef);
+    final freshDocument = document.copyWithId(freshRef);
 
     await _signerService.useProposerCredentials(
       (catalystId, privateKey) {
@@ -404,11 +338,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> removeFavoriteProposal({required DocumentRef ref}) {
-    return _documentRepository.updateDocumentFavorite(
-      ref: ref.toLoose(),
-      type: DocumentType.proposalDocument,
-      isFavorite: false,
-    );
+    return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: false);
   }
 
   @override
@@ -428,7 +358,7 @@ final class ProposalServiceImpl implements ProposalService {
 
         await _proposalRepository.publishProposalAction(
           metadata: DocumentDataMetadata.proposalAction(
-            selfRef: actionRef,
+            id: actionRef,
             proposalRef: proposalRef,
             parameters: proposalParameters,
           ),
@@ -453,7 +383,7 @@ final class ProposalServiceImpl implements ProposalService {
 
         await _proposalRepository.publishProposalAction(
           metadata: DocumentDataMetadata.proposalAction(
-            selfRef: actionRef,
+            id: actionRef,
             proposalRef: proposalRef,
             parameters: proposalParameters,
           ),
@@ -469,7 +399,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> upsertDraftProposal({
-    required DraftRef selfRef,
+    required DraftRef id,
     required DocumentDataContent content,
     required SignedDocumentRef templateRef,
     required DocumentParameters parameters,
@@ -482,7 +412,7 @@ final class ProposalServiceImpl implements ProposalService {
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata.proposal(
-          selfRef: selfRef,
+          id: id,
           template: templateRef,
           parameters: parameters,
           authors: [catalystId],
@@ -493,154 +423,161 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<List<String>> watchFavoritesProposalsIds() {
-    return _documentRepository.watchAllDocumentsFavoriteIds(
-      type: DocumentType.proposalDocument,
+  Stream<bool> watchMaxProposalsLimitReached() {
+    final activeAccountId = _userService.watchUnlockedActiveAccount
+        .map((account) => account?.catalystId)
+        .distinct();
+    final activeCampaign = _activeCampaignObserver.watchCampaign.distinct();
+
+    return Rx.combineLatest2<CatalystId?, Campaign?, ProposalsFiltersV2?>(
+      activeAccountId,
+      activeCampaign,
+      (author, campaign) {
+        if (author == null || campaign == null) {
+          return null;
+        }
+
+        return ProposalsFiltersV2(
+          status: ProposalStatusFilter.aFinal,
+          originalAuthor: author,
+          campaign: ProposalsCampaignFilters.from(campaign),
+        );
+      },
+    ).distinct().switchMap(
+      (filters) {
+        if (filters == null) {
+          return Stream.value(true);
+        }
+
+        return _proposalRepository
+            .watchProposalsCountV2(filters: filters)
+            .map((event) => event >= ProposalDocument.maxSubmittedProposalsPerUser);
+      },
     );
   }
 
   @override
-  Stream<bool> watchIsFavoritesProposal({required DocumentRef ref}) {
-    return _documentRepository.watchIsDocumentFavorite(ref: ref.toLoose());
-  }
-
-  @override
-  Stream<bool> watchMaxProposalsLimitReached() {
-    return watchUserProposalsCount().map((count) {
-      return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
-    });
-  }
-
-  @override
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
-  }) {
-    final proposalsCount = _proposalRepository.watchProposalsCount(filters: filters);
-
-    // TODO(LynxxLynx): Remove this when we start supporting writing votes to the database
-    return proposalsCount.switchMap((count) {
-      return _castedVotesObserver.watchCastedVotes.map((votedProposals) {
-        return count.copyWith(
-          voted: votedProposals.length,
-        );
-      });
-    });
-  }
-
-  @override
-  Stream<Page<Proposal>> watchProposalsPage({
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPageV2({
     required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalRepository
-        .watchProposalsPage(request: request, filters: filters, order: order)
-        .asyncMap(_mapProposalDataPage);
+    final proposals = _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalRepository.watchProposalsBriefPage(
+          request: request,
+          order: order,
+          filters: effectiveFilters,
+        );
+      },
+    );
+
+    final draftVotes = _ballotBuilder.watchVotes;
+    final castedVotes = _castedVotesObserver.watchCastedVotes;
+
+    return Rx.combineLatest3(
+      proposals,
+      draftVotes,
+      castedVotes,
+      (page, draftVotes, castedVotes) {
+        return page.map(
+          (proposal) => _mapJoinedProposalBriefData(proposal, draftVotes, castedVotes),
+        );
+      },
+    );
   }
 
   @override
-  Stream<List<DetailProposal>> watchUserProposals() async* {
-    yield* _userService //
-        .watchUser
-        .distinct()
-        .switchMap(_userWhenUnlockedStream)
-        .switchMap((user) {
-          if (user == null) return const Stream.empty();
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalRepository.watchProposalsCountV2(filters: effectiveFilters);
+      },
+    );
+  }
 
-          final authorId = user.activeAccount?.catalystId;
-          if (!_isProposer(user) || authorId == null) {
-            return const Stream.empty();
-          }
+  @override
+  Stream<List<DetailProposal>> watchUserProposals() {
+    return _userService.watchUnlockedActiveAccount.distinct().switchMap((account) {
+      if (account == null) return const Stream.empty();
 
-          return _proposalRepository
-              .watchUserProposals(authorId: authorId)
-              .distinct()
-              .switchMap<List<DetailProposal>>((documents) async* {
-                if (documents.isEmpty) {
-                  yield [];
-                  return;
-                }
-                final proposalsDataStreams = await Future.wait(
-                  documents.map(_createProposalDataStream).toList(),
+      final authorId = account.catalystId;
+      if (!account.hasRole(AccountRole.proposer)) {
+        return const Stream.empty();
+      }
+
+      return _proposalRepository
+          .watchUserProposals(authorId: authorId)
+          .distinct()
+          .switchMap<List<DetailProposal>>((documents) async* {
+            if (documents.isEmpty) {
+              yield [];
+              return;
+            }
+            final proposalsDataStreams = await Future.wait(
+              documents.map(_createProposalDataStream).toList(),
+            );
+
+            yield* Rx.combineLatest(
+              proposalsDataStreams,
+              (List<ProposalData?> proposalsData) async {
+                // Note. one is null and two versions of same id.
+                final validProposalsData = proposalsData.whereType<ProposalData>().toList();
+
+                final groupedProposals = groupBy(
+                  validProposalsData,
+                  (data) => data.document.metadata.id.id,
                 );
 
-                yield* Rx.combineLatest(
-                  proposalsDataStreams,
-                  (List<ProposalData?> proposalsData) async {
-                    // Note. one is null and two versions of same id.
-                    final validProposalsData = proposalsData.whereType<ProposalData>().toList();
+                final filteredProposalsData = groupedProposals.values
+                    .map((group) {
+                      if (group.any(
+                        (p) => p.publish != ProposalPublish.localDraft,
+                      )) {
+                        return group.where(
+                          (p) => p.publish != ProposalPublish.localDraft,
+                        );
+                      }
+                      return group;
+                    })
+                    .expand((group) => group)
+                    .toList();
 
-                    final groupedProposals = groupBy(
-                      validProposalsData,
-                      (data) => data.document.metadata.selfRef.id,
-                    );
-
-                    final filteredProposalsData = groupedProposals.values
-                        .map((group) {
-                          if (group.any(
-                            (p) => p.publish != ProposalPublish.localDraft,
-                          )) {
-                            return group.where(
-                              (p) => p.publish != ProposalPublish.localDraft,
-                            );
-                          }
-                          return group;
-                        })
-                        .expand((group) => group)
-                        .toList();
-
-                    final proposalsWithVersions = await Future.wait(
-                      filteredProposalsData.map((proposalData) async {
-                        final versions = await _getDetailVersionsOfProposal(proposalData);
-                        return DetailProposal.fromData(proposalData, versions);
-                      }),
-                    );
-                    return proposalsWithVersions;
-                  },
-                ).switchMap(Stream.fromFuture);
-              });
-        });
+                final proposalsWithVersions = await Future.wait(
+                  filteredProposalsData.map((proposalData) async {
+                    final versions = await _getDetailVersionsOfProposal(proposalData);
+                    return DetailProposal.fromData(proposalData, versions);
+                  }),
+                );
+                return proposalsWithVersions;
+              },
+            ).switchMap(Stream.fromFuture);
+          });
+    });
   }
 
-  @override
-  Stream<ProposalsCount> watchUserProposalsCount() {
-    return _userService //
-        .watchUser
-        .distinct()
-        .switchMap(_userWhenUnlockedStream)
-        .switchMap((user) {
-          if (user == null) return const Stream.empty();
+  // TODO(damian-molinski): Remove this when voteBy is implemented.
+  Stream<ProposalsFiltersV2> _adaptFilters(ProposalsFiltersV2 filters) {
+    if (filters.voteBy == null) {
+      return Stream.value(filters);
+    }
 
-          final authorId = user.activeAccount?.catalystId;
-          if (!_isProposer(user) || authorId == null) {
-            // user is not eligible for creating proposals
-            return const Stream.empty();
-          }
-
-          final activeCampaign = _activeCampaignObserver.campaign;
-          final categoriesIds = activeCampaign?.categories.map((e) => e.selfRef.id).toList();
-
-          final filters = ProposalsCountFilters(
-            author: authorId,
-            onlyAuthor: true,
-            campaign: categoriesIds != null ? CampaignFilters(categoriesIds: categoriesIds) : null,
-          );
-
-          return watchProposalsCount(filters: filters);
-        });
+    return _castedVotesObserver.watchCastedVotes
+        .map((votes) => votes.map((e) => e.proposal.id).toList())
+        .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
   }
 
   Future<Stream<ProposalData?>> _createProposalDataStream(
     ProposalDocument doc,
   ) async {
-    final selfRef = doc.metadata.selfRef;
+    final proposalId = doc.metadata.id;
 
-    final commentsCountStream = _proposalRepository.watchCommentsCount(
-      refTo: selfRef,
-    );
+    final commentsCountStream = _proposalRepository.watchCommentsCount(referencing: proposalId);
 
     return Rx.combineLatest2(
-      _proposalRepository.watchProposalPublish(refTo: selfRef),
+      _proposalRepository.watchProposalPublish(referencing: proposalId),
       commentsCountStream,
       (ProposalPublish? publishState, int commentsCount) {
         if (publishState == null) return null;
@@ -654,26 +591,17 @@ final class ProposalServiceImpl implements ProposalService {
     );
   }
 
-  CampaignCategory _findActiveCampaignCategory(DocumentParameters parameters) {
-    final activeCampaign = _activeCampaignObserver.campaign;
-    return activeCampaign!.categories.firstWhere(
-      (category) => parameters.contains(category.selfRef),
-    );
-  }
-
   // Helper method to fetch versions for a proposal
   Future<List<ProposalVersion>> _getDetailVersionsOfProposal(ProposalData proposal) async {
     final versions = await _proposalRepository.queryVersionsOfId(
-      id: proposal.document.metadata.selfRef.id,
+      id: proposal.document.metadata.id.id,
       includeLocalDrafts: true,
     );
     final versionsData = (await Future.wait(
       versions.map(
         (e) async {
-          final selfRef = e.metadata.selfRef;
-          final action = await _proposalRepository.getProposalPublishForRef(
-            ref: selfRef,
-          );
+          final proposalId = e.metadata.id;
+          final action = await _proposalRepository.getProposalPublishForRef(ref: proposalId);
           if (action == null) {
             return null;
           }
@@ -689,35 +617,35 @@ final class ProposalServiceImpl implements ProposalService {
     return versionsData.map((e) => e.toProposalVersion()).toList();
   }
 
-  bool _isProposer(User user) {
-    return user.activeAccount?.roles.contains(AccountRole.proposer) ?? false;
-  }
+  ProposalBriefData _mapJoinedProposalBriefData(
+    JoinedProposalBriefData data,
+    List<Vote> draftVotes,
+    List<Vote> castedVotes,
+  ) {
+    final proposal = data.proposal;
+    final isFinal = data.isFinal;
 
-  Future<Page<Proposal>> _mapProposalDataPage(Page<ProposalData> page) async {
-    final proposals = await page.items.map(
-      (item) async {
-        final versions = await _proposalRepository
-            .queryVersionsOfId(
-              id: item.document.metadata.selfRef.id,
-              includeLocalDrafts: true,
-            )
-            .then(
-              (value) => value.map((e) => e.metadata.selfRef.version!).whereType<String>().toList(),
-            );
+    final draftVote = isFinal
+        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
+        : null;
+    final castedVote = isFinal
+        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.id)
+        : null;
 
-        return Proposal.fromData(item, versions);
-      },
-    ).wait;
-
-    return page.copyWithItems(proposals);
-  }
-
-  Stream<User?> _userWhenUnlockedStream(User user) {
-    final activeAccount = user.activeAccount;
-
-    if (activeAccount == null) return Stream.value(null);
-
-    final isUnlockedStream = activeAccount.keychain.watchIsUnlocked;
-    return isUnlockedStream.map((isUnlocked) => isUnlocked ? user : null);
+    return ProposalBriefData(
+      id: proposal.id,
+      authorName: data.originalAuthors.firstOrNull?.username ?? '',
+      title: proposal.title ?? '',
+      description: proposal.description ?? '',
+      categoryName: proposal.categoryName ?? '',
+      durationInMonths: proposal.durationInMonths ?? 0,
+      fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      createdAt: proposal.id.ver!.dateTime,
+      iteration: data.iteration,
+      commentsCount: data.commentsCount,
+      isFinal: isFinal,
+      isFavorite: data.isFavorite,
+      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
+    );
   }
 }

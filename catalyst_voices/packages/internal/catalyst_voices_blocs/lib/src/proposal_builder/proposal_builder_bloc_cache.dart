@@ -8,6 +8,7 @@ final class ProposalBuilderBlocCache extends Equatable {
   final Document? proposalDocument;
   final ProposalBuilderMetadata? proposalMetadata;
   final CampaignCategory? category;
+  final CampaignCategoryTotalAsk? categoryTotalAsk;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
   final AccountPublicStatus? accountPublicStatus;
@@ -19,6 +20,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     this.proposalDocument,
     this.proposalMetadata,
     this.category,
+    this.categoryTotalAsk,
     this.commentTemplate,
     this.comments,
     this.accountPublicStatus,
@@ -34,6 +36,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     proposalDocument,
     proposalMetadata,
     category,
+    categoryTotalAsk,
     commentTemplate,
     comments,
     accountPublicStatus,
@@ -46,6 +49,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     Optional<Document>? proposalDocument,
     Optional<ProposalBuilderMetadata>? proposalMetadata,
     Optional<CampaignCategory>? category,
+    Optional<CampaignCategoryTotalAsk>? categoryTotalAsk,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
     Optional<AccountPublicStatus>? accountPublicStatus,
@@ -57,6 +61,7 @@ final class ProposalBuilderBlocCache extends Equatable {
       proposalDocument: proposalDocument.dataOr(this.proposalDocument),
       proposalMetadata: proposalMetadata.dataOr(this.proposalMetadata),
       category: category.dataOr(this.category),
+      categoryTotalAsk: categoryTotalAsk.dataOr(this.categoryTotalAsk),
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
       accountPublicStatus: accountPublicStatus.dataOr(this.accountPublicStatus),

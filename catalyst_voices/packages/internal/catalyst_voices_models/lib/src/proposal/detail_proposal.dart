@@ -4,7 +4,7 @@ final class DetailProposal extends CoreProposal {
   final List<ProposalVersion> versions;
 
   factory DetailProposal({
-    required DocumentRef selfRef,
+    required DocumentRef id,
     required DocumentParameters parameters,
     required String title,
     required String description,
@@ -18,7 +18,7 @@ final class DetailProposal extends CoreProposal {
     versions.sort();
 
     return DetailProposal._(
-      selfRef: selfRef,
+      id: id,
       parameters: parameters,
       title: title,
       description: description,
@@ -36,7 +36,7 @@ final class DetailProposal extends CoreProposal {
     List<ProposalVersion> versions,
   ) {
     return DetailProposal(
-      selfRef: data.document.metadata.selfRef,
+      id: data.document.metadata.id,
       parameters: data.document.metadata.parameters,
       title: data.document.title ?? '',
       description: data.document.description ?? '',
@@ -50,7 +50,7 @@ final class DetailProposal extends CoreProposal {
   }
 
   const DetailProposal._({
-    required super.selfRef,
+    required super.id,
     required super.parameters,
     required super.title,
     required super.description,
@@ -68,15 +68,15 @@ final class DetailProposal extends CoreProposal {
     versions,
   ];
 
-  int get versionNumber => versions.versionNumber(selfRef.version!);
+  int get versionNumber => versions.versionNumber(id.ver!);
 }
 
 extension ProposalWithVersionX on DetailProposal {
   static DetailProposal dummy(ProposalPublish publish, {SignedDocumentRef? categoryRef}) =>
       DetailProposal(
-        selfRef: const SignedDocumentRef(
+        id: const SignedDocumentRef(
           id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
-          version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
+          ver: '019584be-2321-7a1a-9b68-ad33a97a7e84',
         ),
         parameters: DocumentParameters({categoryRef ?? SignedDocumentRef.generateFirstRef()}),
         title: 'Dummy Proposal ver 2',
@@ -89,27 +89,27 @@ extension ProposalWithVersionX on DetailProposal {
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: const SignedDocumentRef(
+            id: const SignedDocumentRef(
               id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
-              version: '019584be-2314-7aaa-8b21-0f902ff817d4',
+              ver: '019584be-2314-7aaa-8b21-0f902ff817d4',
             ),
             title: 'Title ver 1',
             createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.submittedProposal,
-            selfRef: const SignedDocumentRef(
+            id: const SignedDocumentRef(
               id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
-              version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
+              ver: '019584be-2321-7a1a-9b68-ad33a97a7e84',
             ),
             title: 'Dummy Proposal ver 2',
             createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
-            selfRef: const SignedDocumentRef(
+            id: const SignedDocumentRef(
               id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
-              version: '019584be-232d-729b-950d-ce9fb79513ed',
+              ver: '019584be-232d-729b-950d-ce9fb79513ed',
             ),
             title: 'Title ver 3',
             createdAt: DateTime.now(),

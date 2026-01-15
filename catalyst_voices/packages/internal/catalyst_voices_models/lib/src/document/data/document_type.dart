@@ -1,27 +1,18 @@
-import 'dart:math' as math;
-
 import 'package:catalyst_voices_models/src/document/data/document_content_type.dart';
 
 // TODO(damian-molinski): update this list base on specs.
 /// https://github.com/input-output-hk/catalyst-libs/blob/main/docs/src/architecture/08_concepts/signed_doc/types.md#document-base-types
 enum DocumentBaseType {
-  action(priority: 900),
+  action,
   brand,
   proposal,
   campaign,
   category,
   comment,
-  template(priority: 1000),
+  template,
   unknown;
 
-  /// Can be used to order documents synchronisation.
-  ///
-  /// The bigger then more important.
-  final int priority;
-
-  const DocumentBaseType({
-    this.priority = 0,
-  });
+  const DocumentBaseType();
 }
 
 /// List of types and metadata fields is here
@@ -93,38 +84,6 @@ enum DocumentType {
     this.baseTypes = const [],
     required this.contentType,
   });
-
-  /// Finds biggest [baseTypes] priority or 0.
-  int get priority => baseTypes.fold(
-    0,
-    (previousValue, element) => math.max(previousValue, element.priority),
-  );
-
-  DocumentType? get template {
-    return switch (this) {
-      // proposal
-      DocumentType.proposalDocument ||
-      DocumentType.proposalTemplate => DocumentType.proposalTemplate,
-
-      // comment
-      DocumentType.commentDocument || DocumentType.commentTemplate => DocumentType.commentTemplate,
-
-      // category
-      DocumentType.categoryParametersDocument ||
-      DocumentType.categoryParametersTemplate => DocumentType.categoryParametersTemplate,
-
-      // campaign
-      DocumentType.campaignParametersDocument ||
-      DocumentType.campaignParametersTemplate => DocumentType.campaignParametersTemplate,
-
-      // brand
-      DocumentType.brandParametersDocument ||
-      DocumentType.brandParametersTemplate => DocumentType.brandParametersTemplate,
-
-      // other
-      DocumentType.proposalActionDocument || DocumentType.unknown => null,
-    };
-  }
 
   static DocumentType fromJson(String data) {
     return DocumentType.values.firstWhere(

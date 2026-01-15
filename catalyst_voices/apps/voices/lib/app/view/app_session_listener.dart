@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/notification/catalyst_messenger.dart';
-import 'package:catalyst_voices/notification/specialized/account_needs_verification_banner.dart';
+import 'package:catalyst_voices/notification/specialized/banner/account_needs_verification_banner.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -30,12 +30,7 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener>
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): refactor it to use signals
-    return BlocListener<SessionCubit, SessionState>(
-      listenWhen: _listenToSessionChangesWhen,
-      listener: _onSessionChanged,
-      child: widget.child,
-    );
+    return widget.child;
   }
 
   @override
@@ -47,28 +42,23 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener>
             : AccountContributorNeedsVerificationBanner();
         CatalystMessenger.of(context).add(notification);
       case CancelAccountNeedsVerificationSignal():
-        CatalystMessenger.of(
-          context,
-        ).cancelWhere((notification) => notification is AccountNeedsVerificationBanner);
+        CatalystMessenger.of(context).cancelWhere(
+          (notification) => notification is AccountNeedsVerificationBanner,
+        );
+      case KeychainLockedSignal():
+        _handleKeychainLock();
+      case KeychainUnlockedSignal():
+        _handleKeychainUnlock();
     }
   }
 
-  bool _listenToSessionChangesWhen(SessionState prev, SessionState next) {
-    // We deliberately check if previous was guest because we don't
-    // want to show the snackbar after the registration is completed.
-    final keychainUnlocked = prev.isGuest && next.isActive;
-    final keychainLocked = prev.isActive && next.isGuest;
-
-    return keychainUnlocked || keychainLocked;
-  }
-
-  void _onLockedKeychain(BuildContext context) {
+  void _handleKeychainLock() {
     VoicesSnackBar(
       type: VoicesSnackBarType.error,
       behavior: SnackBarBehavior.floating,
-      icon: VoicesAssets.icons.lockClosed.buildIcon(),
       title: context.l10n.lockSnackbarTitle,
       message: context.l10n.lockSnackbarMessage,
+      icon: VoicesAssets.icons.lockClosed.buildIcon(),
     ).show(context);
 
     final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
@@ -78,21 +68,13 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener>
     }
   }
 
-  void _onSessionChanged(BuildContext context, SessionState state) {
-    if (state.isActive) {
-      _onUnlockedKeychain(context);
-    } else if (state.isGuest) {
-      _onLockedKeychain(context);
-    }
-  }
-
-  void _onUnlockedKeychain(BuildContext context) {
+  void _handleKeychainUnlock() {
     VoicesSnackBar(
       type: VoicesSnackBarType.success,
       behavior: SnackBarBehavior.floating,
-      icon: VoicesAssets.icons.lockOpen.buildIcon(),
       title: context.l10n.unlockSnackbarTitle,
       message: context.l10n.unlockSnackbarMessage,
+      icon: VoicesAssets.icons.lockOpen.buildIcon(),
     ).show(context);
 
     final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;

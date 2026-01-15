@@ -114,6 +114,12 @@ final class SessionCubit extends Cubit<SessionState>
     await _userService.user.activeAccount?.keychain.lock();
   }
 
+  @override
+  void onChange(Change<SessionState> change) {
+    super.onChange(change);
+    _shouldEmitKeychainSignals(change);
+  }
+
   Future<void> removeKeychain() async {
     final account = _userService.user.activeAccount;
     if (account != null) {
@@ -300,6 +306,23 @@ final class SessionCubit extends Cubit<SessionState>
 
     _isVotingFeatureFlagEnabled = isEnabled;
     _updateState();
+  }
+
+  void _shouldEmitKeychainSignals(Change<SessionState> change) {
+    // Emit keychain lock/unlock signals based on state transitions
+    // We deliberately check if previous was guest because we don't
+    // want to show the snackbar after the registration is completed.
+    final prevStatus = change.currentState.status;
+    final nextStatus = change.nextState.status;
+
+    final keychainUnlocked = prevStatus == SessionStatus.guest && nextStatus == SessionStatus.actor;
+    final keychainLocked = prevStatus == SessionStatus.actor && nextStatus == SessionStatus.guest;
+
+    if (keychainUnlocked) {
+      emitSignal(const KeychainUnlockedSignal());
+    } else if (keychainLocked) {
+      emitSignal(const KeychainLockedSignal());
+    }
   }
 
   void _updateState() {

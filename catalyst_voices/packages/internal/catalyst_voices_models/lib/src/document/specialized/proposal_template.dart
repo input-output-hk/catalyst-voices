@@ -17,6 +17,11 @@ final class ProposalTemplate extends Equatable {
     schema,
   ];
 
+  DocumentCurrencySchema? get requestedFunds {
+    final property = schema.getPropertySchema(ProposalDocument.requestedFundsNodeId);
+    return property is DocumentCurrencySchema ? property : null;
+  }
+
   DocumentStringSchema? get title {
     final property = schema.getPropertySchema(ProposalDocument.titleNodeId);
     return property is DocumentStringSchema ? property : null;
@@ -25,7 +30,7 @@ final class ProposalTemplate extends Equatable {
 
 final class ProposalTemplateMetadata extends DocumentMetadata {
   ProposalTemplateMetadata({
-    required super.selfRef,
+    required super.id,
     required super.parameters,
   });
 }

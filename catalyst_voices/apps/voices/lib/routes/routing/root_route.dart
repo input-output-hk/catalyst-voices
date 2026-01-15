@@ -10,6 +10,11 @@ part 'root_route.g.dart';
 
 @TypedGoRoute<RootRoute>(path: '/')
 final class RootRoute extends GoRouteData with $RootRoute {
+  static List<String> rootRouteNameOptions = [
+    DiscoveryRoute.name,
+    VotingRoute.name,
+  ];
+
   const RootRoute();
 
   @override
