@@ -33,9 +33,7 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
       return;
     }
 
-    final updatedProposalsDisplayConsent = List<CollaboratorProposalDisplayConsent>.from(
-      _cache.proposalsDisplayConsent,
-    );
+    final updatedProposalsDisplayConsent = List.of(_cache.proposalsDisplayConsent);
     updatedProposalsDisplayConsent[indexOfProposalConsent] =
         updatedProposalsDisplayConsent[indexOfProposalConsent].copyWith(
           lastDisplayConsentUpdate: Optional(DateTime.now()),
