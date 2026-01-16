@@ -2,7 +2,7 @@ import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_plus/cryptography_plus.dart';
 import 'package:equatable/equatable.dart';
 
 /// The public and private Ed25519 key pair.

@@ -65,7 +65,7 @@ final class AccountDto {
     final address = this.address;
 
     return Account(
-      catalystId: CatalystId.fromUri(Uri.parse(catalystId)),
+      catalystId: CatalystId.parse(catalystId),
       email: email,
       keychain: keychain,
       roles: roles,

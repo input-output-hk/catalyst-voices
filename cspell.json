@@ -7,7 +7,9 @@
     {
       "language": "es,es_ES",
       "filename": "**/*_es.arb",
-      "dictionaries": ["es-es"]
+      "dictionaries": [
+        "es-es"
+      ]
     },
     {
       "filename": "**/*.pbxproj",
@@ -27,7 +29,10 @@
     {
       "filename": "**/*.plist",
       "allowCompoundWords": true,
-      "words": ["FMWK", "APPL"]
+      "words": [
+        "FMWK",
+        "APPL"
+      ]
     },
     {
       "filename": "**/*.yaml",
@@ -36,7 +41,9 @@
     {
       "filename": "**/gradle.properties",
       "allowCompoundWords": true,
-      "words": ["jvmargs"]
+      "words": [
+        "jvmargs"
+      ]
     },
     {
       "filename": "**/*.xml",
@@ -45,11 +52,15 @@
     {
       "filename": "**/build.gradle",
       "allowCompoundWords": true,
-      "words": ["getenv"]
+      "words": [
+        "getenv"
+      ]
     },
     {
       "filename": "**/gradle-wrapper.properties",
-      "words": ["dists"]
+      "words": [
+        "dists"
+      ]
     },
     {
       "filename": "**/*.kt",
@@ -57,7 +68,9 @@
     },
     {
       "filename": "**/Appfile",
-      "words": ["Appfile"]
+      "words": [
+        "Appfile"
+      ]
     },
     {
       "filename": "**/*.storyboard",
@@ -66,24 +79,39 @@
     {
       "filename": "**/*.appiconset/Contents.json",
       "allowCompoundWords": true,
-      "words": ["xcassets"]
+      "words": [
+        "xcassets"
+      ]
     },
     {
       "filename": "**/analysis_options.1.0.0.yaml",
-      "words": ["interps", "todos", "pubspec", "unawaited", "bools"]
+      "words": [
+        "interps",
+        "todos",
+        "pubspec",
+        "unawaited",
+        "bools"
+      ]
     },
     {
       "filename": "**/*.xcscheme",
       "allowCompoundWords": true,
-      "words": ["LLDB", "xcodeproj"]
+      "words": [
+        "LLDB",
+        "xcodeproj"
+      ]
     },
     {
       "filename": "**/*.xcconfig",
-      "words": ["xcconfig"]
+      "words": [
+        "xcconfig"
+      ]
     },
     {
       "filename": "**/*.xcworkspacedata",
-      "words": ["xcodeproj"]
+      "words": [
+        "xcodeproj"
+      ]
     }
   ],
   "useGitignore": true,
@@ -143,7 +171,7 @@
     "**/historic_data/**/*.sql",
     "**/historic_data/**/*.yaml",
     "**/historic_data/**/*.json",
-    "**/test_data/**/*.sql",
+    "**/test_data/**",
     "styles.min.css",
     "web-components.min.js",
     "**/generated/**",
@@ -156,8 +184,12 @@
     "**/*.svg",
     "catalyst_voices/docs/licenses/**",
     "catalyst_voices/docs/dependency_graph.dot",
+    "catalyst_voices/scripts/version_web_assets/test/helper",
     "catalyst-gateway/tests/api_tests/test_data/**",
     "utilities/reviews-mock-server/cat-reviews.json"
   ],
-  "enableFiletypes": ["earthfile", "github-actions-workflow"]
+  "enableFiletypes": [
+    "earthfile",
+    "github-actions-workflow"
+  ]
 }

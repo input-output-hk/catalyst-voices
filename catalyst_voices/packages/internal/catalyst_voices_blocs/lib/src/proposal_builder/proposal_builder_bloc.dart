@@ -129,16 +129,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return proposalBuilder!.build();
   }
 
-  DocumentData _buildDocumentData([DocumentRef? selfRef]) {
+  DocumentData _buildDocumentData([DocumentRef? id]) {
     return DocumentData(
-      metadata: _buildDocumentMetadata(selfRef),
+      metadata: _buildDocumentMetadata(id),
       content: _documentMapper.toContent(_buildDocument()),
     );
   }
 
-  DocumentDataMetadata _buildDocumentMetadata([DocumentRef? selfRef]) {
+  DocumentDataMetadata _buildDocumentMetadata([DocumentRef? id]) {
     return DocumentDataMetadata.proposal(
-      selfRef: selfRef ?? state.metadata.documentRef!,
+      id: id ?? state.metadata.documentRef!,
       template: state.metadata.templateRef!,
       parameters: state.metadata.parameters!,
       authors: [_userService.activeAccountId],
@@ -149,6 +149,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required Document proposalDocument,
     required ProposalBuilderMetadata proposalMetadata,
     required CampaignCategory category,
+    required CampaignCategoryTotalAsk categoryTotalAsk,
     required DocumentSchema? commentSchema,
     required List<CommentWithReplies> comments,
     required CommentsState commentsState,
@@ -174,7 +175,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final firstSegment = documentSegments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
     final guidance = _getGuidanceForSection(firstSegment, firstSection);
-    final categoryVM = CampaignCategoryDetailsViewModel.fromModel(category);
+    final stateCategory = CampaignCategoryDetailsViewModel.fromModel(
+      category,
+      finalProposalsCount: categoryTotalAsk.finalProposalsCount,
+      totalAsk: categoryTotalAsk.totalAsk,
+    );
 
     return ProposalBuilderState(
       documentSegments: documentSegments,
@@ -182,7 +187,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       guidance: guidance,
       document: proposalDocument,
       metadata: proposalMetadata,
-      category: categoryVM,
+      category: stateCategory,
       activeNodeId: firstSection?.id,
       validationErrors: state.validationErrors?.withErrorList(proposalDocument.collectErrors()),
       canPublish: isEmailVerified && proposalDocument.isValid,
@@ -195,8 +200,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required DocumentBuilder proposalBuilder,
     required ProposalBuilderMetadata proposalMetadata,
     required CampaignCategory category,
+    required CampaignCategoryTotalAsk categoryTotalAsk,
   }) async {
-    final commentTemplate = await _commentService.getCommentTemplate(category: category.selfRef);
+    final commentTemplate = await _commentService.getCommentTemplate(category: category.id);
 
     _cache = _cache.copyWith(
       proposalBuilder: Optional(proposalDocument.toBuilder()),
@@ -205,6 +211,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       category: Optional(category),
       commentTemplate: Optional(commentTemplate),
       comments: const Optional.empty(),
+      categoryTotalAsk: Optional(categoryTotalAsk),
     );
 
     await _commentsSub?.cancel();
@@ -261,7 +268,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       emit(state.copyWith(isChanging: true));
 
       // removing all versions of this proposal
-      final unversionedRef = ref.copyWith(version: const Optional.empty());
+      final unversionedRef = ref.toLoose();
 
       await _proposalService.deleteDraftProposal(unversionedRef);
       emitSignal(const DeletedProposalBuilderSignal());
@@ -463,9 +470,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         throw StateError('Cannot load proposal, active campaign not found');
       }
       final category = campaign.categories.first;
-      final categoryRef = category.selfRef;
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
 
-      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryRef);
+      final proposalTemplate = await _proposalService.getProposalTemplate(category: category.id);
       final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
@@ -473,10 +480,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalDocument: documentBuilder.build(),
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
-          templateRef: proposalTemplate.metadata.selfRef.toSignedDocumentRef(),
+          templateRef: proposalTemplate.metadata.id.toSignedDocumentRef(),
           parameters: templateParameters,
         ),
         category: category,
+        categoryTotalAsk: categoryTotalAsk,
       );
     });
   }
@@ -485,7 +493,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final proposalRef = await _proposalService.getLatestProposalVersion(ref: event.proposalId);
+    final proposalRef = await _proposalService.getLatestProposalVersion(id: event.proposalId);
 
     if (state.metadata.documentRef == proposalRef) {
       _logger.info('Loading proposal: $proposalRef ignored, already loaded');
@@ -496,12 +504,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     await _loadState(emit, () async {
       final proposalData = await _proposalService.getProposalDetail(
-        ref: proposalRef,
+        id: proposalRef,
       );
-      final versionsIds = proposalData.versions
-          .map((e) => e.selfRef.version)
-          .whereType<String>()
-          .toList();
+      final versionsIds = proposalData.versions.map((e) => e.id.ver).whereType<String>().toList();
       final proposal = Proposal.fromData(proposalData, versionsIds);
 
       if (proposalData.publish.isPublished) {
@@ -514,12 +519,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       }
 
       final versions = proposalData.versions.mapIndexed((index, version) {
-        final versionRef = version.selfRef;
-        final versionId = versionRef.version ?? versionRef.id;
+        final versionRef = version.id;
+        final versionId = versionRef.ver ?? versionRef.id;
         return DocumentVersion(
           id: versionId,
           number: index + 1,
-          isCurrent: versionId == proposalRef.version,
+          isCurrent: versionId == proposalRef.ver,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
@@ -530,23 +535,26 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
         emitSignal(const NewProposalAndEmailNotVerifiedSignal());
       }
+
       final category = await _campaignService.getCategory(proposal.parameters);
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
       final campaign = await _campaignService.getActiveCampaign();
-      final fromActiveCampaign = campaign?.hasCategory(category.selfRef.id) ?? false;
+      final fromActiveCampaign = campaign?.hasCategory(category.id.id) ?? false;
 
       return _cacheAndCreateState(
         proposalDocument: proposalData.document.document,
         proposalBuilder: proposalData.document.document.toBuilder(),
         proposalMetadata: ProposalBuilderMetadata(
           publish: proposal.publish,
-          documentRef: proposal.selfRef,
-          originalDocumentRef: proposal.selfRef,
+          documentRef: proposal.id,
+          originalDocumentRef: proposal.id,
           templateRef: proposalData.document.metadata.templateRef,
           parameters: proposalData.document.metadata.parameters,
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
         ),
         category: category,
+        categoryTotalAsk: categoryTotalAsk,
       );
     });
   }
@@ -555,23 +563,27 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     LoadProposalCategoryEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final categoryRef = event.categoryRef;
-    _logger.info('Loading proposal category: $categoryRef');
+    final categoryId = event.categoryId;
+    _logger.info('Loading proposal category: $categoryId');
 
     await _loadState(emit, () async {
-      final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
-      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryRef);
+      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
+      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryId);
       final templateParameters = proposalTemplate.metadata.parameters;
+
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryId);
+
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
       return _cacheAndCreateState(
         proposalDocument: documentBuilder.build(),
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
-          templateRef: proposalTemplate.metadata.selfRef.toSignedDocumentRef(),
+          templateRef: proposalTemplate.metadata.id.toSignedDocumentRef(),
           parameters: templateParameters,
         ),
         category: category,
+        categoryTotalAsk: categoryTotalAsk,
       );
     });
   }
@@ -828,6 +840,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final proposalDocument = _cache.proposalDocument;
     final proposalMetadata = _cache.proposalMetadata;
     final category = _cache.category;
+    final categoryTotalAsk = _cache.categoryTotalAsk;
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
@@ -849,6 +862,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       proposalDocument: proposalDocument,
       proposalMetadata: proposalMetadata,
       category: category,
+      categoryTotalAsk: categoryTotalAsk ?? CampaignCategoryTotalAsk.zero(category.id),
       commentSchema: commentTemplate.schema,
       comments: comments,
       commentsState: commentsState,
@@ -861,8 +875,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     DocumentRef? newRef,
     DocumentRef? removedRef,
   }) {
-    final current = state.metadata.versions.whereNot((e) => e.id == removedRef?.version);
-    final currentId = newRef?.version ?? current.last.id;
+    final current = state.metadata.versions.whereNot((e) => e.id == removedRef?.ver);
+    final currentId = newRef?.ver ?? current.last.id;
 
     return [
       for (final (index, ver) in current.indexed)
@@ -873,10 +887,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ),
       if (newRef != null)
         DocumentVersion(
-          id: newRef.version!,
+          id: newRef.ver!,
           number: current.length + 1,
-          isCurrent: newRef.version == currentId,
-          isLatest: newRef.version == currentId,
+          isCurrent: newRef.ver == currentId,
+          isLatest: newRef.ver == currentId,
         ),
     ];
   }
@@ -929,12 +943,22 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       emit(state.copyWith(isChanging: true));
       if (state.isMaxProposalsLimitReached) {
         final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
-        final count = await _proposalService.watchUserProposalsCount().first;
+        final activeAccountId = _userService.user.activeAccount?.catalystId;
+        final count = activeAccountId == null
+            ? 0
+            : await _proposalService
+                  .watchProposalsCountV2(
+                    filters: ProposalsFiltersV2(
+                      status: ProposalStatusFilter.aFinal,
+                      originalAuthor: activeAccountId,
+                    ),
+                  )
+                  .first;
 
         if (proposalSubmissionCloseDate != null) {
           final signal = MaxProposalsLimitReachedSignal(
             proposalSubmissionCloseDate: proposalSubmissionCloseDate,
-            currentSubmissions: count.finals,
+            currentSubmissions: count,
             maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
           );
 
@@ -1035,9 +1059,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
-        selfRef: commentRef,
+        id: commentRef,
         proposalRef: originalProposalRef! as SignedDocumentRef,
-        commentTemplate: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.id as SignedDocumentRef,
         reply: event.reply,
         parameters: state.metadata.parameters!,
         authorId: activeAccountId!,
@@ -1242,7 +1266,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     } else {
       nextRef = currentRef.nextVersion();
       await _proposalService.upsertDraftProposal(
-        selfRef: nextRef,
+        id: nextRef,
         content: document,
         templateRef: templateRef,
         parameters: parameters,

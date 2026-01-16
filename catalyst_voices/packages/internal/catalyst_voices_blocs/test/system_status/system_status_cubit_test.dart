@@ -1,16 +1,16 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
   group(SystemStatusCubit, () {
-    late SystemStatusRepository repository;
+    late SystemStatusService repository;
     late SystemStatusCubit cubit;
 
     setUp(() {
-      repository = _MockSystemStatusRepository();
+      repository = _MockSystemStatusService();
     });
 
     tearDown(() async {
@@ -74,4 +74,4 @@ void main() {
   });
 }
 
-class _MockSystemStatusRepository extends Mock implements SystemStatusRepository {}
+class _MockSystemStatusService extends Mock implements SystemStatusService {}

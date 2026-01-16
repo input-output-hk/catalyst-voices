@@ -6,7 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 const _recentProposalsMaxAge = Duration(hours: 72);
 final _logger = Logger('ProposalsCubit');
@@ -22,85 +22,108 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  final FeatureFlagsService _featureFlagsService;
 
-  ProposalsCubitCache _cache = const ProposalsCubitCache();
+  ProposalsCubitCache _cache = ProposalsCubitCache(
+    filters: ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active()),
+  );
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
-  StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
-  StreamSubscription<ProposalsCount>? _proposalsCountSub;
+  StreamSubscription<Map<ProposalsPageTab, int>>? _proposalsCountSub;
+  StreamSubscription<Page<ProposalBrief>>? _proposalsPageSub;
+
+  Completer<void>? _proposalsRequestCompleter;
 
   ProposalsCubit(
     this._userService,
     this._campaignService,
     this._proposalService,
-    this._featureFlagsService,
   ) : super(const ProposalsState(recentProposalsMaxAge: _recentProposalsMaxAge)) {
     _resetCache();
+    _rebuildProposalsCountSubs();
 
     _activeAccountIdSub = _userService.watchUser
         .map((event) => event.activeAccount?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChange);
+  }
 
-    _favoritesProposalsIdsSub = _proposalService
-        .watchFavoritesProposalsIds()
-        .distinct(listEquals)
-        .listen(_handleFavoriteProposalsIds);
+  Future<Campaign?> get _campaign async {
+    final cachedCampaign = _cache.campaign;
+    if (cachedCampaign != null) {
+      return cachedCampaign;
+    }
+
+    final campaign = await _campaignService.getActiveCampaign();
+    _cache = _cache.copyWith(campaign: Optional(campaign));
+    return campaign;
   }
 
   void changeFilters({
-    Optional<CatalystId>? author,
-    Optional<bool>? onlyMy,
-    Optional<SignedDocumentRef>? category,
-    ProposalsFilterType? type,
+    Optional<String>? categoryId,
+    Optional<ProposalsPageTab>? tab,
     Optional<String>? searchQuery,
     bool? isRecentEnabled,
     bool resetProposals = false,
   }) {
+    _cache = _cache.copyWith(tab: tab);
+    emit(state.copyWith(isOrderEnabled: _cache.tab == ProposalsPageTab.total));
+
+    final status = switch (_cache.tab) {
+      ProposalsPageTab.drafts => ProposalStatusFilter.draft,
+      ProposalsPageTab.finals => ProposalStatusFilter.aFinal,
+      ProposalsPageTab.total || ProposalsPageTab.favorites || ProposalsPageTab.my || null => null,
+    };
+
     final filters = _cache.filters.copyWith(
-      type: type,
-      author: author,
-      onlyAuthor: onlyMy,
-      category: category,
+      status: Optional(status),
+      isFavorite: _cache.tab == ProposalsPageTab.favorites
+          ? const Optional(true)
+          : const Optional.empty(),
+      originalAuthor: Optional(_cache.tab == ProposalsPageTab.my ? _cache.activeAccountId : null),
+      categoryId: categoryId,
       searchQuery: searchQuery,
-      maxAge: isRecentEnabled != null
+      latestUpdate: isRecentEnabled != null
           ? Optional(isRecentEnabled ? _recentProposalsMaxAge : null)
           : null,
+      campaign: Optional(ProposalsCampaignFilters.active()),
     );
 
     if (_cache.filters == filters) {
       return;
     }
 
+    final statusChanged = _cache.filters.status != filters.status;
+    final categoryChanged = _cache.filters.categoryId != filters.categoryId;
+    final searchQueryChanged = _cache.filters.searchQuery != filters.searchQuery;
+    final latestUpdateChanged = _cache.filters.latestUpdate != filters.latestUpdate;
+    final campaignChanged = _cache.filters.campaign != filters.campaign;
+
+    final shouldRebuildCountSubs =
+        categoryChanged || searchQueryChanged || latestUpdateChanged || campaignChanged;
+
     _cache = _cache.copyWith(filters: filters);
 
     emit(
       state.copyWith(
-        isOrderEnabled: _cache.filters.type == ProposalsFilterType.total,
-        isRecentProposalsEnabled: _cache.filters.maxAge != null,
+        isRecentProposalsEnabled: _cache.filters.latestUpdate != null,
       ),
     );
 
-    if (category != null) _rebuildCategories();
-    if (type != null) _rebuildOrder();
-
-    _watchProposalsCount(filters: filters.toCountFilters());
-
-    if (resetProposals) {
-      emitSignal(const ResetPaginationProposalsSignal());
-    }
+    if (categoryId != null) _rebuildCategories();
+    if (statusChanged) _rebuildOrder();
+    if (shouldRebuildCountSubs) _rebuildProposalsCountSubs();
+    if (resetProposals) emitSignal(const ResetPaginationProposalsSignal());
   }
 
   void changeOrder(
     ProposalsOrder? order, {
     bool resetProposals = false,
   }) {
-    if (_cache.selectedOrder == order) {
+    if (_cache.order == order) {
       return;
     }
 
-    _cache = _cache.copyWith(selectedOrder: Optional(order));
+    _cache = _cache.copyWith(order: Optional(order));
 
     _rebuildOrder();
 
@@ -109,8 +132,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }
   }
 
-  void changeSelectedCategory(SignedDocumentRef? categoryRef) {
-    emitSignal(ChangeCategoryProposalsSignal(to: categoryRef));
+  void changeSelectedCategory(SignedDocumentRef? categoryId) {
+    emitSignal(ChangeCategoryProposalsSignal(to: categoryId));
   }
 
   @override
@@ -118,81 +141,70 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     await _activeAccountIdSub?.cancel();
     _activeAccountIdSub = null;
 
-    await _favoritesProposalsIdsSub?.cancel();
-    _favoritesProposalsIdsSub = null;
-
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
+
+    await _proposalsPageSub?.cancel();
+    _proposalsPageSub = null;
+
+    if (_proposalsRequestCompleter != null && !_proposalsRequestCompleter!.isCompleted) {
+      _proposalsRequestCompleter!.complete();
+    }
+    _proposalsRequestCompleter = null;
 
     return super.close();
   }
 
   Future<void> getProposals(PageRequest request) async {
-    try {
-      if (_cache.campaign == null) {
-        final campaign = await _campaignService.getActiveCampaign();
-        _cache = _cache.copyWith(campaign: Optional(campaign));
-      }
+    final filters = _cache.filters;
+    final order = _resolveEffectiveOrder();
 
-      final filters = _cache.filters;
-      final order = _resolveEffectiveOrder();
-
-      _logger.finer('Proposals request[$request], filters[$filters], order[$order]');
-
-      final page = await _proposalService.getProposalsPage(
-        request: request,
-        filters: filters,
-        order: order,
-      );
-
-      _cache = _cache.copyWith(page: Optional(page));
-
-      _emitCachedProposalsPage();
-    } catch (error, stackTrace) {
-      _logger.severe('Failed loading page $request', error, stackTrace);
+    if (_proposalsRequestCompleter != null && !_proposalsRequestCompleter!.isCompleted) {
+      _proposalsRequestCompleter!.complete();
     }
+    _proposalsRequestCompleter = Completer();
+
+    await _proposalsPageSub?.cancel();
+    _proposalsPageSub = _proposalService
+        .watchProposalsBriefPageV2(request: request, order: order, filters: filters)
+        .map((page) => page.map(ProposalBrief.fromData))
+        .distinct()
+        .listen(_handleProposalsChange);
+
+    await _proposalsRequestCompleter?.future;
   }
 
   void init({
-    required bool onlyMyProposals,
-    required SignedDocumentRef? category,
-    required ProposalsFilterType type,
-    required ProposalsOrder order,
+    String? categoryId,
+    ProposalsPageTab? tab,
+    ProposalsOrder order = const Alphabetical(),
   }) {
     _resetCache();
     _rebuildOrder();
     unawaited(_loadCampaignCategories());
 
-    changeFilters(onlyMy: Optional(onlyMyProposals), category: Optional(category), type: type);
+    changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
     changeOrder(order);
   }
 
   /// Changes the favorite status of the proposal with [ref].
-  void onChangeFavoriteProposal(
+  Future<void> onChangeFavoriteProposal(
     DocumentRef ref, {
     required bool isFavorite,
-  }) {
-    final favoritesIds = List.of(state.favoritesIds);
+  }) async {
+    _updateFavoriteProposalLocally(ref, isFavorite);
 
-    if (isFavorite) {
-      favoritesIds.add(ref.id);
-    } else {
-      favoritesIds.removeWhere((element) => element == ref.id);
-    }
-
-    emit(state.copyWith(favoritesIds: favoritesIds));
-
-    if (!isFavorite && _cache.filters.type.isFavorite) {
-      final page = _cache.page;
-      if (page != null) {
-        final proposals = page.items.where((element) => element.proposal.selfRef != ref).toList();
-        final updatedPage = page.copyWithItems(proposals);
-        _cache = _cache.copyWith(page: Optional(updatedPage));
-        _emitCachedProposalsPage();
+    try {
+      if (isFavorite) {
+        await _proposalService.addFavoriteProposal(id: ref);
+      } else {
+        await _proposalService.removeFavoriteProposal(ref: ref);
       }
-    }
+    } catch (error, stack) {
+      _logger.severe('Updating proposal[$ref] favorite failed', error, stack);
 
-    unawaited(_updateFavoriteProposal(ref, isFavorite: isFavorite));
+      emitError(LocalizedException.create(error));
+    }
   }
 
   void updateSearchQuery(String query) {
@@ -207,49 +219,67 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     emit(state.copyWith(hasSearchQuery: !asOptional.isEmpty));
   }
 
-  void _emitCachedProposalsPage() {
-    final campaign = _cache.campaign;
-    final page = _cache.page;
-    final showComments = _showComments(campaign);
-
-    if (campaign == null || page == null) {
-      return;
-    }
-
-    final mappedPage = page.map(
-      // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
-      (proposal) => ProposalBrief.fromProposal(
-        proposal.proposal,
-        isFavorite: state.favoritesIds.contains(proposal.proposal.selfRef.id),
-        categoryName: campaign.categories
-            .firstWhere((category) => proposal.proposal.parameters.containsId(category.selfRef.id))
-            .formattedCategoryName,
-        showComments: showComments,
+  ProposalsFiltersV2 _buildProposalsCountFilters(ProposalsPageTab tab) {
+    return switch (tab) {
+      ProposalsPageTab.total => _cache.filters.copyWith(
+        status: const Optional.empty(),
+        isFavorite: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
       ),
-    );
-
-    final signal = PageReadyProposalsSignal(page: mappedPage);
-
-    emitSignal(signal);
+      ProposalsPageTab.drafts => _cache.filters.copyWith(
+        status: const Optional(ProposalStatusFilter.draft),
+        isFavorite: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
+      ),
+      ProposalsPageTab.finals => _cache.filters.copyWith(
+        status: const Optional(ProposalStatusFilter.aFinal),
+        isFavorite: const Optional.empty(),
+        originalAuthor: const Optional.empty(),
+      ),
+      ProposalsPageTab.favorites => _cache.filters.copyWith(
+        status: const Optional.empty(),
+        isFavorite: const Optional(true),
+        originalAuthor: const Optional.empty(),
+      ),
+      ProposalsPageTab.my => _cache.filters.copyWith(
+        status: const Optional.empty(),
+        isFavorite: const Optional.empty(),
+        originalAuthor: Optional(_cache.activeAccountId),
+      ),
+    };
   }
 
   void _handleActiveAccountIdChange(CatalystId? id) {
-    changeFilters(author: Optional(id), resetProposals: true);
+    _cache = _cache.copyWith(activeAccountId: Optional(id));
+    final isMyTab = _cache.tab == ProposalsPageTab.my;
+
+    changeFilters(resetProposals: isMyTab);
   }
 
-  void _handleFavoriteProposalsIds(List<String> ids) {
-    emit(state.copyWith(favoritesIds: ids));
-    _emitCachedProposalsPage();
+  void _handleProposalsChange(Page<ProposalBrief> page) {
+    _logger.finest(
+      'Got page[${page.page}] with proposals[${page.items.length}]. '
+      'Total[${page.total}]',
+    );
+
+    final requestCompleter = _proposalsRequestCompleter;
+    if (requestCompleter != null && !requestCompleter.isCompleted) {
+      requestCompleter.complete();
+    }
+
+    _cache = _cache.copyWith(page: Optional(page));
+
+    emitSignal(PageReadyProposalsSignal(page: page));
   }
 
-  void _handleProposalsCount(ProposalsCount count) {
-    _cache = _cache.copyWith(count: count);
+  void _handleProposalsCountChange(Map<ProposalsPageTab, int> data) {
+    _logger.finest('Proposals count changed: $data');
 
-    emit(state.copyWith(count: count));
+    emit(state.copyWith(count: Map.unmodifiable(data)));
   }
 
   Future<void> _loadCampaignCategories() async {
-    final campaign = await _campaignService.getActiveCampaign();
+    final campaign = await _campaign;
 
     _cache = _cache.copyWith(categories: Optional(campaign?.categories));
 
@@ -259,14 +289,14 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void _rebuildCategories() {
-    final selectedCategory = _cache.filters.category;
+    final selectedCategory = _cache.filters.categoryId;
     final categories = _cache.categories ?? const [];
 
     final items = categories.map((e) {
       return ProposalsCategorySelectorItem(
-        ref: e.selfRef,
+        ref: e.id,
         name: e.formattedCategoryName,
-        isSelected: e.selfRef.id == selectedCategory?.id,
+        isSelected: e.id.id == selectedCategory,
       );
     }).toList();
 
@@ -276,10 +306,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void _rebuildOrder() {
-    final filterType = _cache.filters.type;
+    final isNoStatusFilter = _cache.filters.status == null;
     final selectedOrder = _resolveEffectiveOrder();
 
-    final options = filterType == ProposalsFilterType.total
+    final options = isNoStatusFilter
         ? const [
             Alphabetical(),
             Budget(isAscending: false),
@@ -298,54 +328,71 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     emit(state.copyWith(order: order));
   }
 
+  void _rebuildProposalsCountSubs() {
+    final streams = ProposalsPageTab.values.map((tab) {
+      final filters = _buildProposalsCountFilters(tab);
+      return _proposalService
+          .watchProposalsCountV2(filters: filters)
+          .distinct()
+          .map((count) => MapEntry(tab, count));
+    });
+
+    unawaited(_proposalsCountSub?.cancel());
+    _proposalsCountSub = Rx.combineLatest(
+      streams,
+      Map<ProposalsPageTab, int>.fromEntries,
+    ).startWith(state.count).listen(_handleProposalsCountChange);
+  }
+
   void _resetCache() {
-    final activeAccount = _userService.user.activeAccount;
-    final filters = ProposalsFilters.forActiveCampaign(author: activeAccount?.catalystId);
-    _cache = ProposalsCubitCache(filters: filters);
+    final activeAccountId = _userService.user.activeAccount?.catalystId;
+    final filters = ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active());
+
+    _cache = ProposalsCubitCache(
+      filters: filters,
+      activeAccountId: activeAccountId,
+    );
   }
 
   ProposalsOrder _resolveEffectiveOrder() {
-    final filterType = _cache.filters.type;
-    final selectedOrder = _cache.selectedOrder;
+    final isTotalTab = _cache.tab == ProposalsPageTab.total;
+    final selectedOrder = _cache.order;
 
     // skip order for non total
-    if (filterType != ProposalsFilterType.total) {
+    if (!isTotalTab) {
       return const UpdateDate(isAscending: false);
     }
 
     return selectedOrder ?? const Alphabetical();
   }
 
-  bool _showComments(Campaign? campaign) {
-    if (campaign == null) return false;
+  void _updateFavoriteProposalLocally(DocumentRef ref, bool isFavorite) {
+    final count = Map.of(state.count)
+      ..update(
+        ProposalsPageTab.favorites,
+        (value) => value + (isFavorite ? 1 : -1),
+        ifAbsent: () => (isFavorite ? 1 : 0),
+      );
 
-    return !(_featureFlagsService.isEnabled(Features.voting) && campaign.isVotingStateActive);
-  }
+    emit(state.copyWith(count: Map.unmodifiable(count)));
 
-  Future<void> _updateFavoriteProposal(
-    DocumentRef ref, {
-    required bool isFavorite,
-  }) async {
-    try {
-      if (isFavorite) {
-        await _proposalService.addFavoriteProposal(ref: ref);
+    final page = _cache.page;
+    if (page != null) {
+      var items = List.of(page.items);
+      if (_cache.tab != ProposalsPageTab.favorites || isFavorite) {
+        items = items.map((e) => e.id == ref ? e.copyWith(isFavorite: isFavorite) : e).toList();
       } else {
-        await _proposalService.removeFavoriteProposal(ref: ref);
+        items = items.where((element) => element.id != ref).toList();
       }
-    } catch (error, stack) {
-      _logger.severe('Updating proposal[$ref] favorite failed', error, stack);
 
-      emitError(LocalizedException.create(error));
+      final diff = page.items.length - items.length;
+
+      final updatedPage = page.copyWith(
+        items: items,
+        total: page.total - diff,
+      );
+
+      _handleProposalsChange(updatedPage);
     }
-  }
-
-  void _watchProposalsCount({
-    required ProposalsCountFilters filters,
-  }) {
-    unawaited(_proposalsCountSub?.cancel());
-    _proposalsCountSub = _proposalService
-        .watchProposalsCount(filters: filters)
-        .distinct()
-        .listen(_handleProposalsCount);
   }
 }

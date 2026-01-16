@@ -11,7 +11,7 @@ final class DocumentDataMetadata extends Equatable {
   final DocumentType type;
 
   /// Reference to this document. Have to be exact.
-  final DocumentRef selfRef;
+  final DocumentRef id;
 
   /// Reference to another document. The purpose of the ref will vary depending
   /// on the document type.
@@ -43,7 +43,7 @@ final class DocumentDataMetadata extends Equatable {
   DocumentDataMetadata({
     required this.contentType,
     required this.type,
-    required this.selfRef,
+    required this.id,
     this.ref,
     this.template,
     this.reply,
@@ -52,15 +52,15 @@ final class DocumentDataMetadata extends Equatable {
     this.parameters = const DocumentParameters(),
     this.authors,
   }) : assert(
-         selfRef.isExact,
-         'selfRef have to be exact. Make sure version is not null',
+         id.isExact,
+         'id have to be exact. Make sure version is not null',
        );
 
   /// Creates a [DocumentDataMetadata] representing a [DocumentType.commentDocument].
   ///
   /// The [parameters] should be the ones assigned to the [proposalRef].
   factory DocumentDataMetadata.comment({
-    required SignedDocumentRef selfRef,
+    required SignedDocumentRef id,
     required SignedDocumentRef proposalRef,
     required SignedDocumentRef template,
     required DocumentParameters parameters,
@@ -70,7 +70,7 @@ final class DocumentDataMetadata extends Equatable {
     return DocumentDataMetadata(
       contentType: DocumentContentType.json,
       type: DocumentType.commentDocument,
-      selfRef: selfRef,
+      id: id,
       ref: proposalRef,
       template: template,
       reply: reply,
@@ -79,11 +79,26 @@ final class DocumentDataMetadata extends Equatable {
     );
   }
 
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.commentTemplate].
+  ///
+  /// The [parameters] should be the ones assigned to template's parent, most likely the category.
+  factory DocumentDataMetadata.commentTemplate({
+    required DocumentRef id,
+    required DocumentParameters parameters,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.commentTemplate,
+      contentType: DocumentContentType.schemaJson,
+      id: id,
+      parameters: parameters,
+    );
+  }
+
   /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalDocument].
   ///
   /// The [parameters] should be the ones assigned to the [template].
   factory DocumentDataMetadata.proposal({
-    required DocumentRef selfRef,
+    required DocumentRef id,
     required SignedDocumentRef template,
     required DocumentParameters parameters,
     required List<CatalystId> authors,
@@ -92,7 +107,7 @@ final class DocumentDataMetadata extends Equatable {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
       contentType: DocumentContentType.json,
-      selfRef: selfRef,
+      id: id,
       template: template,
       parameters: parameters,
       authors: authors,
@@ -104,14 +119,14 @@ final class DocumentDataMetadata extends Equatable {
   ///
   /// The [parameters] should be the ones assigned to the [proposalRef].
   factory DocumentDataMetadata.proposalAction({
-    required SignedDocumentRef selfRef,
+    required SignedDocumentRef id,
     required SignedDocumentRef proposalRef,
     required DocumentParameters parameters,
   }) {
     return DocumentDataMetadata(
       type: DocumentType.proposalActionDocument,
       contentType: DocumentContentType.json,
-      selfRef: selfRef,
+      id: id,
       ref: proposalRef,
       parameters: parameters,
     );
@@ -121,24 +136,22 @@ final class DocumentDataMetadata extends Equatable {
   ///
   /// The [parameters] should be the ones assigned to template's parent, most likely the category.
   factory DocumentDataMetadata.proposalTemplate({
-    required DocumentRef selfRef,
+    required DocumentRef id,
     required DocumentParameters parameters,
   }) {
     return DocumentDataMetadata(
       type: DocumentType.proposalTemplate,
       contentType: DocumentContentType.schemaJson,
-      selfRef: selfRef,
+      id: id,
       parameters: parameters,
     );
   }
-
-  String get id => selfRef.id;
 
   @override
   List<Object?> get props => [
     contentType,
     type,
-    selfRef,
+    id,
     ref,
     template,
     reply,
@@ -151,12 +164,10 @@ final class DocumentDataMetadata extends Equatable {
   /// Who signed this document version. Can change from version to version.
   List<CatalystId>? get signers => authors;
 
-  String get version => selfRef.version!;
-
   DocumentDataMetadata copyWith({
     DocumentContentType? contentType,
     DocumentType? type,
-    DocumentRef? selfRef,
+    DocumentRef? id,
     Optional<DocumentRef>? ref,
     Optional<SignedDocumentRef>? template,
     Optional<SignedDocumentRef>? reply,
@@ -168,7 +179,7 @@ final class DocumentDataMetadata extends Equatable {
     return DocumentDataMetadata(
       contentType: contentType ?? this.contentType,
       type: type ?? this.type,
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       ref: ref.dataOr(this.ref),
       template: template.dataOr(this.template),
       reply: reply.dataOr(this.reply),

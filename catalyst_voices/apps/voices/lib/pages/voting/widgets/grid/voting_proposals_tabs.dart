@@ -3,7 +3,6 @@ import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -12,29 +11,6 @@ class VotingProposalsTabs extends StatelessWidget {
 
   const VotingProposalsTabs({
     super.key,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, ProposalsCount>(
-      selector: (state) => state.count,
-      builder: (context, state) {
-        return _VotingProposalsTabs(
-          data: state,
-          controller: controller,
-        );
-      },
-    );
-  }
-}
-
-class _VotingProposalsTabs extends StatelessWidget {
-  final ProposalsCount data;
-  final VoicesTabController<VotingPageTab> controller;
-
-  const _VotingProposalsTabs({
-    required this.data,
     required this.controller,
   });
 
@@ -51,9 +27,26 @@ class _VotingProposalsTabs extends StatelessWidget {
           VoicesTab(
             data: tab,
             key: tab.tabKey(),
-            child: VoicesTabText(tab.noOf(context, count: data.ofType(tab.filter))),
+            child: _TabText(key: ValueKey('${tab.name}Text'), tab: tab),
           ),
       ],
+    );
+  }
+}
+
+class _TabText extends StatelessWidget {
+  final VotingPageTab tab;
+
+  const _TabText({
+    required super.key,
+    required this.tab,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<VotingCubit, VotingState, int>(
+      selector: (state) => state.count[tab] ?? 0,
+      builder: (context, state) => VoicesTabText(tab.noOf(context, count: state)),
     );
   }
 }

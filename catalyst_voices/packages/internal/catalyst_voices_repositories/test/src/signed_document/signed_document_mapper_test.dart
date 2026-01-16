@@ -23,7 +23,7 @@ void main() {
     /* cSpell:enable */
 
     // Common Objects
-    const signedDocRef = SignedDocumentRef(id: uuidV7Str, version: uuidV7Str);
+    const signedDocRef = SignedDocumentRef(id: uuidV7Str, ver: uuidV7Str);
 
     group('buildCoseProtectedHeaders', () {
       test('maps all fields correctly when fully populated', () {
@@ -31,7 +31,7 @@ void main() {
         final metadata = DocumentDataMetadata(
           contentType: DocumentContentType.json,
           type: DocumentType.proposalDocument,
-          selfRef: signedDocRef,
+          id: signedDocRef,
           ref: signedDocRef,
           template: signedDocRef,
           reply: signedDocRef,
@@ -73,7 +73,7 @@ void main() {
         final metadata = DocumentDataMetadata(
           contentType: DocumentContentType.unknown,
           type: DocumentType.proposalDocument,
-          selfRef: signedDocRef,
+          id: signedDocRef,
           // All optional fields null
           ref: null,
           template: null,
@@ -132,8 +132,8 @@ void main() {
 
         // Assert
         expect(metadata.contentType, DocumentContentType.json);
-        expect(metadata.id, signedDocRef.id);
-        expect(metadata.version, signedDocRef.version);
+        expect(metadata.id.id, signedDocRef.id);
+        expect(metadata.id.ver, signedDocRef.ver);
 
         // Verify single item extraction from lists
         expect(metadata.ref?.id, signedDocRef.id);

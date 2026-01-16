@@ -9,14 +9,14 @@ import 'package:equatable/equatable.dart';
 ///
 /// Data for this view model is extracted from the [Campaign] model.
 final class CampaignInfo extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final CampaignStage stage;
   final DateTime startDate;
   final DateTime endDate;
   final String description;
 
   const CampaignInfo({
-    required this.selfRef,
+    required this.id,
     required this.stage,
     required this.startDate,
     required this.endDate,
@@ -27,7 +27,7 @@ final class CampaignInfo extends Equatable {
   factory CampaignInfo.fromCampaign(Campaign campaign) {
     final stage = CampaignStage.fromCampaign(campaign);
     return CampaignInfo(
-      selfRef: campaign.selfRef,
+      id: campaign.id,
       stage: stage,
       startDate: campaign.timeline.phases.first.timeline.from ?? DateTime.now(),
       endDate: campaign.timeline.phases.last.timeline.to ?? DateTime.now(),
@@ -41,7 +41,7 @@ final class CampaignInfo extends Equatable {
     CampaignStage campaignStage,
   ) {
     return CampaignInfo(
-      selfRef: campaign.selfRef,
+      id: campaign.id,
       stage: campaignStage,
       startDate: _mockCampaignStartDate(campaignStage),
       endDate: _mockCampaignEndDate(campaignStage),
@@ -50,7 +50,7 @@ final class CampaignInfo extends Equatable {
   }
 
   @override
-  List<Object?> get props => [selfRef, stage, startDate, endDate, description];
+  List<Object?> get props => [id, stage, startDate, endDate, description];
 
   static DateTime _mockCampaignEndDate(CampaignStage stage) {
     return switch (stage) {

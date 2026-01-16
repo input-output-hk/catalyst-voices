@@ -5,7 +5,7 @@ final class Proposal extends CoreProposal {
   final int versionNumber;
 
   factory Proposal({
-    required DocumentRef selfRef,
+    required DocumentRef id,
     required DocumentParameters parameters,
     required String title,
     required String description,
@@ -16,10 +16,10 @@ final class Proposal extends CoreProposal {
     required String? author,
     required int commentsCount,
   }) {
-    final versionNumber = versionsIds.versionNumber(selfRef.version!);
+    final versionNumber = versionsIds.versionNumber(id.ver!);
 
     return Proposal._(
-      selfRef: selfRef,
+      id: id,
       parameters: parameters,
       title: title,
       fundsRequested: fundsRequested,
@@ -36,7 +36,7 @@ final class Proposal extends CoreProposal {
     final document = data.document;
 
     return Proposal(
-      selfRef: document.metadata.selfRef,
+      id: document.metadata.id,
       parameters: document.metadata.parameters,
       title: document.title ?? '',
       description: document.description ?? '',
@@ -50,7 +50,7 @@ final class Proposal extends CoreProposal {
   }
 
   const Proposal._({
-    required super.selfRef,
+    required super.id,
     required super.parameters,
     required super.title,
     required super.description,

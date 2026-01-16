@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/notification/catalyst_messenger.dart';
+import 'package:catalyst_voices/notification/specialized/dialog/keychain_deleted_dialog_notification.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/account/pending_email_change_dialog.dart';
 import 'package:catalyst_voices/pages/account/verification_email_send_dialog.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
@@ -16,10 +17,9 @@ import 'package:catalyst_voices/pages/account/widgets/account_username_tile.dart
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
-import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/root_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -115,30 +115,9 @@ class _AccountPageState extends State<AccountPage>
     }
 
     if (mounted) {
-      unawaited(KeychainDeletedDialog.show(context));
-
-      // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
-      final phaseType = context.read<CampaignPhaseAwareCubit>().state.activeCampaignPhaseType;
-
-      switch (phaseType) {
-        case CampaignPhaseType.communityReview:
-        case CampaignPhaseType.communityVoting:
-          final isVotingEnabled = context.read<FeatureFlagsCubit>().state.isEnabled(
-            Features.voting,
-          );
-          if (isVotingEnabled) {
-            const VotingRoute.keychainDeleted().go(context);
-          } else {
-            const DiscoveryRoute.keychainDeleted().go(context);
-          }
-        case null:
-        case CampaignPhaseType.proposalSubmission:
-        case CampaignPhaseType.votingRegistration:
-        case CampaignPhaseType.reviewRegistration:
-        case CampaignPhaseType.votingResults:
-        case CampaignPhaseType.projectOnboarding:
-          const DiscoveryRoute.keychainDeleted().go(context);
-      }
+      final notification = KeychainDeletedDialogNotification();
+      CatalystMessenger.of(context).add(notification);
+      const RootRoute().go(context);
     }
   }
 

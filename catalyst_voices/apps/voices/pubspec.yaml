@@ -43,7 +43,9 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_dropzone: ^4.2.1
-  flutter_inappwebview: ^6.1.5
+  # TODO(LynxLynxx): Update to stable version when available.
+  # For more context, see https://github.com/input-output-hk/catalyst-voices/pull/3999
+  flutter_inappwebview: ^6.2.0-beta.2
   flutter_localized_locales: ^2.0.5
   flutter_markdown: ^0.7.7+1
   flutter_native_splash: ^2.4.6
@@ -89,6 +91,8 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.10.3
   catalyst_analysis: ^3.0.0
+  catalyst_voices_dev:
+    path: ../../packages/internal/catalyst_voices_dev
   flutter_driver:
     sdk: flutter
   flutter_test:

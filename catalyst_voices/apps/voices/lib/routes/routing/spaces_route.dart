@@ -43,15 +43,11 @@ final class CategoryDetailRoute extends GoRouteData
 final class DiscoveryRoute extends GoRouteData with $DiscoveryRoute, FadePageTransitionMixin {
   static const name = 'discovery';
 
-  final bool? $extra;
-
-  const DiscoveryRoute({this.$extra});
-
-  const DiscoveryRoute.keychainDeleted() : this($extra: true);
+  const DiscoveryRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return SentryDisplayWidget(child: DiscoveryPage(keychainDeleted: $extra ?? false));
+    return const SentryDisplayWidget(child: DiscoveryPage());
   }
 }
 
@@ -90,13 +86,10 @@ final class ProposalsRoute extends GoRouteData with $ProposalsRoute, FadePageTra
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final categoryId = this.categoryId;
-    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
-
     final tab = ProposalsPageTab.values.asNameMap()[this.tab];
 
     return ProposalsPage(
-      categoryRef: categoryRef,
+      categoryId: categoryId,
       tab: tab,
     );
   }
@@ -124,7 +117,7 @@ final class ProposalsRoute extends GoRouteData with $ProposalsRoute, FadePageTra
     ),
     TypedGoRoute<VotingRoute>(
       path: '/voting',
-      name: 'voting',
+      name: VotingRoute.name,
     ),
     TypedGoRoute<FundedProjectsRoute>(
       path: '/funded_projects',
@@ -188,24 +181,15 @@ final class TreasuryRoute extends GoRouteData
 
 final class VotingRoute extends GoRouteData
     with $VotingRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
+  static const name = 'voting';
+
   final String? categoryId;
   final String? tab;
-  final bool? $extra;
 
   const VotingRoute({
     this.categoryId,
     this.tab,
-    this.$extra,
   });
-
-  const VotingRoute.keychainDeleted({
-    String? categoryId,
-    String? tab,
-  }) : this(
-         categoryId: categoryId,
-         tab: tab,
-         $extra: true,
-       );
 
   @override
   List<RouteGuard> get routeGuards => [const VotingFeatureFlagGuard()];
@@ -213,14 +197,12 @@ final class VotingRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final categoryId = this.categoryId;
-    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
     final tab = VotingPageTab.values.asNameMap()[this.tab];
 
     return VotingPage(
-      categoryRef: categoryRef,
+      categoryId: categoryId,
       tab: tab,
-      keychainDeleted: $extra ?? false,
     );
   }
 }

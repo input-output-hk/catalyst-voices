@@ -71,6 +71,7 @@ COCOAPODS
 codegen
 codepoints
 COEP
+Collab
 collabs
 commitlog
 concatcp
@@ -127,6 +128,7 @@ emiride
 emurgo
 encryptor
 endfunction
+endtemplate
 Eternl
 EUTXO
 eventdb
@@ -179,6 +181,7 @@ iohk
 IPFS
 iphoneos
 iphonesimulator
+isready
 IPLD
 jaegertracing
 jdbc
@@ -287,6 +290,7 @@ postcss
 Pozhylenkov
 Precache
 Precertificate
+precompressed
 preprod
 proguard
 projectcatalyst
@@ -360,6 +364,7 @@ Subkey
 submiting
 subosito
 subprojects
+subqueries
 svgs
 syncable
 SYSROOT
@@ -406,6 +411,7 @@ UTXO
 Utxos
 uuidv
 varint
+vers
 Vespr
 vite
 vitss

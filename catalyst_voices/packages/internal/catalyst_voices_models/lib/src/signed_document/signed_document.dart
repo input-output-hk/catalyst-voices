@@ -1,10 +1,4 @@
-// ignore_for_file: one_member_abstracts
-
-import 'dart:typed_data';
-
-import 'package:catalyst_voices_models/src/document/data/document_data_metadata.dart';
-import 'package:catalyst_voices_models/src/signed_document/signed_document_payload.dart';
-import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Represents an abstract document that is protected
 /// with cryptographic signature.
@@ -25,7 +19,7 @@ abstract interface class SignedDocument {
   List<CatalystId> get signers;
 
   /// Converts the document into binary representation.
-  Uint8List toBytes();
+  DocumentArtifact toArtifact();
 
   /// Verifies if the [payload] has been signed by a private key
   /// that belongs to the given [catalystId].

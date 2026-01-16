@@ -21,7 +21,6 @@ class CurrentCampaignInfoViewModel extends Equatable {
   factory CurrentCampaignInfoViewModel.dummy() {
     return CurrentCampaignInfoViewModel(
       title: 'Catalyst Fund14',
-      // Description is used in dialog detail campaign
       allFunds: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
           currency: Currencies.ada,
@@ -34,15 +33,6 @@ class CurrentCampaignInfoViewModel extends Equatable {
           majorUnits: BigInt.from(4020000),
         ),
       ),
-    );
-  }
-
-  factory CurrentCampaignInfoViewModel.fromModel(Campaign model) {
-    return CurrentCampaignInfoViewModel(
-      title: model.name,
-      allFunds: model.allFunds,
-      totalAsk: model.totalAsk,
-      timeline: model.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList(),
     );
   }
 

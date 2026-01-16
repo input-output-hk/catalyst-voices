@@ -1,48 +1,55 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalsCubitCache extends Equatable {
   final Campaign? campaign;
-  final Page<ProposalWithContext>? page;
-  final ProposalsFilters filters;
-  final ProposalsOrder? selectedOrder;
+  final CatalystId? activeAccountId;
+  final ProposalsFiltersV2 filters;
+  final ProposalsPageTab? tab;
+  final ProposalsOrder? order;
   final List<CampaignCategory>? categories;
-  final ProposalsCount count;
+  final Page<ProposalBrief>? page;
 
   const ProposalsCubitCache({
     this.campaign,
-    this.page,
-    this.filters = const ProposalsFilters(),
-    this.selectedOrder,
+    this.activeAccountId,
+    this.tab,
+    this.filters = const ProposalsFiltersV2(),
+    this.order,
     this.categories,
-    this.count = const ProposalsCount(),
+    this.page,
   });
 
   @override
   List<Object?> get props => [
     campaign,
-    page,
+    activeAccountId,
+    tab,
     filters,
-    selectedOrder,
+    order,
     categories,
-    count,
+    page,
   ];
 
   ProposalsCubitCache copyWith({
     Optional<Campaign>? campaign,
-    Optional<Page<ProposalWithContext>>? page,
-    ProposalsFilters? filters,
-    Optional<ProposalsOrder>? selectedOrder,
+    Optional<CatalystId>? activeAccountId,
+    Optional<ProposalsPageTab>? tab,
+    ProposalsFiltersV2? filters,
+    Optional<ProposalsOrder>? order,
     Optional<List<CampaignCategory>>? categories,
-    ProposalsCount? count,
+    Map<ProposalsPageTab, ProposalsFiltersV2>? proposalsCountFilters,
+    Optional<Page<ProposalBrief>>? page,
   }) {
     return ProposalsCubitCache(
       campaign: campaign.dataOr(this.campaign),
-      page: page.dataOr(this.page),
+      activeAccountId: activeAccountId.dataOr(this.activeAccountId),
+      tab: tab.dataOr(this.tab),
       filters: filters ?? this.filters,
-      selectedOrder: selectedOrder.dataOr(this.selectedOrder),
+      order: order.dataOr(this.order),
       categories: categories.dataOr(this.categories),
-      count: count ?? this.count,
+      page: page.dataOr(this.page),
     );
   }
 }

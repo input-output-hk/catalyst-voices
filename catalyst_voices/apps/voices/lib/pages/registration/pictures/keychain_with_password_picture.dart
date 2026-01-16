@@ -13,7 +13,7 @@ class KeychainWithPasswordPicture extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            VoicesAssets.images.keychain.buildIcon(allowSize: false),
+            VoicesAssets.images.svg.keychain.buildIcon(allowSize: false),
             Align(
               alignment: const Alignment(0.52, -0.4),
               child: VoicesAssets.icons.lockClosed.buildIcon(),

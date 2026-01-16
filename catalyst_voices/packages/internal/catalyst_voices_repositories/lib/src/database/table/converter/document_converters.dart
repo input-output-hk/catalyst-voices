@@ -1,11 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/catalyst_id_list_converter.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/document_parameters_converter.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/string_list_converter.dart';
 import 'package:drift/drift.dart';
 
 typedef DocumentContentJsonBConverter = JsonTypeConverter2<DocumentDataContent, Uint8List, Object?>;
-
-typedef DocumentMetadataJsonBConverter =
-    JsonTypeConverter2<DocumentDataMetadata, Uint8List, Object?>;
 
 abstract final class DocumentConverters {
   /// Converts [DocumentType] to String for text column.
@@ -18,12 +17,14 @@ abstract final class DocumentConverters {
     toJson: (content) => content.data,
   );
 
-  /// Converts [DocumentDataMetadata] into json for bloc column.
-  /// Required for jsonb queries.
-  static final DocumentMetadataJsonBConverter metadata = TypeConverter.jsonb(
-    fromJson: (json) => DocumentDataMetadataDto.fromJson(json! as Map<String, Object?>).toModel(),
-    toJson: (metadata) => DocumentDataMetadataDto.fromModel(metadata).toJson(),
-  );
+  /// Converts list of [CatalystId] to String for text column.
+  static const catId = CatalystIdListConverter();
+
+  /// Converts [DocumentParameters] to String for text column.
+  static const parameters = DocumentParametersConverter();
+
+  /// Converts list of [String] to single [String] for text column.
+  static const strings = StringListConverter();
 }
 
 final class _DocumentTypeConverter extends TypeConverter<DocumentType, String> {
