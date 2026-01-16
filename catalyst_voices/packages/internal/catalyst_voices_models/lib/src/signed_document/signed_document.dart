@@ -15,6 +15,11 @@ abstract interface class SignedDocument {
   /// A getter that returns a parsed document payload.
   SignedDocumentPayload get payload;
 
+  /// A binary representation of the [payload].
+  ///
+  /// Might be compressed and transformed in other ways.
+  SignedDocumentRawPayload get rawPayload;
+
   /// Returns a list of [CatalystId] that signed the document.
   List<CatalystId> get signers;
 
