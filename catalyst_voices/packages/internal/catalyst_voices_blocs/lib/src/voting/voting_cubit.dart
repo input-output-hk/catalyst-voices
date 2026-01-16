@@ -59,8 +59,8 @@ final class VotingCubit extends Cubit<VotingState>
       latestUpdate: const Optional.empty(),
       campaign: Optional(
         campaign != null
-            ? ProposalsCampaignFilters.from(campaign)
-            : const ProposalsCampaignFilters(categoriesIds: {}),
+            ? CampaignFilters.from(campaign)
+            : const CampaignFilters(categoriesIds: {}),
       ),
       voteBy: _cache.tab == VotingPageTab.votedOn
           ? Optional(_cache.activeAccountId)
@@ -391,7 +391,7 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
-    final filters = ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active());
+    final filters = ProposalsFiltersV2(campaign: CampaignFilters.active());
 
     _cache = VotingCubitCache(
       filters: filters,
