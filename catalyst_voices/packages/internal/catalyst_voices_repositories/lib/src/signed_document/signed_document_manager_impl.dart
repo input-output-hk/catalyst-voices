@@ -32,11 +32,11 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       debounce: true,
     );
 
-    final rawPayload = await _decompressPayload(coseSign);
+    final payloadBytes = await _decompressPayload(coseSign);
 
     return _CoseSignedDocument.fromCose(
       coseSign,
-      rawPayload: rawPayload,
+      payloadBytes: payloadBytes,
     );
   }
 
@@ -65,7 +65,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
 
       return _CoseSignedDocument.fromCose(
         coseSign,
-        rawPayload: payload.toBytes(),
+        payloadBytes: payload.toBytes(),
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
@@ -93,11 +93,11 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
         debounce: true,
       );
 
-      final rawPayload = await _decompressPayload(coseSign);
+      final payloadBytes = await _decompressPayload(coseSign);
 
       return _CoseSignedDocument.fromCose(
         coseSign,
-        rawPayload: rawPayload,
+        payloadBytes: payloadBytes,
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
@@ -194,7 +194,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
 
   factory _CoseSignedDocument.fromCose(
     CoseSign coseSign, {
-    required SignedDocumentPayloadBytes rawPayload,
+    required SignedDocumentPayloadBytes payloadBytes,
   }) {
     final signers = coseSign.signatures
         .map((e) => e.protectedHeaders.kid)
@@ -208,7 +208,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
       signers: signers,
     );
     final payload = SignedDocumentPayload.fromBytes(
-      rawPayload,
+      payloadBytes,
       contentType: metadata.contentType,
     );
 
