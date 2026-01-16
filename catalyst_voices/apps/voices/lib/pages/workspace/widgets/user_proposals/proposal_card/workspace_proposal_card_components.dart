@@ -4,13 +4,13 @@ class _BodyHeader extends StatelessWidget {
   final String title;
   final DateTime lastUpdate;
   final UserProposalOwnership ownership;
-  final List<Collaborator> collaborators;
+  final List<Contributor> contributors;
 
   const _BodyHeader({
     required this.title,
     required this.lastUpdate,
     required this.ownership,
-    required this.collaborators,
+    required this.contributors,
   });
 
   @override
@@ -22,7 +22,10 @@ class _BodyHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       spacing: 20,
       children: [
-        _LeadingIcon(ownership: ownership, collaborators: collaborators),
+        _LeadingIcon(
+          ownership: ownership,
+          contributors: contributors,
+        ),
         Column(
           spacing: 2,
           mainAxisSize: MainAxisSize.min,
@@ -98,22 +101,22 @@ class _CampaignData extends StatelessWidget {
 
 class _LeadingIcon extends StatelessWidget {
   final UserProposalOwnership ownership;
-  final List<Collaborator> collaborators;
+  final List<Contributor> contributors;
 
   const _LeadingIcon({
     required this.ownership,
-    required this.collaborators,
+    required this.contributors,
   });
 
   bool get _tooltipVisibility =>
-      collaborators.isNotEmpty && ownership is CollaboratorProposalOwnership;
+      contributors.isNotEmpty && ownership is CollaboratorProposalOwnership;
 
   @override
   Widget build(BuildContext context) {
     return TooltipVisibility(
       visible: _tooltipVisibility,
       child: Tooltip(
-        richMessage: WidgetSpan(child: _TooltipOverlay(collaborators)),
+        richMessage: WidgetSpan(child: _TooltipOverlay(contributors)),
         decoration: const BoxDecoration(),
         constraints: const BoxConstraints(maxWidth: 350),
         enableTapToDismiss: false,
@@ -134,9 +137,9 @@ class _LeadingIcon extends StatelessWidget {
 }
 
 class _TooltipOverlay extends StatelessWidget {
-  final List<Collaborator> collaborators;
+  final List<Contributor> contributors;
 
-  const _TooltipOverlay(this.collaborators);
+  const _TooltipOverlay(this.contributors);
 
   @override
   Widget build(BuildContext context) {
@@ -146,16 +149,16 @@ class _TooltipOverlay extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: collaborators.map(_TooltipOverlayTile.new).toList(),
+        children: contributors.map(_TooltipOverlayTile.new).toList(),
       ),
     );
   }
 }
 
 class _TooltipOverlayTile extends StatelessWidget {
-  final Collaborator collaborator;
+  final Contributor contributor;
 
-  const _TooltipOverlayTile(this.collaborator);
+  const _TooltipOverlayTile(this.contributor);
 
   @override
   Widget build(BuildContext context) {
@@ -175,10 +178,10 @@ class _TooltipOverlayTile extends StatelessWidget {
       child: Row(
         spacing: 12,
         children: [
-          collaborator.status
+          contributor.status
               .icon(context)
               .buildIcon(
-                color: collaborator.status.statusColor(context),
+                color: contributor.status.statusColor(context),
                 size: 24,
               ),
           Column(
@@ -187,7 +190,7 @@ class _TooltipOverlayTile extends StatelessWidget {
             children: [
               AffixDecorator(
                 suffix: CatalystIdText(
-                  collaborator.id,
+                  contributor.id,
                   isCompact: true,
                   showCopy: false,
                   copyEnabled: false,
@@ -195,13 +198,13 @@ class _TooltipOverlayTile extends StatelessWidget {
                   style: idStyle,
                 ),
                 child: UsernameText(
-                  collaborator.id.username,
+                  contributor.id.username,
                   style: usernameStyle,
                   maxLines: 1,
                 ),
               ),
               Text(
-                collaborator.status.labelText(context),
+                contributor.status.labelText(context),
                 style: labelStatusStyle,
               ),
             ],
