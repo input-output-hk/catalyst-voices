@@ -20,6 +20,7 @@ export 'my_actions/my_actions.dart';
 export 'proposal/proposal.dart';
 export 'proposal_builder/new_proposal/new_proposal.dart';
 export 'proposal_builder/proposal_builder.dart';
+export 'proposal_viewer/proposal_viewer.dart';
 export 'proposals/proposals.dart';
 export 'registration/registration.dart';
 export 'session/session.dart';

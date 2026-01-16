@@ -171,6 +171,15 @@ final class Dependencies extends DependencyProvider {
           get<FeatureFlagsService>(),
         );
       })
+      ..registerFactory<ProposalViewerCubit>(() {
+        return ProposalViewerCubit(
+          const ProposalViewerState(),
+          get<ProposalService>(),
+          get<UserService>(),
+          get<DocumentMapper>(),
+          get<FeatureFlagsService>(),
+        );
+      })
       ..registerFactory<NewProposalCubit>(() {
         return NewProposalCubit(
           get<CampaignService>(),

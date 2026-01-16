@@ -60,6 +60,9 @@ class _AppState extends State<App> {
       BlocProvider<ProposalCubit>(
         create: (_) => Dependencies.instance.get<ProposalCubit>(),
       ),
+      BlocProvider<ProposalViewerCubit>(
+        create: (_) => Dependencies.instance.get<ProposalViewerCubit>(),
+      ),
       BlocProvider<NewProposalCubit>(
         create: (_) => Dependencies.instance.get<NewProposalCubit>(),
       ),

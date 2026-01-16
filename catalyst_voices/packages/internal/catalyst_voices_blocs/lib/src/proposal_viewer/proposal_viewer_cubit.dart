@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/document_viewer/mixins/document_viewer_collaborator_mixin.dart';
-import 'package:catalyst_voices_blocs/src/proposal_viewer/proposal_viewer_cache.dart';
-import 'package:catalyst_voices_blocs/src/proposal_viewer/proposal_viewer_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
