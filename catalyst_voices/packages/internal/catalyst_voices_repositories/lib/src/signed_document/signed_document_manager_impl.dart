@@ -84,6 +84,9 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
         'cose_sign_doc',
         () {
           return CoseSign.sign(
+            // TODO(dt-iohk): the payload might be compressed or not however
+            // buildCoseProtectedHeaders() always adds content encoding params.
+            // Make sure the content encoding is set conditionally based on the payload.
             protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
             unprotectedHeaders: const CoseHeaders.unprotected(),
             payload: CosePayload(payload.bytes),
