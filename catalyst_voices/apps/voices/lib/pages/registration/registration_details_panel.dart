@@ -5,6 +5,8 @@ import 'package:catalyst_voices/pages/registration/create_keychain/create_keycha
 import 'package:catalyst_voices/pages/registration/get_started/get_started_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/recover_method_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/recover_seed_phrase_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/wallet_drep_link_completed_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/wallet_drep_link_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/wallet_link_panel.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -29,7 +31,9 @@ class RegistrationDetailsPanel extends StatelessWidget {
             completedSteps: completedSteps,
           ),
           WalletLinkStep(:final stage) => WalletLinkPanel(stage: stage),
+          WalletDrepLinkStep(:final stage) => WalletDrepLinkPanel(stage: stage),
           AccountCompletedStep() => const AccountCompletedPanel(),
+          WalletDrepLinkCompletedStep() => const WalletDrepLinkCompletedPanel(),
         };
       },
     );

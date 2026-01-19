@@ -34,6 +34,18 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
   CardanoWallet? get selectedWallet => _selectedWallet;
 
+  void clearSelectedWallet() {
+    _selectedWallet = null;
+
+    state.copyWith(
+      selectedWallet: const Optional.empty(),
+      walletConnection: const Optional.empty(),
+      walletSummary: const Optional.empty(),
+      isNetworkIdMatching: false,
+      hasEnoughBalance: false,
+    );
+  }
+
   @override
   Future<void> refreshWallets() async {
     try {
@@ -143,6 +155,20 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     ).toList();
 
     emit(state.copyWith(roles: updatedRoles, accountRoles: roles));
+  }
+
+  void setRoles(Set<AccountRole> roles) {
+    final registrationRoles = roles
+        .map(
+          (role) => RegistrationRole(
+            type: role,
+            isSelected: role.isDefault,
+            isLocked: role.isDefault,
+          ),
+        )
+        .toList();
+
+    emit(state.copyWith(roles: registrationRoles));
   }
 }
 

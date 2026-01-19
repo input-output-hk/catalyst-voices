@@ -100,7 +100,12 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   }
 
   void chooseOtherWallet() {
-    _goToStep(const WalletLinkStep(stage: WalletLinkStage.selectWallet));
+    if (state.walletDrepLinkAccountDetails?.isSuccess ?? false) {
+      _clearWalletDrepLinkData();
+      _goToStep(const WalletDrepLinkStep(stage: WalletDrepLinkStage.selectWallet));
+    } else {
+      _goToStep(const WalletLinkStep(stage: WalletLinkStage.selectWallet));
+    }
   }
 
   @override
@@ -144,6 +149,11 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     if (nextStep != null) {
       _goToStep(nextStep);
     }
+  }
+
+  void drepLinkChooseOtherWallet() {
+    _clearWalletDrepLinkData();
+    previousStep();
   }
 
   Future<void> finishRegistration() async {
@@ -213,6 +223,41 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     if (nextStep != null) {
       _goToStep(nextStep);
     }
+  }
+
+  void prepareDrepLinkAccountSummary() {
+    final id = _accountId!;
+    final user = _userService.user;
+    final account = user.getAccount(id);
+    final selectedWallet = _walletLinkCubit.state.selectedWallet!;
+    final walletAddress = selectedWallet.address;
+    final balance = selectedWallet.balance.toMoney();
+
+    if (account.address != walletAddress) {
+      emit(
+        state.copyWith(
+          walletDrepLinkAccountDetails: Optional(
+            Failure(const LocalizedRegistrationWalletMismatchException()),
+          ),
+        ),
+      );
+      return;
+    }
+
+    final accountDetails = AccountSummaryData(
+      username: account.username,
+      email: account.email,
+      roles: account.roles,
+      formattedAddress: WalletAddressFormatter.formatShort(walletAddress),
+      clipboardAddress: walletAddress,
+      balance: MoneyFormatter.formatCompactRounded(balance),
+    );
+
+    emit(
+      state.copyWith(
+        walletDrepLinkAccountDetails: Optional(Success(accountDetails)),
+      ),
+    );
   }
 
   Future<void> prepareRegistration() async {
@@ -376,6 +421,25 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _goToStep(const WalletLinkStep());
   }
 
+  Future<void> startLinkDrepKey({required CatalystId id}) async {
+    final user = _userService.user;
+    if (!user.hasAccount(id: id)) {
+      return;
+    }
+
+    final account = user.getAccount(id);
+
+    _accountId = id;
+    _keychain = account.keychain;
+
+    _walletLinkCubit
+      ..setRoles(AccountRole.values.toSet())
+      ..setAccountRoles(account.roles)
+      ..selectRoles({...account.roles, AccountRole.drep});
+
+    _goToStep(const WalletDrepLinkStep());
+  }
+
   AccountSubmitData _buildAccountSubmitData() {
     final keychain = _keychain!;
     final wallet = _walletLinkCubit.selectedWallet!;
@@ -400,6 +464,11 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       email: email.isNotEmpty ? email : null,
       roles: roles,
     );
+  }
+
+  void _clearWalletDrepLinkData() {
+    _walletLinkCubit.clearSelectedWallet();
+    emit(state.copyWith(walletDrepLinkAccountDetails: const Optional.empty()));
   }
 
   void _goToStep(RegistrationStep step) {
@@ -454,6 +523,21 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       return nextStage != null ? WalletLinkStep(stage: nextStage) : const AccountCompletedStep();
     }
 
+    RegistrationStep nextWalletDrepLinkStep() {
+      final step = state.step;
+
+      // if current step is not from create WalletDrepLink just return current one
+      if (step is! WalletDrepLinkStep) {
+        return const WalletDrepLinkStep();
+      }
+
+      // if there is no next step from wallet drep link go to account completed.
+      final nextStage = step.stage.next;
+      return nextStage != null
+          ? WalletDrepLinkStep(stage: nextStage)
+          : const WalletDrepLinkCompletedStep();
+    }
+
     RegistrationStep? nextRecoverWithSeedPhraseStep() {
       final step = state.step;
 
@@ -491,7 +575,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       CreateKeychainStep() => nextKeychainStep(),
       AccountCreateProgressStep(:final completedSteps) => nextRegistrationStep(completedSteps),
       WalletLinkStep() => nextWalletLinkStep(),
+      WalletDrepLinkStep() => nextWalletDrepLinkStep(),
       AccountCompletedStep() => null,
+      WalletDrepLinkCompletedStep() => null,
     };
   }
 
@@ -553,6 +639,15 @@ final class RegistrationCubit extends Cubit<RegistrationState>
             );
     }
 
+    /// Nested function. Responsible only for wallet drep link steps logic.
+    RegistrationStep? previousWalletDrepLinkStep() {
+      final step = state.step;
+
+      final previousStep = step is WalletDrepLinkStep ? step.stage.previous : null;
+
+      return previousStep != null ? WalletDrepLinkStep(stage: previousStep) : null;
+    }
+
     RegistrationStep previousRecoverWithSeedPhraseStep() {
       final step = state.step;
 
@@ -571,7 +666,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       CreateKeychainStep() => previousKeychainStep(),
       AccountCreateProgressStep() => null,
       WalletLinkStep() => previousWalletLinkStep(),
+      WalletDrepLinkStep() => previousWalletDrepLinkStep(),
       AccountCompletedStep() => null,
+      WalletDrepLinkCompletedStep() => null,
     };
   }
 

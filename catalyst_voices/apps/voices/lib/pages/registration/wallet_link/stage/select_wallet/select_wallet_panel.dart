@@ -14,8 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SelectWalletPanel extends StatefulWidget {
+  final bool isDrepLink;
+
   const SelectWalletPanel({
     super.key,
+    this.isDrepLink = false,
   });
 
   @override
@@ -75,6 +78,9 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     final success = await registration.walletLink.selectWallet(wallet);
     if (success) {
       registration.nextStep();
+      if (widget.isDrepLink) {
+        registration.prepareDrepLinkAccountSummary();
+      }
     }
   }
 

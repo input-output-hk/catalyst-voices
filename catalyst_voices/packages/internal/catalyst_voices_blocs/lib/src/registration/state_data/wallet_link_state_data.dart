@@ -48,6 +48,11 @@ final class WalletLinkStateData extends Equatable {
     return !selectedRoleTypes.containsAll(accountRoles);
   }
 
+  /// Returns the roles that are newly being added (selected but not yet owned).
+  List<RegistrationRole> get newlyAddedRoles {
+    return roles.where((role) => role.isSelected && !accountRoles.contains(role.type)).toList();
+  }
+
   @override
   List<Object?> get props => [
     wallets,
