@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_collaborators_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -9,14 +8,6 @@ final _logger = Logger('DocumentViewerCollaboratorsMixin');
 
 base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
     on DocumentViewerCubit<S> {
-  DocumentViewerCollaboratorsCache get _collaboratorsCache {
-    assert(
-      cache is DocumentViewerCollaboratorsCache,
-      'Cache must implement DocumentViewerCollaboratorsCache',
-    );
-    return cache as DocumentViewerCollaboratorsCache;
-  }
-
   ProposalService get _proposalService;
 
   @mustCallSuper

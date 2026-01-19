@@ -16,7 +16,7 @@ class ProposalShareButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<ProposalCubit, ProposalState, DocumentRef?>(
       selector: (state) {
-        return state.data.header.proposalRef;
+        return state.data.header.documentRef;
       },
       builder: (context, proposalRef) {
         return ShareButton(

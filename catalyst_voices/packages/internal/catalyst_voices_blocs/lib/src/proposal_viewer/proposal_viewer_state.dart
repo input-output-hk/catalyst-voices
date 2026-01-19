@@ -1,9 +1,10 @@
-import 'package:catalyst_voices_blocs/src/document_viewer/document_viewer_state.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
 final class ProposalViewerState extends DocumentViewerState {
   final CollaboratorProposalState collaborator;
+  final CommentsState comments;
 
   const ProposalViewerState({
     super.isLoading,
@@ -11,18 +12,20 @@ final class ProposalViewerState extends DocumentViewerState {
     super.error,
     super.readOnlyMode,
     this.collaborator = const NoneCollaboratorProposalState(),
+    this.comments = const CommentsState(),
   });
 
   @override
-  List<Object?> get props => [...super.props, collaborator];
+  List<Object?> get props => [...super.props, collaborator, comments];
 
   @override
   ProposalViewerState copyWith({
     bool? isLoading,
-    DocumentViewData? data,
+    DocumentViewerData? data,
     Optional<LocalizedException>? error,
     bool? readOnlyMode,
     CollaboratorProposalState? collaborator,
+    CommentsState? comments,
   }) {
     return ProposalViewerState(
       isLoading: isLoading ?? this.isLoading,
@@ -30,6 +33,7 @@ final class ProposalViewerState extends DocumentViewerState {
       error: error.dataOr(this.error),
       readOnlyMode: readOnlyMode ?? this.readOnlyMode,
       collaborator: collaborator ?? this.collaborator,
+      comments: comments ?? this.comments,
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:catalyst_voices_blocs/src/document_viewer/mixins/document_viewer
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 
 final _logger = Logger('ProposalViewerCubit');
 
@@ -132,7 +133,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   @override
   Future<void> retryLastRef() async {
-    final id = cache.id;
+    final id = _proposalCache.id;
 
     if (id != null) {
       return loadProposal(id);
@@ -156,7 +157,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   @override
   Future<void> updateIsFavorite({required bool value}) async {
-    final id = cache.id;
+    final id = _proposalCache.id;
     assert(id != null, 'Proposal id not found. Load doc first');
 
     // Update cache optimistically
@@ -181,30 +182,232 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     }
   }
 
-  /// Builds the proposal view data from cache.
-  DocumentViewData _buildProposalViewData() {
-    final proposalData = _proposalCache.proposalData;
-    final proposal = proposalData?.proposalOrDocument.asProposalDocument;
+  ProposalViewData _buildProposalViewData({
+    required bool hasAccountUsername,
+    required CatalystId? activeAccountId,
+    required ProposalDocument? proposal,
+    required CampaignCategory? category,
+    required List<CommentWithReplies> comments,
+    required DocumentSchema? commentSchema,
+    required ProposalCommentsSort commentsSort,
+    required List<ProposalDataCollaborator> collaborators,
+    required bool isFavorite,
+    required bool isVotingStage,
+    required bool showComments,
+    required bool readOnlyMode,
+    required Vote? lastCastedVote,
+    required Vote? draftVote,
+    required List<DocumentRef> proposalVersions,
+    required ProposalPublish? publish,
+  }) {
+    final proposalDocumentRef = proposal?.metadata.id;
 
-    if (proposal == null) {
-      return const DocumentViewData();
-    }
+    final versions = proposalVersions.reversed.mapIndexed((index, version) {
+      final ver = version.ver;
 
-    final proposalDocumentRef = proposal.metadata.id;
+      return DocumentVersion(
+        id: ver ?? '',
+        number: index + 1,
+        isCurrent: ver == proposalDocumentRef?.ver,
+        isLatest: index == proposalVersions.length - 1,
+      );
+    }).toList();
+    final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
+    final commentsCount = showComments
+        ? comments.fold(0, (prev, next) => prev + 1 + next.repliesCount)
+        : null;
 
-    // Build segments from proposal document
-    final segments = mapDocumentToSegments(proposal.document);
-
-    final header = DocumentViewHeader(
-      title: proposal.title ?? '',
-      authorName: proposal.authorName,
-      createdAt: proposalDocumentRef.ver?.tryDateTime,
+    final collaboratorsState = Collaborators.filterByActiveAccount(
+      activeAccountId: activeAccountId,
+      authorId: proposal?.authorId,
+      collaborators: collaborators.map(Collaborator.fromBriefData).toList(),
     );
 
-    return DocumentViewData(
+    final segments = proposal != null
+        ? _buildSegments(
+            proposal: proposal,
+            category: category,
+            version: currentVersion,
+            comments: comments,
+            commentSchema: commentSchema,
+            commentsSort: commentsSort,
+            collaborators: collaboratorsState,
+            hasActiveAccount: activeAccountId != null,
+            hasAccountUsername: hasAccountUsername,
+            commentsCount: commentsCount,
+            isVotingStage: isVotingStage,
+            showComments: showComments,
+            readOnlyMode: readOnlyMode,
+            lastCastedVote: lastCastedVote,
+            draftVote: draftVote,
+            publish: publish,
+          )
+        : const <Segment>[];
+
+    final header = ProposalViewHeader(
+      documentRef: proposalDocumentRef,
+      title: proposal?.title ?? '',
+      authorName: proposal?.authorName,
+      createdAt: proposalDocumentRef?.ver?.tryDateTime,
+      commentsCount: commentsCount,
+      versions: versions,
+      isFavorite: isFavorite,
+    );
+
+    return ProposalViewData(
+      isCurrentVersionLatest: currentVersion?.isLatest,
       header: header,
       segments: segments,
+      categoryText: category?.formattedCategoryName,
     );
+  }
+
+  ProposalViewData _buildProposalViewDataUsingCache() {
+    final proposalData = _proposalCache.proposalData;
+    final commentTemplate = _proposalCache.commentTemplate;
+    final comments = _proposalCache.comments ?? const [];
+    final commentsSort = state.comments.commentsSort;
+    final activeAccountId = _proposalCache.activeAccountId;
+
+    final proposalCampaign = proposalData?.proposalOrDocument.campaign;
+    final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
+    final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
+
+    final isVotingStage = _isVotingStage(proposalCampaign);
+
+    return _buildProposalViewData(
+      activeAccountId: activeAccountId,
+      hasAccountUsername: !(activeAccountId?.isAnonymous ?? true),
+      proposal: proposalData?.proposalOrDocument.asProposalDocument,
+      category: proposalData?.proposalOrDocument.category,
+      comments: comments,
+      commentSchema: commentTemplate?.schema,
+      commentsSort: commentsSort,
+      collaborators: proposalData?.collaborators ?? const [],
+      isFavorite: proposalData?.isFavorite ?? false,
+      readOnlyMode: isReadOnlyMode,
+      isVotingStage: isVotingStage,
+      showComments: !(proposalData?.publish.isPublished ?? false),
+      lastCastedVote: proposalData?.votes?.casted,
+      draftVote: proposalData?.votes?.draft,
+      proposalVersions: proposalData?.versions ?? [],
+      publish: proposalData?.publish,
+    );
+  }
+
+  ProposalVotingOverviewSegment? _buildProposalVotingOverviewSegment({
+    required bool isVotingStage,
+    required bool hasActiveAccount,
+    required bool isLatestVersion,
+    required bool isFinal,
+    required DocumentRef proposalRef,
+    required Vote? lastCastedVote,
+    required Vote? draftVote,
+  }) {
+    final appCheck = (isVotingStage && hasActiveAccount);
+    final proposalCheck = isLatestVersion && isFinal && proposalRef is SignedDocumentRef;
+    if (!appCheck || !proposalCheck) {
+      return null;
+    }
+
+    return ProposalVotingOverviewSegment.build(
+      data: ProposalViewVoting(
+        VoteButtonData.fromProposalVotes(
+          ProposalVotes(
+            proposalRef: proposalRef,
+            lastCasted: lastCastedVote,
+            currentDraft: draftVote,
+          ),
+        ),
+        proposalRef,
+      ),
+    );
+  }
+
+  List<Segment> _buildSegments({
+    required ProposalDocument proposal,
+    required CampaignCategory? category,
+    required DocumentVersion? version,
+    required List<CommentWithReplies> comments,
+    required DocumentSchema? commentSchema,
+    required ProposalCommentsSort commentsSort,
+    required Collaborators collaborators,
+    required bool hasActiveAccount,
+    required bool hasAccountUsername,
+    required int? commentsCount,
+    required bool isVotingStage,
+    required bool showComments,
+    required bool readOnlyMode,
+    required Vote? lastCastedVote,
+    required Vote? draftVote,
+    required ProposalPublish? publish,
+  }) {
+    final document = proposal.document;
+    final isDraftProposal = proposal.metadata.id is DraftRef;
+    final isLatestVersion = version?.isLatest ?? false;
+    final effectivePublish =
+        publish ?? (isDraftProposal ? ProposalPublish.localDraft : ProposalPublish.publishedDraft);
+
+    final votingSegment = _buildProposalVotingOverviewSegment(
+      isVotingStage: isVotingStage,
+      hasActiveAccount: hasActiveAccount,
+      isLatestVersion: isLatestVersion,
+      isFinal: effectivePublish.isPublished,
+      proposalRef: proposal.metadata.id,
+      lastCastedVote: lastCastedVote,
+      draftVote: draftVote,
+    );
+
+    final overviewSegment = ProposalOverviewSegment.build(
+      categoryName: category?.formattedCategoryName ?? '',
+      proposalTitle: proposal.title ?? '',
+      isVotingStage: (isVotingStage && isLatestVersion),
+      data: ProposalViewMetadata(
+        author: Profile(catalystId: proposal.authorId!),
+        collaborators: collaborators,
+        description: proposal.description,
+        status: effectivePublish,
+        createdAt: version?.id.tryDateTime ?? DateTimeExt.now(),
+        warningCreatedAt: version?.isLatest == false,
+        tag: proposal.tag,
+        commentsCount: commentsCount,
+        fundsRequested: proposal.fundsRequested,
+        projectDuration: proposal.duration,
+        milestoneCount: proposal.milestoneCount,
+      ),
+    );
+
+    final proposalSegments = mapDocumentToSegments(document);
+
+    final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
+    final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
+    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null && !readOnlyMode;
+
+    final commentsSegment = ProposalCommentsSegment(
+      id: const NodeId('comments'),
+      sort: commentsSort,
+      sections: [
+        ProposalViewCommentsSection(
+          id: const NodeId('comments.view'),
+          sort: commentsSort,
+          comments: commentsSort.applyTo(comments),
+          canReply: canReply,
+        ),
+        if (canComment)
+          ProposalAddCommentSection(
+            id: const NodeId('comments.add'),
+            schema: commentSchema,
+            showUsernameRequired: !hasAccountUsername,
+          ),
+      ],
+    );
+
+    return [
+      if (votingSegment != null) votingSegment,
+      overviewSegment,
+      ...proposalSegments,
+      if ((canComment || comments.isNotEmpty) && showComments) commentsSegment,
+    ];
   }
 
   /// Handles changes to proposal data.
@@ -233,7 +436,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     final proposalCampaign = _proposalCache.proposalData?.proposalOrDocument.campaign;
     final isVotingStage = _isVotingStage(proposalCampaign);
 
-    if (isVotingStage && cache.activeAccountId != null) {
+    if (isVotingStage && _proposalCache.activeAccountId != null) {
       emitSignal(const ViewingOlderVersionWhileVotingSignal());
     } else {
       emitSignal(const ViewingOlderVersionSignal());
@@ -251,12 +454,10 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     final proposalData = _proposalCache.proposalData;
 
     final proposalCampaign = proposalData?.proposalOrDocument.campaign;
-    final submissionPhase = proposalCampaign?.phaseStateTo(
-      CampaignPhaseType.proposalSubmission,
-    );
+    final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
     final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
 
-    final activeAccountId = cache.activeAccountId;
+    final activeAccountId = _proposalCache.activeAccountId;
     final collaborators = proposalData?.collaborators ?? const <ProposalDataCollaborator>[];
     final collaboratorsState = CollaboratorProposalState.fromCollaboratorData(
       collaborators: collaborators,
@@ -264,11 +465,11 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
       isFinal: proposalData?.publish.isPublished ?? false,
     );
 
-    final viewData = _buildProposalViewData();
+    final proposalViewData = _buildProposalViewDataUsingCache();
 
     emit(
       state.copyWith(
-        data: viewData,
+        data: proposalViewData,
         collaborator: collaboratorsState,
         readOnlyMode: isReadOnlyMode,
       ),
@@ -277,14 +478,14 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   /// Synchronizes proposal data from the service.
   Future<void> _syncProposal() async {
-    final id = cache.id;
+    final id = _proposalCache.id;
     if (id == null) {
       return;
     }
 
     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
     try {
-      final activeAccountId = cache.activeAccountId;
+      final activeAccountId = _proposalCache.activeAccountId;
       final proposal = await proposalService.getProposalV2(
         id: id,
         activeAccount: activeAccountId,
@@ -325,8 +526,8 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   /// Watches for proposal updates via stream.
   void _watchProposal() {
-    final id = cache.id;
-    final activeAccountId = cache.activeAccountId;
+    final id = _proposalCache.id;
+    final activeAccountId = _proposalCache.activeAccountId;
 
     final stream = id != null
         ? proposalService.watchProposal(id: id, activeAccount: activeAccountId)

@@ -8,17 +8,17 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalViewerError extends StatelessWidget {
-  const ProposalViewerError({super.key});
+class DocumentViewerError extends StatelessWidget {
+  const DocumentViewerError({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalViewerCubit, ProposalViewerState, ErrorVisibilityState>(
+    return BlocSelector<DocumentViewerCubit, DocumentViewerState, ErrorVisibilityState>(
       selector: (state) => (show: state.showError, data: state.error),
       builder: (context, state) {
         return Offstage(
           offstage: !state.show,
-          child: _ProposalViewerError(exception: state.data),
+          child: _DocumentViewerError(exception: state.data),
         );
       },
     );
@@ -45,10 +45,10 @@ class _NotFoundError extends StatelessWidget {
   }
 }
 
-class _ProposalViewerError extends StatelessWidget {
+class _DocumentViewerError extends StatelessWidget {
   final LocalizedException? exception;
 
-  const _ProposalViewerError({required this.exception});
+  const _DocumentViewerError({required this.exception});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class _RecoverableError extends StatelessWidget {
       button: VoicesTextButton(
         leading: VoicesAssets.icons.refresh.buildIcon(),
         child: Text(context.l10n.refresh),
-        onTap: () => context.read<ProposalViewerCubit>().retryLastRef(),
+        onTap: () => context.read<DocumentViewerCubit>().retryLastRef(),
       ),
     );
   }

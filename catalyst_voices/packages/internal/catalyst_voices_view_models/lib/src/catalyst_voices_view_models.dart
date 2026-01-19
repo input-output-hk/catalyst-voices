@@ -36,6 +36,7 @@ export 'document/document_segment.dart';
 export 'document/document_version.dart';
 export 'document/uuid.dart';
 export 'document/validation/localized_document_validation_result.dart';
+export 'document_viewer/document_viewer.dart';
 export 'exception/localized_document_hidden_exception.dart';
 export 'exception/localized_document_import_invalid_data_exception.dart';
 export 'exception/localized_document_reference_exception.dart';

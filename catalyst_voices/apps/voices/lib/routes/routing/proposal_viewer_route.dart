@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/proposal_viewer/proposal_viewer.dart';
+import 'package:catalyst_voices/pages/proposal_viewer/proposal_viewer_page.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,8 @@ part 'proposal_viewer_route.g.dart';
   path: '/proposal-viewer/:proposalId',
   name: 'proposal_viewer_new',
 )
-final class ProposalViewerRoute extends GoRouteData with $ProposalViewerRoute, FadePageTransitionMixin {
+final class ProposalViewerRoute extends GoRouteData
+    with $ProposalViewerRoute, FadePageTransitionMixin {
   final String proposalId;
   final String? version;
   final bool local;
@@ -41,17 +42,17 @@ final class ProposalViewerRoute extends GoRouteData with $ProposalViewerRoute, F
   }
 
   ProposalViewerRoute.fromRef({required DocumentRef ref})
-      : this(
-          proposalId: ref.id,
-          version: ref.ver,
-          local: ref is DraftRef,
-        );
+    : this(
+        proposalId: ref.id,
+        version: ref.ver,
+        local: ref is DraftRef,
+      );
 
   DocumentRef get ref => DocumentRef.build(
-        id: proposalId,
-        ver: version,
-        isDraft: local,
-      );
+    id: proposalId,
+    ver: version,
+    isDraft: local,
+  );
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

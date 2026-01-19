@@ -21,7 +21,7 @@ final class ProposalState extends Equatable {
   });
 
   bool get isViewingLatestVersion {
-    return data.header.proposalRef != null && (data.isCurrentVersionLatest ?? false);
+    return data.header.documentRef != null && (data.isCurrentVersionLatest ?? false);
   }
 
   @override
