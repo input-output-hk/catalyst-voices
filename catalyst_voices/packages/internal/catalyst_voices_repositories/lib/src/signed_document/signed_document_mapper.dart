@@ -24,9 +24,22 @@ final class SignedDocumentMapper {
     CoseHeaders headers,
     DocumentDataMetadataUpdate updates,
   ) {
+    final id = updates.id;
     final collaborators = updates.collaborators;
 
     return headers.copyWith(
+      id: id == null
+          ? null
+          : () {
+              final uuid = id.data?.id.asUuidV7;
+              return uuid == null ? null : CoseDocumentId(uuid);
+            },
+      ver: id == null
+          ? null
+          : () {
+              final uuid = id.data?.ver?.asUuidV7;
+              return uuid == null ? null : CoseDocumentVer(uuid);
+            },
       collaborators: collaborators == null
           ? null
           : () => _mapCollaboratorsToCose(collaborators.data),
