@@ -6,7 +6,6 @@ export 'constant/constant_documents_refs.dart';
 export 'constant/f14_const_documents_refs.dart';
 export 'constant/f15_const_documents_refs.dart';
 export 'data/document_artifact.dart';
-export 'data/document_content_encoding.dart';
 export 'data/document_content_type.dart';
 export 'data/document_data.dart';
 export 'data/document_data_content.dart';
