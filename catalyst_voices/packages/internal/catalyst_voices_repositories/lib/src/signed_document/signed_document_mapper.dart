@@ -19,6 +19,20 @@ final class SignedDocumentMapper {
 
   SignedDocumentMapper._();
 
+  /// Returns a copy of [headers] with applied changes from [updates].
+  static CoseHeaders applyCoseProtectedHeadersUpdates(
+    CoseHeaders headers,
+    DocumentDataMetadataUpdate updates,
+  ) {
+    final collaborators = updates.collaborators;
+
+    return headers.copyWith(
+      collaborators: collaborators == null
+          ? null
+          : () => _mapCollaboratorsToCose(collaborators.data),
+    );
+  }
+
   /// Maps domain [DocumentDataMetadata] into [CoseHeaders].
   ///
   /// Unprotected headers are not permitted by the specification,

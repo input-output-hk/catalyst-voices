@@ -4,6 +4,7 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
+import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -509,9 +510,9 @@ void main() {
         ).thenAnswer((_) async => mockOriginalDocument);
 
         when(
-          () => mockSignedDocumentManager.signRawDocument(
+          () => mockSignedDocumentManager.signUpdatedDocument(
             any(),
-            metadata: any(named: 'metadata'),
+            buildMetadataUpdates: any(named: 'buildMetadataUpdates'),
             catalystId: any(named: 'catalystId'),
             privateKey: any(named: 'privateKey'),
           ),
@@ -531,14 +532,18 @@ void main() {
 
         // Then
         verify(
-          () => mockSignedDocumentManager.signRawDocument(
+          () => mockSignedDocumentManager.signUpdatedDocument(
             any(),
-            metadata: any(
-              named: 'metadata',
-              that: predicate<DocumentDataMetadata>((meta) {
-                if (meta.id.id != 'proposal-1') return false;
-                if (meta.id.ver == 'v1') return false; // new version
-                return listEquals(meta.collaborators, [otherCollaboratorId]);
+            buildMetadataUpdates: any(
+              named: 'buildMetadataUpdates',
+              that: predicate<DocumentMetadataUpdatesBuilder>((builder) {
+                final updates = builder(originalMetadata);
+                final id = updates.id?.data;
+                final collaborators = updates.collaborators?.data;
+
+                if (id?.id != 'proposal-1') return false;
+                if (id?.ver == 'v1') return false; // new version
+                return listEquals(collaborators, [otherCollaboratorId]);
               }),
             ),
             catalystId: collaboratorId,

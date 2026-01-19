@@ -4,6 +4,13 @@ import 'package:catalyst_voices_repositories/src/document/exception/document_exc
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager_impl.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
+/// A callback that generates updates to the [metadata].
+///
+/// The callback should create an instance of [DocumentDataMetadataUpdate]
+/// that describes what changes to apply to the original [metadata].
+typedef DocumentMetadataUpdatesBuilder =
+    DocumentDataMetadataUpdate Function(DocumentDataMetadata metadata);
+
 /// Manages the [SignedDocument]s.
 abstract interface class SignedDocumentManager {
   /// The default constructor for the [SignedDocumentManager],
@@ -37,16 +44,15 @@ abstract interface class SignedDocumentManager {
     required CatalystPrivateKey privateKey,
   });
 
-  /// Signs the raw [payload] with a single [privateKey].
-  ///
-  /// Returns the [SignedDocument] which wraps the [payload] with
-  /// a secure cryptographic signature created with [privateKey].
+  /// Updates the metadata encoded in the [artifact]
+  /// with the changes described in [buildMetadataUpdates],
+  /// signs the document and returns a signed instance.
   ///
   /// The [catalystId] will be added as metadata in the signed document
   /// so that it's easier to identify who signed it.
-  Future<SignedDocument> signRawDocument(
-    SignedDocumentRawPayload payload, {
-    required DocumentDataMetadata metadata,
+  Future<SignedDocument> signUpdatedDocument(
+    DocumentArtifact artifact, {
+    required DocumentMetadataUpdatesBuilder buildMetadataUpdates,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   });
