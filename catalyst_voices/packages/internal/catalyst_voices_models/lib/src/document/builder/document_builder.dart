@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/src/document/builder/document_change.dart';
-import 'package:catalyst_voices_models/src/document/document.dart';
+import 'package:catalyst_voices_models/src/document/document_model.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';

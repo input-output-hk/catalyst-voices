@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/campaign/campaign.dart';
+import 'package:catalyst_voices_models/src/campaign/campaign_model.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/document/document_ref.dart';
 
