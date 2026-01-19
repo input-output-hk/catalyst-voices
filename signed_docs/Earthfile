@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.10-mk-signed-docs-key-type AS cat-libs-rust
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.10 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.13 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.6.13 AS rust-ci
 
 package:
     FROM python-ci+python-base
@@ -10,17 +10,15 @@ package:
 
     ARG tag='latest'
 
-    COPY cat-libs-rust+build/mk_signed_doc .
-    ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
-
     COPY pyproject.toml .
     COPY uv.lock .
     COPY setup_fund.py .
 
     COPY --dir dev .
-
+    
     COPY entrypoint.sh .
     RUN chmod +x entrypoint.sh
+    RUN uv sync
 
     ENTRYPOINT ["/app/entrypoint.sh"]
 
