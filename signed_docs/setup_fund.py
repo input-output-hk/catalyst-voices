@@ -3,11 +3,12 @@ import os
 import requests
 import json
 from pathlib import Path
+from typing import Any
 
 from catalyst_python.admin import AdminKey
 from catalyst_python.ed25519 import Ed25519Keys
-from catalyst_python.signed_doc import (
-    SignedDocument,
+from catalyst_python.catalyst_ffi import (
+    CatalystSignedDocument,
     brand_parameters_form_template_doc,
     brand_parameters_doc,
     campaign_parameters_form_template_doc,
@@ -25,7 +26,7 @@ def load_json_file(filepath: str) -> dict[str, str]:
         return json.load(f)
 
 
-def read_json_file(env_dir: Path, file_name: str) -> dict[str, str]:
+def read_json_file(env_dir: Path, file_name: str) -> dict[str, Any]:
     filepath = Path(env_dir) / file_name
     assert Path.is_file(filepath), f"Missing {file_name} at {filepath}"
 
@@ -43,9 +44,9 @@ def read_admin_key(admin_key_env: str, network: str) -> AdminKey:
     return AdminKey(key=key, network="cardano", subnet=network)
 
 
-def publish_document(url: str, timeout: int, doc: SignedDocument, token: str):
+def publish_document(url: str, timeout: int, doc: CatalystSignedDocument, token: str):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/cbor"}
-    data = bytes.fromhex(doc.hex_cbor)
+    data = bytes.fromhex(doc.hex_cbor())
 
     resp = requests.put(url, timeout=timeout, headers=headers, data=data)
     resp.raise_for_status()
@@ -71,19 +72,23 @@ def setup_fund(env: str):
         "parameters_form_template"
     ]
     brand_parameters_form_template = brand_parameters_form_template_doc(
-        content=read_json_file(
-            env_dir, brand_parameters_form_template_settings["path"]
+        content=json.dumps(
+            read_json_file(env_dir, brand_parameters_form_template_settings["path"])
         ),
-        admin_key=admin,
-    ).build_and_sign()
+        sk=admin.key.sk_hex,
+        kid=admin.cat_id(),
+        id=None,
+    )
     docs_to_publish.append(brand_parameters_form_template)
 
     brand_parameters_settings = settings["brand"]["parameters"]
     brand_parameters = brand_parameters_doc(
-        content=read_json_file(env_dir, brand_parameters_settings["path"]),
-        brand_parameters_form_template_ref=brand_parameters_form_template.doc_ref(),
-        admin_key=admin,
-    ).build_and_sign()
+        content=json.dumps(read_json_file(env_dir, brand_parameters_settings["path"])),
+        template=brand_parameters_form_template,
+        sk=admin.key.sk_hex,
+        kid=admin.cat_id(),
+        id=None,
+    )
     docs_to_publish.append(brand_parameters)
 
     for campaign in settings["brand"]["campaigns"]:
@@ -91,21 +96,29 @@ def setup_fund(env: str):
             "parameters_form_template"
         ]
         campaign_parameters_form_template = campaign_parameters_form_template_doc(
-            content=read_json_file(
-                env_dir, campaign_parameters_form_template_settings["path"]
+            content=json.dumps(
+                read_json_file(
+                    env_dir, campaign_parameters_form_template_settings["path"]
+                )
             ),
-            param_ref=brand_parameters.doc_ref(),
-            admin_key=admin,
-        ).build_and_sign()
+            parameters=brand_parameters,
+            sk=admin.key.sk_hex,
+            kid=admin.cat_id(),
+            id=None,
+        )
         docs_to_publish.append(campaign_parameters_form_template)
 
         campaign_parameters_settings = campaign["parameters"]
         campaign_parameters = campaign_parameters_doc(
-            content=read_json_file(env_dir, campaign_parameters_settings["path"]),
-            campaign_parameters_form_template_doc=campaign_parameters_form_template.doc_ref(),
-            param_ref=brand_parameters.doc_ref(),
-            admin_key=admin,
-        ).build_and_sign()
+            content=json.dumps(
+                read_json_file(env_dir, campaign_parameters_settings["path"])
+            ),
+            template=campaign_parameters_form_template,
+            parameters=brand_parameters,
+            sk=admin.key.sk_hex,
+            kid=admin.cat_id(),
+            id=None,
+        )
         docs_to_publish.append(campaign_parameters)
 
         for category in campaign["categories"]:
@@ -113,43 +126,57 @@ def setup_fund(env: str):
                 "parameters_form_template"
             ]
             category_parameters_form_template = category_parameters_form_template_doc(
-                content=read_json_file(
-                    env_dir, category_parameters_form_template_settings["path"]
+                content=json.dumps(
+                    read_json_file(
+                        env_dir, category_parameters_form_template_settings["path"]
+                    )
                 ),
-                param_ref=campaign_parameters.doc_ref(),
-                admin_key=admin,
-            ).build_and_sign()
+                parameters=campaign_parameters,
+                sk=admin.key.sk_hex,
+                kid=admin.cat_id(),
+                id=None,
+            )
             docs_to_publish.append(category_parameters_form_template)
 
             category_parameters_settings = category["parameters"]
             category_parameters = category_parameters_doc(
-                content=read_json_file(env_dir, category_parameters_settings["path"]),
-                category_parameters_form_template_doc=category_parameters_form_template.doc_ref(),
-                param_ref=campaign_parameters.doc_ref(),
-                admin_key=admin,
-            ).build_and_sign()
+                content=json.dumps(
+                    read_json_file(env_dir, category_parameters_settings["path"])
+                ),
+                template=category_parameters_form_template,
+                parameters=campaign_parameters,
+                sk=admin.key.sk_hex,
+                kid=admin.cat_id(),
+                id=None,
+            )
             docs_to_publish.append(category_parameters)
 
             proposal_form_template_settings = category["proposal_form_template"]
             proposal_form_template = proposal_form_template_doc(
-                content=read_json_file(
-                    env_dir, proposal_form_template_settings["path"]
+                content=json.dumps(
+                    read_json_file(env_dir, proposal_form_template_settings["path"])
                 ),
-                param_ref=category_parameters.doc_ref(),
-                admin_key=admin,
-            ).build_and_sign()
+                parameters=category_parameters,
+                sk=admin.key.sk_hex,
+                kid=admin.cat_id(),
+                id=None,
+            )
             docs_to_publish.append(proposal_form_template)
 
             proposal_comment_form_template_settings = category[
                 "proposal_comment_form_template"
             ]
             proposal_comment_form_template = proposal_comment_form_template_doc(
-                content=read_json_file(
-                    env_dir, proposal_comment_form_template_settings["path"]
+                content=json.dumps(
+                    read_json_file(
+                        env_dir, proposal_comment_form_template_settings["path"]
+                    )
                 ),
-                param_ref=category_parameters.doc_ref(),
-                admin_key=admin,
-            ).build_and_sign()
+                parameters=category_parameters,
+                sk=admin.key.sk_hex,
+                kid=admin.cat_id(),
+                id=None,
+            )
             docs_to_publish.append(proposal_comment_form_template)
 
     for doc in docs_to_publish:
