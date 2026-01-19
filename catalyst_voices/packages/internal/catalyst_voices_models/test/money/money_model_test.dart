@@ -1,6 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/src/money/currencies.dart';
-import 'package:catalyst_voices_models/src/money/money.dart';
+import 'package:catalyst_voices_models/src/money/money_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

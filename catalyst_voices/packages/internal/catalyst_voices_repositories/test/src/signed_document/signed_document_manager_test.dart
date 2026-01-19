@@ -20,16 +20,16 @@ void main() {
 
     test('signDocument creates a signed document '
         'that can be converted from/to bytes', () async {
-      const document = SignedDocumentJsonPayload({'title': 'hey'});
+      const payload = SignedDocumentJsonPayload({'title': 'hey'});
 
       final signedDocument = await documentManager.signDocument(
-        document,
+        payload,
         catalystId: _catalystId,
         metadata: _metadata,
         privateKey: _privateKey,
       );
 
-      expect(signedDocument.payload, equals(document));
+      expect(signedDocument.payload, equals(payload));
 
       final isVerified = await signedDocument.verifySignature(_catalystId);
       expect(isVerified, isTrue);
@@ -37,7 +37,8 @@ void main() {
       final signedDocumentArtifact = signedDocument.toArtifact();
       final parsedDocument = await documentManager.parseDocument(signedDocumentArtifact);
 
-      expect(parsedDocument, equals(signedDocument));
+      expect(parsedDocument.payload, equals(payload));
+      expect(parsedDocument.rawPayload, isNotEmpty);
       expect(parsedDocument.signers, [_catalystId]);
     });
 

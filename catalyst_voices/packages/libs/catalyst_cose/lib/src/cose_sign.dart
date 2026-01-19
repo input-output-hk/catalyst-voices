@@ -4,6 +4,7 @@ import 'package:catalyst_cose/src/cose_constants.dart';
 import 'package:catalyst_cose/src/exception/cose_exception.dart';
 import 'package:catalyst_cose/src/exception/cose_format_exception.dart';
 import 'package:catalyst_cose/src/types/cose_headers.dart';
+import 'package:catalyst_cose/src/types/cose_payload.dart';
 import 'package:cbor/cbor.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -21,7 +22,7 @@ final class CoseSign extends Equatable {
   final CoseHeaders unprotectedHeaders;
 
   /// The data that is signed by the [signatures].
-  final Uint8List payload;
+  final CosePayload payload;
 
   /// The cryptographic signatures over
   /// the [protectedHeaders] and the [payload].
@@ -54,7 +55,7 @@ final class CoseSign extends Equatable {
         unprotectedHeaders,
         encodeAsBytes: false,
       ),
-      payload: Uint8List.fromList((payload as CborBytes).bytes),
+      payload: CosePayload.fromCbor(payload),
       signatures: (signatures as CborList).map(CoseSignature.fromCbor).toList(),
     );
   }
@@ -73,7 +74,7 @@ final class CoseSign extends Equatable {
       [
         protectedHeaders.toCbor(),
         unprotectedHeaders.toCbor(),
-        CborBytes(payload),
+        payload.toCbor(),
         CborList([
           for (final signature in signatures) signature.toCbor(),
         ]),
@@ -132,7 +133,7 @@ final class CoseSign extends Equatable {
   static Future<CoseSign> sign({
     required CoseHeaders protectedHeaders,
     required CoseHeaders unprotectedHeaders,
-    required Uint8List payload,
+    required CosePayload payload,
     required List<CatalystCoseSigner> signers,
   }) async {
     try {
@@ -198,12 +199,12 @@ final class CoseSign extends Equatable {
   static Uint8List _createCoseSignSigStructureBytes({
     required CoseHeaders bodyProtectedHeaders,
     required CoseHeaders signatureProtectedHeaders,
-    required Uint8List payload,
+    required CosePayload payload,
   }) {
     final sigStructure = _createCoseSignSigStructure(
       bodyProtectedHeaders: bodyProtectedHeaders.toCbor(),
       signatureProtectedHeaders: signatureProtectedHeaders.toCbor(),
-      payload: CborBytes(payload),
+      payload: payload.toCbor(),
     );
 
     return Uint8List.fromList(cbor.encode(sigStructure));

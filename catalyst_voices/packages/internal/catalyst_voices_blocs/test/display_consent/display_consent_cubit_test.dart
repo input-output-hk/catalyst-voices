@@ -184,7 +184,7 @@ void main() {
 
         when(
           () => proposalService.submitCollaboratorProposalAction(
-            ref: any(named: 'ref'),
+            proposalId: any(named: 'proposalId'),
             action: any(named: 'action'),
           ),
         ).thenAnswer((_) async {});
@@ -234,7 +234,7 @@ void main() {
         verify: (_) {
           verify(
             () => proposalService.submitCollaboratorProposalAction(
-              ref: proposal.id,
+              proposalId: proposal.id as SignedDocumentRef,
               action: CollaboratorProposalAction.acceptInvitation,
             ),
           ).called(1);
@@ -283,7 +283,7 @@ void main() {
         verify: (_) {
           verify(
             () => proposalService.submitCollaboratorProposalAction(
-              ref: proposal.id,
+              proposalId: proposal.id as SignedDocumentRef,
               action: CollaboratorProposalAction.rejectInvitation,
             ),
           ).called(1);
@@ -330,7 +330,7 @@ void main() {
         build: () {
           when(
             () => proposalService.submitCollaboratorProposalAction(
-              ref: any(named: 'ref'),
+              proposalId: any(named: 'proposalId'),
               action: any(named: 'action'),
             ),
           ).thenThrow(Exception('Network error'));
@@ -412,7 +412,7 @@ void main() {
         verify: (_) {
           verifyNever(
             () => proposalService.submitCollaboratorProposalAction(
-              ref: any(named: 'ref'),
+              proposalId: any(named: 'proposalId'),
               action: any(named: 'action'),
             ),
           );
