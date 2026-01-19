@@ -89,9 +89,7 @@ void main() {
         );
 
         // Then
-        expect(result.id, headers.id);
-        expect(result.ver, headers.ver);
-        expect(result.collaborators, equals(headers.collaborators));
+        expect(result, equals(headers));
       });
     });
 
