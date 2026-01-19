@@ -20,12 +20,10 @@ class _CoProposersConsentPageState extends State<CoProposersConsentPage> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _cubit,
-      child: Builder(
-        builder: (_) => ScaffoldMessenger(
-          child: Scaffold(
-            body: CoProposersConsentPageContent(
-              onCloseTap: () => ActionsShellPage.close(context),
-            ),
+      child: ScaffoldMessenger(
+        child: Scaffold(
+          body: CoProposersConsentPageContent(
+            onCloseTap: () => ActionsShellPage.close(context),
           ),
         ),
       ),
