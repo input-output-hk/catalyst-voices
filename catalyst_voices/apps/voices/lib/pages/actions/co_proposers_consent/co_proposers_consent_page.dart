@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/dependency/dependencies.dart';
+import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/co_proposers_consent_page_content.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -19,10 +20,13 @@ class _CoProposersConsentPageState extends State<CoProposersConsentPage> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _cubit,
-      child: const ScaffoldMessenger(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: CoProposersConsentPageContent(),
+      child: Builder(
+        builder: (_) => ScaffoldMessenger(
+          child: Scaffold(
+            body: CoProposersConsentPageContent(
+              onCloseTap: () => ActionsShellPage.close(context),
+            ),
+          ),
         ),
       ),
     );
