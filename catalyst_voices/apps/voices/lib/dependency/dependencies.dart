@@ -506,6 +506,12 @@ final class Dependencies extends DependencyProvider {
         get<AppMetaStorage>(),
       );
     });
+    registerLazySingleton<DelegationBuilder>(DelegationBuilder.new);
+    registerLazySingleton<RepresentativesService>(() {
+      return RepresentativesService(
+        get<DocumentRepository>(),
+      );
+    });
   }
 
   void _registerStorages() {

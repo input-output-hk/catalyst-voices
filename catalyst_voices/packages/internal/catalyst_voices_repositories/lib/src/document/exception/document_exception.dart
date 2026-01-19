@@ -43,6 +43,27 @@ final class DocumentNotFoundException implements DocumentException {
   }
 }
 
+/// Exception thrown when document is found but revoked.
+final class DocumentRevokedException implements DocumentException {
+  final DocumentRef ref;
+  final String? message;
+
+  DocumentRevokedException({
+    required this.ref,
+    this.message,
+  });
+
+  @override
+  String toString() {
+    final message = this.message;
+    if (message != null) {
+      return message;
+    }
+
+    return 'Document matching $ref is revoked';
+  }
+}
+
 /// Exception thrown when draft is not found.
 final class DraftNotFoundException implements DocumentException {
   final DocumentRef ref;

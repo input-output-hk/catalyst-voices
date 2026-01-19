@@ -1,13 +1,16 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/src/representatives/representatives_documents_service.dart';
 
 /// Service for managing representatives and delegations.
 abstract interface class RepresentativesService {
-  // TODO(damian-molinski): define exception for revoked documents.
+  const factory RepresentativesService(DocumentRepository documentRepository) =
+      RepresentativesDocumentsService;
+
   /// Retrieves detailed information about a representative's profile.
   ///
   /// Throws [DocumentNotFoundException] if document with [profileId] is not found.
-  /// Throws [Exception] if document with [profileId] is found but revoked.
+  /// Throws [DocumentRevokedException] if document with [profileId] is found but revoked.
   Future<RepresentativeDetails> getRepresentativeDetails({required DocumentRef profileId});
 
   /// Revokes all delegations of [delegatorId] made for [campaign].

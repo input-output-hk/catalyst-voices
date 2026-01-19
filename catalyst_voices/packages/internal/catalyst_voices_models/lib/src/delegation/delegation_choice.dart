@@ -34,12 +34,12 @@ final class DelegationChoice extends Equatable {
   DelegationChoice copyWith({
     CatalystId? representativeId,
     DocumentRef? representativeProfileId,
-    bool? isProfileLatest,
+    bool? isProfileLatestVer,
   }) {
     return DelegationChoice(
       representativeId: representativeId ?? this.representativeId,
       representativeProfileId: representativeProfileId ?? this.representativeProfileId,
-      isProfileLatestVer: isProfileLatest ?? this.isProfileLatestVer,
+      isProfileLatestVer: isProfileLatestVer ?? this.isProfileLatestVer,
     );
   }
 }
