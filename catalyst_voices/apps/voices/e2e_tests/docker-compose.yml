@@ -122,6 +122,12 @@ services:
       - CLICK_DELAY=300
       # Display for Xvfb (headed mode required for Chrome extensions)
       - DISPLAY=:99
+      # S3 configuration for wallet extensions
+      # Extensions are downloaded from S3 for stable, reproducible tests
+      - EXTENSION_S3_BUCKET=${EXTENSION_S3_BUCKET:-catalyst-e2e-extensions}
+      - EXTENSION_S3_REGION=${EXTENSION_S3_REGION:-eu-central-1}
+      - EXTENSION_S3_PREFIX=${EXTENSION_S3_PREFIX:-wallet-extensions}
+      - EXTENSION_SOURCE=${EXTENSION_SOURCE:-s3}
     volumes:
       # Mount test results for access after tests complete
       - ./test-results:/workspace/test-results
