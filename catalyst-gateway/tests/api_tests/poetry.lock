@@ -512,7 +512,7 @@ requests = ">=2.32.5"
 type = "git"
 url = "https://github.com/input-output-hk/catalyst-libs.git"
 reference = "feat/catalyst-python-uniffi"
-resolved_reference = "13270c22428112ea126476a71987953613a2c34b"
+resolved_reference = "349ec546bf94156b373ca8c82b5add6db6749556"
 subdirectory = "catalyst-python"
 
 [[package]]
