@@ -1,26 +1,27 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// Orders representatives by their [CatalystId.username].
+final class RepresentativesAlphabetical extends RepresentativesOrder {
+  const RepresentativesAlphabetical();
+
+  @override
+  String toString() => 'Alphabetical';
+}
+
+/// Base class for defining the order of representatives.
 sealed class RepresentativesOrder extends Equatable {
+  /// Creates a [RepresentativesOrder].
   const RepresentativesOrder();
 
   @override
   List<Object?> get props => [];
 }
 
-final class RepresentativesOrderUpdateDate extends RepresentativesOrder {
-  final bool isAscending;
-
-  const RepresentativesOrderUpdateDate({
-    required this.isAscending,
-  });
-
-  const RepresentativesOrderUpdateDate.asc() : this(isAscending: true);
-
-  const RepresentativesOrderUpdateDate.desc() : this(isAscending: false);
+/// Orders representatives randomly.
+final class RepresentativesRandom extends RepresentativesOrder {
+  const RepresentativesRandom();
 
   @override
-  List<Object?> get props => [isAscending];
-
-  @override
-  String toString() => 'RepresentativesOrderUpdateDate(${isAscending ? 'asc' : 'desc'})';
+  String toString() => 'Random';
 }

@@ -1,40 +1,43 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+/// Representative is an account with public representative profile and has nominations
+/// for contests(categories).
+///
+/// Right now publishing representative profile means publishing nominations
+/// for all categories of campaign.
 final class Representative extends Equatable {
+  /// The catId of the representative (account).
   final CatalystId id;
-  final RepresentativeProfile profile;
-  final List<RepresentativeNomination> nominations;
+
+  /// Ref of profile document.
+  final DocumentRef profileId;
+
+  /// Value of profile document description property.
+  final String description;
 
   const Representative({
     required this.id,
-    required this.profile,
-    this.nominations = const [],
+    required this.profileId,
+    required this.description,
   });
-
-  bool get isValid {
-    return !profile.isRevoked &&
-        nominations.isNotEmpty &&
-        nominations.none((nomination) => nomination.isRevoked);
-  }
 
   @override
   List<Object?> get props => [
     id,
-    profile,
-    nominations,
+    profileId,
+    description,
   ];
 
   Representative copyWith({
     CatalystId? id,
-    RepresentativeProfile? profile,
-    List<RepresentativeNomination>? nominations,
+    DocumentRef? profileId,
+    String? description,
   }) {
     return Representative(
       id: id ?? this.id,
-      profile: profile ?? this.profile,
-      nominations: nominations ?? this.nominations,
+      profileId: profileId ?? this.profileId,
+      description: description ?? this.description,
     );
   }
 }

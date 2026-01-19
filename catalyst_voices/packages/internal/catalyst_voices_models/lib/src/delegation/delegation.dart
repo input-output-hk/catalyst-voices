@@ -1,34 +1,33 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// Delegation is done on campaign level but technically speaking we're delegating
+/// per contest(category) of that campaign.
 final class Delegation extends Equatable {
+  /// The catId of the delegator (account).
   final CatalystId delegatorId;
-  final List<ContestDelegation> contestsDelegations;
+
+  /// List of representatives chosen to represent [delegatorId].
+  final List<DelegationChoice> choices;
 
   const Delegation({
     required this.delegatorId,
-    this.contestsDelegations = const [],
+    this.choices = const [],
   });
-
-  bool get delegatedToOutdatedNomination {
-    return contestsDelegations.any((delegation) => delegation.hasOutdatedNominations);
-  }
-
-  bool get isValid => contestsDelegations.isNotEmpty && contestsDelegations.every((e) => e.isValid);
 
   @override
   List<Object?> get props => [
     delegatorId,
-    contestsDelegations,
+    choices,
   ];
 
   Delegation copyWith({
     CatalystId? delegator,
-    List<ContestDelegation>? contestsDelegations,
+    List<DelegationChoice>? choices,
   }) {
     return Delegation(
-      delegatorId: delegator ?? this.delegatorId,
-      contestsDelegations: contestsDelegations ?? this.contestsDelegations,
+      delegatorId: delegator ?? delegatorId,
+      choices: choices ?? this.choices,
     );
   }
 }
