@@ -2,6 +2,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/representatives/representatives_service.dart';
 
+// TODO(damian-molinski): To be implemented.
+/// Implementation of [RepresentativesService].
 final class RepresentativesDocumentsService implements RepresentativesService {
   // ignore: unused_field
   final DocumentRepository _documentRepository;
@@ -10,13 +12,11 @@ final class RepresentativesDocumentsService implements RepresentativesService {
 
   @override
   Future<RepresentativeDetails> getRepresentativeDetails({required DocumentRef profileId}) {
-    // TODO: implement getRepresentativeDetails
     throw UnimplementedError();
   }
 
   @override
   Future<void> revokeDelegation({required CatalystId delegatorId, required Campaign campaign}) {
-    // TODO: implement revokeDelegation
     throw UnimplementedError();
   }
 
@@ -25,13 +25,11 @@ final class RepresentativesDocumentsService implements RepresentativesService {
     required CatalystId representativeId,
     required Campaign campaign,
   }) {
-    // TODO: implement revokeRepresentation
     throw UnimplementedError();
   }
 
   @override
   Future<void> submitDelegation(Delegation delegation) {
-    // TODO: implement submitDelegation
     throw UnimplementedError();
   }
 
@@ -42,7 +40,6 @@ final class RepresentativesDocumentsService implements RepresentativesService {
     required DocumentRef template,
     required Campaign campaign,
   }) {
-    // TODO: implement submitRepresentativeProfile
     throw UnimplementedError();
   }
 
@@ -51,25 +48,21 @@ final class RepresentativesDocumentsService implements RepresentativesService {
     required DocumentRef profileId,
     required bool isFavorite,
   }) {
-    // TODO: implement updateRepresentativeFavorite
     throw UnimplementedError();
   }
 
   @override
   Stream<Delegation?> watchDelegation({required CatalystId delegatorId}) {
-    // TODO: implement watchDelegation
     throw UnimplementedError();
   }
 
   @override
   Stream<Representative?> watchRepresentative({required CatalystId representativeId}) {
-    // TODO: implement watchRepresentative
     throw UnimplementedError();
   }
 
   @override
   Stream<RepresentativeDetails?> watchRepresentativeDetails({required DocumentRef profileId}) {
-    // TODO: implement watchRepresentativeDetails
     throw UnimplementedError();
   }
 
@@ -79,7 +72,6 @@ final class RepresentativesDocumentsService implements RepresentativesService {
     RepresentativesOrder order = const RepresentativesAlphabetical(),
     RepresentativesFilters filters = const RepresentativesFilters(),
   }) {
-    // TODO: implement watchRepresentatives
     throw UnimplementedError();
   }
 
@@ -87,7 +79,6 @@ final class RepresentativesDocumentsService implements RepresentativesService {
   Stream<Page<Representative>> watchRepresentativesCount({
     RepresentativesFilters filters = const RepresentativesFilters(),
   }) {
-    // TODO: implement watchRepresentativesCount
     throw UnimplementedError();
   }
 }
