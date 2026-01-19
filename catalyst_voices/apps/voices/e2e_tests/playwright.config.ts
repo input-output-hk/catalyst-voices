@@ -6,7 +6,7 @@ configDotenv();
 export default defineConfig({
   testDir: "./tests",
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: 2,
   workers: process.env.CI ? 1 : undefined,
   reporter: [["junit", { outputFile: "/results/voices.junit-report.xml" }], ["html"]],
   timeout: 1200 * 1000,

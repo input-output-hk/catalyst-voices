@@ -6,12 +6,15 @@ This repository contains the Catalyst Voices app and packages.
 
 * [Catalyst Voices](#catalyst-voices)
     * [Requirements](#requirements)
+    * [Recommended VS code plugins](#recommended-vs-code-plugins)
     * [Platforms](#platforms)
     * [Getting Started](#getting-started)
-        * [Bootstrapping](#bootstrapping)
-        * [Packages](#packages)
-        * [Environment Type vs Flavor](#environment-type-vs-flavor)
+    * [Bootstrapping](#bootstrapping)
+    * [Packages](#packages)
+    * [Environment Type vs Flavor](#environment-type-vs-flavor)
         * [Environment types](#environment-types)
+            * [Stress Test](#stress-test)
+            * [Debug Performance Flags](#debug-performance-flags)
         * [Flavor types](#flavor-types)
         * [Environment variables](#environment-variables)
             * [Environment config](#environment-config)
@@ -19,10 +22,12 @@ This repository contains the Catalyst Voices app and packages.
             * [Using Feature Flags with --dart-define](#using-feature-flags-with---dart-define)
         * [Code Generation](#code-generation)
             * [Running Code Generation](#running-code-generation)
-                * [Basic Generation](#basic-generation)
-                * [Local Saving](#local-saving)
-            * [GitHub Token / PAT Setup](#github-token--pat-setup)
-            * [Security Notes](#security-notes)
+    * [Code Generation](#code-generation)
+      *[Running Code Generation](#running-code-generation)
+        * [Basic Generation](#basic-generation)
+      *[Local Saving](#local-saving)
+        * [GitHub Token / PAT Setup](#github-token--pat-setup)
+        * [Security Notes](#security-notes)
     * [Running Tests](#running-tests)
 
 ## Requirements
@@ -45,7 +50,8 @@ This repository contains the Catalyst Voices app and packages.
 
 ## Recommended VS code plugins
 
-* [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - formatting html and js files.
+* [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) -
+  formatting html and js files.
 
 ## Platforms
 
@@ -68,16 +74,17 @@ just bootstrap
 
 <!-- markdownlint-disable MD042 -->
 
-| Package                                                                  | Description              | Example   |
-|--------------------------------------------------------------------------|--------------------------|-----------|
-| [catalyst_voices_assets](./packages/internal/catalyst_voices_assets/)    | Assets used in Catalyst Voices |[example](./packages/internal/catalyst_voices_assets/example/lib/src/main.dart)|
-| [catalyst_voices_blocs](./packages/internal/catalyst_voices_blocs/)               | State management of Catalyst Voices |[example](./packages/internal/catalyst_voices_blocs/)|
-| [catalyst_voices_localization](./packages/internal/catalyst_voices_localization/) | Localization files for Catalyst Voices |[example](./packages/internal/catalyst_voices_localization/)|
-| [catalyst_voices_models](./packages/internal/catalyst_voices_models/)             | Models |[example](./packages/internal/catalyst_voices_models/)|
-| [catalyst_voices_repositories](./packages/internal/catalyst_voices_repositories/) | Repositories |[example](./packages/internal/catalyst_voices_repositories/)|
-| [catalyst_voices_services](./packages/internal/catalyst_voices_services/)         | Services |[example](./packages/internal/catalyst_voices_services/)|
-| [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
-| [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
+| Package                                                                           | Description                            | Example                                                                         |
+|-----------------------------------------------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------|
+| [catalyst_voices_assets](./packages/internal/catalyst_voices_assets/)             | Assets used in Catalyst Voices         | [example](./packages/internal/catalyst_voices_assets/example/lib/src/main.dart) |
+| [catalyst_voices_blocs](./packages/internal/catalyst_voices_blocs/)               | State management of Catalyst Voices    | [example](./packages/internal/catalyst_voices_blocs/)                           |
+| [catalyst_voices_localization](./packages/internal/catalyst_voices_localization/) | Localization files for Catalyst Voices | [example](./packages/internal/catalyst_voices_localization/)                    |
+| [catalyst_voices_models](./packages/internal/catalyst_voices_models/)             | Models                                 | [example](./packages/internal/catalyst_voices_models/)                          |
+| [catalyst_voices_repositories](./packages/internal/catalyst_voices_repositories/) | Repositories                           | [example](./packages/internal/catalyst_voices_repositories/)                    |
+| [catalyst_voices_services](./packages/internal/catalyst_voices_services/)         | Services                               | [example](./packages/internal/catalyst_voices_services/)                        |
+| [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code                            | [example](./packages/internal/catalyst_voices_shared/)                          |
+| [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels                             | [example](./packages/internal/catalyst_voices_view_models/)                     |
+| [catalyst_voices_dev](./packages/internal/catalyst_voices_dev/)                   | Dev                                    | [example](./packages/internal/catalyst_voices_dev/)                             |
 
 ### Environment Type vs Flavor
 
@@ -124,6 +131,41 @@ flutter run --target lib/configs/main.dart --dart-define=ENV_NAME=prod -d chrome
 > Catalyst Voices works on the Web only.
 > We plan to add support for other targets later.
 
+#### Stress Test
+
+Each environment can be launched in stress test.
+It will use local version of Gateway and produce as many proposals as configured (defaults to 100).
+Use following `--dart-define` variables to configure your setup:
+
+* `--dart-define=STRESS_TEST=true` to enable
+* `--dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=100` says how many proposals will be produced
+* `--dart-define=STRESS_TEST_DECOMPRESSED=false` if signed documents should be compressed or not
+
+#### Debug Performance Flags
+
+Each environment can be launched with additional debug performance flags on web in `Profile` mode
+There is four performance flags to choose from:
+
+* **debugProfileBuildsEnabled:** Adds Timeline events for every Widget built.
+* **debugProfileBuildsEnabledUserWidgets:** Adds Timeline events for every user-created Widget
+  built.
+* **debugProfileLayoutsEnabled:** Adds Timeline events for every RenderObject layout.
+* **debugProfilePaintsEnabled:** Adds Timeline events for every RenderObject painted.
+
+To use following `--dart-define` variables to configure your setup:
+
+* `--dart-define=DEBUG_PROFILE_BUILDS_ENABLED` to enable debugProfileBuildsEnabled
+* `--dart-define=DEBUG_PROFILE_BUILDS_ENABLED_USER_WIDGETS` to enable
+  debugProfileBuildsEnabledUserWidgets
+* `--dart-define=DEBUG_PROFILE_LAYOUTS_ENABLED` to enable debugProfileLayoutsEnabled
+* `--dart-define=DEBUG_PROFILE_PAINTS_ENABLED` to enable debugProfilePaintsEnabled
+
+There is `--dart-define` variable to enable all four performance flags at once:
+
+* `--dart-define=DEBUG_PROFILE_DEVELOPER_PROFILER_ENABLE_ALL`
+
+Remember to also use `--profile` mode when running the app.
+
 ### Flavor types
 
 You should use flavor types instead of environment variables when running the app on mobile
@@ -168,9 +210,10 @@ Priority looks as follow:
 1. `dart-define` vars
 2. `flavor` var
 
-If none of above is defined app will fallback to **relative** type for web or **dev** in other cases.
+If none of above is defined app will fallback to **relative** type for web or **dev** in other
+cases.
 
-Using following command below will resolve in **relative** env type for web  and **dev** for mobile
+Using following command below will resolve in **relative** env type for web and **dev** for mobile
 and desktop because **ENV_NAME** nor **flavor** is defined.
 
 ```sh
@@ -187,7 +230,8 @@ on used env type.
 Feature flags allow you to enable or disable specific features at compile-time or runtime.
 The feature flag system provides flexible configuration through multiple sources.
 
-All feature flags can be found in the [Features](./packages/internal/catalyst_voices_models/lib/src/feature_flags/features.dart)
+All feature flags can be found in
+the [Features](./packages/internal/catalyst_voices_models/lib/src/feature_flags/features.dart)
 class.
 
 #### Using Feature Flags with --dart-define
@@ -206,7 +250,6 @@ flutter run --dart-define=FEATURE_VOTING=false
 
 This project utilizes automatic code generation for the following components:
 
-* Catalyst Gateway OpenAPI
 * Localization files
 * Asset files
 * Navigation route files
@@ -246,7 +289,8 @@ To run all unit and widget tests use the following command:
 flutter test --coverage --test-randomize-ordering-seed random
 ```
 
-To view the generated coverage report you can use [lcov](https://github.com/linux-test-project/lcov).
+To view the generated coverage report you can
+use [lcov](https://github.com/linux-test-project/lcov).
 
 ```sh
 # Generate Coverage Report

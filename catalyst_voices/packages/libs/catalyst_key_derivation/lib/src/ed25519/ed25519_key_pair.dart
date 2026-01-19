@@ -1,6 +1,6 @@
 import 'package:catalyst_key_derivation/src/ed25519/ed25519_private_key.dart';
 import 'package:catalyst_key_derivation/src/ed25519/ed25519_public_key.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_plus/cryptography_plus.dart';
 import 'package:equatable/equatable.dart';
 
 /// The public and private Ed25519 key pair.

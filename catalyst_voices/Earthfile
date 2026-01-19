@@ -1,7 +1,6 @@
 VERSION 0.8
 
 IMPORT ../ AS repo-ci
-IMPORT ../catalyst-gateway AS catalyst-gateway
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.10 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
@@ -22,57 +21,45 @@ builder:
     DO flutter-ci+BOOTSTRAP
 
 # Generates flutter code.
-# Generates codes for Catalyst Gateway OpenAPI, Voices Localization and
-# VoicesAssets and other packages that depend on code-generator.
+# Generates codes for Voices Localization and VoicesAssets and other packages
+# that depend on code-generator.
 # It accepts [save_locally] ARG that when true place the artifacts in the
 # proper folders
 code-generator:
     ARG save_locally=false
     FROM +builder
 
-    LET gen_code_path = lib/generated/api
-    LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
-
-    WORKDIR packages/internal/catalyst_voices_repositories
+    LET local_gen_db_code_path = packages/internal/catalyst_voices_repositories/test/src/database/migration/catalyst_database/generated/
 
     WORKDIR /frontend
 
     RUN melos l10n
+    RUN melos build-db-migration
     RUN melos build-runner
-    RUN melos build-runner-repository
 
     IF [ $save_locally = true ]
-        # This step saves generated files other then OpenApi Services
+        # This step saves generated files
         RUN find . \
           \( -name "*.g.dart" \
-          -o -name "*.chopper.dart" \
           -o -name "*.gen.dart" \
           -o -name "catalyst_voices_localizations*.dart" \
           -o -name "*.drift.dart" \)
 
         FOR generated_file IN $(find . \
                                           \( -name "*.g.dart" \
-                                          -o -name "*.chopper.dart" \
                                           -o -name "*.gen.dart" \
                                           -o -name "catalyst_voices_localizations*.dart" \
                                           -o -name "*.drift.dart" \))
            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
         END
+
+        # Save database migration generated files
+        WORKDIR packages/internal/catalyst_voices_repositories/test/src/database/migration/catalyst_database
+        SAVE ARTIFACT generated/* AS LOCAL $local_gen_db_code_path
+        WORKDIR /frontend
     ELSE
        SAVE ARTIFACT .
     END
-
-    WORKDIR packages/internal/catalyst_voices_repositories
-
-    # Saves generated OpenApi Services
-    IF [ $save_locally = true ]
-        SAVE ARTIFACT "$gen_code_path/*" AS LOCAL $local_gen_code_path
-    ELSE
-        SAVE ARTIFACT $gen_code_path
-    END
-
-    # restore current working directory to the root of the project
-    WORKDIR /frontend
 
 # Runs code formatting checks.
 check-code-formatting:
@@ -126,7 +113,14 @@ build-web:
         --TARGET=lib/configs/main_web.dart \
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
-        --SENTRY_PROJECT='catalyst-voices'
+        --SENTRY_PROJECT='catalyst-voices' \
+        --WASM=true
+
+    # Version web assets with content-based MD5 hashes for cache busting
+    RUN dart run /frontend/scripts/version_web_assets/version_web_assets.dart --build-dir=$WORKDIR/build/web --wasm=true
+
+    DO flutter-ci+COMPRESS_WEB_FILES
+
     SAVE ARTIFACT --keep-ts web
 
 package:

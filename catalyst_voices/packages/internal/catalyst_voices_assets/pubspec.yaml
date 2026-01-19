@@ -13,13 +13,16 @@ dependencies:
     sdk: flutter
   flutter_svg: ^2.2.0
   lottie: ^3.3.1
+  vector_graphics: ^1.1.19
 
 dev_dependencies:
-  build_runner: ^2.5.4
+  build_runner: ^2.10.3
   catalyst_analysis: ^3.0.0
-  flutter_gen_runner: ^5.11.0
+  flutter_gen_runner: ^5.12.0
   flutter_test:
     sdk: flutter
+  path: ^1.9.1
+  vector_graphics_compiler: ^1.1.19
 
 flutter:
   generate: true
@@ -27,6 +30,7 @@ flutter:
     - assets/images/
     - assets/images/category/
     - assets/images/opportunities/
+    - assets/images/svg/
     - assets/icons/
     - assets/lottie/
     - assets/videos/
@@ -40,6 +44,8 @@ flutter_gen:
   output: lib/generated/
   assets:
     enabled: true
+    exclude:
+      - assets_svg_source/**
     outputs:
       class_name: VoicesAssets
       package_parameter_enabled: false

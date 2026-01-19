@@ -1,0 +1,39 @@
+VERSION 0.8
+
+# builder - Installs dependencies for the mock server
+builder:
+    FROM node:20-alpine
+    WORKDIR /app
+
+    # Copy package files
+    COPY package.json package-lock.json .
+
+    # Install dependencies
+    RUN npm ci --omit=dev
+
+    # Copy server code and OpenAPI spec
+    COPY server.js cat-reviews.json .
+
+    # Install concurrently and prism
+    RUN npm install concurrently @stoplight/prism-cli
+
+    SAVE ARTIFACT /app
+
+# docker - Build the mock server image
+docker:
+    FROM node:20-alpine
+    WORKDIR /app
+
+    ARG container="reviews-mock-server"
+    ARG tag="latest"
+
+    # Copy built artifacts from builder
+    COPY +builder/app .
+
+    # Run both prism (on 4010) and express server (on 4020)
+    CMD ["npx", "concurrently", "-k", \
+         "npx prism mock cat-reviews.json -p 4010 -h 0.0.0.0", \
+         "node server.js"]
+
+    SAVE IMAGE ${container}:${tag}
+

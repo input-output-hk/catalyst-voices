@@ -2,15 +2,16 @@ import 'dart:convert';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(RbacRegistrationChain, () {
     setUpAll(() {
-      Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
+      Bip32Ed25519XPublicKeyFactory.instance = FakeBip32Ed25519XPublicKeyFactory();
     });
 
     RbacRegistrationChain getRegistrationChain(String jsonString) {
@@ -36,6 +37,26 @@ void main() {
         equals(
           '0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2',
         ),
+      );
+    });
+
+    test('can decode lastVolatileTxn', () {
+      final registrationChain = getRegistrationChain(_voterAndProposerJson);
+
+      expect(
+        registrationChain.lastVolatileTxn,
+        equals(
+          '0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2',
+        ),
+      );
+    });
+
+    test('can decode purpose', () {
+      final registrationChain = getRegistrationChain(_voterAndProposerJson);
+
+      expect(
+        registrationChain.purpose,
+        equals(['ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c']),
       );
     });
 
@@ -91,156 +112,189 @@ const _noRoleJson = '''
     "purpose": [
         "ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c"
     ],
-    "roles": {}
+    "roles": []
 }
 ''';
 
-const _voterAndProposerJson = '''
+const _voterAndProposerJson = r'''
 {
-    "catalyst_id": "preprod.cardano/QhSfGm8dpD_PBmpHPhJRW1tiFv7fxSuHvuCRRWmB2cY",
-    "last_persistent_txn": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
-    "purpose": [
-        "ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c"
-    ],
-    "roles": {
-        "0": {
-            "extended_data": {
-                "10": [
-                    111,
-                    82,
-                    101,
-                    103,
-                    105,
-                    115,
-                    116,
-                    101,
-                    114,
-                    32,
-                    114,
-                    111,
-                    108,
-                    101,
-                    32,
-                    48
-                ]
-            },
-            "payment_addresses": [
-                {
-                    "address": "addr_test1qr3f7dmpr59t8vtp8an9ptrxvetvd4t7mzxwdp9tdjva8580qvqw2t5gfue6xylvsxljc4j2a7kedsxldcym2uu9q6yqs0ju92",
-                    "is_persistent": true,
-                    "time": "2025-04-10T02:22:19+00:00"
-                }
-            ],
-            "signing_keys": [
-                {
-                    "is_persistent": true,
-                    "key_type": "x509",
-                    "key_value": "0x308201fc308201aea0030201020205008d00cd12300506032b6570304231093007060355040613003109300706035504081300310930070603550407130031093007060355040a130031093007060355040b13003109300706035504031300301e170d3235303431303032323134335a170d3939313233313233353935395a304231093007060355040613003109300706035504081300310930070603550407130031093007060355040a130031093007060355040b13003109300706035504031300304a300506032b657003410042149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866a381a43081a130819e0603551d11048196308193820c6d79646f6d61696e2e636f6d82107777772e6d79646f6d61696e2e636f6d820b6578616d706c652e636f6d820f7777772e6578616d706c652e636f6d86537765622b63617264616e6f3a2f2f616464722f7374616b655f7465737431757268737871383939367979377661727a306b6772306576326539776c74766b6372306b757a643477777a73647a71767430653874300506032b657003410097cdda6815238e059116a6906157d94d93373ac6d6f92649a20446a51f0e6c34f76db1fabbdb20128c32522bcac1522526e360f00160c354e396e5dabc961b07",
-                    "time": "2025-04-10T02:22:19+00:00"
-                }
-            ]
+  "catalyst_id": "preprod.cardano/QhSfGm8dpD_PBmpHPhJRW1tiFv7fxSuHvuCRRWmB2cY",
+  "last_persistent_txn": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
+  "last_volatile_txn": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
+  "purpose": [
+    "ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c"
+  ],
+  "invalid": [
+    {
+      "previous_txn": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
+      "purpose": "c9993e54-1ee1-41f7-ab99-3fdec865c744",
+      "report": {
+        "kind": "Error",
+        "msg": "An error has occurred, the details of the error are ..."
+      },
+      "slot": 1234567,
+      "time": "2024-04-09T15:28:21+00:00",
+      "txn_id": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
+      "txn_index": 7
+    }
+  ],
+  "roles": [
+    {
+      "role_id": 0,
+      "encryption_keys": [
+        {
+          "is_persistent": true,
+          "key_type": "x509",
+          "key_value": {
+            "pubkey": "0x56CDD154355E078A0990F9E633F9553F7D43A68B2FF9BEF78B9F5C71C808A7C8"
+          },
+          "slot": 1234567,
+          "time": "2024-04-09T15:28:21+00:00",
+          "txn_index": 7
+        }
+      ],
+      "extended_data": [
+        {
+          "key": 10,
+          "value": "0x6f526567697374657220726f6c652030"
+        }
+      ],
+      "payment_addresses": [
+        {
+          "address": "addr_test1qr3f7dmpr59t8vtp8an9ptrxvetvd4t7mzxwdp9tdjva8580qvqw2t5gfue6xylvsxljc4j2a7kedsxldcym2uu9q6yqs0ju92",
+          "is_persistent": true,
+          "time": "2025-04-10T02:22:19+00:00",
+          "slot": 1234567,
+          "txn_index": 7
+        }
+      ],
+      "signing_keys": [
+        {
+          "is_persistent": true,
+          "key_type": "x509",
+          "key_value": {
+            "x509": "-----BEGIN CERTIFICATE-----\nMIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE\nCBMAMQkwBwYDVQQHEwAxCTAHBgNVBAoTADEJMAcGA1UECxMAMQkwBwYDVQQDEwAw\nHhcNMjUwNDEwMDIyMTQzWhcNOTkxMjMxMjM1OTU5WjBCMQkwBwYDVQQGEwAxCTAH\nBgNVBAgTADEJMAcGA1UEBxMAMQkwBwYDVQQKEwAxCTAHBgNVBAsTADEJMAcGA1UE\nAxMAMEowBQYDK2VwA0EAQhSfGm8dpD/PBmpHPhJRW1tiFv7fxSuHvuCRRWmB2cbS\np2gpo7U+Zq95uwyx763gdfCuZeqqu3X1EGu+71m4ZqOBpDCBoTCBngYDVR0RBIGW\nMIGTggxteWRvbWFpbi5jb22CEHd3dy5teWRvbWFpbi5jb22CC2V4YW1wbGUuY29t\ngg93d3cuZXhhbXBsZS5jb22GU3dlYitjYXJkYW5vOi8vYWRkci9zdGFrZV90ZXN0\nMXVyaHN4cTg5OTZ5eTd2YXJ6MGtncjBldjJlOXdsdHZrY3Iwa3V6ZDR3d3pzZHpx\ndnQwZTh0MAUGAytlcANBAJfN2mgVI44FkRamkGFX2U2TNzrG1vkmSaIERqUfDmw0\n922x+rvbIBKMMlIrysFSJSbjYPABYMNU45bl2ryWGwc=\n-----END CERTIFICATE-----"
+          },
+          "time": "2025-04-10T02:22:19+00:00",
+          "slot": 1234567,
+          "txn_index": 7
+        }
+      ]
+    },
+    {
+      "role_id": 3,
+      "encryption_keys": [
+        {
+          "is_persistent": true,
+          "key_type": "x509",
+          "key_value": {
+            "pubkey": "0x56CDD154355E078A0990F9E633F9553F7D43A68B2FF9BEF78B9F5C71C808A7C8"
+          },
+          "slot": 1234567,
+          "time": "2024-04-09T15:28:21+00:00",
+          "txn_index": 7
+        }
+      ],
+      "extended_data": [
+        {
+          "key": 10,
+          "value": "0x6448696869"
+        }
+      ],
+      "payment_addresses": [
+        {
+          "address": "addr_test1qr3f7dmpr59t8vtp8an9ptrxvetvd4t7mzxwdp9tdjva8580qvqw2t5gfue6xylvsxljc4j2a7kedsxldcym2uu9q6yqs0ju92",
+          "is_persistent": true,
+          "time": "2025-04-10T02:22:19+00:00",
+          "slot": 1234567,
+          "txn_index": 7
         },
-        "3": {
-            "extended_data": {
-                "10": [
-                    100,
-                    72,
-                    105,
-                    104,
-                    105
-                ]
-            },
-            "payment_addresses": [
-                {
-                    "address": "addr_test1qr3f7dmpr59t8vtp8an9ptrxvetvd4t7mzxwdp9tdjva8580qvqw2t5gfue6xylvsxljc4j2a7kedsxldcym2uu9q6yqs0ju92",
-                    "is_persistent": true,
-                    "time": "2025-04-10T02:22:19+00:00"
-                },
-                {
-                    "address": "addr_test1qr4jr9uuq0hdwgrsyze2pdr4vk6647c69suyndv6r75wd30qwklppmzu2aw2l7mgkzxrz3cxvm20uxhw5p7pd4j88yps20uevn",
-                    "is_persistent": true,
-                    "time": "2025-04-11T04:49:07+00:00"
-                }
-            ],
-            "signing_keys": [
-                {
-                    "is_persistent": true,
-                    "key_type": "pubkey",
-                    "key_value": "0xac36a7c87a77de72c3404cca36029e63cdd5cc6e7b2538a52908eee983011b51",
-                    "time": "2025-04-10T02:22:19+00:00"
-                },
-                {
-                    "is_persistent": true,
-                    "key_type": "pubkey",
-                    "key_value": "0xac36a7c87a77de72c3404cca36029e63cdd5cc6e7b2538a52908eee983011b51",
-                    "time": "2025-04-11T04:49:07+00:00"
-                }
-            ]
+        {
+          "address": "addr_test1qr4jr9uuq0hdwgrsyze2pdr4vk6647c69suyndv6r75wd30qwklppmzu2aw2l7mgkzxrz3cxvm20uxhw5p7pd4j88yps20uevn",
+          "is_persistent": true,
+          "time": "2025-04-11T04:49:07+00:00",
+          "slot": 1234567,
+          "txn_index": 7
         }
+      ],
+      "signing_keys": [
+        {
+          "is_persistent": true,
+          "key_type": "pubkey",
+          "key_value": {
+            "pubkey": "0xac36a7c87a77de72c3404cca36029e63cdd5cc6e7b2538a52908eee983011b51"
+          },
+          "time": "2025-04-10T02:22:19+00:00",
+          "slot": 1234567,
+          "txn_index": 7
+        },
+        {
+          "is_persistent": true,
+          "key_type": "pubkey",
+          "key_value": {
+            "pubkey": "0xac36a7c87a77de72c3404cca36029e63cdd5cc6e7b2538a52908eee983011b51"
+          },
+          "time": "2025-04-11T04:49:07+00:00",
+          "slot": 1234567,
+          "txn_index": 7
+        }
+      ]
     }
+  ]
 }
 ''';
 
-const _voterJson = '''
+const _voterJson = r'''
 {
-    "catalyst_id": "preprod.cardano/QhSfGm8dpD_PBmpHPhJRW1tiFv7fxSuHvuCRRWmB2cY",
-    "last_persistent_txn": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
-    "purpose": [
-        "ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c"
-    ],
-    "roles": {
-        "0": {
-            "extended_data": {
-                "10": [
-                    111,
-                    82,
-                    101,
-                    103,
-                    105,
-                    115,
-                    116,
-                    101,
-                    114,
-                    32,
-                    114,
-                    111,
-                    108,
-                    101,
-                    32,
-                    48
-                ]
-            },
-            "payment_addresses": [
-                {
-                    "address": "addr_test1qr3f7dmpr59t8vtp8an9ptrxvetvd4t7mzxwdp9tdjva8580qvqw2t5gfue6xylvsxljc4j2a7kedsxldcym2uu9q6yqs0ju92",
-                    "is_persistent": true,
-                    "time": "2025-04-10T02:22:19+00:00"
-                }
-            ],
-            "signing_keys": [
-                {
-                    "is_persistent": true,
-                    "key_type": "x509",
-                    "key_value": "0x308201fc308201aea0030201020205008d00cd12300506032b6570304231093007060355040613003109300706035504081300310930070603550407130031093007060355040a130031093007060355040b13003109300706035504031300301e170d3235303431303032323134335a170d3939313233313233353935395a304231093007060355040613003109300706035504081300310930070603550407130031093007060355040a130031093007060355040b13003109300706035504031300304a300506032b657003410042149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866a381a43081a130819e0603551d11048196308193820c6d79646f6d61696e2e636f6d82107777772e6d79646f6d61696e2e636f6d820b6578616d706c652e636f6d820f7777772e6578616d706c652e636f6d86537765622b63617264616e6f3a2f2f616464722f7374616b655f7465737431757268737871383939367979377661727a306b6772306576326539776c74766b6372306b757a643477777a73647a71767430653874300506032b657003410097cdda6815238e059116a6906157d94d93373ac6d6f92649a20446a51f0e6c34f76db1fabbdb20128c32522bcac1522526e360f00160c354e396e5dabc961b07",
-                    "time": "2025-04-10T02:22:19+00:00"
-                }
-            ]
+  "catalyst_id": "preprod.cardano/QhSfGm8dpD_PBmpHPhJRW1tiFv7fxSuHvuCRRWmB2cY",
+  "last_persistent_txn": "0x95f781a3db75af41d1dde5a997b9f9ab3e20035882d4a2ccafdc81cfda6f52a2",
+  "purpose": [
+    "ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c"
+  ],
+  "roles": [
+    {
+      "role_id": 0,
+      "encryption_keys": [
+        {
+          "is_persistent": true,
+          "key_type": "x509",
+          "key_value": {
+            "pubkey": "0x56CDD154355E078A0990F9E633F9553F7D43A68B2FF9BEF78B9F5C71C808A7C8"
+          },
+          "slot": 1234567,
+          "time": "2024-04-09T15:28:21+00:00",
+          "txn_index": 7
         }
+      ],
+      "extended_data": [
+        {
+          "key": 10,
+          "value": "0x6f526567697374657220726f6c652030"
+        }
+      ],
+      "payment_addresses": [
+        {
+          "address": "addr_test1qr3f7dmpr59t8vtp8an9ptrxvetvd4t7mzxwdp9tdjva8580qvqw2t5gfue6xylvsxljc4j2a7kedsxldcym2uu9q6yqs0ju92",
+          "is_persistent": true,
+          "time": "2025-04-10T02:22:19+00:00",
+          "slot": 1234567,
+          "txn_index": 7
+        }
+      ],
+      "signing_keys": [
+        {
+          "is_persistent": true,
+          "key_type": "x509",
+          "key_value": {
+            "x509": "-----BEGIN CERTIFICATE-----\nMIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE\nCBMAMQkwBwYDVQQHEwAxCTAHBgNVBAoTADEJMAcGA1UECxMAMQkwBwYDVQQDEwAw\nHhcNMjUwNDEwMDIyMTQzWhcNOTkxMjMxMjM1OTU5WjBCMQkwBwYDVQQGEwAxCTAH\nBgNVBAgTADEJMAcGA1UEBxMAMQkwBwYDVQQKEwAxCTAHBgNVBAsTADEJMAcGA1UE\nAxMAMEowBQYDK2VwA0EAQhSfGm8dpD/PBmpHPhJRW1tiFv7fxSuHvuCRRWmB2cbS\np2gpo7U+Zq95uwyx763gdfCuZeqqu3X1EGu+71m4ZqOBpDCBoTCBngYDVR0RBIGW\nMIGTggxteWRvbWFpbi5jb22CEHd3dy5teWRvbWFpbi5jb22CC2V4YW1wbGUuY29t\ngg93d3cuZXhhbXBsZS5jb22GU3dlYitjYXJkYW5vOi8vYWRkci9zdGFrZV90ZXN0\nMXVyaHN4cTg5OTZ5eTd2YXJ6MGtncjBldjJlOXdsdHZrY3Iwa3V6ZDR3d3pzZHpx\ndnQwZTh0MAUGAytlcANBAJfN2mgVI44FkRamkGFX2U2TNzrG1vkmSaIERqUfDmw0\n922x+rvbIBKMMlIrysFSJSbjYPABYMNU45bl2ryWGwc=\n-----END CERTIFICATE-----"
+          },
+          "time": "2025-04-10T02:22:19+00:00",
+          "slot": 1234567,
+          "txn_index": 7
+        }
+      ]
     }
+  ]
 }
 ''';
 /* cSpell:enable */
-
-class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed25519XPublicKey(this.bytes);
-}
-
-class _FakeBip32Ed25519XPublicKeyFactory extends Fake implements Bip32Ed25519XPublicKeyFactory {
-  @override
-  Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed25519XPublicKey(bytes);
-  }
-}

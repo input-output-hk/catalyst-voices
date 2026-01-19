@@ -1,12 +1,12 @@
 import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dart'
     show DraftProposalChip, FinalProposalChip, PrivateProposalChip;
 import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
     show ProposalVersionViewModel, UsersProposalOverview;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 import '../../helpers/helpers.dart';
 
@@ -19,17 +19,13 @@ void main() {
     late String draftVersion;
 
     setUpAll(() async {
-      // TODO(LynxLynxx): When we create dev test package use DocumentFactoryRef here
-      // Extracting DocumentFactoryRef to Shared not possible due to need of importing classes from
-      // repository package
-      proposalId = const Uuid().v7();
-      draftVersion = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 10), () {});
-      latestVersion = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 10), () {});
-      localVersion = const Uuid().v7();
+      proposalId = DocumentRefFactory.randomUuidV7();
+      draftVersion = DocumentRefFactory.randomUuidV7();
+      latestVersion = DocumentRefFactory.randomUuidV7();
+      localVersion = DocumentRefFactory.randomUuidV7();
       mockProposal = UsersProposalOverview(
-        selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+        id: SignedDocumentRef(id: proposalId, ver: latestVersion),
+        parameters: DocumentParameters({SignedDocumentRef.generateFirstRef()}),
         title: 'Test Proposal',
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),
@@ -37,7 +33,7 @@ void main() {
         versions: [
           ProposalVersionViewModel(
             publish: ProposalPublish.localDraft,
-            selfRef: DraftRef(id: proposalId, version: localVersion),
+            id: DraftRef(id: proposalId, ver: localVersion),
             title: 'Title ver 1',
             createdAt: DateTime.now(),
             isLatest: true,
@@ -46,7 +42,7 @@ void main() {
           ),
           ProposalVersionViewModel(
             publish: ProposalPublish.publishedDraft,
-            selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+            id: SignedDocumentRef(id: proposalId, ver: latestVersion),
             title: 'Test Proposal',
             createdAt: DateTime.now(),
             isLatest: false,
@@ -55,7 +51,7 @@ void main() {
           ),
           ProposalVersionViewModel(
             publish: ProposalPublish.publishedDraft,
-            selfRef: SignedDocumentRef(id: proposalId, version: draftVersion),
+            id: SignedDocumentRef(id: proposalId, ver: draftVersion),
             title: 'Title ver 2',
             createdAt: DateTime.now(),
             isLatest: false,
@@ -66,7 +62,6 @@ void main() {
         fundNumber: 14,
         commentsCount: 0,
         category: 'Cardano Use Cases: Concept',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         fromActiveCampaign: true,
       );
     });

@@ -1,194 +1,195 @@
 {
-    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
-    "version": "0.2",
-    "enabled": true,
-    "language": "en,en-US",
-    "overrides": [
-        {
-            "language": "es,es_ES",
-            "filename": "**/*_es.arb",
-            "dictionaries": [
-                "es-es"
-            ]
-        },
-        {
-            "filename": "**/*.pbxproj",
-            "allowCompoundWords": true,
-            "words": [
-                "iphoneos",
-                "onone",
-                "xcassets",
-                "objc",
-                "xcconfig",
-                "lproj",
-                "libc",
-                "objc",
-                "dsym"
-            ]
-        },
-        {
-            "filename": "**/*.plist",
-            "allowCompoundWords": true,
-            "words": [
-                "FMWK",
-                "APPL"
-            ]
-        },
-        {
-            "filename": "**/*.yaml",
-            "allowCompoundWords": true
-        },
-        {
-            "filename": "**/gradle.properties",
-            "allowCompoundWords": true,
-            "words": [
-                "jvmargs"
-            ]
-        },
-        {
-            "filename": "**/*.xml",
-            "allowCompoundWords": true
-        },
-        {
-            "filename": "**/build.gradle",
-            "allowCompoundWords": true,
-            "words": [
-                "getenv"
-            ]
-        },
-        {
-            "filename": "**/gradle-wrapper.properties",
-            "words": [
-                "dists"
-            ]
-        },
-        {
-            "filename": "**/*.kt",
-            "allowCompoundWords": true
-        },
-        {
-            "filename": "**/Appfile",
-            "words": [
-                "Appfile"
-            ]
-        },
-        {
-            "filename": "**/*.storyboard",
-            "allowCompoundWords": true
-        },
-        {
-            "filename": "**/*.appiconset/Contents.json",
-            "allowCompoundWords": true,
-            "words": [
-                "xcassets"
-            ]
-        },
-        {
-            "filename": "**/analysis_options.1.0.0.yaml",
-            "words": [
-                "interps",
-                "todos",
-                "pubspec",
-                "unawaited",
-                "bools"
-            ]
-        },
-        {
-            "filename": "**/*.xcscheme",
-            "allowCompoundWords": true,
-            "words": [
-                "LLDB",
-                "xcodeproj"
-            ]
-        },
-        {
-            "filename": "**/*.xcconfig",
-            "words": [
-                "xcconfig"
-            ]
-        },
-        {
-            "filename": "**/*.xcworkspacedata",
-            "words": [
-                "xcodeproj"
-            ]
-        }
-    ],
-    "useGitignore": true,
-    "dictionaryDefinitions": [
-        {
-            "name": "project-words",
-            "path": ".config/dictionaries/project.dic",
-            "description": "Words used in this project",
-            "addWords": true
-        }
-    ],
-    "dictionaries": [
-        "project-words",
-        "bash",
-        "companies",
-        "cpp",
-        "cryptocurrencies",
-        "css",
-        "dart",
-        "data-science",
-        "docker",
-        "filetypes",
-        "fonts",
-        "fullstack",
-        "git",
-        "html",
-        "html-symbol-entities",
-        "java",
-        "public-licenses",
-        "rust",
-        "softwareTerms",
-        "sql",
-        "typescript",
-        "swift",
-        "addrs",
-        "metamap",
-        "sidechain",
-        "permutations",
-        "cbor"
-    ],
-    "import": [
-        ".config/dictionaries/cspell/es_ES/cspell-ext.json",
-        ".config/dictionaries/cspell/markdown/cspell-ext.json"
-    ],
-    "ignorePaths": [
-        "*.excalidraw",
-        ".config/dictionaries/**",
-        "tmp/**",
-        "cspell.json",
-        ".git/**",
-        "**/.gitignore",
-        ".vscode/**",
-        "**/.idea/**",
-        "*.bin",
-        "*.sqlite3",
-        "**/historic_data/**/*.sql",
-        "**/historic_data/**/*.sql",
-        "**/historic_data/**/*.yaml",
-        "**/historic_data/**/*.json",
-        "**/test_data/**/*.sql",
-        "styles.min.css",
-        "web-components.min.js",
-        "**/generated/**",
-        "**/openapi/**",
-        "**/GeneratedPluginRegistrant.swift",
-        "catalyst_voices/packages/libs/**/cargokit/**",
-        "catalyst_voices/packages/libs/**/lib/src/rust/**",
-        "catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/**",
-        "catalyst_voices/utilities/remote_widgets/example/**/**",
-        "catalyst_voices/utilities/poc_local_storage/**/**",
-        "**/*.svg",
-        "catalyst_voices/docs/licenses/**",
-        "catalyst_voices/docs/dependency_graph.dot",
-        "catalyst-gateway/tests/api_tests/test_data/**",
-    ],
-    "enableFiletypes": [
-        "earthfile",
-        "github-actions-workflow"
-    ]
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "enabled": true,
+  "language": "en,en-US",
+  "overrides": [
+    {
+      "language": "es,es_ES",
+      "filename": "**/*_es.arb",
+      "dictionaries": [
+        "es-es"
+      ]
+    },
+    {
+      "filename": "**/*.pbxproj",
+      "allowCompoundWords": true,
+      "words": [
+        "iphoneos",
+        "onone",
+        "xcassets",
+        "objc",
+        "xcconfig",
+        "lproj",
+        "libc",
+        "objc",
+        "dsym"
+      ]
+    },
+    {
+      "filename": "**/*.plist",
+      "allowCompoundWords": true,
+      "words": [
+        "FMWK",
+        "APPL"
+      ]
+    },
+    {
+      "filename": "**/*.yaml",
+      "allowCompoundWords": true
+    },
+    {
+      "filename": "**/gradle.properties",
+      "allowCompoundWords": true,
+      "words": [
+        "jvmargs"
+      ]
+    },
+    {
+      "filename": "**/*.xml",
+      "allowCompoundWords": true
+    },
+    {
+      "filename": "**/build.gradle",
+      "allowCompoundWords": true,
+      "words": [
+        "getenv"
+      ]
+    },
+    {
+      "filename": "**/gradle-wrapper.properties",
+      "words": [
+        "dists"
+      ]
+    },
+    {
+      "filename": "**/*.kt",
+      "allowCompoundWords": true
+    },
+    {
+      "filename": "**/Appfile",
+      "words": [
+        "Appfile"
+      ]
+    },
+    {
+      "filename": "**/*.storyboard",
+      "allowCompoundWords": true
+    },
+    {
+      "filename": "**/*.appiconset/Contents.json",
+      "allowCompoundWords": true,
+      "words": [
+        "xcassets"
+      ]
+    },
+    {
+      "filename": "**/analysis_options.1.0.0.yaml",
+      "words": [
+        "interps",
+        "todos",
+        "pubspec",
+        "unawaited",
+        "bools"
+      ]
+    },
+    {
+      "filename": "**/*.xcscheme",
+      "allowCompoundWords": true,
+      "words": [
+        "LLDB",
+        "xcodeproj"
+      ]
+    },
+    {
+      "filename": "**/*.xcconfig",
+      "words": [
+        "xcconfig"
+      ]
+    },
+    {
+      "filename": "**/*.xcworkspacedata",
+      "words": [
+        "xcodeproj"
+      ]
+    }
+  ],
+  "useGitignore": true,
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": ".config/dictionaries/project.dic",
+      "description": "Words used in this project",
+      "addWords": true
+    }
+  ],
+  "dictionaries": [
+    "project-words",
+    "bash",
+    "companies",
+    "cpp",
+    "cryptocurrencies",
+    "css",
+    "dart",
+    "data-science",
+    "docker",
+    "filetypes",
+    "fonts",
+    "fullstack",
+    "git",
+    "html",
+    "html-symbol-entities",
+    "java",
+    "public-licenses",
+    "rust",
+    "softwareTerms",
+    "sql",
+    "typescript",
+    "swift",
+    "addrs",
+    "metamap",
+    "sidechain",
+    "permutations",
+    "cbor"
+  ],
+  "import": [
+    ".config/dictionaries/cspell/es_ES/cspell-ext.json",
+    ".config/dictionaries/cspell/markdown/cspell-ext.json"
+  ],
+  "ignorePaths": [
+    "*.excalidraw",
+    ".config/dictionaries/**",
+    "tmp/**",
+    "cspell.json",
+    ".git/**",
+    "**/.gitignore",
+    ".vscode/**",
+    "**/.idea/**",
+    "*.bin",
+    "*.sqlite3",
+    "**/historic_data/**/*.sql",
+    "**/historic_data/**/*.sql",
+    "**/historic_data/**/*.yaml",
+    "**/historic_data/**/*.json",
+    "**/test_data/**",
+    "styles.min.css",
+    "web-components.min.js",
+    "**/generated/**",
+    "**/GeneratedPluginRegistrant.swift",
+    "catalyst_voices/packages/libs/**/cargokit/**",
+    "catalyst_voices/packages/libs/**/lib/src/rust/**",
+    "catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/**",
+    "catalyst_voices/utilities/remote_widgets/example/**/**",
+    "catalyst_voices/utilities/poc_local_storage/**/**",
+    "**/*.svg",
+    "catalyst_voices/docs/licenses/**",
+    "catalyst_voices/docs/dependency_graph.dot",
+    "catalyst_voices/scripts/version_web_assets/test/helper",
+    "catalyst-gateway/tests/api_tests/test_data/**",
+    "utilities/reviews-mock-server/cat-reviews.json"
+  ],
+  "enableFiletypes": [
+    "earthfile",
+    "github-actions-workflow"
+  ]
 }

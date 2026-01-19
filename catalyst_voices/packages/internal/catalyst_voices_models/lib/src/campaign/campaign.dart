@@ -3,6 +3,8 @@ import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign
 import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_timeline.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_timeline.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/fx_static_campaign_categories.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/fx_static_campaign_timeline.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -12,30 +14,30 @@ final class Campaign extends Equatable {
   // They're only used to difference between campaigns.
   static const f14Ref = SignedDocumentRef.first('01997695-e26f-70db-b9d4-92574a806bcd');
   static const f15Ref = SignedDocumentRef.first('0199802c-21b4-7d91-986d-0e913cd81391');
+  static const fXRef = SignedDocumentRef.first('019b4b08-6b39-7ec1-8ae5-6696f28e370c');
 
   static final all = <Campaign>[
     Campaign.f14(),
     Campaign.f15(),
+    Campaign.fX(),
   ];
 
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
   // 'draft' version of campaign like Proposal
-  final DocumentRef selfRef;
+  final DocumentRef id;
   final String name;
   final String description;
   final MultiCurrencyAmount allFunds;
-  final MultiCurrencyAmount totalAsk;
   final int fundNumber;
   final CampaignTimeline timeline;
   final List<CampaignCategory> categories;
   final CampaignPublish publish;
 
   const Campaign({
-    required this.selfRef,
+    required this.id,
     required this.name,
     required this.description,
     required this.allFunds,
-    required this.totalAsk,
     required this.fundNumber,
     required this.timeline,
     required this.categories,
@@ -44,12 +46,11 @@ final class Campaign extends Equatable {
 
   factory Campaign.f14() {
     return Campaign(
-      selfRef: f14Ref,
+      id: f14Ref,
       name: 'Catalyst Fund14',
       description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
       allFunds: MultiCurrencyAmount.single(Currencies.ada.amount(20000000)),
-      totalAsk: MultiCurrencyAmount.single(Money.zero(currency: Currencies.ada)),
       fundNumber: 14,
       timeline: f14StaticCampaignTimeline,
       publish: CampaignPublish.published,
@@ -59,21 +60,33 @@ Project Catalyst turns economic power into innovation power by using the Cardano
 
   factory Campaign.f15() {
     return Campaign(
-      selfRef: f15Ref,
+      id: f15Ref,
       name: 'Catalyst Fund15',
       description: '''TODO''',
       allFunds: MultiCurrencyAmount.list([
         Currencies.ada.amount(20000000),
         Currencies.usdm.amount(250000),
       ]),
-      totalAsk: MultiCurrencyAmount.list([
-        Money.zero(currency: Currencies.ada),
-        Money.zero(currency: Currencies.usdm),
-      ]),
       fundNumber: 15,
       timeline: f15StaticCampaignTimeline,
       publish: CampaignPublish.published,
       categories: f15StaticCampaignCategories,
+    );
+  }
+
+  factory Campaign.fX() {
+    return Campaign(
+      id: fXRef,
+      name: 'Catalyst Next Fund',
+      description: '''TODO''',
+      allFunds: MultiCurrencyAmount.list([
+        Currencies.ada.amount(20000000),
+        Currencies.usdm.amount(250000),
+      ]),
+      fundNumber: 16,
+      timeline: fXStaticCampaignTimeline,
+      publish: CampaignPublish.published,
+      categories: fXStaticCampaignCategories,
     );
   }
 
@@ -112,11 +125,10 @@ Project Catalyst turns economic power into innovation power by using the Cardano
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
     name,
     description,
     allFunds,
-    totalAsk,
     fundNumber,
     timeline,
     publish,
@@ -158,22 +170,20 @@ Project Catalyst turns economic power into innovation power by using the Cardano
   }
 
   Campaign copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
     String? name,
     String? description,
     MultiCurrencyAmount? allFunds,
-    MultiCurrencyAmount? totalAsk,
     int? fundNumber,
     CampaignTimeline? timeline,
     CampaignPublish? publish,
     List<CampaignCategory>? categories,
   }) {
     return Campaign(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
       allFunds: allFunds ?? this.allFunds,
-      totalAsk: totalAsk ?? this.totalAsk,
       fundNumber: fundNumber ?? this.fundNumber,
       timeline: timeline ?? this.timeline,
       publish: publish ?? this.publish,
@@ -182,7 +192,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
   }
 
   bool hasCategory(String id) {
-    return categories.any((element) => element.selfRef.id == id);
+    return categories.any((element) => element.id.id == id);
   }
 
   /// Returns the state of the campaign for a specific phase.

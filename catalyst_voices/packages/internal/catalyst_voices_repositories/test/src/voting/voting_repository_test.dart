@@ -60,7 +60,7 @@ void main() {
         expect(votes.first.proposal, equals(proposal1));
         expect(votes.first.type, equals(VoteType.yes));
         expect(votes.first.isCasted, isTrue);
-        expect(votes.first.selfRef, isA<SignedDocumentRef>());
+        expect(votes.first.id, isA<SignedDocumentRef>());
       });
 
       test('should add multiple votes for different proposals', () async {

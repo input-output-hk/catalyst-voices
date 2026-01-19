@@ -8,15 +8,20 @@ import 'package:meta/meta.dart';
 /// We have concept of *useful* document such as [ProposalDocument] or [CommentDocument]
 /// which is combination of multiple documents(eg. template + data).
 abstract base class DocumentMetadata extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
+
+  /// A list of referenced parameters like brand, campaign or category.
+  final DocumentParameters parameters;
 
   DocumentMetadata({
-    required this.selfRef,
-  }) : assert(selfRef.isExact, 'SelfRef have to be exact!');
+    required this.id,
+    required this.parameters,
+  }) : assert(id.isExact, 'Id have to be exact!');
 
   @override
   @mustCallSuper
   List<Object?> get props => [
-    selfRef,
+    id,
+    parameters,
   ];
 }

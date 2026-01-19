@@ -33,7 +33,7 @@ class ProposalsPaginationEmptyState extends StatelessWidget {
               ? Text(context.l10n.tryDifferentSearch)
               : Text(context.l10n.discoverySpaceEmptyProposals),
           image: VoicesImagesScheme(
-            image: VoicesAssets.images.noProposalForeground.buildPicture(),
+            image: VoicesAssets.images.svg.noProposalForeground.buildPicture(),
             background: Container(
               height: 180,
               decoration: BoxDecoration(

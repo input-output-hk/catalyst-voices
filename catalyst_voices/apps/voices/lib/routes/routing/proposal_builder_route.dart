@@ -15,7 +15,7 @@ part 'proposal_builder_route.g.dart';
   name: 'proposal_builder_draft',
 )
 final class ProposalBuilderDraftRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $ProposalBuilderDraftRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
 
   const ProposalBuilderDraftRoute({
@@ -47,7 +47,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   name: 'proposal_builder_edit',
 )
 final class ProposalBuilderRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $ProposalBuilderRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
   final String? proposalVersion;
   final bool local;
@@ -63,7 +63,7 @@ final class ProposalBuilderRoute extends GoRouteData
   }) {
     return ProposalBuilderRoute(
       proposalId: ref.id,
-      proposalVersion: ref.version,
+      proposalVersion: ref.ver,
       local: ref is DraftRef,
     );
   }
@@ -78,7 +78,7 @@ final class ProposalBuilderRoute extends GoRouteData
   Widget build(BuildContext context, GoRouterState state) {
     final ref = DocumentRef.build(
       id: proposalId,
-      version: proposalVersion,
+      ver: proposalVersion,
       isDraft: local,
     );
 

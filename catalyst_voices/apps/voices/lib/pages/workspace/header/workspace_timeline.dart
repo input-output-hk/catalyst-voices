@@ -144,7 +144,7 @@ class _ViewComments extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
-      selector: (state) => state.hasComments,
+      selector: (state) => state.userProposals.hasComments,
       builder: (context, hasComments) {
         return hasComments
             ? Padding(

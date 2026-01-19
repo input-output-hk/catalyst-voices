@@ -3,7 +3,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class UsersProposalOverview extends Equatable {
-  final DocumentRef selfRef;
+  final DocumentRef id;
+  final DocumentParameters parameters;
   final String title;
   final DateTime updateDate;
   final Money fundsRequested;
@@ -11,12 +12,12 @@ final class UsersProposalOverview extends Equatable {
   final List<ProposalVersionViewModel> versions;
   final int commentsCount;
   final String category;
-  final SignedDocumentRef categoryId;
   final int fundNumber;
   final bool fromActiveCampaign;
 
   const UsersProposalOverview({
-    required this.selfRef,
+    required this.id,
+    required this.parameters,
     required this.title,
     required this.updateDate,
     required this.fundsRequested,
@@ -24,7 +25,6 @@ final class UsersProposalOverview extends Equatable {
     required this.versions,
     required this.commentsCount,
     required this.category,
-    required this.categoryId,
     required this.fundNumber,
     required this.fromActiveCampaign,
   });
@@ -36,7 +36,8 @@ final class UsersProposalOverview extends Equatable {
     required bool fromActiveCampaign,
   }) {
     return UsersProposalOverview(
-      selfRef: proposal.selfRef,
+      id: proposal.id,
+      parameters: proposal.parameters,
       title: proposal.title,
       updateDate: proposal.updateDate,
       fundsRequested: proposal.fundsRequested,
@@ -44,7 +45,6 @@ final class UsersProposalOverview extends Equatable {
       versions: proposal.versions.toViewModels(),
       commentsCount: proposal.commentsCount,
       category: categoryName,
-      categoryId: proposal.categoryRef,
       fundNumber: fundNumber,
       fromActiveCampaign: fromActiveCampaign,
     );
@@ -58,12 +58,13 @@ final class UsersProposalOverview extends Equatable {
   int get iteration {
     if (versions.isEmpty) return DocumentVersion.firstNumber;
 
-    return versions.firstWhere((version) => version.selfRef == selfRef).versionNumber;
+    return versions.firstWhere((version) => version.id == id).versionNumber;
   }
 
   @override
   List<Object?> get props => [
-    selfRef,
+    id,
+    parameters,
     title,
     updateDate,
     fundsRequested,
@@ -71,13 +72,13 @@ final class UsersProposalOverview extends Equatable {
     versions,
     commentsCount,
     category,
-    categoryId,
     fundNumber,
     fromActiveCampaign,
   ];
 
   UsersProposalOverview copyWith({
-    DocumentRef? selfRef,
+    DocumentRef? id,
+    DocumentParameters? parameters,
     String? title,
     DateTime? updateDate,
     Money? fundsRequested,
@@ -85,12 +86,12 @@ final class UsersProposalOverview extends Equatable {
     List<ProposalVersionViewModel>? versions,
     int? commentsCount,
     String? category,
-    SignedDocumentRef? categoryId,
     int? fundNumber,
     bool? fromActiveCampaign,
   }) {
     return UsersProposalOverview(
-      selfRef: selfRef ?? this.selfRef,
+      id: id ?? this.id,
+      parameters: parameters ?? this.parameters,
       title: title ?? this.title,
       updateDate: updateDate ?? this.updateDate,
       fundsRequested: fundsRequested ?? this.fundsRequested,
@@ -98,7 +99,6 @@ final class UsersProposalOverview extends Equatable {
       versions: versions ?? this.versions,
       commentsCount: commentsCount ?? this.commentsCount,
       category: category ?? this.category,
-      categoryId: categoryId ?? this.categoryId,
       fundNumber: fundNumber ?? this.fundNumber,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
     );

@@ -9,9 +9,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 final f15StaticCampaignCategories = <CampaignCategory>[
   //Tier-1 Enterprise Integrations
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[0].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[0].proposal,
-    campaignRef: f15ConstDocumentsRefs[0].comment,
+    id: f15ConstDocumentsRefs[0].category,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Tier-1 Enterprise Integrations',
     description:
@@ -19,7 +18,6 @@ final f15StaticCampaignCategories = <CampaignCategory>[
     shortDescription:
         'To fund high-impact R&D pilots and integrations led by or in collaboration with established Tier-1 enterprises, driving mainstream Cardano adoption and creating significant co-marketing opportunities.',
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(10000000)),
-    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: Range(
       min: Currencies.ada.amount(250000),
       max: Currencies.ada.amount(750000),
@@ -132,15 +130,13 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Use vague team bios; provide links.',
     ],
     submissionCloseDate: DateTimeExt.now(),
-    proposalsCount: 0,
     imageUrl: '',
   ),
 
   //Cardano Use Cases: Prototype & Launch
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[1].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[1].proposal,
-    campaignRef: f15ConstDocumentsRefs[1].comment,
+    id: f15ConstDocumentsRefs[1].category,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Prototype & Launch',
     description:
@@ -148,7 +144,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
     shortDescription:
         'To provide entrepreneurial individuals and teams with funding to build and launch novel prototypes that have already undergone foundational research and design, accelerating the delivery of new on-chain utility for Cardano.',
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(6000000)),
-    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(200000),
@@ -241,14 +236,12 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Budget for giveaways/re-grants.',
     ],
     submissionCloseDate: DateTimeExt.now(),
-    proposalsCount: 0,
     imageUrl: '',
   ),
   //   //Cardano Open: Ecosystem
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[2].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[2].proposal,
-    campaignRef: f15ConstDocumentsRefs[2].comment,
+    id: f15ConstDocumentsRefs[2].category,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',
     description:
@@ -256,7 +249,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
     shortDescription:
         'Funds non-technical initiatives like marketing, education, research, and community building to grow Cardano’s ecosystem and onboard new users globally.',
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(2500000)),
-    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(60000),
@@ -348,14 +340,12 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Focus on giveaways/incentives.',
     ],
     submissionCloseDate: DateTimeExt.now(),
-    proposalsCount: 0,
     imageUrl: '',
   ),
   //Midnight: Compact DApps
   CampaignCategory(
-    selfRef: f15ConstDocumentsRefs[3].category,
-    proposalTemplateRef: f15ConstDocumentsRefs[3].proposal,
-    campaignRef: f15ConstDocumentsRefs[3].comment,
+    id: f15ConstDocumentsRefs[3].category,
+    campaignRef: Campaign.f15Ref,
     categoryName: 'Midnight:',
     categorySubname: 'Compact DApps',
     description:
@@ -363,7 +353,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
     shortDescription:
         'To accelerate developer adoption of Midnight by funding essential open-source reference DApps. This category is seeking reference DApps, and funding will be sponsored by the Midnight Foundation.',
     availableFunds: MultiCurrencyAmount.single(Currencies.usdm.amount(250000)),
-    totalAsk: MultiCurrencyAmount.single(Currencies.usdm.amount(0)),
     range: Range(
       min: Currencies.usdm.amount(2500),
       max: Currencies.usdm.amount(10000),
@@ -479,7 +468,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Outsource the core development.',
     ],
     submissionCloseDate: DateTimeExt.now(),
-    proposalsCount: 0,
     imageUrl: '',
   ),
 ];

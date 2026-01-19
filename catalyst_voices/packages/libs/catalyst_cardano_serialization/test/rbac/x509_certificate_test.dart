@@ -1,8 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
 import 'package:collection/collection.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(X509Certificate, () {
@@ -63,7 +62,134 @@ void main() {
 
       final derCertificate = certificate.toDer();
       final decodedCertificate = X509Certificate.fromDer(derCertificate);
-      expect(decodedCertificate, equals(decodedCertificate));
+      expect(decodedCertificate, equals(certificate));
+    });
+
+    test('fromPem decodes PEM certificate correctly', () async {
+      final certificate = await X509Certificate.generateSelfSigned(
+        tbsCertificate: tbs,
+        privateKey: privateKey,
+      );
+
+      final pem = certificate.toPem();
+      final decodedCertificate = X509Certificate.fromPem(pem);
+
+      expect(decodedCertificate, equals(certificate));
+    });
+
+    test('fromPem handles custom label', () async {
+      final certificate = await X509Certificate.generateSelfSigned(
+        tbsCertificate: tbs,
+        privateKey: privateKey,
+      );
+
+      final pem = certificate.toPem('CUSTOM LABEL');
+      final decodedCertificate = X509Certificate.fromPem(pem);
+
+      expect(decodedCertificate, equals(certificate));
+    });
+
+    test('fromPem handles whitespace variations', () async {
+      final certificate = await X509Certificate.generateSelfSigned(
+        tbsCertificate: tbs,
+        privateKey: privateKey,
+      );
+
+      final normalPem = certificate.toPem();
+      final pemWithWhitespace = normalPem.replaceAll('\n', '\n\t  ');
+      final decodedCertificate = X509Certificate.fromPem(pemWithWhitespace);
+
+      expect(decodedCertificate, equals(certificate));
+    });
+
+    test('extractBase64FromPem removes header and footer', () {
+      /* cSpell:disable */
+      const pem = '''
+-----BEGIN CERTIFICATE-----
+MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
+-----END CERTIFICATE-----
+''';
+
+      final base64 = X509Certificate.extractBase64FromPem(pem);
+
+      expect(base64, isNot(contains('-----BEGIN')));
+      expect(base64, isNot(contains('-----END')));
+      expect(base64, isNot(contains('CERTIFICATE')));
+      expect(base64, isNot(contains('\n')));
+      expect(base64, isNot(contains(' ')));
+      expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
+    });
+
+    test('extractBase64FromPem handles custom label', () {
+      /* cSpell:disable */
+      const pem = '''
+-----BEGIN CUSTOM LABEL-----
+MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
+-----END CUSTOM LABEL-----
+''';
+
+      final base64 = X509Certificate.extractBase64FromPem(pem);
+
+      expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
+    });
+
+    test('extractBase64FromPem handles label without spaces', () {
+      /* cSpell:disable */
+      const pem = '''
+-----BEGIN-----
+MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
+-----END-----
+''';
+
+      final base64 = X509Certificate.extractBase64FromPem(pem);
+
+      expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
+    });
+
+    test('extractBase64FromPem removes all whitespace types', () {
+      /* cSpell:disable */
+      const pem = '''
+-----BEGIN CERTIFICATE-----
+MIIB /DCC Aa6g
+AwIB  AgIF\tAI0A
+-----END CERTIFICATE-----
+''';
+
+      final base64 = X509Certificate.extractBase64FromPem(pem);
+
+      expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0A'));
+      expect(base64, isNot(contains(' ')));
+      expect(base64, isNot(contains('\t')));
+      expect(base64, isNot(contains('\n')));
+      /* cSpell:enable */
+    });
+
+    test('extractBase64FromPem handles multiple newlines', () {
+      /* cSpell:disable */
+      const pem = '''
+-----BEGIN CERTIFICATE-----
+
+
+MIIB/DCCAa6g
+
+
+AwIBAgIFAI0A
+zRIwBQYDK2Vw
+MEIxCTAHBgNV
+BAYTADEJMAcG
+
+A1UE
+
+-----END CERTIFICATE-----
+''';
+
+      final base64 = X509Certificate.extractBase64FromPem(pem);
+
+      expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
     });
   });
 }

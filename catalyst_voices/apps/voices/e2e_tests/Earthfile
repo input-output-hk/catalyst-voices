@@ -39,5 +39,8 @@ all-images:
     # Build voices frontend (without debug symbols for e2e tests)
     BUILD ../../../+docker --UPLOAD_DEBUG_SYMBOLS=false
     
+    # Build reviews mock server
+    BUILD ../../../../utilities/reviews-mock-server+docker
+    
     # Build E2E test runner
     BUILD +docker

@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_plus/cryptography_plus.dart';
 
 Future<void> main() async {
   await _coseSign1();
@@ -74,12 +74,12 @@ final class _SignerVerifier implements CatalystCoseSigner, CatalystCoseVerifier 
   const _SignerVerifier(this._algorithm, this._keyPair);
 
   @override
-  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+  CoseStringOrInt? get alg => const CoseIntValue(CoseValues.eddsaAlg);
 
   @override
-  Future<Uint8List?> get kid async {
+  Future<CatalystIdKid?> get kid async {
     final pk = await _keyPair.extractPublicKey();
-    return Uint8List.fromList(pk.bytes);
+    return CatalystIdKid(Uint8List.fromList(pk.bytes));
   }
 
   @override

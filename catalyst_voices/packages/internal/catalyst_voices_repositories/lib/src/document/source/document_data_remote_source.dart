@@ -1,18 +1,18 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/common/content_types.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document_version.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
-  @visibleForTesting
-  static const indexPageSize = 200;
-
   final ApiServices _api;
   final SignedDocumentManager _signedDocumentManager;
 
@@ -22,118 +22,128 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   );
 
   @override
-  Future<DocumentData> get({required DocumentRef ref}) async {
-    final bytes = await _api.gateway
-        .apiV1DocumentDocumentIdGet(
-          documentId: ref.id,
-          version: ref.version,
-        )
-        .successBodyBytesOrThrow();
+  Future<DocumentDataWithArtifact> get(DocumentRef ref) async {
+    final artifact = await _api.gateway
+        .getDocument(documentId: ref.id, version: ref.ver)
+        .successBodyOrThrow()
+        .then(DocumentArtifact.new);
 
-    final signedDocument = await _signedDocumentManager.parseDocument(bytes);
+    final signedDocument = await _signedDocumentManager.parseDocument(artifact);
     return DocumentDataFactory.create(signedDocument);
   }
 
   @override
-  Future<String?> getLatestVersion(String id) async {
-    final constVersion = allConstantDocumentRefs
-        .expand((element) => element.all)
-        .firstWhereOrNull((element) => element.id == id)
-        ?.version;
-
-    if (constVersion != null) {
-      return constVersion;
-    }
-
-    try {
-      final index = await _api.gateway
-          .apiV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
-            limit: 1,
-          )
-          .successBodyOrThrow()
-          .then(_mapDynamicResponseValue);
-
-      final docs = index.docs;
-      if (docs.isEmpty) {
-        return null;
-      }
-
-      return docs
-          .sublist(0, 1)
-          .cast<Map<String, dynamic>>()
-          .map(DocumentIndexListDto.fromJson)
-          .firstOrNull
-          ?.ver
-          .firstOrNull
-          ?.ver;
-    } on NotFoundException {
+  Future<DocumentRef?> getLatestRefOf(DocumentRef ref) async {
+    final ver = await getLatestVersion(ref.id);
+    if (ver == null) {
       return null;
     }
+
+    return SignedDocumentRef(id: ref.id, ver: ver);
   }
 
   @override
-  Future<List<TypedDocumentRef>> index({
-    required Campaign campaign,
-  }) async {
-    final allRefs = <TypedDocumentRef>{};
+  Future<String?> getLatestVersion(String id) {
+    final ver = allConstantDocumentRefs
+        .firstWhereOrNull((element) => element.hasId(id))
+        ?.withId(id)
+        ?.ver;
 
-    var page = 0;
-    const maxPerPage = indexPageSize;
-    var remaining = 0;
+    if (ver != null) {
+      return Future.value(ver);
+    }
 
-    do {
-      final response =
-          await _getDocumentIndexList(
-            page: page,
-            limit: maxPerPage,
-            campaign: campaign,
-          )
-          // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-          // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-          .onError<NotFoundException>(
-            (_, _) {
-              return DocumentIndexList(
-                docs: [],
-                page: CurrentPage(page: page, limit: maxPerPage, remaining: 0),
-              );
-            },
-          );
-
-      allRefs.addAll(response.refs);
-
-      // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-      // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-      remaining = response.docs.length < maxPerPage ? 0 : response.page.remaining;
-      page = response.page.page + 1;
-    } while (remaining > 0);
-
-    return allRefs.toList();
-  }
-
-  @override
-  Future<void> publish(SignedDocument document) async {
-    final bytes = document.toBytes();
-    await _api.gateway
-        .apiV1DocumentPut(
-          body: bytes,
-          contentType: ContentTypes.applicationCbor,
+    return _getDocumentIndexList(
+          page: 0,
+          limit: 1,
+          filter: DocumentIndexQueryFilter(id: IdSelector.eq(id)),
         )
-        .successOrThrow();
+        .then(_mapDynamicResponseValue)
+        .then((response) => response.docs.firstOrNull?.ver.firstOrNull?.ver);
+  }
+
+  @override
+  Future<DocumentIndex> index({
+    int page = 0,
+    int limit = 100,
+    required DocumentIndexFilters filters,
+  }) {
+    final filter = DocumentIndexQueryFilter(
+      type: filters.type?.map((e) => e.uuid).toList(),
+      parameters: IdAndVerRef.idOnly(IdSelector.inside(filters.categoriesIds)),
+    );
+
+    return _getDocumentIndexList(
+      page: page,
+      limit: limit,
+      filter: filter,
+    ).then((value) => value.toModel());
+  }
+
+  @override
+  Future<void> publish(DocumentArtifact artifact) async {
+    await _api.gateway.uploadDocument(body: artifact.value).successBodyOrThrow();
+  }
+
+  // TODO(damian-molinski): Remove this when backend can serve const documents
+  DocumentIndexList _forConstRefs({
+    required int page,
+    required int limit,
+    required Iterable<SignedDocumentRef> refs,
+    required DocumentType type,
+  }) {
+    final skip = page * limit;
+
+    final docs = refs.skip(skip).take(limit).map(
+      (e) {
+        return IndexedDocument(
+          id: e.id,
+          ver: [
+            IndexedDocumentVersion(ver: e.ver!, type: type.uuid, id: e.id),
+          ],
+        );
+      },
+    ).toList();
+
+    final remaining = skip + docs.length - refs.length;
+
+    return DocumentIndexList(
+      docs: docs,
+      page: CurrentPage(
+        page: page,
+        limit: limit,
+        remaining: remaining,
+      ),
+    );
   }
 
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
-    required Campaign campaign,
+    required DocumentIndexQueryFilter filter,
   }) async {
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    // TODO(damian-molinski): Remove this when backend can serve const documents
+    if ((filter.type ?? const []).contains(DocumentType.proposalTemplate.uuid)) {
+      return _forConstRefs(
+        page: page,
+        limit: limit,
+        refs: constantDocumentRefsPerCampaign(activeCampaignRef).map((e) => e.proposal).nonNulls,
+        type: DocumentType.proposalTemplate,
+      );
+    }
+    // TODO(damian-molinski): Remove this when backend can serve const documents
+    if ((filter.type ?? const []).contains(DocumentType.commentTemplate.uuid)) {
+      return _forConstRefs(
+        page: page,
+        limit: limit,
+        refs: constantDocumentRefsPerCampaign(activeCampaignRef).map((e) => e.comment).nonNulls,
+        type: DocumentType.commentTemplate,
+      );
+    }
 
     return _api.gateway
-        .apiV1DocumentIndexPost(
-          body: DocumentIndexQueryFilter(
-            parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
-          ),
+        .documentIndex(
+          filter: filter,
           limit: limit,
           page: page,
         )
@@ -155,74 +165,59 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 }
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
+  @override
+  Future<DocumentDataWithArtifact?> get(DocumentRef ref);
+
   Future<String?> getLatestVersion(String id);
 
-  Future<List<TypedDocumentRef>> index({required Campaign campaign});
+  Future<DocumentIndex> index({
+    int page,
+    int limit,
+    required DocumentIndexFilters filters,
+  });
 
-  Future<void> publish(SignedDocument document);
+  Future<void> publish(DocumentArtifact artifact);
+}
+
+extension on DocumentReference {
+  SignedDocumentRef toRef() => SignedDocumentRef(id: id, ver: ver);
 }
 
 extension on DocumentIndexList {
-  List<TypedDocumentRef> get refs {
-    return docs
-        .cast<Map<String, dynamic>>()
-        .map(DocumentIndexListDto.fromJson)
-        .map((ref) {
-          return <TypedDocumentRef>[
-            ...ref.ver
-                .map((ver) {
-                  final documentType = DocumentType.fromJson(ver.type);
+  DocumentIndex toModel() {
+    final docs = this.docs.map((e) => e.toModel()).toList();
+    final page = this.page.toModel();
 
-                  return <TypedDocumentRef>[
-                    TypedDocumentRef(
-                      ref: SignedDocumentRef(id: ref.id, version: ver.ver),
-                      type: documentType,
-                    ),
-                    if (ver.ref != null)
-                      TypedDocumentRef(
-                        ref: ver.ref!.toRef(),
-                        type: DocumentType.unknown,
-                      ),
-                    if (ver.reply != null)
-                      TypedDocumentRef(
-                        ref: ver.reply!.toRef(),
-                        type: DocumentType.unknown,
-                      ),
-                    if (ver.parameters != null)
-                      TypedDocumentRef(
-                        ref: ver.parameters!.toRef(),
-                        type: DocumentType.categoryParametersDocument,
-                      ),
-                    if (ver.template != null)
-                      TypedDocumentRef(
-                        ref: ver.template!.toRef(),
-                        type: documentType.template ?? DocumentType.unknown,
-                      ),
-                    if (ver.brand != null)
-                      TypedDocumentRef(
-                        ref: ver.brand!.toRef(),
-                        type: DocumentType.brandParametersDocument,
-                      ),
-                    if (ver.campaign != null)
-                      TypedDocumentRef(
-                        ref: ver.campaign!.toRef(),
-                        type: DocumentType.campaignParametersDocument,
-                      ),
-                    if (ver.category != null)
-                      TypedDocumentRef(
-                        ref: ver.category!.toRef(),
-                        type: DocumentType.categoryParametersDocument,
-                      ),
-                  ];
-                })
-                .expand((element) => element),
-          ];
-        })
-        .expand((element) => element)
-        .toList();
+    return DocumentIndex(docs: docs, page: page);
   }
 }
 
-extension on DocumentRefForFilteredDocuments {
-  SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
+extension on CurrentPage {
+  DocumentIndexPage toModel() {
+    return DocumentIndexPage(
+      page: page,
+      limit: limit,
+      remaining: remaining,
+    );
+  }
+}
+
+extension on IndexedDocument {
+  DocumentIndexDoc toModel() {
+    return DocumentIndexDoc(
+      id: id,
+      ver: ver.map(
+        (e) {
+          return DocumentIndexDocVersion(
+            ver: e.ver,
+            type: DocumentType.fromJson(e.type),
+            ref: e.ref?.map((e) => e.toRef()).toList(),
+            reply: e.reply?.map((e) => e.toRef()).toList(),
+            template: e.template?.map((e) => e.toRef()).toList(),
+            parameters: e.parameters?.map((e) => e.toRef()).toList(),
+          );
+        },
+      ).toList(),
+    );
+  }
 }

@@ -1,11 +1,11 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart'
-    show RbacRegistrationChain;
-import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_create.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
@@ -80,7 +80,7 @@ final class UserRepositoryImpl implements UserRepository {
   @override
   Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId}) {
     return _apiServices.gateway
-        .apiV1RbacRegistrationGet(lookup: catalystId?.toUri().toStringWithoutScheme())
+        .rbacRegistration(lookup: catalystId?.toUri().toStringWithoutScheme())
         .successBodyOrThrow();
   }
 
@@ -91,9 +91,13 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
 
-    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
+    final publicProfile = await _getAccountPublicProfile(
+      token: rbacToken,
+    ).onError<ForbiddenException>((_, _) => null);
+
     final username =
         publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
+
     final votingPower = await _getVotingPower(token: rbacToken);
 
     return RecoverableAccount(
@@ -125,16 +129,14 @@ final class UserRepositoryImpl implements UserRepository {
     required String email,
   }) {
     return _apiServices.reviews
-        .apiCatalystIdsMePost(
-          body: CatalystIDCreate(
+        .upsertPublicProfile(
+          body: CatalystIdCreate(
             catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
             email: email,
           ),
         )
         .successBodyOrThrow()
-        .onError<ResourceConflictException>(
-          (error, stackTrace) => throw const EmailAlreadyUsedException(),
-        )
+        .onError<ResourceConflictException>((_, _) => throw const EmailAlreadyUsedException())
         .then((value) => value.toModel());
   }
 
@@ -149,9 +151,9 @@ final class UserRepositoryImpl implements UserRepository {
   /// account if [token] is not specified.
   Future<AccountPublicProfile?> _getAccountPublicProfile({RbacToken? token}) async {
     return _apiServices.reviews
-        .apiCatalystIdsMeGet(authorization: token?.authHeader())
+        .getPublicProfile(authorization: token?.authHeader())
         .successBodyOrThrow()
-        .then<CatalystIDPublic?>((value) => value)
+        .then<CatalystIdPublic?>((value) => value)
         .onError<NotFoundException>((error, stackTrace) => null)
         // Review module returns 401 Registration not found for the auth token
         .onError<UnauthorizedException>((error, stackTrace) => null)
@@ -169,7 +171,7 @@ final class UserRepositoryImpl implements UserRepository {
   }) {
     final significantId = catalystId.toSignificant();
     return _documentRepository
-        .getLatestDocument(authorId: significantId)
+        .findFirst(originalAuthorId: significantId)
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {

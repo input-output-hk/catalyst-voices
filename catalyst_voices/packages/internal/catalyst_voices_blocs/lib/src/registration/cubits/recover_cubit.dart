@@ -1,7 +1,9 @@
 // ignore_for_file: one_member_abstracts
 
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/unlock_password_manager.dart';
+import 'package:catalyst_voices_blocs/src/registration/utils/logger_level_ext.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -85,13 +87,21 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       final account = await _registrationService
           .recoverAccount(seedPhrase: seedPhrase)
-          .onError<NotFoundException>((_, __) => throw const LocalizedRecoverAccountNotFound());
+          .onError<NotFoundException>((_, _) => throw const LocalizedRecoverAccountNotFound());
 
       final address = account.address!;
-      final balance = await _registrationService.getWalletBalance(
-        seedPhrase: seedPhrase,
-        address: address,
-      );
+      final balance = await _registrationService
+          .getWalletBalance(
+            seedPhrase: seedPhrase,
+            address: address,
+          )
+          .onError<Object>(
+            (error, stackTrace) {
+              _logger.warning('Failed to get wallet balance', error, stackTrace);
+              if (!isClosed) emitError(const LocalizedWalletBalanceException());
+              return const Coin(0);
+            },
+          );
 
       _recoveredAccount = account;
 
@@ -107,21 +117,13 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       emit(state.copyWith(accountDetails: Optional(Success(accountDetails))));
 
       return true;
-    } on RegistrationException catch (error, stack) {
-      _logger.severe('recover account', error, stack);
-
-      _recoveredAccount = null;
-
-      final exception = LocalizedRegistrationException.from(error);
-      emit(state.copyWith(accountDetails: Optional(Failure(exception))));
-
-      return false;
     } catch (error, stack) {
-      _logger.severe('recover account', error, stack);
+      _logger.log(error.level, 'recover account', error, stack);
 
       _recoveredAccount = null;
 
-      final exception = LocalizedException.create(error);
+      final exception = LocalizedRegistrationException.create(error);
+
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
 
       return false;

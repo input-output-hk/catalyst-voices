@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/reporting/reporting_service.dart';
+import 'package:dio/dio.dart' show Dio;
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:sentry_dio/sentry_dio.dart';
 import 'package:sentry_drift/sentry_drift.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_logging/sentry_logging.dart';
@@ -15,11 +16,6 @@ final class SentryReportingService implements ReportingService {
   @override
   QueryInterceptor? buildDbInterceptor({required String databaseName}) {
     return SentryQueryInterceptor(databaseName: databaseName);
-  }
-
-  @override
-  http.Client buildHttpClient() {
-    return SentryHttpClient();
   }
 
   @override
@@ -51,7 +47,12 @@ final class SentryReportingService implements ReportingService {
           ..debug = config.debug
           ..diagnosticLevel = SentryLevel.fromName(config.diagnosticLevel)
           ..release = config.release
-          ..dist = config.dist;
+          ..dist = config.dist
+          ..beforeSend = filterThirdPartyErrors
+          ..addInAppInclude('catalyst')
+          ..addInAppExclude('chrome-extension://')
+          ..addInAppExclude('moz-extension://')
+          ..addInAppExclude('safari-web-extension://');
 
         if (config.enableLogs) {
           options.addIntegration(LoggingIntegration());
@@ -59,6 +60,9 @@ final class SentryReportingService implements ReportingService {
       },
     );
   }
+
+  @override
+  void registerDio(Dio dio) => dio.addSentry();
 
   @override
   Future<void> reportingAs(Account? account) async {
@@ -97,4 +101,50 @@ final class SentryReportingService implements ReportingService {
 
   @override
   Widget wrapApp(Widget app) => SentryWidget(child: app);
+
+  /// Filters out errors originating from third-party browser extensions
+  /// that don't involve our application code.
+  ///
+  /// This prevents noise from wallet extensions (e.g., Talisman, MetaMask)
+  /// reporting their own internal errors that are unrelated to Catalyst Voices.
+  ///
+  /// Errors are kept if:
+  /// - They originate from our app code (catalyst_* packages)
+  /// - They occur during wallet interactions initiated by our app
+  ///
+  /// Errors are filtered if:
+  /// - They only have browser extension frames (no app involvement)
+  /// - They are pure third-party extension errors
+  @visibleForTesting
+  static FutureOr<SentryEvent?> filterThirdPartyErrors(
+    SentryEvent event,
+    Hint hint,
+  ) {
+    final exceptions = event.exceptions;
+    if (exceptions == null || exceptions.isEmpty) {
+      return event;
+    }
+
+    final containsAppFrames = exceptions.any((exception) {
+      final stackTrace = exception.stackTrace;
+      // If no stack trace, assume it's from our app to be safe
+      if (stackTrace == null) return true;
+
+      final frames = stackTrace.frames;
+      if (frames.isEmpty) return false;
+
+      // Check if ALL frames in this exception are from browser extensions
+      final allFramesAreExtensions = frames.every((frame) {
+        final absPath = (frame.absPath ?? '').toLowerCase();
+        return absPath.contains('chrome-extension://') ||
+            absPath.contains('moz-extension://') ||
+            absPath.contains('safari-web-extension://');
+      });
+
+      // If all frames are from extensions, filter out this exception
+      return !allFramesAreExtensions;
+    });
+
+    return containsAppFrames ? event : null;
+  }
 }

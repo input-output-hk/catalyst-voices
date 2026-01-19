@@ -1,28 +1,29 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_role_data.dart';
 import 'package:collection/collection.dart';
 
 /// DTO utils for [RbacRegistrationChain], mostly helpers to decode **complex**
 /// data types that can't just be json deserialized.
 extension RbacRegistrationChainExt on RbacRegistrationChain {
   Set<AccountRole> get accountRoles {
-    final roleNumbers = _roleData.keys.map(int.tryParse);
-    final accountRoles = roleNumbers.map(AccountRole.maybeFromNumber).nonNulls.toSet();
+    final accountRoles = _roles
+        .map((role) => AccountRole.maybeFromNumber(role.roleId))
+        .nonNulls
+        .toSet();
 
     return accountRoles;
   }
 
   ShelleyAddress get stakeAddress {
-    final rootRoleData = _roleData[_rootRoleKey] as Map<String, dynamic>;
-    final signingKeys = rootRoleData['signing_keys'] as List<dynamic>;
-    final signingKey = signingKeys.firstOrNull as Map<String, dynamic>?;
+    final signingKeys = _rootRoleData.signingKeys;
+    final signingKey = signingKeys.firstOrNull;
     if (signingKey == null) {
       throw ArgumentError.notNull('signingKey');
     }
 
-    final signingKeyType = signingKey['key_type'] as String;
-    final signingKeyValue = signingKey['key_value'] as String;
+    final signingKeyType = signingKey.keyType;
 
     if (signingKeyType != RegistrationCertificate.certificateType) {
       throw ArgumentError.value(
@@ -32,24 +33,37 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
       );
     }
 
-    final x509Certificate = _decodeX509Certificate(signingKeyValue);
+    final signingKeyValue = signingKey.keyValue?.x509;
+
+    if (signingKeyValue == null) {
+      throw ArgumentError.value(
+        signingKeyValue,
+        'signingKeyValue',
+        'Was null for $signingKeyType key (the value was deleted or key type mismatch).',
+      );
+    }
+
+    final x509Certificate = X509Certificate.fromPem(signingKeyValue);
     return _decodeStakeAddressFromCertificate(x509Certificate);
   }
 
-  Map<String, dynamic> get _roleData {
-    final roleData = roles as Map<String, dynamic>;
-    if (!roleData.containsKey(_rootRoleKey)) {
+  List<RbacRoleData> get _roles {
+    final hasRootRole = roles.any((role) => role.roleId == _rootRoleKey);
+    if (!hasRootRole) {
       throw ArgumentError.value(
-        roleData,
-        'roleData',
+        roles,
+        'roles',
         'Did not contain mandatory root role.',
       );
     }
 
-    return roleData;
+    return roles;
   }
 
-  String get _rootRoleKey => AccountRole.root.number.toString();
+  /// The root role data. If missing [ArgumentError] is thrown.
+  RbacRoleData get _rootRoleData => _roles.firstWhere((role) => role.roleId == _rootRoleKey);
+
+  int get _rootRoleKey => AccountRole.root.number;
 
   ShelleyAddress _decodeStakeAddressFromCertificate(
     X509Certificate certificate,
@@ -73,11 +87,5 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
     }
 
     return CardanoAddressUri.fromString(stakeAddressUri).address;
-  }
-
-  X509Certificate _decodeX509Certificate(String hexString) {
-    final certificateBytes = hexDecode(hexString);
-    final derCertificate = X509DerCertificate.fromBytes(bytes: certificateBytes);
-    return X509Certificate.fromDer(derCertificate);
   }
 }

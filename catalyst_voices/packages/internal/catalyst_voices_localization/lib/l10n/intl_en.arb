@@ -133,6 +133,14 @@
   "@anonymousUsername": {
     "description": "When account does not have specified username this text is shown"
   },
+  "apiErrorBadCertificate": "Bad certificate",
+  "@apiErrorBadCertificate": {
+    "description": "Generic message when incorrect certificate is used for api requests"
+  },
+  "apiErrorConnectionError": "Connection error",
+  "@apiErrorConnectionError": {
+    "description": "Message of an error when api is not reachable."
+  },
   "apiErrorInternalServerError": "Internal server error",
   "@apiErrorInternalServerError": {
     "description": "Message of an error when api returns matching status code."
@@ -145,9 +153,17 @@
   "@apiErrorNotFound": {
     "description": "Message of an error when api returns not found status code, depends on context."
   },
+  "apiErrorRequestCancelled": "Request cancelled",
+  "@apiErrorRequestCancelled": {
+    "description": "Message of an error when api request is cancelled."
+  },
   "apiErrorServiceUnavailable": "Service Unavailable",
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
+  },
+  "apiErrorTimeout": "Connection timeout",
+  "@apiErrorTimeout": {
+    "description": "Message of an error when api request times out."
   },
   "apiErrorTooManyRequests": "Too many requests, please try again in 10 minutes.",
   "@apiErrorTooManyRequests": {
@@ -1031,7 +1047,12 @@
   },
   "emailNotVerifiedBannerProposerMessage": "You can’t publish a proposal until your email is verified. Go to {destination} to verify it.",
   "@emailNotVerifiedBannerProposerMessage": {
-    "description": "Message of banner shown when user account is not verified"
+    "description": "Message of banner shown when user account is not verified",
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      }
+    }
   },
   "emailNotVerifiedBannerTitle": "Email Not Verified",
   "@emailNotVerifiedBannerTitle": {
@@ -1076,6 +1097,10 @@
   "errorActiveAccountNotFound": "Active account not found.",
   "@errorActiveAccountNotFound": {
     "description": "Generic error message when trying to access account resources but non was found."
+  },
+  "errorCardanoWalletUnknown": "Wallet failed unexpectedly.",
+  "@errorCardanoWalletUnknown": {
+    "description": "Generic wallet exception"
   },
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
   "@errorDisplayNameValidationEmpty": {
@@ -1291,21 +1316,75 @@
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
   },
-  "errorWalletLinkAccountChange": "Wallet account change",
+  "errorWalletBalance": "Couldn't find wallet balance",
+  "@errorWalletBalance": {
+    "description": "Error message shown when trying to find wallet balance but got error response."
+  },
+  "errorWalletDataSignAddressNotPk": "Wallet was unable to sign the data because of address format.",
+  "@errorWalletDataSignAddressNotPk": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletDataSignProofGeneration": "Wallet was unable to sign the data.",
+  "@errorWalletDataSignProofGeneration": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletDataSignUserDeclined": "Transaction declined.",
+  "@errorWalletDataSignUserDeclined": {
+    "description": "Error message shown when wallet throws DataSign exception"
+  },
+  "errorWalletLinkAccountChange": "Wallet account has changed.",
   "@errorWalletLinkAccountChange": {
     "description": "Error message shown when wallet account has changed"
   },
-  "errorWalletLinkInternalError": "Wallet authorisation internal error",
+  "errorWalletLinkInternalError": "Wallet error occurred during execution of this API call.",
   "@errorWalletLinkInternalError": {
     "description": "Error message shown when internal error occurs during wallet authorization"
   },
-  "errorWalletLinkInvalidRequest": "Wallet authorisation invalid request",
+  "errorWalletLinkInvalidRequest": "Wallet inputs do not conform to this spec or are otherwise invalid.",
   "@errorWalletLinkInvalidRequest": {
     "description": "Error message shown when wallet authorization request is invalid"
   },
-  "errorWalletLinkRefused": "Wallet authorisation failed",
+  "errorWalletLinkInvalidRequestCode": "Wallet request failed with code {code}.",
+  "@errorWalletLinkInvalidRequestCode": {
+    "description": "Error message shown when wallet authorization request is invalid",
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "errorWalletLinkRefused": "The wallet request was refused due to lack of access.",
   "@errorWalletLinkRefused": {
     "description": "Error message shown when wallet authorization is refused"
+  },
+  "errorWalletPaginationMaxSize": "Wallet pagination max size({maxSize}) exceeded.",
+  "@errorWalletPaginationMaxSize": {
+    "description": "Error message shown when wallet throws DataSign exception",
+    "placeholders": {
+      "maxSize": {
+        "type": "int"
+      }
+    }
+  },
+  "errorWalletTxSendFailure": "Wallet could not send the tx.",
+  "@errorWalletTxSendFailure": {
+    "description": "Error message shown when wallet throws TxSend exception"
+  },
+  "errorWalletTxSendRefused": "Wallet refuses to send the tx (could be rate limiting).",
+  "@errorWalletTxSendRefused": {
+    "description": "Error message shown when wallet throws TxSend exception"
+  },
+  "errorWalletTxSignDepreciatedCertificate": "Transaction contains depreciated certificate.",
+  "@errorWalletTxSignDepreciatedCertificate": {
+    "description": "Error message shown when wallet throws TxSign exception"
+  },
+  "errorWalletTxSignProofGeneration": "Wallet was unable to sign the transaction.",
+  "@errorWalletTxSignProofGeneration": {
+    "description": "Error message shown when wallet throws TxSign exception"
+  },
+  "errorWalletTxSignUserDeclined": "Transaction declined.",
+  "@errorWalletTxSignUserDeclined": {
+    "description": "Error message shown when wallet throws TxSign exception"
   },
   "eternlWallet": "Eternl Wallet",
   "@eternlWallet": {
@@ -1428,16 +1507,6 @@
     "description": "Describes that category comes from fund number",
     "placeholders": {
       "number": {
-        "type": "int"
-      }
-    }
-  },
-  "fundProposalSubmissionNotice": "Fund{fundNumber} Proposal Submission Notice",
-  "@fundProposalSubmissionNotice": {
-    "description": "Link to the Fund Proposal Submission Notice",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
         "type": "int"
       }
     }
@@ -1826,6 +1895,14 @@
   "namiWallet": "Nami Wallet",
   "@namiWallet": {
     "description": "Name of the nami wallet"
+  },
+  "newAppVersionAvailableDescriptionWeb": "Please Force-Refresh this page to get new version of the app",
+  "@newAppVersionAvailableDescriptionWeb": {
+    "description": "information for the user how to get new version of the app on the web"
+  },
+  "newAppVersionAvailableTitle": "New version available",
+  "@newAppVersionAvailableTitle": {
+    "description": "Used in banner to inform user that new version of the app is available"
   },
   "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
   "@newIterationTitle": {
@@ -2867,10 +2944,6 @@
   "@registrationSeedPhraseNotFound": {
     "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
   },
-  "registrationTransactionFailed": "Transaction failed",
-  "@registrationTransactionFailed": {
-    "description": "Indicates an error when submitting a registration transaction failed."
-  },
   "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 {currency}), be sure your wallet has a minimum of {money}.",
   "@registrationTransactionFeeDescription": {
     "description": "Description for the registration transaction fee",
@@ -3344,7 +3417,12 @@
   },
   "systemStatusIssueBannerMessage": "We're aware of an issue and are working on a fix. Thanks for your patience! {readMoreLink}",
   "@systemStatusIssueBannerMessage": {
-    "description": "Message of banner shown when there is a system status issue"
+    "description": "Message of banner shown when there is a system status issue",
+    "placeholders": {
+      "readMoreLink": {
+        "type": "String"
+      }
+    }
   },
   "systemStatusIssueBannerTitle": "Heads Up",
   "@systemStatusIssueBannerTitle": {

@@ -93,6 +93,19 @@ services:
       config-init:
         condition: service_completed_successfully
 
+  # Reviews API Mock Server (Prism + Express overrides)
+  reviews-mock-server:
+    image: reviews-mock-server:latest
+    container_name: reviews-mock-server
+    ports:
+      - "4020:4020"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:4020/api/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   # Playwright E2E Test Runner
   e2e-test-runner:
     image: e2e-test-runner:latest
@@ -129,3 +142,4 @@ services:
     depends_on:
       - cat-voices
       - cat-gateway
+      - reviews-mock-server

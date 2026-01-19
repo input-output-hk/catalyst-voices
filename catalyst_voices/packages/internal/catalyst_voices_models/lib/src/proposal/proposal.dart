@@ -1,10 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 
 final class Proposal extends CoreProposal {
   final int versionNumber;
 
   factory Proposal({
-    required DocumentRef selfRef,
+    required DocumentRef id,
+    required DocumentParameters parameters,
     required String title,
     required String description,
     required Money fundsRequested,
@@ -13,12 +15,12 @@ final class Proposal extends CoreProposal {
     required int duration,
     required String? author,
     required int commentsCount,
-    required SignedDocumentRef categoryRef,
   }) {
-    final versionNumber = versionsIds.versionNumber(selfRef.version!);
+    final versionNumber = versionsIds.versionNumber(id.ver!);
 
     return Proposal._(
-      selfRef: selfRef,
+      id: id,
+      parameters: parameters,
       title: title,
       fundsRequested: fundsRequested,
       publish: publish,
@@ -27,7 +29,6 @@ final class Proposal extends CoreProposal {
       duration: duration,
       author: author,
       versionNumber: versionNumber,
-      categoryRef: categoryRef,
     );
   }
 
@@ -35,7 +36,8 @@ final class Proposal extends CoreProposal {
     final document = data.document;
 
     return Proposal(
-      selfRef: document.metadata.selfRef,
+      id: document.metadata.id,
+      parameters: document.metadata.parameters,
       title: document.title ?? '',
       description: document.description ?? '',
       fundsRequested: document.fundsRequested ?? Money.zero(currency: Currencies.fallback),
@@ -43,14 +45,13 @@ final class Proposal extends CoreProposal {
       duration: document.duration ?? 0,
       author: document.authorName,
       commentsCount: data.commentsCount,
-      categoryRef: data.document.metadata.categoryId,
       versionsIds: versionsIds,
     );
   }
 
   const Proposal._({
-    required super.selfRef,
-    required super.categoryRef,
+    required super.id,
+    required super.parameters,
     required super.title,
     required super.description,
     required super.fundsRequested,
@@ -64,7 +65,7 @@ final class Proposal extends CoreProposal {
 
 extension ProposalVersionsNumber on List<String> {
   int versionNumber(String version) {
-    sort((versionA, versionB) => versionB.compareTo(versionA));
-    return length - indexWhere((element) => element == version);
+    final list = sorted((versionA, versionB) => versionB.compareTo(versionA));
+    return list.length - list.indexWhere((element) => element == version);
   }
 }

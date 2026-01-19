@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/catalyst_cose.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_plus/cryptography_plus.dart';
 import 'package:test/test.dart';
 
 void main() {
   group(CoseSign1, () {
+    const uuidV4 = 'e9aba14f-d05b-49b2-b5b5-100595853384';
     const uuidV7 = '0193b535-7196-7cd1-84e6-ad9c316cf2d2';
     late _SignerVerifier signerVerifier;
 
@@ -19,17 +20,23 @@ void main() {
 
     test('sign generates a valid COSE_SIGN1 structure', () async {
       final coseSign1 = await CoseSign1.sign(
-        protectedHeaders: const CoseHeaders.protected(
-          contentType: IntValue(CoseValues.jsonContentType),
-          contentEncoding: StringValue(CoseValues.brotliContentEncoding),
-          type: Uuid(uuidV7),
-          id: Uuid(uuidV7),
-          ver: Uuid(uuidV7),
-          ref: ReferenceUuid(id: Uuid(uuidV7)),
-          template: ReferenceUuid(id: Uuid(uuidV7)),
-          reply: ReferenceUuid(id: Uuid(uuidV7)),
-          section: 'section_name',
-          collabs: ['test@domain.com'],
+        protectedHeaders: CoseHeaders.protected(
+          mediaType: CoseMediaType.json,
+          contentEncoding: CoseHttpContentEncoding.brotli,
+          type: CoseDocumentType(CoseUuidV4.fromString(uuidV4)),
+          id: CoseDocumentId(CoseUuidV7.fromString(uuidV7)),
+          ver: CoseDocumentVer(CoseUuidV7.fromString(uuidV7)),
+          ref: CoseDocumentRefs([
+            CoseDocumentRef.optional(documentId: CoseUuidV7.fromString(uuidV7)),
+          ]),
+          template: CoseDocumentRefs([
+            CoseDocumentRef.optional(documentId: CoseUuidV7.fromString(uuidV7)),
+          ]),
+          reply: CoseDocumentRefs([
+            CoseDocumentRef.optional(documentId: CoseUuidV7.fromString(uuidV7)),
+          ]),
+          section: const CoseSectionRef(CoseJsonPointer('section_name')),
+          collaborators: CoseCollaborators([CatalystIdKid.fromString('test@domain.com')]),
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         signer: signerVerifier,
@@ -72,12 +79,12 @@ final class _SignerVerifier implements CatalystCoseSigner, CatalystCoseVerifier 
   const _SignerVerifier(this._algorithm, this._keyPair);
 
   @override
-  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+  CoseStringOrInt? get alg => const CoseIntValue(CoseValues.eddsaAlg);
 
   @override
-  Future<Uint8List?> get kid async {
+  Future<CatalystIdKid?> get kid async {
     final pk = await _keyPair.extractPublicKey();
-    return Uint8List.fromList(pk.bytes);
+    return CatalystIdKid(Uint8List.fromList(pk.bytes));
   }
 
   @override

@@ -35,6 +35,7 @@ bech
 bimap
 bindgen
 bkioshn
+Blockquotes
 bluefireteam
 bridgefor
 BROTLI
@@ -65,10 +66,12 @@ ciphertext
 ciphertexts
 CIPs
 CNFT
+COAP
 COCOAPODS
 codegen
 codepoints
 COEP
+Collab
 collabs
 commitlog
 concatcp
@@ -125,6 +128,7 @@ emiride
 emurgo
 encryptor
 endfunction
+endtemplate
 Eternl
 EUTXO
 eventdb
@@ -151,8 +155,8 @@ hackathon
 Hackathons
 headful
 headlessui
-healthz
 healthcheckv
+healthz
 HIDPI
 hotfixes
 hotspots
@@ -177,6 +181,8 @@ iohk
 IPFS
 iphoneos
 iphonesimulator
+isready
+IPLD
 jaegertracing
 jdbc
 jetbrains
@@ -284,6 +290,7 @@ postcss
 Pozhylenkov
 Precache
 Precertificate
+precompressed
 preprod
 proguard
 projectcatalyst
@@ -357,6 +364,7 @@ Subkey
 submiting
 subosito
 subprojects
+subqueries
 svgs
 syncable
 SYSROOT
@@ -403,6 +411,7 @@ UTXO
 Utxos
 uuidv
 varint
+vers
 Vespr
 vite
 vitss

@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart'
-    show RbacRegistrationChain;
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -34,12 +34,12 @@ void main() {
         secureStorage: const FlutterSecureStorage(),
         sharedPreferences: SharedPreferencesAsync(),
         cacheConfig: AppConfig.dev().cache,
-        keychainSigner: _FakeKeychainSigner(),
+        keychainSigner: FakeKeychainSigner(),
       );
       userObserver = StreamUserObserver();
 
       registerFallbackValue(CatalystId(host: '', role0Key: Uint8List(32)));
-      poller = _MockPoller();
+      poller = MockRegistrationStatusPoller();
       when(() => poller.start(any())).thenAnswer((_) => const Stream.empty());
       when(() => poller.stop()).thenAnswer((_) => {});
       when(() => poller.dispose()).thenAnswer((_) => Future(() {}));
@@ -50,7 +50,7 @@ void main() {
     });
 
     setUp(() {
-      userRepository = _FakeUserRepository();
+      userRepository = FakeUserRepository();
       service = UserService(userRepository, userObserver, poller);
     });
 
@@ -99,6 +99,7 @@ void main() {
 
       expect(currentAccount?.catalystId, account.catalystId);
       expect(currentAccount?.isActive, isTrue);
+      expect(service.activeAccountId, equals(account.catalystId));
     });
 
     test('when using a new account with the same catalystId '
@@ -130,6 +131,7 @@ void main() {
 
       expect(currentAccount, equals(newAccount));
       expect(currentAccount, isNot(oldAccount));
+      expect(service.activeAccountId, equals(newAccount.catalystId));
     });
 
     test('using different account emits update in stream', () async {
@@ -340,20 +342,25 @@ void main() {
 
       test('when has active account', () async {
         // Given
-        final keychainId = const Uuid().v4();
+        final mockRepository = FakeUserRepository()
+          ..previousRegistrationTransactionId = _transactionHash;
+        final mockService = UserService(mockRepository, userObserver, poller);
 
-        // When
+        final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
+        final catalystId = DummyCatalystIdFactory.create();
         final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
+          catalystId: catalystId,
           keychain: keychain,
           isActive: true,
         );
-        userObserver.user = User.optional(accounts: [account]);
+        final user = User.optional(accounts: [account]);
+
+        userObserver.user = user;
 
         // Then
         expect(
-          await service.getPreviousRegistrationTransactionId(),
+          await mockService.getPreviousRegistrationTransactionId(),
           equals(_transactionHash),
         );
       });
@@ -445,16 +452,12 @@ void main() {
 
     group('refreshActiveAccountProfile', () {
       setUp(() {
-        userRepository = _MockUserRepository();
+        userRepository = MockUserRepository();
         when(
           () => userRepository.getRbacRegistration(catalystId: any(named: 'catalystId')),
         ).thenAnswer(
           (_) {
-            const rbac = RbacRegistrationChain(
-              catalystId: '',
-              purpose: [],
-              roles: '',
-            );
+            const rbac = RbacRegistrationChain(catalystId: '');
             return Future.value(rbac);
           },
         );
@@ -566,7 +569,7 @@ void main() {
 
     group('refreshActiveAccountVotingPower', () {
       setUp(() {
-        userRepository = _MockUserRepository();
+        userRepository = MockUserRepository();
         service = UserService(userRepository, userObserver, poller);
 
         registerFallbackValue(const User.empty());
@@ -610,7 +613,7 @@ void main() {
 
     group('updateAccount', () {
       setUp(() {
-        userRepository = _MockUserRepository();
+        userRepository = MockUserRepository();
         service = UserService(userRepository, userObserver, poller);
 
         registerFallbackValue(const User.empty());
@@ -1035,48 +1038,8 @@ void main() {
 }
 
 const _lockFactor = PasswordLockFactor('Test1234');
-final _masterKey = _FakeCatalystPrivateKey(bytes: Uint8List.fromList(List.filled(32, 0)));
+final _masterKey = FakeCatalystPrivateKey(bytes: Uint8List.fromList(List.filled(32, 0)));
 
 final _transactionHash = TransactionHash.fromHex(
   '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2',
 );
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-}
-
-class _FakeKeychainSigner extends Fake implements KeychainSigner {}
-
-class _FakeUserRepository extends Fake implements UserRepository {
-  User? _user;
-
-  @override
-  Future<TransactionHash> getPreviousRegistrationTransactionId({
-    required CatalystId catalystId,
-  }) async {
-    return _transactionHash;
-  }
-
-  @override
-  Future<User> getUser() async => _user ?? const User.empty();
-
-  @override
-  Future<AccountPublicProfile> publishUserProfile({
-    required CatalystId catalystId,
-    required String email,
-  }) async {
-    return AccountPublicProfile(email: email, status: AccountPublicStatus.notSetup);
-  }
-
-  @override
-  Future<void> saveUser(User user) async {
-    _user = user;
-  }
-}
-
-class _MockPoller extends Mock implements RegistrationStatusPoller {}
-
-class _MockUserRepository extends Mock implements UserRepository {}

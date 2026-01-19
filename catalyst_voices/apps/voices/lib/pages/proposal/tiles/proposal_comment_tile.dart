@@ -23,7 +23,7 @@ class ProposalCommentTile extends StatelessWidget {
       return value.state.comments.showReplyBuilder[comment.ref] ?? false;
     });
 
-    final id = comment.comment.metadata.selfRef.id;
+    final id = comment.comment.metadata.id.id;
     final cubit = context.read<ProposalCubit>();
 
     return ProposalCommentWithRepliesCard(

@@ -8,15 +8,15 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class CategoryProposalsDetailsCard extends StatelessWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
   final String categoryName;
-  final int categoryProposalsCount;
+  final int categoryFinalProposalsCount;
 
   const CategoryProposalsDetailsCard({
     super.key,
-    required this.categoryId,
+    required this.categoryRef,
     required this.categoryName,
-    required this.categoryProposalsCount,
+    required this.categoryFinalProposalsCount,
   });
 
   @override
@@ -28,7 +28,7 @@ class CategoryProposalsDetailsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            context.l10n.proposalsSubmittedCount(categoryProposalsCount),
+            context.l10n.proposalsSubmittedCount(categoryFinalProposalsCount),
             style: context.textTheme.titleMedium?.copyWith(
               color: context.colors.textOnPrimaryLevel0,
             ),
@@ -41,11 +41,11 @@ class CategoryProposalsDetailsCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Offstage(
-            offstage: categoryProposalsCount == 0,
+            offstage: categoryFinalProposalsCount == 0,
             child: VoicesOutlinedButton(
               child: Text(context.l10n.viewProposals),
               onTap: () {
-                ProposalsRoute.fromRef(categoryRef: categoryId).go(context);
+                ProposalsRoute.fromRef(categoryRef: categoryRef).go(context);
               },
             ),
           ),
