@@ -15,7 +15,9 @@ class RecoveryAccountDetailsPanel extends StatelessWidget {
       onBackButtonTap: () async {
         final cubit = RegistrationCubit.of(context);
         await cubit.recover.reset();
-        cubit.previousStep();
+        if (!cubit.isClosed) {
+          cubit.previousStep();
+        }
       },
       onRetryButtonTap: () async {
         final recover = RegistrationCubit.of(context).recover;

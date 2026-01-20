@@ -67,18 +67,22 @@ class _BlocSummary extends StatelessWidget {
     return BlocSelector<
       RegistrationCubit,
       RegistrationState,
-      ({Set<AccountRole> roles, WalletInfo selectedWallet, String transactionFee})?
+      ({
+        IterableData<Set<AccountRole>> rolesData,
+        WalletInfo selectedWallet,
+        String transactionFee,
+      })?
     >(
       selector: (state) {
         final selectedWallet = state.walletLinkStateData.selectedWallet;
         final transactionFee = state.registrationStateData.transactionFee;
-        final selectedRoles = state.walletLinkStateData.selectedRoleTypes;
+        final selectedRolesData = state.walletLinkStateData.selectedRoleTypesData;
         if (selectedWallet == null || transactionFee == null) {
           return null;
         }
 
         return (
-          roles: selectedRoles,
+          rolesData: selectedRolesData,
           selectedWallet: selectedWallet,
           transactionFee: transactionFee,
         );
@@ -89,7 +93,7 @@ class _BlocSummary extends StatelessWidget {
         }
 
         return _Summary(
-          roles: state.roles,
+          roles: state.rolesData.value,
           walletInfo: state.selectedWallet,
           transactionFee: state.transactionFee,
           isDrepLink: isDrepLink,

@@ -49,8 +49,11 @@ final class WalletLinkStateData extends Equatable {
   }
 
   /// Returns the roles that are newly being added (selected but not yet owned).
-  List<RegistrationRole> get newlyAddedRoles {
-    return roles.where((role) => role.isSelected && !accountRoles.contains(role.type)).toList();
+  IterableData<List<RegistrationRole>> get newlyAddedRolesData {
+    final newRoles = roles
+        .where((role) => role.isSelected && !accountRoles.contains(role.type))
+        .toList();
+    return IterableData(newRoles);
   }
 
   @override
@@ -65,9 +68,13 @@ final class WalletLinkStateData extends Equatable {
     accountRoles,
   ];
 
+  IterableData<List<RegistrationRole>> get rolesData => IterableData(roles);
+
   Set<AccountRole> get selectedRoleTypes {
     return roles.where((role) => role.isSelected).map((e) => e.type).toSet();
   }
+
+  IterableData<Set<AccountRole>> get selectedRoleTypesData => IterableData(selectedRoleTypes);
 
   WalletLinkStateData copyWith({
     Optional<Result<List<WalletMetadata>, Exception>>? wallets,

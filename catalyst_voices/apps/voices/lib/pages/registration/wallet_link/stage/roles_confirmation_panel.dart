@@ -41,9 +41,9 @@ class _BlocNewRolesSummaryContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<List<RegistrationRole>>(
-      selector: (state) => state.newlyAddedRoles,
-      builder: (context, newRoles) => _RolesSummaryContainer(roles: newRoles),
+    return BlocWalletLinkSelector<IterableData<List<RegistrationRole>>>(
+      selector: (state) => state.newlyAddedRolesData,
+      builder: (context, data) => _RolesSummaryContainer(roles: data.value),
     );
   }
 }
