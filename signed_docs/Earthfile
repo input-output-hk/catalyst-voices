@@ -3,8 +3,9 @@ VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.13 AS python-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.6.13 AS rust-ci
 
-package:
-    FROM python-ci+python-base
+builder:
+    DO rust-ci+SETUP
+    DO python-ci+INSTALL
 
     WORKDIR /app
 
@@ -25,7 +26,7 @@ package:
     SAVE IMAGE setup-fund-documents:${tag}
 
 docker:
-    FROM +package
+    FROM +builder
 
     ARG container="setup-fund-documents"
     ARG tag="latest"
