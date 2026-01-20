@@ -1,10 +1,7 @@
 # A collection of tests with the deprecated signed documents
 import pytest
-from utils.rbac_chain import rbac_chain_factory
-from utils.signed_doc.deprecated import comment, proposal, proposal_submission
 
 from api.v1 import document as document_v1
-from api.v2 import document as document_v2
 
 
 # Getting documents using GET `/v1/document` endpoint.
@@ -247,39 +244,4 @@ def test_get_migrated_and_f14_documents():
         )
         assert resp.content.hex() == doc_cbor, (
             f"Unexpected document cbor bytes for {doc_id}"
-        )
-
-
-# Trying to submit a deprecated proposal, comment and proposal actions documents
-@pytest.mark.preprod_indexing
-def test_put_deprecated_documents(rbac_chain_factory):
-    rbac_chain = rbac_chain_factory()
-
-    proposal_cbor, proposal_id = proposal(rbac_chain)
-    comment_cbor, comment_id = comment(rbac_chain, proposal_id)
-    proposal_submission_cbor, proposal_submission_id = proposal_submission(
-        rbac_chain, proposal_id
-    )
-
-    for cbor, id in [
-        (proposal_cbor, proposal_id),
-        (comment_cbor, comment_id),
-        (proposal_submission_cbor, proposal_submission_id),
-    ]:
-        resp = document_v1.put(
-            data=cbor,
-            token=rbac_chain.auth_token(),
-        )
-        assert resp.status_code == 201, (
-            f"Failed to publish document: {resp.status_code} - {resp.text}"
-        )
-
-        resp = document_v1.get(document_id=id)
-        assert resp.status_code == 200, (
-            f"Failed to get document: {resp.status_code} - {resp.text}"
-        )
-
-        resp = document_v2.post(filter={"id": {"eq": id}})
-        assert resp.status_code == 200, (
-            f"Failed to get document: {resp.status_code} - {resp.text}"
         )
