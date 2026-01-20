@@ -1,3 +1,4 @@
+export 'account_submit_data.dart';
 export 'create_account_type.dart';
 export 'exception/registration_exception.dart';
 export 'registration_certificate.dart';

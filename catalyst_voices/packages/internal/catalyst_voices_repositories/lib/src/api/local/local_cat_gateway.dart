@@ -286,7 +286,7 @@ final class LocalCatGateway implements CatGatewayService {
     final coseSign = CoseSign(
       protectedHeaders: protectedHeaders,
       unprotectedHeaders: const CoseHeaders.unprotected(),
-      payload: payload,
+      payload: CosePayload(payload),
       signatures: [signature],
     );
 

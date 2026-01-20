@@ -5,24 +5,28 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+/// A collaborator on the proposal. Not the author.
 final class Collaborator extends Equatable {
   final CatalystId id;
   final ProposalsCollaborationStatus status;
+  final DateTime? createdAt;
 
   const Collaborator({
     required this.id,
     required this.status,
+    this.createdAt,
   });
 
   factory Collaborator.fromBriefData(ProposalDataCollaborator briefData) {
     return Collaborator(
       id: briefData.id,
       status: briefData.status,
+      createdAt: briefData.createdAt,
     );
   }
 
   @override
-  List<Object?> get props => [id, status];
+  List<Object?> get props => [id, status, createdAt];
 }
 
 /// A status of the collaborator invited to a document (proposal).
@@ -57,6 +61,27 @@ extension ProposalsCollaborationStatusExt on ProposalsCollaborationStatus {
       ProposalsCollaborationStatus.left => context.l10n.collaboratorInvitationStatusLeft,
       ProposalsCollaborationStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
       ProposalsCollaborationStatus.mainProposer => context.l10n.mainProposer,
+    };
+  }
+
+  String? proposalApprovalFinalSecondaryLabel(BuildContext context) {
+    return switch (this) {
+      ProposalsCollaborationStatus.accepted || ProposalsCollaborationStatus.mainProposer => null,
+      ProposalsCollaborationStatus.pending ||
+      ProposalsCollaborationStatus.rejected ||
+      ProposalsCollaborationStatus.left ||
+      ProposalsCollaborationStatus.removed => context.l10n.notShownOnFinalProposal,
+    };
+  }
+
+  String proposalApprovalLabel(BuildContext context) {
+    return switch (this) {
+      ProposalsCollaborationStatus.pending => context.l10n.collaboratorAwaitingApproval,
+      ProposalsCollaborationStatus.accepted => context.l10n.collaboratorApprovedFinal,
+      ProposalsCollaborationStatus.rejected => context.l10n.collaboratorInvitationStatusRejected,
+      ProposalsCollaborationStatus.left => context.l10n.collaboratorInvitationStatusLeft,
+      ProposalsCollaborationStatus.removed => context.l10n.collaboratorInvitationStatusRemoved,
+      ProposalsCollaborationStatus.mainProposer => context.l10n.collaboratorApprovedFinal,
     };
   }
 

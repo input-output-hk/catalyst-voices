@@ -91,7 +91,7 @@ void main() {
           };
 
           // When
-          final migrated = DocumentDataMetadataDto.migrateJson1(json);
+          final migrated = DocumentDataMetadataDto.migrateJson2(json);
 
           // Then
           expect(json, same(migrated));
@@ -165,7 +165,7 @@ void main() {
           };
 
           // When
-          final migrated = DocumentDataMetadataDto.migrateJson1(json);
+          final migrated = DocumentDataMetadataDto.migrateJson3(json);
 
           // Then
           expect(json, same(migrated));
@@ -204,7 +204,7 @@ void main() {
           };
 
           // When
-          final migrated = DocumentDataMetadataDto.migrateJson1(json);
+          final migrated = DocumentDataMetadataDto.migrateJson4(json);
 
           // Then
           expect(json, same(migrated));
@@ -246,7 +246,7 @@ void main() {
           };
 
           // When
-          final migrated = DocumentDataMetadataDto.migrateJson1(json);
+          final migrated = DocumentDataMetadataDto.migrateJson5(json);
 
           // Then
           expect(json, same(migrated));

@@ -230,6 +230,13 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<ProposalService>(),
         );
+      })
+      ..registerFactory<ProposalApprovalCubit>(() {
+        return ProposalApprovalCubit(
+          get<UserService>(),
+          get<CampaignService>(),
+          get<ProposalService>(),
+        );
       });
   }
 
@@ -505,6 +512,12 @@ final class Dependencies extends DependencyProvider {
       return SystemStatusService(
         get<SystemStatusRepository>(),
         get<AppMetaStorage>(),
+      );
+    });
+    registerLazySingleton<DelegationBuilder>(DelegationBuilder.new);
+    registerLazySingleton<RepresentativesService>(() {
+      return RepresentativesService(
+        get<DocumentRepository>(),
       );
     });
   }

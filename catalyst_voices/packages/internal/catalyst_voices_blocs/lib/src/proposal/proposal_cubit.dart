@@ -55,8 +55,13 @@ final class ProposalCubit extends Cubit<ProposalState>
   // Exported to DocumentViewerCollaboratorMixin
   Future<void> acceptCollaboratorInvitation() async {
     try {
+      final id = _cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.acceptInvitation,
       );
       if (!isClosed) {
@@ -73,8 +78,13 @@ final class ProposalCubit extends Cubit<ProposalState>
   // Exported to DocumentViewerCollaboratorMixin
   Future<void> acceptFinalProposal() async {
     try {
+      final id = _cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept final proposal of a draft: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.acceptFinal,
       );
 
@@ -133,8 +143,13 @@ final class ProposalCubit extends Cubit<ProposalState>
   // Exported to DocumentViewerCollaboratorMixin
   Future<void> rejectCollaboratorInvitation() async {
     try {
+      final id = _cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot reject collaborator invitation for a draft proposal: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.rejectInvitation,
       );
 
@@ -152,8 +167,13 @@ final class ProposalCubit extends Cubit<ProposalState>
   // Exported to DocumentViewerCollaboratorMixin
   Future<void> rejectFinalProposal() async {
     try {
+      final id = _cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot reject reject final proposal of a draft: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: _cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.rejectFinal,
       );
 
