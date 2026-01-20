@@ -62,7 +62,7 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     campaign = campaign_parameters_doc(
         content=json.dumps({}),
         template=campaign_template,
-        paramters=brand,
+        parameters=brand,
         sk=admin_key.key.sk_hex,
         kid=admin_key.cat_id(),
         id=None,
@@ -81,7 +81,7 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     category = category_parameters_doc(
         content=json.dumps({}),
         template=category_template,
-        paramters=campaign,
+        parameters=campaign,
         sk=admin_key.key.sk_hex,
         kid=admin_key.cat_id(),
         id=None,
@@ -101,7 +101,7 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
 
         proposal_template = proposal_form_template_doc(
             content=json.dumps(proposal_template_content),
-            paramters=category,
+            parameters=category,
             sk=admin_key.key.sk_hex,
             kid=admin_key.cat_id(),
             id=None,
@@ -114,7 +114,7 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
         doc = proposal_doc(
             content=json.dumps(proposal_content),
             template=proposal_template,
-            paramters=category,
+            parameters=category,
             sk=key,
             kid=cat_id,
             id=None,

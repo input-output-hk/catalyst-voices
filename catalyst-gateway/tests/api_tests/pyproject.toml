@@ -1,3 +1,5 @@
+# cspell: words addopts testpaths pythonpath uniffi
+
 [project]
 name = "api-tests"
 version = "0.1.0"
