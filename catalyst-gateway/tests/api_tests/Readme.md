@@ -26,27 +26,14 @@ export SIGNED_DOC_SK="0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3
 ./target/release/cat-gateway run
 ```
 
-### Get binary for building and signing Catalyst Signed Document objects
-
-* compile a [`mk_singed_doc` cli tool](https://github.com/input-output-hk/catalyst-libs/tree/r20250416-00/rust/signed_doc)
-  (version tag `r20250416-00`)
-* Copy this binary under this directory `api_tests`
-
-```shell
-git clone https://github.com/input-output-hk/catalyst-libs.git
-cd catalyst-libs/rust
-git checkout r20250416-00
-cargo b --release -p catalyst-signed-doc
-cp ./target/release/mk_singed_doc <path>/api_tests
-```
 
 ### Running tests
 
-* First install [`poetry` link](https://github.com/python-poetry/poetry)
+* First install [`uv`](https://github.com/astral-sh/uv)
 * Install dependencies (from 'api_tests' directory):
 
 ```shell
-poetry install
+uv sync
 ```
 
 * Get the `cardano-asset-preprod.json` file from the
@@ -69,7 +56,7 @@ export CAT_GATEWAY_TEST_URL="http://127.0.0.1:3030"
     * health_with_proxy_endpoint (marks tests for health endpoint which requires a proxy for testing)
 
 ```shell
-poetry run pytest -s -m <marker>
+uv run pytest -s -m <marker>
 ```
 
 Additional steps for tests requiring proxy:
