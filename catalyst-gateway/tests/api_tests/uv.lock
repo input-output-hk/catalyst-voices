@@ -44,7 +44,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "catalyst-python", git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&branch=feat%2Fcatalyst-python-uniffi" },
+    { name = "catalyst-python", git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&tag=catalyst-python%2Fv0.3.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "requests", specifier = ">=2.32.5" },
@@ -121,8 +121,8 @@ wheels = [
 
 [[package]]
 name = "catalyst-python"
-version = "0.1.0"
-source = { git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&branch=feat%2Fcatalyst-python-uniffi#a8c88a5e9bda40043a0728e3753c3d314dfa4427" }
+version = "0.3.0"
+source = { git = "https://github.com/input-output-hk/catalyst-libs.git?subdirectory=catalyst-python&tag=catalyst-python%2Fv0.3.0#820c6b7f7c8acb47e93fa8f252605632c71f1d9f" }
 dependencies = [
     { name = "cryptography" },
     { name = "ipfs-cid" },
