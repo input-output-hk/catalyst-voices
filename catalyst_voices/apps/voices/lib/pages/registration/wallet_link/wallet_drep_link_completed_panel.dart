@@ -11,36 +11,28 @@ class WalletDrepLinkCompletedPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RegistrationDetailsPanelScaffold(
-      body: const SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _TitleText(),
-            SizedBox(height: 10),
-            _RolesUpdatedCard(),
-            SizedBox(height: 32),
-            _Summary(),
-          ],
-        ),
-      ),
-      footer: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const _NextStep(),
-          const SizedBox(height: 12),
-          _CreateDrepProfileButton(
-            onTap: () {
-              Navigator.pop(context);
-              // TODO(bstolinski): open page
-            },
-          ),
-          const SizedBox(height: 12),
-          _SkipButton(onTap: () => Navigator.pop(context)),
-        ],
-      ),
+    return const RegistrationDetailsPanelScaffold(
+      body: SingleChildScrollView(child: _Body()),
+      footer: _Footer(),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  const _Body();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _TitleText(),
+        SizedBox(height: 10),
+        _RolesUpdatedCard(),
+        SizedBox(height: 32),
+        _Summary(),
+      ],
     );
   }
 }
@@ -60,6 +52,30 @@ class _CreateDrepProfileButton extends StatelessWidget {
         context.l10n.drepLinkCompletedCreateProfileButton,
         semanticsIdentifier: 'CreateRepresentativeProfileButton',
       ),
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  const _Footer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _NextStep(),
+        const SizedBox(height: 12),
+        _CreateDrepProfileButton(
+          onTap: () {
+            Navigator.pop(context);
+            // TODO(bstolinski): open profile builder page
+          },
+        ),
+        const SizedBox(height: 12),
+        _SkipButton(onTap: () => Navigator.pop(context)),
+      ],
     );
   }
 }

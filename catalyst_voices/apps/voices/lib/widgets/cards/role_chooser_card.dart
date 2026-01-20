@@ -73,6 +73,7 @@ class RoleChooserCard extends StatelessWidget {
           Expanded(
             child: Column(
               mainAxisAlignment: displayValue ? MainAxisAlignment.start : MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   children: [
@@ -91,18 +92,15 @@ class RoleChooserCard extends StatelessWidget {
                 ),
                 if (displayValue) ...[
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      if (isViewOnly)
-                        _DisplayingValueAsChips(value: value, isDefault: isDefault)
-                      else
-                        _DisplayingValueAsSegmentedButton(
-                          value: value,
-                          isLocked: isLocked,
-                          isDefault: isDefault,
-                          onChanged: onChanged,
-                        ),
-                    ],
+                  Flexible(
+                    child: isViewOnly
+                        ? _DisplayingValueAsChips(value: value, isDefault: isDefault)
+                        : _DisplayingValueAsSegmentedButton(
+                            value: value,
+                            isLocked: isLocked,
+                            isDefault: isDefault,
+                            onChanged: onChanged,
+                          ),
                   ),
                 ],
               ],
