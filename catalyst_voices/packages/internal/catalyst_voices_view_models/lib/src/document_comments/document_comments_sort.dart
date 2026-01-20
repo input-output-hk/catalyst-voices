@@ -6,14 +6,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 /// Enum representing proposal comments sort options
-enum ProposalCommentsSort {
+enum DocumentCommentsSort {
   newest,
   oldest;
 
   SvgGenImage get icon {
     return switch (this) {
-      ProposalCommentsSort.newest => VoicesAssets.icons.sortDescending,
-      ProposalCommentsSort.oldest => VoicesAssets.icons.sortAscending,
+      DocumentCommentsSort.newest => VoicesAssets.icons.sortDescending,
+      DocumentCommentsSort.oldest => VoicesAssets.icons.sortAscending,
     };
   }
 
@@ -22,14 +22,14 @@ enum ProposalCommentsSort {
         .map((e) {
           return e.copyWith(
             // Replies always have oldest to newest order
-            replies: ProposalCommentsSort.oldest.applyTo(e.replies),
+            replies: DocumentCommentsSort.oldest.applyTo(e.replies),
           );
         })
         .sortedByCompare(
           (element) => element.comment.metadata.id,
           (a, b) => switch (this) {
-            ProposalCommentsSort.newest => a.compareTo(b) * -1,
-            ProposalCommentsSort.oldest => a.compareTo(b),
+            DocumentCommentsSort.newest => a.compareTo(b) * -1,
+            DocumentCommentsSort.oldest => a.compareTo(b),
           },
         )
         .toList();
@@ -37,17 +37,17 @@ enum ProposalCommentsSort {
 
   String localizedName(BuildContext context) {
     return switch (this) {
-      ProposalCommentsSort.newest => context.l10n.commentsSortNewest,
-      ProposalCommentsSort.oldest => context.l10n.commentsSortOldest,
+      DocumentCommentsSort.newest => context.l10n.commentsSortNewest,
+      DocumentCommentsSort.oldest => context.l10n.commentsSortOldest,
     };
   }
 }
 
 extension SegmentsExt on Iterable<Segment> {
-  Iterable<Segment> sortWith({required ProposalCommentsSort sort}) {
+  Iterable<Segment> sortWith({required DocumentCommentsSort sort}) {
     return List.of(this).map(
       (segment) {
-        return segment is ProposalCommentsSegment ? segment.copySorted(sort: sort) : segment;
+        return segment is DocumentCommentsSegment ? segment.copySorted(sort: sort) : segment;
       },
     );
   }
