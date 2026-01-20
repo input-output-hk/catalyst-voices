@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/catalyst_cose.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/document/exception/document_exception.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_mapper.dart';
@@ -24,6 +25,73 @@ void main() {
 
     // Common Objects
     const signedDocRef = SignedDocumentRef(id: uuidV7Str, ver: uuidV7Str);
+
+    group('applyCoseProtectedHeadersUpdates', () {
+      test('applies id and ver update', () {
+        // Given
+        final newId = DocumentRefFactory.randomUuidV7();
+        final newVer = DocumentRefFactory.randomUuidV7();
+
+        final headers = CoseHeaders.protected(
+          id: CoseDocumentId(CoseUuidV7.fromString(uuidV7Str)),
+          ver: CoseDocumentVer(CoseUuidV7.fromString(uuidV7Str)),
+        );
+        final updates = DocumentDataMetadataUpdate(
+          id: Optional(
+            SignedDocumentRef(id: newId, ver: newVer),
+          ),
+        );
+
+        // When
+        final result = SignedDocumentMapper.applyCoseProtectedHeadersUpdates(
+          headers,
+          updates,
+        );
+
+        // Then
+        expect(result.id?.value.format(), newId);
+        expect(result.ver?.value.format(), newVer);
+      });
+
+      test('applies collaborators update', () {
+        // Given
+        const headers = CoseHeaders.protected(
+          collaborators: null,
+        );
+        final updates = DocumentDataMetadataUpdate(
+          collaborators: Optional([catalystId]),
+        );
+
+        // When
+        final result = SignedDocumentMapper.applyCoseProtectedHeadersUpdates(
+          headers,
+          updates,
+        );
+
+        // Then
+        expect(result.collaborators?.list, hasLength(1));
+        expect(result.collaborators?.list.first.bytes, catalystIdKid.bytes);
+      });
+
+      test('does not modify fields if they are not provided', () {
+        // Given
+        final headers = CoseHeaders.protected(
+          id: CoseDocumentId(CoseUuidV7.fromString(uuidV7Str)),
+          ver: CoseDocumentVer(CoseUuidV7.fromString(uuidV7Str)),
+          collaborators: null,
+        );
+        const emptyUpdates = DocumentDataMetadataUpdate();
+
+        // When
+        final result = SignedDocumentMapper.applyCoseProtectedHeadersUpdates(
+          headers,
+          emptyUpdates,
+        );
+
+        // Then
+        expect(result, equals(headers));
+      });
+    });
 
     group('buildCoseProtectedHeaders', () {
       test('maps all fields correctly when fully populated', () {

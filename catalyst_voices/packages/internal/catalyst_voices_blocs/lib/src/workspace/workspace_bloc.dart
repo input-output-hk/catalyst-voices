@@ -265,10 +265,22 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _onLeaveProposal(LeaveProposalEvent event, Emitter<WorkspaceState> emit) async {
-    await _proposalService.submitCollaboratorProposalAction(
-      ref: event.id,
-      action: CollaboratorProposalAction.leaveProposal,
-    );
+    try {
+      final ref = event.id;
+      if (ref is! SignedDocumentRef) {
+        throw ArgumentError('Cannot leave draft proposal with ref: $ref');
+      }
+
+      await _proposalService.submitCollaboratorProposalAction(
+        proposalId: ref,
+        action: CollaboratorProposalAction.leaveProposal,
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('onLeaveProposal', error, stackTrace);
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
+    }
   }
 
   Future<void> _onUnlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {

@@ -131,7 +131,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
     ],
     imageUrl: '',
   ),
-
   //Cardano Use Cases: Prototype & Launch
   CampaignCategory(
     id: f15ConstDocumentsRefs[1].category,
@@ -236,7 +235,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
     ],
     imageUrl: '',
   ),
-  //   //Cardano Open: Ecosystem
+  //Cardano Open: Ecosystem
   CampaignCategory(
     id: f15ConstDocumentsRefs[2].category,
     campaignRef: Campaign.f15Ref,

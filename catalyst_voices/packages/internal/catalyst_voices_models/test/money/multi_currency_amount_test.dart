@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/src/money/currencies.dart';
-import 'package:catalyst_voices_models/src/money/money.dart';
+import 'package:catalyst_voices_models/src/money/money_model.dart';
 import 'package:catalyst_voices_models/src/money/multi_currency_amount.dart';
 import 'package:test/test.dart';
 

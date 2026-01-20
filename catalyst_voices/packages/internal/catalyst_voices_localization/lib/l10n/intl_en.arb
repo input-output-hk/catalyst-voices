@@ -381,6 +381,10 @@
   "@cancelCommit": {
     "description": "Cancel comment submission"
   },
+  "candidateFinalProposal": "Candidate Final",
+  "@candidateFinalProposal": {
+    "description": "Label indicating a candidate for a final proposal status"
+  },
   "cantEditThisProposal": "Can't edit this proposal",
   "@cantEditThisProposal": {
     "description": "Message shown when user tries to edit a proposal that should not be editable."
@@ -532,6 +536,14 @@
   "collaborator": "Co-Proposer",
   "@collaborator": {
     "description": "text indicating to view Collaborator proposals"
+  },
+  "collaboratorApprovedFinal": "Approved final",
+  "@collaboratorApprovedFinal": {
+    "description": "Collaborator approved final proposal"
+  },
+  "collaboratorAwaitingApproval": "Awaiting approval",
+  "@collaboratorAwaitingApproval": {
+    "description": "Collaborator awaiting approval for a proposal"
   },
   "collaboratorDisplayConsent": "Co-Proposer\nDisplay Consent",
   "@collaboratorDisplayConsent": {
@@ -1715,6 +1727,17 @@
     "description": "Generic text about nr. of fund / campaign",
     "placeholders": {
       "fundNumber": {
+        "description": "Number of fund",
+        "type": "int"
+      }
+    }
+  },
+  "fundXAbbr": "F{fundNumber}",
+  "@fundXAbbr": {
+    "description": "Abbreviated title for fund number.",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
         "type": "int"
       }
     }
@@ -1773,11 +1796,19 @@
   },
   "headsUpDisplayConsentHintContent": "You can agree or disagree to be displayed on any proposal you’re invited to.\n\nChanged your mind? You can update your display consent anytime, just keep the submission deadline in mind. Earlier iterations will still show your previous choice.",
   "@headsUpDisplayConsentHintContent": {
-    "description": "Content for heads up about co-proposer display consent"
+    "description": "Content for heads up about final proposals approval"
   },
   "headsUpDisplayConsentHintTitle": "Heads up on Co-proposer Display consent",
   "@headsUpDisplayConsentHintTitle": {
     "description": "Title for heads up about co-proposer display consent"
+  },
+  "headsUpProposalApprovalHintContent": "Final proposals are published to Voting space, do keep in mind that Drafts are not eligible for funding.",
+  "@headsUpProposalApprovalHintContent": {
+    "description": "Content for heads up about co-proposer display consent"
+  },
+  "headsUpProposalApprovalHintTitle": "Heads up on Final Proposals",
+  "@headsUpProposalApprovalHintTitle": {
+    "description": "Title for heads up about final proposals approval"
   },
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {
@@ -2244,6 +2275,15 @@
       }
     }
   },
+  "noOfDecide": "Decide · {count}",
+  "@noOfDecide": {
+    "description": "Tab label for \"Decide\" proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfDraft": "Draft proposals · {count}",
   "@noOfDraft": {
     "description": "Tab label for draft proposals in voting space",
@@ -2264,7 +2304,7 @@
   },
   "noOfFinal": "Final proposals · {count}",
   "@noOfFinal": {
-    "description": "Tab label for final proposals in voting space",
+    "description": "Tab label for final proposals",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2383,6 +2423,10 @@
   "@notPublishedProposals": {
     "description": "Title for section to show not published proposals"
   },
+  "notShownOnFinalProposal": "Not shown on final proposal",
+  "@notShownOnFinalProposal": {
+    "description": "Text explaining that given piece of information is not shown on final proposal."
+  },
   "notVerified": "Not verified",
   "@notVerified": {
     "description": "Message of account status chip next to email. Meaning Account is not verified."
@@ -2419,6 +2463,10 @@
   "openAppSettings": "Open App Settings",
   "@openAppSettings": {
     "description": "CTA to open app settings"
+  },
+  "openForDecision": "Open for Decision",
+  "@openForDecision": {
+    "description": "Navigate to the details of the proposal to take a decision about it"
   },
   "openInEditor": "Open in editor",
   "@openInEditor": {
@@ -2543,6 +2591,34 @@
   "proposal": "Proposal",
   "@proposal": {
     "description": "Generic name to describe an type of item."
+  },
+  "proposalApprovalDecideEmptyDescription": "Approval requests will appear here.",
+  "@proposalApprovalDecideEmptyDescription": {
+    "description": "Header for final proposal approval page empty state for proposals to decide tab"
+  },
+  "proposalApprovalDecideEmptyTitle": "No final approval requests yet",
+  "@proposalApprovalDecideEmptyTitle": {
+    "description": "Header for final proposal approval page empty state for proposals to decide tab"
+  },
+  "proposalApprovalFinalProposalsEmptyDescription": "Final proposals will appear here.",
+  "@proposalApprovalFinalProposalsEmptyDescription": {
+    "description": "Header for final proposal approval page empty state for final proposals tab"
+  },
+  "proposalApprovalFinalProposalsEmptyTitle": "No final proposals yet",
+  "@proposalApprovalFinalProposalsEmptyTitle": {
+    "description": "Header for final proposal approval page empty state for final proposals tab"
+  },
+  "proposalApprovalHeader": "Final Proposal Approval",
+  "@proposalApprovalHeader": {
+    "description": "Header for final proposal approval page"
+  },
+  "proposalApprovalSubheader": "Once the proposal draft is finalized, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
+  "@proposalApprovalSubheader": {
+    "description": "Subheader for final proposal approval page"
+  },
+  "proposalApprovalTabDecide": "Decide",
+  "@proposalApprovalTabDecide": {
+    "description": "Label for \"decide\" tab"
   },
   "proposalApprovals": "Proposal Approvals",
   "@proposalApprovals": {
@@ -4452,6 +4528,10 @@
   "yesterday": "Yesterday",
   "@yesterday": {
     "description": "Refers to date which is yesterday."
+  },
+  "you": "You",
+  "@you": {
+    "description": "You (referring to the current app user)"
   },
   "youAreSettingFinalToDraft": "You are setting your final proposal back to draft.",
   "@youAreSettingFinalToDraft": {

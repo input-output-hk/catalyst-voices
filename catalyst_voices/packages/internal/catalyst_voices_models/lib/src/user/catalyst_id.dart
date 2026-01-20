@@ -284,7 +284,7 @@ extension NullableCatalystId on CatalystId? {
   bool isSameAs(CatalystId? other) {
     final instance = this;
     if (instance == null && other == null) return true;
-    if (instance != null && other != null) instance.isSameAs(other);
+    if (instance != null && other != null) return instance.isSameAs(other);
 
     return false;
   }
