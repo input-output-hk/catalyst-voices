@@ -259,6 +259,31 @@ void main() {
       );
 
       blocTest<WorkspaceBloc, WorkspaceState>(
+        'leaveProposal - delegates to the proposal service',
+        setUp: () {
+          when(
+            () => mockProposalService.submitCollaboratorProposalAction(
+              proposalId: any(named: 'proposalId'),
+              action: CollaboratorProposalAction.leaveProposal,
+            ),
+          ).thenAnswer((_) async => {});
+        },
+        build: () => workspaceBloc,
+        act: (bloc) {
+          const ref = SignedDocumentRef(id: 'signed-123');
+          bloc.add(const LeaveProposalEvent(ref));
+        },
+        verify: (_) {
+          verify(
+            () => mockProposalService.submitCollaboratorProposalAction(
+              proposalId: any(named: 'proposalId'),
+              action: CollaboratorProposalAction.leaveProposal,
+            ),
+          ).called(1);
+        },
+      );
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
         'forgetProposal - derived properties stay in sync after forgetting',
         setUp: () {
           when(

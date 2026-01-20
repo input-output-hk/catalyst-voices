@@ -40,7 +40,7 @@ void main() {
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         signer: signerVerifier,
-        payload: utf8.encode('Test payload'),
+        payload: CosePayload(utf8.encode('Test payload')),
       );
 
       // verify whether alg & kid fields were added to protected headers
@@ -61,7 +61,7 @@ void main() {
       final coseSign1 = CoseSign1(
         protectedHeaders: const CoseHeaders.protected(),
         unprotectedHeaders: const CoseHeaders.unprotected(),
-        payload: utf8.encode('Test payload'),
+        payload: CosePayload(utf8.encode('Test payload')),
         signature: Uint8List(64),
       );
 
