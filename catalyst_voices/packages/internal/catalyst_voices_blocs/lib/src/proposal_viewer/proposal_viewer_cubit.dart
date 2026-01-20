@@ -35,17 +35,6 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
   ProposalViewerCache get _proposalCache => cache as ProposalViewerCache;
 
   @override
-  List<DocumentRef> getDocumentVersions() {
-    return _proposalCache.proposalData?.versions ?? [];
-  }
-
-  @override
-  bool isVotingStage() {
-    final proposalCampaign = _proposalCache.proposalData?.proposalOrDocument.campaign;
-    return _isVotingStage(proposalCampaign);
-  }
-
-  @override
   Future<void> acceptCollaboratorInvitation() async {
     try {
       await super.acceptCollaboratorInvitation();
@@ -89,7 +78,8 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   @override
   void dismissCollaboratorBanner() {
-    emit(state.copyWith(collaborator: const NoneCollaboratorProposalState()));
+    cache = _proposalCache.copyWithCollaborators(const NoneCollaboratorProposalState());
+    _rebuildState();
   }
 
   @override
@@ -102,6 +92,17 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     cache = _proposalCache.copyWith(commentTemplate: Optional(commentTemplate));
 
     if (!isClosed) _rebuildState();
+  }
+
+  @override
+  List<DocumentRef> getDocumentVersions() {
+    return _proposalCache.proposalData?.versions ?? [];
+  }
+
+  @override
+  bool isVotingStage() {
+    final proposalCampaign = _proposalCache.proposalData?.proposalOrDocument.campaign;
+    return _isVotingStage(proposalCampaign);
   }
 
   Future<void> loadProposal(DocumentRef id) async {
@@ -437,7 +438,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: category?.formattedCategoryName ?? '',
       proposalTitle: proposal.title ?? '',
-      isVotingStage: (isVotingStage && isLatestVersion),
+      isVotingStage: (isVotingStage && isLatestVersion && effectivePublish.isPublished),
       data: ProposalViewMetadata(
         author: Profile(catalystId: proposal.authorId!),
         collaborators: collaborators,
@@ -490,10 +491,19 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
   void _handleProposalData(ProposalDataV2? data) {
     final proposalDataChanged = _proposalCache.proposalData != data;
     final proposalIdChanged = _proposalCache.proposalData?.id != data?.id;
+    final activeAccountId = _proposalCache.activeAccountId;
 
     cache = _proposalCache.copyWith(proposalData: Optional(data));
 
     if (proposalIdChanged) {
+      final collaborators =
+          _proposalCache.proposalData?.collaborators ?? const <ProposalDataCollaborator>[];
+      final isFinal = _proposalCache.proposalData?.publish.isPublished ?? false;
+      buildCollaboratorState(
+        collaborators: collaborators,
+        activeAccountId: activeAccountId,
+        isFinal: isFinal,
+      );
       // Proposal changed - fetch comment template and watch comments
       unawaited(fetchCommentTemplate());
       watchComments(onCommentsChanged: (_) => _rebuildState());
@@ -525,15 +535,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     final proposalCampaign = proposalData?.proposalOrDocument.campaign;
     final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
     final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
-
-    final activeAccountId = _proposalCache.activeAccountId;
-    final collaborators = proposalData?.collaborators ?? const <ProposalDataCollaborator>[];
-    final collaboratorsState = CollaboratorProposalState.fromCollaboratorData(
-      collaborators: collaborators,
-      activeAccountId: activeAccountId,
-      isFinal: proposalData?.publish.isPublished ?? false,
-    );
-
+    final collaboratorsState = _proposalCache.collaboratorsState;
     final proposalViewData = _buildProposalViewDataUsingCache();
 
     emit(

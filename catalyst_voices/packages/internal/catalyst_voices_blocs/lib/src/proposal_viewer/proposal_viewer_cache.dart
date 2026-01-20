@@ -37,7 +37,7 @@ final class ProposalViewerCache
   final Vote? vote;
 
   @override
-  final List<Collaborator> collaborators;
+  final CollaboratorProposalState collaboratorsState;
 
   ProposalViewerCache({
     this.id,
@@ -48,7 +48,7 @@ final class ProposalViewerCache
     this.comments,
     this.commentTemplate,
     this.vote,
-    this.collaborators = const [],
+    this.collaboratorsState = const NoneCollaboratorProposalState(),
   });
 
   /// Creates an empty cache with default values.
@@ -64,7 +64,7 @@ final class ProposalViewerCache
     Optional<List<CommentWithReplies>>? comments,
     Optional<CommentTemplate>? commentTemplate,
     Optional<Vote>? vote,
-    List<Collaborator>? collaborators,
+    CollaboratorProposalState? collaboratorsState,
   }) {
     return ProposalViewerCache(
       id: id.dataOr(this.id),
@@ -75,13 +75,13 @@ final class ProposalViewerCache
       comments: comments.dataOr(this.comments),
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       vote: vote.dataOr(this.vote),
-      collaborators: collaborators ?? this.collaborators,
+      collaboratorsState: collaboratorsState ?? this.collaboratorsState,
     );
   }
 
   @override
-  ProposalViewerCache copyWithCollaborators(List<Collaborator> collaborators) {
-    return copyWith(collaborators: collaborators);
+  ProposalViewerCache copyWithCollaborators(CollaboratorProposalState collaboratorsState) {
+    return copyWith(collaboratorsState: collaboratorsState);
   }
 
   @override
@@ -111,7 +111,7 @@ final class ProposalViewerCache
       comments: const Optional.empty(),
       commentTemplate: const Optional.empty(),
       vote: const Optional.empty(),
-      collaborators: const [],
+      collaboratorsState: const NoneCollaboratorProposalState(),
     );
   }
 
