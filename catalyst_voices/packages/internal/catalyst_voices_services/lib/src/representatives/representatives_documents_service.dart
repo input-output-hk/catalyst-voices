@@ -69,7 +69,7 @@ final class RepresentativesDocumentsService implements RepresentativesService {
   @override
   Stream<Page<Representative>> watchRepresentatives({
     required PageRequest request,
-    RepresentativesOrder order = const RepresentativesAlphabetical(),
+    RepresentativesOrder order = const RepresentativesAlphabeticalOrder(),
     RepresentativesFilters filters = const RepresentativesFilters(),
   }) {
     throw UnimplementedError();

@@ -17,7 +17,6 @@ void main() {
     });
 
     test('initial state is empty', () {
-      // Then
       expect(builder.count, 0);
       expect(builder.maxCount, 4);
       expect(builder.representatives, isEmpty);

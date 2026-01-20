@@ -2,8 +2,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// Orders representatives by their [CatalystId.username].
-final class RepresentativesAlphabetical extends RepresentativesOrder {
-  const RepresentativesAlphabetical();
+final class RepresentativesAlphabeticalOrder extends RepresentativesOrder {
+  const RepresentativesAlphabeticalOrder();
 
   @override
   String toString() => 'Alphabetical';
@@ -19,8 +19,8 @@ sealed class RepresentativesOrder extends Equatable {
 }
 
 /// Orders representatives randomly.
-final class RepresentativesRandom extends RepresentativesOrder {
-  const RepresentativesRandom();
+final class RepresentativesRandomOrder extends RepresentativesOrder {
+  const RepresentativesRandomOrder();
 
   @override
   String toString() => 'Random';

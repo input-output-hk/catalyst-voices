@@ -34,12 +34,7 @@ final class DocumentNotFoundException implements DocumentException {
 
   @override
   String toString() {
-    final message = this.message;
-    if (message != null) {
-      return message;
-    }
-
-    return 'Document matching $ref not found';
+    return message ?? 'Document matching $ref not found';
   }
 }
 
@@ -55,12 +50,7 @@ final class DocumentRevokedException implements DocumentException {
 
   @override
   String toString() {
-    final message = this.message;
-    if (message != null) {
-      return message;
-    }
-
-    return 'Document matching $ref is revoked';
+    return message ?? 'Document matching $ref is revoked';
   }
 }
 
