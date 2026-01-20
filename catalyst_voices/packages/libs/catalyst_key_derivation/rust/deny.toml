@@ -69,6 +69,8 @@ allow-git = [
     "https://github.com/input-output-hk/catalyst_flutter_rust_bridge",
     # TODO: remove this when new version `0.6.2` would be published to crates.io
     "https://github.com/nervosnetwork/sparse-merkle-tree.git",
+    # TODO: remove this when change from forked is merged
+    "https://github.com/input-output-hk/rust-ipfs"    
 ]
 
 [licenses]
