@@ -8,7 +8,7 @@ builder:
     DO rust-ci+SETUP
     DO python-ci+INSTALL
 
-    RUN apt-get clean && apt-get git
+    RUN apt-get clean && apt-get install -y git
 
     # prepare tests
     COPY pyproject.toml uv.lock Readme.md .
