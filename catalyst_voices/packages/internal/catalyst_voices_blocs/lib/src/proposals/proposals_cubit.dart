@@ -24,7 +24,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   final ProposalService _proposalService;
 
   ProposalsCubitCache _cache = ProposalsCubitCache(
-    filters: ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active()),
+    filters: ProposalsFiltersV2(campaign: CampaignFilters.active()),
   );
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
@@ -75,8 +75,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
           : null,
       campaign: Optional(
         campaign != null
-            ? ProposalsCampaignFilters.from(campaign)
-            : const ProposalsCampaignFilters(categoriesIds: {}),
+            ? CampaignFilters.from(campaign)
+            : const CampaignFilters(categoriesIds: {}),
       ),
     );
 
@@ -385,7 +385,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   void _resetCache() {
     final activeAccountId = _userService.user.activeAccount?.catalystId;
-    final filters = ProposalsFiltersV2(campaign: ProposalsCampaignFilters.active());
+    final filters = ProposalsFiltersV2(campaign: CampaignFilters.active());
 
     _cache = ProposalsCubitCache(
       filters: filters,
