@@ -2,17 +2,18 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
-import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
-import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
-import 'package:catalyst_voices/pages/proposal/widget/proposal_sidebars.dart';
+import 'package:catalyst_voices/pages/document_viewer/document_viewer_content.dart';
+import 'package:catalyst_voices/pages/document_viewer/document_viewer_error.dart';
+import 'package:catalyst_voices/pages/document_viewer/document_viewer_loading.dart';
+import 'package:catalyst_voices/pages/document_viewer/snack_bar/username_updated_snack_bar.dart';
+import 'package:catalyst_voices/pages/document_viewer/snack_bar/viewing_older_version_snack_bar.dart';
+import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_header.dart';
+import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_sidebars.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
-import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/pages/document_viewer/document_viewer_content.dart';
-import 'package:catalyst_voices/widgets/pages/document_viewer/document_viewer_error.dart';
-import 'package:catalyst_voices/widgets/pages/document_viewer/document_viewer_loading.dart';
+import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -74,7 +75,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 class _ProposalViewerViewState extends State<ProposalViewerView>
     with
         ErrorHandlerStateMixin<ProposalViewerCubit, ProposalViewerView>,
-        SignalHandlerStateMixin<ProposalViewerCubit, ProposalSignal, ProposalViewerView> {
+        SignalHandlerStateMixin<ProposalViewerCubit, DocumentViewerSignal, ProposalViewerView> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -88,7 +89,6 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
         children: [
           Scaffold(
             appBar: const _AppBar(),
-            endDrawer: const OpportunitiesDrawer(),
             floatingActionButton: _ScrollToTopButton(
               segmentsScrollController: _segmentsScrollController,
             ),
@@ -131,7 +131,17 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
   }
 
   @override
-  void handleSignal(ProposalSignal signal) {
+  void handleError(Object error) {
+    switch (error) {
+      case LocalizedUnknownPublishCommentException():
+        unawaited(_showCommentException(error));
+      default:
+        super.handleError(error);
+    }
+  }
+
+  @override
+  void handleSignal(DocumentViewerSignal signal) {
     switch (signal) {
       case ViewingOlderVersionSignal():
         VoicesSnackBar.hideCurrent(context);
@@ -145,8 +155,8 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
       case ChangeVersionSignal():
         _changeVersion(signal.to);
       case UsernameUpdatedSignal():
-        // Not needed for basic viewer
-        break;
+        VoicesSnackBar.hideCurrent(context);
+        UsernameUpdatedSnackBar(context).show(context);
     }
   }
 
@@ -154,7 +164,7 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
   void initState() {
     super.initState();
 
-    final bloc = context.read<ProposalViewerCubit>();
+    final cubit = context.read<ProposalViewerCubit>();
 
     _segmentsController = SegmentsController(scrollAlignment: 0.1);
     _segmentsScrollController = ItemScrollController();
@@ -163,22 +173,32 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
       ..addListener(_handleSegmentsControllerChange)
       ..attachItemsScrollController(_segmentsScrollController);
 
-    _segmentsSub = bloc.stream
+    _segmentsSub = cubit.stream
         .map((event) => event.data.segments)
         .distinct(listEquals)
         .listen(_updateSegments);
 
-    unawaited(bloc.loadProposal(widget.ref));
+    cubit.clear();
+    unawaited(cubit.loadProposal(widget.ref));
   }
 
   void _changeVersion(String? version) {
     Router.neglect(context, () {
       final ref = widget.ref.copyWith(ver: Optional(version));
-      ProposalViewerRoute.fromRef(ref: ref).replace(context);
+      ProposalRoute.fromRef(ref: ref).replace(context);
     });
   }
 
   void _handleSegmentsControllerChange() {}
+
+  Future<void> _showCommentException(
+    LocalizedUnknownPublishCommentException error,
+  ) {
+    return SubmitCommentErrorDialog.show(
+      context: context,
+      exception: error,
+    );
+  }
 
   void _updateSegments(List<Segment> data) {
     final state = _segmentsController.value;
