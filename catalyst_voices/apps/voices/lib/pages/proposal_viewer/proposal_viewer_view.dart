@@ -178,7 +178,6 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
         .distinct(listEquals)
         .listen(_updateSegments);
 
-    cubit.clear();
     unawaited(cubit.loadProposal(widget.ref));
   }
 

@@ -41,17 +41,17 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
     this.userService,
     this.documentMapper,
     this.featureFlagsService,
-  ) {
-    // Initialize cache with active account ID
-    cache = cache.copyWith(
-      activeAccountId: Optional(userService.user.activeAccount?.catalystId),
-    );
+  );
 
-    // Watch for active account changes
-    _activeAccountIdSub = userService.watchUnlockedActiveAccount
-        .map((activeAccount) => activeAccount?.catalystId)
-        .distinct()
-        .listen(handleActiveAccountIdChanged);
+  /// Checks if viewing the latest version of the document.
+  @protected
+  bool get isViewingLatestVersion {
+    final versions = getDocumentVersions();
+    if (versions.isEmpty) return true;
+
+    final currentVersion = cache.id?.ver;
+    final latestVersion = versions.last.ver;
+    return currentVersion == latestVersion;
   }
 
   @override
@@ -65,6 +65,12 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
 
     return super.close();
   }
+
+  /// Returns the list of document versions.
+  ///
+  /// Subclasses implement this to provide version information from their cache.
+  @protected
+  List<DocumentRef> getDocumentVersions();
 
   /// Handles active account ID changes.
   ///
@@ -84,6 +90,46 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
       unawaited(retryLastRef());
     }
   }
+
+  /// Emits signals based on document version being viewed.
+  ///
+  /// Called when the document changes to notify the UI about version state.
+  /// Emits:
+  /// - [ViewingOlderVersionWhileVotingSignal] if viewing old version during voting
+  /// - [ViewingOlderVersionSignal] if viewing old version otherwise
+  @protected
+  void handleDocumentVersionSignal() {
+    if (isViewingLatestVersion) {
+      return;
+    }
+
+    final isVoting = isVotingStage();
+    final hasActiveAccount = cache.activeAccountId != null;
+
+    if (isVoting && hasActiveAccount) {
+      emitSignal(const ViewingOlderVersionWhileVotingSignal());
+    } else {
+      emitSignal(const ViewingOlderVersionSignal());
+    }
+  }
+
+  /// Initializes the cubit with subscriptions and cache setup.
+  @mustCallSuper
+  void init() {
+    // Initialize cache with active account ID
+    cache = cache.copyWith(
+      activeAccountId: Optional(userService.user.activeAccount?.catalystId),
+    );
+
+    // Watch for active account changes
+    _setupActiveAccountIdSubscription();
+  }
+
+  /// Returns whether the document is in voting stage.
+  ///
+  /// Subclasses implement this to check if voting is active for the document.
+  @protected
+  bool isVotingStage();
 
   /// Loads a document by reference.
   ///
@@ -132,48 +178,11 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
 
   Future<void> updateIsFavorite({required bool value});
 
-  /// Returns the list of document versions.
-  ///
-  /// Subclasses implement this to provide version information from their cache.
-  @protected
-  List<DocumentRef> getDocumentVersions();
-
-  /// Returns whether the document is in voting stage.
-  ///
-  /// Subclasses implement this to check if voting is active for the document.
-  @protected
-  bool isVotingStage();
-
-  /// Checks if viewing the latest version of the document.
-  @protected
-  bool get isViewingLatestVersion {
-    final versions = getDocumentVersions();
-    if (versions.isEmpty) return true;
-
-    final currentVersion = cache.id?.ver;
-    final latestVersion = versions.last.ver;
-    return currentVersion == latestVersion;
-  }
-
-  /// Emits signals based on document version being viewed.
-  ///
-  /// Called when the document changes to notify the UI about version state.
-  /// Emits:
-  /// - [ViewingOlderVersionWhileVotingSignal] if viewing old version during voting
-  /// - [ViewingOlderVersionSignal] if viewing old version otherwise
-  @protected
-  void handleDocumentVersionSignal() {
-    if (isViewingLatestVersion) {
-      return;
-    }
-
-    final isVoting = isVotingStage();
-    final hasActiveAccount = cache.activeAccountId != null;
-
-    if (isVoting && hasActiveAccount) {
-      emitSignal(const ViewingOlderVersionWhileVotingSignal());
-    } else {
-      emitSignal(const ViewingOlderVersionSignal());
-    }
+  /// Sets up the subscription for active account ID changes.
+  void _setupActiveAccountIdSubscription() {
+    _activeAccountIdSub = userService.watchUnlockedActiveAccount
+        .map((activeAccount) => activeAccount?.catalystId)
+        .distinct()
+        .listen(handleActiveAccountIdChanged);
   }
 }

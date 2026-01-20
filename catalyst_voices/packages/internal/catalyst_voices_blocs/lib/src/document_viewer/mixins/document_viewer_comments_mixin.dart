@@ -35,18 +35,9 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
 
   /// Protected method to cancel the comments subscription.
   @protected
-  @mustCallSuper
   Future<void> cancelCommentsWatch() async {
     await _commentsSub?.cancel();
     _commentsSub = null;
-  }
-
-  @override
-  @mustCallSuper
-  Future<void> close() async {
-    await _commentsSub?.cancel();
-    _commentsSub = null;
-    return super.close();
   }
 
   /// Protected method for editing a comment (placeholder for future DRep feature).
@@ -163,8 +154,6 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   ///
   /// This is a UI state management method that must be implemented by the cubit
   /// to change how comments are sorted (e.g., newest first, oldest first).
-  ///
-  // TODO(LynxLynxx): If all documents has the same comments sort then we should rename this parameter from ProposalCommentsSort to DocumentCommentsSort
   void updateCommentsSort({required DocumentCommentsSort sort});
 
   Future<void> updateUsername(String value);

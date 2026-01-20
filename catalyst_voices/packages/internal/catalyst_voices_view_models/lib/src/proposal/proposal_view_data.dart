@@ -21,8 +21,6 @@ final class ProposalViewData extends DocumentViewerData {
   List<Object?> get props => [
     ...super.props,
     isCurrentVersionLatest,
-    header,
-    segments,
     categoryText,
   ];
 

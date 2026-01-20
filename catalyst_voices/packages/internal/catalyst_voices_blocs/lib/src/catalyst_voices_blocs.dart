@@ -17,7 +17,6 @@ export 'display_consent/display_consent.dart';
 export 'document_viewer/document_viewer.dart';
 export 'feature_flags/feature_flags.dart';
 export 'my_actions/my_actions.dart';
-// export 'proposal/proposal.dart';
 export 'proposal_builder/new_proposal/new_proposal.dart';
 export 'proposal_builder/proposal_builder.dart';
 export 'proposal_viewer/proposal_viewer.dart';

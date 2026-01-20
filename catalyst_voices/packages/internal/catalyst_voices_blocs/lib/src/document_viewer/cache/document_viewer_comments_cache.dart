@@ -10,9 +10,6 @@ abstract interface class DocumentViewerCommentsCache {
   /// The template defining the schema for comments.
   CommentTemplate? get commentTemplate;
 
-  /// The document parameters (campaign, category, etc.).
-  DocumentParameters? get documentParameters;
-
   /// Returns a copy of the cache with updated comments.
   DocumentViewerCache copyWithComments(List<CommentWithReplies>? comments);
 

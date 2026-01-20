@@ -28,18 +28,6 @@ class _ProposalViewerPageState extends State<ProposalViewerPage> {
   late final ProposalViewerCubit _cubit;
 
   @override
-  void initState() {
-    super.initState();
-    _cubit = Dependencies.instance.get<ProposalViewerCubit>();
-  }
-
-  @override
-  void dispose() {
-    unawaited(_cubit.close());
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     // Provide the cubit as both ProposalViewerCubit and DocumentViewerCubit
     // This allows child widgets to access it using either type
@@ -50,5 +38,18 @@ class _ProposalViewerPageState extends State<ProposalViewerPage> {
         child: ProposalViewerView(ref: widget.ref),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    unawaited(_cubit.close());
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = Dependencies.instance.get<ProposalViewerCubit>();
+    _cubit.init();
   }
 }

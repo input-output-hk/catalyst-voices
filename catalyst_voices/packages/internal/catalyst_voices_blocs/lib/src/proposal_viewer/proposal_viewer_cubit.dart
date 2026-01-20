@@ -24,12 +24,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     super.documentMapper,
     super.featureFlagsService,
     this.commentService,
-  ) {
-    // Initialize cache with specific type
-    cache = ProposalViewerCache.empty().copyWith(
-      activeAccountId: Optional(userService.user.activeAccount?.catalystId),
-    );
-  }
+  );
 
   // Helper to get typed cache
   ProposalViewerCache get _proposalCache => cache as ProposalViewerCache;
@@ -63,16 +58,14 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     }
   }
 
-  /// Clears the current proposal and resets state.
-  void clear() {
-    cache = _proposalCache.copyWithoutProposal();
-    emit(const ProposalViewerState());
-  }
-
   @override
   Future<void> close() async {
     await _proposalSub?.cancel();
     _proposalSub = null;
+
+    // Explicitly call mixin cleanup methods to ensure all subscriptions are closed
+    await cancelCommentsWatch();
+
     return super.close();
   }
 
@@ -97,6 +90,16 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
   @override
   List<DocumentRef> getDocumentVersions() {
     return _proposalCache.proposalData?.versions ?? [];
+  }
+
+  @override
+  void init() {
+    super.init();
+
+    // Initialize cache with specific type
+    cache = ProposalViewerCache.empty().copyWith(
+      activeAccountId: Optional(userService.user.activeAccount?.catalystId),
+    );
   }
 
   @override

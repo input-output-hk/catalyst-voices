@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/proposal/proposal.dart';
 import 'package:equatable/equatable.dart';
 
 /// Signal emitted by [DocumentViewerCubit]. Tells the UI that the version of the Document has changed.
@@ -25,7 +24,7 @@ final class UsernameUpdatedSignal extends DocumentViewerSignal {
   const UsernameUpdatedSignal();
 }
 
-/// Signal emitted by [ProposalCubit]. Tells the UI that the user is viewing an older version of the Proposal.
+/// Signal emitted by [DocumentViewerCubit]. Tells the UI that the user is viewing an older version of the Proposal.
 final class ViewingOlderVersionSignal extends DocumentViewerSignal {
   const ViewingOlderVersionSignal();
 }
