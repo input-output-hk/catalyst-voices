@@ -63,19 +63,28 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   @mustCallSuper
   Future<void> fetchCommentTemplate();
 
-  /// Protected method to submit a comment.
+  /// Submits a comment or reply to the document.
   ///
-  /// This method handles the business logic of submitting a comment:
+  /// This is the public API that must be implemented by subclasses.
+  /// Implementations should call [submitCommentInternal] and handle state emission.
+  Future<void> submitComment({
+    required Document document,
+    SignedDocumentRef? reply,
+  });
+
+  /// Protected internal method that handles comment submission business logic.
+  ///
+  /// This method:
   /// - Validates the cache state
   /// - Creates the comment document
   /// - Updates the cache optimistically
   /// - Calls the comment service
   /// - Rolls back on error by rethrowing
   ///
-  /// The cubit should call this method and handle state emission.
+  /// Subclasses should call this from [submitComment] and handle state emission.
   @protected
   @mustCallSuper
-  Future<void> submitComment({
+  Future<void> submitCommentInternal({
     required Document document,
     SignedDocumentRef? reply,
   }) async {
@@ -156,7 +165,27 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   /// to change how comments are sorted (e.g., newest first, oldest first).
   ///
   // TODO(LynxLynxx): If all documents has the same comments sort then we should rename this parameter from ProposalCommentsSort to DocumentCommentsSort
-  void updateCommentsSort({required ProposalCommentsSort sort});
+  void updateCommentsSort({required DocumentCommentsSort sort});
+
+  Future<void> updateUsername(String value);
+
+  Future<void> updateUsernameInternal(String value) async {
+    final catId = cache.activeAccountId;
+    if (catId == null) {
+      _logger.warning('Tried to update username but no action account found');
+      return;
+    }
+
+    try {
+      await userService.updateAccount(
+        id: catId,
+        username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+      );
+    } catch (error, stack) {
+      _logger.info('Updating username failed', error, stack);
+      rethrow;
+    }
+  }
 
   /// Protected method to watch comments on the current document.
   ///

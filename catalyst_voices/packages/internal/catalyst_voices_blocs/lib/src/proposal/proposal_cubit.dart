@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/document/document_to_segment_mixin.dart';
+import 'package:catalyst_voices_blocs/src/proposal/proposal.dart';
 import 'package:catalyst_voices_blocs/src/proposal/proposal_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -252,7 +253,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     emit(state.copyWith(comments: updatedComments));
   }
 
-  void updateCommentsSort({required ProposalCommentsSort sort}) {
+  void updateCommentsSort({required DocumentCommentsSort sort}) {
     final data = state.data;
     final comments = state.comments;
     final segments = data.segments.sortWith(sort: sort).toList();
@@ -295,7 +296,8 @@ final class ProposalCubit extends Cubit<ProposalState>
         username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
       );
 
-      emitSignal(const UsernameUpdatedSignal());
+      // TODO(LynxLynxx): Will be removed in cleanup pr
+      // emitSignal(const UsernameUpdatedSignal());
     } catch (error, stackTrace) {
       _logger.severe('Update username failed', error, stackTrace);
       emitError(LocalizedException.create(error));
@@ -309,7 +311,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required ProposalCommentsSort commentsSort,
+    required DocumentCommentsSort commentsSort,
     required List<ProposalDataCollaborator> collaborators,
     required bool isFavorite,
     required bool isVotingStage,
@@ -450,7 +452,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required DocumentVersion? version,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required ProposalCommentsSort commentsSort,
+    required DocumentCommentsSort commentsSort,
     required Collaborators collaborators,
     required bool hasActiveAccount,
     required bool hasAccountUsername,
@@ -503,18 +505,18 @@ final class ProposalCubit extends Cubit<ProposalState>
     final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
     final canComment = isNotLocalAndHasActiveAccount && commentSchema != null && !readOnlyMode;
 
-    final commentsSegment = ProposalCommentsSegment(
+    final commentsSegment = DocumentCommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
       sections: [
-        ProposalViewCommentsSection(
+        DocumentViewCommentsSection(
           id: const NodeId('comments.view'),
           sort: commentsSort,
           comments: commentsSort.applyTo(comments),
           canReply: canReply,
         ),
         if (canComment)
-          ProposalAddCommentSection(
+          DocumentAddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,
             showUsernameRequired: !hasAccountUsername,
@@ -589,9 +591,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     final isVotingStage = _isVotingStage(proposalCampaign);
 
     if (isVotingStage && _cache.activeAccountId != null) {
-      emitSignal(const ViewingOlderVersionWhileVotingSignal());
+      // emitSignal(const ViewingOlderVersionWhileVotingSignal());
     } else {
-      emitSignal(const ViewingOlderVersionSignal());
+      // emitSignal(const ViewingOlderVersionSignal());
     }
   }
 

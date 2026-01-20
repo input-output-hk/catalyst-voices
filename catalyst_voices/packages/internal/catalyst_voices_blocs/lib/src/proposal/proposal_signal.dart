@@ -1,4 +1,5 @@
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/proposal/proposal.dart' show ProposalCubit;
+import 'package:catalyst_voices_blocs/src/proposal/proposal_cubit.dart' show ProposalCubit;
 import 'package:equatable/equatable.dart';
 
 /// Signal emitted by [ProposalCubit]. Tells the UI that the version of the Proposal has changed.

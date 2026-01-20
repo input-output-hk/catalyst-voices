@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/mixins/document_viewer_collaborator_mixin.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -10,9 +10,10 @@ import 'package:collection/collection.dart';
 final _logger = Logger('ProposalViewerCubit');
 
 final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
-    with
-        DocumentViewerCollaboratorsMixin,
-        BlocSignalEmitterMixin<ProposalSignal, ProposalViewerState> {
+    with DocumentViewerCommentsMixin, DocumentViewerCollaboratorsMixin {
+  @override
+  final CommentService commentService;
+
   // Subscription for watching proposal data updates
   StreamSubscription<ProposalDataV2?>? _proposalSub;
 
@@ -22,6 +23,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     super.userService,
     super.documentMapper,
     super.featureFlagsService,
+    this.commentService,
   ) {
     // Initialize cache with specific type
     cache = ProposalViewerCache.empty().copyWith(
@@ -29,21 +31,19 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     );
   }
 
-  /// Checks if viewing the latest version.
-  bool get _isViewingLatestVersion {
-    final proposalData = _proposalCache.proposalData;
-    if (proposalData == null) return true;
-
-    final currentVersion = cache.id?.ver;
-    final versions = proposalData.versions ?? [];
-    if (versions.isEmpty) return true;
-
-    final latestVersion = versions.last.ver;
-    return currentVersion == latestVersion;
-  }
-
   // Helper to get typed cache
   ProposalViewerCache get _proposalCache => cache as ProposalViewerCache;
+
+  @override
+  List<DocumentRef> getDocumentVersions() {
+    return _proposalCache.proposalData?.versions ?? [];
+  }
+
+  @override
+  bool isVotingStage() {
+    final proposalCampaign = _proposalCache.proposalData?.proposalOrDocument.campaign;
+    return _isVotingStage(proposalCampaign);
+  }
 
   @override
   Future<void> acceptCollaboratorInvitation() async {
@@ -90,6 +90,18 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
   @override
   void dismissCollaboratorBanner() {
     emit(state.copyWith(collaborator: const NoneCollaboratorProposalState()));
+  }
+
+  @override
+  Future<void> fetchCommentTemplate() async {
+    final categoryId = _proposalCache.proposalData?.proposalOrDocument.category?.id;
+    final commentTemplate = categoryId != null
+        ? await commentService.getCommentTemplate(category: categoryId)
+        : null;
+
+    cache = _proposalCache.copyWith(commentTemplate: Optional(commentTemplate));
+
+    if (!isClosed) _rebuildState();
   }
 
   Future<void> loadProposal(DocumentRef id) async {
@@ -141,6 +153,24 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
   }
 
   @override
+  Future<void> submitComment({
+    required Document document,
+    SignedDocumentRef? reply,
+  }) async {
+    try {
+      await submitCommentInternal(document: document, reply: reply);
+      if (!isClosed) _rebuildState();
+    } catch (error, stack) {
+      _logger.info('Publishing comment failed', error, stack);
+      if (!isClosed) {
+        final localizedException = LocalizedException.create(error);
+        emitError(localizedException);
+      }
+      if (!isClosed) _rebuildState();
+    }
+  }
+
+  @override
   Future<void> syncAndWatchDocument() async {
     // Cancel existing subscription
     await _proposalSub?.cancel();
@@ -153,6 +183,42 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     if (!isClosed) {
       _watchProposal();
     }
+  }
+
+  @override
+  void updateCommentBuilder({
+    required SignedDocumentRef ref,
+    required bool show,
+  }) {
+    final updatedComments = state.comments.updateCommentBuilder(ref: ref, show: show);
+    emit(state.copyWith(comments: updatedComments));
+  }
+
+  @override
+  void updateCommentReplies({
+    required SignedDocumentRef ref,
+    required bool show,
+  }) {
+    final updatedComments = state.comments.updateCommentReplies(ref: ref, show: show);
+    emit(state.copyWith(comments: updatedComments));
+  }
+
+  @override
+  void updateCommentsSort({required DocumentCommentsSort sort}) {
+    final data = state.data;
+
+    final comments = state.comments;
+    final segments = data.segments.sortWith(sort: sort).toList();
+
+    final updatedData = data.copyWith(segments: segments);
+    final updatedComments = comments.copyWith(commentsSort: sort);
+
+    emit(
+      state.copyWith(
+        data: updatedData,
+        comments: updatedComments,
+      ),
+    );
   }
 
   @override
@@ -182,6 +248,16 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     }
   }
 
+  @override
+  Future<void> updateUsername(String value) async {
+    try {
+      await updateUsernameInternal(value);
+      emitSignal(const UsernameUpdatedSignal());
+    } catch (error) {
+      emitError(LocalizedException.create(error));
+    }
+  }
+
   ProposalViewData _buildProposalViewData({
     required bool hasAccountUsername,
     required CatalystId? activeAccountId,
@@ -189,7 +265,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required ProposalCommentsSort commentsSort,
+    required DocumentCommentsSort commentsSort,
     required List<ProposalDataCollaborator> collaborators,
     required bool isFavorite,
     required bool isVotingStage,
@@ -330,7 +406,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     required DocumentVersion? version,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required ProposalCommentsSort commentsSort,
+    required DocumentCommentsSort commentsSort,
     required Collaborators collaborators,
     required bool hasActiveAccount,
     required bool hasAccountUsername,
@@ -383,18 +459,18 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
     final canComment = isNotLocalAndHasActiveAccount && commentSchema != null && !readOnlyMode;
 
-    final commentsSegment = ProposalCommentsSegment(
+    final commentsSegment = DocumentCommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
       sections: [
-        ProposalViewCommentsSection(
+        DocumentViewCommentsSection(
           id: const NodeId('comments.view'),
           sort: commentsSort,
           comments: commentsSort.applyTo(comments),
           canReply: canReply,
         ),
         if (canComment)
-          ProposalAddCommentSection(
+          DocumentAddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,
             showUsernameRequired: !hasAccountUsername,
@@ -418,28 +494,21 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     cache = _proposalCache.copyWith(proposalData: Optional(data));
 
     if (proposalIdChanged) {
-      // Proposal changed - update collaborator state
-      _handleProposalVersionSignal();
+      // Proposal changed - fetch comment template and watch comments
+      unawaited(fetchCommentTemplate());
+      watchComments(onCommentsChanged: (_) => _rebuildState());
+
+      // Reset comments UI state
+      emit(state.copyWith(comments: const CommentsState()));
+
+      // Update collaborator state
+      if (!state.isLoading) {
+        handleDocumentVersionSignal();
+      }
     }
 
     if (proposalDataChanged) {
       _rebuildState();
-    }
-  }
-
-  /// Emits signals based on proposal version being viewed.
-  void _handleProposalVersionSignal() {
-    if (state.isLoading || _isViewingLatestVersion) {
-      return;
-    }
-
-    final proposalCampaign = _proposalCache.proposalData?.proposalOrDocument.campaign;
-    final isVotingStage = _isVotingStage(proposalCampaign);
-
-    if (isVotingStage && _proposalCache.activeAccountId != null) {
-      emitSignal(const ViewingOlderVersionWhileVotingSignal());
-    } else {
-      emitSignal(const ViewingOlderVersionSignal());
     }
   }
 

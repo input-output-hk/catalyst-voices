@@ -9,7 +9,10 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends Cubit<S>
-    with BlocErrorEmitterMixin, DocumentToSegmentMixin {
+    with
+        BlocErrorEmitterMixin,
+        BlocSignalEmitterMixin<DocumentViewerSignal, S>,
+        DocumentToSegmentMixin {
   @protected
   final ProposalService proposalService;
 
@@ -128,4 +131,49 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
   Future<void> syncAndWatchDocument();
 
   Future<void> updateIsFavorite({required bool value});
+
+  /// Returns the list of document versions.
+  ///
+  /// Subclasses implement this to provide version information from their cache.
+  @protected
+  List<DocumentRef> getDocumentVersions();
+
+  /// Returns whether the document is in voting stage.
+  ///
+  /// Subclasses implement this to check if voting is active for the document.
+  @protected
+  bool isVotingStage();
+
+  /// Checks if viewing the latest version of the document.
+  @protected
+  bool get isViewingLatestVersion {
+    final versions = getDocumentVersions();
+    if (versions.isEmpty) return true;
+
+    final currentVersion = cache.id?.ver;
+    final latestVersion = versions.last.ver;
+    return currentVersion == latestVersion;
+  }
+
+  /// Emits signals based on document version being viewed.
+  ///
+  /// Called when the document changes to notify the UI about version state.
+  /// Emits:
+  /// - [ViewingOlderVersionWhileVotingSignal] if viewing old version during voting
+  /// - [ViewingOlderVersionSignal] if viewing old version otherwise
+  @protected
+  void handleDocumentVersionSignal() {
+    if (isViewingLatestVersion) {
+      return;
+    }
+
+    final isVoting = isVotingStage();
+    final hasActiveAccount = cache.activeAccountId != null;
+
+    if (isVoting && hasActiveAccount) {
+      emitSignal(const ViewingOlderVersionWhileVotingSignal());
+    } else {
+      emitSignal(const ViewingOlderVersionSignal());
+    }
+  }
 }

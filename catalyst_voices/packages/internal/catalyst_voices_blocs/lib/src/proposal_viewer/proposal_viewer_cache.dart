@@ -80,6 +80,11 @@ final class ProposalViewerCache
   }
 
   @override
+  ProposalViewerCache copyWithCollaborators(List<Collaborator> collaborators) {
+    return copyWith(collaborators: collaborators);
+  }
+
+  @override
   ProposalViewerCache copyWithComments(List<CommentWithReplies>? comments) {
     return copyWith(comments: Optional(comments));
   }
@@ -87,16 +92,6 @@ final class ProposalViewerCache
   @override
   ProposalViewerCache copyWithCommentTemplate(CommentTemplate? template) {
     return copyWith(commentTemplate: Optional(template));
-  }
-
-  @override
-  ProposalViewerCache copyWithVoting(Vote? vote) {
-    return copyWith(vote: Optional(vote));
-  }
-
-  @override
-  ProposalViewerCache copyWithCollaborators(List<Collaborator> collaborators) {
-    return copyWith(collaborators: collaborators);
   }
 
   /// Updates the favorite status of the proposal.
@@ -118,5 +113,10 @@ final class ProposalViewerCache
       vote: const Optional.empty(),
       collaborators: const [],
     );
+  }
+
+  @override
+  ProposalViewerCache copyWithVoting(Vote? vote) {
+    return copyWith(vote: Optional(vote));
   }
 }
