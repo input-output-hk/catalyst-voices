@@ -162,15 +162,6 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
       })
-      ..registerFactory<ProposalCubit>(() {
-        return ProposalCubit(
-          get<UserService>(),
-          get<ProposalService>(),
-          get<CommentService>(),
-          get<DocumentMapper>(),
-          get<FeatureFlagsService>(),
-        );
-      })
       ..registerFactory<ProposalViewerCubit>(() {
         return ProposalViewerCubit(
           const ProposalViewerState(),
@@ -178,6 +169,7 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<DocumentMapper>(),
           get<FeatureFlagsService>(),
+          get<CommentService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
