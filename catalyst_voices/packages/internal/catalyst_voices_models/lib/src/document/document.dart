@@ -10,6 +10,7 @@ export 'data/document_content_type.dart';
 export 'data/document_data.dart';
 export 'data/document_data_content.dart';
 export 'data/document_data_metadata.dart';
+export 'data/document_data_metadata_update.dart';
 export 'data/document_type.dart';
 export 'data/proposal_document_data.dart';
 export 'document_mapper.dart';
