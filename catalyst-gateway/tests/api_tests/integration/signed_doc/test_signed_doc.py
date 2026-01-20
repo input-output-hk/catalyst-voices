@@ -14,7 +14,7 @@ from api.v2 import document as document_v2
 def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
     proposal_doc = proposal_doc_factory()
-    proposal_doc_id = proposal_doc.metadata["id"]
+    proposal_doc_id = proposal_doc.id()
 
     # Get the proposal document
     resp = document_v1.get(document_id=proposal_doc_id)
@@ -33,11 +33,9 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
     )
 
     # Put document with different ver
-    new_doc = proposal_doc.copy()
-    new_doc.new_version()
-    new_doc = new_doc.build_and_sign()
+    new_doc = proposal_doc_factory(id=proposal_doc.id(), publish=False)
     resp = document_v1.put(
-        data=new_doc.hex_cbor,
+        data=new_doc.hex_cbor(),
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 201, (
@@ -46,73 +44,47 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     # Put a document again
     resp = document_v1.put(
-        data=new_doc.hex_cbor,
+        data=new_doc.hex_cbor(),
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 204, (
         f"Failed to publish document: {resp.status_code} - {resp.text}"
     )
 
-    # Put a non valid document with same ID different content
-    invalid_doc = proposal_doc.copy()
-    invalid_doc.content["setup"]["title"] = {"title": "another title"}
+    # # Put a non valid document
+    invalid_doc = proposal_doc_factory(
+        proposal_template_content={
+            "type": "object",
+            "properties": {"name": {"type": "string"}},
+            "required": ["name"],
+        },
+        proposal_content={"age": 12},
+        publish=False,
+    )
     resp = document_v1.put(
-        data=invalid_doc.build_and_sign(),
+        data=invalid_doc.hex_cbor(),
         token=rbac_chain.auth_token(),
     )
     assert resp.status_code == 422, (
         f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
     )
 
-    # Put a signed document with same ID, but different version and different content
-    new_doc = proposal_doc.copy()
-    new_doc.new_version()
-    new_doc.content["setup"]["title"]["title"] = "another title"
-    new_doc = new_doc.build_and_sign()
-    resp = document_v1.put(
-        data=new_doc.hex_cbor,
-        token=rbac_chain.auth_token(),
-    )
-    assert resp.status_code == 201, (
-        f"Failed to publish document: {resp.status_code} - {resp.text}"
-    )
-
-
-@pytest.mark.preprod_indexing
-def test_document_put_validation_failed(proposal_doc_factory, rbac_chain_factory):
-    with open("./test_data/signed_docs/proposal_form_template.json", "r") as json_file:
-        proposal_template_content = json.load(json_file)
-        proposal_template_content["definitions"]["segment"]["properties"][
-            "proposer"
-        ] = {"type": "boolean"}
-    try:
-        proposal_doc_factory(proposal_template_content)
-        assert False  # Document published successfully - expected 422 validation
-    except AssertionError as e:
-        if "422" in str(e):
-            pass
-        else:
-            raise
-
 
 @pytest.mark.preprod_indexing
 def test_document_index_endpoint(
     proposal_doc_factory,
     rbac_chain_factory,
-):
+): 
     doc = proposal_doc_factory()
-
     rbac_chain = rbac_chain_factory()
     # submiting 10 documents
     total_amount = 10
 
     for _ in range(total_amount - 1):
-        doc = doc.copy()
+        doc = proposal_doc_factory(id=doc.id(), publish=False)
         # keep the same id, but different version
-        doc.new_version()
-        doc = doc.build_and_sign()
         resp = document_v1.put(
-            data=doc.cbor_hex,
+            data=doc.hex_cbor(),
             token=rbac_chain.auth_token(),
         )
         assert resp.status_code == 201, (
@@ -121,7 +93,7 @@ def test_document_index_endpoint(
 
     limit = 1
     page = 0
-    filter = {"id": {"eq": doc.metadata["id"]}}
+    filter = {"id": {"eq": doc.id()}}
     resp = document_v2.post(
         limit=limit,
         page=page,

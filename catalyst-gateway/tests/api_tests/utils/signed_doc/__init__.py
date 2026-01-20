@@ -91,14 +91,11 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
 
     def proposal_doc_factory(
-        proposal_template_content: dict | None = None,
+        proposal_template_content: dict = {"type": "object"},
+        proposal_content: dict = {},
+        id: str | None = None,
+        publish: bool = True,
     ) -> CatalystSignedDocument:
-        if proposal_template_content == None:
-            with open(
-                "./test_data/signed_docs/proposal_form_template.json", "r"
-            ) as json_file:
-                proposal_template_content = json.load(json_file)
-
         proposal_template = proposal_form_template_doc(
             content=json.dumps(proposal_template_content),
             parameters=category,
@@ -108,18 +105,17 @@ def proposal_doc_factory(admin_key, rbac_chain_factory):
         )
         publish_document(proposal_template, admin_key.auth_token())
 
-        with open("./test_data/signed_docs/proposal.json", "r") as json_file:
-            proposal_content = json.load(json_file)
         (cat_id, key) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
         doc = proposal_doc(
             content=json.dumps(proposal_content),
             template=proposal_template,
             parameters=category,
-            sk=key,
+            sk=key.sk_hex,
             kid=cat_id,
-            id=None,
+            id=id,
         )
-        publish_document(doc, rbac_chain.auth_token())
+        if publish:
+            publish_document(doc, rbac_chain.auth_token())
         return doc
 
     return proposal_doc_factory

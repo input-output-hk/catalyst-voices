@@ -245,4 +245,3 @@ def test_get_migrated_and_f14_documents():
         assert resp.content.hex() == doc_cbor, (
             f"Unexpected document cbor bytes for {doc_id}"
         )
-
