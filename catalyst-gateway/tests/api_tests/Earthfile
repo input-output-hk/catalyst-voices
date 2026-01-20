@@ -9,7 +9,7 @@ builder:
     DO python-ci+INSTALL
 
     # prepare tests
-    COPY pyproject.toml uv.lock README.md .
+    COPY pyproject.toml uv.lock Readme.md .
     COPY --dir ./api .
     COPY --dir ./integration .
     COPY --dir ./scripts .
