@@ -16,6 +16,6 @@ final fXStaticCampaignCategories = [
   ),
   f15StaticCampaignCategories[2].copyWith(
     campaignRef: Campaign.fXRef,
-    id: const SignedDocumentRef.first('019b2b86-7507-7b95-929e-74e3bffb030d'),
+    id: const SignedDocumentRef.first('019bc671-0aa5-7442-88b4-5458645b26b7'),
   ),
 ];
