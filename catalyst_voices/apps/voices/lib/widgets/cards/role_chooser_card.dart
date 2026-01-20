@@ -92,7 +92,7 @@ class RoleChooserCard extends StatelessWidget {
                 ),
                 if (displayValue) ...[
                   const SizedBox(height: 8),
-                  Flexible(
+                  SizedBox(
                     child: isViewOnly
                         ? _DisplayingValueAsChips(value: value, isDefault: isDefault)
                         : _DisplayingValueAsSegmentedButton(

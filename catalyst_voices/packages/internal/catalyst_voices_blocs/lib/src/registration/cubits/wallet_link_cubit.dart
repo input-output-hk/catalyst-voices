@@ -37,12 +37,14 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   void clearSelectedWallet() {
     _selectedWallet = null;
 
-    state.copyWith(
-      selectedWallet: const Optional.empty(),
-      walletConnection: const Optional.empty(),
-      walletSummary: const Optional.empty(),
-      isNetworkIdMatching: false,
-      hasEnoughBalance: false,
+    emit(
+      state.copyWith(
+        selectedWallet: const Optional.empty(),
+        walletConnection: const Optional.empty(),
+        walletSummary: const Optional.empty(),
+        isNetworkIdMatching: false,
+        hasEnoughBalance: false,
+      ),
     );
   }
 
