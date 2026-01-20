@@ -26,7 +26,6 @@ export SIGNED_DOC_SK="0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3
 ./target/release/cat-gateway run
 ```
 
-
 ### Running tests
 
 * First install [`uv`](https://github.com/astral-sh/uv)

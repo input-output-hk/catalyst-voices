@@ -1,3 +1,6 @@
+# cspell: words uniffi
+
+
 [project]
 name = "signed-docs"
 version = "1.0.0"
