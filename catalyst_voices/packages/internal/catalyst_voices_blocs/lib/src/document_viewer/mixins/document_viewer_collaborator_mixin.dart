@@ -24,8 +24,13 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
   @protected
   Future<void> acceptCollaboratorInvitation() async {
     try {
+      final id = cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.acceptInvitation,
       );
     } catch (error, stackTrace) {
@@ -38,8 +43,13 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
   @protected
   Future<void> acceptFinalProposal() async {
     try {
+      final id = cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.acceptFinal,
       );
     } catch (error, stackTrace) {
@@ -68,8 +78,13 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
   @protected
   Future<void> rejectCollaboratorInvitation() async {
     try {
+      final id = cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.rejectInvitation,
       );
 
@@ -86,8 +101,13 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
   @protected
   Future<void> rejectFinalProposal() async {
     try {
+      final id = cache.id;
+      if (id is! SignedDocumentRef) {
+        throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
+      }
+
       await _proposalService.submitCollaboratorProposalAction(
-        ref: cache.id!,
+        proposalId: id,
         action: CollaboratorProposalAction.rejectFinal,
       );
     } catch (error, stackTrace) {
