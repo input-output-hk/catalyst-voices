@@ -4,14 +4,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class ProposalCommentCard extends StatelessWidget {
+class DocumentCommentCard extends StatelessWidget {
   final CommentDocument document;
   final bool canReply;
   final int trimLines;
   final VoidCallback? onReplyTap;
   final Widget? footer;
 
-  const ProposalCommentCard({
+  const DocumentCommentCard({
     super.key,
     required this.document,
     this.canReply = true,

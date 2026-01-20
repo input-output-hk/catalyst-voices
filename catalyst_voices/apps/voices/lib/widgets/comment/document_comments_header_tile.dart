@@ -5,12 +5,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalCommentsHeaderTile extends StatelessWidget {
-  final ProposalCommentsSort sort;
-  final ValueChanged<ProposalCommentsSort> onChanged;
+class DocumentCommentsHeaderTile extends StatelessWidget {
+  final DocumentCommentsSort sort;
+  final ValueChanged<DocumentCommentsSort> onChanged;
   final bool showSort;
 
-  const ProposalCommentsHeaderTile({
+  const DocumentCommentsHeaderTile({
     super.key,
     required this.sort,
     required this.onChanged,
@@ -36,8 +36,8 @@ class ProposalCommentsHeaderTile extends StatelessWidget {
 }
 
 class _SortDropdownButton extends StatelessWidget {
-  final ProposalCommentsSort selected;
-  final ValueChanged<ProposalCommentsSort> onChanged;
+  final DocumentCommentsSort selected;
+  final ValueChanged<DocumentCommentsSort> onChanged;
 
   const _SortDropdownButton({
     required this.selected,
@@ -46,11 +46,11 @@ class _SortDropdownButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesOutlinedPopupMeuButton<ProposalCommentsSort>(
-      items: ProposalCommentsSort.values,
+    return VoicesOutlinedPopupMeuButton<DocumentCommentsSort>(
+      items: DocumentCommentsSort.values,
       initialValue: selected,
       builder: (context, index) {
-        final value = ProposalCommentsSort.values[index];
+        final value = DocumentCommentsSort.values[index];
         return Text(value.localizedName(context));
       },
       onSelected: onChanged,

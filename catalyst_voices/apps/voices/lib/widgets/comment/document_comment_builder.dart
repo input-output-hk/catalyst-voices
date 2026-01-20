@@ -7,20 +7,20 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentPropertyBuilder;
 import 'package:flutter/material.dart';
 
-typedef OnSubmitProposalComment =
+typedef OnSubmitDocumentComment =
     Future<void> Function({
       required Document document,
       SignedDocumentRef? reply,
     });
 
-class ProposalCommentBuilder extends StatefulWidget {
+class DocumentCommentBuilder extends StatefulWidget {
   final DocumentSchema schema;
   final SignedDocumentRef? parent;
   final bool showCancel;
-  final OnSubmitProposalComment onSubmit;
+  final OnSubmitDocumentComment onSubmit;
   final VoidCallback? onCancelTap;
 
-  const ProposalCommentBuilder({
+  const DocumentCommentBuilder({
     super.key,
     required this.schema,
     this.parent,
@@ -30,7 +30,7 @@ class ProposalCommentBuilder extends StatefulWidget {
   });
 
   @override
-  State<ProposalCommentBuilder> createState() => _ProposalCommentBuilderState();
+  State<DocumentCommentBuilder> createState() => _DocumentCommentBuilderState();
 }
 
 class _Actions extends StatelessWidget {
@@ -64,7 +64,7 @@ class _Actions extends StatelessWidget {
   }
 }
 
-class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
+class _DocumentCommentBuilderState extends State<DocumentCommentBuilder> {
   final _formKey = GlobalKey<FormState>();
   final _focusNode = FocusScopeNode();
 
@@ -120,7 +120,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
   }
 
   @override
-  void didUpdateWidget(ProposalCommentBuilder oldWidget) {
+  void didUpdateWidget(DocumentCommentBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.schema != oldWidget.schema) {

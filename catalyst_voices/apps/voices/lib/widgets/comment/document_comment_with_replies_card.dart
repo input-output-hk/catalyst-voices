@@ -1,23 +1,23 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/comment/proposal_comment_builder.dart';
-import 'package:catalyst_voices/widgets/comment/proposal_comment_card.dart';
+import 'package:catalyst_voices/widgets/comment/document_comment_builder.dart';
+import 'package:catalyst_voices/widgets/comment/document_comment_card.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/common/animated_expand_chevron.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalCommentWithRepliesCard extends StatelessWidget {
+class DocumentCommentWithRepliesCard extends StatelessWidget {
   final CommentWithReplies comment;
   final bool canReply;
   final Map<DocumentRef, bool> showReplies;
   final bool showReplyBuilder;
-  final OnSubmitProposalComment onSubmit;
+  final OnSubmitDocumentComment onSubmit;
   final VoidCallback onCancel;
   final ValueChanged<bool> onToggleBuilder;
   final ValueChanged<bool> onToggleReplies;
 
-  const ProposalCommentWithRepliesCard({
+  const DocumentCommentWithRepliesCard({
     super.key,
     required this.comment,
     required this.canReply,
@@ -46,8 +46,8 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
       children: [
-        ProposalCommentCard(
-          key: ValueKey('ProposalComment${comment.comment.metadata.id}Card'),
+        DocumentCommentCard(
+          key: ValueKey('DocumentComment${comment.comment.metadata.id}Card'),
           document: comment.comment,
           canReply: canReply,
           trimLines: 6,
@@ -92,7 +92,7 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
               left: repliesIndent.toDouble(),
               bottom: 16,
             ),
-            child: ProposalCommentBuilder(
+            child: DocumentCommentBuilder(
               schema: comment.comment.document.schema,
               parent: comment.comment.metadata.id,
               showCancel: true,
@@ -108,7 +108,7 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
 class _RepliesCard extends StatelessWidget {
   final CommentWithReplies comment;
   final Map<DocumentRef, bool> showReplies;
-  final OnSubmitProposalComment onSubmit;
+  final OnSubmitDocumentComment onSubmit;
   final VoidCallback onCancel;
   final ValueChanged<bool> onToggleBuilder;
   final ValueChanged<bool> onToggleReplies;
@@ -125,7 +125,7 @@ class _RepliesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProposalCommentWithRepliesCard(
+    return DocumentCommentWithRepliesCard(
       comment: comment,
       canReply: false,
       showReplies: showReplies,
