@@ -24,8 +24,8 @@ void main() {
 
       final signedDocument = await documentManager.signDocument(
         payload,
-        catalystId: _catalystId,
         metadata: _metadata,
+        catalystId: _catalystId,
         privateKey: _privateKey,
       );
 
@@ -39,7 +39,38 @@ void main() {
 
       expect(parsedDocument.payload, equals(payload));
       expect(parsedDocument.rawPayload, isNotEmpty);
-      expect(parsedDocument.signers, [_catalystId]);
+      expect(parsedDocument.signers, containsAllInOrder([_catalystId]));
+    });
+
+    test('signUpdatedDocument creates a signed document '
+        'that can be converted from/to bytes', () async {
+      const payload = SignedDocumentJsonPayload({'title': 'hey'});
+      final updatedDocumentId = DocumentRefFactory.signedDocumentRef();
+      final updatedCollaborators = [_collaboratorId];
+
+      final originalSignedDocument = await documentManager.signDocument(
+        payload,
+        metadata: _metadata,
+        catalystId: _catalystId,
+        privateKey: _privateKey,
+      );
+
+      final signedDocumentArtifact = originalSignedDocument.toArtifact();
+      final updatedSignedDocument = await documentManager.signUpdatedDocument(
+        signedDocumentArtifact,
+        buildMetadataUpdates: (metadata) => DocumentDataMetadataUpdate(
+          id: Optional(updatedDocumentId),
+          collaborators: Optional(updatedCollaborators),
+        ),
+        catalystId: _catalystId,
+        privateKey: _privateKey,
+      );
+
+      expect(updatedSignedDocument.payload, equals(payload));
+      expect(updatedSignedDocument.rawPayload, isNotEmpty);
+      expect(updatedSignedDocument.signers, containsAllInOrder([_catalystId]));
+      expect(updatedSignedDocument.metadata.id, equals(updatedDocumentId));
+      expect(updatedSignedDocument.metadata.collaborators, containsAllInOrder([_collaboratorId]));
     });
 
     test('parse signed document v0.0.1', () async {
@@ -69,9 +100,16 @@ void main() {
 final _catalystId = CatalystId(
   host: CatalystIdHost.cardanoPreprod.host,
   role0Key: _publicKey.publicKeyBytes,
+  username: 'author',
 );
 
 final _categoryRef = DocumentRefFactory.signedDocumentRef();
+
+final _collaboratorId = CatalystId(
+  host: CatalystIdHost.cardanoPreprod.host,
+  role0Key: _publicKey.publicKeyBytes,
+  username: 'collaborator',
+);
 
 final _metadata = DocumentDataMetadata.proposal(
   id: DocumentRefFactory.signedDocumentRef(),

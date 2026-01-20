@@ -73,34 +73,49 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   @override
-  Future<SignedDocument> signRawDocument(
-    SignedDocumentRawPayload payload, {
-    required DocumentDataMetadata metadata,
+  Future<SignedDocument> signUpdatedDocument(
+    DocumentArtifact artifact, {
+    required DocumentMetadataUpdatesBuilder buildMetadataUpdates,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
     try {
+      final cborValue = await profiler.timeWithResult(
+        'cbor_decode_doc',
+        () => cbor.decode(artifact.value),
+        debounce: true,
+      );
+
       final coseSign = await profiler.timeWithResult(
+        'cose_decode',
+        () => CoseSign.fromCbor(cborValue),
+        debounce: true,
+      );
+
+      final signedDocument = _CoseSignedDocument.fromCose(
+        coseSign,
+        payloadBytes: await _decompressPayload(coseSign),
+      );
+
+      final updatedCoseSign = await profiler.timeWithResult(
         'cose_sign_doc',
         () {
           return CoseSign.sign(
-            // TODO(dt-iohk): the payload might be compressed or not however
-            // buildCoseProtectedHeaders() always adds content encoding params.
-            // Make sure the content encoding is set conditionally based on the payload.
-            protectedHeaders: SignedDocumentMapper.buildCoseProtectedHeaders(metadata),
-            unprotectedHeaders: const CoseHeaders.unprotected(),
-            payload: CosePayload(payload.bytes),
+            protectedHeaders: SignedDocumentMapper.applyCoseProtectedHeadersUpdates(
+              coseSign.protectedHeaders,
+              buildMetadataUpdates(signedDocument.metadata),
+            ),
+            unprotectedHeaders: coseSign.unprotectedHeaders,
+            payload: coseSign.payload,
             signers: [_CatalystSigner(catalystId, privateKey)],
           );
         },
         debounce: true,
       );
 
-      final payloadBytes = await _decompressPayload(coseSign);
-
       return _CoseSignedDocument.fromCose(
-        coseSign,
-        payloadBytes: payloadBytes,
+        updatedCoseSign,
+        payloadBytes: await _decompressPayload(updatedCoseSign),
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
