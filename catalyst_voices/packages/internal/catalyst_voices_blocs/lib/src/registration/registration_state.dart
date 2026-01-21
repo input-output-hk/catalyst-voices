@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:result_type/result_type.dart';
 
 final class RegistrationState extends Equatable {
   final RegistrationStep step;
@@ -10,6 +12,7 @@ final class RegistrationState extends Equatable {
   final WalletLinkStateData walletLinkStateData;
   final RegistrationStateData registrationStateData;
   final RecoverStateData recoverStateData;
+  final Result<AccountSummaryData, LocalizedException>? walletDrepLinkAccountDetails;
 
   const RegistrationState({
     this.step = const GetStartedStep(),
@@ -19,6 +22,7 @@ final class RegistrationState extends Equatable {
     this.walletLinkStateData = const WalletLinkStateData(),
     this.registrationStateData = const RegistrationStateData(),
     this.recoverStateData = const RecoverStateData(),
+    this.walletDrepLinkAccountDetails,
   });
 
   double? get progress {
@@ -46,6 +50,12 @@ final class RegistrationState extends Equatable {
       return current / total;
     }
 
+    double walletDrepLinkProgress(WalletDrepLinkStage stage) {
+      final current = WalletDrepLinkStage.values.indexOf(stage);
+      final total = WalletDrepLinkStage.values.length;
+      return current / total;
+    }
+
     return switch (step) {
       GetStartedStep() => null,
       // recovery
@@ -58,8 +68,12 @@ final class RegistrationState extends Equatable {
       AccountCreateProgressStep() => 1.0,
       WalletLinkStep(:final stage) => walletLinkProgress(stage),
 
+      // account update
+      WalletDrepLinkStep(:final stage) => walletDrepLinkProgress(stage),
+
       // ready
       AccountCompletedStep() => 1.0,
+      WalletDrepLinkCompletedStep() => 1.0,
     };
   }
 
@@ -72,6 +86,7 @@ final class RegistrationState extends Equatable {
     walletLinkStateData,
     registrationStateData,
     recoverStateData,
+    walletDrepLinkAccountDetails,
   ];
 
   RegistrationState copyWith({
@@ -82,6 +97,7 @@ final class RegistrationState extends Equatable {
     WalletLinkStateData? walletLinkStateData,
     RegistrationStateData? registrationStateData,
     RecoverStateData? recoverStateData,
+    Optional<Result<AccountSummaryData, LocalizedException>>? walletDrepLinkAccountDetails,
   }) {
     return RegistrationState(
       step: step ?? this.step,
@@ -91,6 +107,9 @@ final class RegistrationState extends Equatable {
       walletLinkStateData: walletLinkStateData ?? this.walletLinkStateData,
       registrationStateData: registrationStateData ?? this.registrationStateData,
       recoverStateData: recoverStateData ?? this.recoverStateData,
+      walletDrepLinkAccountDetails: walletDrepLinkAccountDetails.dataOr(
+        this.walletDrepLinkAccountDetails,
+      ),
     );
   }
 }

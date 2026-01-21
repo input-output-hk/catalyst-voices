@@ -61,9 +61,9 @@ class _BlocRolesSummaryContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<List<RegistrationRole>>(
-      selector: (state) => state.roles,
-      builder: (context, state) => RolesSummaryContainer(roles: state),
+    return BlocWalletLinkSelector<IterableData<List<RegistrationRole>>>(
+      selector: (state) => state.rolesData,
+      builder: (context, data) => RolesSummaryContainer(roles: data.value),
     );
   }
 }
@@ -73,10 +73,10 @@ class _BlocSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<Set<AccountRole>>(
-      selector: (state) => state.selectedRoleTypes,
-      builder: (context, state) {
-        return _Subtitle(selectedRoles: state);
+    return BlocWalletLinkSelector<IterableData<Set<AccountRole>>>(
+      selector: (state) => state.selectedRoleTypesData,
+      builder: (context, data) {
+        return _Subtitle(selectedRoles: data.value);
       },
     );
   }
