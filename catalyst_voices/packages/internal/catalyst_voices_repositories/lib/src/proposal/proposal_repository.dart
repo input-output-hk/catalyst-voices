@@ -77,6 +77,12 @@ abstract interface class ProposalRepository {
     bool includeLocalDrafts = false,
   });
 
+  Future<void> removeCollaboratorFromProposal({
+    required SignedDocumentRef proposalId,
+    required CatalystId collaboratorId,
+    required CatalystPrivateKey privateKey,
+  });
+
   Future<void> updateProposalFavorite({
     required String id,
     required bool isFavorite,
@@ -329,6 +335,35 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> removeCollaboratorFromProposal({
+    required SignedDocumentRef proposalId,
+    required CatalystId collaboratorId,
+    required CatalystPrivateKey privateKey,
+  }) async {
+    final artifact = await _documentRepository.getDocumentArtifact(id: proposalId);
+
+    final updatedDocument = await _signedDocumentManager.signUpdatedDocument(
+      artifact,
+      buildMetadataUpdates: (metadata) {
+        final updatedDocumentId = metadata.id.fresh().toSignedDocumentRef();
+
+        final updatedCollaborators = metadata.collaborators
+            ?.whereNot((e) => e.isSameAs(collaboratorId))
+            .toList();
+
+        return DocumentDataMetadataUpdate(
+          id: Optional(updatedDocumentId),
+          collaborators: Optional(updatedCollaborators),
+        );
+      },
+      catalystId: collaboratorId,
+      privateKey: privateKey,
+    );
+
+    await _documentRepository.publishDocument(document: updatedDocument);
   }
 
   @override

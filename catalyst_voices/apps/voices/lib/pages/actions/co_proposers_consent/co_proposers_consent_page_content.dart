@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/error_handler.dart';
-import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/widgets/display_consent_list.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/widgets/heads_up_display_consent_hint_card.dart';
 import 'package:catalyst_voices/pages/actions/widgets/actions_header_text.dart';
@@ -9,7 +8,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class CoProposersConsentPageContent extends StatefulWidget {
-  const CoProposersConsentPageContent({super.key});
+  final VoidCallback? onCloseTap;
+
+  const CoProposersConsentPageContent({
+    super.key,
+    this.onCloseTap,
+  });
 
   @override
   State<CoProposersConsentPageContent> createState() => _CoProposersConsentPageContentState();
@@ -25,7 +29,7 @@ class _CoProposersConsentPageContentState extends State<CoProposersConsentPageCo
           padding: const EdgeInsets.only(left: 24, right: 24, top: 22, bottom: 16),
           child: VoicesDrawerHeader(
             text: context.l10n.collaboratorDisplayConsentHeader,
-            onCloseTap: () => ActionsShellPage.close(context),
+            onCloseTap: widget.onCloseTap,
             showBackButton: true,
           ),
         ),

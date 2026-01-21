@@ -1,39 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
-
-/// A set of filters to be applied when querying for campaign proposals.
-final class ProposalsCampaignFilters extends Equatable {
-  /// Filters proposals by their category IDs.
-  final Set<String> categoriesIds;
-
-  /// Creates a set of filters for querying campaign proposals.
-  const ProposalsCampaignFilters({
-    required this.categoriesIds,
-  });
-
-  /// Currently hardcoded active campaign helper constructor.
-  factory ProposalsCampaignFilters.active() {
-    final categoriesIds = Campaign.all
-        .where((campaign) => campaign.id == activeCampaignRef)
-        .map((campaign) => campaign.categories.map((category) => category.id.id))
-        .flattened
-        .toSet();
-
-    return ProposalsCampaignFilters(categoriesIds: categoriesIds);
-  }
-
-  factory ProposalsCampaignFilters.from(Campaign campaign) {
-    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet();
-    return ProposalsCampaignFilters(categoriesIds: categoriesIds);
-  }
-
-  @override
-  List<Object?> get props => [categoriesIds];
-
-  @override
-  String toString() => 'categoriesIds: $categoriesIds';
-}
 
 /// A set of filters to be applied when querying for proposals.
 base class ProposalsFiltersV2 extends Equatable {
@@ -67,7 +33,7 @@ base class ProposalsFiltersV2 extends Equatable {
   /// Filters proposals based on their campaign categories.
   /// If [campaign] is not null and [categoryId] is not included, empty list will be returned.
   /// If null, this filter is not applied.
-  final ProposalsCampaignFilters? campaign;
+  final CampaignFilters? campaign;
 
   /// Filters proposals based on whether a specific user has voted on them.
   /// The value is the [CatalystId] of the user.
@@ -111,7 +77,7 @@ base class ProposalsFiltersV2 extends Equatable {
     Optional<String>? categoryId,
     Optional<String>? searchQuery,
     Optional<Duration>? latestUpdate,
-    Optional<ProposalsCampaignFilters>? campaign,
+    Optional<CampaignFilters>? campaign,
     Optional<CatalystId>? voteBy,
     Optional<List<String>>? ids,
   }) {
