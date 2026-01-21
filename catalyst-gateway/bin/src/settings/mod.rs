@@ -81,7 +81,7 @@ fn calculate_service_uuid() -> String {
 #[clap(version = BUILD_INFO)]
 pub(crate) struct ServiceSettings {
     /// Logging level
-    #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
+    #[clap(long, env = "LOG_LEVEL", default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
 }
 
