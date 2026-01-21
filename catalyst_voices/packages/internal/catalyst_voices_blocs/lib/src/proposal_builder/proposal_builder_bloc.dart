@@ -4,7 +4,7 @@ import 'package:catalyst_voices_blocs/src/comments/comments_state.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
-import 'package:catalyst_voices_blocs/src/document_builder/document_guidance.dart';
+import 'package:catalyst_voices_blocs/src/document_builder/document_builder.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_bloc_cache.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_signal.dart';
@@ -176,7 +176,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final firstSegment = documentSegments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
-    final guidance = DocumentGuidance.create(
+    final guidance = DocumentBuilderGuidance.create(
       firstSegment,
       firstSection,
       titleGenerator: _generateDocumentGuidanceCustomTitle,
@@ -340,14 +340,14 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return property.schema.nodeId.matchesPattern(milestoneListWildcard) ? '' : null;
   }
 
-  DocumentGuidance _getGuidanceForNodeId(NodeId? nodeId) {
+  DocumentBuilderGuidance _getGuidanceForNodeId(NodeId? nodeId) {
     if (nodeId == null) {
-      return const DocumentGuidance(isNoneSelected: true);
+      return const DocumentBuilderGuidance(isNoneSelected: true);
     } else {
       final segment = state.documentSegments.firstWhereOrNull((e) => nodeId.isSameOrChildOf(e.id));
       final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
 
-      return DocumentGuidance.create(
+      return DocumentBuilderGuidance.create(
         segment,
         section,
         titleGenerator: _generateDocumentGuidanceCustomTitle,
@@ -1236,7 +1236,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         documentSegments: documentSegments,
         validationErrors: Optional(
           ProposalBuilderValidationErrors(
-            status: ProposalBuilderValidationStatus.notStarted,
+            status: DocumentBuilderValidationStatus.notStarted,
             origin: event.origin,
             errors: document.invalidPropertiesTitles,
           ),

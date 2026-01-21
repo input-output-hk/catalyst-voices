@@ -158,7 +158,7 @@ class _NotStartedSnackbar extends StatelessWidget {
       buttonText: context.l10n.startButtonText,
       buttonAction: () {
         const event = UpdateProposalBuilderValidationStatusEvent(
-          status: ProposalBuilderValidationStatus.pendingHideAll,
+          status: DocumentBuilderValidationStatus.pendingHideAll,
         );
         context.read<ProposalBuilderBloc>().add(event);
       },
@@ -195,10 +195,10 @@ class _PendingSnackbar extends StatelessWidget {
       buttonAction: () {
         final event = switch (showAll) {
           true => const UpdateProposalBuilderValidationStatusEvent(
-            status: ProposalBuilderValidationStatus.pendingHideAll,
+            status: DocumentBuilderValidationStatus.pendingHideAll,
           ),
           false => const UpdateProposalBuilderValidationStatusEvent(
-            status: ProposalBuilderValidationStatus.pendingShowAll,
+            status: DocumentBuilderValidationStatus.pendingShowAll,
           ),
         };
 
@@ -271,24 +271,24 @@ class _SnackbarStatusSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (validationErrors.status) {
-      case ProposalBuilderValidationStatus.notStarted:
+      case DocumentBuilderValidationStatus.notStarted:
         return _NotStartedSnackbar(
           origin: validationErrors.origin,
           errorCount: validationErrors.errors.length,
         );
-      case ProposalBuilderValidationStatus.pendingShowAll:
+      case DocumentBuilderValidationStatus.pendingShowAll:
         return _PendingSnackbar(
           origin: validationErrors.origin,
           showAll: true,
           errors: validationErrors.errors,
         );
-      case ProposalBuilderValidationStatus.pendingHideAll:
+      case DocumentBuilderValidationStatus.pendingHideAll:
         return _PendingSnackbar(
           origin: validationErrors.origin,
           showAll: false,
           errors: validationErrors.errors,
         );
-      case ProposalBuilderValidationStatus.cleared:
+      case DocumentBuilderValidationStatus.cleared:
         return _ClearedSnackbar(origin: validationErrors.origin);
     }
   }

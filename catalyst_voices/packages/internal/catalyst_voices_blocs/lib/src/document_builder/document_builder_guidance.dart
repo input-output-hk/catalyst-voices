@@ -5,30 +5,30 @@ import 'package:equatable/equatable.dart';
 /// A callback to generate a custom property title for a [DocumentProperty].
 ///
 /// Returning null will use the default title of the [property].
-typedef DocumentGuidancePropertyTitleGenerator = String? Function(DocumentProperty property);
+typedef DocumentBuilderGuidancePropertyTitleGenerator = String? Function(DocumentProperty property);
 
-/// A list of [DocumentGuidanceItem] related to a [DocumentSection] or [DocumentSegment].
-final class DocumentGuidance extends Equatable {
+/// A list of [DocumentBuilderGuidanceItem] related to a [DocumentSection] or [DocumentSegment].
+final class DocumentBuilderGuidance extends Equatable {
   final bool isNoneSelected;
-  final List<DocumentGuidanceItem> guidanceList;
+  final List<DocumentBuilderGuidanceItem> guidanceList;
 
-  const DocumentGuidance({
+  const DocumentBuilderGuidance({
     this.isNoneSelected = false,
     this.guidanceList = const [],
   });
 
-  /// Creates the [DocumentGuidance] for all properties of the [section] in given [segment].
+  /// Creates the [DocumentBuilderGuidance] for all properties of the [section] in given [segment].
   ///
   /// The [titleGenerator] can optionally be used to override the property title.
-  factory DocumentGuidance.create(
+  factory DocumentBuilderGuidance.create(
     DocumentSegment? segment,
     DocumentSection? section, {
-    DocumentGuidancePropertyTitleGenerator? titleGenerator,
+    DocumentBuilderGuidancePropertyTitleGenerator? titleGenerator,
   }) {
     if (segment == null || section == null) {
-      return const DocumentGuidance();
+      return const DocumentBuilderGuidance();
     } else {
-      return DocumentGuidance(
+      return DocumentBuilderGuidance(
         guidanceList: _findGuidanceItems(
           segment,
           section,
@@ -47,11 +47,11 @@ final class DocumentGuidance extends Equatable {
 
   bool get showEmptyState => !isNoneSelected && guidanceList.isEmpty;
 
-  static Iterable<DocumentGuidanceItem> _findGuidanceItems(
+  static Iterable<DocumentBuilderGuidanceItem> _findGuidanceItems(
     DocumentSegment segment,
     DocumentSection section,
     DocumentProperty property,
-    DocumentGuidancePropertyTitleGenerator? titleGenerator,
+    DocumentBuilderGuidancePropertyTitleGenerator? titleGenerator,
   ) sync* {
     if (property.schema.isSubsection && section.id != property.nodeId) {
       // Since the property is a standalone subsection we cannot
@@ -63,7 +63,7 @@ final class DocumentGuidance extends Equatable {
     final sectionTitle = titleGenerator?.call(property) ?? property.schema.title;
 
     if (guidance != null) {
-      yield DocumentGuidanceItem(
+      yield DocumentBuilderGuidanceItem(
         segmentTitle: segment.schema.title,
         sectionTitle: sectionTitle,
         description: guidance,
@@ -87,13 +87,13 @@ final class DocumentGuidance extends Equatable {
 }
 
 /// A guidance data of the [DocumentProperty] identified by [nodeId].
-final class DocumentGuidanceItem extends Equatable {
+final class DocumentBuilderGuidanceItem extends Equatable {
   final String segmentTitle;
   final String sectionTitle;
   final MarkdownData description;
   final DocumentNodeId nodeId;
 
-  const DocumentGuidanceItem({
+  const DocumentBuilderGuidanceItem({
     required this.segmentTitle,
     required this.sectionTitle,
     required this.description,
