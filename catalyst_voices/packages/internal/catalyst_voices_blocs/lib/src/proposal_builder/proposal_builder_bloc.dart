@@ -179,7 +179,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final guidance = DocumentBuilderGuidance.create(
       firstSegment,
       firstSection,
-      titleGenerator: _generateDocumentGuidanceCustomTitle,
+      titleGenerator: _getGuidanceCustomTitle,
     );
     final stateCategory = CampaignCategoryDetailsViewModel.fromModel(
       category,
@@ -335,7 +335,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
   }
 
-  String? _generateDocumentGuidanceCustomTitle(DocumentProperty property) {
+  String? _getGuidanceCustomTitle(DocumentProperty property) {
     final milestoneListWildcard = ProposalDocument.milestoneListChildNodeId;
     return property.schema.nodeId.matchesPattern(milestoneListWildcard) ? '' : null;
   }
@@ -350,7 +350,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       return DocumentBuilderGuidance.create(
         segment,
         section,
-        titleGenerator: _generateDocumentGuidanceCustomTitle,
+        titleGenerator: _getGuidanceCustomTitle,
       );
     }
   }
