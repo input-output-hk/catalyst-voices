@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../ AS repo-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.10 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.14 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
