@@ -121,6 +121,7 @@ abstract interface class ProposalService {
     required DocumentDataContent content,
     required SignedDocumentRef templateRef,
     required DocumentParameters parameters,
+    required List<CatalystId> collaborators,
   });
 
   Future<CollaboratorValidationResult> validateForCollaborator(CatalystId id);
@@ -446,6 +447,7 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentDataContent content,
     required SignedDocumentRef templateRef,
     required DocumentParameters parameters,
+    required List<CatalystId> collaborators,
   }) async {
     // TODO(LynxLynxx): when we start supporting multiple authors
     // we need to get the list of authors actually stored in the db and
@@ -459,6 +461,7 @@ final class ProposalServiceImpl implements ProposalService {
           template: templateRef,
           parameters: parameters,
           authors: [catalystId],
+          collaborators: collaborators,
         ),
         content: content,
       ),
