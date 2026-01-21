@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 /// Contains the state of validation errors for the document builder.
-class DocumentBuilderValidationErrors<Origin extends Object> extends Equatable {
+final class DocumentBuilderValidationErrors<ValidationOrigin extends Object> extends Equatable {
   final DocumentBuilderValidationStatus status;
-  final Origin origin;
+  final ValidationOrigin origin;
   final List<String> errors;
 
   const DocumentBuilderValidationErrors({
@@ -26,9 +26,9 @@ class DocumentBuilderValidationErrors<Origin extends Object> extends Equatable {
     }
   }
 
-  DocumentBuilderValidationErrors<Origin> copyWith({
+  DocumentBuilderValidationErrors<ValidationOrigin> copyWith({
     DocumentBuilderValidationStatus? status,
-    Origin? origin,
+    ValidationOrigin? origin,
     List<String>? errors,
   }) {
     return DocumentBuilderValidationErrors(
@@ -38,7 +38,7 @@ class DocumentBuilderValidationErrors<Origin extends Object> extends Equatable {
     );
   }
 
-  DocumentBuilderValidationErrors<Origin> withErrorList(
+  DocumentBuilderValidationErrors<ValidationOrigin> withErrorList(
     List<String> errors,
   ) {
     return copyWith(
