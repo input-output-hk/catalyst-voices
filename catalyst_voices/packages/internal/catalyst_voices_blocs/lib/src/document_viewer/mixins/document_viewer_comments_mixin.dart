@@ -40,18 +40,6 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
     _commentsSub = null;
   }
 
-  /// Protected method for editing a comment (placeholder for future DRep feature).
-  @protected
-  @mustCallSuper
-  Future<void> editComment({
-    required Document document,
-    SignedDocumentRef? reply,
-  }) async {
-    // To be implemented in DRep feature
-    _logger.info('editComment not yet implemented');
-  }
-
-  @mustCallSuper
   Future<void> fetchCommentTemplate();
 
   /// Submits a comment or reply to the document.
@@ -69,15 +57,16 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   /// - Validates the cache state
   /// - Creates the comment document
   /// - Updates the cache optimistically
+  /// - Calls [onOptimisticUpdate] to rebuild state
   /// - Calls the comment service
   /// - Rolls back on error by rethrowing
   ///
   /// Subclasses should call this from [submitComment] and handle state emission.
   @protected
-  @mustCallSuper
   Future<void> submitCommentInternal({
     required Document document,
     SignedDocumentRef? reply,
+    required VoidCallback onOptimisticUpdate,
   }) async {
     final proposalId = cache.id;
     assert(proposalId != null, 'Document ref not found. Load document first!');
@@ -111,6 +100,9 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
     // Optimistically update cache
     final comments = (_commentsCache.comments ?? []).addComment(comment: comment);
     cache = _commentsCache.copyWithComments(comments);
+
+    // Rebuild state immediately to show optimistic update
+    onOptimisticUpdate();
 
     final documentData = comment.toDocumentData(mapper: documentMapper);
 
@@ -182,7 +174,6 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   /// The provided [onCommentsChanged] callback is called when comments change,
   /// allowing the cubit to rebuild state.
   @protected
-  @mustCallSuper
   void watchComments({
     required void Function(List<CommentWithReplies>) onCommentsChanged,
   }) {

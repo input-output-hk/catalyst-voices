@@ -33,7 +33,6 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<CommentWithReplies>>? _commentsSub;
-  StreamSubscription<Vote?>? _watchedCastedVotesSub;
   StreamSubscription<ProposalDataV2?>? _proposalSub;
 
   ProposalCubit(
@@ -111,9 +110,6 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     await _commentsSub?.cancel();
     _commentsSub = null;
-
-    await _watchedCastedVotesSub?.cancel();
-    _watchedCastedVotesSub = null;
 
     await _proposalSub?.cancel();
     _proposalSub = null;

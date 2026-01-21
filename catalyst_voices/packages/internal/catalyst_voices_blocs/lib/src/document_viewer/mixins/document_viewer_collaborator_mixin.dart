@@ -10,6 +10,9 @@ final _logger = Logger('DocumentViewerCollaboratorsMixin');
 
 base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
     on DocumentViewerCubit<S> {
+  @override
+  ProposalService get proposalService;
+
   DocumentViewerCollaboratorsCache get _collaboratorsCache {
     assert(
       cache is DocumentViewerCollaboratorsCache,
@@ -17,8 +20,6 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
     );
     return cache as DocumentViewerCollaboratorsCache;
   }
-
-  ProposalService get _proposalService;
 
   @mustCallSuper
   @protected
@@ -29,9 +30,12 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
       }
 
-      await _proposalService.submitCollaboratorProposalAction(
+      await proposalService.submitCollaboratorProposalAction(
         proposalId: id,
         action: CollaboratorProposalAction.acceptInvitation,
+      );
+      cache = _collaboratorsCache.copyWithCollaborators(
+        const AcceptedCollaboratorInvitationState(),
       );
     } catch (error, stackTrace) {
       _logger.severe('acceptCollaboratorInvitation', error, stackTrace);
@@ -48,10 +52,11 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
       }
 
-      await _proposalService.submitCollaboratorProposalAction(
+      await proposalService.submitCollaboratorProposalAction(
         proposalId: id,
         action: CollaboratorProposalAction.acceptFinal,
       );
+      cache = _collaboratorsCache.copyWithCollaborators(const AcceptedFinalProposalConsentState());
     } catch (error, stackTrace) {
       _logger.severe('acceptFinalProposal', error, stackTrace);
       rethrow;
@@ -72,7 +77,11 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
     cache = _collaboratorsCache.copyWithCollaborators(collaboratorState);
   }
 
-  void dismissCollaboratorBanner();
+  @mustCallSuper
+  @protected
+  void dismissCollaboratorBanner() {
+    cache = _collaboratorsCache.copyWithCollaborators(const NoneCollaboratorProposalState());
+  }
 
   @mustCallSuper
   @protected
@@ -83,7 +92,7 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
       }
 
-      await _proposalService.submitCollaboratorProposalAction(
+      await proposalService.submitCollaboratorProposalAction(
         proposalId: id,
         action: CollaboratorProposalAction.rejectInvitation,
       );
@@ -106,9 +115,13 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         throw ArgumentError('Cannot accept collaborator invitation for a draft proposal: $id');
       }
 
-      await _proposalService.submitCollaboratorProposalAction(
+      await proposalService.submitCollaboratorProposalAction(
         proposalId: id,
         action: CollaboratorProposalAction.rejectFinal,
+      );
+
+      cache = _collaboratorsCache.copyWithCollaborators(
+        const RejectedCollaboratorFinalProposalConsentState(),
       );
     } catch (error, stackTrace) {
       _logger.severe('rejectFinalProposal', error, stackTrace);

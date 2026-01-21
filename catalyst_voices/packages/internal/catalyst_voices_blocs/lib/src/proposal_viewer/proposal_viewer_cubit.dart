@@ -13,7 +13,6 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     with DocumentViewerCommentsMixin, DocumentViewerCollaboratorsMixin {
   @override
   final CommentService commentService;
-
   // Subscription for watching proposal data updates
   StreamSubscription<ProposalDataV2?>? _proposalSub;
 
@@ -34,7 +33,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     try {
       await super.acceptCollaboratorInvitation();
       if (!isClosed) {
-        emit(state.copyWith(collaborator: const AcceptedCollaboratorInvitationState()));
+        _rebuildState();
       }
     } catch (error) {
       if (!isClosed) {
@@ -49,7 +48,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
       await super.acceptFinalProposal();
 
       if (!isClosed) {
-        emit(state.copyWith(collaborator: const AcceptedFinalProposalConsentState()));
+        _rebuildState();
       }
     } catch (error) {
       if (!isClosed) {
@@ -71,7 +70,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   @override
   void dismissCollaboratorBanner() {
-    cache = _proposalCache.copyWithCollaborators(const NoneCollaboratorProposalState());
+    super.dismissCollaboratorBanner();
     _rebuildState();
   }
 
@@ -118,7 +117,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
       await super.rejectCollaboratorInvitation();
 
       if (!isClosed) {
-        emit(state.copyWith(collaborator: const RejectedCollaboratorInvitationState()));
+        _rebuildState();
       }
     } catch (error) {
       if (!isClosed) {
@@ -133,7 +132,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
       await super.rejectFinalProposal();
 
       if (!isClosed) {
-        emit(state.copyWith(collaborator: const RejectedCollaboratorFinalProposalConsentState()));
+        _rebuildState();
       }
     } catch (error) {
       if (!isClosed) {
@@ -162,8 +161,13 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     SignedDocumentRef? reply,
   }) async {
     try {
-      await submitCommentInternal(document: document, reply: reply);
-      if (!isClosed) _rebuildState();
+      await submitCommentInternal(
+        document: document,
+        reply: reply,
+        onOptimisticUpdate: () {
+          if (!isClosed) _rebuildState();
+        },
+      );
     } catch (error, stack) {
       _logger.info('Publishing comment failed', error, stack);
       if (!isClosed) {
@@ -282,7 +286,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
   }) {
     final proposalDocumentRef = proposal?.metadata.id;
 
-    final versions = proposalVersions.reversed.mapIndexed((index, version) {
+    final versions = proposalVersions.mapIndexed((index, version) {
       final ver = version.ver;
 
       return DocumentVersion(
@@ -496,7 +500,10 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     final proposalIdChanged = _proposalCache.proposalData?.id != data?.id;
     final activeAccountId = _proposalCache.activeAccountId;
 
-    cache = _proposalCache.copyWith(proposalData: Optional(data));
+    cache = _proposalCache.copyWith(
+      proposalData: Optional(data),
+      documentParameters: data != null ? Optional(data.proposalOrDocument.parameters) : null,
+    );
 
     if (proposalIdChanged) {
       final collaborators =
