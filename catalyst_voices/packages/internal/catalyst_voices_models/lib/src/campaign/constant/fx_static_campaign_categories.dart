@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/campaign/campaign.dart';
+import 'package:catalyst_voices_models/src/campaign/campaign_model.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/document/document_ref.dart';
 
@@ -16,6 +16,6 @@ final fXStaticCampaignCategories = [
   ),
   f15StaticCampaignCategories[2].copyWith(
     campaignRef: Campaign.fXRef,
-    id: const SignedDocumentRef.first('019b2b86-7507-7b95-929e-74e3bffb030d'),
+    id: const SignedDocumentRef.first('019bc671-0aa5-7442-88b4-5458645b26b7'),
   ),
 ];
