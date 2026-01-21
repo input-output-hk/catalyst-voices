@@ -73,6 +73,25 @@ void main() {
         expect(result.collaborators?.list.first.bytes, catalystIdKid.bytes);
       });
 
+      test('returns null collaborators when list is empty', () {
+        // Given
+        final headers = CoseHeaders.protected(
+          collaborators: CoseCollaborators([catalystIdKid]),
+        );
+        const updates = DocumentDataMetadataUpdate(
+          collaborators: Optional([]),
+        );
+
+        // When
+        final result = SignedDocumentMapper.applyCoseProtectedHeadersUpdates(
+          headers,
+          updates,
+        );
+
+        // Then
+        expect(result.collaborators, isNull);
+      });
+
       test('does not modify fields if they are not provided', () {
         // Given
         final headers = CoseHeaders.protected(
@@ -163,6 +182,24 @@ void main() {
         expect(headers.section, isNull);
         expect(headers.collaborators, isNull);
         expect(headers.parameters, isNull);
+      });
+
+      test('returns null collaborators when list is empty', () {
+        // Arrange
+        final metadata = DocumentDataMetadata(
+          contentType: DocumentContentType.json,
+          type: DocumentType.proposalDocument,
+          id: signedDocRef,
+          collaborators: const [],
+          parameters: const DocumentParameters({}),
+          authors: const [],
+        );
+
+        // Act
+        final headers = SignedDocumentMapper.buildCoseProtectedHeaders(metadata);
+
+        // Assert
+        expect(headers.collaborators, isNull);
       });
     });
 
