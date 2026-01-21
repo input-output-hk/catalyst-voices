@@ -22,7 +22,6 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
     required DocumentRef id,
     required CollaboratorDisplayConsentStatus displayConsentStatus,
   }) async {
-    // TODO(LynxLynxx): Test it when available
     final collaboratorAction = displayConsentStatus.toCollaboratorAction();
 
     final indexOfProposalConsent = _cache.proposalsDisplayConsent.indexWhere(

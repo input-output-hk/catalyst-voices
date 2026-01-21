@@ -71,10 +71,12 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
     // Proposal Brief do not support "removed" or "left" status.
     final collaborators = data.proposal.metadata.collaborators?.map(
       (id) {
+        final rawCollaboratorAction = collaboratorsActions[id.toSignificant()];
         return ProposalDataCollaborator.fromAction(
           id: id,
-          action: collaboratorsActions[id.toSignificant()]?.action,
+          action: rawCollaboratorAction?.action,
           isProposalFinal: isFinal,
+          actionId: rawCollaboratorAction?.actionId,
         );
       },
     ).toList();
