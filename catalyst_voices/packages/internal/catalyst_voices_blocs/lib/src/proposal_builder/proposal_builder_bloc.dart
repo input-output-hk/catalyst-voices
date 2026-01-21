@@ -143,7 +143,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       template: state.metadata.templateRef!,
       parameters: state.metadata.parameters!,
       authors: [_userService.activeAccountId],
-      collaborators: state.metadata.collaborators,
+      collaborators: state.metadata.collaborators.isEmpty ? null : state.metadata.collaborators,
     );
   }
 
@@ -1176,13 +1176,17 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
   }
 
-  void _updateCollaborators(
+  Future<void> _updateCollaborators(
     UpdateCollaboratorsEvent event,
     Emitter<ProposalBuilderState> emit,
-  ) {
-    final stateMetadata = state.metadata.copyWith(collaborators: event.collaborators);
-    _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
-    emit(state.copyWith(metadata: stateMetadata));
+  ) async {
+    final metadata = state.metadata.copyWith(collaborators: event.collaborators);
+
+    _cache = _cache.copyWith(proposalMetadata: Optional(metadata));
+
+    emit(state.copyWith(metadata: metadata));
+
+    await _saveDocumentLocally(emit, _cache.proposalDocument!);
   }
 
   Future<void> _updateCommentBuilder(
@@ -1267,6 +1271,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final originalRef = state.metadata.originalDocumentRef;
     final templateRef = state.metadata.templateRef!;
     final parameters = state.metadata.parameters!;
+    final collaborators = state.metadata.collaborators;
 
     DraftRef nextRef;
     if (originalRef == null) {
@@ -1282,6 +1287,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         content: document,
         templateRef: templateRef,
         parameters: parameters,
+        collaborators: collaborators,
       );
     }
 
