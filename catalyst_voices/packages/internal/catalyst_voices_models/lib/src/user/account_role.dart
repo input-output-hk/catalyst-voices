@@ -32,13 +32,11 @@ enum AccountRole {
   /// role the signing key belongs.
   final int registrationOffset;
   final bool isDefault;
-  final bool isHidden;
 
   const AccountRole({
     required this.number,
     required this.registrationOffset,
     this.isDefault = false,
-    this.isHidden = false,
   });
 
   factory AccountRole.fromNumber(int number) {

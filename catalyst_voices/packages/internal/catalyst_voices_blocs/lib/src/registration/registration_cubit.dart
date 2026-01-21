@@ -233,17 +233,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     final walletAddress = selectedWallet.address;
     final balance = selectedWallet.balance.toMoney();
 
-    if (account.address != walletAddress) {
-      emit(
-        state.copyWith(
-          walletDrepLinkAccountDetails: Optional(
-            Failure(const LocalizedRegistrationWalletMismatchException()),
-          ),
-        ),
-      );
-      return;
-    }
-
     final accountDetails = AccountSummaryData(
       username: account.username,
       email: account.email,
@@ -270,7 +259,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
       );
 
-      final accountId = _accountId;
       final keychain = _keychain;
       if (keychain == null) {
         emitError(const LocalizedRegistrationKeychainNotFoundException());
@@ -278,27 +266,14 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       }
 
       final wallet = _walletLinkCubit.selectedWallet!;
-      final roles = _walletLinkCubit.roles;
-      final accountRoles = <AccountRole>{};
-
-      if (accountId != null) {
-        final account = _userService.user.getAccount(accountId);
-        accountRoles.addAll(account.roles);
-      }
+      final newlyAddedRoles = _walletLinkCubit.state.newlyAddedRoles;
 
       final transactionRoles = AccountRole.values.map((role) {
-        final isSelected = roles.contains(role);
-        final isAccountRole = accountRoles.contains(role);
-
-        if (isSelected && !isAccountRole) {
-          return RegistrationTransactionRole.set(role);
-        }
-
-        if (!isSelected && isAccountRole) {
-          return RegistrationTransactionRole.unset(role);
-        }
-
-        return RegistrationTransactionRole.undefined(role);
+        final isSelected = newlyAddedRoles.contains(role);
+        // Currently we only support setting up new roles
+        return isSelected
+            ? RegistrationTransactionRole.set(role)
+            : RegistrationTransactionRole.undefined(role);
       }).toSet();
 
       final transaction = await _registrationService.prepareRegistration(
@@ -433,25 +408,50 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _keychain = account.keychain;
 
     _walletLinkCubit
-      ..setRoles(AccountRole.values.toSet())
       ..setAccountRoles(account.roles)
-      ..selectRoles({...account.roles, AccountRole.drep});
+      ..selectRoles({AccountRole.drep});
 
     _goToStep(const WalletDrepLinkStep());
+  }
+
+  /// Validates that the selected wallet matches the account's wallet address
+  /// for update flows. For new registrations, always returns true.
+  bool validateSelectedWallet() {
+    final id = _accountId;
+    // For new registrations, no validation needed
+    if (id == null) return true;
+
+    final user = _userService.user;
+    final account = user.getAccount(id);
+    final selectedWallet = _walletLinkCubit.state.selectedWallet;
+    if (selectedWallet == null) return false;
+
+    final walletAddress = selectedWallet.address;
+    if (account.address != walletAddress) {
+      _clearWalletDrepLinkData();
+      emitError(const LocalizedRegistrationWalletMismatchException());
+      return false;
+    }
+
+    return true;
   }
 
   AccountSubmitData _buildAccountSubmitData() {
     final keychain = _keychain!;
     final wallet = _walletLinkCubit.selectedWallet!;
     final transaction = _transaction!;
+    final newlyAddedRoles = _walletLinkCubit.state.newlyAddedRoles;
 
     final metadata = AccountSubmitMetadata(wallet: wallet, transaction: transaction);
 
-    final roles = _walletLinkCubit.roles;
-
-    final accountId = _accountId;
-    if (accountId != null) {
-      return AccountSubmitUpdateData(metadata: metadata, accountId: accountId, roles: roles);
+    if (_accountId case final accountId?) {
+      final currentRoles = _walletLinkCubit.state.accountRoles;
+      final roles = {...newlyAddedRoles, ...currentRoles};
+      return AccountSubmitUpdateData(
+        metadata: metadata,
+        accountId: accountId,
+        roles: roles,
+      );
     }
 
     final username = _baseProfileCubit.state.username.value;
@@ -462,7 +462,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       keychain: keychain,
       username: username,
       email: email.isNotEmpty ? email : null,
-      roles: roles,
+      roles: newlyAddedRoles,
     );
   }
 

@@ -76,12 +76,16 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     final registration = RegistrationCubit.of(context);
 
     final success = await registration.walletLink.selectWallet(wallet);
-    if (success) {
-      registration.nextStep();
-      if (widget.isDrepLink) {
-        registration.prepareDrepLinkAccountSummary();
-      }
+    if (!success) return;
+
+    final isValidWallet = registration.validateSelectedWallet();
+    if (!isValidWallet) return;
+
+    if (widget.isDrepLink) {
+      registration.prepareDrepLinkAccountSummary();
     }
+
+    registration.nextStep();
   }
 
   void _refreshWallets() {

@@ -26,7 +26,6 @@ final class WalletLinkStateData extends Equatable {
 
   factory WalletLinkStateData.initial() {
     final roles = AccountRole.values
-        .where((element) => !element.isHidden)
         .map(
           (e) => RegistrationRole(
             type: e,
@@ -49,11 +48,15 @@ final class WalletLinkStateData extends Equatable {
   }
 
   /// Returns the roles that are newly being added (selected but not yet owned).
-  IterableData<List<RegistrationRole>> get newlyAddedRolesData {
+  IterableData<List<RegistrationRole>> get newlyAddedRegistrationRolesData {
     final newRoles = roles
         .where((role) => role.isSelected && !accountRoles.contains(role.type))
         .toList();
     return IterableData(newRoles);
+  }
+
+  Set<AccountRole> get newlyAddedRoles {
+    return newlyAddedRegistrationRolesData.value.map((e) => e.type).toSet();
   }
 
   @override

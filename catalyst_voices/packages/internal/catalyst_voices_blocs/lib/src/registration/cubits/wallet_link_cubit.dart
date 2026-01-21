@@ -29,9 +29,6 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     required this.blockchainConfig,
   }) : super(WalletLinkStateData.initial());
 
-  Set<AccountRole> get roles =>
-      state.roles.where((element) => element.isSelected).map((e) => e.type).toSet();
-
   CardanoWallet? get selectedWallet => _selectedWallet;
 
   void clearSelectedWallet() {
@@ -157,20 +154,6 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     ).toList();
 
     emit(state.copyWith(roles: updatedRoles, accountRoles: roles));
-  }
-
-  void setRoles(Set<AccountRole> roles) {
-    final registrationRoles = roles
-        .map(
-          (role) => RegistrationRole(
-            type: role,
-            isSelected: role.isDefault,
-            isLocked: role.isDefault,
-          ),
-        )
-        .toList();
-
-    emit(state.copyWith(roles: registrationRoles));
   }
 }
 
