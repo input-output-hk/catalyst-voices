@@ -26,7 +26,6 @@ final class WalletLinkStateData extends Equatable {
 
   factory WalletLinkStateData.initial() {
     final roles = AccountRole.values
-        .where((element) => !element.isHidden)
         .map(
           (e) => RegistrationRole(
             type: e,
@@ -48,6 +47,18 @@ final class WalletLinkStateData extends Equatable {
     return !selectedRoleTypes.containsAll(accountRoles);
   }
 
+  /// Returns the roles that are newly being added (selected but not yet owned).
+  IterableData<List<RegistrationRole>> get newlyAddedRegistrationRolesData {
+    final newRoles = roles
+        .where((role) => role.isSelected && !accountRoles.contains(role.type))
+        .toList();
+    return IterableData(newRoles);
+  }
+
+  Set<AccountRole> get newlyAddedRoles {
+    return newlyAddedRegistrationRolesData.value.map((e) => e.type).toSet();
+  }
+
   @override
   List<Object?> get props => [
     wallets,
@@ -60,9 +71,13 @@ final class WalletLinkStateData extends Equatable {
     accountRoles,
   ];
 
+  IterableData<List<RegistrationRole>> get rolesData => IterableData(roles);
+
   Set<AccountRole> get selectedRoleTypes {
     return roles.where((role) => role.isSelected).map((e) => e.type).toSet();
   }
+
+  IterableData<Set<AccountRole>> get selectedRoleTypesData => IterableData(selectedRoleTypes);
 
   WalletLinkStateData copyWith({
     Optional<Result<List<WalletMetadata>, Exception>>? wallets,

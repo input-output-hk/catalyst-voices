@@ -16,8 +16,32 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
 
-class AccountDetailsPanel extends StatelessWidget {
-  const AccountDetailsPanel({super.key});
+typedef AccountDetailsSelector =
+    BlocWidgetSelector<RegistrationState, Result<AccountSummaryData, LocalizedException>?>;
+
+class WalletAccountDetails extends StatelessWidget {
+  final AccountDetailsSelector accountDetailsSelector;
+  final BlocWidgetSelector<RegistrationState, bool> isNextButtonEnabledSelector;
+  final VoidCallback onNextButtonTap;
+  final VoidCallback onBackButtonTap;
+  final VoidCallback onRetryButtonTap;
+  final String title;
+  final String successTitle;
+  final String nextButtonTitle;
+  final String backButtonTitle;
+
+  const WalletAccountDetails({
+    super.key,
+    required this.accountDetailsSelector,
+    required this.isNextButtonEnabledSelector,
+    required this.onNextButtonTap,
+    required this.onBackButtonTap,
+    required this.onRetryButtonTap,
+    required this.title,
+    required this.successTitle,
+    required this.nextButtonTitle,
+    required this.backButtonTitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +50,43 @@ class AccountDetailsPanel extends StatelessWidget {
 
     return RegistrationDetailsPanelScaffold(
       title: Text(
-        key: const Key('RecoveryAccountTitle'),
-        context.l10n.recoveryAccountTitle,
+        key: const Key('WalletAccountTitle'),
+        title,
         style: theme.textTheme.titleMedium?.copyWith(color: textColor),
       ),
-      body: const SingleChildScrollView(child: _BlocAccountSummery()),
-      footer: const _BlocNavigation(),
+      body: SingleChildScrollView(
+        child: _BlocWalletAccountSummary(
+          accountDetailsSelector: accountDetailsSelector,
+          onRetryButtonTap: onRetryButtonTap,
+          successTitle: successTitle,
+        ),
+      ),
+      footer: _BlocNavigation(
+        isNextButtonEnabledSelector: isNextButtonEnabledSelector,
+        onNextButtonTap: onNextButtonTap,
+        onBackButtonTap: onBackButtonTap,
+        nextButtonTitle: nextButtonTitle,
+        backButtonTitle: backButtonTitle,
+      ),
+    );
+  }
+}
+
+class _AccountFailure extends StatelessWidget {
+  final LocalizedException exception;
+  final VoidCallback onRetryButtonTap;
+
+  const _AccountFailure({
+    required this.exception,
+    required this.onRetryButtonTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesErrorIndicator(
+      key: const Key('AccountDetailsError'),
+      message: exception.message(context),
+      onRetry: onRetryButtonTap,
     );
   }
 }
@@ -60,12 +115,56 @@ class _AccountRoles extends StatelessWidget {
   }
 }
 
+class _AccountSummary extends StatelessWidget {
+  final AccountSummaryData account;
+  final String successTitle;
+
+  const _AccountSummary({
+    required this.account,
+    required this.successTitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final address = account.formattedAddress;
+    final balance = account.balance;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SuccessTitle(successTitle),
+        const SizedBox(height: 24),
+        _AccountSummaryDetails(
+          key: const Key('AccountSummaryDetails'),
+          username: account.username,
+          email: account.email,
+          roles: account.roles,
+        ),
+        if (address != null && balance != null) ...[
+          const SizedBox(height: 24),
+          _WalletSummaryDetails(
+            address: address,
+            clipboardAddress: account.clipboardAddress,
+            balance: balance,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 class _AccountSummaryDetails extends StatelessWidget {
   final String? username;
   final String? email;
   final Set<AccountRole> roles;
 
-  const _AccountSummaryDetails({required this.username, required this.email, required this.roles});
+  const _AccountSummaryDetails({
+    super.key,
+    required this.username,
+    required this.email,
+    required this.roles,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +179,14 @@ class _AccountSummaryDetails extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 12,
         children: [
-          _SummaryDetails(label: Text(context.l10n.nickname), value: UsernameText(username)),
+          Text(
+            context.l10n.summary,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          _SummaryDetails(
+            label: Text(context.l10n.nickname),
+            value: UsernameText(username),
+          ),
           _SummaryDetails(
             label: Text(context.l10n.email),
             value: Text(email?.nullIfEmpty() ?? context.l10n.notAvailableAbbr.toLowerCase()),
@@ -95,37 +201,69 @@ class _AccountSummaryDetails extends StatelessWidget {
   }
 }
 
-class _BlocAccountSummery extends StatelessWidget {
-  const _BlocAccountSummery();
+class _BlocNavigation extends StatelessWidget {
+  final BlocWidgetSelector<RegistrationState, bool> isNextButtonEnabledSelector;
+  final VoidCallback onNextButtonTap;
+  final VoidCallback onBackButtonTap;
+  final String nextButtonTitle;
+  final String backButtonTitle;
+
+  const _BlocNavigation({
+    required this.isNextButtonEnabledSelector,
+    required this.onNextButtonTap,
+    required this.onBackButtonTap,
+    required this.nextButtonTitle,
+    required this.backButtonTitle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverSelector<Result<AccountSummaryData, LocalizedException>?>(
-      selector: (state) => state.accountDetails,
+    return BlocSelector<RegistrationCubit, RegistrationState, bool>(
+      selector: isNextButtonEnabledSelector,
       builder: (context, state) {
-        return switch (state) {
-          Success<AccountSummaryData, LocalizedException>(:final value) => _RecoveredAccountSummary(
-            account: value,
-          ),
-          Failure<AccountSummaryData, LocalizedException>(:final value) => _RecoverAccountFailure(
-            exception: value,
-          ),
-          _ => const Center(child: VoicesCircularProgressIndicator()),
-        };
+        return _Navigation(
+          isNextEnabled: state,
+          onNextButtonTap: onNextButtonTap,
+          onBackButtonTap: onBackButtonTap,
+          nextButtonTitle: nextButtonTitle,
+          backButtonTitle: backButtonTitle,
+        );
       },
     );
   }
 }
 
-class _BlocNavigation extends StatelessWidget {
-  const _BlocNavigation();
+class _BlocWalletAccountSummary extends StatelessWidget {
+  final AccountDetailsSelector accountDetailsSelector;
+  final VoidCallback onRetryButtonTap;
+  final String successTitle;
+
+  const _BlocWalletAccountSummary({
+    required this.accountDetailsSelector,
+    required this.onRetryButtonTap,
+    required this.successTitle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverSelector<bool>(
-      selector: (state) => state.isAccountSummaryNextEnabled,
+    return BlocSelector<
+      RegistrationCubit,
+      RegistrationState,
+      Result<AccountSummaryData, LocalizedException>?
+    >(
+      selector: accountDetailsSelector,
       builder: (context, state) {
-        return _Navigation(isNextEnabled: state);
+        return switch (state) {
+          Success<AccountSummaryData, LocalizedException>(:final value) => _AccountSummary(
+            account: value,
+            successTitle: successTitle,
+          ),
+          Failure<AccountSummaryData, LocalizedException>(:final value) => _AccountFailure(
+            exception: value,
+            onRetryButtonTap: onRetryButtonTap,
+          ),
+          _ => const Center(child: VoicesCircularProgressIndicator()),
+        };
       },
     );
   }
@@ -164,8 +302,18 @@ class _CheckOnCardanoScanButton extends StatelessWidget with LaunchUrlMixin {
 
 class _Navigation extends StatelessWidget {
   final bool isNextEnabled;
+  final VoidCallback onNextButtonTap;
+  final VoidCallback onBackButtonTap;
+  final String nextButtonTitle;
+  final String backButtonTitle;
 
-  const _Navigation({this.isNextEnabled = false});
+  const _Navigation({
+    this.isNextEnabled = false,
+    required this.onNextButtonTap,
+    required this.onBackButtonTap,
+    required this.nextButtonTitle,
+    required this.backButtonTitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -174,92 +322,48 @@ class _Navigation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         VoicesFilledButton(
-          key: const Key('SetUnlockPasswordButton'),
-          onTap: isNextEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
+          key: const Key('NextButton'),
+          onTap: isNextEnabled ? onNextButtonTap : null,
           child: Text(
-            context.l10n.recoveryAccountDetailsAction,
-            semanticsIdentifier: 'recoveryAccountDetailsAction',
+            nextButtonTitle,
+            semanticsIdentifier: 'accountDetailsNextAction',
           ),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
-          key: const Key('RecoverDifferentKeychainButton'),
-          onTap: () async {
-            final cubit = RegistrationCubit.of(context);
-            await cubit.recover.reset();
-            cubit.previousStep();
-          },
-          child: Text(context.l10n.recoverDifferentKeychain),
+          key: const Key('BackButton'),
+          onTap: onBackButtonTap,
+          child: Text(backButtonTitle),
         ),
       ],
     );
   }
 }
 
-class _RecoverAccountFailure extends StatelessWidget {
-  final LocalizedException exception;
+class _SuccessTitle extends StatelessWidget {
+  final String successTitle;
 
-  const _RecoverAccountFailure({required this.exception});
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesErrorIndicator(
-      key: const Key('RecoveryAccountError'),
-      message: exception.message(context),
-      onRetry: () async {
-        final recover = RegistrationCubit.of(context).recover;
-        await recover.recoverAccount();
-      },
-    );
-  }
-}
-
-class _RecoveredAccountSummary extends StatelessWidget {
-  final AccountSummaryData account;
-
-  const _RecoveredAccountSummary({required this.account});
-
-  @override
-  Widget build(BuildContext context) {
-    final address = account.formattedAddress;
-    final balance = account.balance;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const _RecoverStatusText(),
-        const SizedBox(height: 24),
-        _AccountSummaryDetails(
-          username: account.username,
-          email: account.email,
-          roles: account.roles,
-        ),
-        if (address != null && balance != null) ...[
-          const SizedBox(height: 24),
-          _WalletSummaryDetails(
-            address: address,
-            clipboardAddress: account.clipboardAddress,
-            balance: balance,
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _RecoverStatusText extends StatelessWidget {
-  const _RecoverStatusText();
+  const _SuccessTitle(this.successTitle);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textColor = theme.colors.textOnPrimaryLevel1;
+    final colors = theme.colors;
+    final textColor = colors.textOnPrimaryLevel0;
+    final iconColor = colors.success;
 
-    return Text(
-      key: const Key('RecoveryAccountSuccessTitle'),
-      context.l10n.recoveryAccountSuccessTitle,
-      style: theme.textTheme.titleMedium?.copyWith(color: textColor),
+    return Row(
+      spacing: 8,
+      children: [
+        VoicesAssets.icons.checkCircle.buildIcon(color: iconColor),
+        Expanded(
+          child: Text(
+            key: const Key('SuccessTitle'),
+            successTitle,
+            style: theme.textTheme.bodyLarge?.copyWith(color: textColor),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -268,7 +372,10 @@ class _SummaryDetails extends StatelessWidget {
   final Widget label;
   final Widget value;
 
-  const _SummaryDetails({required this.label, required this.value});
+  const _SummaryDetails({
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
