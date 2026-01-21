@@ -72,6 +72,7 @@ export 'proposal_approval/proposal_approval.dart';
 export 'proposal_builder/exception/proposal_builder_exception.dart';
 export 'proposal_builder/proposal_builder_menu_item_data.dart';
 export 'proposal_builder/proposal_menu_item_action_enum.dart';
+export 'proposal_viewer_segments_data/proposal_viewer_segments_data.dart';
 export 'proposals/proposals_category_filter.dart';
 export 'proposals/proposals_category_selector_item.dart';
 export 'proposals/proposals_dropdown_order_item.dart';
