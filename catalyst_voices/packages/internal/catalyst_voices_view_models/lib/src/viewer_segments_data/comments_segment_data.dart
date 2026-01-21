@@ -46,13 +46,13 @@ final class CommentsSegmentData extends Equatable {
     required bool hasActiveAccount,
     required bool hasAccountUsername,
     required bool isReadOnlyMode,
-    required bool isDraftDocument,
+    required bool isLocalDocument,
   }) {
-    final commentsCount = showComments
+    final commentsCount = showComments && !isLocalDocument
         ? comments.fold(0, (prev, next) => prev + 1 + next.repliesCount)
         : null;
 
-    final isNotLocalAndHasActiveAccount = !isDraftDocument && hasActiveAccount;
+    final isNotLocalAndHasActiveAccount = !isLocalDocument && hasActiveAccount;
     final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
     final canComment = isNotLocalAndHasActiveAccount && commentSchema != null && !isReadOnlyMode;
 

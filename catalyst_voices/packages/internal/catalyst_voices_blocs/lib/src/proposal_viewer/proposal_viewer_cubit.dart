@@ -351,7 +351,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
       hasActiveAccount: segmentData.hasActiveAccount,
       hasAccountUsername: hasAccountUsername,
       isReadOnlyMode: readOnlyMode,
-      isDraftDocument: effectivePublish.isDraft,
+      isLocalDocument: effectivePublish.isLocal,
     );
 
     final collaboratorsState = Collaborators.filterByActiveAccount(
