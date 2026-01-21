@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_blocs/src/comments/comments_state.dart';
+import 'package:catalyst_voices_blocs/src/document_builder/document_guidance.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -88,7 +89,7 @@ final class ProposalBuilderState extends Equatable {
   final List<DocumentSegment> documentSegments;
   final List<Segment> commentSegments;
   final CommentsState comments;
-  final ProposalGuidance guidance;
+  final DocumentGuidance guidance;
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
   final ProposalBuilderValidationErrors? validationErrors;
@@ -104,7 +105,7 @@ final class ProposalBuilderState extends Equatable {
     this.documentSegments = const [],
     this.commentSegments = const [],
     this.comments = const CommentsState(),
-    this.guidance = const ProposalGuidance(),
+    this.guidance = const DocumentGuidance(),
     this.category,
     this.activeNodeId,
     this.validationErrors,
@@ -168,7 +169,7 @@ final class ProposalBuilderState extends Equatable {
     List<DocumentSegment>? documentSegments,
     List<Segment>? commentSegments,
     CommentsState? comments,
-    ProposalGuidance? guidance,
+    DocumentGuidance? guidance,
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
     Optional<ProposalBuilderValidationErrors>? validationErrors,
@@ -274,44 +275,4 @@ enum ProposalBuilderValidationStatus {
   pendingShowAll,
   pendingHideAll,
   cleared,
-}
-
-final class ProposalGuidance extends Equatable {
-  final bool isNoneSelected;
-  final List<ProposalGuidanceItem> guidanceList;
-
-  const ProposalGuidance({
-    this.isNoneSelected = false,
-    this.guidanceList = const [],
-  });
-
-  @override
-  List<Object?> get props => [
-    isNoneSelected,
-    guidanceList,
-  ];
-
-  bool get showEmptyState => !isNoneSelected && guidanceList.isEmpty;
-}
-
-final class ProposalGuidanceItem extends Equatable {
-  final String segmentTitle;
-  final String sectionTitle;
-  final MarkdownData description;
-  final DocumentNodeId nodeId;
-
-  const ProposalGuidanceItem({
-    required this.segmentTitle,
-    required this.sectionTitle,
-    required this.description,
-    required this.nodeId,
-  });
-
-  @override
-  List<Object?> get props => [
-    segmentTitle,
-    sectionTitle,
-    description,
-    nodeId,
-  ];
 }

@@ -19,7 +19,7 @@ class ProposalBuilderGuidanceSelector extends StatelessWidget {
           BlocSelector<
             ProposalBuilderBloc,
             ProposalBuilderState,
-            ({bool isLoading, ProposalGuidance guidance})
+            ({bool isLoading, DocumentGuidance guidance})
           >(
             selector: (state) => (isLoading: state.isLoading, guidance: state.guidance),
             builder: (context, state) {
@@ -39,7 +39,7 @@ class ProposalBuilderGuidanceSelector extends StatelessWidget {
 }
 
 class _GuidanceCard extends StatelessWidget {
-  final ProposalGuidanceItem item;
+  final DocumentGuidanceItem item;
 
   const _GuidanceCard({required this.item});
 
@@ -129,7 +129,7 @@ class _GuidanceCardPlaceholder extends StatelessWidget {
 }
 
 class _GuidanceList extends StatelessWidget {
-  final List<ProposalGuidanceItem> items;
+  final List<DocumentGuidanceItem> items;
 
   const _GuidanceList({required this.items});
 

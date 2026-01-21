@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
@@ -32,6 +33,11 @@ final class Document extends Equatable {
     return [
       for (final property in properties) ...property.invalidProperties,
     ];
+  }
+
+  /// Returns non-blank titles of [invalidProperties].
+  List<String> get invalidPropertiesTitles {
+    return invalidProperties.map((e) => e.schema.title).whereNot((e) => e.isBlank).toList();
   }
 
   /// Returns true if all properties in this document are valid,
