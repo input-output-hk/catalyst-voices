@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/actions/proposal_approval/widgets/proposal_approval_collaborators.dart';
-import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
+import 'package:catalyst_voices/routes/routing/proposal_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -69,7 +69,7 @@ class _Footer extends StatelessWidget {
       child: VoicesFilledButton(
         leading: VoicesAssets.icons.plus.buildIcon(),
         child: Text(context.l10n.openForDecision),
-        onTap: () => unawaited(ProposalBuilderRoute.fromRef(ref: proposalId).push(context)),
+        onTap: () => unawaited(ProposalRoute.fromRef(ref: proposalId).push(context)),
       ),
     );
   }
