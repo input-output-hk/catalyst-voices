@@ -58,7 +58,7 @@ class DocumentBuilderValidationSnackbar extends StatelessWidget {
 
   Future<void> _onExit(BuildContext context) async {
     if (type == VoicesSnackBarType.success) {
-      // success snackbar doesn't require validation
+      // success snackbar doesn't require confirmation
       onExit();
       return;
     }
