@@ -43,7 +43,11 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbCatalystId {
         v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let id = String::deserialize(typ, v)?;
-        let id: CatalystId = id.parse().map_err(DeserializationError::new)?;
+
+        let id: CatalystId = id.parse().map_err(|e| {
+            tracing::error!(e = ?e, id=id, "Cannot parse catalyst id");
+            DeserializationError::new(e)
+        })?;
         Ok(Self(id))
     }
 }
