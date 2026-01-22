@@ -27,6 +27,14 @@ sealed class AccountVotingRole extends Equatable {
     CatalystId? accountId,
     DocumentRef? campaignId,
   });
+
+  /// Returns true if this voting role can be used in context of [accountId] and [campaignId].
+  bool isOf({
+    required CatalystId accountId,
+    required DocumentRef campaignId,
+  }) {
+    return accountId.isSameAs(this.accountId) && campaignId.contains(this.campaignId);
+  }
 }
 
 /// Represents valid and active delegator role status of an account.
@@ -141,5 +149,16 @@ final class AccountVotingRoleRepresentative extends AccountVotingRole {
       votingPower: votingPower ?? this.votingPower,
       delegatorsCount: delegatorsCount ?? this.delegatorsCount,
     );
+  }
+}
+
+extension NullableAccountVotingRole on AccountVotingRole? {
+  /// Nullable helper extension for [AccountVotingRole.isOf].
+  bool isOf({
+    required CatalystId accountId,
+    required DocumentRef campaignId,
+  }) {
+    final instance = this;
+    return instance != null && instance.isOf(accountId: accountId, campaignId: campaignId);
   }
 }

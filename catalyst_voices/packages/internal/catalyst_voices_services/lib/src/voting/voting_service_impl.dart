@@ -6,17 +6,14 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
 final class VotingServiceImpl implements VotingService {
-  // ignore: unused_field
   final VotingRepository _votingRepository;
-
-  // ignore: unused_field
-  final DocumentRepository _documentRepository;
+  final CampaignRepository _campaignRepository;
   final UserObserver _userObserver;
   final ActiveCampaignObserver _campaignObserver;
 
   VotingServiceImpl(
     this._votingRepository,
-    this._documentRepository,
+    this._campaignRepository,
     this._userObserver,
     this._campaignObserver,
   );
@@ -41,7 +38,14 @@ final class VotingServiceImpl implements VotingService {
     required CatalystId accountId,
     required DocumentRef campaignId,
   }) {
-    throw UnimplementedError();
+    final campaignStream = Stream.fromFuture(_campaignRepository.getCampaign(id: campaignId.id));
+
+    return campaignStream.switchMap((campaign) {
+      return _votingRepository.watchAccountVotingRoleFor(
+        accountId: accountId,
+        campaign: campaign,
+      );
+    });
   }
 
   @override

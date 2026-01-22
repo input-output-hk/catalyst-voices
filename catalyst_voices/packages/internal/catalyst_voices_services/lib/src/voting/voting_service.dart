@@ -10,7 +10,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 abstract interface class VotingService {
   factory VotingService(
     VotingRepository votingRepository,
-    DocumentRepository documentRepository,
+    CampaignRepository campaignRepository,
     UserObserver userObserver,
     ActiveCampaignObserver campaignObserver,
   ) = VotingServiceImpl;
