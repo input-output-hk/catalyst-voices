@@ -4,10 +4,10 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/user/user_stream_transformers.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/rxdart.dart';
 
 /// [UserService] allows to manage user accounts.
 /// [watchUser] returns a stream of user changes which allows to react to user changes.
@@ -141,15 +141,10 @@ final class UserServiceImpl implements UserService {
   @override
   User get user => _userObserver.user;
 
-  // TODO(damian-molinski): extract into mixin for VotingService.
   @override
-  Stream<Account?> get watchUnlockedActiveAccount =>
-      watchUser.map((e) => e.activeAccount).switchMap((account) {
-        if (account == null) return Stream.value(null);
-
-        final isUnlockedStream = account.keychain.watchIsUnlocked;
-        return isUnlockedStream.map((isUnlocked) => isUnlocked ? account : null);
-      }).distinct();
+  Stream<Account?> get watchUnlockedActiveAccount {
+    return _userObserver.watchUser.toUnlockedActiveAccount;
+  }
 
   @override
   Stream<User> get watchUser => _userObserver.watchUser;

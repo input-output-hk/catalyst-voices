@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/user/user_stream_transformers.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -64,16 +65,7 @@ final class VotingMockService implements VotingService {
 
   @override
   Stream<AccountVotingRole?> watchActiveVotingRole() {
-    final accountStream = _userObserver.watchUser
-        .map((event) => event.activeAccount)
-        .switchMap(
-          (account) {
-            if (account == null) return Stream.value(null);
-
-            final isUnlockedStream = account.keychain.watchIsUnlocked;
-            return isUnlockedStream.map((isUnlocked) => isUnlocked ? account : null);
-          },
-        )
+    final accountStream = _userObserver.watchUser.toUnlockedActiveAccount
         .map((account) => account?.catalystId)
         .distinct((previous, next) => previous.isSameAs(next));
 
