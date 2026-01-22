@@ -38,7 +38,7 @@ extension AccountRoleExt on AccountRole {
     var name = switch (this) {
       AccountRole.voter => context.l10n.contributor,
       AccountRole.proposer => context.l10n.proposer,
-      AccountRole.drep => context.l10n.drep,
+      AccountRole.drep => context.l10n.representative,
     };
 
     if (addDefaultState && isDefault) {

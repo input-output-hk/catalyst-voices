@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 part 'account_create_step.dart';
 part 'account_recover_step.dart';
+part 'wallet_drep_link_step.dart';
 
 final class AccountCompletedStep extends RegistrationStep {
   const AccountCompletedStep();
@@ -21,6 +22,10 @@ sealed class RegistrationStep extends Equatable {
 
   bool get isRegistrationFlow {
     return this is AccountCreateStep || this is AccountCreateProgressStep;
+  }
+
+  bool get isWalletDrepLinkFlow {
+    return this is WalletDrepLinkStep;
   }
 
   bool get isWalletLinkFlow {

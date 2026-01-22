@@ -131,7 +131,7 @@ final class SignedDocumentMapper {
   static CoseCollaborators? _mapCollaboratorsToCose(
     List<CatalystId>? collaborators,
   ) {
-    if (collaborators == null) return null;
+    if (collaborators == null || collaborators.isEmpty) return null;
     return CoseCollaborators(
       collaborators.map((e) => CatalystIdKid.fromString(e.toString())).toList(),
     );

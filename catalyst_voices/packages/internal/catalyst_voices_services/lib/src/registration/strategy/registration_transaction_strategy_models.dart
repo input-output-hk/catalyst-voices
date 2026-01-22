@@ -134,6 +134,17 @@ final class RegistrationTransactionStrategyModels implements RegistrationTransac
               // it's the change address (which the user controls).
               paymentKey: 0,
             ),
+          if (roles.any((element) => element.setDrep))
+            RoleData(
+              roleNumber: AccountRole.drep.number,
+              roleSigningKey: LocalKeyReference(
+                keyType: LocalKeyReferenceType.pubKeys,
+                offset: AccountRole.drep.registrationOffset,
+              ),
+              // Refer to first key in transaction outputs, in our case
+              // it's the change address (which the user controls).
+              paymentKey: 0,
+            ),
         },
       ),
     );
