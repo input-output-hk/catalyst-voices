@@ -435,7 +435,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       }
       final category = campaign.categories.first;
       final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
-
       final proposalTemplate = await _proposalService.getProposalTemplate(category: category.id);
       final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
@@ -522,12 +521,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     _logger.info('Loading proposal category: $categoryId');
 
     await _loadState(emit, () async {
-      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
-      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryId);
+      final (category, proposalTemplate, categoryTotalAsk) = await (
+        _campaignService.getCategory(DocumentParameters({categoryId})),
+        _proposalService.getProposalTemplate(category: categoryId),
+        _campaignService.getCategoryTotalAsk(ref: categoryId),
+      ).wait;
+
       final templateParameters = proposalTemplate.metadata.parameters;
-
-      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryId);
-
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
       return _cacheAndCreateState(
