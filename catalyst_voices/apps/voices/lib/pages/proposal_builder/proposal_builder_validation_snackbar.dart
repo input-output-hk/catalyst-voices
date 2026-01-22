@@ -1,11 +1,6 @@
-import 'dart:async';
-
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
+import 'package:catalyst_voices/widgets/document_builder/layout/document_builder_validation_snackbar.dart';
+import 'package:catalyst_voices/widgets/document_builder/layout/document_builder_validation_snackbar_scaffold.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -27,29 +22,9 @@ class ProposalBuilderValidationSnackbarOverlay extends StatelessWidget {
     >(
       selector: (state) => state.validationErrors,
       builder: (context, state) {
-        return Stack(
-          children: [
-            child,
-            if (state != null)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 32,
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth:
-                          VoicesSnackBar.calculateSnackBarWidth(
-                            behavior: SnackBarBehavior.floating,
-                            screenWidth: MediaQuery.sizeOf(context).width,
-                          ) ??
-                          double.infinity,
-                    ),
-                    child: _SnackbarStatusSelector(validationErrors: state),
-                  ),
-                ),
-              ),
-          ],
+        return DocumentBuilderValidationSnackbarScaffold(
+          snackbar: state != null ? _SnackbarStatusSelector(validationErrors: state) : null,
+          child: child,
         );
       },
     );
@@ -63,7 +38,7 @@ class _ClearedSnackbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Snackbar(
+    return DocumentBuilderValidationSnackbar(
       type: VoicesSnackBarType.success,
       title: context.l10n.proposalEditorValidationErrorClearedTitle,
       message: switch (origin) {
@@ -91,45 +66,6 @@ class _ClearedSnackbar extends StatelessWidget {
   }
 }
 
-class _ExitFormIssueModeDialog extends StatelessWidget {
-  const _ExitFormIssueModeDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesInfoDialog(
-      icon: VoicesAssets.icons.exclamation.buildIcon(
-        color: context.colors.iconsWarning,
-      ),
-      title: Text(context.l10n.proposalEditorValidationExitDialogTitle),
-      message: const Offstage(),
-      action: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: 12,
-        children: [
-          VoicesTextButton(
-            child: Text(context.l10n.exitButtonText),
-            onTap: () => Navigator.of(context).pop(true),
-          ),
-          VoicesFilledButton(
-            child: Text(context.l10n.resumeButtonText),
-            onTap: () => Navigator.of(context).pop(false),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static Future<bool> show(BuildContext context) async {
-    final result = await VoicesDialog.show<bool>(
-      context: context,
-      routeSettings: const RouteSettings(name: '/proposal-builder/exit-form-issue-mode'),
-      builder: (context) => const _ExitFormIssueModeDialog(),
-    );
-
-    return result ?? false;
-  }
-}
-
 class _NotStartedSnackbar extends StatelessWidget {
   final ProposalBuilderValidationOrigin origin;
   final int errorCount;
@@ -141,7 +77,7 @@ class _NotStartedSnackbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Snackbar(
+    return DocumentBuilderValidationSnackbar(
       type: VoicesSnackBarType.error,
       title: switch (origin) {
         ProposalBuilderValidationOrigin.shareDraft =>
@@ -162,6 +98,9 @@ class _NotStartedSnackbar extends StatelessWidget {
         );
         context.read<ProposalBuilderBloc>().add(event);
       },
+      onExit: () {
+        context.read<ProposalBuilderBloc>().add(const ClearValidationProposalEvent());
+      },
     );
   }
 }
@@ -179,7 +118,7 @@ class _PendingSnackbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Snackbar(
+    return DocumentBuilderValidationSnackbar(
       type: VoicesSnackBarType.error,
       title: switch (origin) {
         ProposalBuilderValidationOrigin.shareDraft =>
@@ -204,6 +143,9 @@ class _PendingSnackbar extends StatelessWidget {
 
         context.read<ProposalBuilderBloc>().add(event);
       },
+      onExit: () {
+        context.read<ProposalBuilderBloc>().add(const ClearValidationProposalEvent());
+      },
     );
   }
 
@@ -212,53 +154,6 @@ class _PendingSnackbar extends StatelessWidget {
       return errors.map((e) => '   • $e').join('\n');
     } else {
       return context.l10n.proposalEditorValidationErrorInProgressMessage;
-    }
-  }
-}
-
-class _Snackbar extends StatelessWidget {
-  final VoicesSnackBarType type;
-  final String title;
-  final String message;
-  final String buttonText;
-  final VoidCallback buttonAction;
-  final VoidCallback? onExit;
-
-  const _Snackbar({
-    required this.type,
-    required this.title,
-    required this.message,
-    required this.buttonText,
-    required this.buttonAction,
-    this.onExit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesSnackBar(
-      type: type,
-      title: title,
-      message: message,
-      showClose: false,
-      actions: [
-        VoicesSnackBarSecondaryAction(
-          type: type,
-          onPressed: buttonAction,
-          child: Text(buttonText),
-        ),
-        VoicesSnackBarSecondaryAction(
-          type: type,
-          onPressed: onExit ?? () => unawaited(_onExit(context)),
-          child: Text(context.l10n.proposalEditorValidationExitIssueMode),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _onExit(BuildContext context) async {
-    final close = await _ExitFormIssueModeDialog.show(context);
-    if (close && context.mounted) {
-      context.read<ProposalBuilderBloc>().add(const ClearValidationProposalEvent());
     }
   }
 }
