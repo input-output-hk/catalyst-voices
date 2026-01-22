@@ -6,6 +6,7 @@ export 'account_public_status.dart';
 export 'account_registration_status.dart';
 export 'account_role.dart';
 export 'account_update_result.dart';
+export 'account_voting_role.dart';
 export 'catalyst_id.dart';
 export 'keychain.dart';
 export 'preferences.dart';

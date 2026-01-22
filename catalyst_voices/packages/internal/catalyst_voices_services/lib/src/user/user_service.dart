@@ -141,6 +141,7 @@ final class UserServiceImpl implements UserService {
   @override
   User get user => _userObserver.user;
 
+  // TODO(damian-molinski): extract into mixin for VotingService.
   @override
   Stream<Account?> get watchUnlockedActiveAccount =>
       watchUser.map((e) => e.activeAccount).switchMap((account) {
