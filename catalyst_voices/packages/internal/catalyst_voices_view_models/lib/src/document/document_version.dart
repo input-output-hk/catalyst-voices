@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents a document version. Allows tracking multiple versions of a document.
@@ -38,5 +40,38 @@ final class DocumentVersion extends Equatable {
       isCurrent: isCurrent ?? this.isCurrent,
       isLatest: isLatest ?? this.isLatest,
     );
+  }
+}
+
+extension DocumentRefIterableExt on Iterable<DocumentRef> {
+  Iterable<DocumentVersion> toDocumentVersions(DocumentRef? currentRef) {
+    final list = this;
+    return list.mapIndexed((index, version) {
+      final versionId = version.ver ?? version.id;
+
+      return DocumentVersion(
+        id: versionId,
+        number: index + 1,
+        isCurrent: versionId == currentRef?.ver,
+        isLatest: index == list.length - 1,
+      );
+    });
+  }
+}
+
+extension ProposalVersionIterableExt on Iterable<ProposalVersion> {
+  /// Maps the models to view models.
+  Iterable<DocumentVersion> toDocumentVersions(DocumentRef? currentRef) {
+    final list = this;
+    return list.mapIndexed((index, version) {
+      final versionRef = version.id;
+      final versionId = versionRef.ver ?? versionRef.id;
+      return DocumentVersion(
+        id: versionId,
+        number: index + 1,
+        isCurrent: versionId == currentRef?.ver,
+        isLatest: index == list.length - 1,
+      );
+    });
   }
 }

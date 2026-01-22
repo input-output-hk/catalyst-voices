@@ -482,16 +482,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         );
       }
 
-      final versions = proposalData.versions.mapIndexed((index, version) {
-        final versionRef = version.id;
-        final versionId = versionRef.ver ?? versionRef.id;
-        return DocumentVersion(
-          id: versionId,
-          number: index + 1,
-          isCurrent: versionId == proposalRef.ver,
-          isLatest: index == proposalData.versions.length - 1,
-        );
-      }).toList();
+      final versions = proposalData.versions.toDocumentVersions(proposalRef).toList();
       final notVerifiedAccount =
           !(_userService.user.activeAccount?.publicStatus.isVerified ?? false);
       final firstVersion =
