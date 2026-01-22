@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 
 class MyActionCard extends StatelessWidget {
   final ActionsCardType type;
-  final String backgroundImagePath;
   final Widget? timeRemainingWidget;
   final Widget actionWidget;
 
   const MyActionCard({
     super.key,
     required this.type,
-    required this.backgroundImagePath,
     this.timeRemainingWidget,
     required this.actionWidget,
   });
@@ -24,13 +22,14 @@ class MyActionCard extends StatelessWidget {
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: context.colors.actionsGradientBackground,
+        ),
         image: DecorationImage(
           image: CatalystImage.asset(
-            backgroundImagePath,
-            scale: 1.5,
+            VoicesAssets.images.actionPixelsBackground.path,
           ).image,
-          fit: BoxFit.none,
-          alignment: const Alignment(-1, -0.4),
+          alignment: Alignment.topLeft,
         ),
       ),
       child: Column(
