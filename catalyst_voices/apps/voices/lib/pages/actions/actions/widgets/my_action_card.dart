@@ -26,9 +26,7 @@ class MyActionCard extends StatelessWidget {
           colors: context.colors.actionsGradientBackground,
         ),
         image: DecorationImage(
-          image: CatalystImage.asset(
-            VoicesAssets.images.actionPixelsBackground.path,
-          ).image,
+          image: VoicesAssets.images.actionPixelsBackground.provider(),
           alignment: Alignment.topLeft,
         ),
       ),
