@@ -79,6 +79,7 @@ impl TryFrom<&str> for CatalystId {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         value
             .parse()
+            .inspect_err(|e| tracing::error!(e = ?e, id=value, "Cannot parse catalyst id"))
             .context("Invalid Catalyst ID")
             .map(|id: CatalystIdInner| Self(id.as_short_id()))
     }

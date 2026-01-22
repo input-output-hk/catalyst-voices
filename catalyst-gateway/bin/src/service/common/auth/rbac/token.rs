@@ -121,7 +121,10 @@ impl CatalystRBACTokenV1 {
             .map_err(|_| anyhow!("Invalid token signature length"))?;
         let raw = as_raw_bytes(token);
 
-        let catalyst_id: CatalystId = token.parse().context("Invalid Catalyst ID")?;
+        let catalyst_id: CatalystId = token
+            .parse()
+            .inspect_err(|e| tracing::error!(e = ?e, id=token, "Cannot parse catalyst id"))
+            .context("Invalid Catalyst ID")?;
         if catalyst_id.username().is_some_and(|n| !n.is_empty()) {
             return Err(anyhow!("Catalyst ID must not contain username"));
         }
