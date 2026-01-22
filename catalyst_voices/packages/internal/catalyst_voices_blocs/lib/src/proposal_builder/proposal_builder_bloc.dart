@@ -467,11 +467,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     await _loadState(emit, () async {
-      final proposalData = await _proposalService.getProposalDetail(
-        id: proposalRef,
-      );
-      final versionsIds = proposalData.versions.map((e) => e.id.ver).whereType<String>().toList();
-      final proposal = Proposal.fromData(proposalData, versionsIds);
+      final proposalData = await _proposalService.getProposalDetail(id: proposalRef);
+      final proposal = Proposal.fromDetailData(proposalData);
 
       if (proposalData.publish.isPublished) {
         emitSignal(
