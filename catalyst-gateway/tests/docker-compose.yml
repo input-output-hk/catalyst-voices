@@ -159,7 +159,7 @@ services:
       - SERVICE_LIVE_COUNTER_THRESHOLD=100
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
     command: >
-      poetry run pytest -m "${API_TEST_MARKS}" -s --junitxml junit-report.xml --cov integration --cov-report lcov
+      uv run pytest -m "${API_TEST_MARKS}" -s --junitxml junit-report.xml --cov integration --cov-report lcov
 
   schemathesis-runner:
     image: schemathesis-runner:latest
