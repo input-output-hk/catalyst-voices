@@ -114,11 +114,196 @@ Purpose and responsibilities:
 
 Interfaces:
 
-* HTTP client generated from OpenAPI with request and response interceptors.
+* HTTP client based on OpenAPI specification with request and response interceptors.
 
 Quality characteristics:
 
 * Predictable behavior and testability with generated types and fixtures.
+
+### Frontend Application (cat-voices)
+
+Purpose and responsibilities:
+
+The Catalyst Voices frontend application is a Flutter-based application
+that provides the user interface for proposal creation, voting,
+and event management.
+It follows Clean Architecture principles with BLoC pattern for state management.
+
+Architecture Layers:
+
+```mermaid
+flowchart TB
+    subgraph Presentation Layer
+        UI[UI Widgets]
+        PAGES[Pages]
+        WIDGETS[Reusable Widgets]
+        ROUTER[GoRouter]
+    end
+
+    subgraph Business Logic Layer
+        BLOCS[BLoCs/Cubits]
+        VIEWMODELS[ViewModels]
+        SIGNALS[Signals]
+    end
+
+    subgraph Service Layer
+        SERVICES[Services]
+        OBSERVERS[Observers]
+    end
+
+    subgraph Domain Layer
+        REPOS[Repositories]
+        MODELS[Domain Models]
+    end
+
+    subgraph Data Layer
+        API[HTTP API Client - Dio]
+        LDB[(Local DB - Drift/SQLite)]
+        WASM[Rust WASM Libraries]
+        SECURE[Secure Storage]
+    end
+
+    UI --> BLOCS
+    PAGES --> BLOCS
+    WIDGETS --> BLOCS
+    ROUTER --> PAGES
+    PAGES --> SIGNALS
+    BLOCS --> VIEWMODELS
+    BLOCS --> SERVICES
+    VIEWMODELS --> SERVICES
+    SERVICES --> OBSERVERS
+    SERVICES --> REPOS
+    REPOS --> API
+    REPOS --> LDB
+    REPOS --> WASM
+    REPOS --> SECURE
+```
+
+Contained building blocks:
+
+* **Presentation Layer**:
+    * **Pages**: Feature-specific page widgets (proposal, voting, discovery, workspace, etc.)
+    * **Widgets**: Reusable UI components
+    * **Router**: GoRouter-based navigation with type-safe routes
+    * **Theming**: Material Design with custom theming system
+
+* **Business Logic Layer**:
+    * **BLoCs/Cubits**: State management using flutter_bloc
+        * Session management (SessionCubit)
+        * Workspace management (WorkspaceBloc)
+        * Voting (VotingCubit)
+        * Proposals (ProposalsCubit)
+        * Account (AccountCubit)
+        * Discovery (DiscoveryCubit)
+    * **ViewModels**: Presentation logic abstraction
+    * **Signals**: User event information mechanism (snackbars, route changes) handled in pages
+
+* **Service Layer**:
+    * **Services**: Business logic services that merge information from different sources
+        * ProposalService: Merges local and remote proposals into unified streams
+        * UserService: Manages user state and authentication
+        * CampaignService: Handles campaign data and active campaign tracking
+        * VotingService: Manages voting operations
+        * DocumentsService: Handles document synchronization
+    * **Observers**: Cross-BLoC communication mechanism via service layer
+        * UserObserver: Tracks user state changes
+        * ActiveCampaignObserver: Tracks active campaign changes
+        * CastedVotesObserver: Tracks vote casting events
+
+* **Domain Layer**:
+    * **Repositories**: Data access abstraction
+        * Document repository
+        * Event repository
+        * User repository
+        * Proposal repository
+        * Voting repository
+    * **Models**: Domain entities and value objects
+
+* **Data Layer**:
+    * **HTTP API Client**: OpenAPI-based client using Dio (not code-generated)
+    * **Local Database**: Drift-based SQLite with JSONB support
+        * Uses BlobColumn with DocumentConverters for document content storage
+        * Complex SQLite queries with JSONB functions (SQLite 3.45.0+)
+        * Schema migrations with versioned drift schemas
+    * **WASM Libraries**: Rust-based cryptographic operations
+        * catalyst_key_derivation: Key derivation from mnemonics (Rust)
+        * catalyst_compression: Brotli and Zstd compression (Rust)
+        * Compiled to WASM for Web, native libraries for mobile
+    * **Secure Storage**: Flutter Secure Storage for sensitive data
+        * Encrypted keychain data storage
+        * Secure encryption/decryption of local keychain data
+
+Key architectural patterns:
+
+* **Clean Architecture**: Clear separation of concerns across layers
+* **BLoC Pattern**: Reactive state management with events and states
+* **Service Layer Pattern**: Services merge data from multiple sources (local and remote)
+* **Repository Pattern**: Abstraction of data sources
+* **Observer Pattern**: Cross-BLoC communication via observers in service layer
+* **Dependency Injection**: Manual DI via constructor injection
+* **Offline-First**: Local database enables full offline functionality
+* **Signal Pattern**: User event information (not direct BLoC-to-BLoC communication)
+
+Interfaces:
+
+* **Navigation**: Type-safe routing via GoRouter
+* **State Management**: Stream-based reactive updates via BLoC
+* **Data Access**: Repository interfaces abstracting API and local storage
+* **Service Communication**: Observer pattern for cross-feature communication
+* **Platform Integration**: Platform channels for native features
+
+Quality characteristics:
+
+* **Testability**: Clear separation enables unit and widget testing
+* **Maintainability**: Consistent patterns across features
+* **Scalability**: Modular architecture supports feature growth
+* **Performance**: Local caching and reactive updates for responsiveness
+* **Offline Support**: Full functionality without network connectivity
+
+#### Frontend Internal Packages
+
+The frontend application is organized into internal packages for separation of concerns:
+
+* **catalyst_voices_blocs**: State management (BLoCs, Cubits, States, Events)
+    * 20+ feature-specific BLoCs
+    * Common mixins for error handling and signals
+    * Cache management for performance
+
+* **catalyst_voices_repositories**: Data access layer
+    * Repository implementations
+    * Database schema and migrations (Drift)
+    * API client integration
+    * Local storage management
+
+* **catalyst_voices_models**: Domain models and value objects
+    * Serialization/deserialization
+    * Validation logic
+
+* **catalyst_voices_view_models**: Presentation logic
+    * ViewModel implementations
+    * UI state transformations
+
+* **catalyst_voices_services**: Business logic services
+    * Service implementations
+    * Cross-cutting concerns
+    * Data merging from multiple sources
+
+* **catalyst_voices_shared**: Shared utilities
+    * Common extensions
+    * Helper functions
+    * Constants
+
+* **catalyst_voices_assets**: Asset management
+    * SVG compilation
+    * Image assets
+
+* **catalyst_voices_localization**: Internationalization
+    * ARB files for translations
+    * Generated localization code
+
+* **catalyst_voices_brands**: Branding system
+    * Theme configuration
+    * Brand-specific styling
 
 ## Level 3
 

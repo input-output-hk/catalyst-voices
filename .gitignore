@@ -81,6 +81,9 @@ $RECYCLE.BIN/
 !/.vscode/settings.recommended.json
 !/.vscode/tasks.recommended.json
 
+# .devcontainer
+/.devcontainer
+
 # Flutter/Dart/Pub
 .dart_tool/
 .packages
