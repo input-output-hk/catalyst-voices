@@ -9,6 +9,12 @@ abstract interface class VotingRepository implements CastedVotesObserver {
 
   Future<void> castVotes(List<Vote> draftVotes);
 
+  /// Similar to [watchAccountVotingRoleFor] but calculates [AccountVotingRole] one time.
+  Future<AccountVotingRole> getAccountVotingRoleFor({
+    required CatalystId accountId,
+    required Campaign campaign,
+  });
+
   Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef);
 
   /// Emits update to date [AccountVotingRole] for given [accountId] in context of [campaign].

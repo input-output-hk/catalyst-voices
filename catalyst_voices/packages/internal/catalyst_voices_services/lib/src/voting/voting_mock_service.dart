@@ -26,6 +26,29 @@ final class VotingMockService implements VotingService {
   }
 
   @override
+  Future<AccountVotingRole> getActiveVotingRole() async {
+    final activeAccount = _userObserver.user.activeAccount;
+    if (activeAccount == null) {
+      throw const ActiveAccountNotFoundException();
+    }
+    if (!activeAccount.keychain.lastIsUnlocked) {
+      throw AccountKeychainLockedException(activeAccount.catalystId);
+    }
+
+    final accountId = activeAccount.catalystId;
+    final campaignId = _campaignObserver.campaign?.id;
+    if (campaignId == null) {
+      throw const ActiveCampaignNotFoundException();
+    }
+
+    return AccountVotingRoleIndividual(
+      accountId: accountId,
+      campaignId: campaignId,
+      votingPower: Snapshot.done(data: VotingPower.dummy()),
+    );
+  }
+
+  @override
   Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef) {
     return _votingRepository.getProposalLastCastedVote(proposalRef);
   }

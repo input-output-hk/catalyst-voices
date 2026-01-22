@@ -22,6 +22,18 @@ final class VotingRepositoryImpl implements VotingRepository {
   Future<void> dispose() => throw UnimplementedError('CastedVotesObserver have to removed');
 
   @override
+  Future<AccountVotingRole> getAccountVotingRoleFor({
+    required CatalystId accountId,
+    required Campaign campaign,
+  }) async {
+    return AccountVotingRoleIndividual(
+      accountId: accountId,
+      campaignId: campaign.id,
+      votingPower: Snapshot.done(data: VotingPower.dummy()),
+    );
+  }
+
+  @override
   Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef) {
     throw UnimplementedError();
   }

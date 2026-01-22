@@ -34,9 +34,6 @@ final class Account extends Equatable {
   /// can be changed by attaching [email] to account.
   final AccountPublicStatus publicStatus;
 
-  /// The actual amount of voting power this account holds.
-  final VotingPower? votingPower;
-
   /// Whether this account is being used.
   final bool isActive;
 
@@ -50,7 +47,6 @@ final class Account extends Equatable {
     required this.roles,
     required this.address,
     required this.publicStatus,
-    this.votingPower,
     this.isActive = false,
     required this.registrationStatus,
   }) : assert(
@@ -80,7 +76,6 @@ final class Account extends Equatable {
       ),
       /* cSpell:enable */
       publicStatus: AccountPublicStatus.notSetup,
-      votingPower: VotingPower.dummy(),
       isActive: isActive,
       registrationStatus: const AccountRegistrationStatus.notIndexed(),
     );
@@ -99,7 +94,6 @@ final class Account extends Equatable {
     roles,
     address,
     publicStatus,
-    votingPower,
     isActive,
     registrationStatus,
   ];
@@ -113,7 +107,6 @@ final class Account extends Equatable {
     Set<AccountRole>? roles,
     ShelleyAddress? address,
     AccountPublicStatus? publicStatus,
-    Optional<VotingPower>? votingPower,
     bool? isActive,
     AccountRegistrationStatus? registrationStatus,
   }) {
@@ -124,7 +117,6 @@ final class Account extends Equatable {
       roles: roles ?? this.roles,
       address: address ?? this.address,
       publicStatus: publicStatus ?? this.publicStatus,
-      votingPower: votingPower.dataOr(this.votingPower),
       isActive: isActive ?? this.isActive,
       registrationStatus: registrationStatus ?? this.registrationStatus,
     );

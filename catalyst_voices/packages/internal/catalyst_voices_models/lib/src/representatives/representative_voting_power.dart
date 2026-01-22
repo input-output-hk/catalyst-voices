@@ -18,6 +18,17 @@ final class RepresentativeVotingPower extends Equatable {
   @override
   List<Object?> get props => [own, delegated];
 
+  VotingPowerStatus? get status {
+    final ownStatus = own?.status;
+    final delegatedStatus = delegated?.status;
+
+    return switch ((ownStatus, delegatedStatus)) {
+      (VotingPowerStatus.confirmed, VotingPowerStatus.confirmed) => VotingPowerStatus.confirmed,
+      (null, null) => null,
+      (_, _) => VotingPowerStatus.provisional,
+    };
+  }
+
   /// Total voting power amount.
   int get totalAmount => (own?.amount ?? 0) + (delegated?.amount ?? 0);
 

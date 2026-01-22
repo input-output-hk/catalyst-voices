@@ -23,6 +23,9 @@ sealed class AccountVotingRole extends Equatable {
     campaignId,
   ];
 
+  /// Sum of all voting power accessible to [accountId].
+  int get totalVotingPowerAmount;
+
   AccountVotingRole copyWith({
     CatalystId? accountId,
     DocumentRef? campaignId,
@@ -63,6 +66,9 @@ final class AccountVotingRoleDelegator extends AccountVotingRole {
       ];
 
   @override
+  int get totalVotingPowerAmount => votingPower.data?.amount ?? 0;
+
+  @override
   AccountVotingRoleDelegator copyWith({
     CatalystId? accountId,
     DocumentRef? campaignId,
@@ -93,6 +99,9 @@ final class AccountVotingRoleIndividual extends AccountVotingRole {
 
   @override
   List<Object?> get props => super.props + [votingPower];
+
+  @override
+  int get totalVotingPowerAmount => votingPower.data?.amount ?? 0;
 
   @override
   AccountVotingRoleIndividual copyWith({
@@ -135,6 +144,9 @@ final class AccountVotingRoleRepresentative extends AccountVotingRole {
         votingPower,
         delegatorsCount,
       ];
+
+  @override
+  int get totalVotingPowerAmount => votingPower.data?.totalAmount ?? 0;
 
   @override
   AccountVotingRoleRepresentative copyWith({

@@ -59,9 +59,6 @@ abstract interface class UserService implements ActiveAware {
   /// Refreshes the active account with the latest profile from the server.
   Future<void> refreshActiveAccountProfile();
 
-  /// Refreshes the active account with the voting power from the server.
-  Future<void> refreshActiveAccountVotingPower();
-
   /// Registers a new [account] and makes it active.
   ///
   /// It can invoke some one-time registration logic,
@@ -270,22 +267,6 @@ final class UserServiceImpl implements UserService {
     if (account != activeAccount) {
       final updatedUser = user.updateAccount(account);
 
-      await _updateUser(updatedUser);
-    }
-  }
-
-  @override
-  Future<void> refreshActiveAccountVotingPower() async {
-    final user = await getUser();
-    final activeAccount = user.activeAccount;
-    if (activeAccount == null) {
-      return;
-    }
-
-    final votingPower = await _userRepository.getVotingPower();
-    if (votingPower != activeAccount.votingPower) {
-      final updatedAccount = activeAccount.copyWith(votingPower: Optional(votingPower));
-      final updatedUser = user.updateAccount(updatedAccount);
       await _updateUser(updatedUser);
     }
   }

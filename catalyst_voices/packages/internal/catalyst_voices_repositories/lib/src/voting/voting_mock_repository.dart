@@ -46,6 +46,18 @@ final class VotingMockRepository implements VotingRepository {
   }
 
   @override
+  Future<AccountVotingRole> getAccountVotingRoleFor({
+    required CatalystId accountId,
+    required Campaign campaign,
+  }) async {
+    return AccountVotingRoleIndividual(
+      accountId: accountId,
+      campaignId: campaign.id,
+      votingPower: Snapshot.done(data: VotingPower.dummy()),
+    );
+  }
+
+  @override
   Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef) async {
     return _votesObserver.votes.firstWhereOrNull((vote) => vote.proposal == proposalRef);
   }

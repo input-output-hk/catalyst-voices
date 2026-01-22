@@ -8,6 +8,8 @@ export 'account_role.dart';
 export 'account_update_result.dart';
 export 'account_voting_role.dart';
 export 'catalyst_id.dart';
+export 'exception/account_keychain_locked_exception.dart';
+export 'exception/active_account_not_found_exception.dart';
 export 'keychain.dart';
 export 'preferences.dart';
 export 'profile.dart';

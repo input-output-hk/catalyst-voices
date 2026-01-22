@@ -25,6 +25,12 @@ abstract interface class VotingService {
 
   Future<void> castVotes(List<Vote> draftVotes);
 
+  /// Calculates voting role for active unlocked account and active campaign.
+  ///
+  /// This method is similar to [watchActiveVotingRole] but throws exception when
+  /// can not calculate [AccountVotingRole].
+  Future<AccountVotingRole> getActiveVotingRole();
+
   Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef);
 
   Future<VoteProposal> getVoteProposal(DocumentRef proposalRef);

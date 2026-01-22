@@ -24,6 +24,27 @@ final class VotingServiceImpl implements VotingService {
   }
 
   @override
+  Future<AccountVotingRole> getActiveVotingRole() async {
+    final activeAccount = _userObserver.user.activeAccount;
+    if (activeAccount == null) {
+      throw const ActiveAccountNotFoundException();
+    }
+    if (!activeAccount.keychain.lastIsUnlocked) {
+      throw AccountKeychainLockedException(activeAccount.catalystId);
+    }
+
+    final accountId = activeAccount.catalystId;
+    final campaignId = _campaignObserver.campaign?.id;
+    if (campaignId == null) {
+      throw const ActiveCampaignNotFoundException();
+    }
+
+    final campaign = await _campaignRepository.getCampaign(id: campaignId.id);
+
+    return _votingRepository.getAccountVotingRoleFor(accountId: accountId, campaign: campaign);
+  }
+
+  @override
   Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef) {
     throw UnimplementedError();
   }
