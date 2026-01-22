@@ -59,6 +59,35 @@ extension DocumentRefIterableExt on Iterable<DocumentRef> {
   }
 }
 
+extension DocumentVersionListExt on List<DocumentVersion> {
+  /// Returns a copy of this list, removes a version identified by [removedRef] and appends
+  /// the new version identified by [newRef] at the end of the list.
+  List<DocumentVersion> recreateWith({
+    DocumentRef? newRef,
+    DocumentRef? removedRef,
+  }) {
+    final versions = this;
+    final current = versions.whereNot((e) => e.id == removedRef?.ver);
+    final currentId = newRef?.ver ?? current.last.id;
+
+    return [
+      for (final (index, ver) in current.indexed)
+        ver.copyWith(
+          number: index + 1,
+          isCurrent: ver.id == currentId,
+          isLatest: ver.id == currentId,
+        ),
+      if (newRef != null)
+        DocumentVersion(
+          id: newRef.ver!,
+          number: current.length + 1,
+          isCurrent: newRef.ver == currentId,
+          isLatest: newRef.ver == currentId,
+        ),
+    ];
+  }
+}
+
 extension ProposalVersionIterableExt on Iterable<ProposalVersion> {
   /// Maps the models to view models.
   Iterable<DocumentVersion> toDocumentVersions(DocumentRef? currentRef) {

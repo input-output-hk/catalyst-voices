@@ -659,7 +659,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       // if a new ref has been created we need to recreate
       // the version history to reflect it, drop the old one
       // because the new one overrode it
-      updatedVersions = _recreateDocumentVersionsWithNewRef(
+      updatedVersions = state.metadata.versions.recreateWith(
         newRef: updatedId,
         removedRef: currentId,
       );
@@ -706,7 +706,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         // if a new ref has been created we need to recreate
         // the version history to reflect it, drop the old one
         // because the new one overrode it
-        updatedVersions = _recreateDocumentVersionsWithNewRef(
+        updatedVersions = state.metadata.versions.recreateWith(
           newRef: updatedRef,
           removedRef: currentRef,
         );
@@ -795,30 +795,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       isEmailVerified: isEmailVerified,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
-  }
-
-  List<DocumentVersion> _recreateDocumentVersionsWithNewRef({
-    DocumentRef? newRef,
-    DocumentRef? removedRef,
-  }) {
-    final current = state.metadata.versions.whereNot((e) => e.id == removedRef?.ver);
-    final currentId = newRef?.ver ?? current.last.id;
-
-    return [
-      for (final (index, ver) in current.indexed)
-        ver.copyWith(
-          number: index + 1,
-          isCurrent: ver.id == currentId,
-          isLatest: ver.id == currentId,
-        ),
-      if (newRef != null)
-        DocumentVersion(
-          id: newRef.ver!,
-          number: current.length + 1,
-          isCurrent: newRef.ver == currentId,
-          isLatest: newRef.ver == currentId,
-        ),
-    ];
   }
 
   Future<void> _requestPublishProposal(
@@ -954,7 +930,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     if (updatedRef != currentRef) {
       // if a new ref has been created we need to recreate
       // the version history to reflect it
-      updatedVersions = _recreateDocumentVersionsWithNewRef(newRef: updatedRef);
+      updatedVersions = state.metadata.versions.recreateWith(
+        newRef: updatedRef,
+      );
     }
 
     _updateMetadata(
