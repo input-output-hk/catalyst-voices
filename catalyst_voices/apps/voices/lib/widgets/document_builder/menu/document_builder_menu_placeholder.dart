@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/widgets/menu/voices_node_menu_placeholder.dart';
 import 'package:flutter/material.dart';
 
+/// The placeholder for the (left) menu of the document builder
+/// with navigation to different sections/properties.
 class DocumentBuilderMenuPlaceholder extends StatelessWidget {
   const DocumentBuilderMenuPlaceholder({super.key});
 
