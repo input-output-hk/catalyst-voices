@@ -22,7 +22,7 @@
     "ace-builds": "^1.32.7",
     "cborg": "^4.1.1",
     "dayjs": "^1.11.10",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.23",
     "react": "^18.2.0",
     "react-ace": "^10.1.0",
     "react-dom": "^18.2.0",
