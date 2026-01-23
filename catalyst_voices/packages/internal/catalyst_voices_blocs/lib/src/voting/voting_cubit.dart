@@ -17,12 +17,14 @@ final class VotingCubit extends Cubit<VotingState>
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final VotingService _votingService;
 
   VotingCubitCache _cache = const VotingCubitCache();
   Timer? _countdownTimer;
 
   StreamSubscription<Account?>? _activeAccountSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
+  StreamSubscription<AccountVotingRole?>? _activeVotingRoleSub;
   StreamSubscription<Map<VotingPageTab, int>>? _proposalsCountSub;
   StreamSubscription<Page<ProposalBrief>>? _proposalsPageSub;
 
@@ -32,6 +34,7 @@ final class VotingCubit extends Cubit<VotingState>
     this._userService,
     this._campaignService,
     this._proposalService,
+    this._votingService,
   ) : super(const VotingState());
 
   void changeFilters({
@@ -95,6 +98,9 @@ final class VotingCubit extends Cubit<VotingState>
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
 
+    await _activeVotingRoleSub?.cancel();
+    _activeVotingRoleSub = null;
+
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
 
@@ -142,11 +148,7 @@ final class VotingCubit extends Cubit<VotingState>
   }) async {
     _resetCache();
     _rebuildProposalsCountSubs();
-
-    await (
-      _loadVotingPower(),
-      _loadCampaign(),
-    ).wait;
+    await _loadCampaign();
 
     if (isClosed) {
       return;
@@ -163,6 +165,11 @@ final class VotingCubit extends Cubit<VotingState>
     unawaited(_activeCampaignSub?.cancel());
     _activeCampaignSub = _campaignService.watchActiveCampaign.distinct().listen(
       _handleActiveCampaignChange,
+    );
+
+    unawaited(_activeVotingRoleSub?.cancel());
+    _activeVotingRoleSub = _votingService.watchActiveVotingRole().distinct().listen(
+      _handleActiveVotingRoleChange,
     );
 
     _countdownTimer?.cancel();
@@ -277,11 +284,6 @@ final class VotingCubit extends Cubit<VotingState>
       _cache = _cache.copyWith(activeAccountId: Optional(account?.catalystId));
       changeFilters(resetProposals: true);
     }
-
-    if (_cache.votingPower != account?.votingPower) {
-      _cache = _cache.copyWith(votingPower: Optional(account?.votingPower));
-      _dispatchState();
-    }
   }
 
   void _handleActiveCampaignChange(Campaign? campaign) {
@@ -302,6 +304,14 @@ final class VotingCubit extends Cubit<VotingState>
       );
       _dispatchState();
     }
+  }
+
+  // TODO(damian-molinski): to be implemented.
+  void _handleActiveVotingRoleChange(AccountVotingRole? votingRole) {
+    /*if (_cache.votingPower != account?.votingPower) {
+      _cache = _cache.copyWith(votingPower: Optional(account?.votingPower));
+      _dispatchState();
+    }*/
   }
 
   void _handleProposalsChange(Page<ProposalBrief> page) {
@@ -331,10 +341,6 @@ final class VotingCubit extends Cubit<VotingState>
     if (!isClosed) {
       _handleActiveCampaignChange(campaign);
     }
-  }
-
-  Future<void> _loadVotingPower() async {
-    await _userService.refreshActiveAccountVotingPower();
   }
 
   void _rebuildProposalsCountSubs() {
@@ -395,7 +401,6 @@ final class VotingCubit extends Cubit<VotingState>
 
     _cache = VotingCubitCache(
       filters: filters,
-      votingPower: activeAccount?.votingPower,
       activeAccountId: activeAccount?.catalystId,
     );
   }
