@@ -2,7 +2,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_act
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/voting/vote_delegation_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/voting/vote_list_button.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/voting/voting_leading_button.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/voting/voting_category_leading_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +59,7 @@ class _VotingAppbar extends StatelessWidget {
     if (!isAppUnlock) {
       return null;
     } else if (hasCategory) {
-      return const VotingLeadingButton();
+      return const VotingCategoryLeadingButton();
     } else {
       return const DrawerToggleButton();
     }
