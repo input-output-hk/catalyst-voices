@@ -278,18 +278,13 @@ final class ProposalViewerCubit
   /// and latest state.
   List<DocumentVersion> _buildDocumentVersions({
     required List<DocumentRef> proposalVersions,
-    required DocumentRef? currentRef,
+    required DocumentRef? currentId,
   }) {
-    return proposalVersions.mapIndexed((index, version) {
-      final ver = version.ver;
+    if (currentId == null) {
+      return [];
+    }
 
-      return DocumentVersion(
-        id: ver ?? '',
-        number: index + 1,
-        isCurrent: ver == currentRef?.ver,
-        isLatest: index == proposalVersions.length - 1,
-      );
-    }).toList();
+    return proposalVersions.toDocumentVersions(currentId).toList();
   }
 
   ProposalViewData _buildProposalViewData({
@@ -319,7 +314,7 @@ final class ProposalViewerCubit
     // Build document versions list
     final versions = _buildDocumentVersions(
       proposalVersions: proposalVersions,
-      currentRef: proposalId,
+      currentId: proposalId,
     );
     final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
 
