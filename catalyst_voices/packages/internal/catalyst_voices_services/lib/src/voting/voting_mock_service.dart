@@ -88,7 +88,8 @@ final class VotingMockService implements VotingService {
 
   @override
   Stream<AccountVotingRole?> watchActiveVotingRole() {
-    final accountStream = _userObserver.watchUser.toUnlockedActiveAccount
+    final accountStream = _userObserver.watchUser
+        .toUnlockedActiveAccount()
         .map((account) => account?.catalystId)
         .distinct((previous, next) => previous.isSameAs(next));
 

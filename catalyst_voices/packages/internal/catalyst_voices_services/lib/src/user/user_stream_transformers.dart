@@ -6,7 +6,7 @@ import 'package:rxdart/rxdart.dart';
 extension UnlockedActiveAccountTransformer on Stream<User> {
   /// Transforms a stream of [User] into a stream of the active [Account]
   /// only when that account's keychain is unlocked.
-  Stream<Account?> get toUnlockedActiveAccount {
+  Stream<Account?> toUnlockedActiveAccount() {
     return map((user) => user.activeAccount).switchMap((account) {
       if (account == null) return Stream.value(null);
 

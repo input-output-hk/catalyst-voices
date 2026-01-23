@@ -140,7 +140,7 @@ final class UserServiceImpl implements UserService {
 
   @override
   Stream<Account?> get watchUnlockedActiveAccount {
-    return _userObserver.watchUser.toUnlockedActiveAccount;
+    return _userObserver.watchUser.toUnlockedActiveAccount();
   }
 
   @override
