@@ -4,6 +4,7 @@ import 'package:catalyst_voices_blocs/src/comments/comments_state.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
+import 'package:catalyst_voices_blocs/src/document_builder/document_builder.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_bloc_cache.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_signal.dart';
@@ -160,8 +161,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required bool isMaxProposalsLimitReached,
     required bool hasAccountUsername,
   }) {
-    final documentSegments = _mapDocumentToSegments(
-      proposalDocument,
+    final documentSegments = proposalDocument.createSegments(
       showValidationErrors: state.validationErrors?.showErrors ?? false,
     );
 
@@ -176,7 +176,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final firstSegment = documentSegments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
-    final guidance = _getGuidanceForSection(firstSegment, firstSection);
+    final guidance = DocumentBuilderGuidance.create(
+      firstSegment,
+      firstSection,
+      titleGenerator: _getGuidanceCustomTitle,
+    );
     final stateCategory = CampaignCategoryDetailsViewModel.fromModel(
       category,
       finalProposalsCount: categoryTotalAsk.finalProposalsCount,
@@ -191,7 +195,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       metadata: proposalMetadata,
       category: stateCategory,
       activeNodeId: firstSection?.id,
-      validationErrors: state.validationErrors?.withErrorList(proposalDocument.collectErrors()),
+      validationErrors: state.validationErrors?.withErrorList(
+        proposalDocument.invalidPropertiesTitles,
+      ),
       canPublish: isEmailVerified && proposalDocument.isValid,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
@@ -247,10 +253,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     ClearValidationProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) {
-    final documentSegments = _mapDocumentToSegments(
-      _cache.proposalDocument!,
-      showValidationErrors: false,
-    );
+    final documentSegments = _cache.proposalDocument!.createSegments();
 
     emit(
       state.copyWith(
@@ -311,45 +314,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
   }
 
-  Iterable<ProposalGuidanceItem> _findGuidanceItems(
-    DocumentSegment segment,
-    DocumentSection section,
-    DocumentProperty property,
-  ) sync* {
-    if (property.schema.isSubsection && section.id != property.nodeId) {
-      // Since the property is a standalone subsection we cannot
-      // lookup guidance items for it in a context of given section.
-      return;
-    }
-
-    final guidance = property.schema.guidance;
-    final milestoneListWildcard = ProposalDocument.milestoneListChildNodeId;
-    final sectionTitle = property.schema.nodeId.matchesPattern(milestoneListWildcard)
-        ? ''
-        : property.schema.title;
-    if (guidance != null) {
-      yield ProposalGuidanceItem(
-        segmentTitle: segment.schema.title,
-        sectionTitle: sectionTitle,
-        description: guidance,
-        nodeId: property.nodeId,
-      );
-    }
-
-    switch (property) {
-      case DocumentListProperty():
-        for (final childProperty in property.properties) {
-          yield* _findGuidanceItems(segment, section, childProperty);
-        }
-      case DocumentObjectProperty():
-        for (final childProperty in property.properties) {
-          yield* _findGuidanceItems(segment, section, childProperty);
-        }
-      case DocumentValueProperty():
-      // do nothing, values don't have children
-    }
-  }
-
   Future<void> _forgetProposal(
     ProposalBuilderEvent event,
     Emitter<ProposalBuilderState> emit,
@@ -371,26 +335,22 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
   }
 
-  ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
+  String? _getGuidanceCustomTitle(DocumentProperty property) {
+    final milestoneListWildcard = ProposalDocument.milestoneListChildNodeId;
+    return property.schema.nodeId.matchesPattern(milestoneListWildcard) ? '' : null;
+  }
+
+  DocumentBuilderGuidance _getGuidanceForNodeId(NodeId? nodeId) {
     if (nodeId == null) {
-      return const ProposalGuidance(isNoneSelected: true);
+      return const DocumentBuilderGuidance(isNoneSelected: true);
     } else {
       final segment = state.documentSegments.firstWhereOrNull((e) => nodeId.isSameOrChildOf(e.id));
       final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
 
-      return _getGuidanceForSection(segment, section);
-    }
-  }
-
-  ProposalGuidance _getGuidanceForSection(
-    DocumentSegment? segment,
-    DocumentSection? section,
-  ) {
-    if (segment == null || section == null) {
-      return const ProposalGuidance();
-    } else {
-      return ProposalGuidance(
-        guidanceList: _findGuidanceItems(segment, section, section.property).toList(),
+      return DocumentBuilderGuidance.create(
+        segment,
+        section,
+        titleGenerator: _getGuidanceCustomTitle,
       );
     }
   }
@@ -436,12 +396,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     _cache = _cache.copyWith(proposalDocument: Optional(document));
 
-    final documentSegments = _mapDocumentToSegments(
-      document,
+    final documentSegments = document.createSegments(
       showValidationErrors: state.validationErrors?.showErrors ?? false,
     );
 
-    final validationErrors = state.validationErrors?.withErrorList(document.collectErrors());
+    final validationErrors = state.validationErrors?.withErrorList(
+      document.invalidPropertiesTitles,
+    );
 
     final newState = state.copyWith(
       document: Optional(document),
@@ -474,7 +435,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       }
       final category = campaign.categories.first;
       final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.id);
-
       final proposalTemplate = await _proposalService.getProposalTemplate(category: category.id);
       final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
@@ -506,11 +466,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     await _loadState(emit, () async {
-      final proposalData = await _proposalService.getProposalDetail(
-        id: proposalRef,
-      );
-      final versionsIds = proposalData.versions.map((e) => e.id.ver).whereType<String>().toList();
-      final proposal = Proposal.fromData(proposalData, versionsIds);
+      final proposalData = await _proposalService.getProposalDetail(id: proposalRef);
+      final proposal = Proposal.fromDetailData(proposalData);
 
       if (proposalData.publish.isPublished) {
         emitSignal(
@@ -521,16 +478,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         );
       }
 
-      final versions = proposalData.versions.mapIndexed((index, version) {
-        final versionRef = version.id;
-        final versionId = versionRef.ver ?? versionRef.id;
-        return DocumentVersion(
-          id: versionId,
-          number: index + 1,
-          isCurrent: versionId == proposalRef.ver,
-          isLatest: index == proposalData.versions.length - 1,
-        );
-      }).toList();
+      final versions = proposalData.versions.toDocumentVersions(proposalRef).toList();
       final notVerifiedAccount =
           !(_userService.user.activeAccount?.publicStatus.isVerified ?? false);
       final firstVersion =
@@ -573,12 +521,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     _logger.info('Loading proposal category: $categoryId');
 
     await _loadState(emit, () async {
-      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
-      final proposalTemplate = await _proposalService.getProposalTemplate(category: categoryId);
+      final (category, proposalTemplate, categoryTotalAsk) = await (
+        _campaignService.getCategory(DocumentParameters({categoryId})),
+        _proposalService.getProposalTemplate(category: categoryId),
+        _campaignService.getCategoryTotalAsk(ref: categoryId),
+      ).wait;
+
       final templateParameters = proposalTemplate.metadata.parameters;
-
-      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryId);
-
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
       return _cacheAndCreateState(
@@ -665,32 +614,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return const [];
   }
 
-  List<DocumentSegment> _mapDocumentToSegments(
-    Document document, {
-    required bool showValidationErrors,
-  }) {
-    return document.segments.map((segment) {
-      final sections = segment.sections
-          .expand(DocumentNodeTraverser.findSectionsAndSubsections)
-          .map(
-            (section) => DocumentSection(
-              id: section.schema.nodeId,
-              property: section,
-              schema: section.schema,
-              hasError: showValidationErrors && !section.isValidExcludingSubsections,
-            ),
-          )
-          .toList();
-
-      return DocumentSegment(
-        id: segment.schema.nodeId,
-        sections: sections,
-        property: segment,
-        schema: segment.schema as DocumentSegmentSchema,
-      );
-    }).toList();
-  }
-
   Future<void> _onUpdateUsername(
     UpdateUsernameEvent event,
     Emitter<ProposalBuilderState> emit,
@@ -736,7 +659,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       // if a new ref has been created we need to recreate
       // the version history to reflect it, drop the old one
       // because the new one overrode it
-      updatedVersions = _recreateDocumentVersionsWithNewRef(
+      updatedVersions = state.metadata.versions.recreateWith(
         newRef: updatedId,
         removedRef: currentId,
       );
@@ -783,7 +706,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         // if a new ref has been created we need to recreate
         // the version history to reflect it, drop the old one
         // because the new one overrode it
-        updatedVersions = _recreateDocumentVersionsWithNewRef(
+        updatedVersions = state.metadata.versions.recreateWith(
           newRef: updatedRef,
           removedRef: currentRef,
         );
@@ -872,30 +795,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       isEmailVerified: isEmailVerified,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
-  }
-
-  List<DocumentVersion> _recreateDocumentVersionsWithNewRef({
-    DocumentRef? newRef,
-    DocumentRef? removedRef,
-  }) {
-    final current = state.metadata.versions.whereNot((e) => e.id == removedRef?.ver);
-    final currentId = newRef?.ver ?? current.last.id;
-
-    return [
-      for (final (index, ver) in current.indexed)
-        ver.copyWith(
-          number: index + 1,
-          isCurrent: ver.id == currentId,
-          isLatest: ver.id == currentId,
-        ),
-      if (newRef != null)
-        DocumentVersion(
-          id: newRef.ver!,
-          number: current.length + 1,
-          isCurrent: newRef.ver == currentId,
-          isLatest: newRef.ver == currentId,
-        ),
-    ];
   }
 
   Future<void> _requestPublishProposal(
@@ -1031,7 +930,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     if (updatedRef != currentRef) {
       // if a new ref has been created we need to recreate
       // the version history to reflect it
-      updatedVersions = _recreateDocumentVersionsWithNewRef(newRef: updatedRef);
+      updatedVersions = state.metadata.versions.recreateWith(
+        newRef: updatedRef,
+      );
     }
 
     _updateMetadata(
@@ -1253,8 +1154,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) {
     final validationErrors = state.validationErrors?.copyWith(status: event.status);
 
-    final documentSegments = _mapDocumentToSegments(
-      _cache.proposalDocument!,
+    final documentSegments = _cache.proposalDocument!.createSegments(
       showValidationErrors: validationErrors?.showErrors ?? false,
     );
 
@@ -1301,19 +1201,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final document = _buildDocument();
     final showErrors = !document.isValid;
 
-    final documentSegments = _mapDocumentToSegments(
-      document,
-      showValidationErrors: false,
-    );
+    final documentSegments = document.createSegments();
 
     if (showErrors) {
       final newState = state.copyWith(
         documentSegments: documentSegments,
         validationErrors: Optional(
           ProposalBuilderValidationErrors(
-            status: ProposalBuilderValidationStatus.notStarted,
+            status: DocumentBuilderValidationStatus.notStarted,
             origin: event.origin,
-            errors: document.collectErrors(),
+            errors: document.invalidPropertiesTitles,
           ),
         ),
       );
@@ -1325,11 +1222,5 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       );
       emit(newState);
     }
-  }
-}
-
-extension on Document {
-  List<String> collectErrors() {
-    return invalidProperties.map((e) => e.schema.title).whereNot((e) => e.isBlank).toList();
   }
 }
