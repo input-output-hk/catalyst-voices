@@ -4,33 +4,17 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class GlobalSyncIndicatorSelector extends StatefulWidget {
-  const GlobalSyncIndicatorSelector({super.key});
+class GlobalSyncIndicatorBanner extends StatefulWidget {
+  const GlobalSyncIndicatorBanner({super.key});
 
   @override
-  State<GlobalSyncIndicatorSelector> createState() => _GlobalSyncIndicatorSelectorState();
+  State<GlobalSyncIndicatorBanner> createState() => _GlobalSyncIndicatorBannerState();
 }
 
-class _GlobalSyncIndicatorSelectorState extends State<GlobalSyncIndicatorSelector> {
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<SyncIndicatorCubit, SyncIndicatorState, bool>(
-      selector: (state) => state.isSyncing,
-      builder: (context, isSyncing) => _Indicator(show: isSyncing),
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    context.read<SyncIndicatorCubit>().init();
-  }
-}
-
-class _Indicator extends StatelessWidget {
+class _Banner extends StatelessWidget {
   final bool show;
 
-  const _Indicator({required this.show});
+  const _Banner({required this.show});
 
   @override
   Widget build(BuildContext context) {
@@ -64,5 +48,21 @@ class _Indicator extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _GlobalSyncIndicatorBannerState extends State<GlobalSyncIndicatorBanner> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<SyncIndicatorCubit, SyncIndicatorState, bool>(
+      selector: (state) => state.isSyncing,
+      builder: (context, isSyncing) => _Banner(show: isSyncing),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<SyncIndicatorCubit>().init();
   }
 }

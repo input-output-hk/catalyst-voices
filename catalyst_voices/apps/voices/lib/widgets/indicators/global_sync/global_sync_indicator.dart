@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/indicators/global_sync/widgets/global_sync_indicator_selector.dart';
+import 'package:catalyst_voices/widgets/indicators/global_sync/widgets/global_sync_indicator_banner.dart';
 import 'package:flutter/material.dart';
 
 /// A global sync indicator that displays an indefinite horizontal progress bar
@@ -15,7 +15,7 @@ class GlobalSyncIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const GlobalSyncIndicatorSelector(),
+        const GlobalSyncIndicatorBanner(),
         Expanded(child: child),
       ],
     );
