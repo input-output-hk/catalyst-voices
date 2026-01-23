@@ -1826,6 +1826,10 @@
   "@getStartedButtonLabelText": {
     "description": "Label text shown in the GetStartedButton widget."
   },
+  "globalSyncIndicatorTitle": "Syncing...",
+  "@globalSyncIndicatorTitle": {
+    "description": "Title shown in the global sync indicator banner"
+  },
   "goMyProposals": "Go My proposals",
   "@goMyProposals": {
     "description": "Action to go to my proposals"

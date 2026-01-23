@@ -77,6 +77,9 @@ class _AppState extends State<App> {
       BlocProvider<FeatureFlagsCubit>(
         create: (_) => Dependencies.instance.get<FeatureFlagsCubit>(),
       ),
+      BlocProvider<SyncIndicatorCubit>(
+        create: (_) => Dependencies.instance.get<SyncIndicatorCubit>(),
+      ),
     ];
   }
 }
