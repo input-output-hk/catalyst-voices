@@ -86,6 +86,9 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<SystemStatusCubit>(
         () => SystemStatusCubit(get<SystemStatusService>()),
       )
+      ..registerLazySingleton<SyncIndicatorCubit>(
+        () => SyncIndicatorCubit(get<SyncManager>()),
+      )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
