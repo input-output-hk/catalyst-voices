@@ -49,6 +49,11 @@ final class Proposal extends CoreProposal {
     );
   }
 
+  factory Proposal.fromDetailData(ProposalDetailData data) {
+    final versionsIds = data.versions.map((e) => e.id.ver).whereType<String>().toList();
+    return Proposal.fromData(data, versionsIds);
+  }
+
   const Proposal._({
     required super.id,
     required super.parameters,
