@@ -3,7 +3,6 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::{Cip36, Slot, TxnIndex, VotingPubKey, pallas_addresses::Address};
-use poem_openapi::types::ToJSON;
 use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
@@ -12,7 +11,6 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTxnIndex},
     },
-    service::common::objects::generic::problem_report::ProblemReport,
     settings::cassandra_db,
 };
 
@@ -88,7 +86,8 @@ impl Params {
             .unwrap_or_default();
         let is_cip36 = cip36.is_cip36().map_or(MaybeUnset::Unset, MaybeUnset::Set);
         let payment_address = cip36.payment_address().map_or(Vec::new(), Address::to_vec);
-        let problem_report = ProblemReport::from(cip36.err_report().clone()).to_json_string();
+        // let problem_report = ProblemReport::from(cip36.err_report().clone()).to_json_string();
+        let problem_report = String::new();
 
         Params {
             stake_public_key,
