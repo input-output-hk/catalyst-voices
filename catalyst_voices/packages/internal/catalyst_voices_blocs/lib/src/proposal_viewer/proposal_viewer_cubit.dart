@@ -30,7 +30,10 @@ final class ProposalViewerCubit
     super.documentMapper,
     super.featureFlagsService,
     this.commentService,
-  ) : super(initialState: const ProposalViewerState());
+  ) : super(
+        initialState: const ProposalViewerState(),
+        cache: const ProposalViewerCache(),
+      );
 
   @override
   Future<void> acceptCollaboratorInvitation() async {
@@ -99,8 +102,7 @@ final class ProposalViewerCubit
   void init() {
     super.init();
 
-    // Initialize cache with specific type
-    cache = const ProposalViewerCache().copyWith(
+    cache = cache.copyWith(
       activeAccountId: Optional(userService.user.activeAccount?.catalystId),
     );
   }
@@ -415,7 +417,8 @@ final class ProposalViewerCubit
       isFavorite: proposalData?.isFavorite ?? false,
       readOnlyMode: isReadOnlyMode,
       isVotingStage: isVotingStage,
-      showComments: !(proposalData?.publish.isPublished ?? false),
+      // canComment is set in CommentsSegmentData where isReadOnlyMode is also considered
+      showComments: !(proposalData?.publish.isLocal ?? false),
       proposalVersions: proposalData?.versions ?? [],
       publish: proposalData?.publish,
     );

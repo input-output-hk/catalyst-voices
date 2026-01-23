@@ -30,7 +30,7 @@ abstract base class DocumentViewerCubit<
   final FeatureFlagsService featureFlagsService;
 
   @protected
-  late Cache cache;
+  Cache cache;
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
 
@@ -45,6 +45,7 @@ abstract base class DocumentViewerCubit<
     this.documentMapper,
     this.featureFlagsService, {
     required S initialState,
+    required this.cache,
   }) : super(initialState);
 
   /// Checks if viewing the latest version of the document.
