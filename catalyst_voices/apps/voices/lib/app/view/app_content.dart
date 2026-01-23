@@ -11,7 +11,7 @@ import 'package:catalyst_voices/common/ext/preferences_ext.dart';
 import 'package:catalyst_voices/notification/catalyst_messenger.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
-import 'package:catalyst_voices/widgets/indicators/global_sync_indicator.dart';
+import 'package:catalyst_voices/widgets/indicators/global_sync/global_sync_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
