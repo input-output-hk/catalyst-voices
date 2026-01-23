@@ -86,6 +86,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color discoveryTextOnPrimary;
   final Color discoveryOnPrimary;
   final Color discoveryTextOnPrimaryWhite;
+  final List<Color> actionsGradientBackground;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -167,6 +168,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.discoveryOnPrimary,
     required this.discoveryTextOnPrimary,
     required this.discoveryTextOnPrimaryWhite,
+    required this.actionsGradientBackground,
   });
 
   @visibleForTesting
@@ -250,6 +252,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.discoveryOnPrimary = Colors.black,
     this.discoveryTextOnPrimary = Colors.black,
     this.discoveryTextOnPrimaryWhite = Colors.black,
+    this.actionsGradientBackground = const [],
   });
 
   @override
@@ -333,6 +336,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? discoveryOnPrimary,
     Color? discoveryTextOnPrimary,
     Color? discoveryTextOnPrimaryWhite,
+    List<Color>? actionsGradientBackground,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -418,6 +422,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       discoveryOnPrimary: discoveryOnPrimary ?? this.discoveryOnPrimary,
       discoveryTextOnPrimary: discoveryTextOnPrimary ?? this.discoveryTextOnPrimary,
       discoveryTextOnPrimaryWhite: discoveryTextOnPrimaryWhite ?? this.discoveryTextOnPrimaryWhite,
+      actionsGradientBackground: actionsGradientBackground ?? this.actionsGradientBackground,
     );
   }
 
@@ -578,6 +583,14 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
         other.discoveryTextOnPrimaryWhite,
         t,
       )!,
+      actionsGradientBackground: List.generate(
+        actionsGradientBackground.length,
+        (i) => Color.lerp(
+          actionsGradientBackground[i],
+          other.actionsGradientBackground[i],
+          t,
+        )!,
+      ),
     );
   }
 }
