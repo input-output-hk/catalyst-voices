@@ -52,6 +52,15 @@ final f15StaticCampaignTimeline = CampaignTimeline(
       type: CampaignPhaseType.communityVoting,
     ),
     CampaignPhase(
+      title: 'Voting tally',
+      description: '''Final votes counting''',
+      timeline: DateRange(
+        from: DateTime.utc(2027, 07, 12, 10),
+        to: DateTime.utc(2027, 07, 14, 10),
+      ),
+      type: CampaignPhaseType.votingTally,
+    ),
+    CampaignPhase(
       title: 'Voting Results',
       description:
           '''Votes are tallied and the results are announced. Rewards are distributed to both voters and community reviewers.''',
