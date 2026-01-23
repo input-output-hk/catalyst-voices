@@ -337,16 +337,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }) {
     final proposalDocumentRef = proposal?.metadata.id;
 
-    final versions = proposalVersions.reversed.mapIndexed((index, version) {
-      final ver = version.ver;
-
-      return DocumentVersion(
-        id: ver ?? '',
-        number: index + 1,
-        isCurrent: ver == proposalDocumentRef?.ver,
-        isLatest: index == proposalVersions.length - 1,
-      );
-    }).toList();
+    final versions = proposalVersions.reversed.toDocumentVersions(proposalDocumentRef).toList();
     final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
     final commentsCount = showComments
         ? comments.fold(0, (prev, next) => prev + 1 + next.repliesCount)
