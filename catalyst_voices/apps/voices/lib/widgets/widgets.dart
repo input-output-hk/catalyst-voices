@@ -49,6 +49,7 @@ export 'headers/section_header.dart';
 export 'headers/section_learn_more_header.dart';
 export 'headers/segment_header.dart';
 export 'headers/sticky_header.dart';
+export 'indicators/global_sync/global_sync_indicator.dart';
 export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_error_indicator.dart';

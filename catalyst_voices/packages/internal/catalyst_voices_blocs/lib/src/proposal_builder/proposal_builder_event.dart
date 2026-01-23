@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/src/document_builder/document_builder_validation_errors.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -216,7 +217,7 @@ final class UpdateCommentsSortEvent extends ProposalBuilderEvent {
 }
 
 final class UpdateProposalBuilderValidationStatusEvent extends ProposalBuilderEvent {
-  final ProposalBuilderValidationStatus status;
+  final DocumentBuilderValidationStatus status;
 
   const UpdateProposalBuilderValidationStatusEvent({required this.status});
 

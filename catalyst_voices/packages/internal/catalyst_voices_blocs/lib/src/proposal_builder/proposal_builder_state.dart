@@ -1,8 +1,13 @@
 import 'package:catalyst_voices_blocs/src/comments/comments_state.dart';
+import 'package:catalyst_voices_blocs/src/document_builder/document_builder_guidance.dart';
+import 'package:catalyst_voices_blocs/src/document_builder/document_builder_validation_errors.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
+
+typedef ProposalBuilderValidationErrors =
+    DocumentBuilderValidationErrors<ProposalBuilderValidationOrigin>;
 
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
@@ -88,7 +93,7 @@ final class ProposalBuilderState extends Equatable {
   final List<DocumentSegment> documentSegments;
   final List<Segment> commentSegments;
   final CommentsState comments;
-  final ProposalGuidance guidance;
+  final DocumentBuilderGuidance guidance;
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
   final ProposalBuilderValidationErrors? validationErrors;
@@ -104,7 +109,7 @@ final class ProposalBuilderState extends Equatable {
     this.documentSegments = const [],
     this.commentSegments = const [],
     this.comments = const CommentsState(),
-    this.guidance = const ProposalGuidance(),
+    this.guidance = const DocumentBuilderGuidance(),
     this.category,
     this.activeNodeId,
     this.validationErrors,
@@ -168,7 +173,7 @@ final class ProposalBuilderState extends Equatable {
     List<DocumentSegment>? documentSegments,
     List<Segment>? commentSegments,
     CommentsState? comments,
-    ProposalGuidance? guidance,
+    DocumentBuilderGuidance? guidance,
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
     Optional<ProposalBuilderValidationErrors>? validationErrors,
@@ -194,124 +199,7 @@ final class ProposalBuilderState extends Equatable {
   }
 }
 
-final class ProposalBuilderValidationErrors extends Equatable {
-  final ProposalBuilderValidationStatus status;
-  final ProposalBuilderValidationOrigin origin;
-  final List<String> errors;
-
-  const ProposalBuilderValidationErrors({
-    required this.status,
-    required this.origin,
-    required this.errors,
-  });
-
-  @override
-  List<Object?> get props => [status, origin, errors];
-
-  bool get showErrors {
-    switch (status) {
-      case ProposalBuilderValidationStatus.notStarted:
-      case ProposalBuilderValidationStatus.cleared:
-        return false;
-      case ProposalBuilderValidationStatus.pendingShowAll:
-      case ProposalBuilderValidationStatus.pendingHideAll:
-        return true;
-    }
-  }
-
-  ProposalBuilderValidationErrors copyWith({
-    ProposalBuilderValidationStatus? status,
-    ProposalBuilderValidationOrigin? origin,
-    List<String>? errors,
-  }) {
-    return ProposalBuilderValidationErrors(
-      status: status ?? this.status,
-      origin: origin ?? this.origin,
-      errors: errors ?? this.errors,
-    );
-  }
-
-  ProposalBuilderValidationErrors withErrorList(
-    List<String> errors,
-  ) {
-    return copyWith(
-      status: _ensureStatusMatchesErrorList(status, errors),
-      errors: errors,
-    );
-  }
-
-  ProposalBuilderValidationStatus _ensureStatusMatchesErrorList(
-    ProposalBuilderValidationStatus status,
-    List<String> errors,
-  ) {
-    switch (status) {
-      case ProposalBuilderValidationStatus.notStarted:
-      case ProposalBuilderValidationStatus.pendingShowAll:
-      case ProposalBuilderValidationStatus.pendingHideAll:
-        if (errors.isEmpty) {
-          return ProposalBuilderValidationStatus.cleared;
-        } else {
-          return status;
-        }
-
-      case ProposalBuilderValidationStatus.cleared:
-        if (errors.isEmpty) {
-          return status;
-        } else {
-          return ProposalBuilderValidationStatus.pendingShowAll;
-        }
-    }
-  }
-}
-
 enum ProposalBuilderValidationOrigin {
   shareDraft,
   submitForReview,
-}
-
-enum ProposalBuilderValidationStatus {
-  notStarted,
-  pendingShowAll,
-  pendingHideAll,
-  cleared,
-}
-
-final class ProposalGuidance extends Equatable {
-  final bool isNoneSelected;
-  final List<ProposalGuidanceItem> guidanceList;
-
-  const ProposalGuidance({
-    this.isNoneSelected = false,
-    this.guidanceList = const [],
-  });
-
-  @override
-  List<Object?> get props => [
-    isNoneSelected,
-    guidanceList,
-  ];
-
-  bool get showEmptyState => !isNoneSelected && guidanceList.isEmpty;
-}
-
-final class ProposalGuidanceItem extends Equatable {
-  final String segmentTitle;
-  final String sectionTitle;
-  final MarkdownData description;
-  final DocumentNodeId nodeId;
-
-  const ProposalGuidanceItem({
-    required this.segmentTitle,
-    required this.sectionTitle,
-    required this.description,
-    required this.nodeId,
-  });
-
-  @override
-  List<Object?> get props => [
-    segmentTitle,
-    sectionTitle,
-    description,
-    nodeId,
-  ];
 }

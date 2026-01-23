@@ -22,7 +22,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
   var _cache = const VotingBallotCache();
 
-  StreamSubscription<VotingPower?>? _votingPowerSub;
+  StreamSubscription<AccountVotingRole?>? _activeVotingRoleSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
   StreamSubscription<Vote?>? _watchedCastedVotesSub;
 
@@ -34,7 +34,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     this._ballotBuilder,
     this._votingService,
   ) : super(const VotingBallotState()) {
-    on<UpdateVotingPowerEvent>(_updateVotingPower, transformer: uniqueEvents());
+    on<UpdateVotingRoleEvent>(_updateVotingRole, transformer: uniqueEvents());
     on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress, transformer: uniqueEvents());
     on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
     on<UpdateFooterFromBallotBuilderEvent>(_updateFooterFromBallot, transformer: uniqueEvents());
@@ -47,10 +47,9 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     on<CancelCastingVotesEvent>(_cancelCastingVotes);
     on<CheckPasswordEvent>(_checkPassword);
 
-    _votingPowerSub = _userService.watchUser
-        .map((user) => user.activeAccount?.votingPower)
-        .distinct()
-        .listen(_handleVotingPowerChange);
+    _activeVotingRoleSub = _votingService.watchActiveVotingRole().distinct().listen(
+      _handleActiveVotingRoleChange,
+    );
 
     _activeCampaignSub = _campaignService.watchActiveCampaign.listen(_handleCampaignChange);
 
@@ -68,8 +67,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   Future<void> close() async {
     _ballotBuilder.removeListener(_handleBallotBuilderChange);
 
-    await _votingPowerSub?.cancel();
-    _votingPowerSub = null;
+    await _activeVotingRoleSub?.cancel();
+    _activeVotingRoleSub = null;
 
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
@@ -246,6 +245,10 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     return _votingService.getProposalLastCastedVote(proposal);
   }
 
+  void _handleActiveVotingRoleChange(AccountVotingRole? votingRole) {
+    add(UpdateVotingRoleEvent(votingRole));
+  }
+
   void _handleBallotBuilderChange() {
     final canCastVotes = _ballotBuilder.length > 0;
     final showPendingVotesDisclaimer = _ballotBuilder.length > 0;
@@ -270,10 +273,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
   void _handleLastCastedChange(Vote? vote) {
     add(UpdateLastCastedVoteEvent(vote?.createdAt));
-  }
-
-  void _handleVotingPowerChange(VotingPower? votingPower) {
-    add(UpdateVotingPowerEvent(votingPower));
   }
 
   List<_VoteWithProposal> _mapVotesWithProposals(
@@ -403,16 +402,25 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     );
   }
 
-  void _updateVotingPower(
-    UpdateVotingPowerEvent event,
+  void _updateVotingRole(
+    UpdateVotingRoleEvent event,
     Emitter<VotingBallotState> emit,
   ) {
     final votingPower = event.data;
 
+    final amount = votingPower?.totalVotingPowerAmount ?? 0;
+    final status = switch (votingPower) {
+      AccountVotingRoleDelegator(:final votingPower) => votingPower.data?.status,
+      AccountVotingRoleIndividual(:final votingPower) => votingPower.data?.status,
+      AccountVotingRoleRepresentative(:final votingPower) => votingPower.data?.status,
+      null => null,
+    };
+
     final userSummary = VotingListUserSummaryData(
-      amount: votingPower?.amount ?? 0,
-      status: votingPower?.status,
+      amount: amount,
+      status: status,
     );
+
     emit(state.copyWith(userSummary: userSummary));
   }
 }

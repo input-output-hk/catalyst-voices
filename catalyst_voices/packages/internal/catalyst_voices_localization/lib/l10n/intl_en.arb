@@ -1138,6 +1138,14 @@
   "@doWord": {
     "description": "Label for a list of things to do"
   },
+  "documentBuilderValidationExitDialogTitle": "Exit form issue mode?",
+  "@documentBuilderValidationExitDialogTitle": {
+    "description": "Title in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "documentBuilderValidationExitIssueMode": "Exit Issue Mode",
+  "@documentBuilderValidationExitIssueMode": {
+    "description": "Button text for exiting the document builder validation snackbar."
+  },
   "documentHiddenException": "The proposal is no longer available.",
   "@documentHiddenException": {
     "description": "Message when the document (proposal) is no longer available due to being hidden."
@@ -1817,6 +1825,10 @@
   "getStartedButtonLabelText": "Get Started",
   "@getStartedButtonLabelText": {
     "description": "Label text shown in the GetStartedButton widget."
+  },
+  "globalSyncIndicatorTitle": "Syncing...",
+  "@globalSyncIndicatorTitle": {
+    "description": "Title shown in the global sync indicator banner"
   },
   "goMyProposals": "Go My proposals",
   "@goMyProposals": {
@@ -2816,14 +2828,6 @@
         "type": "int"
       }
     }
-  },
-  "proposalEditorValidationExitDialogTitle": "Exit form issue mode?",
-  "@proposalEditorValidationExitDialogTitle": {
-    "description": "Title in a dialog asking if the user wants to leave the form issue mode."
-  },
-  "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
-  "@proposalEditorValidationExitIssueMode": {
-    "description": "Button text for exiting the proposal editor validation snackbar."
   },
   "proposalHidden": "Proposal is hidden",
   "@proposalHidden": {

@@ -1,32 +1,31 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.10 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.10-mk-signed-docs-key-type AS cat-libs-rust
-IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.4-fix-earthly-build AS dep-cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.14 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.6.14 AS rust-ci
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
 
 builder:
-    FROM python-ci+python-base-deprecated
+    DO rust-ci+SETUP
+    DO python-ci+INSTALL
+
+    RUN apt-get clean && apt-get install -y git
 
     # prepare tests
+    COPY pyproject.toml uv.lock Readme.md .
     COPY --dir ./api .
     COPY --dir ./integration .
     COPY --dir ./scripts .
     COPY --dir ./test_data .
     COPY --dir ./utils .
-    COPY cat-libs-rust+build/mk_signed_doc .
-    # mk_signed_doc cli tool for building deprecated version of documents
-    COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
-    DO python-ci+BUILDER_WITH_POETRY
+
+    RUN uv sync
 
 # Creates a package of the python integration test runner
 testing-package:
     FROM +builder
 
     ENV ASSETS_DATA_PATH="./cardano-asset-preprod.json"
-    ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
-    ENV DEP_MK_SIGNED_DOC_PATH="./dep_mk_signed_doc"
 
     # Install socat
     RUN apt-get clean && apt-get autoremove && apt-get update \
