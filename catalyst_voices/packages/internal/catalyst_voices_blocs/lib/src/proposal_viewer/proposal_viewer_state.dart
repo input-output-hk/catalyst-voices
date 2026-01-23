@@ -2,7 +2,8 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
-class ProposalViewerState extends DocumentViewerState implements DocumentViewerStateWithComments {
+class ProposalViewerState extends DocumentViewerState<ProposalViewData>
+    implements DocumentViewerStateWithComments {
   final CollaboratorProposalState collaborator;
 
   @override
@@ -10,15 +11,12 @@ class ProposalViewerState extends DocumentViewerState implements DocumentViewerS
 
   const ProposalViewerState({
     super.isLoading,
-    ProposalViewData super.data = const ProposalViewData(),
+    super.data = const ProposalViewData(),
     super.error,
     super.readOnlyMode,
     this.collaborator = const NoneCollaboratorProposalState(),
     this.comments = const CommentsState(),
   });
-
-  @override
-  ProposalViewData get data => super.data as ProposalViewData;
 
   @override
   List<Object?> get props => [...super.props, collaborator, comments];

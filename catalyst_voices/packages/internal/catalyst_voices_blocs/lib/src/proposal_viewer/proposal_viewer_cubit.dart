@@ -10,28 +10,27 @@ import 'package:collection/collection.dart';
 
 final _logger = Logger('ProposalViewerCubit');
 
-final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
-    with DocumentViewerCommentsMixin, DocumentViewerCollaboratorsMixin {
+final class ProposalViewerCubit
+    extends DocumentViewerCubit<ProposalViewerState, ProposalViewerCache>
+    with
+        DocumentViewerCommentsMixin<ProposalViewerState, ProposalViewerCache>,
+        DocumentViewerCollaboratorsMixin<ProposalViewerState, ProposalViewerCache> {
   @override
   final CommentService commentService;
 
   // Builder for creating proposal segments
-  final ProposalSegmentBuilder _segmentBuilder = const ProposalSegmentBuilder();
+  final _segmentBuilder = const ProposalSegmentBuilder();
 
   // Subscription for watching proposal data updates
   StreamSubscription<ProposalDataV2?>? _proposalSub;
 
   ProposalViewerCubit(
-    super.initialState,
     super.proposalService,
     super.userService,
     super.documentMapper,
     super.featureFlagsService,
     this.commentService,
-  );
-
-  // Helper to get typed cache
-  ProposalViewerCache get _proposalCache => cache as ProposalViewerCache;
+  ) : super(initialState: const ProposalViewerState());
 
   @override
   Future<void> acceptCollaboratorInvitation() async {
@@ -81,19 +80,19 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   @override
   Future<void> fetchCommentTemplate() async {
-    final categoryId = _proposalCache.proposalData?.proposalOrDocument.category?.id;
+    final categoryId = cache.proposalData?.proposalOrDocument.category?.id;
     final commentTemplate = categoryId != null
         ? await commentService.getCommentTemplate(category: categoryId)
         : null;
 
-    cache = _proposalCache.copyWith(commentTemplate: Optional(commentTemplate));
+    cache = cache.copyWith(commentTemplate: Optional(commentTemplate));
 
     if (!isClosed) _rebuildState();
   }
 
   @override
   List<DocumentRef> getDocumentVersions() {
-    return _proposalCache.proposalData?.versions ?? [];
+    return cache.proposalData?.versions ?? [];
   }
 
   @override
@@ -101,14 +100,14 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     super.init();
 
     // Initialize cache with specific type
-    cache = ProposalViewerCache.empty().copyWith(
+    cache = const ProposalViewerCache().copyWith(
       activeAccountId: Optional(userService.user.activeAccount?.catalystId),
     );
   }
 
   @override
   bool isVotingStage() {
-    final proposalCampaign = _proposalCache.proposalData?.proposalOrDocument.campaign;
+    final proposalCampaign = cache.proposalData?.proposalOrDocument.campaign;
     return _isVotingStage(proposalCampaign);
   }
 
@@ -153,7 +152,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   @override
   Future<void> retryLastRef() async {
-    final id = _proposalCache.id;
+    final id = cache.id;
 
     if (id != null) {
       return loadProposal(id);
@@ -236,11 +235,11 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   @override
   Future<void> updateIsFavorite({required bool value}) async {
-    final id = _proposalCache.id;
+    final id = cache.id;
     assert(id != null, 'Proposal id not found. Load doc first');
 
     // Update cache optimistically
-    cache = _proposalCache.copyWithIsFavorite(value: value);
+    cache = cache.copyWithIsFavorite(value: value);
     _rebuildState();
 
     // Update via service
@@ -253,7 +252,7 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
     } catch (error, stackTrace) {
       _logger.severe('Failed to update favorite status', error, stackTrace);
       // Rollback on error
-      cache = _proposalCache.copyWithIsFavorite(value: !value);
+      cache = cache.copyWithIsFavorite(value: !value);
       if (!isClosed) {
         _rebuildState();
         emitError(LocalizedException.create(error));
@@ -391,11 +390,11 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
   }
 
   ProposalViewData _buildProposalViewDataUsingCache() {
-    final proposalData = _proposalCache.proposalData;
-    final commentTemplate = _proposalCache.commentTemplate;
-    final comments = _proposalCache.comments ?? const [];
+    final proposalData = cache.proposalData;
+    final commentTemplate = cache.commentTemplate;
+    final comments = cache.comments ?? const [];
     final commentsSort = state.comments.commentsSort;
-    final activeAccountId = _proposalCache.activeAccountId;
+    final activeAccountId = cache.activeAccountId;
 
     final proposalCampaign = proposalData?.proposalOrDocument.campaign;
     final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
@@ -424,19 +423,18 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   /// Handles changes to proposal data.
   void _handleProposalData(ProposalDataV2? data) {
-    final proposalDataChanged = _proposalCache.proposalData != data;
-    final proposalIdChanged = _proposalCache.proposalData?.id != data?.id;
-    final activeAccountId = _proposalCache.activeAccountId;
+    final proposalDataChanged = cache.proposalData != data;
+    final proposalIdChanged = cache.proposalData?.id != data?.id;
+    final activeAccountId = cache.activeAccountId;
 
-    cache = _proposalCache.copyWith(
+    cache = cache.copyWith(
       proposalData: Optional(data),
       documentParameters: data != null ? Optional(data.proposalOrDocument.parameters) : null,
     );
 
     if (proposalIdChanged) {
-      final collaborators =
-          _proposalCache.proposalData?.collaborators ?? const <ProposalDataCollaborator>[];
-      final isFinal = _proposalCache.proposalData?.publish.isPublished ?? false;
+      final collaborators = cache.proposalData?.collaborators ?? const <ProposalDataCollaborator>[];
+      final isFinal = cache.proposalData?.publish.isPublished ?? false;
       buildCollaboratorState(
         collaborators: collaborators,
         activeAccountId: activeAccountId,
@@ -468,12 +466,12 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   /// Rebuilds the state from the cache.
   void _rebuildState() {
-    final proposalData = _proposalCache.proposalData;
+    final proposalData = cache.proposalData;
 
     final proposalCampaign = proposalData?.proposalOrDocument.campaign;
     final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
     final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
-    final collaboratorsState = _proposalCache.collaboratorsState;
+    final collaboratorsState = cache.collaboratorsState;
     final proposalViewData = _buildProposalViewDataUsingCache();
 
     emit(
@@ -487,14 +485,14 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   /// Synchronizes proposal data from the service.
   Future<void> _syncProposal() async {
-    final id = _proposalCache.id;
+    final id = cache.id;
     if (id == null) {
       return;
     }
 
     emit(state.copyWith(isLoading: true, error: const Optional.empty()));
     try {
-      final activeAccountId = _proposalCache.activeAccountId;
+      final activeAccountId = cache.activeAccountId;
       final proposal = await proposalService.getProposalV2(
         id: id,
         activeAccount: activeAccountId,
@@ -535,8 +533,8 @@ final class ProposalViewerCubit extends DocumentViewerCubit<ProposalViewerState>
 
   /// Watches for proposal updates via stream.
   void _watchProposal() {
-    final id = _proposalCache.id;
-    final activeAccountId = _proposalCache.activeAccountId;
+    final id = cache.id;
+    final activeAccountId = cache.activeAccountId;
 
     final stream = id != null
         ? proposalService.watchProposal(id: id, activeAccount: activeAccountId)

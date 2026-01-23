@@ -164,7 +164,6 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerFactory<ProposalViewerCubit>(() {
         return ProposalViewerCubit(
-          const ProposalViewerState(),
           get<ProposalService>(),
           get<UserService>(),
           get<DocumentMapper>(),

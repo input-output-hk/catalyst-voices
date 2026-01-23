@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_collaborators_cache.dart';
+import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -8,19 +8,19 @@ import 'package:flutter/foundation.dart';
 
 final _logger = Logger('DocumentViewerCollaboratorsMixin');
 
-base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
-    on DocumentViewerCubit<S> {
+/// Mixin providing collaborators functionality for document viewers.
+///
+/// Accesses the collaboratorsState field from the cache.
+base mixin DocumentViewerCollaboratorsMixin<
+  State extends DocumentViewerState,
+  Cache extends DocumentViewerCache<Cache>
+>
+    on DocumentViewerCubit<State, Cache>
+    implements DocumentViewerCollaborators {
   @override
   ProposalService get proposalService;
 
-  DocumentViewerCollaboratorsCache get _collaboratorsCache {
-    assert(
-      cache is DocumentViewerCollaboratorsCache,
-      'Cache must implement DocumentViewerCollaboratorsCache',
-    );
-    return cache as DocumentViewerCollaboratorsCache;
-  }
-
+  @override
   @mustCallSuper
   @protected
   Future<void> acceptCollaboratorInvitation() async {
@@ -34,8 +34,8 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         proposalId: id,
         action: CollaboratorProposalAction.acceptInvitation,
       );
-      cache = _collaboratorsCache.copyWithCollaborators(
-        const AcceptedCollaboratorInvitationState(),
+      cache = cache.copyWith(
+        collaboratorsState: const AcceptedCollaboratorInvitationState(),
       );
     } catch (error, stackTrace) {
       _logger.severe('acceptCollaboratorInvitation', error, stackTrace);
@@ -43,6 +43,7 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
     }
   }
 
+  @override
   @mustCallSuper
   @protected
   Future<void> acceptFinalProposal() async {
@@ -56,7 +57,7 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         proposalId: id,
         action: CollaboratorProposalAction.acceptFinal,
       );
-      cache = _collaboratorsCache.copyWithCollaborators(const AcceptedFinalProposalConsentState());
+      cache = cache.copyWith(collaboratorsState: const AcceptedFinalProposalConsentState());
     } catch (error, stackTrace) {
       _logger.severe('acceptFinalProposal', error, stackTrace);
       rethrow;
@@ -74,13 +75,13 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
       activeAccountId: activeAccountId,
       isFinal: isFinal,
     );
-    cache = _collaboratorsCache.copyWithCollaborators(collaboratorState);
+    cache = cache.copyWith(collaboratorsState: collaboratorState);
   }
 
   @mustCallSuper
   @protected
   void dismissCollaboratorBanner() {
-    cache = _collaboratorsCache.copyWithCollaborators(const NoneCollaboratorProposalState());
+    cache = cache.copyWith(collaboratorsState: const NoneCollaboratorProposalState());
   }
 
   @mustCallSuper
@@ -97,8 +98,8 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         action: CollaboratorProposalAction.rejectInvitation,
       );
 
-      cache = _collaboratorsCache.copyWithCollaborators(
-        const RejectedCollaboratorInvitationState(),
+      cache = cache.copyWith(
+        collaboratorsState: const RejectedCollaboratorInvitationState(),
       );
     } catch (error, stackTrace) {
       _logger.severe('rejectCollaboratorInvitation', error, stackTrace);
@@ -120,8 +121,8 @@ base mixin DocumentViewerCollaboratorsMixin<S extends DocumentViewerState>
         action: CollaboratorProposalAction.rejectFinal,
       );
 
-      cache = _collaboratorsCache.copyWithCollaborators(
-        const RejectedCollaboratorFinalProposalConsentState(),
+      cache = cache.copyWith(
+        collaboratorsState: const RejectedCollaboratorFinalProposalConsentState(),
       );
     } catch (error, stackTrace) {
       _logger.severe('rejectFinalProposal', error, stackTrace);

@@ -1,45 +1,21 @@
 import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_cache.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_collaborators_cache.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_comments_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
 /// Cache for ProposalViewerCubit with support for comments, voting, and collaborators.
-final class ProposalViewerCache
-    implements DocumentViewerCache, DocumentViewerCommentsCache, DocumentViewerCollaboratorsCache {
-  @override
-  final DocumentRef? id;
-
-  @override
-  final CatalystId? activeAccountId;
-
-  @override
-  final DocumentParameters? documentParameters;
-
+final class ProposalViewerCache extends DocumentViewerCache<ProposalViewerCache> {
   /// The full proposal data including metadata, versions, collaborators, votes, etc.
   final ProposalDataV2? proposalData;
 
-  @override
-  final List<CommentWithReplies>? comments;
-
-  @override
-  final CommentTemplate? commentTemplate;
-
-  @override
-  final CollaboratorProposalState collaboratorsState;
-
-  ProposalViewerCache({
-    this.id,
-    this.activeAccountId,
-    this.documentParameters,
+  const ProposalViewerCache({
+    super.id,
+    super.activeAccountId,
+    super.documentParameters,
+    super.comments,
+    super.commentTemplate,
+    super.collaboratorsState = const NoneCollaboratorProposalState(),
     this.proposalData,
-    this.comments,
-    this.commentTemplate,
-    this.collaboratorsState = const NoneCollaboratorProposalState(),
   });
-
-  /// Creates an empty cache with default values.
-  factory ProposalViewerCache.empty() => ProposalViewerCache();
 
   @override
   ProposalViewerCache copyWith({
@@ -61,21 +37,6 @@ final class ProposalViewerCache
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       collaboratorsState: collaboratorsState ?? this.collaboratorsState,
     );
-  }
-
-  @override
-  ProposalViewerCache copyWithCollaborators(CollaboratorProposalState collaboratorsState) {
-    return copyWith(collaboratorsState: collaboratorsState);
-  }
-
-  @override
-  ProposalViewerCache copyWithComments(List<CommentWithReplies>? comments) {
-    return copyWith(comments: Optional(comments));
-  }
-
-  @override
-  ProposalViewerCache copyWithCommentTemplate(CommentTemplate? template) {
-    return copyWith(commentTemplate: Optional(template));
   }
 
   /// Updates the favorite status of the proposal.

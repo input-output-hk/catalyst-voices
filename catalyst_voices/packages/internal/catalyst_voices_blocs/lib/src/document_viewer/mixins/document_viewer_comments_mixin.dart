@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_comments_cache.dart';
+import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_cache.dart';
 import 'package:catalyst_voices_blocs/src/document_viewer/document_viewer_cubit.dart';
 import 'package:catalyst_voices_blocs/src/document_viewer/document_viewer_state.dart';
+import 'package:catalyst_voices_blocs/src/document_viewer/interfaces/document_viewer_comments.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -13,25 +14,20 @@ final _logger = Logger('DocumentViewerCommentsMixin');
 
 /// Mixin providing comments functionality for document viewers.
 ///
-/// This mixin provides protected  methods that handle comment business logic
+/// This mixin provides protected methods that handle comment business logic
 /// (cache manipulation, service calls) but do NOT emit state. The cubit that uses
 /// this mixin is responsible for orchestrating these methods and emitting state.
 ///
-/// The cache must implement [DocumentViewerCommentsCache] to use this mixin.
-base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on DocumentViewerCubit<S> {
+/// Accesses the comments and commentTemplate fields from the cache.
+base mixin DocumentViewerCommentsMixin<
+  State extends DocumentViewerState,
+  Cache extends DocumentViewerCache<Cache>
+>
+    on DocumentViewerCubit<State, Cache>
+    implements DocumentViewerComments {
   StreamSubscription<List<CommentWithReplies>>? _commentsSub;
 
   CommentService get commentService;
-
-  /// Returns the cache as [DocumentViewerCommentsCache].
-  /// Asserts in debug mode that the cache implements the correct type.
-  DocumentViewerCommentsCache get _commentsCache {
-    assert(
-      cache is DocumentViewerCommentsCache,
-      'Cache must implement DocumentViewerCommentsCache',
-    );
-    return cache as DocumentViewerCommentsCache;
-  }
 
   /// Protected method to cancel the comments subscription.
   @protected
@@ -46,6 +42,7 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   ///
   /// This is the public API that must be implemented by subclasses.
   /// Implementations should call [submitCommentInternal] and handle state emission.
+  @override
   Future<void> submitComment({
     required Document document,
     SignedDocumentRef? reply,
@@ -78,7 +75,7 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
     final activeAccountId = cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
 
-    final commentTemplate = _commentsCache.commentTemplate;
+    final commentTemplate = cache.commentTemplate;
     assert(commentTemplate != null, 'No comment template found!');
 
     final documentParameters = cache.documentParameters;
@@ -98,8 +95,8 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
     );
 
     // Optimistically update cache
-    final comments = (_commentsCache.comments ?? []).addComment(comment: comment);
-    cache = _commentsCache.copyWithComments(comments);
+    final comments = (cache.comments ?? []).addComment(comment: comment);
+    cache = cache.copyWith(comments: Optional(comments));
 
     // Rebuild state immediately to show optimistic update
     onOptimisticUpdate();
@@ -112,9 +109,9 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
       _logger.info('Publishing comment failed', error, stack);
 
       // Rollback cache on error
-      final source = _commentsCache.comments;
+      final source = cache.comments;
       final comments = (source ?? []).removeComment(ref: commentRef);
-      cache = _commentsCache.copyWithComments(comments);
+      cache = cache.copyWith(comments: Optional(comments));
 
       rethrow;
     }
@@ -126,6 +123,7 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   /// to show/hide reply input forms for specific comments.
   ///
   /// Implementation should update the state to reflect the builder visibility.
+  @override
   void updateCommentBuilder({
     required SignedDocumentRef ref,
     required bool show,
@@ -137,6 +135,7 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   /// to expand or collapse reply threads for specific comments.
   ///
   /// Implementation should update the state to reflect the replies visibility.
+  @override
   void updateCommentReplies({
     required SignedDocumentRef ref,
     required bool show,
@@ -146,8 +145,10 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
   ///
   /// This is a UI state management method that must be implemented by the cubit
   /// to change how comments are sorted (e.g., newest first, oldest first).
+  @override
   void updateCommentsSort({required DocumentCommentsSort sort});
 
+  @override
   Future<void> updateUsername(String value);
 
   Future<void> updateUsernameInternal(String value) async {
@@ -185,8 +186,7 @@ base mixin DocumentViewerCommentsMixin<S extends DocumentViewerState> on Documen
 
     unawaited(_commentsSub?.cancel());
     _commentsSub = stream.listen((comments) {
-      final c = _commentsCache;
-      cache = c.copyWithComments(comments);
+      cache = cache.copyWith(comments: Optional(comments));
       onCommentsChanged(comments);
     });
   }

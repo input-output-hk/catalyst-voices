@@ -8,7 +8,11 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends Cubit<S>
+abstract base class DocumentViewerCubit<
+  S extends DocumentViewerState,
+  Cache extends DocumentViewerCache<Cache>
+>
+    extends Cubit<S>
     with
         BlocErrorEmitterMixin,
         BlocSignalEmitterMixin<DocumentViewerSignal, S>,
@@ -26,7 +30,7 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
   final FeatureFlagsService featureFlagsService;
 
   @protected
-  DocumentViewerCache cache = DocumentViewerCache();
+  late Cache cache;
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
 
@@ -36,12 +40,12 @@ abstract base class DocumentViewerCubit<S extends DocumentViewerState> extends C
   StreamSubscription<DocumentData?>? documentSub;
 
   DocumentViewerCubit(
-    super.initialState,
     this.proposalService,
     this.userService,
     this.documentMapper,
-    this.featureFlagsService,
-  );
+    this.featureFlagsService, {
+    required S initialState,
+  }) : super(initialState);
 
   /// Checks if viewing the latest version of the document.
   @protected

@@ -4,15 +4,15 @@ import 'package:equatable/equatable.dart';
 
 /// Base state for document viewers.
 /// Shared across all document types.
-class DocumentViewerState extends Equatable {
+class DocumentViewerState<Data extends DocumentViewerData> extends Equatable {
   final bool isLoading;
-  final DocumentViewerData data;
+  final Data data;
   final LocalizedException? error;
   final bool readOnlyMode;
 
   const DocumentViewerState({
     this.isLoading = false,
-    this.data = const DocumentViewerData(),
+    required this.data,
     this.error,
     this.readOnlyMode = false,
   });
@@ -25,7 +25,7 @@ class DocumentViewerState extends Equatable {
 
   DocumentViewerState copyWith({
     bool? isLoading,
-    DocumentViewerData? data,
+    Data? data,
     Optional<LocalizedException>? error,
     bool? readOnlyMode,
   }) {
