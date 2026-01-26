@@ -12,6 +12,7 @@ final class CollaboratorInvitationsProposalsFilter extends ProposalsFiltersV2 {
 
 final class CollaboratorProposalApprovalsFilter extends ProposalsFiltersV2 {
   final ProposalApprovalStatus approvalStatus;
+
   CollaboratorProposalApprovalsFilter(
     CatalystId id, {
     this.approvalStatus = ProposalApprovalStatus.any,
