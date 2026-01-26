@@ -16,9 +16,9 @@ class CountDownValueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final digits = _getDigits(value);
     final digitTheme = AnimatedVoicesCountdownTheme.maybeOf(context);
-    final effectiveThemeData = digitTheme ?? AnimatedVoicesCountdownThemeData.defaultTheme(context);
+    final effectiveThemeData =
+        digitTheme ?? AnimatedVoicesCountdownThemeData.defaultTheme(context);
 
     return Container(
       margin: effectiveThemeData.margin,
@@ -33,54 +33,100 @@ class CountDownValueCard extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(effectiveThemeData.borderRadius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: effectiveThemeData.blurSigmaX,
-            sigmaY: effectiveThemeData.blurSigmaY,
-          ),
-          child: Padding(
-            padding: effectiveThemeData.padding,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Offstage(
-                      offstage: digits.length < 3,
-                      child: _DigitWidget(
-                        key: const ValueKey('hundreds'),
-                        digit: digits[0],
-                        textAlign: TextAlign.right,
-                        themeData: effectiveThemeData.digitThemeData,
-                      ),
-                    ),
-                    _DigitWidget(
-                      key: const ValueKey('tens'),
-                      digit: digits.length < 3 ? digits[0] : digits[1],
-                      textAlign: TextAlign.right,
-                      themeData: effectiveThemeData.digitThemeData,
-                    ),
-                    _DigitWidget(
-                      key: const ValueKey('ones'),
-                      digit: digits.length < 3 ? digits[1] : digits[2],
-                      textAlign: TextAlign.left,
-                      themeData: effectiveThemeData.digitThemeData,
-                    ),
-                  ],
-                ),
-                Positioned(
-                  bottom: effectiveThemeData.unitTextBottomPosition,
-                  child: Text(
-                    unit,
-                    style: effectiveThemeData.unitTextStyle,
-                  ),
-                ),
-              ],
-            ),
+        child: _ConditionalBlurLayer(
+          blurSigmaX: effectiveThemeData.blurSigmaX,
+          blurSigmaY: effectiveThemeData.blurSigmaY,
+          child: _CountdownCardContent(
+            value: value,
+            unit: unit,
+            themeData: effectiveThemeData,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ConditionalBlurLayer extends StatelessWidget {
+  final double blurSigmaX;
+  final double blurSigmaY;
+  final Widget child;
+
+  const _ConditionalBlurLayer({
+    required this.blurSigmaX,
+    required this.blurSigmaY,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Skip expensive BackdropFilter when blur is 0
+    if (blurSigmaX == 0 && blurSigmaY == 0) {
+      return child;
+    }
+
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: blurSigmaX, sigmaY: blurSigmaY),
+      child: child,
+    );
+  }
+}
+
+class _CountdownCardContent extends StatelessWidget {
+  final int value;
+  final String unit;
+  final AnimatedVoicesCountdownThemeData themeData;
+
+  const _CountdownCardContent({
+    required this.value,
+    required this.unit,
+    required this.themeData,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final digits = _getDigits(value);
+
+    return Padding(
+      padding: themeData.padding,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Offstage(
+                offstage: digits.length < 3,
+                child: _DigitWidget(
+                  key: const ValueKey('hundreds'),
+                  digit: digits[0],
+                  textAlign: TextAlign.right,
+                  themeData: themeData.digitThemeData,
+                ),
+              ),
+              _DigitWidget(
+                key: const ValueKey('tens'),
+                digit: digits.length < 3 ? digits[0] : digits[1],
+                textAlign: TextAlign.right,
+                themeData: themeData.digitThemeData,
+              ),
+              _DigitWidget(
+                key: const ValueKey('ones'),
+                digit: digits.length < 3 ? digits[1] : digits[2],
+                textAlign: TextAlign.left,
+                themeData: themeData.digitThemeData,
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: themeData.unitTextBottomPosition,
+            child: Text(
+              unit,
+              style: themeData.unitTextStyle,
+            ),
+          ),
+        ],
       ),
     );
   }
