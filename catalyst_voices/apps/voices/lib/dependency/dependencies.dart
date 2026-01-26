@@ -86,6 +86,9 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<SystemStatusCubit>(
         () => SystemStatusCubit(get<SystemStatusService>()),
       )
+      ..registerLazySingleton<SyncIndicatorCubit>(
+        () => SyncIndicatorCubit(get<SyncManager>()),
+      )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
@@ -123,6 +126,7 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
+          get<VotingService>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management
@@ -484,10 +488,12 @@ final class Dependencies extends DependencyProvider {
       );
     });
     registerLazySingleton<VotingService>(() {
-      return VotingService(
+      return VotingService.mock(
         get<VotingRepository>(),
         get<ProposalService>(),
         get<CampaignService>(),
+        get<UserObserver>(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<ReportingServiceMediator>(
