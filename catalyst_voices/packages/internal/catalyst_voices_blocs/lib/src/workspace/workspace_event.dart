@@ -6,11 +6,12 @@ import 'package:equatable/equatable.dart';
 
 final class ChangeWorkspaceFilters extends WorkspaceEvent {
   final WorkspaceFilters? filters;
+  final bool showLoading;
 
-  const ChangeWorkspaceFilters({this.filters});
+  const ChangeWorkspaceFilters({this.filters, this.showLoading = false});
 
   @override
-  List<Object?> get props => [...super.props, filters];
+  List<Object?> get props => [...super.props, filters, showLoading];
 }
 
 final class DeleteDraftProposalEvent extends WorkspaceEvent {
