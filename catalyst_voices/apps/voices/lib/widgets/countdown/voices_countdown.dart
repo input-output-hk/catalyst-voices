@@ -70,6 +70,23 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
     _startCountdown();
   }
 
+  void _onTick(Timer timer) {
+    final now = DateTimeExt.now();
+    final diff = widget.dateTime.difference(now);
+
+    if (diff.isNegative) {
+      _timer?.cancel();
+      setState(() {
+        _timeLeft = Duration.zero;
+      });
+      widget.onCountdownEnd?.call(true);
+    } else {
+      setState(() {
+        _timeLeft = diff;
+      });
+    }
+  }
+
   void _startCountdown() {
     final initialTimeLeft = widget.dateTime.difference(DateTimeExt.now());
 
@@ -83,21 +100,6 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
     _hasStarted = true;
     widget.onCountdownStart?.call(true);
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      final now = DateTimeExt.now();
-      final diff = widget.dateTime.difference(now);
-
-      if (diff.isNegative) {
-        _timer?.cancel();
-        setState(() {
-          _timeLeft = Duration.zero;
-        });
-        widget.onCountdownEnd?.call(true);
-      } else {
-        setState(() {
-          _timeLeft = diff;
-        });
-      }
-    });
+    _timer = Timer.periodic(const Duration(seconds: 1), _onTick);
   }
 }
