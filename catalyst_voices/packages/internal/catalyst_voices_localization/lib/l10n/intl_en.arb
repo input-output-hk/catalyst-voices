@@ -3577,6 +3577,10 @@
   "@resubmitAsFinalWarning": {
     "description": "Information for user that proposal needs to be resubmitted as final to be eligible for funding."
   },
+  "results": "Results",
+  "@results": {
+    "description": "Tab label for results in voting space"
+  },
   "resumeButtonText": "Resume",
   "@resumeButtonText": {
     "description": "Text shown in resume button"

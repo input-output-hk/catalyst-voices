@@ -54,7 +54,7 @@ final class VotingCubit extends Cubit<VotingState>
           ? const Optional(true)
           : const Optional.empty(),
       relationships: {
-        if (_cache.tab == VotingPageTab.my && activeAccountId != null)
+        if (_cache.tab == VotingPageTab.myFinalProposals && activeAccountId != null)
           OriginalAuthor(activeAccountId),
       },
       categoryId: categoryId,
@@ -65,7 +65,7 @@ final class VotingCubit extends Cubit<VotingState>
             ? CampaignFilters.from(campaign)
             : const CampaignFilters(categoriesIds: {}),
       ),
-      voteBy: _cache.tab == VotingPageTab.votedOn
+      voteBy: _cache.tab == VotingPageTab.myVotes
           ? Optional(_cache.activeAccountId)
           : const Optional.empty(),
     );
@@ -224,8 +224,10 @@ final class VotingCubit extends Cubit<VotingState>
     }).toList();
   }
 
-  ProposalsFiltersV2 _buildProposalsCountFilters(VotingPageTab tab) {
+  ProposalsFiltersV2? _buildProposalsCountFilters(VotingPageTab tab) {
     return switch (tab) {
+      // Results tab does not display the counter.
+      VotingPageTab.results => null,
       VotingPageTab.total => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
@@ -236,14 +238,14 @@ final class VotingCubit extends Cubit<VotingState>
         isFavorite: const Optional(true),
         relationships: const {},
       ),
-      VotingPageTab.my => _cache.filters.copyWith(
+      VotingPageTab.myFinalProposals => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
         relationships: {
           if (_cache.activeAccountId != null) OriginalAuthor(_cache.activeAccountId!),
         },
       ),
-      VotingPageTab.votedOn => _cache.filters.copyWith(
+      VotingPageTab.myVotes => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
         relationships: const {},
@@ -346,10 +348,11 @@ final class VotingCubit extends Cubit<VotingState>
   void _rebuildProposalsCountSubs() {
     final streams = VotingPageTab.values.map((tab) {
       final filters = _buildProposalsCountFilters(tab);
-      return _proposalService
-          .watchProposalsCountV2(filters: filters)
-          .distinct()
-          .map((count) => MapEntry(tab, count));
+      final stream = filters != null
+          ? _proposalService.watchProposalsCountV2(filters: filters)
+          : const Stream<int>.empty();
+
+      return stream.distinct().map((count) => MapEntry(tab, count));
     });
 
     unawaited(_proposalsCountSub?.cancel());
@@ -390,6 +393,7 @@ final class VotingCubit extends Cubit<VotingState>
     );
 
     final isDelegator = votingRole is AccountVotingRoleDelegator;
+    final isVotingResultsOrTallyActive = campaign?.isVotingResultsOrTallyActive();
 
     return state.copyWith(
       header: header,
@@ -398,6 +402,7 @@ final class VotingCubit extends Cubit<VotingState>
       votingPhase: Optional(votingPhaseViewModel),
       hasSearchQuery: hasSearchQuery,
       isDelegator: isDelegator,
+      isVotingResultsOrTallyActive: isVotingResultsOrTallyActive,
       categorySelectorItems: categorySelectorItems,
     );
   }
@@ -440,5 +445,14 @@ final class VotingCubit extends Cubit<VotingState>
 
       _handleProposalsChange(updatedPage);
     }
+  }
+}
+
+extension CampaignExt on Campaign {
+  bool isVotingResultsOrTallyActive() {
+    final results = phaseStateTo(CampaignPhaseType.votingResults);
+    final tally = phaseStateTo(CampaignPhaseType.votingTally);
+
+    return results.status.isActive || tally.status.isActive;
   }
 }

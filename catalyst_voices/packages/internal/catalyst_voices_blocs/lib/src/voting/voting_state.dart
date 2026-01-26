@@ -48,8 +48,9 @@ class VotingState extends Equatable {
   final int? fundNumber;
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
-  final bool isDelegator;
   final bool hasSearchQuery;
+  final bool isDelegator;
+  final bool isVotingResultsOrTallyActive;
   final Map<VotingPageTab, int> count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
@@ -58,8 +59,9 @@ class VotingState extends Equatable {
     this.fundNumber,
     this.votingPower = const VotingPowerViewModel(),
     this.votingPhase,
-    this.isDelegator = false,
     this.hasSearchQuery = false,
+    this.isDelegator = false,
+    this.isVotingResultsOrTallyActive = false,
     this.count = const {},
     this.categorySelectorItems = const [],
   });
@@ -74,6 +76,7 @@ class VotingState extends Equatable {
     votingPhase,
     hasSearchQuery,
     isDelegator,
+    isVotingResultsOrTallyActive,
     count,
     categorySelectorItems,
   ];
@@ -89,6 +92,7 @@ class VotingState extends Equatable {
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     bool? hasSearchQuery,
     bool? isDelegator,
+    bool? isVotingResultsOrTallyActive,
     Map<VotingPageTab, int>? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
@@ -99,18 +103,21 @@ class VotingState extends Equatable {
       votingPhase: votingPhase.dataOr(this.votingPhase),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       isDelegator: isDelegator ?? this.isDelegator,
+      isVotingResultsOrTallyActive:
+          isVotingResultsOrTallyActive ?? this.isVotingResultsOrTallyActive,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );
   }
 
   List<VotingPageTab> tabs({required bool isProposerUnlock}) {
-    return VotingPageTab.values.where((tab) {
-      if (tab == VotingPageTab.my) {
-        return isProposerUnlock && !isDelegator;
-      }
-      return true;
-    }).toList();
+    return [
+      if (isVotingResultsOrTallyActive) VotingPageTab.results,
+      if (!isVotingResultsOrTallyActive) VotingPageTab.total,
+      if (isProposerUnlock) VotingPageTab.myFinalProposals,
+      VotingPageTab.favorites,
+      if (!isDelegator) VotingPageTab.myVotes,
+    ];
   }
 }
 
