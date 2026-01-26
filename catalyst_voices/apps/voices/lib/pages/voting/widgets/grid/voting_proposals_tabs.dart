@@ -57,10 +57,10 @@ extension on VotingPageTab {
     required int count,
   }) {
     return switch (this) {
-      VotingPageTab.total => context.l10n.noOfAll(count),
-      VotingPageTab.favorites => context.l10n.noOfFavorites(count),
-      VotingPageTab.my => context.l10n.noOfMyProposals(count),
-      VotingPageTab.votedOn => context.l10n.noOfVotedOn(count),
+      VotingPageTab.total => context.l10n.noOfAllFinalProposals(count),
+      VotingPageTab.favorites => context.l10n.noOfFavoriteFinals(count),
+      VotingPageTab.my => context.l10n.noOfMyFinalProposals(count),
+      VotingPageTab.votedOn => context.l10n.noOfMyVotes(count),
     };
   }
 
