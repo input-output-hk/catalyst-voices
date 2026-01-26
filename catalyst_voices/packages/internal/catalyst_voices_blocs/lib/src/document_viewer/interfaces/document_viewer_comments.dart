@@ -3,6 +3,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
 /// Interface for comment-related functionality in document viewers.
 abstract interface class DocumentViewerComments {
+  Future<void> fetchCommentTemplate();
+
   /// Submits a comment or reply to the document.
   Future<void> submitComment({
     required Document document,
@@ -26,4 +28,6 @@ abstract interface class DocumentViewerComments {
 
   /// Updates the username for the active account.
   Future<void> updateUsername(String value);
+
+  void watchComments();
 }

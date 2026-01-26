@@ -1,22 +1,22 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/document_viewer/cache/document_viewer_cache.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/document_viewer_cubit.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/document_viewer_state.dart';
-import 'package:catalyst_voices_blocs/src/document_viewer/interfaces/document_viewer_comments.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:flutter/foundation.dart';
 
 final _logger = Logger('DocumentViewerCommentsMixin');
 
 /// Mixin providing comments functionality for document viewers.
 ///
-/// This mixin provides protected methods that handle comment business logic
-/// (cache manipulation, service calls) but do NOT emit state. The cubit that uses
-/// this mixin is responsible for orchestrating these methods and emitting state.
+/// This mixin handles comment business logic including cache manipulation,
+/// service calls, and state emission. Methods in this mixin may emit state
+/// updates, errors, and signals directly.
+///
+/// Some methods are implemented with full business logic, while others are
+/// abstract and must be implemented by the cubit using this mixin.
 ///
 /// Accesses the comments and commentTemplate fields from the cache.
 base mixin DocumentViewerCommentsMixin<
@@ -29,41 +29,21 @@ base mixin DocumentViewerCommentsMixin<
 
   CommentService get commentService;
 
-  /// Protected method to cancel the comments subscription.
-  @protected
-  Future<void> cancelCommentsWatch() async {
+  @override
+  Future<void> close() async {
     await _commentsSub?.cancel();
     _commentsSub = null;
+
+    return super.close();
   }
 
+  @override
   Future<void> fetchCommentTemplate();
 
-  /// Submits a comment or reply to the document.
-  ///
-  /// This is the public API that must be implemented by subclasses.
-  /// Implementations should call [submitCommentInternal] and handle state emission.
   @override
   Future<void> submitComment({
     required Document document,
     SignedDocumentRef? reply,
-  });
-
-  /// Protected internal method that handles comment submission business logic.
-  ///
-  /// This method:
-  /// - Validates the cache state
-  /// - Creates the comment document
-  /// - Updates the cache optimistically
-  /// - Calls [onOptimisticUpdate] to rebuild state
-  /// - Calls the comment service
-  /// - Rolls back on error by rethrowing
-  ///
-  /// Subclasses should call this from [submitComment] and handle state emission.
-  @protected
-  Future<void> submitCommentInternal({
-    required Document document,
-    SignedDocumentRef? reply,
-    required VoidCallback onOptimisticUpdate,
   }) async {
     final proposalId = cache.id;
     assert(proposalId != null, 'Document ref not found. Load document first!');
@@ -99,7 +79,7 @@ base mixin DocumentViewerCommentsMixin<
     cache = cache.copyWith(comments: Optional(comments));
 
     // Rebuild state immediately to show optimistic update
-    onOptimisticUpdate();
+    rebuildState();
 
     final documentData = comment.toDocumentData(mapper: documentMapper);
 
@@ -113,45 +93,31 @@ base mixin DocumentViewerCommentsMixin<
       final comments = (source ?? []).removeComment(ref: commentRef);
       cache = cache.copyWith(comments: Optional(comments));
 
-      rethrow;
+      if (!isClosed) {
+        final localizedException = LocalizedException.create(error);
+        emitError(localizedException);
+        rebuildState();
+      }
     }
   }
 
-  /// Updates the visibility of a comment reply builder (input form).
-  ///
-  /// This is a UI state management method that must be implemented by the cubit
-  /// to show/hide reply input forms for specific comments.
-  ///
-  /// Implementation should update the state to reflect the builder visibility.
   @override
   void updateCommentBuilder({
     required SignedDocumentRef ref,
     required bool show,
   });
 
-  /// Updates the visibility of comment replies (expand/collapse thread).
-  ///
-  /// This is a UI state management method that must be implemented by the cubit
-  /// to expand or collapse reply threads for specific comments.
-  ///
-  /// Implementation should update the state to reflect the replies visibility.
   @override
   void updateCommentReplies({
     required SignedDocumentRef ref,
     required bool show,
   });
 
-  /// Updates the sorting order of comments.
-  ///
-  /// This is a UI state management method that must be implemented by the cubit
-  /// to change how comments are sorted (e.g., newest first, oldest first).
   @override
   void updateCommentsSort({required DocumentCommentsSort sort});
 
   @override
-  Future<void> updateUsername(String value);
-
-  Future<void> updateUsernameInternal(String value) async {
+  Future<void> updateUsername(String value) async {
     final catId = cache.activeAccountId;
     if (catId == null) {
       _logger.warning('Tried to update username but no action account found');
@@ -163,21 +129,17 @@ base mixin DocumentViewerCommentsMixin<
         id: catId,
         username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
       );
+
+      emitSignal(const UsernameUpdatedSignal());
     } catch (error, stack) {
       _logger.info('Updating username failed', error, stack);
-      rethrow;
+
+      emitError(LocalizedException.create(error));
     }
   }
 
-  /// Protected method to watch comments on the current document.
-  ///
-  /// This sets up a subscription to watch for comment changes and updates the cache.
-  /// The provided [onCommentsChanged] callback is called when comments change,
-  /// allowing the cubit to rebuild state.
-  @protected
-  void watchComments({
-    required void Function(List<CommentWithReplies>) onCommentsChanged,
-  }) {
+  @override
+  void watchComments() {
     final id = cache.id;
 
     final stream = id != null && id.isSigned
@@ -187,7 +149,7 @@ base mixin DocumentViewerCommentsMixin<
     unawaited(_commentsSub?.cancel());
     _commentsSub = stream.listen((comments) {
       cache = cache.copyWith(comments: Optional(comments));
-      onCommentsChanged(comments);
+      rebuildState();
     });
   }
 }

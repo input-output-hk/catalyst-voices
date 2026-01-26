@@ -8,8 +8,6 @@ import 'package:flutter/foundation.dart';
 final _logger = Logger('DocumentViewerCollaboratorsMixin');
 
 /// Mixin providing collaborators functionality for document viewers.
-///
-/// Accesses the collaboratorsState field from the cache.
 base mixin DocumentViewerCollaboratorsMixin<
   State extends DocumentViewerState,
   Cache extends DocumentViewerCache<Cache>

@@ -24,7 +24,7 @@ class ProposalViewerState extends DocumentViewerState<ProposalViewData>
   @override
   ProposalViewerState copyWith({
     bool? isLoading,
-    covariant ProposalViewData? data,
+    ProposalViewData? data,
     Optional<LocalizedException>? error,
     bool? readOnlyMode,
     CollaboratorProposalState? collaborator,

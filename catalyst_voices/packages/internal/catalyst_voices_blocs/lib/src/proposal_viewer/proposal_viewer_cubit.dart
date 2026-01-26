@@ -40,9 +40,6 @@ final class ProposalViewerCubit
     await _proposalSub?.cancel();
     _proposalSub = null;
 
-    // Explicitly call mixin cleanup methods to ensure all subscriptions are closed
-    await cancelCommentsWatch();
-
     return super.close();
   }
 
@@ -113,29 +110,6 @@ final class ProposalViewerCubit
 
     if (id != null) {
       return loadProposal(id);
-    }
-  }
-
-  @override
-  Future<void> submitComment({
-    required Document document,
-    SignedDocumentRef? reply,
-  }) async {
-    try {
-      await submitCommentInternal(
-        document: document,
-        reply: reply,
-        onOptimisticUpdate: () {
-          if (!isClosed) rebuildState();
-        },
-      );
-    } catch (error, stack) {
-      _logger.info('Publishing comment failed', error, stack);
-      if (!isClosed) {
-        final localizedException = LocalizedException.create(error);
-        emitError(localizedException);
-      }
-      if (!isClosed) rebuildState();
     }
   }
 
@@ -214,16 +188,6 @@ final class ProposalViewerCubit
         rebuildState();
         emitError(LocalizedException.create(error));
       }
-    }
-  }
-
-  @override
-  Future<void> updateUsername(String value) async {
-    try {
-      await updateUsernameInternal(value);
-      emitSignal(const UsernameUpdatedSignal());
-    } catch (error) {
-      emitError(LocalizedException.create(error));
     }
   }
 
@@ -395,7 +359,7 @@ final class ProposalViewerCubit
       );
       // Proposal changed - fetch comment template and watch comments
       unawaited(fetchCommentTemplate());
-      watchComments(onCommentsChanged: (_) => rebuildState());
+      watchComments();
 
       // Reset comments UI state
       emit(state.copyWith(comments: const CommentsState()));
