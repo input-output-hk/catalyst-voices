@@ -9,7 +9,7 @@ export default defineConfig({
   retries: 2,
   workers: process.env.CI ? 1 : undefined,
   reporter: [["junit", { outputFile: "/results/voices.junit-report.xml" }], ["html"]],
-  timeout: 1200 * 1000,
+  timeout: 300 * 1000,
   use: {
     baseURL: `https://app.${process.env.ENVIRONMENT}.projectcatalyst.io/`,
     trace: "on-first-retry",
@@ -17,13 +17,6 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        testIdAttribute: "flt-semantics-identifier",
-      },
-    },
     {
       name: "local-run",
       use: {
