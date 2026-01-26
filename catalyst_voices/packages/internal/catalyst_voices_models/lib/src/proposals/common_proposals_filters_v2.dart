@@ -10,19 +10,21 @@ final class CollaboratorInvitationsProposalsFilter extends ProposalsFiltersV2 {
       );
 }
 
+final class CollaboratorProposalApprovalsFilter extends ProposalsFiltersV2 {
+  final ProposalApprovalStatus approvalStatus;
+
+  CollaboratorProposalApprovalsFilter(
+    CatalystId id, {
+    this.approvalStatus = ProposalApprovalStatus.any,
+  }) : super(
+         status: ProposalStatusFilter.aFinal,
+         relationships: approvalStatus.approvalFilter(id),
+       );
+}
+
 final class CollaboratorProposalDisplayConsentFilter extends ProposalsFiltersV2 {
   CollaboratorProposalDisplayConsentFilter(CatalystId id)
     : super(
-        relationships: {
-          CollaborationInvitation.any(id),
-        },
-      );
-}
-
-final class CollaboratorProposalApprovalsFilter extends ProposalsFiltersV2 {
-  CollaboratorProposalApprovalsFilter(CatalystId id)
-    : super(
-        status: ProposalStatusFilter.aFinal,
         relationships: {
           CollaborationInvitation.any(id),
         },

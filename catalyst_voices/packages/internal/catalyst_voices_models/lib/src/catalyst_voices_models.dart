@@ -111,6 +111,7 @@ export 'proposal/data/raw_proposal_collaborators_actions.dart';
 export 'proposal/detail_proposal.dart';
 export 'proposal/exception/proposal_limit_reached_exception.dart';
 export 'proposal/proposal.dart';
+export 'proposal/proposal_approval_status.dart';
 export 'proposal/proposal_creation_step.dart';
 export 'proposal/proposal_data.dart';
 export 'proposal/proposal_enums.dart';
