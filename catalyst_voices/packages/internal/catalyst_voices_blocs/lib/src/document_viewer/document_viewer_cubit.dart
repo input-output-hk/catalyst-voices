@@ -162,6 +162,9 @@ abstract base class DocumentViewerCubit<
     await syncAndWatchDocument();
   }
 
+  @protected
+  void rebuildState();
+
   /// Resolves a loose document reference to its latest version.
   ///
   /// Subclasses implement this to call their specific service method.

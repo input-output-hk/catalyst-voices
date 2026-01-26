@@ -5,4 +5,13 @@ abstract interface class DocumentViewerCollaborators {
 
   /// Accepts the final proposal consent.
   Future<void> acceptFinalProposal();
+
+  /// Dismisses the collaborator banner.
+  void dismissCollaboratorBanner();
+
+  /// Rejects a collaborator invitation.
+  Future<void> rejectCollaboratorInvitation();
+
+  /// Rejects the final proposal consent.
+  Future<void> rejectFinalProposal();
 }

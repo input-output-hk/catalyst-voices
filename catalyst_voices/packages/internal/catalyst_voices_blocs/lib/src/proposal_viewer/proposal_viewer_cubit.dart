@@ -36,35 +36,6 @@ final class ProposalViewerCubit
       );
 
   @override
-  Future<void> acceptCollaboratorInvitation() async {
-    try {
-      await super.acceptCollaboratorInvitation();
-      if (!isClosed) {
-        _rebuildState();
-      }
-    } catch (error) {
-      if (!isClosed) {
-        emitError(LocalizedException.create(error));
-      }
-    }
-  }
-
-  @override
-  Future<void> acceptFinalProposal() async {
-    try {
-      await super.acceptFinalProposal();
-
-      if (!isClosed) {
-        _rebuildState();
-      }
-    } catch (error) {
-      if (!isClosed) {
-        emitError(LocalizedException.create(error));
-      }
-    }
-  }
-
-  @override
   Future<void> close() async {
     await _proposalSub?.cancel();
     _proposalSub = null;
@@ -76,12 +47,6 @@ final class ProposalViewerCubit
   }
 
   @override
-  void dismissCollaboratorBanner() {
-    super.dismissCollaboratorBanner();
-    _rebuildState();
-  }
-
-  @override
   Future<void> fetchCommentTemplate() async {
     final categoryId = cache.proposalData?.proposalOrDocument.category?.id;
     final commentTemplate = categoryId != null
@@ -90,7 +55,7 @@ final class ProposalViewerCubit
 
     cache = cache.copyWith(commentTemplate: Optional(commentTemplate));
 
-    if (!isClosed) _rebuildState();
+    if (!isClosed) rebuildState();
   }
 
   @override
@@ -117,34 +82,24 @@ final class ProposalViewerCubit
     return super.loadDocument(id);
   }
 
+  /// Rebuilds the state from the cache.
   @override
-  Future<void> rejectCollaboratorInvitation() async {
-    try {
-      await super.rejectCollaboratorInvitation();
+  void rebuildState() {
+    final proposalData = cache.proposalData;
 
-      if (!isClosed) {
-        _rebuildState();
-      }
-    } catch (error) {
-      if (!isClosed) {
-        emitError(LocalizedException.create(error));
-      }
-    }
-  }
+    final proposalCampaign = proposalData?.proposalOrDocument.campaign;
+    final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
+    final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
+    final collaboratorsState = cache.collaboratorsState;
+    final proposalViewData = _buildProposalViewDataUsingCache();
 
-  @override
-  Future<void> rejectFinalProposal() async {
-    try {
-      await super.rejectFinalProposal();
-
-      if (!isClosed) {
-        _rebuildState();
-      }
-    } catch (error) {
-      if (!isClosed) {
-        emitError(LocalizedException.create(error));
-      }
-    }
+    emit(
+      state.copyWith(
+        data: proposalViewData,
+        collaborator: collaboratorsState,
+        readOnlyMode: isReadOnlyMode,
+      ),
+    );
   }
 
   @override
@@ -171,7 +126,7 @@ final class ProposalViewerCubit
         document: document,
         reply: reply,
         onOptimisticUpdate: () {
-          if (!isClosed) _rebuildState();
+          if (!isClosed) rebuildState();
         },
       );
     } catch (error, stack) {
@@ -180,7 +135,7 @@ final class ProposalViewerCubit
         final localizedException = LocalizedException.create(error);
         emitError(localizedException);
       }
-      if (!isClosed) _rebuildState();
+      if (!isClosed) rebuildState();
     }
   }
 
@@ -242,7 +197,7 @@ final class ProposalViewerCubit
 
     // Update cache optimistically
     cache = cache.copyWithIsFavorite(value: value);
-    _rebuildState();
+    rebuildState();
 
     // Update via service
     try {
@@ -256,7 +211,7 @@ final class ProposalViewerCubit
       // Rollback on error
       cache = cache.copyWithIsFavorite(value: !value);
       if (!isClosed) {
-        _rebuildState();
+        rebuildState();
         emitError(LocalizedException.create(error));
       }
     }
@@ -440,7 +395,7 @@ final class ProposalViewerCubit
       );
       // Proposal changed - fetch comment template and watch comments
       unawaited(fetchCommentTemplate());
-      watchComments(onCommentsChanged: (_) => _rebuildState());
+      watchComments(onCommentsChanged: (_) => rebuildState());
 
       // Reset comments UI state
       emit(state.copyWith(comments: const CommentsState()));
@@ -452,7 +407,7 @@ final class ProposalViewerCubit
     }
 
     if (proposalDataChanged) {
-      _rebuildState();
+      rebuildState();
     }
   }
 
@@ -460,25 +415,6 @@ final class ProposalViewerCubit
   bool _isVotingStage(Campaign? campaign) {
     if (!featureFlagsService.isEnabled(Features.voting)) return false;
     return campaign?.isVotingStateActive ?? false;
-  }
-
-  /// Rebuilds the state from the cache.
-  void _rebuildState() {
-    final proposalData = cache.proposalData;
-
-    final proposalCampaign = proposalData?.proposalOrDocument.campaign;
-    final submissionPhase = proposalCampaign?.phaseStateTo(CampaignPhaseType.proposalSubmission);
-    final isReadOnlyMode = submissionPhase?.status.isPost ?? true;
-    final collaboratorsState = cache.collaboratorsState;
-    final proposalViewData = _buildProposalViewDataUsingCache();
-
-    emit(
-      state.copyWith(
-        data: proposalViewData,
-        collaborator: collaboratorsState,
-        readOnlyMode: isReadOnlyMode,
-      ),
-    );
   }
 
   /// Synchronizes proposal data from the service.
