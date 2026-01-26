@@ -65,7 +65,7 @@ class _VoicesFloatingActionButtonState extends State<VoicesFloatingActionButton>
 
     final borderRadius = _isExtended ? BorderRadius.circular(28) : BorderRadius.circular(16);
 
-    /// This seems wierd but [VoicesCounterFloatingActionButton] wraps icons with white background
+    /// This seems weird but [VoicesCounterFloatingActionButton] wraps icons with white background
     /// and icon have to match background
     final iconColor = widget.backgroundGradient != null
         ? widget.backgroundGradient?.colors.lastOrNull
