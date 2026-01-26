@@ -350,7 +350,7 @@ final class VotingCubit extends Cubit<VotingState>
       final filters = _buildProposalsCountFilters(tab);
       final stream = filters != null
           ? _proposalService.watchProposalsCountV2(filters: filters)
-          : const Stream<int>.empty();
+          : Stream.value(0);
 
       return stream.distinct().map((count) => MapEntry(tab, count));
     });
