@@ -138,7 +138,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     await _rebuildDataPageSub();
 
-    if (!isClosed) {
+    if (!isClosed && !event.showLoading) {
       emit(state.copyWith(isLoading: false));
     }
   }
