@@ -1,7 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:flutter/material.dart';
 
-const _minPixelsDelta = 10.0;
+const _animationDuration = Duration(milliseconds: 150);
+const _minPixelsDelta = 5.0;
 
 typedef VoicesFloatingActionButtonWidgetBuilder =
     Widget Function(
@@ -42,7 +43,20 @@ class _VoicesFloatingActionButtonState extends State<VoicesFloatingActionButton>
   @override
   Widget build(BuildContext context) {
     final padding = _isExtended
-        ? const EdgeInsets.symmetric(vertical: 20, horizontal: 24)
+        ? const EdgeInsets.symmetric(
+            vertical: 20,
+            horizontal: 24,
+          )
+          /// Because [VoicesCounterFloatingActionButton] is using Text with font poppins,
+          /// which already has quite bit of spacing it it's letters, we have to offset padding
+          /// so it may render in correct place.
+          ///
+          /// Should be reverted after https://github.com/flutter/flutter/issues/146860
+          /// is implemented and released by Flutter team.
+          ///
+          /// If this widget will be needed else where then [VoicesCounterFloatingActionButton] it
+          /// may require refactoring to into parameter.
+          .subtract(const EdgeInsetsGeometry.only(bottom: 10))
         : EdgeInsets.zero;
 
     final constraints = _isExtended
@@ -51,25 +65,59 @@ class _VoicesFloatingActionButtonState extends State<VoicesFloatingActionButton>
 
     final borderRadius = _isExtended ? BorderRadius.circular(28) : BorderRadius.circular(16);
 
-    return AnimatedContainer(
-      padding: padding,
-      constraints: constraints,
-      duration: const Duration(milliseconds: 150),
-      decoration: BoxDecoration(
+    /// This seems wierd but [VoicesCounterFloatingActionButton] wraps icons with white background
+    /// and icon have to match background
+    final iconColor = widget.backgroundGradient != null
+        ? widget.backgroundGradient?.colors.lastOrNull
+        : widget.backgroundColor;
+    final iconThemeData = IconThemeData(color: iconColor);
+
+    return Material(
+      type: MaterialType.transparency,
+      textStyle: TextStyle(color: widget.foregroundColor),
+      borderRadius: borderRadius,
+      animationDuration: _animationDuration,
+      child: InkWell(
         borderRadius: borderRadius,
-        color: widget.backgroundColor,
-        gradient: widget.backgroundGradient,
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(4, 6),
-            blurRadius: 40,
-            spreadRadius: -30,
-            color: context.colors.dropShadow,
+        splashColor: widget.foregroundColor?.withValues(alpha: 0.32),
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          constraints: constraints,
+          duration: _animationDuration,
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            color: widget.backgroundColor,
+            gradient: widget.backgroundGradient,
+            boxShadow: [
+              BoxShadow(
+                offset: const Offset(4, 6),
+                blurRadius: 40,
+                spreadRadius: -30,
+                color: context.colors.dropShadow,
+              ),
+            ],
           ),
-        ],
+          alignment: Alignment.center,
+          child: IconTheme(
+            data: iconThemeData,
+            child: Material(
+              type: MaterialType.transparency,
+              textStyle: TextStyle(color: widget.foregroundColor),
+              borderRadius: borderRadius,
+              animationDuration: _animationDuration,
+              child: InkWell(
+                borderRadius: borderRadius,
+                splashColor: widget.foregroundColor?.withValues(alpha: 0.32),
+                onTap: widget.onTap,
+                child: Padding(
+                  padding: padding,
+                  child: widget.builder(context, _isExtended),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-      alignment: Alignment.center,
-      child: widget.builder(context, _isExtended),
     );
   }
 
@@ -108,7 +156,7 @@ class _VoicesFloatingActionButtonState extends State<VoicesFloatingActionButton>
       final shouldIgnore = pixelsDelta.abs() <= _minPixelsDelta;
       if (shouldIgnore) return;
 
-      final isExtended = pixelsDelta > 0 || atEdge;
+      final isExtended = pixelsDelta >= 0 || atEdge;
       if (isExtended != _isExtended) {
         setState(() {
           _isExtended = isExtended;

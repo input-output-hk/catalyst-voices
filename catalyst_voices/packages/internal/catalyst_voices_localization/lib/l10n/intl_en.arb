@@ -3518,6 +3518,10 @@
   "@representative": {
     "description": "representative account role"
   },
+  "repsList": "Representative List",
+  "@repsList": {
+    "description": "Generic text describing any list with representatives for voting on someone behalf"
+  },
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
   "@requestedAmountShouldBeBetweenMinAndMax": {
     "description": "Validation message when requested amount is outside allowed range",
@@ -4608,6 +4612,24 @@
   "@xCharactersMinimum": {
     "placeholders": {
       "number": {
+        "type": "int"
+      }
+    }
+  },
+  "xProposalsAdded": "{count, plural, =0{Proposals} =1{Proposal} other{Proposals}} Added",
+  "@xProposalsAdded": {
+    "description": "Number of proposals added to the ballot for voting",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "xRepsAdded": "{count, plural, =0{Reps} =1{Rep} other{Reps}} Added",
+  "@xRepsAdded": {
+    "description": "Number of representatives added for voting on someone behalf",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }
