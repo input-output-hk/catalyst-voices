@@ -22,7 +22,6 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
     required DocumentRef id,
     required CollaboratorDisplayConsentStatus displayConsentStatus,
   }) async {
-    // TODO(LynxLynxx): Test it when available
     final collaboratorAction = displayConsentStatus.toCollaboratorAction();
 
     final indexOfProposalConsent = _cache.proposalsDisplayConsent.indexWhere(
@@ -34,6 +33,7 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
     }
 
     final updatedProposalsDisplayConsent = List.of(_cache.proposalsDisplayConsent);
+
     updatedProposalsDisplayConsent[indexOfProposalConsent] =
         updatedProposalsDisplayConsent[indexOfProposalConsent].copyWith(
           lastDisplayConsentUpdate: Optional(DateTime.now()),
@@ -44,8 +44,14 @@ final class DisplayConsentCubit extends Cubit<DisplayConsentState> with BlocErro
 
     if (collaboratorAction != null) {
       try {
+        if (id is! SignedDocumentRef) {
+          throw ArgumentError(
+            'Cannot send a collaborator action $collaboratorAction for a draft: $id',
+          );
+        }
+
         await _proposalService.submitCollaboratorProposalAction(
-          ref: id,
+          proposalId: id,
           action: collaboratorAction,
         );
         _cache = _cache.copyWith(proposalsDisplayConsent: updatedProposalsDisplayConsent);

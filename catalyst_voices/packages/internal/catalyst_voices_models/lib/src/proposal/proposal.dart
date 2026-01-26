@@ -1,71 +1,21 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
-
-final class Proposal extends CoreProposal {
-  final int versionNumber;
-
-  factory Proposal({
-    required DocumentRef id,
-    required DocumentParameters parameters,
-    required String title,
-    required String description,
-    required Money fundsRequested,
-    required ProposalPublish publish,
-    List<String> versionsIds = const [],
-    required int duration,
-    required String? author,
-    required int commentsCount,
-  }) {
-    final versionNumber = versionsIds.versionNumber(id.ver!);
-
-    return Proposal._(
-      id: id,
-      parameters: parameters,
-      title: title,
-      fundsRequested: fundsRequested,
-      publish: publish,
-      commentsCount: commentsCount,
-      description: description,
-      duration: duration,
-      author: author,
-      versionNumber: versionNumber,
-    );
-  }
-
-  factory Proposal.fromData(ProposalData data, List<String> versionsIds) {
-    final document = data.document;
-
-    return Proposal(
-      id: document.metadata.id,
-      parameters: document.metadata.parameters,
-      title: document.title ?? '',
-      description: document.description ?? '',
-      fundsRequested: document.fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      publish: data.publish,
-      duration: document.duration ?? 0,
-      author: document.authorName,
-      commentsCount: data.commentsCount,
-      versionsIds: versionsIds,
-    );
-  }
-
-  const Proposal._({
-    required super.id,
-    required super.parameters,
-    required super.title,
-    required super.description,
-    required super.fundsRequested,
-    required super.publish,
-    required super.duration,
-    required super.author,
-    required super.commentsCount,
-    required this.versionNumber,
-  });
-}
-
-extension ProposalVersionsNumber on List<String> {
-  int versionNumber(String version) {
-    final list = sorted((versionA, versionB) => versionB.compareTo(versionA));
-    return list.length - list.indexWhere((element) => element == version);
-  }
-}
+export 'core_proposal.dart';
+export 'data/proposal_brief_data.dart';
+export 'data/proposal_data_collaborator.dart';
+export 'data/proposal_data_v2.dart';
+export 'data/proposal_versions_titles.dart';
+export 'data/proposals_total_ask.dart';
+export 'data/raw_proposal.dart';
+export 'data/raw_proposal_brief.dart';
+export 'data/raw_proposal_collaborators_actions.dart';
+export 'detail_proposal.dart';
+export 'exception/proposal_limit_reached_exception.dart';
+export 'proposal_creation_step.dart';
+export 'proposal_data.dart';
+export 'proposal_enums.dart';
+export 'proposal_forget_actions.dart';
+export 'proposal_model.dart';
+export 'proposal_or_document.dart';
+export 'proposal_version.dart';
+export 'proposal_votes.dart';
+export 'proposal_with_context.dart';
+export 'proposals_collaboration_status.dart';

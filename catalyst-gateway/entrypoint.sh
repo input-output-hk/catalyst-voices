@@ -6,7 +6,7 @@ if [[ -n "${DEBUG_SLEEP}" ]]; then
 fi
 
 args+=()
-args+=("run" "--log-level" "debug")
+args+=("run")
 
 echo "Starting gateway node..."
 "/app/cat-gateway" "${args[@]}"

@@ -616,6 +616,156 @@ void main() {
         await streamController.close();
       });
     });
+
+    group('submitCollaboratorProposalAction', () {
+      setUp(() {
+        registerFallbackValue(ProposalSubmissionAction.aFinal);
+        registerFallbackValue(FakeCatalystPrivateKey());
+
+        when(
+          () => mockSignerService.useProposerCredentials<SignedDocumentRef>(any()),
+        ).thenAnswer((invocation) async {
+          final callback =
+              invocation.positionalArguments.first as RoleCredentialsCallback<SignedDocumentRef>;
+          await callback(CatalystIdFactory.create(), FakeCatalystPrivateKey());
+          return DocumentRefFactory.signedDocumentRef();
+        });
+
+        when(
+          () => mockSignerService.useProposerCredentials<void>(any()),
+        ).thenAnswer((invocation) async {
+          final callback = invocation.positionalArguments.first as RoleCredentialsCallback<void>;
+          await callback(CatalystIdFactory.create(), FakeCatalystPrivateKey());
+          return;
+        });
+
+        when(
+          () => mockProposalRepository.publishProposalAction(
+            actionId: any(named: 'actionId'),
+            proposalId: any(named: 'proposalId'),
+            action: any(named: 'action'),
+            catalystId: any(named: 'catalystId'),
+            privateKey: any(named: 'privateKey'),
+          ),
+        ).thenAnswer((_) async => {});
+
+        when(
+          () => mockProposalRepository.removeCollaboratorFromProposal(
+            proposalId: any(named: 'proposalId'),
+            collaboratorId: any(named: 'collaboratorId'),
+            privateKey: any(named: 'privateKey'),
+          ),
+        ).thenAnswer((_) async => {});
+      });
+
+      test('accept invitation will submit draft proposal submission action', () async {
+        // Given
+        final proposalId = SignedDocumentRef.generateFirstRef();
+
+        // When
+        await proposalService.submitCollaboratorProposalAction(
+          proposalId: proposalId,
+          action: CollaboratorProposalAction.acceptInvitation,
+        );
+
+        // Then
+        verify(
+          () => mockProposalRepository.publishProposalAction(
+            actionId: any(named: 'actionId'),
+            proposalId: proposalId,
+            action: ProposalSubmissionAction.draft,
+            catalystId: any(named: 'catalystId'),
+            privateKey: any(named: 'privateKey'),
+          ),
+        );
+      });
+
+      test('reject invitation will submit hide proposal submission action', () async {
+        // Given
+        final proposalId = SignedDocumentRef.generateFirstRef();
+
+        // When
+        await proposalService.submitCollaboratorProposalAction(
+          proposalId: proposalId,
+          action: CollaboratorProposalAction.rejectInvitation,
+        );
+
+        // Then
+        verify(
+          () => mockProposalRepository.publishProposalAction(
+            actionId: any(named: 'actionId'),
+            proposalId: proposalId,
+            action: ProposalSubmissionAction.hide,
+            catalystId: any(named: 'catalystId'),
+            privateKey: any(named: 'privateKey'),
+          ),
+        );
+      });
+
+      test('leave proposal will remove collaborator', () async {
+        // Given
+        final proposalId = SignedDocumentRef.generateFirstRef();
+
+        // When
+        await proposalService.submitCollaboratorProposalAction(
+          proposalId: proposalId,
+          action: CollaboratorProposalAction.leaveProposal,
+        );
+
+        // Then
+        verify(
+          () => mockProposalRepository.removeCollaboratorFromProposal(
+            proposalId: proposalId,
+            collaboratorId: any(named: 'collaboratorId'),
+            privateKey: any(named: 'privateKey'),
+          ),
+        );
+      });
+
+      test('accept final proposal will submit final proposal submission action', () async {
+        // Given
+        final proposalId = SignedDocumentRef.generateFirstRef();
+
+        // When
+        await proposalService.submitCollaboratorProposalAction(
+          proposalId: proposalId,
+          action: CollaboratorProposalAction.acceptFinal,
+        );
+
+        // Then
+        verify(
+          () => mockProposalRepository.publishProposalAction(
+            actionId: any(named: 'actionId'),
+            proposalId: proposalId,
+            action: ProposalSubmissionAction.aFinal,
+            catalystId: any(named: 'catalystId'),
+            privateKey: any(named: 'privateKey'),
+          ),
+        );
+      });
+
+      test('reject final proposal will submit hide proposal submission action', () async {
+        // Given
+        final proposalId = SignedDocumentRef.generateFirstRef();
+
+        // When
+        await proposalService.submitCollaboratorProposalAction(
+          proposalId: proposalId,
+          action: CollaboratorProposalAction.rejectFinal,
+        );
+
+        // Then
+        verify(
+          () => mockProposalRepository.publishProposalAction(
+            actionId: any(named: 'actionId'),
+            proposalId: proposalId,
+            action: ProposalSubmissionAction.hide,
+            catalystId: any(named: 'catalystId'),
+            privateKey: any(named: 'privateKey'),
+          ),
+        );
+      });
+    });
   });
 }
 
