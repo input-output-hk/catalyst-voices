@@ -48,6 +48,7 @@ class VotingState extends Equatable {
   final int? fundNumber;
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
+  final bool isDelegator;
   final bool hasSearchQuery;
   final Map<VotingPageTab, int> count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
@@ -57,6 +58,7 @@ class VotingState extends Equatable {
     this.fundNumber,
     this.votingPower = const VotingPowerViewModel(),
     this.votingPhase,
+    this.isDelegator = false,
     this.hasSearchQuery = false,
     this.count = const {},
     this.categorySelectorItems = const [],
@@ -71,6 +73,7 @@ class VotingState extends Equatable {
     votingPower,
     votingPhase,
     hasSearchQuery,
+    isDelegator,
     count,
     categorySelectorItems,
   ];
@@ -85,6 +88,7 @@ class VotingState extends Equatable {
     VotingPowerViewModel? votingPower,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     bool? hasSearchQuery,
+    bool? isDelegator,
     Map<VotingPageTab, int>? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
@@ -94,15 +98,19 @@ class VotingState extends Equatable {
       votingPower: votingPower ?? this.votingPower,
       votingPhase: votingPhase.dataOr(this.votingPhase),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
+      isDelegator: isDelegator ?? this.isDelegator,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );
   }
 
   List<VotingPageTab> tabs({required bool isProposerUnlock}) {
-    return VotingPageTab.values
-        .where((tab) => tab != VotingPageTab.my || isProposerUnlock)
-        .toList();
+    return VotingPageTab.values.where((tab) {
+      if (tab == VotingPageTab.my) {
+        return isProposerUnlock && !isDelegator;
+      }
+      return true;
+    }).toList();
   }
 }
 

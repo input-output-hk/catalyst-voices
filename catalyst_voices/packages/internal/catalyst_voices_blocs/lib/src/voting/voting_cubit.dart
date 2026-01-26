@@ -280,8 +280,9 @@ final class VotingCubit extends Cubit<VotingState>
   }
 
   void _handleActiveAccountChange(Account? account) {
-    if (account?.catalystId != _cache.activeAccountId) {
-      _cache = _cache.copyWith(activeAccountId: Optional(account?.catalystId));
+    final activeAccountId = account?.catalystId;
+    if (activeAccountId != _cache.activeAccountId) {
+      _cache = _cache.copyWith(activeAccountId: Optional(activeAccountId));
       changeFilters(resetProposals: true);
     }
   }
@@ -306,12 +307,11 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
-  // TODO(damian-molinski): to be implemented.
   void _handleActiveVotingRoleChange(AccountVotingRole? votingRole) {
-    /*if (_cache.votingPower != account?.votingPower) {
-      _cache = _cache.copyWith(votingPower: Optional(account?.votingPower));
+    if (_cache.votingRole != votingRole) {
+      _cache = _cache.copyWith(votingRole: Optional(votingRole));
       _dispatchState();
-    }*/
+    }
   }
 
   void _handleProposalsChange(Page<ProposalBrief> page) {
@@ -361,7 +361,7 @@ final class VotingCubit extends Cubit<VotingState>
 
   VotingState _rebuildState() {
     final campaign = _cache.campaign;
-    final votingPower = _cache.votingPower;
+    final votingRole = _cache.votingRole;
     final categories = campaign?.categories ?? const [];
     final selectedCategoryId = _cache.filters.categoryId;
     final filters = _cache.filters;
@@ -371,6 +371,10 @@ final class VotingCubit extends Cubit<VotingState>
     );
 
     final fundNumber = campaign?.fundNumber;
+    // TODO(dt-iohk): get voting power from voting role and display different states:
+    // https://github.com/input-output-hk/catalyst-voices/issues/3967#issue-3792489539
+    // final votingPower = votingRole?.votingPower;
+    const VotingPower? votingPower = null;
     final votingPowerViewModel = votingPower != null
         ? VotingPowerViewModel.fromModel(votingPower)
         : const VotingPowerViewModel();
@@ -385,12 +389,15 @@ final class VotingCubit extends Cubit<VotingState>
           : null,
     );
 
+    final isDelegator = votingRole is AccountVotingRoleDelegator;
+
     return state.copyWith(
       header: header,
       fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
       votingPhase: Optional(votingPhaseViewModel),
       hasSearchQuery: hasSearchQuery,
+      isDelegator: isDelegator,
       categorySelectorItems: categorySelectorItems,
     );
   }
