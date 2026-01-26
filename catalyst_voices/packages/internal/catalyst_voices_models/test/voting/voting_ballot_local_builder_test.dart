@@ -97,7 +97,7 @@ void main() {
       // When
       final firstVote = Vote.draft(proposal: proposal, type: VoteType.abstain);
       final secondVote = Vote(
-        selfRef: firstVote.selfRef.nextVersion(),
+        id: firstVote.id.nextVersion(),
         proposal: proposal,
         type: VoteType.yes,
       );

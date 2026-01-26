@@ -94,8 +94,8 @@ jobs:
           API_TEST_MARKS: "preprod_indexing or unmarked"
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
-          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
-          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
+          docker cp api-tests-runner:/root/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
+          docker cp api-tests-runner:/root/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
 
       - name: Integration health tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}

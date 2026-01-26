@@ -27,7 +27,7 @@ type BrowserFixtures = {
 
 export const test = base.extend<BrowserFixtures>({
   testModel: [
-    new TestModel(getAccountModel("DummyForTesting"), getWalletConfigByName("Lace")),
+    new TestModel(getAccountModel("DummyForTesting"), getWalletConfigByName("Eternl")),
     { option: true },
   ],
   launchBrowser: async ({ testModel }, use) => {

@@ -1,6 +1,6 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.10 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.6.10 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.14 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.6.14 AS playwright-ci
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/"
 

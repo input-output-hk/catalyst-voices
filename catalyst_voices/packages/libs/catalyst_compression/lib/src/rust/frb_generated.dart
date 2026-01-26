@@ -66,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   static const kDefaultExternalLibraryLoaderConfig = ExternalLibraryLoaderConfig(
     stem: 'catalyst_compression',
     ioDirectory: 'rust/target/release/',
-    webPrefix: '/assets/packages/catalyst_compression/assets/js/',
+    webPrefix: '/assets/packages/catalyst_compression/assets/js/v1/',
     wasmBindGenName: 'compression_wasm_bindgen',
   );
 }

@@ -13,7 +13,7 @@ class NewProposalState extends Equatable {
   final ProposalTitle title;
   final Range<int?>? titleLengthRange;
   final SignedDocumentRef? categoryRef;
-  final List<CampaignCategoryDetailsViewModel> categories;
+  final NewProposalStateCategories categories;
 
   const NewProposalState({
     this.isLoading = false,
@@ -24,7 +24,7 @@ class NewProposalState extends Equatable {
     required this.title,
     this.titleLengthRange,
     this.categoryRef,
-    this.categories = const [],
+    this.categories = const NewProposalStateCategories(),
   });
 
   factory NewProposalState.loading() {
@@ -48,8 +48,8 @@ class NewProposalState extends Equatable {
     categoryRef,
     categories,
   ];
-  String? get selectedCategoryName =>
-      categories.firstWhereOrNull((e) => e.ref == categoryRef)?.formattedName;
+
+  String? get selectedCategoryName => categories.selected?.formattedName;
 
   bool get _isAgreementValid => isAgreeToCategoryCriteria && isAgreeToNoFurtherCategoryChange;
 
@@ -63,7 +63,7 @@ class NewProposalState extends Equatable {
     ProposalTitle? title,
     Optional<Range<int?>>? titleLengthRange,
     Optional<SignedDocumentRef>? categoryRef,
-    List<CampaignCategoryDetailsViewModel>? categories,
+    NewProposalStateCategories? categories,
   }) {
     return NewProposalState(
       isLoading: isLoading ?? this.isLoading,
@@ -76,6 +76,35 @@ class NewProposalState extends Equatable {
       titleLengthRange: titleLengthRange.dataOr(this.titleLengthRange),
       categoryRef: categoryRef.dataOr(this.categoryRef),
       categories: categories ?? this.categories,
+    );
+  }
+}
+
+final class NewProposalStateCategories extends Equatable {
+  final List<CampaignCategoryDetailsViewModel>? categories;
+  final SignedDocumentRef? selectedRef;
+
+  const NewProposalStateCategories({
+    this.categories,
+    this.selectedRef,
+  });
+
+  @override
+  List<Object?> get props => [
+    categories,
+    selectedRef,
+  ];
+
+  CampaignCategoryDetailsViewModel? get selected =>
+      categories?.firstWhereOrNull((element) => element.id.id == selectedRef?.id);
+
+  NewProposalStateCategories copyWith({
+    Optional<List<CampaignCategoryDetailsViewModel>>? categories,
+    Optional<SignedDocumentRef>? selectedRef,
+  }) {
+    return NewProposalStateCategories(
+      categories: categories.dataOr(this.categories),
+      selectedRef: selectedRef.dataOr(this.selectedRef),
     );
   }
 }

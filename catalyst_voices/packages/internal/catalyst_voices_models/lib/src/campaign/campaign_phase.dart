@@ -44,5 +44,13 @@ enum CampaignPhaseType {
   votingRegistration,
   reviewRegistration,
   votingResults,
-  projectOnboarding,
+  projectOnboarding;
+
+  bool get isCommunityReview => this == CampaignPhaseType.communityReview;
+
+  bool get isCommunityVoting => this == CampaignPhaseType.communityVoting;
+
+  bool get isReviewRegistration => this == CampaignPhaseType.reviewRegistration;
+
+  bool get isVotingRegistration => this == CampaignPhaseType.votingRegistration;
 }

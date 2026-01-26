@@ -24,7 +24,7 @@ final class ProposalRoute extends GoRouteData with $ProposalRoute, FadePageTrans
   ProposalRoute.fromRef({required DocumentRef ref})
     : this(
         proposalId: ref.id,
-        version: ref.version,
+        version: ref.ver,
         local: ref is DraftRef,
       );
 
@@ -32,7 +32,7 @@ final class ProposalRoute extends GoRouteData with $ProposalRoute, FadePageTrans
   Widget build(BuildContext context, GoRouterState state) {
     final ref = DocumentRef.build(
       id: proposalId,
-      version: version,
+      ver: version,
       isDraft: local,
     );
     return ProposalPage(ref: ref);

@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../ AS repo-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.10 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.14 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -29,9 +29,12 @@ code-generator:
     ARG save_locally=false
     FROM +builder
 
+    LET local_gen_db_code_path = packages/internal/catalyst_voices_repositories/test/src/database/migration/catalyst_database/generated/
+
     WORKDIR /frontend
 
     RUN melos l10n
+    RUN melos build-db-migration
     RUN melos build-runner
 
     IF [ $save_locally = true ]
@@ -49,6 +52,11 @@ code-generator:
                                           -o -name "*.drift.dart" \))
            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
         END
+
+        # Save database migration generated files
+        WORKDIR packages/internal/catalyst_voices_repositories/test/src/database/migration/catalyst_database
+        SAVE ARTIFACT generated/* AS LOCAL $local_gen_db_code_path
+        WORKDIR /frontend
     ELSE
        SAVE ARTIFACT .
     END
@@ -105,7 +113,14 @@ build-web:
         --TARGET=lib/configs/main_web.dart \
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
-        --SENTRY_PROJECT='catalyst-voices'
+        --SENTRY_PROJECT='catalyst-voices' \
+        --WASM=true
+
+    # Version web assets with content-based MD5 hashes for cache busting
+    RUN dart run /frontend/scripts/version_web_assets/version_web_assets.dart --build-dir=$WORKDIR/build/web --wasm=true
+
+    DO flutter-ci+COMPRESS_WEB_FILES
+
     SAVE ARTIFACT --keep-ts web
 
 package:
