@@ -3,7 +3,7 @@ import { WalletConfigModel } from "../models/walletConfigModel";
 import { getBrowserExtension } from "./browserExtensionConfigs";
 // cspell: disable
 export const walletConfigs: WalletConfigModel[] = [
-  /* {
+  {
     name: "Lace",
     extension: getBrowserExtension(BrowserExtensionName.Lace),
     seed: [
@@ -30,7 +30,7 @@ export const walletConfigs: WalletConfigModel[] = [
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
     stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
-  }, */
+  },
   {
     name: "Eternl",
     extension: getBrowserExtension(BrowserExtensionName.Eternl),
@@ -59,7 +59,7 @@ export const walletConfigs: WalletConfigModel[] = [
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
     stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
   },
-  /*{
+  {
     name: "Yoroi",
     extension: getBrowserExtension(BrowserExtensionName.Yoroi),
     seed: [
@@ -87,7 +87,6 @@ export const walletConfigs: WalletConfigModel[] = [
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
     stakeAddress: "stake_test1up0ugh5h0nrezdv62uaaxuq0ha7c5p02pu2j8wpwfj0qlvg2det9t",
   },
-  */
   {
     name: "Nufi",
     extension: getBrowserExtension(BrowserExtensionName.Nufi),
