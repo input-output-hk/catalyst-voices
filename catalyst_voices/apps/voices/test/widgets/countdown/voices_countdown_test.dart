@@ -35,47 +35,47 @@ void main() {
                 countdownStartCompleter.complete();
               }
             },
-            builder: (
-              context, {
-              required ValueListenable<int> days,
-              required ValueListenable<int> hours,
-              required ValueListenable<int> minutes,
-              required ValueListenable<int> seconds,
-            }) =>
-                Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ValueListenableBuilder<int>(
-                  valueListenable: days,
-                  builder: (context, value, _) => CountDownValueCard(
-                    value: value,
-                    unit: context.l10n.days(value),
-                  ),
+            builder:
+                (
+                  context, {
+                  required ValueListenable<int> days,
+                  required ValueListenable<int> hours,
+                  required ValueListenable<int> minutes,
+                  required ValueListenable<int> seconds,
+                }) => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ValueListenableBuilder<int>(
+                      valueListenable: days,
+                      builder: (context, value, _) => CountDownValueCard(
+                        value: value,
+                        unit: context.l10n.days(value),
+                      ),
+                    ),
+                    ValueListenableBuilder<int>(
+                      valueListenable: hours,
+                      builder: (context, value, _) => CountDownValueCard(
+                        value: value,
+                        unit: context.l10n.hours(value),
+                      ),
+                    ),
+                    ValueListenableBuilder<int>(
+                      valueListenable: minutes,
+                      builder: (context, value, _) => CountDownValueCard(
+                        value: value,
+                        unit: context.l10n.minutes(value),
+                      ),
+                    ),
+                    ValueListenableBuilder<int>(
+                      valueListenable: seconds,
+                      builder: (context, value, _) => CountDownValueCard(
+                        value: value,
+                        unit: context.l10n.seconds(value),
+                      ),
+                    ),
+                  ],
                 ),
-                ValueListenableBuilder<int>(
-                  valueListenable: hours,
-                  builder: (context, value, _) => CountDownValueCard(
-                    value: value,
-                    unit: context.l10n.hours(value),
-                  ),
-                ),
-                ValueListenableBuilder<int>(
-                  valueListenable: minutes,
-                  builder: (context, value, _) => CountDownValueCard(
-                    value: value,
-                    unit: context.l10n.minutes(value),
-                  ),
-                ),
-                ValueListenableBuilder<int>(
-                  valueListenable: seconds,
-                  builder: (context, value, _) => CountDownValueCard(
-                    value: value,
-                    unit: context.l10n.seconds(value),
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       );
