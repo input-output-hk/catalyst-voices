@@ -13,7 +13,7 @@ final class FilePickerService {
   FilePickerService._();
 
   Future<List<PlatformFile>> pickMultipleFiles() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       allowMultiple: true,
       withData: true,
     );
@@ -22,7 +22,7 @@ final class FilePickerService {
   }
 
   Future<List<List<int>>> pickMultipleFilesAsBytes() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       allowMultiple: true,
       withData: true,
     );
@@ -34,7 +34,7 @@ final class FilePickerService {
   }
 
   Future<List<int>?> pickSingleFileAsBytes() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       withData: true,
     );
 

@@ -10,7 +10,7 @@ environment:
 
 dependencies:
   collection: ^1.19.1
-  file_picker: ^10.3.2
+  file_picker: ^10.3.9
   flutter:
     sdk: flutter
   flutter_secure_storage: ^9.2.4
