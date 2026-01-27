@@ -255,7 +255,6 @@ final class ProposalViewerCubit
       category: category,
       currentVersion: currentVersion,
       effectivePublish: effectivePublish,
-      isReadOnlyMode: readOnlyMode,
     );
 
     final commentsSegmentData = CommentsSegmentData.build(
@@ -265,8 +264,8 @@ final class ProposalViewerCubit
       showComments: showComments,
       hasActiveAccount: segmentData.hasActiveAccount,
       hasAccountUsername: hasAccountUsername,
-      isReadOnlyMode: readOnlyMode,
       isLocalDocument: effectivePublish.isLocal,
+      isVotingStage: isVotingStage,
     );
 
     final collaboratorsState = Collaborators.filterByActiveAccount(
@@ -331,7 +330,6 @@ final class ProposalViewerCubit
       isFavorite: proposalData?.isFavorite ?? false,
       readOnlyMode: isReadOnlyMode,
       isVotingStage: isVotingStage,
-      // canComment is set in CommentsSegmentData where isReadOnlyMode is also considered
       showComments: !(proposalData?.publish.isLocal ?? false),
       proposalVersions: proposalData?.versions ?? [],
       publish: proposalData?.publish,

@@ -74,18 +74,13 @@ class _ProposalControls extends StatelessWidget {
     // TODO(LynxLynxx): Remove when we support mobile web
     return ResponsiveChildBuilder(
       xs: (context) => const SizedBox(),
-      sm: (context) => Row(
+      sm: (context) => const Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 4,
         children: [
-          const DocumentVersionText(),
-          const DocumentShareButton(),
-          Offstage(
-            offstage: context.select<DocumentViewerCubit, bool>(
-              (cubit) => cubit.state.readOnlyMode,
-            ),
-            child: const DocumentFavoriteButton(),
-          ),
+          DocumentVersionText(),
+          DocumentShareButton(),
+          DocumentFavoriteButton(),
         ],
       ),
     );

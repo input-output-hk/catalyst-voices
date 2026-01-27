@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/document_viewer/widgets/document_favorite_button.dart';
 import 'package:catalyst_voices/pages/document_viewer/widgets/document_share_button.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -55,9 +54,6 @@ class ProposalOverviewTile extends StatelessWidget {
               // TODO(LynxLynxx): Remove when we support mobile web
               Offstage(
                 offstage:
-                    context.select<DocumentViewerCubit, bool>(
-                      (cubit) => cubit.state.readOnlyMode,
-                    ) ||
                     CatalystFormFactor.current.isMobile,
                 child: const DocumentFavoriteButton(),
               ),
