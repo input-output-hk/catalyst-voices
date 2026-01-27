@@ -444,6 +444,15 @@
       }
     }
   },
+  "catalystFundNoCategories": "Catalyst Fund{fundNumber} Categories:",
+  "@catalystFundNoCategories": {
+    "description": "Used in category picker menu",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
+  },
   "catalystId": "Catalyst ID",
   "@catalystId": {
     "description": "Label of chip with account catalyst ID clearly describing content"
@@ -1266,6 +1275,9 @@
   "@duration": {
     "description": "Label for duration of proposal"
   },
+  "durationDaysAbbreviation": "d",
+  "durationHoursAbbreviation": "h",
+  "durationMinutesAbbreviation": "m",
   "editButtonText": "Edit",
   "@editButtonText": {
     "description": "Text shown in edit button"
@@ -4156,6 +4168,10 @@
   "@usernameSavedTitle": {
     "description": "Used as username change confirmation snack bar title"
   },
+  "utc": "UTC",
+  "@utc": {
+    "description": "UTC timezone"
+  },
   "valueMilestones": "{count} {count, plural, =0{Milestones} =1{Milestone} other{Milestones}}",
   "@valueMilestones": {
     "description": "In context of proposal. How many milestones there is",
@@ -4386,9 +4402,143 @@
   "@votingStatus": {
     "description": "Text shown in voting status section"
   },
+  "votingTimeline": "Voting Timeline · {phase}",
+  "@votingTimeline": {
+    "description": "Header for the voting timeline section",
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineDrop": "Drop:",
+  "@votingTimelineDrop": {
+    "description": "Label for the results drop date"
+  },
+  "votingTimelineEnded": "Ended",
+  "@votingTimelineEnded": {
+    "description": "Text showing when a phase ended"
+  },
+  "votingTimelineEndedXDaysAgo": "{days} {days, plural, =1{day} other{days}} ago",
+  "@votingTimelineEndedXDaysAgo": {
+    "description": "Text showing how many days ago a phase ended",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "votingTimelineFinishes": "Finishes:",
+  "@votingTimelineFinishes": {
+    "description": "Label for the end date of a voting phase"
+  },
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
+  },
+  "votingTimelineHideEvents": "Hide Events",
+  "@votingTimelineHideEvents": {
+    "description": "Button text to hide the voting timeline phase cards"
+  },
+  "votingTimelineLive": "LIVE",
+  "@votingTimelineLive": {
+    "description": "Badge text for the currently active voting phase"
+  },
+  "votingTimelineNewFundComingSoon": "New Fund Coming Soon!",
+  "@votingTimelineNewFundComingSoon": {
+    "description": "Label for new fund coming soon"
+  },
+  "votingTimelinePreVoting": "Pre-Voting",
+  "@votingTimelinePreVoting": {
+    "description": "Label for the pre-voting (registration) phase in the voting timeline"
+  },
+  "votingTimelinePreVotingWindow": "Pre-voting window:",
+  "@votingTimelinePreVotingWindow": {
+    "description": "Label for the pre-voting date window section"
+  },
+  "votingTimelineResults": "Results",
+  "@votingTimelineResults": {
+    "description": "Label for results announcement phase"
+  },
+  "votingTimelineResultsIn": "Results in {countdown}",
+  "@votingTimelineResultsIn": {
+    "description": "Countdown text showing when results starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineResultsLabel": "Results:",
+  "@votingTimelineResultsLabel": {
+    "description": "Label for the results date section"
+  },
+  "votingTimelineSelectCategory": "Select Category",
+  "@votingTimelineSelectCategory": {
+    "description": "Button text to open category selection dropdown"
+  },
+  "votingTimelineShowEvents": "Show Events",
+  "@votingTimelineShowEvents": {
+    "description": "Button text to show the voting timeline phase cards"
+  },
+  "votingTimelineStartingIn": "Starting in",
+  "@votingTimelineStartingIn": {
+    "description": "Text showing how many days until a phase starts"
+  },
+  "votingTimelineStartingInXDays": "{days} {days, plural, =1{day} other{days}}",
+  "@votingTimelineStartingInXDays": {
+    "description": "Text showing how many days until a phase starts",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "votingTimelineStarts": "Starts:",
+  "@votingTimelineStarts": {
+    "description": "Label for the start date of a voting phase"
+  },
+  "votingTimelineTally": "Tally",
+  "@votingTimelineTally": {
+    "description": "Label for vote tallying phase"
+  },
+  "votingTimelineTallyIn": "Tally in {countdown}",
+  "@votingTimelineTallyIn": {
+    "description": "Countdown text showing when tally starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineTallyWindow": "Tally window:",
+  "@votingTimelineTallyWindow": {
+    "description": "Label for the tally date window section"
+  },
+  "votingTimelineToBeAnnounced": "To be announced",
+  "@votingTimelineToBeAnnounced": {
+    "description": "Text shown when voting timeline phase dates are not yet available"
+  },
+  "votingTimelineVoting": "Voting",
+  "@votingTimelineVoting": {
+    "description": "Label for active voting phase"
+  },
+  "votingTimelineVotingIn": "Voting in {countdown}",
+  "@votingTimelineVotingIn": {
+    "description": "Countdown text showing when voting starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineVotingPowerSnapshot": "Voting Power Snapshot",
+  "@votingTimelineVotingPowerSnapshot": {
+    "description": "Label for the voting power snapshot deadline"
+  },
+  "votingTimelineVotingWindow": "Voting window:",
+  "@votingTimelineVotingWindow": {
+    "description": "Label for the voting date window section"
   },
   "walletAccountDetailsTitle": "Catalyst Account",
   "@walletAccountDetailsTitle": {

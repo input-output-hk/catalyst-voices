@@ -29,34 +29,27 @@ final class VotingHeaderCategoryData extends Equatable {
   ];
 }
 
-final class VotingHeaderData extends Equatable {
-  final bool showCategoryPicker;
-  final VotingHeaderCategoryData? category;
-
-  const VotingHeaderData({
-    this.showCategoryPicker = false,
-    this.category,
-  });
-
-  @override
-  List<Object?> get props => [showCategoryPicker, category];
-}
-
 /// The state of available proposals in the voting page.
 class VotingState extends Equatable {
-  final VotingHeaderData header;
+  final VotingHeaderCategoryData? selectedCategoryHeaderData;
   final int? fundNumber;
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
+  final VotingTimelineDetailsViewModel? votingTimeline;
+  final bool votingPhasesExpanded;
+  final bool showCategoryPicker;
   final bool hasSearchQuery;
   final Map<VotingPageTab, int> count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
   const VotingState({
-    this.header = const VotingHeaderData(),
+    this.selectedCategoryHeaderData,
     this.fundNumber,
     this.votingPower = const VotingPowerViewModel(),
     this.votingPhase,
+    this.votingTimeline,
+    this.votingPhasesExpanded = true,
+    this.showCategoryPicker = true,
     this.hasSearchQuery = false,
     this.count = const {},
     this.categorySelectorItems = const [],
@@ -66,10 +59,13 @@ class VotingState extends Equatable {
 
   @override
   List<Object?> get props => [
-    header,
+    selectedCategoryHeaderData,
     fundNumber,
     votingPower,
     votingPhase,
+    votingTimeline,
+    votingPhasesExpanded,
+    showCategoryPicker,
     hasSearchQuery,
     count,
     categorySelectorItems,
@@ -80,19 +76,27 @@ class VotingState extends Equatable {
   }
 
   VotingState copyWith({
-    VotingHeaderData? header,
+    Optional<VotingHeaderCategoryData>? selectedCategoryHeaderData,
     Optional<int>? fundNumber,
     VotingPowerViewModel? votingPower,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
+    Optional<VotingTimelineDetailsViewModel>? votingTimeline,
+    bool? votingPhasesExpanded,
+    bool? showCategoryPicker,
     bool? hasSearchQuery,
     Map<VotingPageTab, int>? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
     return VotingState(
-      header: header ?? this.header,
+      selectedCategoryHeaderData: selectedCategoryHeaderData.dataOr(
+        this.selectedCategoryHeaderData,
+      ),
       fundNumber: fundNumber.dataOr(this.fundNumber),
       votingPower: votingPower ?? this.votingPower,
       votingPhase: votingPhase.dataOr(this.votingPhase),
+      votingTimeline: votingTimeline.dataOr(this.votingTimeline),
+      votingPhasesExpanded: votingPhasesExpanded ?? this.votingPhasesExpanded,
+      showCategoryPicker: showCategoryPicker ?? this.showCategoryPicker,
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,

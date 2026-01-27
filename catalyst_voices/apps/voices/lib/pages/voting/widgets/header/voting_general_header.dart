@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_power_card.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_picker.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/voting_phase_progress_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/timeline/voting_timeline_header.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -8,12 +7,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VotingGeneralHeader extends StatelessWidget {
-  final bool showCategoryPicker;
-
-  const VotingGeneralHeader({
-    super.key,
-    this.showCategoryPicker = true,
-  });
+  const VotingGeneralHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,25 +23,14 @@ class VotingGeneralHeader extends StatelessWidget {
             color: theme.colors.textOnPrimaryLevel1,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            spacing: 16,
-            runSpacing: 12,
-            children: [
-              const _CatalystFund(),
-              if (showCategoryPicker)
-                ResponsivePadding(
-                  md: const EdgeInsets.only(top: 3),
-                  lg: const EdgeInsets.only(top: 3, right: 32),
-                  child: const VotingCategoryPickerSelector(),
-                ),
-            ],
-          ),
+        const Padding(
+          padding: EdgeInsets.only(top: 4),
+          child: _CatalystFund(),
         ),
         const SizedBox(height: 32),
         const _Cards(),
+        const SizedBox(height: 32),
+        const VotingTimelineHeaderSelector(),
       ],
     );
   }
@@ -90,14 +73,7 @@ class _DesktopCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Wrap(
-      spacing: 24,
-      runSpacing: 16,
-      children: [
-        VotingPhaseProgressCardSelector(),
-        AccountVotingPowerCardSelector(),
-      ],
-    );
+    return const AccountVotingPowerCardSelector();
   }
 }
 
@@ -106,14 +82,6 @@ class _SmallCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 16,
-      children: [
-        VotingPhaseProgressCardSelector(),
-        AccountVotingPowerCardSelector(),
-      ],
-    );
+    return const AccountVotingPowerCardSelector();
   }
 }

@@ -192,6 +192,10 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
+  void togglePhasesExpanded() {
+    emit(state.copyWith(votingPhasesExpanded: !state.votingPhasesExpanded));
+  }
+
   void updateSearchQuery(String query) {
     final asOptional = query.isEmpty ? const Optional<String>.empty() : Optional(query);
 
@@ -259,10 +263,48 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
+  VotingTimelineProgressViewModel? _buildVotingTimeline(Campaign? campaign) {
+    final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
+    final campaignStartDate = campaign?.startDate;
+    final campaignTimeline = campaign?.timeline;
+    final phases = <VotingTimelinePhase>[];
+    if (campaignTimeline != null) {
+      final timelinePhaseTypes = [
+        CampaignPhaseType.votingRegistration,
+        CampaignPhaseType.communityVoting,
+        CampaignPhaseType.votingTally,
+        CampaignPhaseType.votingResults,
+      ];
+
+      for (final type in timelinePhaseTypes) {
+        final campaignPhase = campaignTimeline.phase(type);
+        if (campaignPhase != null) {
+          phases.add(VotingTimelinePhase.fromCampaignPhase(campaignPhase));
+        }
+      }
+    }
+
+    if (campaignVotingPhase != null && campaignStartDate != null) {
+      return VotingTimelineProgressViewModel.fromModel(
+        state: campaignVotingPhase,
+        campaignStartDate: campaignStartDate,
+        phases: phases,
+      );
+    } else {
+      return null;
+    }
+  }
+
   VotingPhaseProgressDetailsViewModel? _buildVotingPhaseDetails(Campaign? campaign) {
     final votingPhase = _buildVotingPhase(campaign);
     final now = DateTimeExt.now();
     return votingPhase?.progress(now);
+  }
+
+  VotingTimelineDetailsViewModel? _buildVotingTimelineDetails(Campaign? campaign) {
+    final votingTimeline = _buildVotingTimeline(campaign);
+    final now = DateTimeExt.now();
+    return votingTimeline?.progress(now);
   }
 
   void _dispatchState() {
@@ -369,21 +411,22 @@ final class VotingCubit extends Cubit<VotingState>
         ? VotingPowerViewModel.fromModel(votingPower)
         : const VotingPowerViewModel();
     final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
+    final votingTimelineDetailsViewModel = _buildVotingTimelineDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
 
-    final header = VotingHeaderData(
-      showCategoryPicker: votingPhaseViewModel?.status.isActive ?? false,
-      category: selectedCategory != null
-          ? VotingHeaderCategoryData.fromModel(selectedCategory)
-          : null,
-    );
+    final showCategoryPicker = votingPhaseViewModel?.status.isActive ?? false;
+    final selectedCategoryHeaderData = selectedCategory != null
+        ? VotingHeaderCategoryData.fromModel(selectedCategory)
+        : null;
 
     return state.copyWith(
-      header: header,
+      selectedCategoryHeaderData: Optional(selectedCategoryHeaderData),
       fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
       votingPhase: Optional(votingPhaseViewModel),
+      votingTimeline: Optional(votingTimelineDetailsViewModel),
+      showCategoryPicker: showCategoryPicker,
       hasSearchQuery: hasSearchQuery,
       categorySelectorItems: categorySelectorItems,
     );
