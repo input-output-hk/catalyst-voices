@@ -4386,6 +4386,22 @@
   "@votingRegistrationTimelineHeader": {
     "description": "Header for the voting registration timeline"
   },
+  "votingResultsButton": "View Results at ProjectCatalyst.io",
+  "@votingResultsButton": {
+    "description": "The button label to see the voting results."
+  },
+  "votingResultsHeader": "The Results Are In!",
+  "@votingResultsHeader": {
+    "description": "The header for voting results."
+  },
+  "votingResultsMessage": "The wait is over, voting results are here!\nCheck out the winning proposals and see how the community’s voice has shaped the future.",
+  "@votingResultsMessage": {
+    "description": "The message for voting results."
+  },
+  "votingResultsSubheader": "The community has spoken. Check out the results!",
+  "@votingResultsSubheader": {
+    "description": "The subheader for voting results."
+  },
   "votingStarts": "Voting starts",
   "@votingStarts": {
     "description": "Label when the voting phase starts."
