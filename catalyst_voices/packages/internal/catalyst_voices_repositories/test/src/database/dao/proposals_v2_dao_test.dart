@@ -7821,6 +7821,222 @@ void main() {
             emits(3),
           );
         });
+
+        test('returns proper amount of pending approvals with decide status', () async {
+          final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
+          final approvalsFilters = CollaboratorProposalApprovalsFilter(
+            collaborator,
+            approvalStatus: ProposalApprovalStatus.decide,
+          );
+
+          final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
+
+          // Proposal where collaborator has not responded yet
+          final p1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: p1Ver,
+            ver: p1Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final authorFinalActionProposal1 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal1.doc.id,
+            refVer: proposal1.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          // Proposal where collaborator already accepted
+          final p2Ver = _buildUuidV7At(middle);
+          final proposal2 = _createTestDocumentEntity(
+            id: p2Ver,
+            ver: p2Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final collaboratorAcceptProposal2 = _createTestDocumentEntity(
+            id: 'collaboratorAcceptProposal2',
+            ver: _buildUuidV7At(middle),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
+            authors: [collaborator],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          final authorFinalActionProposal2 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          // Proposal where collaborator rejected
+          final p3Ver = _buildUuidV7At(earliest);
+          final proposal3 = _createTestDocumentEntity(
+            id: p3Ver,
+            ver: p3Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final collaboratorHideProposal3 = _createTestDocumentEntity(
+            id: 'collaboratorHideProposal3',
+            ver: _buildUuidV7At(earliest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal3.doc.id,
+            refVer: proposal3.doc.ver,
+            authors: [collaborator],
+            contentData: ProposalSubmissionActionDto.hide.toJson(),
+          );
+
+          final authorFinalActionProposal3 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal3',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal3.doc.id,
+            refVer: proposal3.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([
+            proposal1,
+            authorFinalActionProposal1,
+            proposal2,
+            collaboratorAcceptProposal2,
+            authorFinalActionProposal2,
+            proposal3,
+            collaboratorHideProposal3,
+            authorFinalActionProposal3,
+          ]);
+
+          final pendingCount = dao.watchVisibleProposalsCount(filters: approvalsFilters);
+
+          await expectLater(
+            pendingCount,
+            emits(1),
+            reason:
+                'Only proposal1 has pending approval status. '
+                'Proposal2 has accepted status and proposal3 has rejected status.',
+          );
+        });
+
+        test('returns proper amount of final approvals with aFinal status', () async {
+          final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
+          final approvalsFilters = CollaboratorProposalApprovalsFilter(
+            collaborator,
+            approvalStatus: ProposalApprovalStatus.aFinal,
+          );
+
+          final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
+
+          // Proposal where collaborator has not responded yet (pending)
+          final p1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: p1Ver,
+            ver: p1Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final authorFinalActionProposal1 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal1',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal1.doc.id,
+            refVer: proposal1.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          // Proposal where collaborator accepted
+          final p2Ver = _buildUuidV7At(middle);
+          final proposal2 = _createTestDocumentEntity(
+            id: p2Ver,
+            ver: p2Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final collaboratorAcceptProposal2 = _createTestDocumentEntity(
+            id: 'collaboratorAcceptProposal2',
+            ver: _buildUuidV7At(middle),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
+            authors: [collaborator],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          final authorFinalActionProposal2 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal2',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal2.doc.id,
+            refVer: proposal2.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          // Proposal where collaborator rejected
+          final p3Ver = _buildUuidV7At(earliest);
+          final proposal3 = _createTestDocumentEntity(
+            id: p3Ver,
+            ver: p3Ver,
+            authors: [author],
+            collaborators: [collaborator],
+          );
+
+          final collaboratorHideProposal3 = _createTestDocumentEntity(
+            id: 'collaboratorHideProposal3',
+            ver: _buildUuidV7At(earliest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal3.doc.id,
+            refVer: proposal3.doc.ver,
+            authors: [collaborator],
+            contentData: ProposalSubmissionActionDto.hide.toJson(),
+          );
+
+          final authorFinalActionProposal3 = _createTestDocumentEntity(
+            id: 'authorFinalActionProposal3',
+            ver: _buildUuidV7At(latest),
+            type: DocumentType.proposalActionDocument,
+            refId: proposal3.doc.id,
+            refVer: proposal3.doc.ver,
+            authors: [author],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([
+            proposal1,
+            authorFinalActionProposal1,
+            proposal2,
+            collaboratorAcceptProposal2,
+            authorFinalActionProposal2,
+            proposal3,
+            collaboratorHideProposal3,
+            authorFinalActionProposal3,
+          ]);
+
+          final finalCount = dao.watchVisibleProposalsCount(filters: approvalsFilters);
+
+          await expectLater(
+            finalCount,
+            emits(2),
+            reason:
+                'Proposal2 has accepted status and proposal3 has rejected status. '
+                'Proposal1 has pending status and is not counted.',
+          );
+        });
       });
     },
     skip: driftSkip,

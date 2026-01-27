@@ -486,7 +486,10 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Stream<AccountInvitesApprovalsCount> watchInvitesApprovalsCount({required CatalystId id}) {
     final invitationsFilters = CollaboratorInvitationsProposalsFilter(id);
-    final approvalsFilters = CollaboratorProposalApprovalsFilter(id);
+    final approvalsFilters = CollaboratorProposalApprovalsFilter(
+      id,
+      approvalStatus: ProposalApprovalStatus.decide,
+    );
 
     final invitationsCountStream = watchProposalsCountV2(
       filters: invitationsFilters,
