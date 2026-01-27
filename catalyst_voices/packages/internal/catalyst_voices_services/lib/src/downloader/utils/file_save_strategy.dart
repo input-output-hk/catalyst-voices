@@ -51,7 +51,7 @@ final class FilePickerSaveStrategy implements FileSaveStrategy {
     try {
       final fileName = fileUri.path;
 
-      await FilePicker.saveFile(
+      await FilePicker.platform.saveFile(
         fileName: fileName,
         bytes: data,
       );

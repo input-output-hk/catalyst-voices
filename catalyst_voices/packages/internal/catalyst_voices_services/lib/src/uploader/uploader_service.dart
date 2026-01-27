@@ -20,7 +20,7 @@ final class UploaderServiceImpl with FilePathHelperMixin implements UploaderServ
     final pickStrategy = FileSaveStrategyFactory.getDefaultStrategyType();
     final initialDirectory = await getDownloadPathIfNeeded(pickStrategy);
 
-    final result = await FilePicker.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       withData: true,
       type: allowedExtensions != null ? FileType.custom : FileType.any,
       allowedExtensions: allowedExtensions,
