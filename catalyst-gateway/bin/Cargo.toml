@@ -15,9 +15,12 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+# TODO: Use proper tags instead of branch.
 cardano-chain-follower = { version = "0.0.19", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.19" }
 rbac-registration = { version = "0.0.15", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.15" }
-catalyst-signed-doc = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.10" }
+#catalyst-signed-doc = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.10" }
+catalyst-signed-doc = { version = "0.0.11", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "main" }
+catalyst-contest = { version = "0.0.1", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "main" }
 catalyst-signed-doc-v1 = { package = "catalyst-signed-doc", version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v.0.0.4" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "c509-certificate-v0.0.3" }
 catalyst-types = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types/v0.0.10" }
