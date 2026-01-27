@@ -7,7 +7,8 @@ enum ActionsCardType {
   displayConsent(ActionsPageTab.approvals),
   representative(ActionsPageTab.role),
   // TODO(LynxLynxx): Verify what page tab voting power should be associated with
-  votingPower(ActionsPageTab.role);
+  votingPower(ActionsPageTab.role),
+  becomeReviewer(ActionsPageTab.external);
 
   final ActionsPageTab associatedTab;
 
@@ -17,10 +18,8 @@ enum ActionsCardType {
     final l10n = context.l10n;
 
     return switch (this) {
-      ActionsCardType.proposalApproval => l10n.participationPreferences,
-      ActionsCardType.displayConsent => l10n.participationPreferences,
-      ActionsCardType.representative => l10n.participationPreferences,
       ActionsCardType.votingPower => '',
+      _ => l10n.participationPreferences,
     };
   }
 
@@ -31,6 +30,7 @@ enum ActionsCardType {
       ActionsCardType.proposalApproval => l10n.finalProposalApproval,
       ActionsCardType.displayConsent => l10n.collaboratorDisplayConsent,
       ActionsCardType.representative => l10n.becomeARepresentative,
+      ActionsCardType.becomeReviewer => l10n.becomeCommunityReviewer,
       ActionsCardType.votingPower => '',
     };
   }

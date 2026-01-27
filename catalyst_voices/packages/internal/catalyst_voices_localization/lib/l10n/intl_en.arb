@@ -225,6 +225,10 @@
   "@becomeARepresentative": {
     "description": "Title for the become a representative card/section"
   },
+  "becomeCommunityReviewer": "Become a Community Reviewer",
+  "@becomeCommunityReviewer": {
+    "description": "CTA to become a community reviewer"
+  },
   "becomeReviewer": "Become a Reviewer!",
   "@becomeReviewer": {
     "description": "Title for becoming a reviewer"

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/actions/actions/widgets/become_comunity_reviewer.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/collaborator_display_consent_card.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/proposal_approval_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
@@ -37,6 +38,8 @@ class ActionCardsList extends StatelessWidget {
       ActionsCardType.displayConsent => const CollaboratorDisplayConsentCard(),
       ActionsCardType.representative => null, // TODO(LynxLynxx): Implement representative card
       ActionsCardType.votingPower => null, // TODO(LynxLynxx): Implement voting power card
+      ActionsCardType.becomeReviewer =>
+        const BecomeComunityReviewerCard(), // TODO(LynxLynxx): Implement voting power card
     };
   }
 
