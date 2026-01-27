@@ -16,33 +16,62 @@ class CountDownValueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final digitTheme = AnimatedVoicesCountdownTheme.maybeOf(context);
-    final effectiveThemeData =
-        digitTheme ?? AnimatedVoicesCountdownThemeData.defaultTheme(context);
+    final digitTheme = AnimatedVoicesCountdownTheme.of(context);
 
     return Container(
-      margin: effectiveThemeData.margin,
+      margin: digitTheme.margin,
       constraints: BoxConstraints.tightFor(
-        width: effectiveThemeData.width,
-        height: effectiveThemeData.height,
+        width: digitTheme.width,
+        height: digitTheme.height,
       ),
       decoration: BoxDecoration(
-        color: effectiveThemeData.backgroundColor(context),
-        borderRadius: BorderRadius.circular(effectiveThemeData.borderRadius),
-        border: Border.all(color: effectiveThemeData.borderColor),
+        color: digitTheme.backgroundColor(context),
+        borderRadius: BorderRadius.circular(digitTheme.borderRadius),
+        border: Border.all(color: digitTheme.borderColor),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(effectiveThemeData.borderRadius),
+        borderRadius: BorderRadius.circular(digitTheme.borderRadius),
         child: _ConditionalBlurLayer(
-          blurSigmaX: effectiveThemeData.blurSigmaX,
-          blurSigmaY: effectiveThemeData.blurSigmaY,
+          blurSigmaX: digitTheme.blurSigmaX,
+          blurSigmaY: digitTheme.blurSigmaY,
           child: _CountdownCardContent(
             value: value,
             unit: unit,
-            themeData: effectiveThemeData,
+            themeData: digitTheme,
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AnimatedDigit extends StatelessWidget {
+  final Widget child;
+  final double fallDistance;
+  final bool isPreviousDigit;
+  final Animation<double> animation;
+
+  const _AnimatedDigit({
+    required this.animation,
+    required this.child,
+    required this.fallDistance,
+    required this.isPreviousDigit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, animation.value * fallDistance),
+          child: Opacity(
+            opacity: isPreviousDigit ? 1 - animation.value : animation.value,
+            child: child,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }
@@ -135,37 +164,6 @@ class _CountdownCardContent extends StatelessWidget {
     if (value < 10) return [0, value];
     if (value < 100) return [value ~/ 10, value % 10];
     return [value ~/ 100, (value ~/ 10) % 10, value % 10];
-  }
-}
-
-class _AnimatedDigit extends StatelessWidget {
-  final Widget child;
-  final double fallDistance;
-  final bool isPreviousDigit;
-  final Animation<double> animation;
-
-  const _AnimatedDigit({
-    required this.animation,
-    required this.child,
-    required this.fallDistance,
-    required this.isPreviousDigit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, animation.value * fallDistance),
-          child: Opacity(
-            opacity: isPreviousDigit ? 1 - animation.value : animation.value,
-            child: child,
-          ),
-        );
-      },
-      child: child,
-    );
   }
 }
 
