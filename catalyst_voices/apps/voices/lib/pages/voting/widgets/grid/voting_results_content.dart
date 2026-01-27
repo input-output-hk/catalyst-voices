@@ -17,7 +17,7 @@ class VotingResultsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: CampaignPhaseAware.when(
+      child: CampaignPhaseAware.orElse(
         phase: CampaignPhaseType.votingResults,
         upcoming: (_, phase, fundNumber) => _ResultsIncoming(
           phaseCountdown: CampaignPhaseCountdownViewModel.fromCampaignPhase(
@@ -25,8 +25,7 @@ class VotingResultsContent extends StatelessWidget {
             fundNumber: fundNumber,
           ),
         ),
-        active: (_, _, _) => const _ResultsReady(),
-        post: (_, _, _) => const _ResultsReady(),
+        orElse: (_, _, _) => const _ResultsReady(),
       ),
     );
   }
