@@ -2329,6 +2329,15 @@
       }
     }
   },
+  "noOfAllFinalProposals": "All Final Proposals · {count}",
+  "@noOfAllFinalProposals": {
+    "description": "Tab label for all final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfComments": "{count} {count, plural, =0{comments} =1{comment} other{comments}}",
   "@noOfComments": {
     "description": "Indicates the amount of comments on a proposal card.",
@@ -2357,6 +2366,15 @@
       }
     }
   },
+  "noOfFavoriteFinals": "Favorite Finals · {count}",
+  "@noOfFavoriteFinals": {
+    "description": "Tab label for favorite final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfFavorites": "Favorites · {count}",
   "@noOfFavorites": {
     "description": "Tab label for draft proposals in voting space",
@@ -2375,6 +2393,15 @@
       }
     }
   },
+  "noOfMyFinalProposals": "My Final Proposals · {count}",
+  "@noOfMyFinalProposals": {
+    "description": "Tab label for my final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfMyProposals": "My proposals · {count}",
   "@noOfMyProposals": {
     "description": "Tab label for my proposals in voting space",
@@ -2384,27 +2411,9 @@
       }
     }
   },
-  "noOfProposalInvites": "Proposal Invites · {count}",
-  "@noOfProposalInvites": {
-    "description": "Information about count of proposals",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noOfProposals": "Proposals · {count}",
-  "@noOfProposals": {
-    "description": "Information about count of proposals",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noOfVotedOn": "Voted On · {count}",
-  "@noOfVotedOn": {
-    "description": "Tab label for voted on proposals in voting space",
+  "noOfMyVotes": "My Votes · {count}",
+  "@noOfMyVotes": {
+    "description": "Tab label for my votes in voting space",
     "placeholders": {
       "count": {
         "type": "int"
@@ -3567,6 +3576,10 @@
   "resubmitAsFinalWarning": "You need to resubmit this proposal as final, to be eligible for funding, so make sure to Submit to review stage (Final) after editing.",
   "@resubmitAsFinalWarning": {
     "description": "Information for user that proposal needs to be resubmitted as final to be eligible for funding."
+  },
+  "results": "Results",
+  "@results": {
+    "description": "Tab label for results in voting space"
   },
   "resumeButtonText": "Resume",
   "@resumeButtonText": {
