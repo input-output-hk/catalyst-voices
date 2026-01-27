@@ -102,21 +102,6 @@ base mixin DocumentViewerCommentsMixin<
   }
 
   @override
-  void updateCommentBuilder({
-    required SignedDocumentRef ref,
-    required bool show,
-  });
-
-  @override
-  void updateCommentReplies({
-    required SignedDocumentRef ref,
-    required bool show,
-  });
-
-  @override
-  void updateCommentsSort({required DocumentCommentsSort sort});
-
-  @override
   Future<void> updateUsername(String value) async {
     final catId = cache.activeAccountId;
     if (catId == null) {
