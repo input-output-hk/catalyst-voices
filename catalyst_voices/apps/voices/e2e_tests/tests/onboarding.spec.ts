@@ -6,6 +6,7 @@ import { createWalletActions } from "../utils/wallets/wallet-actions-factory";
 import { WalletConnectedPanel } from "../page-objects/onboarding/create-flow/step-16-wallet-connected";
 import { TestModel } from "../models/testModel";
 import { getAccountModel } from "../data/accountConfigs";
+import { AccountSetupSuccessPanel } from "../page-objects/onboarding/create-flow/step-20-account-setup-success";
 
 for (const walletConfig of walletConfigs) {
   test.describe(`Onboarding ${walletConfig.extension.Name}`, () => {
@@ -22,10 +23,7 @@ for (const walletConfig of walletConfigs) {
       await page
         .locator("//*[@aria-label='Enable accessibility']")
         .evaluate((element: HTMLElement) => element.click());
-      const walletListPanel = await new WalletListPanel(page, testModel).goto();
-      const walletPage = await walletListPanel.clickConnectWallet(walletConfig.extension.Name);
-      await createWalletActions(walletConfig, walletPage).connectWallet();
-      const walletConnectedPanel = new WalletConnectedPanel(page, testModel);
+      const walletConnectedPanel = await new WalletConnectedPanel(page, testModel).goto();
 
       expect(await walletConnectedPanel.getWalletNameValue()).toContain(
         walletConfig.extension.Name
@@ -35,15 +33,18 @@ for (const walletConfig of walletConfigs) {
         walletConfig.stakeAddress
       );
     });
-    //TODO: Add test for creating Catalyst Keychain in next PR
-    test.skip(`Create Catalyst Keychain - ${walletConfig.extension.Name}`, async ({
+    
+    test(`Create Catalyst Keychain - ${walletConfig.extension.Name}`, async ({
       restoreWallet,
       appBaseURL,
       testModel,
     }) => {
       const page = restoreWallet.pages()[0];
       await page.goto(appBaseURL);
-      await page.locator("//*[@aria-label='Enable accessibility']").evaluate((element: HTMLElement) => element.click());
+      await page
+        .locator("//*[@aria-label='Enable accessibility']")
+        .evaluate((element: HTMLElement) => element.click());
+      const accountSetupSuccessPanel = await new AccountSetupSuccessPanel(page, testModel).goto();
     });
   });
 }

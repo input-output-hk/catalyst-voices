@@ -2,6 +2,7 @@ import { Locator, Page } from "@playwright/test";
 import { OnboardingBasePage } from "../onboarding-base-page";
 import { LinkWalletInfoPanel } from "./step-14-link-wallet-info";
 import { TestModel } from "../../../models/testModel";
+import { createWalletActions } from "../../../utils/wallets/wallet-actions-factory";
 
 export class WalletListPanel extends OnboardingBasePage {
   page: Page;
@@ -17,9 +18,10 @@ export class WalletListPanel extends OnboardingBasePage {
     await new LinkWalletInfoPanel(this.page, this.testModel).chooseCardanoWalletButtonClick();
     return this;
   }
-  async clickConnectWallet(name: string): Promise<Page> {
+  async connectWallet(): Promise<void> {
     const pagePromise = this.page.context().waitForEvent("page");
-    await this.click(this.walletButton(name));
-    return await pagePromise;
+    await this.click(this.walletButton(this.testModel.walletConfig.name));
+    const page = await pagePromise;
+    await createWalletActions(this.testModel.walletConfig, page).connectWallet();
   }
 }
