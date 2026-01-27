@@ -122,9 +122,7 @@ class VoicesDigitThemeData extends Equatable {
 }
 
 class _AnimatedVoicesCountdownThemeDefault extends AnimatedVoicesCountdownThemeData {
-  final BuildContext context;
-
-  _AnimatedVoicesCountdownThemeDefault(this.context)
+  _AnimatedVoicesCountdownThemeDefault(BuildContext context)
     : super(
         borderColor: Theme.of(context).colors.outlineBorder,
         width: 115,
@@ -158,9 +156,7 @@ class _AnimatedVoicesCountdownThemeDefault extends AnimatedVoicesCountdownThemeD
 }
 
 class _AnimatedVoicesCountdownThemePrimary extends AnimatedVoicesCountdownThemeData {
-  final BuildContext context;
-
-  _AnimatedVoicesCountdownThemePrimary(this.context)
+  _AnimatedVoicesCountdownThemePrimary(BuildContext context)
     : super(
         borderColor: Theme.of(context).colors.outlineBorder,
         backgroundColorLight: Colors.white.withValues(alpha: 0.2),
