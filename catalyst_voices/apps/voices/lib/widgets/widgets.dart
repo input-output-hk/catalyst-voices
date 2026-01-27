@@ -75,6 +75,7 @@ export 'modals/voices_panels_dialog.dart';
 export 'modals/voices_question_dialog.dart';
 export 'rich_text/markdown_text.dart';
 export 'rich_text/placeholder_rich_text.dart';
+export 'scaffold/drawer_page_scaffold.dart';
 export 'scrollbar/voices_scrollbar.dart';
 export 'seed_phrase/seed_phrases_completer.dart';
 export 'seed_phrase/seed_phrases_picker.dart';
