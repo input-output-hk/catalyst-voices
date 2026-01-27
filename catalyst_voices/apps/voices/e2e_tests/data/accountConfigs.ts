@@ -7,9 +7,10 @@ export const accountModels: AccountModel[] = [
     email: "testuser1@example.com",
     password: "Test1234!",
     isEmailVerified: false,
-    isProposer: false,
+    isProposer: true,
     seedPhrase: [],
     isDummy: true,
+    seedPhrasePath: ""
   },
 ];
 /* cspell: enable */
@@ -20,9 +21,7 @@ export const accountModels: AccountModel[] = [
  * @returns The account model
  */
 export const getAccountModel = (name: string): AccountModel => {
-  const accountModel = accountModels.find(
-    (accountModel) => accountModel.name === name
-  );
+  const accountModel = accountModels.find((accountModel) => accountModel.name === name);
   if (!accountModel) {
     throw new Error(`Account model with name ${name} not found`);
   }

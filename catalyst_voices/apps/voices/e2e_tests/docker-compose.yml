@@ -38,6 +38,23 @@ services:
     ports:
       - "9042:9042"
 
+  # Seed the event-db with F15 document templates
+  # This inserts the pre-signed production documents that the frontend expects
+  db-seed:
+    image: postgres:16-alpine
+    container_name: db-seed
+    volumes:
+      - ../../../../catalyst-gateway/event-db/seed/f15.sql:/seed/f15.sql:ro
+    command:
+      [
+        "sh",
+        "-c",
+        "echo 'Seeding database with F15 documents...' && PGPASSWORD=CHANGE_ME psql -h event-db -U catalyst-event-dev -d CatalystEventDev -f /seed/f15.sql && echo 'Database seeded successfully!'",
+      ]
+    depends_on:
+      event-db:
+        condition: service_healthy
+
   cat-gateway:
     image: cat-gateway:latest
     container_name: cat-gateway
@@ -55,7 +72,7 @@ services:
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - INTERNAL_API_KEY=123
       # cspell: disable-next-line
-      - SIGNED_DOC_ADMIN_KEY=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
+      - ADMIN_CATALYST_ID=admin.catalyst://preprod.cardano/zbau8Us8jfPciQAgL_pGToBSFEuilGfEzFq7JWx0Z-s
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     ports:
@@ -65,6 +82,8 @@ services:
         condition: service_healthy
       index-db:
         condition: service_healthy
+      db-seed:
+        condition: service_completed_successfully
 
   # Init container to upload frontend config to gateway
   # This is required because the gateway returns a placeholder config by default
