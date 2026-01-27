@@ -38,7 +38,8 @@ dependencies:
   device_info_plus: ^11.5.0
   dotted_border: ^3.1.0
   equatable: ^2.0.7
-  file_picker: ^10.3.2
+  # TODO(LynxLynxx): Update to latest version in https://github.com/input-output-hk/catalyst-voices/issues/3940
+  file_picker: 10.3.2
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1

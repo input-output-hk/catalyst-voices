@@ -37,7 +37,8 @@ dependencies:
   dart_pubspec_licenses: ^3.0.9
 
 dev_dependencies:
-  melos: ^7.1.1
+  # TODO(LynxLynxx): Update to latest version in https://github.com/input-output-hk/catalyst-voices/issues/4071
+  melos: 7.3.0
 
 # TODO(dt-iohk): revert when flutter_secure_storage pulls transitively these or newer versions
 dependency_overrides:
@@ -196,14 +197,14 @@ melos:
           ' TMP_ERR=$(mktemp)
             # Limits flutter test internal workers (adjust based on CI CPU cores)
             flutter test --concurrency=1 --reporter github --no-pub 2> "$TMP_ERR"
-        
+
             # store the exit code after running the tests
             TEST_EXIT_CODE=$?
-        
+
             # filter out irrelevant error messages and print everything else to the stderr
             grep -v "Waiting for another flutter command to release the startup lock" "$TMP_ERR" >&2
             rm -f "$TMP_ERR"
-        
+
             # exit with correct exit code
             exit $TEST_EXIT_CODE
           '
@@ -217,7 +218,7 @@ melos:
         melos exec --concurrency 1 --fail-fast --dir-exists="test" --ignore="catalyst_voices" -- \
           ' TMP_ERR=$(mktemp)
             flutter test --concurrency=1 --reporter github --platform chrome --no-pub 2> "$TMP_ERR"
-        
+
             # store the exit code after running the tests,
             # this is the exit code for the whole script
             TEST_EXIT_CODE=$?
@@ -228,7 +229,7 @@ melos:
 
             # exit with correct exit code
             exit $TEST_EXIT_CODE
-          '   
+          '
       description: |
         Run `flutter test --platform chrome` for all packages.
         Filters out irrelevant warning messages related to the startup lock.
@@ -248,16 +249,16 @@ melos:
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
           TMP_ERR=$(mktemp)
-        
+
           # to limit internal flutter test workers
           flutter test --concurrency=1 --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2> "$TMP_ERR"
-        
+
           # store the exit code after running the tests,
           # this is the exit code for the whole script
           TEST_EXIT_CODE=$?
 
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE
-        
+
           # filter out irrelevant error messages and print everything else to the stderr
           grep -v "Waiting for another flutter command to release the startup lock" "$TMP_ERR" >&2
           rm -f "$TMP_ERR"
@@ -308,15 +309,15 @@ melos:
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
           TMP_ERR=$(mktemp)
-        
+
           flutter test --concurrency=1 --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2> "$TMP_ERR"
-        
+
           # store the exit code after running the tests,
           # this is the exit code for the whole script
           TEST_EXIT_CODE=$?
 
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE
-        
+
           # filter out irrelevant error messages and print everything else to the stderr
           grep -v "Waiting for another flutter command to release the startup lock" "$TMP_ERR" >&2
           rm -f "$TMP_ERR"
