@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 
-class VotingLeadingButton extends StatelessWidget {
-  const VotingLeadingButton({super.key});
+class VotingCategoryLeadingButton extends StatelessWidget {
+  const VotingCategoryLeadingButton({super.key});
 
   @override
   Widget build(BuildContext context) {

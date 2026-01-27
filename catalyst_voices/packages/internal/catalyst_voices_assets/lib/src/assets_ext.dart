@@ -6,6 +6,15 @@ import 'package:lottie/lottie.dart' as lottie;
 import 'package:vector_graphics/vector_graphics.dart';
 
 extension AssetGenImageExt on AssetGenImage {
+  /// Returns an [ImageProvider] with the package automatically set
+  /// to 'catalyst_voices_assets'.
+  ImageProvider voicesProvider({AssetBundle? bundle}) {
+    return provider(
+      bundle: bundle,
+      package: 'catalyst_voices_assets',
+    );
+  }
+
   Future<void> cache({
     required BuildContext context,
     AssetBundle? bundle,
