@@ -337,9 +337,8 @@ final class ProposalCubit extends Cubit<ProposalState>
   }) {
     final proposalDocumentRef = proposal?.metadata.id;
 
-    final versions = proposalVersions.reversed.mapIndexed((index, version) {
+    final versions = proposalVersions.mapIndexed((index, version) {
       final ver = version.ver;
-
       return DocumentVersion(
         id: ver ?? '',
         number: index + 1,
@@ -588,9 +587,8 @@ final class ProposalCubit extends Cubit<ProposalState>
       _watchProposalComments();
 
       emit(state.copyWith(comments: const CommentsState()));
-
-      _handleProposalVersionSignal();
     }
+    _handleProposalVersionSignal();
 
     if (proposalDataChanged) _rebuildState();
   }
