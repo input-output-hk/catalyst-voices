@@ -7,6 +7,7 @@ import { pipeline } from "stream/promises";
 import { Readable } from "stream";
 import { BrowserExtensionName } from "../models/browserExtensionModel";
 import { getBrowserExtension } from "../data/browserExtensionConfigs";
+import { ExtensionStorageManager } from "./extensionStorageManager";
 
 interface PlatformInfo {
   os: string;
@@ -14,11 +15,26 @@ interface PlatformInfo {
   nacl_arch: string;
 }
 
+/**
+ * Extension download source strategy.
+ * - 's3': Download from S3 only (recommended for CI)
+ * - 'chrome-store': Download from Chrome Web Store only (for updating S3)
+ * - 'auto': Try S3 first, fall back to Chrome Store (default)
+ */
+export type ExtensionSource = "s3" | "chrome-store" | "auto";
+
 export class ExtensionDownloader {
   private extensionsDir: string;
+  private source: ExtensionSource;
 
-  constructor() {
+  /**
+   * Creates a new ExtensionDownloader.
+   * @param source Download source strategy. If not provided, reads from
+   *               EXTENSION_SOURCE environment variable, defaults to "auto".
+   */
+  constructor(source?: ExtensionSource) {
     this.extensionsDir = path.resolve(__dirname, "..", "extensions");
+    this.source = source ?? (process.env.EXTENSION_SOURCE as ExtensionSource) ?? "auto";
   }
 
   /**
@@ -42,6 +58,33 @@ export class ExtensionDownloader {
       return extensionPath;
     }
 
+    // Try S3 first if configured
+    if (this.source === "s3" || this.source === "auto") {
+      const s3Path = await this.tryDownloadFromS3(extensionName);
+      if (s3Path) {
+        return s3Path;
+      }
+
+      if (this.source === "s3") {
+        throw new Error(
+          `Extension ${extensionName} not available in S3. Run 'npm run update-remote-extensions' to upload extensions.`
+        );
+      }
+      console.log(`S3 download failed for ${extensionName}, falling back to Chrome Store`);
+    }
+
+    // Download from Chrome Store
+    return this.downloadFromChromeStore(extensionName);
+  }
+
+  /**
+   * Downloads extension directly from Chrome Web Store.
+   * Use this when updating extensions in S3.
+   */
+  public async downloadFromChromeStore(extensionName: BrowserExtensionName): Promise<string> {
+    const extensionId = getBrowserExtension(extensionName).Id;
+    const extensionPath = path.join(this.extensionsDir, extensionId);
+
     // Download the extension
     if (extensionName === BrowserExtensionName.Nufi) {
       const zipPath = await this.downloadNufiExtension();
@@ -50,9 +93,18 @@ export class ExtensionDownloader {
       const crxPath = await this.downloadExtension(extensionName);
       await this.extractExtension(crxPath, extensionPath);
     }
-    // Extract the extension
 
     return extensionPath;
+  }
+
+  private async tryDownloadFromS3(extensionName: BrowserExtensionName): Promise<string | null> {
+    try {
+      const storageManager = new ExtensionStorageManager();
+      return await storageManager.downloadFromS3(extensionName);
+    } catch (error) {
+      console.log(`S3 download not available: ${error}`);
+      return null;
+    }
   }
 
   private async downloadNufiExtension(): Promise<string> {

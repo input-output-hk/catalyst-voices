@@ -114,3 +114,74 @@ test("test", async ({ testModel }) => {
    ```bash
    npx playwright test
    ```
+
+## Browser Extension Management
+
+The e2e tests require wallet browser extensions (Lace, Eternl, Nufi, Vespr and Yoroi).
+To ensure stable and reproducible tests, extensions are stored in S3 rather than
+downloaded directly from Chrome Web Store on each run.
+
+### How it works
+
+1. **S3 Storage**: Extensions are stored in an S3 bucket as `.crx` files
+2. **Version Manifest**: `config/extension-manifest.json` tracks which versions are in S3
+3. **Download Strategy**: Tests download from S3 first, with Chrome Store as fallback
+
+### Updating Extensions in S3
+
+When wallet extensions release updates, you need to manually update the S3 versions
+after verifying they work with our tests:
+
+1. **Test new extensions locally first**:
+
+   ```bash
+   # Delete local extensions to force fresh download from Chrome Store
+   rm -rf extensions/
+
+   # Run tests against latest Chrome Store versions
+   EXTENSION_SOURCE=chrome-store npm run test:local
+   ```
+
+2. **If tests pass, update S3**:
+
+   ```bash
+   # Preview what would be uploaded
+   npm run update-remote-extensions:dry-run
+
+   # Upload to S3 (requires AWS credentials)
+   npm run update-remote-extensions
+   ```
+
+3. **Commit the updated manifest**:
+
+   ```bash
+   git add config/extension-manifest.json
+   git commit -m "chore: update wallet extensions to latest versions"
+   ```
+
+### Updating a Single Extension
+
+To update only a specific extension:
+
+```bash
+npm run update-remote-extensions -- --extension Lace
+```
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `EXTENSION_S3_BUCKET` | S3 bucket name | `catalyst-e2e-extensions` |
+| `EXTENSION_S3_REGION` | S3 region | `eu-central-1` |
+| `EXTENSION_S3_PREFIX` | Path prefix in bucket | `wallet-extensions` |
+| `EXTENSION_SOURCE` | Download strategy (`s3`, `chrome-store`, `auto`) | `auto` |
+| `AWS_ACCESS_KEY_ID` | AWS key for uploads | Required for upload |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret for uploads | Required for upload |
+
+### CI Configuration
+
+In CI, extensions are downloaded from S3. The S3 bucket should be configured with
+public read access (or use AWS credentials for private buckets).
+
+For IOG infrastructure, see the workflow at:
+https://github.com/input-output-hk/catalyst-storage/blob/main/.github/workflows/download-browsers.yml

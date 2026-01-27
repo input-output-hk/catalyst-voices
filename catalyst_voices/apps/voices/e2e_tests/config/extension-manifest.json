@@ -1,0 +1,37 @@
+{
+  "$schema": "./extension-manifest.schema.json",
+  "description": "Manifest of wallet extensions stored in S3 for e2e tests. Do not edit manually - use 'npm run update-remote-extensions' to update.",
+  "lastUpdated": "2026-01-19T11:17:05.879Z",
+  "extensions": {
+    "gafhhkghbfjjkeiendhlofajokpaflmk": {
+      "name": "Lace",
+      "version": "1.33.2",
+      "uploadedAt": "2026-01-19T11:14:49.253Z",
+      "sha256": "e8ffc3c3ed1570add716fd78f272ffa1b65a4e916fe0b5a802819404b7ab6e62"
+    },
+    "kmhcihpebfmpgmihbkipmjlmmioameka": {
+      "name": "Eternl",
+      "version": "2.0.16.0",
+      "uploadedAt": "2026-01-19T11:15:26.449Z",
+      "sha256": "d142ba8821a09f0678a6446e7b4af8f16f6b6af6d2be1fdf8a9a3f5de465e6b9"
+    },
+    "ffnbelfdoeiohenkjibnmadjiehjhajb": {
+      "name": "Yoroi",
+      "version": "5.20.0",
+      "uploadedAt": "2026-01-19T11:15:55.893Z",
+      "sha256": "e9a6f0dd5024b29f14f98079e73a4c6b20eca735d21f3bb3990662317ef7ffe3"
+    },
+    "hbklpdnlgiadjhdadfnfmemmklbopbcm": {
+      "name": "Nufi",
+      "version": "31.1.5",
+      "uploadedAt": "2026-01-19T11:17:05.879Z",
+      "sha256": "7b32c83376452fac048fc2ab986c43899d2cb39bbec36eadd8f5adbe07a48735"
+    },
+    "bedogdpgdnifilpgeianmmdabklhfkcn": {
+      "name": "Vespr",
+      "version": "300.3.20.3",
+      "uploadedAt": "2026-01-19T11:16:25.417Z",
+      "sha256": "f11d9f99d33b8c1053651f5c41839118fbdb556f09ddf528675bd68adea08042"
+    }
+  }
+}
