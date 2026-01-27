@@ -8,30 +8,30 @@ icon: material/quality-high
 
 ## Quality Tree
 
-|  Quality Category |  Quality   |  Description | Scenarios  |
-|:-:|:-:|:-:|:-:|
-| Usable  |  Voting User experience  | Voting and browsing proposals should be easy and intuitive to do  | SC1-SC4, SC7-SC9 |
-| Usable  |  Proposer User experience  | Creating and managing proposals should be easy and intuitive to do  | SC12-SC15 |
-| Usable  |  Correctness  | System functions should provide accurate results | SC50-SC53 |
-| Usable  |  Accessibility  | The system should be design so as to be usable by everyone  | SC63-SC64 |
-| Usable  |  Engagement  | Users should actively participate with the system | SC57-SC60 |
-| Secure   |  Access control  | Role-Based Access Control  | SC24-SC31 |
-| Secure   |  Privacy  | User information are kept private  | SC66 |
-| Secure   |  Auditability  | Voting results can be audited by external parties  | SC20-SC23 |
-| Secure   |  Compliancy  | The system is complaint with local laws | SC41-SC42 |
-| Reliable   |  Fail-safe  | In case of failures the system does not loose data/votes | SC16-SC19, SC65 |
-| Reliable   |  Scalability  | The system should scale well with increasing number of users/votes | SC43-SC49 |
-| Efficient   |  Response Time  | The system should give feedback in timely manner | SC5, SC6, SC10, SC11 |
-| Efficient   |  Code Complexity  |  Code should be easy to understand and well documented | SC68 |
-| Operable   |  Deployability  |  The system should be easy to deploy and operate | SC37-SC40 |
-| Operable   |  Testability  | Tests should be easy to run and give a clear feedback | SC61-SC62  |
-| Operable   |  Clarity  | Clarity in technical documentation  | SC67 |
-| Flexible   |  Configurable  |  Efficient change of business rules | SC32-SC36 |
+| Quality Category | Quality | Description | Scenarios |
+|:---:|:---:|:---:|:---:|
+| Usable | Voting User experience | Voting and browsing proposals should be easy and intuitive to do | SC1-SC4, SC7-SC9 |
+| Usable | Proposer User experience | Creating and managing proposals should be easy and intuitive to do | SC12-SC15 |
+| Usable | Correctness | System functions should provide accurate results | SC50-SC53 |
+| Usable | Accessibility | The system should be design so as to be usable by everyone | SC63-SC64 |
+| Usable | Engagement | Users should actively participate with the system | SC57-SC60 |
+| Secure | Access control | Role-Based Access Control | SC24-SC31 |
+| Secure | Privacy | User information are kept private | SC66 |
+| Secure | Auditability | Voting results can be audited by external parties | SC20-SC23 |
+| Secure | Compliancy | The system is complaint with local laws | SC41-SC42 |
+| Reliable | Fail-safe | In case of failures the system does not loose data/votes | SC16-SC19, SC65 |
+| Reliable | Scalability | The system should scale well with increasing number of users/votes | SC43-SC49 |
+| Efficient | Response Time | The system should give feedback in timely manner | SC5, SC6, SC10, SC11 |
+| Efficient | Code Complexity | Code should be easy to understand and well documented | SC68 |
+| Operable | Deployability | The system should be easy to deploy and operate | SC37-SC40 |
+| Operable | Testability | Tests should be easy to run and give a clear feedback | SC61-SC62 |
+| Operable | Clarity | Clarity in technical documentation | SC67 |
+| Flexible | Configurable | Efficient change of business rules | SC32-SC36 |
 
 ## Quality Scenarios
 
-|  Id |  Scenario   |
-|:-:|:-:|
+| Id | Scenario |
+|:---:|:---:|
 |  SC1 |  A user who is new to Catalyst can understand how to vote in 5 minutes maximum. |
 |  SC2 |  A user should be able to stop voting and restart voting without loosing votes  |
 |  SC3 |  If a user tries to vote on the same proposal twice he will receive a clear error message |
@@ -101,3 +101,72 @@ icon: material/quality-high
 |  SC66 |  User private key are secure |
 |  SC67 |  New team member can be onboarded without help from the team |
 |  SC68 |  Tests functions have a comment explaining the steps of the test |
+
+## Frontend-Specific Quality Requirements
+
+### Performance Targets
+
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| Initial Load Time | < 3 seconds | Time to first contentful paint |
+| Time to Interactive | < 5 seconds | Time until app is fully interactive |
+| Bundle Size (Web) | < 5 MB (gzipped) | Total JavaScript bundle size |
+| Frame Rate | 60 FPS | Smooth animations and scrolling |
+| API Response Time | < 2 seconds | Time to receive API response |
+| Database Query Time | < 100ms | Local database query performance |
+
+### Accessibility Requirements
+
+| Requirement | Standard | Implementation |
+| --- | --- | --- |
+| Screen Reader Support | WCAG 2.1 AA | Semantic HTML, ARIA labels |
+| Keyboard Navigation | Full keyboard access | Tab order, focus management |
+| Color Contrast | WCAG 2.1 AA | Minimum 4.5:1 contrast ratio |
+| Text Scaling | Up to 200% | Responsive text sizing |
+| Touch Targets | Minimum 44x44px | Adequate touch target sizes |
+
+### Browser/Platform Support
+
+**Web Browsers**:
+
+* Chrome/Edge (latest 2 versions)
+* Firefox (latest 2 versions)
+* Safari (latest 2 versions)
+* Mobile browsers (iOS Safari, Chrome Android)
+
+**Mobile Platforms**:
+
+* iOS 13+ (iPhone and iPad)
+* Android 8.0+ (API level 26+)
+
+**Platform-Specific Considerations**:
+
+* WASM support required for web (with fallback)
+* SQLite version 3.45.0+ required
+* Secure storage support on all platforms
+
+### Bundle Size Limits
+
+| Platform | Limit | Notes |
+| --- | --- | --- |
+| Web (Initial) | < 2 MB | First load JavaScript |
+| Web (Total) | < 5 MB | All JavaScript assets |
+| iOS (IPA) | < 100 MB | App Store limit |
+| Android (APK) | < 100 MB | Play Store limit (AAB recommended) |
+
+### Performance Monitoring
+
+**Metrics Tracked**:
+
+* App startup time
+* Screen load times
+* API response times
+* Database query performance
+* Memory usage
+* Frame rendering performance
+
+**Tools**:
+
+* CatalystProfiler for custom profiling
+* Flutter DevTools for performance analysis
+* Sentry for error tracking and performance monitoring

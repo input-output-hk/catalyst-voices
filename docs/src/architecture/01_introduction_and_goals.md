@@ -26,14 +26,14 @@ The system must scale to global participation while remaining usable by non-tech
 
 Main quality goals:
 
-|  Quality Category |  Quality   |  Description |
-|:-:|:-:|:-:|
-| Usable |  User experience  | Voting and browsing proposals should be easy and intuitive to do  |
-| Usable  | Correctness  | System functions should provide accurate results |
-| Secure   | Access control  | Role-Based Access Control  |
-| Secure   | Privacy  | User information are kept private  |
-| Secure   | Accountability  |  Voting results can be audited by external parties |
-| Reliable   |  Fail-safe | In case of failures the system does not lose data |
+| Quality Category | Quality | Description |
+| --- | --- | --- |
+| Usable | User experience | Voting and browsing proposals should be easy and intuitive to do |
+| Usable | Correctness | System functions should provide accurate results |
+| Secure | Access control | Role-Based Access Control |
+| Secure | Privacy | User information are kept private |
+| Secure | Accountability | Voting results can be audited by external parties |
+| Reliable | Fail-safe | In case of failures the system does not lose data |
 
 Supporting goals and drivers:
 
@@ -43,8 +43,8 @@ Supporting goals and drivers:
 
 ## Stakeholders
 
-| Role/Name   | Contact        |
-|-------------|----------------|
+| Role/Name | Contact |
+| --- | --- |
 | Product Owner | Project Catalyst Governance |
 | Engineering | Catalyst Engineering Team |
 | Community | Proposers, Voters, and dReps |

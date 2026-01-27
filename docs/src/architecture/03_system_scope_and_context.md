@@ -15,7 +15,7 @@ It connects users and roles to event rules while integrating Cardano chain data 
 External actors and systems:
 
 | External | Description |
-|---|---|
+| --- | --- |
 | Voter | Community member who registers and votes in events |
 | Proposer | Individual or team creating and maintaining proposals |
 | dRep | Catalyst delegate registered via CIP-509 and using signed documents for nomination and delegation |
@@ -78,7 +78,7 @@ Explanation of external domain interfaces:
 Primary interfaces and protocols:
 
 | Interface | Producer | Consumer | Protocol | Format |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Document PUT | Client | Gateway | HTTPS | CBOR COSE_Sign body |
 | Document GET | Client | Gateway | HTTPS | CBOR COSE_Sign body |
 | Document Index | Client | Gateway | HTTPS | JSON request and JSON index |

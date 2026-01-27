@@ -62,3 +62,48 @@ Mapping of building blocks to infrastructure:
 
 * Earthly pipelines produce Docker images and OpenAPI artifacts.
 * Canary deployments test new versions before rolling fleet upgrades.
+
+## Frontend Deployment
+
+### Web Deployment
+
+Flutter web builds are deployed to CDN with the following process:
+
+1. **Build**: `flutter build web --wasm` (or `--no-wasm` for JS-only)
+2. **Asset Versioning**: Content-based MD5 hashing for cache busting
+3. **CDN Deployment**: Assets served via CDN with proper headers
+4. **Headers**: COOP and COEP headers required for WASM support
+
+**Web Build Requirements**:
+
+* `Cross-Origin-Opener-Policy: same-origin`
+* `Cross-Origin-Embedder-Policy: require-corp`
+* `Content-Type: application/wasm` for WASM files
+* Asset versioning for cache busting
+
+**Build Artifacts**:
+
+* HTML files with versioned asset references
+* JavaScript bundles (potentially split into parts)
+* WASM files (canvaskit, sqlite3, etc.)
+* Asset manifest (`asset_versions.json`)
+
+### Build Pipeline
+
+**Frontend Build Steps**:
+
+1. Dependency installation (`melos bootstrap`)
+2. Code generation (`melos build-runner`)
+3. SVG compilation (`melos compile_svg`)
+4. Localization generation (`flutter gen-l10n`)
+5. Flutter build (web)
+6. Asset versioning (web only)
+7. Artifact packaging
+8. Deployment to target platform
+
+**CI/CD Integration**:
+
+* Automated builds on commits
+* Automated testing (unit, widget, integration)
+* Automated deployment to staging/production
+* Version tagging and release notes
