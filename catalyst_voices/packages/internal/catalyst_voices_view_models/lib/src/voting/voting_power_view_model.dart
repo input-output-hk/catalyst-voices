@@ -21,6 +21,13 @@ final class VotingPowerViewModel extends Equatable {
     );
   }
 
+  factory VotingPowerViewModel.fromSnapshot(Snapshot<VotingPower> snapshot) {
+    final votingPower = snapshot.data;
+    return votingPower == null
+        ? const VotingPowerViewModel()
+        : VotingPowerViewModel.fromModel(votingPower);
+  }
+
   @override
   List<Object?> get props => [amount, status, updatedAt];
 }

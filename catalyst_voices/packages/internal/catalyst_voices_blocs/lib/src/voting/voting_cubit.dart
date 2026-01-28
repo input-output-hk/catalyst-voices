@@ -374,13 +374,9 @@ final class VotingCubit extends Cubit<VotingState>
     );
 
     final fundNumber = campaign?.fundNumber;
-    // TODO(dt-iohk): get voting power from voting role and display different states:
-    // https://github.com/input-output-hk/catalyst-voices/issues/3967#issue-3792489539
-    // final votingPower = votingRole?.votingPower;
-    const VotingPower? votingPower = null;
-    final votingPowerViewModel = votingPower != null
-        ? VotingPowerViewModel.fromModel(votingPower)
-        : const VotingPowerViewModel();
+    final votingRoleViewModel = votingRole != null
+        ? VotingRoleViewModel.fromModel(votingRole)
+        : const NullVotingRoleViewModel();
     final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
@@ -398,7 +394,7 @@ final class VotingCubit extends Cubit<VotingState>
     return state.copyWith(
       header: header,
       fundNumber: Optional(fundNumber),
-      votingPower: votingPowerViewModel,
+      votingRole: votingRoleViewModel,
       votingPhase: Optional(votingPhaseViewModel),
       hasSearchQuery: hasSearchQuery,
       isDelegator: isDelegator,
