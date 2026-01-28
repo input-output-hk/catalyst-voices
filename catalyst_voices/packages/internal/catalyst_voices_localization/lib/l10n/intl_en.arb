@@ -241,26 +241,6 @@
   "@browse": {
     "description": "Button or link text for browsing files or content"
   },
-  "browseFundProposals": "Browse Fund{fundNumber} proposals",
-  "@browseFundProposals": {
-    "description": "Text shown when Catalyst app is closed",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
-  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund{fundNumber} proposals on ProjectCatalyst.io",
-  "@browseProposalsOnProjectCatalyst": {
-    "description": "Text shown when Catalyst app is closed",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
   "campaign": "Campaign",
   "@campaign": {
     "description": "Label for campaign section"
@@ -404,10 +384,6 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
-  },
-  "catalystAppClosed": "The Catalyst app is closed.",
-  "@catalystAppClosed": {
-    "description": "Text shown when Catalyst app is closed"
   },
   "catalystAppClosesIn": "Catalyst App closes in {days}d, {hours}h, {minutes}m, {seconds}s.",
   "@catalystAppClosesIn": {
@@ -2241,10 +2217,6 @@
   "@newAppVersionAvailableTitle": {
     "description": "Used in banner to inform user that new version of the app is available"
   },
-  "newInvites": "New Invites",
-  "@newInvites": {
-    "description": "Title of new invites section"
-  },
   "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
   "@newIterationTitle": {
     "description": "Title for new iteration card",
@@ -2419,10 +2391,6 @@
         "type": "int"
       }
     }
-  },
-  "noPendingInvitesMessage": "You don’t have any proposal invites",
-  "@noPendingInvitesMessage": {
-    "description": "Message shown when user don't have any pending messages"
   },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
@@ -2688,10 +2656,6 @@
   "proposalApprovalSubheader": "Once the proposal draft is finalized, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
   "@proposalApprovalSubheader": {
     "description": "Subheader for final proposal approval page"
-  },
-  "proposalApprovalTabDecide": "Decide",
-  "@proposalApprovalTabDecide": {
-    "description": "Label for \"decide\" tab"
   },
   "proposalApprovals": "Proposal Approvals",
   "@proposalApprovals": {
@@ -3306,10 +3270,6 @@
   "@refresh": {
     "description": "Refresh button label"
   },
-  "registerAsRepresentative": "Register as Representative",
-  "@registerAsRepresentative": {
-    "description": "Button text to register as a representative (dRep)"
-  },
   "registerToVoteFund": "Register to Vote in Fund{fundNumber}",
   "@registerToVoteFund": {
     "description": "Title of the register to vote section",
@@ -3600,10 +3560,6 @@
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
-  },
-  "reviewRequest": "Review Request",
-  "@reviewRequest": {
-    "description": "CTA to make user review invite to collaboration on proposal"
   },
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {
