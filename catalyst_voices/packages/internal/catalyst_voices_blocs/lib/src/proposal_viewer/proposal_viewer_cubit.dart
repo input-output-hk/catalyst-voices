@@ -255,7 +255,6 @@ final class ProposalViewerCubit
       category: category,
       currentVersion: currentVersion,
       effectivePublish: effectivePublish,
-      isReadOnlyMode: readOnlyMode,
     );
 
     final commentsSegmentData = CommentsSegmentData.build(
@@ -265,8 +264,8 @@ final class ProposalViewerCubit
       showComments: showComments,
       hasActiveAccount: segmentData.hasActiveAccount,
       hasAccountUsername: hasAccountUsername,
-      isReadOnlyMode: readOnlyMode,
       isLocalDocument: effectivePublish.isLocal,
+      isVotingStage: isVotingStage,
     );
 
     final collaboratorsState = Collaborators.filterByActiveAccount(
@@ -275,7 +274,10 @@ final class ProposalViewerCubit
       collaborators: collaborators.map(Collaborator.fromBriefData).toList(),
     );
 
-    final contentSegments = mapDocumentToSegments(proposal.document);
+    final contentSegments = mapDocumentToSegments(
+      proposal.document,
+      filterOut: [ProposalDocument.collaboratorsNodeId],
+    );
 
     // Build all segments using the segment builder
     final segments = _segmentBuilder.buildSegments(
@@ -331,7 +333,6 @@ final class ProposalViewerCubit
       isFavorite: proposalData?.isFavorite ?? false,
       readOnlyMode: isReadOnlyMode,
       isVotingStage: isVotingStage,
-      // canComment is set in CommentsSegmentData where isReadOnlyMode is also considered
       showComments: !(proposalData?.publish.isLocal ?? false),
       proposalVersions: proposalData?.versions ?? [],
       publish: proposalData?.publish,
@@ -339,7 +340,10 @@ final class ProposalViewerCubit
   }
 
   /// Handles changes to proposal data.
-  void _handleProposalData(ProposalDataV2? data) {
+  ///
+  /// The [emitVersionSignal] parameter controls whether to emit version signals.
+  /// Set to false during initial sync to avoid duplicate signals.
+  void _handleProposalData(ProposalDataV2? data, {bool emitVersionSignal = true}) {
     final proposalDataChanged = cache.proposalData != data;
     final proposalIdChanged = cache.proposalData?.id != data?.id;
     final activeAccountId = cache.activeAccountId;
@@ -363,15 +367,13 @@ final class ProposalViewerCubit
 
       // Reset comments UI state
       emit(state.copyWith(comments: const CommentsState()));
-
-      // Update collaborator state
-      if (!state.isLoading) {
-        handleDocumentVersionSignal();
-      }
     }
 
     if (proposalDataChanged) {
       rebuildState();
+      if (emitVersionSignal) {
+        handleDocumentVersionSignal();
+      }
     }
   }
 
@@ -399,7 +401,8 @@ final class ProposalViewerCubit
       if (isClosed) return;
 
       _validateProposalData(proposal);
-      _handleProposalData(proposal);
+      // Don't emit version signal during sync - let the watcher handle it
+      _handleProposalData(proposal, emitVersionSignal: false);
     } catch (error, stack) {
       _logger.severe('Synchronizing proposal($id) failed', error, stack);
       if (!isClosed) {

@@ -8,17 +8,15 @@ class DocumentViewerState<Data extends DocumentViewerData> extends Equatable {
   final bool isLoading;
   final Data data;
   final LocalizedException? error;
-  final bool readOnlyMode;
 
   const DocumentViewerState({
     this.isLoading = false,
     required this.data,
     this.error,
-    this.readOnlyMode = false,
   });
 
   @override
-  List<Object?> get props => [isLoading, data, error, readOnlyMode];
+  List<Object?> get props => [isLoading, data, error];
 
   bool get showData => !showError;
   bool get showError => !isLoading && error != null;
@@ -33,7 +31,6 @@ class DocumentViewerState<Data extends DocumentViewerData> extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       data: data ?? this.data,
       error: error.dataOr(this.error),
-      readOnlyMode: readOnlyMode ?? this.readOnlyMode,
     );
   }
 }
