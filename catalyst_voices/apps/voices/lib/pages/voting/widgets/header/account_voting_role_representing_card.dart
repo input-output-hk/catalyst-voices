@@ -56,9 +56,7 @@ class AccountVotingRoleRepresentingCard extends StatelessWidget {
 class _DelegatesCount extends StatelessWidget {
   final int count;
 
-  const _DelegatesCount({
-    required this.count,
-  });
+  const _DelegatesCount({required this.count});
 
   @override
   Widget build(BuildContext context) {

@@ -376,7 +376,7 @@ final class VotingCubit extends Cubit<VotingState>
     final fundNumber = campaign?.fundNumber;
     final votingRoleViewModel = votingRole != null
         ? VotingRoleViewModel.fromModel(votingRole)
-        : const NullVotingRoleViewModel();
+        : const EmptyVotingRoleViewModel();
     final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
