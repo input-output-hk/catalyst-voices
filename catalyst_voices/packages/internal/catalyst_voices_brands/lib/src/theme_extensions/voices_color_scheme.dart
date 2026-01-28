@@ -595,6 +595,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   }
 }
 
+extension ColorSchemeExtension on ColorScheme {
+  Gradient get votingGradient => LinearGradient(colors: [primary, secondary]);
+}
+
 extension VoicesColorSchemeExtension on ThemeData {
   VoicesColorScheme get colors => extension<VoicesColorScheme>()!;
 

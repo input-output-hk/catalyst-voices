@@ -110,10 +110,10 @@ final class UpdateVotingPhaseProgressEvent extends VotingBallotEvent {
   List<Object?> get props => [votingPhase];
 }
 
-final class UpdateVotingPowerEvent extends VotingBallotEvent {
-  final VotingPower? data;
+final class UpdateVotingRoleEvent extends VotingBallotEvent {
+  final AccountVotingRole? data;
 
-  const UpdateVotingPowerEvent(this.data);
+  const UpdateVotingRoleEvent(this.data);
 
   @override
   List<Object?> get props => [data];

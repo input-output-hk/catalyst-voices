@@ -10,7 +10,6 @@ final class RecoverableAccount extends Equatable {
   final Set<AccountRole> roles;
   final ShelleyAddress stakeAddress;
   final AccountPublicStatus publicStatus;
-  final VotingPower? votingPower;
   final bool isPersistent;
 
   const RecoverableAccount({
@@ -19,7 +18,6 @@ final class RecoverableAccount extends Equatable {
     required this.roles,
     required this.stakeAddress,
     required this.publicStatus,
-    required this.votingPower,
     required this.isPersistent,
   });
 
@@ -30,7 +28,6 @@ final class RecoverableAccount extends Equatable {
     roles,
     stakeAddress,
     publicStatus,
-    votingPower,
     isPersistent,
   ];
 }

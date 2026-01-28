@@ -208,7 +208,7 @@ final class UpdateCommentRepliesEvent extends ProposalBuilderEvent {
 }
 
 final class UpdateCommentsSortEvent extends ProposalBuilderEvent {
-  final ProposalCommentsSort sort;
+  final DocumentCommentsSort sort;
 
   const UpdateCommentsSortEvent({required this.sort});
 

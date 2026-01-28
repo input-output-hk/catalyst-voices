@@ -1,26 +1,22 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:equatable/equatable.dart';
 
 /// View model representing proposal in a view mode
-final class ProposalViewData extends Equatable {
+final class ProposalViewData extends DocumentViewerData<ProposalViewHeader> {
   final bool? isCurrentVersionLatest;
-  final ProposalViewHeader header;
-  final List<Segment> segments;
   final String? categoryText;
 
   const ProposalViewData({
     this.isCurrentVersionLatest,
-    this.header = const ProposalViewHeader(),
-    this.segments = const [],
+    super.header = const ProposalViewHeader(),
+    super.segments = const [],
     this.categoryText,
   });
 
   @override
   List<Object?> get props => [
+    ...super.props,
     isCurrentVersionLatest,
-    header,
-    segments,
     categoryText,
   ];
 

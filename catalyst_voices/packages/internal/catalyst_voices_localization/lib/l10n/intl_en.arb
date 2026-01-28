@@ -1838,6 +1838,10 @@
   "@getStartedButtonLabelText": {
     "description": "Label text shown in the GetStartedButton widget."
   },
+  "globalSyncIndicatorTitle": "Syncing...",
+  "@globalSyncIndicatorTitle": {
+    "description": "Title shown in the global sync indicator banner"
+  },
   "goMyProposals": "Go My proposals",
   "@goMyProposals": {
     "description": "Action to go to my proposals"
@@ -2337,6 +2341,15 @@
       }
     }
   },
+  "noOfAllFinalProposals": "All Final Proposals · {count}",
+  "@noOfAllFinalProposals": {
+    "description": "Tab label for all final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfComments": "{count} {count, plural, =0{comments} =1{comment} other{comments}}",
   "@noOfComments": {
     "description": "Indicates the amount of comments on a proposal card.",
@@ -2365,6 +2378,15 @@
       }
     }
   },
+  "noOfFavoriteFinals": "Favorite Finals · {count}",
+  "@noOfFavoriteFinals": {
+    "description": "Tab label for favorite final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfFavorites": "Favorites · {count}",
   "@noOfFavorites": {
     "description": "Tab label for draft proposals in voting space",
@@ -2383,6 +2405,15 @@
       }
     }
   },
+  "noOfMyFinalProposals": "My Final Proposals · {count}",
+  "@noOfMyFinalProposals": {
+    "description": "Tab label for my final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfMyProposals": "My proposals · {count}",
   "@noOfMyProposals": {
     "description": "Tab label for my proposals in voting space",
@@ -2392,27 +2423,9 @@
       }
     }
   },
-  "noOfProposalInvites": "Proposal Invites · {count}",
-  "@noOfProposalInvites": {
-    "description": "Information about count of proposals",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noOfProposals": "Proposals · {count}",
-  "@noOfProposals": {
-    "description": "Information about count of proposals",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noOfVotedOn": "Voted On · {count}",
-  "@noOfVotedOn": {
-    "description": "Tab label for voted on proposals in voting space",
+  "noOfMyVotes": "My Votes · {count}",
+  "@noOfMyVotes": {
+    "description": "Tab label for my votes in voting space",
     "placeholders": {
       "count": {
         "type": "int"
@@ -3526,6 +3539,10 @@
   "@representative": {
     "description": "representative account role"
   },
+  "repsList": "Representative List",
+  "@repsList": {
+    "description": "Generic text describing any list with representatives for voting on someone behalf"
+  },
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
   "@requestedAmountShouldBeBetweenMinAndMax": {
     "description": "Validation message when requested amount is outside allowed range",
@@ -3575,6 +3592,10 @@
   "resubmitAsFinalWarning": "You need to resubmit this proposal as final, to be eligible for funding, so make sure to Submit to review stage (Final) after editing.",
   "@resubmitAsFinalWarning": {
     "description": "Information for user that proposal needs to be resubmitted as final to be eligible for funding."
+  },
+  "results": "Results",
+  "@results": {
+    "description": "Tab label for results in voting space"
   },
   "resumeButtonText": "Resume",
   "@resumeButtonText": {
@@ -4754,6 +4775,24 @@
   "@xCharactersMinimum": {
     "placeholders": {
       "number": {
+        "type": "int"
+      }
+    }
+  },
+  "xProposalsAdded": "{count, plural, =0{Proposals} =1{Proposal} other{Proposals}} Added",
+  "@xProposalsAdded": {
+    "description": "Number of proposals added to the ballot for voting",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "xRepsAdded": "{count, plural, =0{Reps} =1{Rep} other{Reps}} Added",
+  "@xRepsAdded": {
+    "description": "Number of representatives added for voting on someone behalf",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }
