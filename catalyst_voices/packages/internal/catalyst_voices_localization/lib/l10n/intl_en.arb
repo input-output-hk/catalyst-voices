@@ -225,13 +225,17 @@
   "@becomeARepresentative": {
     "description": "Title for the become a representative card/section"
   },
-  "becomeCommunityReviewer": "Become a Community Reviewer",
+  "becomeCommunityReviewer": "Become a Community\nReviewer",
   "@becomeCommunityReviewer": {
     "description": "CTA to become a community reviewer"
   },
-  "becomeReviewer": "Become a Reviewer!",
+  "becomeReviewer": "Become a Reviewer",
   "@becomeReviewer": {
     "description": "Title for becoming a reviewer"
+  },
+  "becomeReviewerActionHeaderText": "The Representative has an expert role in the Cardano Catalyst as people can delegate their vote to Cardano Experts.",
+  "@becomeReviewerActionHeaderText": {
+    "description": "Header text for the become a representative card/section"
   },
   "becomeVoter": "Become a Voter",
   "@becomeVoter": {
@@ -4238,6 +4242,14 @@
   "verifiedEmailNeededToPublishTitle": "A verified email is required to publish your proposal",
   "@verifiedEmailNeededToPublishTitle": {
     "description": "Title of snackbar shown when user tries to publish a proposal without having a verified email"
+  },
+  "verifyYourReviewerRegistration": "Verify your Reviewer registration",
+  "@verifyYourReviewerRegistration": {
+    "description": "Title for the verify your reviewer registration section"
+  },
+  "verifyYourReviewerRegistrationDescription": "• The review module has it’s own tool outside of the Catalyst App.\n• Don’t forget to confirm your registration by checking your email!",
+  "@verifyYourReviewerRegistrationDescription": {
+    "description": "Description for the verify your reviewer registration section"
   },
   "view": "View",
   "@view": {
