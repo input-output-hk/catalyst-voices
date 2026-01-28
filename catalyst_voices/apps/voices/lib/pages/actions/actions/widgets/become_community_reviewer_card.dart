@@ -17,7 +17,7 @@ class BecomeCommunityReviewerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MyActionCard(
-      type: ActionsCardType.becomeReviewer,
+      type: BecomeReviewerCardType(),
       actionWidget: _ActionButton(),
       timeRemainingWidget: _Timer(),
     );

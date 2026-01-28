@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class MyActionsState extends Equatable {
@@ -6,12 +7,14 @@ final class MyActionsState extends Equatable {
   final int finalProposalCount;
   final DateTime? proposalSubmissionCloseDate;
   final DateTime? becomeReviewerCloseDate;
+  final List<ActionsCardType> availableCards;
 
   const MyActionsState({
     this.displayConsentCount = 0,
     this.finalProposalCount = 0,
     this.proposalSubmissionCloseDate,
     this.becomeReviewerCloseDate,
+    this.availableCards = const [],
   });
 
   @override
@@ -20,6 +23,7 @@ final class MyActionsState extends Equatable {
     finalProposalCount,
     proposalSubmissionCloseDate,
     becomeReviewerCloseDate,
+    availableCards,
   ];
 
   MyActionsState copyWith({
@@ -27,6 +31,7 @@ final class MyActionsState extends Equatable {
     int? finalProposalCount,
     Optional<DateTime>? proposalSubmissionCloseDate,
     Optional<DateTime>? becomeReviewerCloseDate,
+    List<ActionsCardType>? availableCards,
   }) {
     return MyActionsState(
       displayConsentCount: displayConsentCount ?? this.displayConsentCount,
@@ -37,6 +42,7 @@ final class MyActionsState extends Equatable {
       becomeReviewerCloseDate: becomeReviewerCloseDate.dataOr(
         this.becomeReviewerCloseDate,
       ),
+      availableCards: availableCards ?? this.availableCards,
     );
   }
 }

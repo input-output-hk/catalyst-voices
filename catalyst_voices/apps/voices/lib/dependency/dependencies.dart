@@ -226,6 +226,7 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
           get<CampaignService>(),
           get<UserService>(),
+          get<VotingService>(),
         );
       })
       ..registerFactory<DisplayConsentCubit>(() {

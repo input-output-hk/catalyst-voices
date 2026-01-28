@@ -9,6 +9,7 @@ final class MyActionsCubitCache extends Equatable {
   final DateTime? proposalSubmissionCloseDate;
   final DateTime? becomeReviewerCloseDate;
   final ActionsPageTab selectedTab;
+  final Set<AccountRole> accountRoles;
 
   const MyActionsCubitCache({
     this.activeAccountId,
@@ -17,6 +18,7 @@ final class MyActionsCubitCache extends Equatable {
     this.proposalSubmissionCloseDate,
     this.becomeReviewerCloseDate,
     this.selectedTab = ActionsPageTab.all,
+    this.accountRoles = const {},
   });
 
   @override
@@ -27,6 +29,7 @@ final class MyActionsCubitCache extends Equatable {
     proposalSubmissionCloseDate,
     becomeReviewerCloseDate,
     selectedTab,
+    accountRoles,
   ];
 
   MyActionsCubitCache copyWith({
@@ -36,6 +39,7 @@ final class MyActionsCubitCache extends Equatable {
     Optional<DateTime>? proposalSubmissionCloseDate,
     Optional<DateTime>? becomeReviewerCloseDate,
     ActionsPageTab? selectedTab,
+    Set<AccountRole>? accountRoles,
   }) {
     return MyActionsCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
@@ -48,6 +52,7 @@ final class MyActionsCubitCache extends Equatable {
         this.becomeReviewerCloseDate,
       ),
       selectedTab: selectedTab ?? this.selectedTab,
+      accountRoles: accountRoles ?? this.accountRoles,
     );
   }
 }

@@ -1037,6 +1037,10 @@
   "@defaultRole": {
     "description": "Related to account role"
   },
+  "delegateYourVotingPower": "Delegate Your Voting Power",
+  "@delegateYourVotingPower": {
+    "description": "Button text to delegate your voting power"
+  },
   "delegationButton": "Delegation",
   "@delegationButton": {
     "description": "The label for voting power delegation."
@@ -2142,6 +2146,14 @@
   "mainnetNetworkId": "Mainnet",
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
+  },
+  "manageDelegation": "Manage Delegation",
+  "@manageDelegation": {
+    "description": "Button text to manage a delegation"
+  },
+  "manageRepresentative": "Manage Representative",
+  "@manageRepresentative": {
+    "description": "Button text to manage a representative (dRep)"
   },
   "maxBudgetRequest": "Max budget request",
   "@maxBudgetRequest": {
