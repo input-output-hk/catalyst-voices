@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_app_closed.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_collaborator_banner.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_favorite_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_share_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
@@ -45,8 +46,21 @@ class ProposalHeaderWrapper extends StatelessWidget {
     return Stack(
       children: [
         child,
-        const ProposalAppClosed(),
-        const ProposalHeader(),
+        const Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          child: Column(
+            // Change vertical direction to change the paint order so that the ProposalInvitationBanner
+            // is not under the ProposalHeader while ProposalHeader is animating.
+            verticalDirection: VerticalDirection.up,
+            children: [
+              ProposalAppClosed(),
+              ProposalHeader(),
+              ProposalCollaboratorBanner(),
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -9,6 +9,7 @@ final class WorkspaceState extends Equatable {
   final WorkspaceStateUserProposals userProposals;
   final List<CampaignTimelineViewModel> timelineItems;
   final int fundNumber;
+  final int invitationsApprovalsCount;
 
   const WorkspaceState({
     this.isLoading = false,
@@ -16,6 +17,7 @@ final class WorkspaceState extends Equatable {
     this.userProposals = const WorkspaceStateUserProposals(),
     this.timelineItems = const [],
     this.fundNumber = 0,
+    this.invitationsApprovalsCount = 0,
   });
 
   WorkspaceStateCampaignTimeline get campaignTimeline =>
@@ -28,6 +30,7 @@ final class WorkspaceState extends Equatable {
     userProposals,
     timelineItems,
     fundNumber,
+    invitationsApprovalsCount,
   ];
 
   bool get showProposals => error == null && !isLoading;
@@ -45,6 +48,7 @@ final class WorkspaceState extends Equatable {
     WorkspaceStateUserProposals? userProposals,
     List<CampaignTimelineViewModel>? timelineItems,
     int? fundNumber,
+    int? invitationsApprovalsCount,
   }) {
     return WorkspaceState(
       isLoading: isLoading ?? this.isLoading,
@@ -52,6 +56,7 @@ final class WorkspaceState extends Equatable {
       userProposals: userProposals ?? this.userProposals,
       timelineItems: timelineItems ?? this.timelineItems,
       fundNumber: fundNumber ?? this.fundNumber,
+      invitationsApprovalsCount: invitationsApprovalsCount ?? this.invitationsApprovalsCount,
     );
   }
 }
@@ -75,6 +80,7 @@ final class WorkspaceStateUserProposals extends Equatable {
   final UserProposalsView published;
   final UserProposalsView notPublished;
   final bool hasComments;
+  final WorkspaceFilters currentFilter;
 
   const WorkspaceStateUserProposals({
     this.localProposals = const UserProposalsView(),
@@ -84,9 +90,13 @@ final class WorkspaceStateUserProposals extends Equatable {
     this.published = const UserProposalsView(),
     this.notPublished = const UserProposalsView(),
     this.hasComments = false,
+    this.currentFilter = WorkspaceFilters.allProposals,
   });
 
-  factory WorkspaceStateUserProposals.fromList(List<UsersProposalOverview> proposals) {
+  factory WorkspaceStateUserProposals.fromList(
+    List<UsersProposalOverview> proposals,
+    WorkspaceFilters filter,
+  ) {
     // Single-pass filtering for better performance
     final localProposalsList = <UsersProposalOverview>[];
     final draftProposalsList = <UsersProposalOverview>[];
@@ -137,6 +147,7 @@ final class WorkspaceStateUserProposals extends Equatable {
       published: UserProposalsView(items: publishedList),
       notPublished: UserProposalsView(items: notPublishedList),
       hasComments: hasComments,
+      currentFilter: filter,
     );
   }
 
@@ -149,5 +160,28 @@ final class WorkspaceStateUserProposals extends Equatable {
     published,
     notPublished,
     hasComments,
+    currentFilter,
   ];
+
+  WorkspaceStateUserProposals copyWith({
+    UserProposalsView? localProposals,
+    UserProposalsView? draftProposals,
+    UserProposalsView? finalProposals,
+    UserProposalsView? inactiveProposals,
+    UserProposalsView? published,
+    UserProposalsView? notPublished,
+    bool? hasComments,
+    WorkspaceFilters? currentFilter,
+  }) {
+    return WorkspaceStateUserProposals(
+      localProposals: localProposals ?? this.localProposals,
+      draftProposals: draftProposals ?? this.draftProposals,
+      finalProposals: finalProposals ?? this.finalProposals,
+      inactiveProposals: inactiveProposals ?? this.inactiveProposals,
+      published: published ?? this.published,
+      notPublished: notPublished ?? this.notPublished,
+      hasComments: hasComments ?? this.hasComments,
+      currentFilter: currentFilter ?? this.currentFilter,
+    );
+  }
 }

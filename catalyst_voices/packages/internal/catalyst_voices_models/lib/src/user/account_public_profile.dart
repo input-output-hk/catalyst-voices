@@ -14,6 +14,12 @@ final class AccountPublicProfile extends Equatable {
     this.rbacRegStatus = AccountPublicRbacStatus.unknown,
   });
 
+  AccountPublicProfile.fromAccountUnknown(Account account)
+    : this(
+        email: account.email ?? '',
+        username: account.username,
+      );
+
   @override
   List<Object?> get props => [
     email,

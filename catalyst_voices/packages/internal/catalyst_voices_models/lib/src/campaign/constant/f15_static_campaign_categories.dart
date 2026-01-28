@@ -129,10 +129,8 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Miss the partnership proof deadline.',
       'Use vague team bios; provide links.',
     ],
-    submissionCloseDate: DateTimeExt.now(),
     imageUrl: '',
   ),
-
   //Cardano Use Cases: Prototype & Launch
   CampaignCategory(
     id: f15ConstDocumentsRefs[1].category,
@@ -235,10 +233,9 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Use vague team bios; link your work.',
       'Budget for giveaways/re-grants.',
     ],
-    submissionCloseDate: DateTimeExt.now(),
     imageUrl: '',
   ),
-  //   //Cardano Open: Ecosystem
+  //Cardano Open: Ecosystem
   CampaignCategory(
     id: f15ConstDocumentsRefs[2].category,
     campaignRef: Campaign.f15Ref,
@@ -339,7 +336,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Use vague team bios; link your work.',
       'Focus on giveaways/incentives.',
     ],
-    submissionCloseDate: DateTimeExt.now(),
     imageUrl: '',
   ),
   //Midnight: Compact DApps
@@ -467,7 +463,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
       'Treat Compact like TypeScript.',
       'Outsource the core development.',
     ],
-    submissionCloseDate: DateTimeExt.now(),
     imageUrl: '',
   ),
 ];

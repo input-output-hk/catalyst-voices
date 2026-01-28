@@ -36,7 +36,7 @@ final class ProposalsCampaignFilters extends Equatable {
 }
 
 /// A set of filters to be applied when querying for proposals.
-final class ProposalsFiltersV2 extends Equatable {
+base class ProposalsFiltersV2 extends Equatable {
   /// Filters proposals by their effective status. If null, this filter is not applied.
   final ProposalStatusFilter? status;
 
@@ -44,10 +44,12 @@ final class ProposalsFiltersV2 extends Equatable {
   /// If null, this filter is not applied.
   final bool? isFavorite;
 
-  /// Filters proposals to only include those signed by this [originalAuthor].
-  /// By original author we mean author of first version (id == ver)
-  /// If null, this filter is not applied.
-  final CatalystId? originalAuthor;
+  /// Filters proposals by specific relationships (Author, Collaborator, etc.).
+  ///
+  /// If multiple relationships are provided, they are treated as an OR condition.
+  /// Example: {OriginalAuthor(A), CollaborationInvitation.accepted(A)} finds documents
+  /// where A is EITHER the author OR has accepted collaboration.
+  final Set<ProposalsRelationship> relationships;
 
   /// Filters proposals by their category ID.
   /// If null, this filter is not applied.
@@ -80,7 +82,7 @@ final class ProposalsFiltersV2 extends Equatable {
   const ProposalsFiltersV2({
     this.status,
     this.isFavorite,
-    this.originalAuthor,
+    this.relationships = const {},
     this.categoryId,
     this.searchQuery,
     this.latestUpdate,
@@ -93,7 +95,7 @@ final class ProposalsFiltersV2 extends Equatable {
   List<Object?> get props => [
     status,
     isFavorite,
-    originalAuthor,
+    relationships,
     categoryId,
     searchQuery,
     latestUpdate,
@@ -105,7 +107,7 @@ final class ProposalsFiltersV2 extends Equatable {
   ProposalsFiltersV2 copyWith({
     Optional<ProposalStatusFilter>? status,
     Optional<bool>? isFavorite,
-    Optional<CatalystId>? originalAuthor,
+    Set<ProposalsRelationship>? relationships,
     Optional<String>? categoryId,
     Optional<String>? searchQuery,
     Optional<Duration>? latestUpdate,
@@ -116,7 +118,7 @@ final class ProposalsFiltersV2 extends Equatable {
     return ProposalsFiltersV2(
       status: status.dataOr(this.status),
       isFavorite: isFavorite.dataOr(this.isFavorite),
-      originalAuthor: originalAuthor.dataOr(this.originalAuthor),
+      relationships: relationships ?? this.relationships,
       categoryId: categoryId.dataOr(this.categoryId),
       searchQuery: searchQuery.dataOr(this.searchQuery),
       latestUpdate: latestUpdate.dataOr(this.latestUpdate),
@@ -137,8 +139,8 @@ final class ProposalsFiltersV2 extends Equatable {
     if (isFavorite != null) {
       parts.add('isFavorite: $isFavorite');
     }
-    if (originalAuthor != null) {
-      parts.add('originalAuthor: $originalAuthor');
+    if (relationships.isNotEmpty) {
+      parts.add('relationships: (${relationships.map((e) => e.toString()).join(' OR ')})');
     }
     if (categoryId != null) {
       parts.add('categoryId: $categoryId');

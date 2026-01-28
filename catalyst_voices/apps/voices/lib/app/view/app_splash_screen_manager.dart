@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
+import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_linear_progress_indicator.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_loading_indicator.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -89,19 +91,19 @@ class _AnimatedProgressSection extends StatelessWidget {
 
 class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     with SingleTickerProviderStateMixin {
-  bool _areDocumentsSynced = false;
+  bool _isWaitingForDocumentsSync = true;
   bool _areImagesAndVideosCached = false;
-  bool _messageShownEnoughTime = true;
   bool _fontsAreReady = false;
 
-  final Stopwatch _loadingStopwatch = Stopwatch();
+  Timer? _progressDataTimerTicker;
   bool _showProgressIndicator = false;
-  Timer? _minimumVisibilityTimer;
 
-  late final SyncManager _syncManager;
+  StreamSubscription<double>? _syncProgressSub;
+  double _syncProgress = 0;
 
-  bool get _isReady =>
-      _areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime && _fontsAreReady;
+  final _loadingStopwatch = Stopwatch();
+
+  bool get _isReady => !_isWaitingForDocumentsSync && _areImagesAndVideosCached && _fontsAreReady;
 
   @override
   Widget build(BuildContext context) {
@@ -109,33 +111,24 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
       return widget.child;
     }
 
-    // Throttle progress updates to reduce rebuilds
-    final throttledStream = _syncManager.progressStream.distinct((prev, curr) {
-      if (prev <= 0 || curr >= 1.0) return false;
-
-      return (curr - prev).abs() < 0.008; // ~0.8% minimum change
-    });
-
-    return StreamBuilder<double>(
-      stream: throttledStream,
-      initialData: 0,
-      builder: (context, snapshot) {
-        final progress = snapshot.data ?? 0;
-        final shouldShow = _handleProgressBarVisibility(progress);
-
-        return _InAppLoading(
-          key: const Key('AppLoadingScreen'),
-          message: context.l10n.settingThingsAppInSplashScreen,
-          progress: progress,
-          showProgressBar: shouldShow,
-        );
-      },
+    return _InAppLoading(
+      key: const Key('AppLoadingScreen'),
+      message: context.l10n.settingThingsAppInSplashScreen,
+      progress: _syncProgress,
+      showProgressBar: _showProgressIndicator,
     );
   }
 
   @override
   void dispose() {
-    _minimumVisibilityTimer?.cancel();
+    _progressDataTimerTicker?.cancel();
+    _progressDataTimerTicker = null;
+
+    unawaited(_syncProgressSub?.cancel());
+    _syncProgressSub = null;
+
+    if (_loadingStopwatch.isRunning) _loadingStopwatch.stop();
+
     super.dispose();
   }
 
@@ -143,8 +136,8 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   void initState() {
     super.initState();
 
-    _syncManager = Dependencies.instance.get<SyncManager>();
-    _loadingStopwatch.start();
+    final syncManager = Dependencies.instance.get<SyncManager>();
+    _setupSyncProgressStreams(syncManager);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -152,9 +145,18 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
       }
     });
 
-    unawaited(_handleDocumentsSync());
+    unawaited(_handleDocumentsSync(syncManager));
     unawaited(_handleImageAndVideoPrecache());
     unawaited(_handleFonts());
+  }
+
+  bool _calculateShowProgressIndicator(double progress, Duration elapsed) {
+    if (progress == 0.0 || progress == 1.0) return false;
+
+    final elapsedInMilliseconds = elapsed.inMilliseconds.toDouble();
+    final estimatedTotal = elapsedInMilliseconds / progress;
+    final estimatedTimeRemaining = estimatedTotal - elapsedInMilliseconds;
+    return elapsedInMilliseconds > 500 && estimatedTimeRemaining > 500;
   }
 
   void _finishStartupProfilerIfReady() {
@@ -170,15 +172,30 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     profiler.finish();
   }
 
-  Future<void> _handleDocumentsSync() async {
-    final campaignPhaseAwareCubit = context.read<CampaignPhaseAwareCubit>();
+  /// Returns progress stream only for active sync request.
+  Stream<double> _getSyncProgressStream(SyncManager syncManager) {
+    final activeRequest = syncManager.activeRequest;
+    if (activeRequest == null) {
+      return Stream<double>.value(1);
+    }
 
-    await _syncManager.waitForSync;
-    await campaignPhaseAwareCubit.awaitForInitialize;
+    return syncManager.activeRequestProgress;
+  }
+
+  Future<void> _handleDocumentsSync(SyncManager syncManager) async {
+    final activeRequest = syncManager.activeRequest;
+    final isInitialProposalRoute = ProposalRoute.isPath(initialLocation);
+
+    if (activeRequest == null || (isInitialProposalRoute && activeRequest is! TargetSyncRequest)) {
+      _isWaitingForDocumentsSync = false;
+      return;
+    }
+
+    await syncManager.waitForActiveRequest;
 
     if (mounted) {
       setState(() {
-        _areDocumentsSynced = true;
+        _isWaitingForDocumentsSync = false;
         _finishStartupProfilerIfReady();
       });
     }
@@ -216,42 +233,37 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     }
   }
 
-  bool _handleProgressBarVisibility(double progress) {
-    final elapsed = _loadingStopwatch.elapsedMilliseconds;
-    var showProgressBar = false;
-
-    if (progress > 0 && progress < 1.0) {
-      final estimatedTotal = elapsed / progress;
-      final estimatedTimeRemaining = estimatedTotal - elapsed;
-      showProgressBar = elapsed > 500 && estimatedTimeRemaining > 500;
-
-      if (showProgressBar && !_showProgressIndicator) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && !_showProgressIndicator) {
-            setState(() {
-              _showProgressIndicator = true;
-            });
-            _startMinimumVisibilityTimer();
-          }
-        });
-      }
-    }
-
-    return showProgressBar || _showProgressIndicator;
+  void _handleSyncProgress(double value) {
+    setState(() {
+      _syncProgress = value;
+      _showProgressIndicator = _calculateShowProgressIndicator(value, _loadingStopwatch.elapsed);
+    });
   }
 
-  void _startMinimumVisibilityTimer() {
-    _minimumVisibilityTimer?.cancel();
+  void _setupSyncProgressStreams(SyncManager syncManager) {
+    _syncProgressSub = _getSyncProgressStream(
+      syncManager,
+    ).distinct(_throttleSyncProgress).listen(_handleSyncProgress);
 
-    // After 2 seconds, hide progress indicator and mark message as shown long enough
-    _minimumVisibilityTimer = Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _showProgressIndicator = false;
-          _messageShownEnoughTime = true;
-          _finishStartupProfilerIfReady();
-        });
-      }
+    _progressDataTimerTicker = Timer.periodic(
+      const Duration(milliseconds: 250),
+      _updateShowProgress,
+    );
+
+    _loadingStopwatch.start();
+  }
+
+  bool _throttleSyncProgress(double prev, double curr) {
+    if (prev <= 0 || curr >= 1.0) return false;
+
+    return (curr - prev).abs() < 0.008; // ~0.8% minimum change
+  }
+
+  void _updateShowProgress(Timer timer) {
+    setState(() {
+      final elapsed = _loadingStopwatch.elapsed;
+      final progress = _syncProgress;
+      _showProgressIndicator = _calculateShowProgressIndicator(progress, elapsed);
     });
   }
 }

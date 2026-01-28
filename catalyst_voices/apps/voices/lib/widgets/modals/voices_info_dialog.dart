@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 ///
 /// Call [VoicesDialog.show] with [VoicesInfoDialog] in order to show it.
 class VoicesInfoDialog extends StatelessWidget {
+  final IconThemeData? iconThemeData;
   final Widget icon;
   final Widget title;
   final Widget message;
@@ -16,6 +17,7 @@ class VoicesInfoDialog extends StatelessWidget {
 
   const VoicesInfoDialog({
     super.key,
+    this.iconThemeData,
     required this.icon,
     required this.title,
     required this.message,
@@ -34,7 +36,7 @@ class VoicesInfoDialog extends StatelessWidget {
     final iconThemeData = IconThemeData(
       size: 48,
       color: theme.colorScheme.primary,
-    );
+    ).merge(this.iconThemeData);
 
     final titleStyle = (textTheme.titleLarge ?? const TextStyle()).copyWith(
       color: colors.textOnPrimaryLevel0,

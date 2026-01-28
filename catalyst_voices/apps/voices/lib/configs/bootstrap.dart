@@ -3,8 +3,8 @@ import 'dart:core';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/app/app_initialization_choreographer.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
-import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -14,7 +14,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,15 +26,19 @@ const ReportingService _reportingService = _shouldUseSentry
 const _shouldUseSentry = kReleaseMode;
 
 var _bootstrapInitState = const _BootstrapState();
+var _initialLocation = Uri();
 
 final _loggerBootstrap = Logger('Bootstrap');
 final _loggerFlutter = Logger('Flutter');
 final _loggerPlatformDispatcher = Logger('PlatformDispatcher');
 final _loggerUncaughtZone = Logger('UncaughtZone');
+
 final _loggingService = LoggingService();
 
 @visibleForTesting
 AppConfig? get appConfig => _bootstrapInitState.appConfig;
+
+Uri get initialLocation => _initialLocation;
 
 @visibleForTesting
 LoggingService get loggingService => _loggingService;
@@ -102,19 +105,13 @@ Future<BootstrapArgs> bootstrap({
   );
 
   final router = buildAppRouter(initialLocation: initialLocation);
+  _initialLocation = router.routeInformationProvider.value.uri;
 
-  // Observer is very noisy on Logger. Enable it only if you want to debug
-  // something
-  Bloc.observer = AppBlocObserver(logOnChange: false);
-
-  if (config.stressTest.isEnabled && config.stressTest.clearDatabase) {
-    await Dependencies.instance.get<CatalystDatabase>().clear();
+  try {
+    await const AppInitializationChoreographer()(config, _initialLocation);
+  } catch (error, stack) {
+    unawaited(_reportBootstrapError(error, stack));
   }
-
-  Dependencies.instance.get<ReportingServiceMediator>().init();
-  unawaited(
-    startupProfiler.documentsSync(body: () => Dependencies.instance.get<SyncManager>().start()),
-  );
 
   return BootstrapArgs(
     routerConfig: router,

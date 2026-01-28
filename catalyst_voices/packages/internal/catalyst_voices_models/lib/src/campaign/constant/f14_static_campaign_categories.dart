@@ -86,7 +86,6 @@ The following will **not** be funded:
       '**No** Cardano infrastructure',
       '**No** way to prove your impact',
     ],
-    submissionCloseDate: DateTimeExt.now(),
   ),
   CampaignCategory(
     id: f14ConstDocumentsRefs[1].category,
@@ -166,7 +165,6 @@ The following will **not** be funded:
       '**No** info-only websites and content',
       '**No** moon metrics!',
     ],
-    submissionCloseDate: DateTimeExt.now(),
   ),
   CampaignCategory(
     id: f14ConstDocumentsRefs[2].category,
@@ -248,7 +246,6 @@ The following will **not** be funded:
       '**No** info-only websites and content',
       '**Forget to be open**, public, and available on Day 1',
     ],
-    submissionCloseDate: DateTimeExt.now(),
   ),
   CampaignCategory(
     id: f14ConstDocumentsRefs[3].category,
@@ -332,6 +329,5 @@ The following will **not** be funded:
       '**No** vague or irrelevant value to Cardano',
       '**No** clear targets or KPIs',
     ],
-    submissionCloseDate: DateTimeExt.now(),
   ),
 ];

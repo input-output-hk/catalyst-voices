@@ -20,6 +20,5 @@ export 'responsive/responsive_builder.dart';
 export 'responsive/responsive_child.dart';
 export 'responsive/responsive_child_builder.dart';
 export 'responsive/responsive_padding.dart';
-export 'user/dummy_catalyst_id_factory.dart';
 export 'user/user_observer.dart';
 export 'utils/utils.dart';

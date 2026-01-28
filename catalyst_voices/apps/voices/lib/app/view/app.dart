@@ -34,6 +34,7 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
     unawaited(Dependencies.instance.get<UserService>().useLocalUser());
+    Dependencies.instance.get<SessionCubit>().init();
   }
 
   List<BlocProvider> _multiBlocProviders() {

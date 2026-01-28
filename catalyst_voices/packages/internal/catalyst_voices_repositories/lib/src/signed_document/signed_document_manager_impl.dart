@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -34,23 +32,23 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       debounce: true,
     );
 
-    final rawPayload = await _decompressPayload(coseSign);
+    final payloadBytes = await _decompressPayload(coseSign);
 
     return _CoseSignedDocument.fromCose(
       coseSign,
-      rawPayload: rawPayload,
+      payloadBytes: payloadBytes,
     );
   }
 
   @override
   Future<SignedDocument> signDocument(
-    SignedDocumentPayload document, {
+    SignedDocumentPayload payload, {
     required DocumentDataMetadata metadata,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
     try {
-      final compressedPayload = await _compressPayload(document.toBytes());
+      final compressedPayload = await _compressPayload(payload.toBytes());
 
       final coseSign = await profiler.timeWithResult(
         'cose_sign_doc',
@@ -65,36 +63,84 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
         debounce: true,
       );
 
-      return _CoseSignedDocument(
-        coseSign: coseSign,
-        payload: document,
-        metadata: metadata,
-        signers: [catalystId],
+      return _CoseSignedDocument.fromCose(
+        coseSign,
+        payloadBytes: payload.toBytes(),
       );
     } on CoseSignException catch (error) {
       throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
     }
   }
 
-  Future<Uint8List> _compressPayload(Uint8List payload) async {
-    final compressed = await profiler.timeWithResult(
-      'brotli_compress',
-      () => brotli.compress(payload),
-      debounce: true,
-    );
-    return Uint8List.fromList(compressed);
+  @override
+  Future<SignedDocument> signUpdatedDocument(
+    DocumentArtifact artifact, {
+    required DocumentMetadataUpdatesBuilder buildMetadataUpdates,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  }) async {
+    try {
+      final cborValue = await profiler.timeWithResult(
+        'cbor_decode_doc',
+        () => cbor.decode(artifact.value),
+        debounce: true,
+      );
+
+      final coseSign = await profiler.timeWithResult(
+        'cose_decode',
+        () => CoseSign.fromCbor(cborValue),
+        debounce: true,
+      );
+
+      final signedDocument = _CoseSignedDocument.fromCose(
+        coseSign,
+        payloadBytes: await _decompressPayload(coseSign),
+      );
+
+      final updatedCoseSign = await profiler.timeWithResult(
+        'cose_sign_doc',
+        () {
+          return CoseSign.sign(
+            protectedHeaders: SignedDocumentMapper.applyCoseProtectedHeadersUpdates(
+              coseSign.protectedHeaders,
+              buildMetadataUpdates(signedDocument.metadata),
+            ),
+            unprotectedHeaders: coseSign.unprotectedHeaders,
+            payload: coseSign.payload,
+            signers: [_CatalystSigner(catalystId, privateKey)],
+          );
+        },
+        debounce: true,
+      );
+
+      return _CoseSignedDocument.fromCose(
+        updatedCoseSign,
+        payloadBytes: await _decompressPayload(updatedCoseSign),
+      );
+    } on CoseSignException catch (error) {
+      throw DocumentSignException('Failed to create a signed document!\nSource: ${error.source}');
+    }
   }
 
-  Future<Uint8List> _decompressPayload(CoseSign coseSign) async {
+  Future<CosePayload> _compressPayload(SignedDocumentPayloadBytes payload) async {
+    final compressed = await profiler.timeWithResult(
+      'brotli_compress',
+      () => brotli.compress(payload.bytes),
+      debounce: true,
+    );
+    return CosePayload(Uint8List.fromList(compressed));
+  }
+
+  Future<SignedDocumentPayloadBytes> _decompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == CoseHttpContentEncoding.brotli) {
       final decompressed = await profiler.timeWithResult(
         'brotli_decompress',
-        () => brotli.decompress(coseSign.payload),
+        () => brotli.decompress(coseSign.payload.bytes),
         debounce: true,
       );
-      return Uint8List.fromList(decompressed);
+      return SignedDocumentPayloadBytes(Uint8List.fromList(decompressed));
     } else {
-      return coseSign.payload;
+      return SignedDocumentPayloadBytes(coseSign.payload.bytes);
     }
   }
 }
@@ -166,7 +212,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
 
   factory _CoseSignedDocument.fromCose(
     CoseSign coseSign, {
-    required Uint8List rawPayload,
+    required SignedDocumentPayloadBytes payloadBytes,
   }) {
     final signers = coseSign.signatures
         .map((e) => e.protectedHeaders.kid)
@@ -180,7 +226,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
       signers: signers,
     );
     final payload = SignedDocumentPayload.fromBytes(
-      rawPayload,
+      payloadBytes,
       contentType: metadata.contentType,
     );
 
@@ -194,6 +240,9 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
 
   @override
   List<Object?> get props => [_coseSign, payload, metadata, signers];
+
+  @override
+  SignedDocumentRawPayload get rawPayload => SignedDocumentRawPayload(_coseSign.payload.bytes);
 
   @override
   DocumentArtifact toArtifact() {

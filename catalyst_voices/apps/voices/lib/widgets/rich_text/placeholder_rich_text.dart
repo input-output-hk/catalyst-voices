@@ -51,7 +51,8 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
   void didUpdateWidget(PlaceholderRichText oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.text != oldWidget.text) {
+    if (widget.text != oldWidget.text ||
+        widget.placeholderSpanBuilder != oldWidget.placeholderSpanBuilder) {
       _spans = _calculateSpans();
     }
   }

@@ -9,12 +9,16 @@ class DayMonthTimeText extends StatelessWidget {
   final DateTime dateTime;
   final bool showTimezone;
   final Color? color;
+  final TextStyle? timestampTextStyle;
+  final TextStyle? timezoneTextStyle;
 
   const DayMonthTimeText({
     super.key,
     required this.dateTime,
     this.showTimezone = false,
     this.color,
+    this.timestampTextStyle,
+    this.timezoneTextStyle,
   });
 
   @override
@@ -24,6 +28,12 @@ class DayMonthTimeText extends StatelessWidget {
     return TimezoneDateTimeTextTheme(
       data: TimezoneDateTimeTextThemeData(
         foregroundColor: color != null ? WidgetStatePropertyAll(color) : null,
+        timestampTextStyle: timestampTextStyle != null
+            ? WidgetStatePropertyAll(timestampTextStyle)
+            : null,
+        timezoneTextStyle: timezoneTextStyle != null
+            ? WidgetStatePropertyAll(timezoneTextStyle)
+            : null,
       ),
       child: TimezoneDateTimeText(
         dateTime,

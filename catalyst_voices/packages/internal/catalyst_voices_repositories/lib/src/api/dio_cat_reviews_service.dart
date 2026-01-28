@@ -29,6 +29,12 @@ abstract interface class CatReviewsService {
   /// Get a catalyst id from request.
   Future<CatalystIdPublic> getPublicProfile({String? authorization});
 
+  /// Returns true if account with a catalyst id from [lookup] is verified.
+  Future<bool> isPubliclyVerified({
+    required String lookup,
+    String? authorization,
+  });
+
   /// Update info associated with a catalyst id.
   Future<CatalystIdPublic> upsertPublicProfile({
     required CatalystIdCreate body,
@@ -55,6 +61,15 @@ final class DioCatReviewsService implements CatReviewsService {
       ),
       mapper: CatalystIdPublic.fromJson,
     );
+  }
+
+  @override
+  Future<bool> isPubliclyVerified({
+    required String lookup,
+    String? authorization,
+  }) {
+    // TODO(damian-molinski): Endpoint do not exist yet. Needs implementation.
+    return Future(() => true);
   }
 
   @override

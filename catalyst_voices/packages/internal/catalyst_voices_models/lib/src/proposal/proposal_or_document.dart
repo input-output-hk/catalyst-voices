@@ -8,6 +8,7 @@ import 'package:equatable/equatable.dart';
 /// specific template (`DocumentData`).
 ///
 /// This class provides a unified interface to access common properties
+///
 /// like [title], [description], etc., regardless of the
 /// underlying data type.
 ///
@@ -22,16 +23,27 @@ sealed class ProposalOrDocument extends Equatable {
   /// Creates a [ProposalOrDocument] from a structured [ProposalDocument].
   const factory ProposalOrDocument.proposal(ProposalDocument data) = _Proposal;
 
-  // TODO(damian-molinski): Category name should come from query but atm those are not documents.
-  /// The name of the proposal's category.
-  String? get categoryName {
+  /// Returns the underlying [ProposalDocument] if this is a proposal,
+  /// or null if it's just a document without a template.
+  ProposalDocument? get asProposalDocument => switch (this) {
+    _Proposal(:final data) => data,
+    _Document() => null,
+  };
+
+  Campaign? get campaign {
+    return Campaign.all.firstWhereOrNull((campaign) => campaign.hasAnyParameterId(parameters));
+  }
+
+  CampaignCategory? get category {
     return Campaign.all
         .map((e) => e.categories)
         .flattened
-        .firstWhereOrNull(
-          (category) => (_parameters ?? const DocumentParameters()).containsId(category.id.id),
-        )
-        ?.formattedCategoryName;
+        .firstWhereOrNull((category) => parameters.containsId(category.id.id));
+  }
+
+  /// The name of the proposal's category.
+  String? get categoryName {
+    return category?.formattedCategoryName;
   }
 
   /// A brief description of the proposal.
@@ -40,21 +52,31 @@ sealed class ProposalOrDocument extends Equatable {
   /// The duration of the proposal in months.
   int? get durationInMonths;
 
+  /// The number of fund this proposal was submitted for.
+  ///
+  /// Fund number should come from query but atm those are not documents.
+  int? get fundNumber {
+    return Campaign.all
+        .firstWhereOrNull((campaign) => campaign.hasAnyParameterId(parameters))
+        ?.fundNumber;
+  }
+
   /// The amount of funds requested by the proposal.
   Money? get fundsRequested;
 
   /// A reference to the document itself.
   DocumentRef get id;
 
+  bool get isDocument => this is _Document;
+
+  bool get isProposal => this is _Proposal;
+
   /// The title of the proposal.
   String? get title;
 
-  /// The version of the document.
-  String get version;
-
   /// A private getter for the category reference, used to find the
   /// [categoryName].
-  DocumentParameters? get _parameters;
+  DocumentParameters get parameters;
 }
 
 final class _Document extends ProposalOrDocument {
@@ -83,10 +105,7 @@ final class _Document extends ProposalOrDocument {
   String? get title => ProposalDocument.titleNodeId.from(data.content.data);
 
   @override
-  String get version => data.metadata.id.ver!;
-
-  @override
-  DocumentParameters? get _parameters => data.metadata.parameters;
+  DocumentParameters get parameters => data.metadata.parameters;
 }
 
 final class _Proposal extends ProposalOrDocument {
@@ -113,10 +132,7 @@ final class _Proposal extends ProposalOrDocument {
   String? get title => data.title;
 
   @override
-  String get version => data.metadata.id.ver!;
-
-  @override
-  DocumentParameters? get _parameters => data.metadata.parameters;
+  DocumentParameters get parameters => data.metadata.parameters;
 }
 
 extension on DocumentNodeId {

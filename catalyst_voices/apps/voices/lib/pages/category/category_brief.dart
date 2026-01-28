@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/category/change_category_button.dart';
-import 'package:catalyst_voices/pages/category/view_all_category_proposal_button.dart';
+import 'package:catalyst_voices/pages/category/widgets/change_category_button.dart';
+import 'package:catalyst_voices/pages/category/widgets/view_all_category_proposal_button.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';

@@ -21,6 +21,7 @@ dependencies:
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
   cbor: ^6.3.7
+  collection: ^1.19.1
   flutter:
     sdk: flutter
   flutter_localizations:

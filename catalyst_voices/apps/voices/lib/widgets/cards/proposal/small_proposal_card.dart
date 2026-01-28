@@ -98,7 +98,7 @@ class _Details extends StatelessWidget {
         },
         ProposalVersionChip(
           version: proposal.iteration.toString(),
-          useInternalBackground: !isPublished,
+          foregroundColor: !isPublished ? context.colors.iconsBackground : null,
         ),
         DayMonthTimeTextWithTooltip(
           datetime: proposal.updateDate,
@@ -109,7 +109,8 @@ class _Details extends StatelessWidget {
           offstage: proposal.commentsCount == 0,
           child: ProposalCommentsChip(
             commentsCount: proposal.commentsCount,
-            useInternalBackground: !isPublished,
+            foregroundColor: !isPublished ? context.colors.textOnPrimaryLevel1 : null,
+            backgroundColor: !isPublished ? context.colors.elevationsOnSurfaceNeutralLv1Grey : null,
           ),
         ),
       ],

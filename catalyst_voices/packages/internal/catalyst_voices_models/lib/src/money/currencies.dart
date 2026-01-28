@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/src/money/currency.dart';
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
-import 'package:catalyst_voices_models/src/money/money.dart';
+import 'package:catalyst_voices_models/src/money/money_model.dart';
 
 /// A list of known custom currencies.
 final class Currencies {

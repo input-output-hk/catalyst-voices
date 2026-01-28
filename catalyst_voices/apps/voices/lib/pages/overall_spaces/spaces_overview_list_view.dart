@@ -7,6 +7,7 @@ import 'package:catalyst_voices/widgets/containers/grey_out_container.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SpacesListView extends StatefulWidget {
@@ -73,6 +74,8 @@ class _SpacesListViewState extends State<SpacesListView> {
   @override
   void initState() {
     super.initState();
-    context.read<WorkspaceBloc>().add(const WatchUserProposalsEvent());
+    context.read<WorkspaceBloc>().add(
+      const ChangeWorkspaceFilters(filters: WorkspaceFilters.allProposals),
+    );
   }
 }

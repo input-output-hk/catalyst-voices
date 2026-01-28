@@ -3,21 +3,40 @@ import 'package:equatable/equatable.dart';
 
 final class DocumentIndexFilters extends Equatable {
   final List<DocumentType>? type;
-  final List<String> categoriesIds;
+  final SignedDocumentRef? id;
+  final List<String>? parameters;
 
   const DocumentIndexFilters({
     this.type,
-    required this.categoriesIds,
+    this.id,
+    this.parameters,
   });
 
-  DocumentIndexFilters.forCampaign(
-    this.type, {
+  DocumentIndexFilters.forCampaign({
     required Campaign campaign,
-  }) : categoriesIds = campaign.categories.map((e) => e.id.id).toSet().toList();
+    DocumentType? type,
+  }) : id = null,
+       type = type != null ? [type] : null,
+       parameters = campaign.categories.map((e) => e.id.id).toSet().toList();
+
+  const DocumentIndexFilters.forTarget(SignedDocumentRef this.id) : type = null, parameters = null;
 
   @override
   List<Object?> get props => [
     type,
-    categoriesIds,
+    id,
+    parameters,
   ];
+
+  DocumentIndexFilters copyWith({
+    Optional<List<DocumentType>>? type,
+    Optional<SignedDocumentRef>? id,
+    Optional<List<String>>? parameters,
+  }) {
+    return DocumentIndexFilters(
+      type: type.dataOr(this.type),
+      id: id.dataOr(this.id),
+      parameters: parameters.dataOr(this.parameters),
+    );
+  }
 }

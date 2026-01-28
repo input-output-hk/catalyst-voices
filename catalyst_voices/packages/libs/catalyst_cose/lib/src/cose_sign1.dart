@@ -4,6 +4,7 @@ import 'package:catalyst_cose/src/cose_constants.dart';
 import 'package:catalyst_cose/src/exception/cose_exception.dart';
 import 'package:catalyst_cose/src/exception/cose_format_exception.dart';
 import 'package:catalyst_cose/src/types/cose_headers.dart';
+import 'package:catalyst_cose/src/types/cose_payload.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
@@ -19,7 +20,7 @@ final class CoseSign1 extends Equatable {
   final CoseHeaders unprotectedHeaders;
 
   /// The data that is signed by the [signature].
-  final Uint8List payload;
+  final CosePayload payload;
 
   /// The cryptographic signature over the [protectedHeaders] and the [payload].
   final Uint8List signature;
@@ -51,7 +52,7 @@ final class CoseSign1 extends Equatable {
         unprotectedHeaders,
         encodeAsBytes: false,
       ),
-      payload: Uint8List.fromList((payload as CborBytes).bytes),
+      payload: CosePayload.fromCbor(payload),
       signature: Uint8List.fromList((signature as CborBytes).bytes),
     );
   }
@@ -70,7 +71,7 @@ final class CoseSign1 extends Equatable {
       [
         protectedHeaders.toCbor(),
         unprotectedHeaders.toCbor(),
-        CborBytes(payload),
+        payload.toCbor(),
         CborBytes(signature),
       ],
       tags: [
@@ -87,7 +88,7 @@ final class CoseSign1 extends Equatable {
   }) async {
     final sigStructure = _createCoseSign1SigStructure(
       protectedHeader: protectedHeaders.toCbor(),
-      payload: CborBytes(payload),
+      payload: payload.toCbor(),
     );
 
     final toBeSigned = cbor.encode(
@@ -113,7 +114,7 @@ final class CoseSign1 extends Equatable {
   static Future<CoseSign1> sign({
     required CoseHeaders protectedHeaders,
     required CoseHeaders unprotectedHeaders,
-    required Uint8List payload,
+    required CosePayload payload,
     required CatalystCoseSigner signer,
   }) async {
     try {
@@ -126,7 +127,7 @@ final class CoseSign1 extends Equatable {
 
       final sigStructure = _createCoseSign1SigStructure(
         protectedHeader: protectedHeaders.toCbor(),
-        payload: CborBytes(payload),
+        payload: payload.toCbor(),
       );
 
       final toBeSigned = Uint8List.fromList(

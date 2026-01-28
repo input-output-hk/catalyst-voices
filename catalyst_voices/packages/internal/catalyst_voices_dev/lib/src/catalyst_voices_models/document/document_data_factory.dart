@@ -8,8 +8,11 @@ abstract final class DocumentDataFactory {
     DocumentContentType contentType = DocumentContentType.json,
     DocumentType type = DocumentType.proposalDocument,
     SignedDocumentRef? id,
+    SignedDocumentRef? ref,
     SignedDocumentRef? template,
     DocumentParameters parameters = const DocumentParameters(),
+    List<CatalystId>? collaborators,
+    List<CatalystId>? authors,
     DocumentDataContent content = const DocumentDataContent({}),
     DocumentArtifact? artifact,
   }) {
@@ -20,8 +23,11 @@ abstract final class DocumentDataFactory {
       contentType: contentType,
       type: type,
       id: id,
+      ref: ref,
       template: template,
       parameters: parameters,
+      collaborators: collaborators,
+      authors: authors,
     );
 
     return DocumentDataWithArtifact(
@@ -37,9 +43,11 @@ abstract final class DocumentDataFactory {
     DraftRef? id,
     SignedDocumentRef? template,
     DocumentParameters parameters = const DocumentParameters(),
+    List<CatalystId>? collaborators,
+    List<CatalystId>? authors,
     DocumentDataContent content = const DocumentDataContent({}),
   }) {
-    id ??= DocumentRefFactory.draftRef();
+    id ??= DocumentRefFactory.draftDocumentRef();
 
     final metadata = DocumentDataMetadata(
       contentType: contentType,
@@ -47,6 +55,8 @@ abstract final class DocumentDataFactory {
       id: id,
       template: template,
       parameters: parameters,
+      collaborators: collaborators,
+      authors: authors,
     );
 
     return DocumentData(

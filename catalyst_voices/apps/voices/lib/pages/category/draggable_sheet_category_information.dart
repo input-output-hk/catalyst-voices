@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/category/card_information.dart';
+import 'package:catalyst_voices/pages/category/widgets/card_information/card_information.dart';
 import 'package:catalyst_voices/widgets/indicators/grab_handler_indicator.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';

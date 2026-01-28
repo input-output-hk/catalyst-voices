@@ -31,9 +31,7 @@ final class ProposalViewData extends Equatable {
     Optional<String>? categoryText,
   }) {
     return ProposalViewData(
-      isCurrentVersionLatest: isCurrentVersionLatest.dataOr(
-        this.isCurrentVersionLatest,
-      ),
+      isCurrentVersionLatest: isCurrentVersionLatest.dataOr(this.isCurrentVersionLatest),
       header: header ?? this.header,
       segments: segments ?? this.segments,
       categoryText: categoryText.dataOr(this.categoryText),

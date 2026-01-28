@@ -12,6 +12,7 @@ export 'dev_tools/dev_tools_repository.dart' show DevToolsRepository;
 export 'dev_tools/dev_tools_storage.dart';
 export 'document/document_mapper.dart' show DocumentMapperImpl;
 export 'document/document_repository.dart' show DocumentRepository;
+export 'document/documents_synchronizer.dart' show DocumentsSynchronizer;
 export 'document/exception/document_exception.dart';
 export 'document/source/database_documents_data_source.dart';
 export 'document/source/database_drafts_data_source.dart';
@@ -21,6 +22,8 @@ export 'document/source/document_data_source.dart';
 export 'document/source/local_document_data_local_source.dart';
 export 'document/source/signed_document_data_local_source.dart';
 export 'dto/document/document_dto.dart' show DocumentExt;
+// TODO(LynxLynxx): Remove this after #3602 merge
+export 'dto/user/rbac_registration_chain_dto.dart';
 export 'feature_flags/feature_flags_repository.dart' show FeatureFlagsRepository;
 export 'logging/logging_settings_storage.dart';
 export 'proposal/proposal_repository.dart' show ProposalRepository;

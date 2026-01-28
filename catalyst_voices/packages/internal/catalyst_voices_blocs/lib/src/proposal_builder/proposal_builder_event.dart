@@ -169,6 +169,17 @@ final class UnlockProposalBuilderEvent extends ProposalBuilderEvent {
   List<Object?> get props => [];
 }
 
+final class UpdateCollaboratorsEvent extends ProposalBuilderEvent {
+  final List<CatalystId> collaborators;
+
+  const UpdateCollaboratorsEvent({
+    required this.collaborators,
+  });
+
+  @override
+  List<Object?> get props => [collaborators];
+}
+
 final class UpdateCommentBuilderEvent extends ProposalBuilderEvent {
   final SignedDocumentRef ref;
   final bool show;

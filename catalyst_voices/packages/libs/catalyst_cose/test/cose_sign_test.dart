@@ -40,7 +40,7 @@ void main() {
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         signers: [signerVerifier],
-        payload: utf8.encode('Test payload'),
+        payload: CosePayload(utf8.encode('Test payload')),
       );
 
       for (final signature in coseSign.signatures) {
@@ -66,7 +66,7 @@ void main() {
       final coseSign = CoseSign(
         protectedHeaders: const CoseHeaders.protected(),
         unprotectedHeaders: const CoseHeaders.unprotected(),
-        payload: utf8.encode('Test payload'),
+        payload: CosePayload(utf8.encode('Test payload')),
         signatures: [
           CoseSignature(
             protectedHeaders: const CoseHeaders.protected(),

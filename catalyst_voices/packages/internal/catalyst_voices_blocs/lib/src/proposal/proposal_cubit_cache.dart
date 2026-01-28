@@ -4,87 +4,55 @@ import 'package:equatable/equatable.dart';
 
 /// Cache for [ProposalCubit].
 final class ProposalCubitCache extends Equatable {
+  final DocumentRef? id;
   final CatalystId? activeAccountId;
-  final DocumentRef? ref;
-  final ProposalDetailData? proposal;
-  final CampaignCategory? category;
+  final ProposalDataV2? proposalData;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
-  final bool? isFavorite;
-  final bool? isVotingStage;
-  final bool? showComments;
-  final bool? readOnlyMode;
-  final Vote? lastCastedVote;
 
   const ProposalCubitCache({
+    this.id,
     this.activeAccountId,
-    this.ref,
-    this.proposal,
-    this.category,
+    this.proposalData,
     this.commentTemplate,
     this.comments,
-    this.isFavorite,
-    this.isVotingStage,
-    this.showComments,
-    this.readOnlyMode,
-    this.lastCastedVote,
   });
 
   @override
   List<Object?> get props => [
+    id,
     activeAccountId,
-    ref,
-    proposal,
-    category,
+    proposalData,
     commentTemplate,
     comments,
-    isFavorite,
-    isVotingStage,
-    showComments,
-    readOnlyMode,
-    lastCastedVote,
   ];
 
   ProposalCubitCache copyWith({
+    Optional<DocumentRef>? id,
     Optional<CatalystId>? activeAccountId,
-    Optional<DocumentRef>? ref,
-    Optional<ProposalDetailData>? proposal,
-    Optional<CampaignCategory>? category,
+    Optional<ProposalDataV2>? proposalData,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
-    Optional<bool>? isFavorite,
-    Optional<bool>? isVotingStage,
-    Optional<bool>? showComments,
-    Optional<bool>? readOnlyMode,
-    Optional<Vote>? lastCastedVote,
   }) {
     return ProposalCubitCache(
+      id: id.dataOr(this.id),
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
-      ref: ref.dataOr(this.ref),
-      proposal: proposal.dataOr(this.proposal),
-      category: category.dataOr(this.category),
+      proposalData: proposalData.dataOr(this.proposalData),
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
-      isFavorite: isFavorite.dataOr(this.isFavorite),
-      isVotingStage: isVotingStage.dataOr(this.isVotingStage),
-      showComments: showComments.dataOr(this.showComments),
-      readOnlyMode: readOnlyMode.dataOr(this.readOnlyMode),
-      lastCastedVote: lastCastedVote.dataOr(this.lastCastedVote),
     );
+  }
+
+  ProposalCubitCache copyWithIsFavorite({required bool value}) {
+    return copyWith(proposalData: Optional(proposalData?.copyWith(isFavorite: value)));
   }
 
   ProposalCubitCache copyWithoutProposal() {
     return copyWith(
-      proposal: const Optional.empty(),
+      id: const Optional.empty(),
+      proposalData: const Optional.empty(),
       commentTemplate: const Optional.empty(),
       comments: const Optional.empty(),
-      isFavorite: const Optional.empty(),
-      isVotingStage: const Optional.empty(),
-      showComments: const Optional.empty(),
-      readOnlyMode: const Optional.empty(),
-      category: const Optional.empty(),
-      lastCastedVote: const Optional.empty(),
-      ref: const Optional.empty(),
     );
   }
 }

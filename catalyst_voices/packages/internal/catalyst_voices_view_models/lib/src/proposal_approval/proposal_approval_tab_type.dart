@@ -1,0 +1,4 @@
+enum ProposalApprovalTabType {
+  decide,
+  finalProposals,
+}

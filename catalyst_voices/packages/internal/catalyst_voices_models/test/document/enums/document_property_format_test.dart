@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/src/document/enums/document_property_format.dart';
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
-import 'package:catalyst_voices_models/src/money/money.dart';
+import 'package:catalyst_voices_models/src/money/money_model.dart';
 import 'package:test/test.dart';
 
 void main() {

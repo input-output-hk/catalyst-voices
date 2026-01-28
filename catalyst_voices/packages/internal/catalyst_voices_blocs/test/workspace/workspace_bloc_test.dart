@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -15,7 +16,7 @@ void main() {
     late MockProposalService mockProposalService;
     late MockDocumentMapper mockDocumentMapper;
     late MockDownloaderService mockDownloaderService;
-
+    late MockUserService mockUserService;
     late WorkspaceBloc workspaceBloc;
 
     final proposalRef = SignedDocumentRef.generateFirstRef();
@@ -28,6 +29,7 @@ void main() {
         template: SignedDocumentRef.generateFirstRef(),
         parameters: DocumentParameters({categoryRef}),
         authors: [authorId],
+        collaborators: const [],
       ),
       content: const DocumentDataContent({}),
     );
@@ -37,6 +39,8 @@ void main() {
       registerFallbackValue(documentData);
       registerFallbackValue(Uint8List(0));
       registerFallbackValue(const DraftRef(id: 'fallback'));
+      registerFallbackValue(const ProposalsFiltersV2());
+      registerFallbackValue(authorId);
       registerFallbackValue(const DocumentParameters());
     });
 
@@ -45,8 +49,46 @@ void main() {
       mockProposalService = MockProposalService();
       mockDocumentMapper = MockDocumentMapper();
       mockDownloaderService = MockDownloaderService();
+      mockUserService = MockUserService();
+
+      final mockKeychain = MockKeychain();
+      when(() => mockKeychain.id).thenReturn('test-keychain');
+      final mockAccount = Account.dummy(
+        catalystId: authorId,
+        keychain: mockKeychain,
+        isActive: true,
+      );
+
+      // Set up default mocks for user service
+      when(() => mockUserService.user).thenReturn(
+        User.optional(accounts: [mockAccount]),
+      );
+      when(() => mockUserService.watchUnlockedActiveAccount).thenAnswer(
+        (_) => Stream.value(mockAccount),
+      );
+
+      // Set up default mock for campaign service
+      when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
+        (_) async => null,
+      );
+      when(() => mockCampaignService.watchActiveCampaign).thenAnswer(
+        (_) => Stream.value(null),
+      );
+
+      // Set up default mock for invitations and approvals count
+      when(() => mockProposalService.watchInvitesApprovalsCount(id: any(named: 'id'))).thenAnswer(
+        (_) => Stream.value(const AccountInvitesApprovalsCount(invitesCount: 0, approvalsCount: 0)),
+      );
+
+      // Set up default mock for watching workspace proposals
+      when(
+        () => mockProposalService.watchWorkspaceProposalsBrief(filters: any(named: 'filters')),
+      ).thenAnswer(
+        (_) => const Stream.empty(),
+      );
 
       workspaceBloc = WorkspaceBloc(
+        mockUserService,
         mockCampaignService,
         mockProposalService,
         mockDocumentMapper,
@@ -57,187 +99,31 @@ void main() {
     tearDown(() async {
       await workspaceBloc.close();
     });
+
     test('initial state is correct', () {
       expect(workspaceBloc.state, const WorkspaceState());
     });
 
-    blocTest<WorkspaceBloc, WorkspaceState>(
-      'emit loading state and loaded state when watching proposals succeeds',
-      setUp: () async {
-        when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
-          (_) async => Campaign(
-            id: SignedDocumentRef.generateFirstRef(),
-            name: 'Catalyst Fund14',
-            description: 'Description',
-            allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            fundNumber: 14,
-            timeline: const CampaignTimeline(phases: []),
-            publish: CampaignPublish.published,
-            categories: [
-              CampaignCategory(
-                id: categoryRef,
-                campaignRef: SignedDocumentRef.generateFirstRef(),
-                categoryName: 'Test Category',
-                categorySubname: 'Test Subname',
-                description: 'Test description',
-                shortDescription: 'Test short description',
-                availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
-                imageUrl: '',
-                range: Range(
-                  min: _adaMajorUnits(10),
-                  max: _adaMajorUnits(100),
-                ),
-                currency: Currencies.ada,
-                descriptions: const [],
-                dos: const [],
-                donts: const [],
-                submissionCloseDate: DateTime(2024, 12, 31),
-              ),
-            ],
-          ),
-        );
-      },
-      build: () {
-        when(() => mockProposalService.watchUserProposals()).thenAnswer(
-          (_) => Stream.value(
-            [ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef)],
-          ),
-        );
-        return workspaceBloc;
-      },
-      act: (bloc) => bloc.add(const WatchUserProposalsEvent()),
-      expect: () => [
-        isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', true),
-        isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', false),
-      ],
-    );
-
-    blocTest<WorkspaceBloc, WorkspaceState>(
-      'watch user proposals - success',
-      setUp: () async {
-        when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
-          (_) async => Campaign(
-            id: SignedDocumentRef.generateFirstRef(),
-            name: 'Catalyst Fund14',
-            description: 'Description',
-            allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
-            // TODO(LynxLynxx): refactor it when _mapProposalToViewModel will be refactored
-            fundNumber: 0,
-            timeline: const CampaignTimeline(phases: []),
-            publish: CampaignPublish.published,
-            categories: [
-              CampaignCategory(
-                id: categoryRef,
-                campaignRef: SignedDocumentRef.generateFirstRef(),
-                categoryName: 'Test Category',
-                categorySubname: 'Test Subname',
-                description: 'Test description',
-                shortDescription: 'Test short description',
-                availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
-                imageUrl: '',
-                range: Range(
-                  min: _adaMajorUnits(10),
-                  max: _adaMajorUnits(100),
-                ),
-                currency: Currencies.ada,
-                descriptions: const [],
-                dos: const [],
-                donts: const [],
-                submissionCloseDate: DateTime(2024, 12, 31),
-              ),
-            ],
-          ),
-        );
-      },
-      build: () {
-        when(() => mockProposalService.watchUserProposals()).thenAnswer(
-          (_) => Stream.value([
-            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
-            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
-          ]),
-        );
-
-        return workspaceBloc;
-      },
-      act: (bloc) => bloc.add(const WatchUserProposalsEvent()),
-      expect: () => [
-        isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', true),
-        isA<WorkspaceState>()
-            .having((s) => s.isLoading, 'isLoading', false)
-            .having((s) => s.userProposals.localProposals.items.length, 'proposals count', 2),
-      ],
-    );
-
-    blocTest<WorkspaceBloc, WorkspaceState>(
-      'watch user proposals - failure',
-      build: () {
-        when(
-          () => mockProposalService.watchUserProposals(),
-        ).thenAnswer((_) => Stream.error(Exception('Failed to load')));
-        return workspaceBloc;
-      },
-      act: (bloc) => bloc.add(const WatchUserProposalsEvent()),
-      expect: () => [
-        isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', true),
-        isA<WorkspaceState>()
-            .having((s) => s.isLoading, 'isLoading', false)
-            .having((s) => s.error, 'has error', isNotNull),
-      ],
-    );
-
     group('Proposal sync tests', () {
-      UsersProposalOverview createProposal({
-        required String title,
-        required ProposalPublish publish,
-        required int commentsCount,
-        bool isLatestLocal = false,
-        DocumentRef? id,
-      }) {
-        final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
-        return UsersProposalOverview(
-          id: effectiveId,
-          parameters: DocumentParameters({categoryRef}),
-          title: title,
-          updateDate: DateTime(2025, 10, 15),
-          fundsRequested: Money.zero(currency: Currencies.ada),
-          publish: publish,
-          versions: [
-            ProposalVersionViewModel(
-              title: title,
-              id: effectiveId,
-              createdAt: DateTime(2025, 10, 15),
-              publish: publish,
-              isLatest: true,
-              isLatestLocal: isLatestLocal,
-              versionNumber: 1,
-            ),
-          ],
-          fromActiveCampaign: true,
-          commentsCount: commentsCount,
-          category: 'Test Category',
-          fundNumber: 14,
-        );
-      }
-
       blocTest<WorkspaceBloc, WorkspaceState>(
-        'loading proposals all derived properties stay in sync',
+        'internal data change - all derived properties stay in sync',
         build: () => workspaceBloc,
         act: (bloc) {
           final proposals = [
-            createProposal(
+            _createProposal(
               title: 'Local 1',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
-              title: 'Local 2 with comments',
+            _createProposal(
+              title: 'Local 2',
               publish: ProposalPublish.localDraft,
-              commentsCount: 3,
+              commentsCount: 0,
               isLatestLocal: true,
             ),
           ];
-          bloc.add(LoadProposalsEvent(proposals));
+          bloc.add(InternalDataChangeEvent(proposals));
         },
         expect: () => [
           isA<WorkspaceState>()
@@ -263,41 +149,41 @@ void main() {
               )
               .having(
                 (s) => s.userProposals.hasComments,
-                'hasComments is true because local2 has comments',
-                true,
+                'hasComments is false',
+                false,
               ),
         ],
       );
 
       blocTest<WorkspaceBloc, WorkspaceState>(
-        'loadProposals - all derived properties stay in sync',
+        'internal data change - all derived properties stay in sync with mixed proposals',
         build: () => workspaceBloc,
         act: (bloc) {
           final proposals = [
-            createProposal(
+            _createProposal(
               title: 'Local 1',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
-              title: 'Local 2 with comments',
+            _createProposal(
+              title: 'Local 2',
               publish: ProposalPublish.localDraft,
-              commentsCount: 3,
+              commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
+            _createProposal(
               title: 'Draft',
               publish: ProposalPublish.publishedDraft,
               commentsCount: 5,
             ),
-            createProposal(
+            _createProposal(
               title: 'Final',
               publish: ProposalPublish.submittedProposal,
-              commentsCount: 0,
+              commentsCount: 2,
             ),
           ];
-          bloc.add(LoadProposalsEvent(proposals));
+          bloc.add(InternalDataChangeEvent(proposals));
         },
         expect: () => [
           isA<WorkspaceState>()
@@ -309,7 +195,7 @@ void main() {
               .having((s) => s.userProposals.published.items.length, 'published count', 2)
               // notPublished includes locals with isLatestLocal
               .having((s) => s.userProposals.notPublished.items.length, 'notPublished count', 2)
-              // hasComments is true because local2 and draft have comments
+              // hasComments is true because draft and final have comments
               .having((s) => s.userProposals.hasComments, 'hasComments', true),
         ],
       );
@@ -321,20 +207,20 @@ void main() {
         },
         build: () => workspaceBloc,
         act: (bloc) {
-          final local = createProposal(
+          final local = _createProposal(
             title: 'Local',
             publish: ProposalPublish.localDraft,
             commentsCount: 0,
             isLatestLocal: true,
           );
           const draftRef = DraftRef(id: 'draft-123');
-          final draft = createProposal(
+          final draft = _createProposal(
             title: 'Draft',
             publish: ProposalPublish.publishedDraft,
             commentsCount: 5,
             id: draftRef,
           );
-          final final$ = createProposal(
+          final final$ = _createProposal(
             title: 'Final',
             publish: ProposalPublish.submittedProposal,
             commentsCount: 0,
@@ -342,7 +228,7 @@ void main() {
 
           // Load initial proposals and delete the draft proposal
           bloc
-            ..add(LoadProposalsEvent([local, draft, final$]))
+            ..add(InternalDataChangeEvent([local, draft, final$]))
             ..add(const DeleteDraftProposalEvent(ref: draftRef));
         },
         expect: () => [
@@ -373,39 +259,65 @@ void main() {
       );
 
       blocTest<WorkspaceBloc, WorkspaceState>(
-        'forgetProposal - derived properties stay in sync after forgetting',
+        'leaveProposal - delegates to the proposal service',
         setUp: () {
           when(
-            () => mockProposalService.forgetProposal(
-              proposalRef: any(named: 'proposalRef'),
-              proposalParameters: any(named: 'proposalParameters'),
+            () => mockProposalService.submitCollaboratorProposalAction(
+              proposalId: any(named: 'proposalId'),
+              action: CollaboratorProposalAction.leaveProposal,
             ),
           ).thenAnswer((_) async => {});
         },
         build: () => workspaceBloc,
         act: (bloc) {
-          final local1 = createProposal(
+          const ref = SignedDocumentRef(id: 'signed-123');
+          bloc.add(const LeaveProposalEvent(ref));
+        },
+        verify: (_) {
+          verify(
+            () => mockProposalService.submitCollaboratorProposalAction(
+              proposalId: any(named: 'proposalId'),
+              action: CollaboratorProposalAction.leaveProposal,
+            ),
+          ).called(1);
+        },
+      );
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
+        'forgetProposal - derived properties stay in sync after forgetting',
+        setUp: () {
+          when(
+            () => mockProposalService.forgetProposal(
+              proposalId: any(named: 'proposalId'),
+            ),
+          ).thenAnswer((_) async => {});
+        },
+        build: () => workspaceBloc,
+        act: (bloc) {
+          final local1 = _createProposal(
             title: 'Local 1',
             publish: ProposalPublish.localDraft,
             commentsCount: 0,
             isLatestLocal: true,
           );
-          final local2 = createProposal(
-            title: 'Local 2 with comments',
+          final local2Ref = SignedDocumentRef.generateFirstRef();
+          final local2 = _createProposal(
+            title: 'Local 2',
             publish: ProposalPublish.localDraft,
-            commentsCount: 3,
+            commentsCount: 0,
             isLatestLocal: true,
+            id: local2Ref,
           );
-          final draft = createProposal(
+          final draft = _createProposal(
             title: 'Draft',
             publish: ProposalPublish.publishedDraft,
             commentsCount: 5,
           );
 
-          // Load initial proposals
+          // Load initial proposals and forget local2
           bloc
-            ..add(LoadProposalsEvent([local1, local2, draft]))
-            ..add(ForgetProposalEvent(local2.id));
+            ..add(InternalDataChangeEvent([local1, local2, draft]))
+            ..add(ForgetProposalEvent(local2Ref));
         },
         expect: () => [
           // After load
@@ -430,8 +342,7 @@ void main() {
         verify: (_) {
           verify(
             () => mockProposalService.forgetProposal(
-              proposalRef: any(named: 'proposalRef'),
-              proposalParameters: DocumentParameters({categoryRef}),
+              proposalId: any(named: 'proposalId'),
             ),
           ).called(1);
         },
@@ -442,19 +353,19 @@ void main() {
         build: () => workspaceBloc,
         act: (bloc) {
           final proposals = [
-            createProposal(
+            _createProposal(
               title: 'Local',
               publish: ProposalPublish.localDraft,
               commentsCount: 0,
               isLatestLocal: true,
             ),
-            createProposal(
+            _createProposal(
               title: 'Final',
               publish: ProposalPublish.submittedProposal,
               commentsCount: 0,
             ),
           ];
-          bloc.add(LoadProposalsEvent(proposals));
+          bloc.add(InternalDataChangeEvent(proposals));
         },
         expect: () => [
           isA<WorkspaceState>()
@@ -463,12 +374,66 @@ void main() {
               .having((s) => s.userProposals.finalProposals.items.length, 'final count', 1),
         ],
       );
+
+      blocTest<WorkspaceBloc, WorkspaceState>(
+        'change workspace filters - updates state correctly',
+        setUp: () {
+          when(
+            () => mockProposalService.watchWorkspaceProposalsBrief(filters: any(named: 'filters')),
+          ).thenAnswer((_) => const Stream.empty());
+        },
+        build: () => workspaceBloc,
+        act: (bloc) {
+          bloc.add(const ChangeWorkspaceFilters(filters: WorkspaceFilters.mainProposer));
+        },
+        expect: () => [
+          isA<WorkspaceState>()
+              .having((s) => s.isLoading, 'isLoading', true)
+              .having(
+                (s) => s.userProposals.currentFilter,
+                'filter',
+                WorkspaceFilters.mainProposer,
+              ),
+          isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', false),
+        ],
+      );
     });
   });
 }
 
-Money _adaMajorUnits(int majorUnits) {
-  return Money.fromMajorUnits(currency: Currencies.ada, majorUnits: BigInt.from(majorUnits));
+UsersProposalOverview _createProposal({
+  required String title,
+  required ProposalPublish publish,
+  required int commentsCount,
+  bool isLatestLocal = false,
+  DocumentRef? id,
+}) {
+  final effectiveId = id ?? SignedDocumentRef.generateFirstRef();
+  return UsersProposalOverview(
+    id: effectiveId,
+    title: title,
+    updateDate: DateTime(2025, 10, 15),
+    fundsRequested: Money.zero(currency: Currencies.ada),
+    publish: publish,
+    versions: [
+      ProposalVersionViewModel(
+        title: title,
+        id: effectiveId,
+        createdAt: DateTime(2025, 10, 15),
+        publish: publish,
+        isLatest: true,
+        isLatestLocal: isLatestLocal,
+        versionNumber: 1,
+      ),
+    ],
+    fromActiveCampaign: true,
+    commentsCount: commentsCount,
+    category: 'Test Category',
+    fundNumber: 14,
+    iteration: 1,
+    ownership: const AuthorProposalOwnership(),
+    parameters: const DocumentParameters(),
+  );
 }
 
 class MockCampaignService extends Mock implements CampaignService {}
@@ -478,3 +443,5 @@ class MockDocumentMapper extends Mock implements DocumentMapper {}
 class MockDownloaderService extends Mock implements DownloaderService {}
 
 class MockProposalService extends Mock implements ProposalService {}
+
+class MockUserService extends Mock implements UserService {}

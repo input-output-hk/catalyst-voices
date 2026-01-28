@@ -45,7 +45,7 @@ void main() {
     group('index', () {
       test('calls API with mapped filters for categories ids', () async {
         // Given
-        const filters = DocumentIndexFilters(categoriesIds: ['cat1', 'cat2']);
+        const filters = DocumentIndexFilters(parameters: ['cat1', 'cat2']);
         const page = 0;
         const limit = 10;
 
@@ -80,12 +80,12 @@ void main() {
                 ).captured.last
                 as DocumentIndexQueryFilter;
 
-        expect(captured.parameters?.id?.inside, equals(filters.categoriesIds));
+        expect(captured.parameters?.id?.inside, equals(filters.parameters));
       });
 
       test('handles dynamic json correctly', () async {
         // Given
-        const filters = DocumentIndexFilters(categoriesIds: []);
+        const filters = DocumentIndexFilters(parameters: []);
         const page = 0;
         const limit = 10;
 

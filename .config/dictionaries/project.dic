@@ -76,6 +76,7 @@ collabs
 commitlog
 concatcp
 configureondemand
+coproposer
 coproposers
 COSE
 coti
@@ -253,6 +254,7 @@ msedgedriver
 multiasset
 multidex
 Multiplatform
+myactions
 myproject
 Nami
 nanos

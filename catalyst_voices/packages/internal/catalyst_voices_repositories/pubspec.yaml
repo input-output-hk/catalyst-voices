@@ -38,6 +38,7 @@ dependencies:
   meta: ^1.16.0
   package_info_plus: ^8.3.0
   path: ^1.9.1
+  pool: ^1.5.1
   result_type: ^1.0.0
   rxdart: ^0.28.0
   sentry_flutter: ^9.6.0

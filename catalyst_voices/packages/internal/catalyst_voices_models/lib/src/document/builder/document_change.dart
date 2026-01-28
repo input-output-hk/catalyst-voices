@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/document/document.dart';
+import 'package:catalyst_voices_models/src/document/document_model.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:equatable/equatable.dart';
 

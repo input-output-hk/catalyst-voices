@@ -137,9 +137,11 @@ class _ProposalsPageState extends State<ProposalsPage>
       _determineTabs,
     ).distinct().listen(_updateTabsIfNeeded);
 
-    _cubit.init(
-      categoryId: widget.categoryId,
-      tab: widget.tab ?? ProposalsPageTab.total,
+    unawaited(
+      _cubit.init(
+        categoryId: widget.categoryId,
+        tab: widget.tab ?? ProposalsPageTab.total,
+      ),
     );
 
     _pagingController

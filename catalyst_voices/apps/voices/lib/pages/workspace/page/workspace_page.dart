@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
-import 'package:catalyst_voices/pages/workspace/header/workspace_header.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_error.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
-import 'package:catalyst_voices/pages/workspace/page/workspace_user_proposals.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/header/workspace_header.dart';
+import 'package:catalyst_voices/pages/workspace/widgets/workspace_content.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -26,6 +26,7 @@ class WorkspacePage extends StatefulWidget {
 
 class _WorkspacePageState extends State<WorkspacePage>
     with
+        TickerProviderStateMixin,
         SignalHandlerStateMixin<WorkspaceBloc, WorkspaceSignal, WorkspacePage>,
         ErrorHandlerStateMixin<WorkspaceBloc, WorkspacePage> {
   @override
@@ -44,7 +45,7 @@ class _WorkspacePageState extends State<WorkspacePage>
               SliverToBoxAdapter(
                 child: WorkspaceError(),
               ),
-              WorkspaceUserProposals(),
+              WorkspaceContent(),
               SliverToBoxAdapter(
                 child: SizedBox(height: 50),
               ),
@@ -87,10 +88,9 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   void initState() {
     super.initState();
-    final bloc = context.read<WorkspaceBloc>();
-    // ignore: cascade_invocations
-    bloc
-      ..add(const WatchUserProposalsEvent())
+
+    context.read<WorkspaceBloc>()
+      ..add(const InitWorkspaceEvent())
       ..add(const GetTimelineItemsEvent());
   }
 

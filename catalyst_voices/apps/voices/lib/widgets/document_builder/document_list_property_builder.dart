@@ -11,6 +11,7 @@ class DocumentListPropertyBuilder extends StatefulWidget {
   final DocumentListProperty property;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
+  final CollaboratorsSectionData collaboratorsSectionData;
   final DocumentPropertyBuilderOverrides? overrides;
 
   const DocumentListPropertyBuilder({
@@ -18,6 +19,7 @@ class DocumentListPropertyBuilder extends StatefulWidget {
     required this.property,
     required this.isEditMode,
     required this.onChanged,
+    required this.collaboratorsSectionData,
     this.overrides,
   });
 
@@ -36,6 +38,7 @@ class _DocumentListPropertyBuilderState extends State<DocumentListPropertyBuilde
       autovalidateMode: _autovalidateMode,
       isEditMode: widget.isEditMode,
       onDocumentChanged: _onDocumentChanged,
+      collaboratorsSectionData: widget.collaboratorsSectionData,
       overrides: widget.overrides,
     );
   }
@@ -63,6 +66,7 @@ class _FormField extends VoicesFormField<DocumentListProperty> {
     super.autovalidateMode,
     required bool isEditMode,
     required ValueChanged<List<DocumentChange>> onDocumentChanged,
+    required CollaboratorsSectionData collaboratorsSectionData,
     required DocumentPropertyBuilderOverrides? overrides,
   }) : super(
          enabled: isEditMode,
@@ -91,6 +95,7 @@ class _FormField extends VoicesFormField<DocumentListProperty> {
                      property: child,
                      isEditMode: isEditMode,
                      onChanged: onDocumentChanged,
+                     collaboratorsSectionData: collaboratorsSectionData,
                      overrides: overrides,
                    );
                  }),

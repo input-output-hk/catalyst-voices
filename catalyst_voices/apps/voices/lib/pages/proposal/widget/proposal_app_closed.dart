@@ -20,6 +20,7 @@ class ProposalAppClosed extends StatefulWidget {
 
 class _AppCloseText extends StatelessWidget {
   final MainAxisSize mainAxisSize;
+
   const _AppCloseText({this.mainAxisSize = MainAxisSize.min});
 
   @override

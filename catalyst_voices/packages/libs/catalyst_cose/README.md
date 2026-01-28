@@ -56,7 +56,7 @@ Future<void> _coseSign1() async {
     protectedHeaders: const CoseHeaders.protected(),
     unprotectedHeaders: const CoseHeaders.unprotected(),
     signer: signerVerifier,
-    payload: utf8.encode('This is the content.'),
+    payload: CosePayload(utf8.encode('This is the content.')),
   );
 
   final verified = await coseSign1.verify(
@@ -83,7 +83,7 @@ Future<void> _coseSign() async {
     protectedHeaders: const CoseHeaders.protected(),
     unprotectedHeaders: const CoseHeaders.unprotected(),
     signers: [signerVerifier],
-    payload: utf8.encode('This is the content.'),
+    payload: CosePayload(utf8.encode('This is the content.')),
   );
 
   final verified = await coseSign.verifyAll(
