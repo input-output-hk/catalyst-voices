@@ -2225,6 +2225,10 @@
   "@myRoles": {
     "description": "Header text for user's roles section"
   },
+  "myVotingPower": "My Voting Power",
+  "@myVotingPower": {
+    "description": "Tab label for my proposals in voting space"
+  },
   "nameOfWallet": "Name of the wallet",
   "@nameOfWallet": {
     "description": "Text used in wallet information summary"
