@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use catalyst_types::catalyst_id::{key_rotation::KeyRotation, role_index::RoleId};
+use catalyst_types::catalyst_id::{CatalystId, key_rotation::KeyRotation, role_index::RoleId};
 use ed25519_dalek::VerifyingKey;
 
 use super::str_env_var::StringEnvVar;
@@ -12,7 +12,7 @@ use super::str_env_var::StringEnvVar;
 pub(crate) struct EnvVars {
     /// The Catalyst Signed Document Admin Catalyst ID from the `ADMIN_CATALYST_ID`
     /// env.
-    admin_key: Option<catalyst_signed_doc::CatalystId>,
+    admin_key: Option<CatalystId>,
 }
 
 impl EnvVars {
@@ -53,7 +53,7 @@ impl EnvVars {
     /// assigned Admin Catalyst ID.
     pub(crate) fn get_admin_key(
         &self,
-        cat_id: &catalyst_signed_doc::CatalystId,
+        cat_id: &CatalystId,
         role: RoleId,
     ) -> Option<(VerifyingKey, KeyRotation)> {
         if let Some(ref admin_key) = self.admin_key
@@ -68,8 +68,8 @@ impl EnvVars {
 }
 
 /// Convert an Envvar into the Catalyst ID type, `None` if missing or invalid value.
-fn string_to_catalyst_id(s: &str) -> Option<catalyst_signed_doc::CatalystId> {
-    catalyst_signed_doc::CatalystId::from_str(s)
+fn string_to_catalyst_id(s: &str) -> Option<CatalystId> {
+    CatalystId::from_str(s)
         .inspect_err(|err| {
             tracing::error!(
                 err = ?err,

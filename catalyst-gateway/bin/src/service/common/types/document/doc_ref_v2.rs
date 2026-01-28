@@ -42,11 +42,7 @@ impl From<catalyst_signed_doc::DocumentRef> for DocumentReferenceV2 {
         Self {
             doc_id: (*value.id()).into(),
             ver: (*value.ver()).into(),
-            cid: if value.doc_locator().is_empty() {
-                None
-            } else {
-                Some(value.doc_locator().clone().into())
-            },
+            cid: Some(value.doc_locator().clone().into()),
         }
     }
 }

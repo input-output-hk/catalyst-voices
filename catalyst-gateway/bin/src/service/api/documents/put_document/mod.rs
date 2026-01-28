@@ -132,11 +132,11 @@ pub(crate) async fn endpoint(
         Ok(false) => {
             match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
                 Ok(true) => (),
-                Ok(false) if doc.problem_report().is_problematic() => {
+                Ok(false) if doc.report().is_problematic() => {
                     return Responses::UnprocessableContent(Json(
                         PutDocumentUnprocessableContent::new(
                             "Failed validating document integrity",
-                            Some(doc.problem_report()),
+                            Some(doc.report()),
                         ),
                     ))
                     .into();
@@ -155,10 +155,10 @@ pub(crate) async fn endpoint(
         Err(err) => return AllResponses::handle_error(&err),
     }
 
-    if doc.problem_report().is_problematic() {
+    if doc.report().is_problematic() {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "Invalid Catalyst Signed Document",
-            Some(doc.problem_report()),
+            Some(doc.report()),
         )))
         .into();
     }
