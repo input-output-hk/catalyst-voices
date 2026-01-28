@@ -35,11 +35,13 @@ class _AccountVotingRoleCards extends StatelessWidget {
         votingPower: votingPower,
       ),
       VotingRoleViewModelRepresentative(
+        :final totalVotingPower,
         :final ownVotingPower,
         :final delegatedVotingPower,
         :final delegatorsCount,
       ) =>
         _RepresentativeVotingRoleCards(
+          totalVotingPower: totalVotingPower,
           ownVotingPower: ownVotingPower,
           delegatedVotingPower: delegatedVotingPower,
           delegatorsCount: delegatorsCount,
@@ -75,7 +77,7 @@ class _DelegatorVotingRoleCards extends StatelessWidget {
         ),
         AccountVotingRoleInfoCard(
           label: context.l10n.myDelegatedVotingPower,
-          value: votingPower.amount,
+          value: Text(votingPower.amount.formattedWithSymbol),
           onInfoTap: () {
             // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
           },
@@ -94,7 +96,7 @@ class _IndividualVotingRoleCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return AccountVotingRoleInfoCard(
       label: context.l10n.myVotingPower,
-      value: votingPower.amount,
+      value: Text(votingPower.amount.formattedWithSymbol),
       onInfoTap: () {
         // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
       },
@@ -103,11 +105,13 @@ class _IndividualVotingRoleCards extends StatelessWidget {
 }
 
 class _RepresentativeVotingRoleCards extends StatelessWidget {
+  final VotingPowerAmount totalVotingPower;
   final VotingPowerViewModel ownVotingPower;
   final VotingPowerViewModel delegatedVotingPower;
   final int delegatorsCount;
 
   const _RepresentativeVotingRoleCards({
+    required this.totalVotingPower,
     required this.ownVotingPower,
     required this.delegatedVotingPower,
     required this.delegatorsCount,
@@ -115,6 +119,25 @@ class _RepresentativeVotingRoleCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 12,
+      children: [
+        AccountVotingRoleRepresentativeTotalPower(
+          totalVotingPower: totalVotingPower,
+          ownVotingPower: ownVotingPower,
+          delegatedVotingPower: delegatedVotingPower,
+          onInfoTap: () {
+            // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
+          },
+        ),
+        AccountVotingRoleRepresentingCard(
+          delegatorsCount: delegatorsCount,
+          onInfoTap: () {
+            // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
+          },
+        ),
+      ],
+    );
   }
 }

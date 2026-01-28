@@ -67,11 +67,13 @@ final class VotingRoleViewModelIndividual extends VotingRoleViewModel {
 
 /// See [AccountVotingRoleRepresentative].
 final class VotingRoleViewModelRepresentative extends VotingRoleViewModel {
+  final VotingPowerAmount totalVotingPower;
   final VotingPowerViewModel ownVotingPower;
   final VotingPowerViewModel delegatedVotingPower;
   final int delegatorsCount;
 
   const VotingRoleViewModelRepresentative({
+    this.totalVotingPower = const VotingPowerAmount.empty(),
     this.ownVotingPower = const VotingPowerViewModel(),
     this.delegatedVotingPower = const VotingPowerViewModel(),
     this.delegatorsCount = 0,
@@ -82,6 +84,9 @@ final class VotingRoleViewModelRepresentative extends VotingRoleViewModel {
     final delegatedVotingPower = model.votingPower.data?.delegated;
 
     return VotingRoleViewModelRepresentative(
+      totalVotingPower: VotingPowerAmount.fromModel(
+        (ownVotingPower?.amount ?? 0) + (delegatedVotingPower?.amount ?? 0),
+      ),
       ownVotingPower: ownVotingPower != null
           ? VotingPowerViewModel.fromModel(ownVotingPower)
           : const VotingPowerViewModel(),
@@ -94,6 +99,7 @@ final class VotingRoleViewModelRepresentative extends VotingRoleViewModel {
 
   @override
   List<Object?> get props => [
+    totalVotingPower,
     ownVotingPower,
     delegatedVotingPower,
     delegatorsCount,
