@@ -58,6 +58,7 @@ class _FundNumberAndVotingPower extends StatelessWidget {
     final theme = Theme.of(context);
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 16,
       runSpacing: 16,
       children: [
