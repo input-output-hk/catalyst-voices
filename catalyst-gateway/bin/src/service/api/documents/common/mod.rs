@@ -2,6 +2,7 @@
 //! endpoint module not specified to a specific endpoint.
 
 use catalyst_signed_doc::CatalystSignedDocument;
+use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV7};
 
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
@@ -42,18 +43,20 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for Validati
 
     async fn try_get_last_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         self.doc_provider.try_get_last_doc(id).await
     }
 
     async fn try_get_first_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         self.doc_provider.try_get_first_doc(id).await
     }
+}
 
+impl catalyst_signed_doc::providers::TimeThresholdProvider for ValidationProvider {
     fn future_threshold(&self) -> Option<std::time::Duration> {
         self.doc_provider.future_threshold()
     }
@@ -66,7 +69,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for Validati
 impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
     async fn try_get_registered_key(
         &self,
-        kid: &catalyst_signed_doc::CatalystId,
+        kid: &CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
         self.verifying_key_provider
             .try_get_registered_key(kid)
@@ -94,7 +97,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 
     async fn try_get_last_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         match FullSignedDoc::retrieve(&id.uuid(), None).await {
             Ok(doc) => Ok(Some(doc.raw().try_into()?)),
@@ -105,7 +108,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 
     async fn try_get_first_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         match FullSignedDoc::retrieve(&id.uuid(), Some(&id.uuid())).await {
             Ok(doc) => Ok(Some(doc.raw().try_into()?)),
@@ -113,7 +116,9 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
             Err(err) => Err(err),
         }
     }
+}
 
+impl catalyst_signed_doc::providers::TimeThresholdProvider for DocProvider {
     fn future_threshold(&self) -> Option<std::time::Duration> {
         let signed_doc_cfg = Settings::signed_doc_cfg();
         Some(signed_doc_cfg.future_threshold())
@@ -140,15 +145,11 @@ impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocPr
     }
 
     fn future_threshold(&self) -> Option<std::time::Duration> {
-        <Self as catalyst_signed_doc::providers::CatalystSignedDocumentProvider>::future_threshold(
-            self,
-        )
+        <Self as catalyst_signed_doc::providers::TimeThresholdProvider>::future_threshold(self)
     }
 
     fn past_threshold(&self) -> Option<std::time::Duration> {
-        <Self as catalyst_signed_doc::providers::CatalystSignedDocumentProvider>::past_threshold(
-            self,
-        )
+        <Self as catalyst_signed_doc::providers::TimeThresholdProvider>::past_threshold(self)
     }
 }
 
@@ -157,7 +158,7 @@ impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocPr
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
 pub(crate) struct VerifyingKeyProvider {
     /// A user's `CatalystId` from the corresponding `CatalystRBACTokenV1`
-    kid: catalyst_signed_doc::CatalystId,
+    kid: CatalystId,
     /// A corresponding `VerifyingKey` derived from the `CatalystRBACTokenV1`
     pk: ed25519_dalek::VerifyingKey,
 }
@@ -165,7 +166,7 @@ pub(crate) struct VerifyingKeyProvider {
 impl catalyst_signed_doc::providers::CatalystIdProvider for VerifyingKeyProvider {
     async fn try_get_registered_key(
         &self,
-        kid: &catalyst_signed_doc::CatalystId,
+        kid: &CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
         if &self.kid == kid {
             Ok(Some(self.pk))
@@ -202,7 +203,7 @@ impl VerifyingKeyProvider {
     /// - The KID is not using the latest rotation.
     pub(crate) async fn try_new(
         token: &mut CatalystRBACTokenV1,
-        kids: &[catalyst_signed_doc::CatalystId],
+        kids: &[CatalystId],
     ) -> anyhow::Result<Self> {
         use itertools::Itertools as _;
 

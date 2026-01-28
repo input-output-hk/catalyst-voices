@@ -5,6 +5,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use catalyst_types::uuid::UuidV7;
 use poem_openapi::{
     NewType, Object, Union,
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
@@ -130,8 +131,8 @@ impl From<uuidv7::UUIDv7> for DocumentVer {
     }
 }
 
-impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
-    fn from(value: catalyst_signed_doc::UuidV7) -> Self {
+impl From<UuidV7> for DocumentVer {
+    fn from(value: UuidV7) -> Self {
         Self(value.to_string())
     }
 }
