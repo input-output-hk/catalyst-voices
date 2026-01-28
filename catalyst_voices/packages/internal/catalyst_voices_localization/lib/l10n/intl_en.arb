@@ -1033,6 +1033,10 @@
   "@defaultRole": {
     "description": "Related to account role"
   },
+  "delegatedTo": "Delegated To",
+  "@delegatedTo": {
+    "description": "In the context of delegating a voting power to a representative."
+  },
   "delegationButton": "Delegation",
   "@delegationButton": {
     "description": "The label for voting power delegation."
@@ -3534,6 +3538,15 @@
   "representative": "Representative",
   "@representative": {
     "description": "representative account role"
+  },
+  "representatives": "{count, plural, =0{Representatives} =1{Representative} other{Representatives}}",
+  "@representatives": {
+    "description": "Plural word for dreps",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "repsList": "Representative List",
   "@repsList": {
