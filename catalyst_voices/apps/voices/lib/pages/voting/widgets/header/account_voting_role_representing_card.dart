@@ -46,31 +46,45 @@ class AccountVotingRoleRepresentingCard extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                '$delegatorsCount',
-                style: theme.textTheme.displayMedium?.copyWith(
-                  color: theme.colors.textOnPrimaryWhite,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Opacity(
-                opacity: 0.8,
-                child: Text(
-                  context.l10n.xDelegates(delegatorsCount),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colors.textOnPrimaryWhite,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _DelegatesCount(count: delegatorsCount),
         ],
       ),
+    );
+  }
+}
+
+class _DelegatesCount extends StatelessWidget {
+  final int count;
+
+  const _DelegatesCount({
+    required this.count,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          '$count',
+          style: theme.textTheme.displayMedium?.copyWith(
+            color: theme.colors.textOnPrimaryWhite,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Opacity(
+          opacity: 0.8,
+          child: Text(
+            context.l10n.xDelegates(count),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colors.textOnPrimaryWhite,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
