@@ -511,7 +511,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       ),
     );
 
-    final proposalSegments = mapDocumentToSegments(document);
+    final proposalSegments = mapDocumentToSegments(
+      document,
+      filterOut: [ProposalDocument.collaboratorsNodeId],
+    );
 
     final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
     final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
