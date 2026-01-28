@@ -57,7 +57,9 @@ class VoicesInstructionsWithStepsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           title,
-          ...steps.mapIndexed((index, element) => _StepItem(step: element, index: index)),
+          ...steps.mapIndexed(
+            (index, element) => _StepItem(step: element, index: index),
+          ),
         ],
       ),
     );
