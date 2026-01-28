@@ -1784,16 +1784,6 @@
       }
     }
   },
-  "fundVoting": "F{fundNumber} Voting: Make sure you're ready.",
-  "@fundVoting": {
-    "description": "Title for registration for F{fundNumber} voting",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
   "fundX": "Fund{fundNumber}",
   "@fundX": {
     "description": "Generic text about nr. of fund / campaign",
@@ -2241,10 +2231,6 @@
   "@myActionsPageHeader": {
     "description": "The header text on the My Actions page."
   },
-  "myOpportunities": "My Opportunities",
-  "@myOpportunities": {
-    "description": "Options available to user to make more impact in the app"
-  },
   "myProposals": "My Proposals",
   "@myProposals": {
     "description": "Header text for user's proposals section"
@@ -2269,10 +2255,6 @@
   "@newAppVersionAvailableTitle": {
     "description": "Used in banner to inform user that new version of the app is available"
   },
-  "newInvites": "New Invites",
-  "@newInvites": {
-    "description": "Title of new invites section"
-  },
   "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
   "@newIterationTitle": {
     "description": "Title for new iteration card",
@@ -2287,10 +2269,6 @@
         "type": "String"
       }
     }
-  },
-  "newUpdates": "New updates - see what's new!",
-  "@newUpdates": {
-    "description": "A message shown when user has new updates"
   },
   "next": "Next",
   "@next": {
@@ -2448,10 +2426,6 @@
       }
     }
   },
-  "noPendingInvitesMessage": "You don’t have any proposal invites",
-  "@noPendingInvitesMessage": {
-    "description": "Message shown when user don't have any pending messages"
-  },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
     "description": "Text when there are no proposals to publish"
@@ -2572,10 +2546,6 @@
   "openInEditor": "Open in editor",
   "@openInEditor": {
     "description": "description of the button that opens the proposal in editor"
-  },
-  "opportunities": "Opportunities",
-  "@opportunities": {
-    "description": "The title of the tile that shows the list of opportunities."
   },
   "optional": "Optional",
   "@optional": {
@@ -2716,10 +2686,6 @@
   "proposalApprovalSubheader": "Once the proposal draft is finalized, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
   "@proposalApprovalSubheader": {
     "description": "Subheader for final proposal approval page"
-  },
-  "proposalApprovalTabDecide": "Decide",
-  "@proposalApprovalTabDecide": {
-    "description": "Label for \"decide\" tab"
   },
   "proposalApprovals": "Proposal Approvals",
   "@proposalApprovals": {
@@ -3334,10 +3300,6 @@
   "@refresh": {
     "description": "Refresh button label"
   },
-  "registerAsRepresentative": "Register as Representative",
-  "@registerAsRepresentative": {
-    "description": "Button text to register as a representative (dRep)"
-  },
   "registerToVoteFund": "Register to Vote in Fund{fundNumber}",
   "@registerToVoteFund": {
     "description": "Title of the register to vote section",
@@ -3628,10 +3590,6 @@
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
-  },
-  "reviewRequest": "Review Request",
-  "@reviewRequest": {
-    "description": "CTA to make user review invite to collaboration on proposal"
   },
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {
@@ -4095,10 +4053,6 @@
   "tryDifferentSearch": "Please try another search.",
   "@tryDifferentSearch": {
     "description": "Description of empty search result. Try different search"
-  },
-  "turnOpinionsIntoActions": "Turn Your Opinions into Impact.",
-  "@turnOpinionsIntoActions": {
-    "description": "Title for becoming a reviewer"
   },
   "twoDaysAgo": "2 days ago",
   "@twoDaysAgo": {
