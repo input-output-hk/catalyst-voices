@@ -20,8 +20,6 @@ class AccountVotingRoleRepresentingCard extends StatelessWidget {
     return AccountVotingRoleCardDecoration(
       padding: const EdgeInsets.fromLTRB(24, 12, 8, 18),
       gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
         colors: [
           theme.colorScheme.primary,
           theme.colorScheme.secondary,
