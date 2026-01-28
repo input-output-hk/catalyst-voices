@@ -57,7 +57,7 @@ class VotingState extends Equatable {
   const VotingState({
     this.header = const VotingHeaderData(),
     this.fundNumber,
-    this.votingRole = const NullVotingRoleViewModel(),
+    this.votingRole = const EmptyVotingRoleViewModel(),
     this.votingPhase,
     this.hasSearchQuery = false,
     this.isDelegator = false,

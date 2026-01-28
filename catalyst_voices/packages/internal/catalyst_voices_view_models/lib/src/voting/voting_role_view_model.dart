@@ -3,8 +3,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// Empty state view model.
-final class NullVotingRoleViewModel extends VotingRoleViewModel {
-  const NullVotingRoleViewModel();
+final class EmptyVotingRoleViewModel extends VotingRoleViewModel {
+  const EmptyVotingRoleViewModel();
 
   @override
   List<Object?> get props => [];

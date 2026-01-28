@@ -1,4 +1,7 @@
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_delegated_to_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_representative_total_power_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_representing_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -26,7 +29,10 @@ class _AccountVotingRoleCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (votingRole) {
-      VotingRoleViewModelDelegator(:final votingPower, :final representativesCount) =>
+      VotingRoleViewModelDelegator(
+        :final votingPower,
+        :final representativesCount,
+      ) =>
         _DelegatorVotingRoleCards(
           votingPower: votingPower,
           representativesCount: representativesCount,
@@ -46,7 +52,7 @@ class _AccountVotingRoleCards extends StatelessWidget {
           delegatedVotingPower: delegatedVotingPower,
           delegatorsCount: delegatorsCount,
         ),
-      NullVotingRoleViewModel() => const Offstage(),
+      EmptyVotingRoleViewModel() => const Offstage(),
     };
   }
 }
@@ -76,7 +82,7 @@ class _DelegatorVotingRoleCards extends StatelessWidget {
           },
         ),
         AccountVotingRoleInfoCard(
-          label: context.l10n.myDelegatedVotingPower,
+          label: Text(context.l10n.myDelegatedVotingPower),
           value: Text(votingPower.amount.formattedWithSymbol),
           onInfoTap: () {
             // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
@@ -95,7 +101,7 @@ class _IndividualVotingRoleCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AccountVotingRoleInfoCard(
-      label: context.l10n.myVotingPower,
+      label: Text(context.l10n.myVotingPower),
       value: Text(votingPower.amount.formattedWithSymbol),
       onInfoTap: () {
         // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
@@ -123,7 +129,7 @@ class _RepresentativeVotingRoleCards extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 12,
       children: [
-        AccountVotingRoleRepresentativeTotalPower(
+        AccountVotingRoleRepresentativeTotalPowerCard(
           totalVotingPower: totalVotingPower,
           ownVotingPower: ownVotingPower,
           delegatedVotingPower: delegatedVotingPower,
