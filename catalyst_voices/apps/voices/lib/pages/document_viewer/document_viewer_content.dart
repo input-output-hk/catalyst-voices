@@ -89,15 +89,11 @@ class _SegmentsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final readOnlyMode = context.select<DocumentViewerCubit, bool>(
-      (cubit) => cubit.state.readOnlyMode,
-    );
-
     return BasicSegmentsListView(
       key: const ValueKey('DocumentViewerSegmentsListView'),
       items: items,
       itemScrollController: scrollController,
-      padding: EdgeInsets.only(top: readOnlyMode ? 150 : 56, bottom: 64),
+      padding: const EdgeInsets.only(top: 56, bottom: 64),
       itemBuilder: (context, index) {
         final item = items[index];
         final nextItem = items.elementAtOrNull(index + 1);

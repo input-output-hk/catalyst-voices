@@ -53,8 +53,7 @@ class ProposalOverviewTile extends StatelessWidget {
               const SizedBox(width: 8),
               // TODO(LynxLynxx): Remove when we support mobile web
               Offstage(
-                offstage:
-                    CatalystFormFactor.current.isMobile,
+                offstage: CatalystFormFactor.current.isMobile,
                 child: const DocumentFavoriteButton(),
               ),
             ],

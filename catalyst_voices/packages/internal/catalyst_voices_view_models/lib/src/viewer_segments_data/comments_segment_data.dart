@@ -54,8 +54,7 @@ final class CommentsSegmentData extends Equatable {
 
     final isNotLocalAndHasActiveAccount = !isLocalDocument && hasActiveAccount;
     final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
-    final canComment =
-        isNotLocalAndHasActiveAccount && commentSchema != null  && !isVotingStage;
+    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null && !isVotingStage;
 
     return CommentsSegmentData(
       comments: comments,
