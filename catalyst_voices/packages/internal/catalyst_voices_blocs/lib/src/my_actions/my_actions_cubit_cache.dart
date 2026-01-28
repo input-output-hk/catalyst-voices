@@ -7,6 +7,7 @@ final class MyActionsCubitCache extends Equatable {
   final int displayConsentCount;
   final int finalProposalCount;
   final DateTime? proposalSubmissionCloseDate;
+  final DateTime? becomeReviewerCloseDate;
   final ActionsPageTab selectedTab;
 
   const MyActionsCubitCache({
@@ -14,6 +15,7 @@ final class MyActionsCubitCache extends Equatable {
     this.displayConsentCount = 0,
     this.finalProposalCount = 0,
     this.proposalSubmissionCloseDate,
+    this.becomeReviewerCloseDate,
     this.selectedTab = ActionsPageTab.all,
   });
 
@@ -23,6 +25,7 @@ final class MyActionsCubitCache extends Equatable {
     displayConsentCount,
     finalProposalCount,
     proposalSubmissionCloseDate,
+    becomeReviewerCloseDate,
     selectedTab,
   ];
 
@@ -31,6 +34,7 @@ final class MyActionsCubitCache extends Equatable {
     int? displayConsentCount,
     int? finalProposalCount,
     Optional<DateTime>? proposalSubmissionCloseDate,
+    Optional<DateTime>? becomeReviewerCloseDate,
     ActionsPageTab? selectedTab,
   }) {
     return MyActionsCubitCache(
@@ -39,6 +43,9 @@ final class MyActionsCubitCache extends Equatable {
       finalProposalCount: finalProposalCount ?? this.finalProposalCount,
       proposalSubmissionCloseDate: proposalSubmissionCloseDate.dataOr(
         this.proposalSubmissionCloseDate,
+      ),
+      becomeReviewerCloseDate: becomeReviewerCloseDate.dataOr(
+        this.becomeReviewerCloseDate,
       ),
       selectedTab: selectedTab ?? this.selectedTab,
     );

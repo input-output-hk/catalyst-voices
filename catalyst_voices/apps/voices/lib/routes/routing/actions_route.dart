@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/actions/actions/actions_page.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
+import 'package:catalyst_voices/pages/actions/become_reviewer/become_reviewer_page.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/co_proposers_consent_page.dart';
 import 'package:catalyst_voices/pages/actions/proposal_approval/proposal_approval_page.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
@@ -46,6 +47,10 @@ final class ActionsRoute extends GoRouteData with $ActionsRoute, CompositeRouteG
           path: 'co_proposers_consent',
           name: 'co_proposers_consent',
         ),
+        TypedGoRoute<BecomeReviewerRoute>(
+          path: 'become_reviewer',
+          name: 'become_reviewer',
+        ),
       ],
     ),
   ],
@@ -65,6 +70,22 @@ final class ActionsShellRoute extends ShellRouteData with EndDrawerShellPageTran
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
     return ActionsShellPage(child: navigator);
+  }
+}
+
+final class BecomeReviewerRoute extends GoRouteData
+    with $BecomeReviewerRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
+  const BecomeReviewerRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const BecomeReviewerPage();
   }
 }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/my_actions/my_actions_cubit_cache.dart';
@@ -59,7 +60,16 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         ?.phase(CampaignPhaseType.proposalSubmission)
         ?.timeline
         .to;
-    _cache = _cache.copyWith(proposalSubmissionCloseDate: Optional(proposalSubmissionCloseDate));
+    final becomeReviewerCloseDate = timeline
+        ?.phase(CampaignPhaseType.reviewRegistration)
+        ?.timeline
+        .to;
+
+    log(becomeReviewerCloseDate.toString());
+    _cache = _cache.copyWith(
+      proposalSubmissionCloseDate: Optional(proposalSubmissionCloseDate),
+      becomeReviewerCloseDate: Optional(becomeReviewerCloseDate),
+    );
     _rebuildState();
   }
 
@@ -78,6 +88,7 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         displayConsentCount: _cache.displayConsentCount,
         finalProposalCount: _cache.finalProposalCount,
         proposalSubmissionCloseDate: Optional(_cache.proposalSubmissionCloseDate),
+        becomeReviewerCloseDate: Optional(_cache.becomeReviewerCloseDate),
       ),
     );
   }
