@@ -6,7 +6,7 @@ import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
-import 'package:catalyst_voices/routes/routing/transitions/end_drawer_page_transition_mixin.dart';
+import 'package:catalyst_voices/routes/routing/transitions/end_drawer_shell_page_transition_mixin.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
