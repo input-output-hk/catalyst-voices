@@ -780,6 +780,10 @@
   "@copyLink": {
     "description": "Action title to copy a link in share dialog."
   },
+  "copyYourCatalystId": "Copy your Catalyst ID",
+  "@copyYourCatalystId": {
+    "description": "Step description how to register in review module"
+  },
   "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \naccount to the Cardano Mainnet.",
   "@createKeychainCreatedNextStep": {
     "description": "Information about the next step after keychain creation"
@@ -1861,6 +1865,10 @@
   "guidance": "Guidance",
   "@guidance": {
     "description": "A tab name of the guidance for the proposal editor."
+  },
+  "headOverToReviewModule": "Head over to the Review module",
+  "@headOverToReviewModule": {
+    "description": "Title CTA for user to go to review module"
   },
   "headsUp": "Heads up",
   "@headsUp": {
@@ -3629,6 +3637,10 @@
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
   },
+  "reviewerInstructions": "Reviewer Instructions",
+  "@reviewerInstructions": {
+    "description": "Instructions for reviewers registration"
+  },
   "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
   "@richTextEditorImageSupportInfo": {
     "description": "Information about supported image sources in the editor"
@@ -4180,6 +4192,10 @@
   "uploadProgressInfo": "Upload in progress",
   "@uploadProgressInfo": {
     "description": "Status message shown during file upload process"
+  },
+  "useYourCatalystIdToRegister": "Use  your copied Catalyst ID to register",
+  "@useYourCatalystIdToRegister": {
+    "description": "Step description how to register in review module"
   },
   "userAuthenticationState": "User Authentication State",
   "@userAuthenticationState": {
