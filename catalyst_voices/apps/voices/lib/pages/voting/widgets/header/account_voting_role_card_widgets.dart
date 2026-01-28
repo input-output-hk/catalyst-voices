@@ -9,7 +9,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-const double _cardHeight = 128;
+const double _cardHeight = 132;
 
 class AccountVotingRoleCardDecoration extends StatelessWidget {
   final EdgeInsets? padding;
@@ -194,11 +194,11 @@ class AccountVotingRoleRepresentativeTotalPower extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AccountVotingRoleInfoCard(
-      padding: const EdgeInsets.fromLTRB(24, 12, 40, 18),
+      padding: const EdgeInsets.fromLTRB(24, 12, 40, 14),
       label: context.l10n.totalVotingPower,
       value: Row(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 20,
         children: [
           VoicesGradientText(
@@ -358,7 +358,6 @@ class _TotalVotingPowerItem extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8,
       children: [
         Opacity(
           opacity: 0.7,
@@ -369,11 +368,11 @@ class _TotalVotingPowerItem extends StatelessWidget {
             ),
           ),
         ),
-
         Text(
           value,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colors.textOnPrimaryLevel1,
+            fontSize: 28,
           ),
         ),
       ],
