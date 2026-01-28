@@ -18,6 +18,7 @@ final class VotingCubit extends Cubit<VotingState>
   final CampaignService _campaignService;
   final ProposalService _proposalService;
   final VotingService _votingService;
+  final VotingBallotBuilder _ballotBuilder;
 
   VotingCubitCache _cache = const VotingCubitCache();
   Timer? _countdownTimer;
@@ -26,7 +27,7 @@ final class VotingCubit extends Cubit<VotingState>
   StreamSubscription<Campaign?>? _activeCampaignSub;
   StreamSubscription<AccountVotingRole?>? _activeVotingRoleSub;
   StreamSubscription<Map<VotingPageTab, int>>? _proposalsCountSub;
-  StreamSubscription<Page<ProposalBrief>>? _proposalsPageSub;
+  StreamSubscription<Page<ProposalBriefData>>? _proposalsPageSub;
 
   Completer<void>? _proposalsRequestCompleter;
 
@@ -35,6 +36,7 @@ final class VotingCubit extends Cubit<VotingState>
     this._campaignService,
     this._proposalService,
     this._votingService,
+    this._ballotBuilder,
   ) : super(const VotingState());
 
   void changeFilters({
@@ -115,10 +117,7 @@ final class VotingCubit extends Cubit<VotingState>
     }
     _proposalsRequestCompleter = null;
 
-    if (_proposalsRequestCompleter != null && !_proposalsRequestCompleter!.isCompleted) {
-      _proposalsRequestCompleter!.complete();
-    }
-    _proposalsRequestCompleter = null;
+    _ballotBuilder.removeListener(_updateBallotBuilderCount);
 
     return super.close();
   }
@@ -135,7 +134,6 @@ final class VotingCubit extends Cubit<VotingState>
     await _proposalsPageSub?.cancel();
     _proposalsPageSub = _proposalService
         .watchProposalsBriefPageV2(request: request, order: order, filters: filters)
-        .map((page) => page.map(ProposalBrief.fromData))
         .distinct()
         .listen(_handleProposalsChange);
 
@@ -175,8 +173,11 @@ final class VotingCubit extends Cubit<VotingState>
     _countdownTimer?.cancel();
     _countdownTimer = Timer.periodic(
       const Duration(seconds: 1),
-      (_) => _dispatchState(),
+      (_) => _onCountdownTick(),
     );
+
+    _ballotBuilder.addListener(_updateBallotBuilderCount);
+    _updateBallotBuilderCount();
   }
 
   /// Changes the favorite status of the proposal with [ref].
@@ -281,6 +282,27 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
+  void _emitProposalsPageSignal() {
+    final sourcePage = _cache.page ?? const Page<ProposalBriefData>.empty();
+    final votingPhaseStatus = _cache.campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
+    final isVotingPhaseActive = votingPhaseStatus?.status.isActive ?? false;
+    final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
+
+    final votingEnabled = isVotingPhaseActive && isManualVotingEnabled;
+
+    final page = sourcePage.map(
+      (data) {
+        return ProposalBrief.fromData(
+          data,
+          showVoteData: true,
+          votingEnabled: votingEnabled,
+        );
+      },
+    );
+
+    emitSignal(PageReadyVotingSignal(page: page));
+  }
+
   void _handleActiveAccountChange(Account? account) {
     final activeAccountId = account?.catalystId;
     if (activeAccountId != _cache.activeAccountId) {
@@ -296,7 +318,10 @@ final class VotingCubit extends Cubit<VotingState>
 
     _logger.finest('Active campaign changed: ${campaign?.id}');
 
-    _cache = _cache.copyWith(campaign: Optional(campaign));
+    _cache = _cache.copyWith(
+      campaign: Optional(campaign),
+      isVotingActive: campaign?.isVotingActive() ?? false,
+    );
 
     if (_cache.filters.categoryId != null) {
       changeSelectedCategory(null);
@@ -311,12 +336,16 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _handleActiveVotingRoleChange(AccountVotingRole? votingRole) {
     if (_cache.votingRole != votingRole) {
+      final manualVotingChanged =
+          _cache.votingRole?.isManualVotingEnabled != votingRole?.isManualVotingEnabled;
+
       _cache = _cache.copyWith(votingRole: Optional(votingRole));
       _dispatchState();
+      if (manualVotingChanged) _emitProposalsPageSignal();
     }
   }
 
-  void _handleProposalsChange(Page<ProposalBrief> page) {
+  void _handleProposalsChange(Page<ProposalBriefData> page) {
     _logger.finest(
       'Got page[${page.page}] with proposals[${page.items.length}]. '
       'Total[${page.total}]',
@@ -329,7 +358,7 @@ final class VotingCubit extends Cubit<VotingState>
 
     _cache = _cache.copyWith(page: Optional(page));
 
-    emitSignal(PageReadyVotingSignal(page: page));
+    _emitProposalsPageSignal();
   }
 
   void _handleProposalsCountChange(Map<VotingPageTab, int> data) {
@@ -342,6 +371,16 @@ final class VotingCubit extends Cubit<VotingState>
     final campaign = await _campaignService.getActiveCampaign();
     if (!isClosed) {
       _handleActiveCampaignChange(campaign);
+    }
+  }
+
+  void _onCountdownTick() {
+    _dispatchState();
+
+    final isVotingActive = _cache.campaign?.isVotingActive() ?? false;
+    if (_cache.isVotingActive != isVotingActive) {
+      _cache = _cache.copyWith(isVotingActive: isVotingActive);
+      _emitProposalsPageSignal();
     }
   }
 
@@ -395,6 +434,12 @@ final class VotingCubit extends Cubit<VotingState>
     final isDelegator = votingRole is AccountVotingRoleDelegator;
     final isVotingResultsOrTallyActive = campaign?.isVotingResultsOrTallyActive();
 
+    final fab = VotingBalloutBuilderFabViewModel.build(
+      ballotBuilderCount: state.fab.count,
+      votingRole: votingRole,
+      campaign: campaign,
+    );
+
     return state.copyWith(
       header: header,
       fundNumber: Optional(fundNumber),
@@ -404,6 +449,7 @@ final class VotingCubit extends Cubit<VotingState>
       isDelegator: isDelegator,
       isVotingResultsOrTallyActive: isVotingResultsOrTallyActive,
       categorySelectorItems: categorySelectorItems,
+      fab: fab,
     );
   }
 
@@ -415,6 +461,10 @@ final class VotingCubit extends Cubit<VotingState>
       filters: filters,
       activeAccountId: activeAccount?.catalystId,
     );
+  }
+
+  void _updateBallotBuilderCount() {
+    emit(state.copyWith(fab: state.fab.copyWith(count: _ballotBuilder.length)));
   }
 
   void _updateFavoriteProposalLocally(DocumentRef ref, bool isFavorite) {

@@ -77,13 +77,33 @@ final class VotingMockService implements VotingService {
     required CatalystId accountId,
     required DocumentRef campaignId,
   }) {
-    final individual = AccountVotingRoleIndividual(
-      accountId: accountId,
-      campaignId: campaignId,
-      votingPower: Snapshot.done(data: VotingPower.dummy()),
+    return Stream.periodic(
+      const Duration(seconds: 30),
+      (computationCount) {
+        return switch (2 & computationCount) {
+          1 => AccountVotingRoleRepresentative(
+            accountId: accountId,
+            campaignId: campaignId,
+            votingPower: Snapshot.done(
+              data: RepresentativeVotingPower(
+                own: VotingPower.dummy(),
+                delegated: VotingPower.dummy().copyWith(amount: 20000),
+              ),
+            ),
+          ),
+          2 => AccountVotingRoleDelegator(
+            accountId: accountId,
+            campaignId: campaignId,
+            votingPower: Snapshot.done(data: VotingPower.dummy()),
+          ),
+          _ => AccountVotingRoleIndividual(
+            accountId: accountId,
+            campaignId: campaignId,
+            votingPower: Snapshot.done(data: VotingPower.dummy()),
+          ),
+        };
+      },
     );
-
-    return Stream.value(individual);
   }
 
   @override
