@@ -4,36 +4,41 @@ import 'package:equatable/equatable.dart';
 
 final class MyActionsCubitCache extends Equatable {
   final CatalystId? activeAccountId;
+  final DocumentRef? activeCampaignId;
+  final AccountVotingRole? accountVotingRole;
   final int displayConsentCount;
   final int finalProposalCount;
   final DateTime? proposalSubmissionCloseDate;
   final DateTime? becomeReviewerCloseDate;
   final ActionsPageTab selectedTab;
-  final Set<AccountRole> accountRoles;
 
   const MyActionsCubitCache({
     this.activeAccountId,
+    this.activeCampaignId,
+    this.accountVotingRole,
     this.displayConsentCount = 0,
     this.finalProposalCount = 0,
     this.proposalSubmissionCloseDate,
     this.becomeReviewerCloseDate,
     this.selectedTab = ActionsPageTab.all,
-    this.accountRoles = const {},
   });
 
   @override
   List<Object?> get props => [
     activeAccountId,
+    activeCampaignId,
+    accountVotingRole,
     displayConsentCount,
     finalProposalCount,
     proposalSubmissionCloseDate,
     becomeReviewerCloseDate,
     selectedTab,
-    accountRoles,
   ];
 
   MyActionsCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,
+    Optional<DocumentRef>? activeCampaignId,
+    Optional<AccountVotingRole>? accountVotingRole,
     int? displayConsentCount,
     int? finalProposalCount,
     Optional<DateTime>? proposalSubmissionCloseDate,
@@ -43,6 +48,8 @@ final class MyActionsCubitCache extends Equatable {
   }) {
     return MyActionsCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
+      activeCampaignId: activeCampaignId.dataOr(this.activeCampaignId),
+      accountVotingRole: accountVotingRole.dataOr(this.accountVotingRole),
       displayConsentCount: displayConsentCount ?? this.displayConsentCount,
       finalProposalCount: finalProposalCount ?? this.finalProposalCount,
       proposalSubmissionCloseDate: proposalSubmissionCloseDate.dataOr(
@@ -52,7 +59,6 @@ final class MyActionsCubitCache extends Equatable {
         this.becomeReviewerCloseDate,
       ),
       selectedTab: selectedTab ?? this.selectedTab,
-      accountRoles: accountRoles ?? this.accountRoles,
     );
   }
 }
