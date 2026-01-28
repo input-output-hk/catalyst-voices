@@ -54,11 +54,13 @@ class _AccountVotingRoleCards extends StatelessWidget {
 class _CardDecoration extends StatelessWidget {
   final EdgeInsets? padding;
   final Color? color;
+  final Gradient? gradient;
   final Widget child;
 
   const _CardDecoration({
     this.padding,
     this.color,
+    this.gradient,
     required this.child,
   });
 
@@ -69,6 +71,7 @@ class _CardDecoration extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
         color: color,
+        gradient: gradient,
       ),
       child: child,
     );
@@ -86,7 +89,13 @@ class _DelegatorVotingRoleCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return _InfoCard(
+      label: context.l10n.myDelegatedVotingPower,
+      value: votingPower.amount,
+      onInfoTap: () {
+        // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
+      },
+    );
   }
 }
 
@@ -97,39 +106,12 @@ class _IndividualVotingRoleCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return _CardDecoration(
-      padding: const EdgeInsets.fromLTRB(24, 12, 8, 18),
-      color: theme.colors.elevationsOnSurfaceNeutralLv1White,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                context.l10n.myVotingPower,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colors.textOnPrimaryLevel0,
-                ),
-              ),
-              _InfoButton(
-                onTap: () {
-                  // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
-                },
-              ),
-            ],
-          ),
-          Text(
-            votingPower.amount,
-            style: theme.textTheme.displayMedium?.copyWith(
-              color: theme.colors.textOnPrimaryLevel0,
-            ),
-          ),
-        ],
-      ),
+    return _InfoCard(
+      label: context.l10n.myVotingPower,
+      value: votingPower.amount,
+      onInfoTap: () {
+        // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
+      },
     );
   }
 }
@@ -149,6 +131,52 @@ class _InfoButton extends StatelessWidget {
       onTap: onTap,
       child: VoicesAssets.icons.informationCircle.buildIcon(
         color: color ?? Theme.of(context).colors.iconsPrimary,
+      ),
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final VoidCallback onInfoTap;
+
+  const _InfoCard({
+    required this.label,
+    required this.value,
+    required this.onInfoTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return _CardDecoration(
+      padding: const EdgeInsets.fromLTRB(24, 12, 8, 18),
+      color: theme.colors.elevationsOnSurfaceNeutralLv1White,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colors.textOnPrimaryLevel0,
+                ),
+              ),
+              _InfoButton(onTap: onInfoTap),
+            ],
+          ),
+          Text(
+            value,
+            style: theme.textTheme.displayMedium?.copyWith(
+              color: theme.colors.textOnPrimaryLevel0,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -2213,6 +2213,10 @@
   "@myActionsPageHeader": {
     "description": "The header text on the My Actions page."
   },
+  "myDelegatedVotingPower": "My (Delegated) Voting Power",
+  "@myDelegatedVotingPower": {
+    "description": "Label for the voting power that the current user has delegated to a representative."
+  },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
     "description": "Options available to user to make more impact in the app"
@@ -2227,7 +2231,7 @@
   },
   "myVotingPower": "My Voting Power",
   "@myVotingPower": {
-    "description": "Tab label for my proposals in voting space"
+    "description": "Label for the user own voting power."
   },
   "nameOfWallet": "Name of the wallet",
   "@nameOfWallet": {
