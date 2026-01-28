@@ -100,7 +100,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
           endDrawer: const OpportunitiesDrawer(),
           body: SegmentsControllerScope(
             controller: _segmentsController,
-            child: ProposalBuilderResponsiveness(
+            child: ResponsiveProposalBuilderLayout(
               segmentsScrollController: _segmentsScrollController,
               sectionTileController: _sectionTileController,
               onRetryTap: _loadProposal,

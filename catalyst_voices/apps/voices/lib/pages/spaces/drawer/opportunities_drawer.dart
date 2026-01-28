@@ -107,7 +107,7 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesDrawerHeader(
-      text: context.l10n.myOpportunities,
+      title: Text(context.l10n.myOpportunities),
     );
   }
 }

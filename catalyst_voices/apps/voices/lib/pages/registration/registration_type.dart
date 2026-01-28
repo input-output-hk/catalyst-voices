@@ -8,6 +8,12 @@ final class FreshRegistration implements RegistrationType {
   const FreshRegistration();
 }
 
+final class LinkDrepKey implements RegistrationType {
+  final CatalystId id;
+
+  const LinkDrepKey({required this.id});
+}
+
 final class RecoverRegistration implements RegistrationType {
   const RecoverRegistration();
 }

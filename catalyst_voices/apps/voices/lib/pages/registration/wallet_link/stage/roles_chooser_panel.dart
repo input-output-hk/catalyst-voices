@@ -38,11 +38,11 @@ class _BlocRolesChooserContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<List<RegistrationRole>>(
-      selector: (state) => state.roles,
-      builder: (context, state) {
+    return BlocWalletLinkSelector<IterableData<List<RegistrationRole>>>(
+      selector: (state) => state.rolesData,
+      builder: (context, data) {
         return RolesChooserContainer(
-          roles: state,
+          roles: data.value,
           onChanged: RegistrationCubit.of(context).walletLink.selectRoles,
           onLearnMore: (role) async {
             await AccountRoleDialog.show(

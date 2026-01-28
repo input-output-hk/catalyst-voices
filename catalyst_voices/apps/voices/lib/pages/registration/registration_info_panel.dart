@@ -103,6 +103,21 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
       };
     }
 
+    _HeaderStrings buildWalletDrepLinkStageHeader(WalletDrepLinkStage stage) {
+      return switch (stage) {
+        WalletDrepLinkStage.rolesConfirmation ||
+        WalletDrepLinkStage.rbacTransaction => _HeaderStrings(
+          title: context.l10n.walletDrepLinkAddRoleHeader,
+          subtitle: context.l10n.walletDrepLinkAddRoleSubheader,
+        ),
+        WalletDrepLinkStage.selectWallet ||
+        WalletDrepLinkStage.walletAccountDetails => _HeaderStrings(
+          title: context.l10n.walletDrepLinkAddRoleHeader,
+          subtitle: context.l10n.walletLinkWalletSubheader,
+        ),
+      };
+    }
+
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
       AccountCreateProgressStep() => _HeaderStrings(
@@ -119,7 +134,12 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
       ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
+      WalletDrepLinkStep(:final stage) => buildWalletDrepLinkStageHeader(stage),
       AccountCompletedStep() => _HeaderStrings(
+        title: context.l10n.registrationCompletedTitle,
+        subtitle: context.l10n.registrationCompletedSubtitle,
+      ),
+      WalletDrepLinkCompletedStep() => _HeaderStrings(
         title: context.l10n.registrationCompletedTitle,
         subtitle: context.l10n.registrationCompletedSubtitle,
       ),
@@ -136,6 +156,13 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
         WalletLinkStage.rolesSummary => VoicesConstants.selectRolesUrl,
         WalletLinkStage.rbacTransaction => VoicesConstants.submitRegistrationTransactionUrl,
         _ => VoicesConstants.linkCardanoWalletUrl,
+      },
+      WalletDrepLinkStep(:final stage) => switch (stage) {
+        WalletDrepLinkStage.rolesConfirmation => VoicesConstants.selectRolesUrl,
+        WalletDrepLinkStage.selectWallet => VoicesConstants.officiallySupportedWalletsUrl,
+        WalletDrepLinkStage.walletAccountDetails =>
+          VoicesConstants.submitRegistrationTransactionUrl,
+        WalletDrepLinkStage.rbacTransaction => VoicesConstants.submitRegistrationTransactionUrl,
       },
       RecoverWithSeedPhraseStep() || RecoverMethodStep() => VoicesConstants.restoreKeychainUrl,
       _ => VoicesConstants.getStartedUrl,
@@ -264,7 +291,9 @@ class _RegistrationPicture extends StatelessWidget {
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
       AccountCreateProgressStep(:final completedSteps) => buildRegistrationProgress(completedSteps),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
+      WalletDrepLinkStep() => const KeychainPicture(),
       AccountCompletedStep() => const AccountCompletedPicture(),
+      WalletDrepLinkCompletedStep() => const AccountCompletedPicture(),
     };
   }
 }

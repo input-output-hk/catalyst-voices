@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 final class VotingCubitCache extends Equatable {
   final Campaign? campaign;
-  final VotingPower? votingPower;
+  final AccountVotingRole? votingRole;
   final Page<ProposalBrief>? page;
   final ProposalsFiltersV2 filters;
   final VotingPageTab? tab;
@@ -12,7 +12,7 @@ final class VotingCubitCache extends Equatable {
 
   const VotingCubitCache({
     this.campaign,
-    this.votingPower,
+    this.votingRole,
     this.page,
     this.filters = const ProposalsFiltersV2(),
     this.tab,
@@ -22,7 +22,7 @@ final class VotingCubitCache extends Equatable {
   @override
   List<Object?> get props => [
     campaign,
-    votingPower,
+    votingRole,
     page,
     filters,
     tab,
@@ -31,7 +31,7 @@ final class VotingCubitCache extends Equatable {
 
   VotingCubitCache copyWith({
     Optional<Campaign>? campaign,
-    Optional<VotingPower>? votingPower,
+    Optional<AccountVotingRole>? votingRole,
     Optional<Page<ProposalBrief>>? page,
     ProposalsFiltersV2? filters,
     Optional<VotingPageTab>? tab,
@@ -39,7 +39,7 @@ final class VotingCubitCache extends Equatable {
   }) {
     return VotingCubitCache(
       campaign: campaign.dataOr(this.campaign),
-      votingPower: votingPower.dataOr(this.votingPower),
+      votingRole: votingRole.dataOr(this.votingRole),
       page: page.dataOr(this.page),
       filters: filters ?? this.filters,
       tab: tab.dataOr(this.tab),

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -54,5 +55,33 @@ final class DocumentSegment extends BaseSegment<DocumentSection> {
   @override
   String resolveTitle(BuildContext context) {
     return property.schema.title;
+  }
+}
+
+extension DocumentExt on Document {
+  /// Maps the [Document] model to a list of [DocumentSegment] view models.
+  List<DocumentSegment> createSegments({
+    bool showValidationErrors = false,
+  }) {
+    return segments.map((segment) {
+      final sections = segment.sections
+          .expand(DocumentNodeTraverser.findSectionsAndSubsections)
+          .map(
+            (section) => DocumentSection(
+              id: section.schema.nodeId,
+              property: section,
+              schema: section.schema,
+              hasError: showValidationErrors && !section.isValidExcludingSubsections,
+            ),
+          )
+          .toList();
+
+      return DocumentSegment(
+        id: segment.schema.nodeId,
+        sections: sections,
+        property: segment,
+        schema: segment.schema as DocumentSegmentSchema,
+      );
+    }).toList();
   }
 }

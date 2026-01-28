@@ -59,5 +59,8 @@ abstract class VoicesConstants {
   static String fundProposalSubmissionNoticeUrl(int fundNumber) =>
       '$_docs/current-fund/fund-basics/fund$fundNumber-proposal-submission-notice';
 
+  // TODO(dt-iohk): Add a correct link to the voting results page
+  static String fundVotingResultsUrl(int fundNumber) => projectCatalystFundUrl(fundNumber);
+
   static String projectCatalystFundUrl(int fundNumber) => '$_projectCatalyst/funds/$fundNumber';
 }

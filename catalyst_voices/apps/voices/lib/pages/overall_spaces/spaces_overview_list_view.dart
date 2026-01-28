@@ -75,7 +75,7 @@ class _SpacesListViewState extends State<SpacesListView> {
   void initState() {
     super.initState();
     context.read<WorkspaceBloc>().add(
-      const ChangeWorkspaceFilters(filters: WorkspaceFilters.allProposals),
+      const ChangeWorkspaceFilters(filters: WorkspaceFilters.allProposals, showLoading: true),
     );
   }
 }

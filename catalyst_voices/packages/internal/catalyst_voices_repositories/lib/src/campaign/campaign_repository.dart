@@ -67,7 +67,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
         return campaign;
       }
     }
-    throw NotFoundException(message: 'Campaign $id not found');
+    throw CampaignNotFoundException(id: id);
   }
 
   @override

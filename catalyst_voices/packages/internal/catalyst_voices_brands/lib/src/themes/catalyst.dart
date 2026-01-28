@@ -124,6 +124,10 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   discoveryOnPrimary: VoicesColors.lightOnPrimary,
   discoveryTextOnPrimary: VoicesColors.lightTextOnPrimaryLevel0,
   discoveryTextOnPrimaryWhite: VoicesColors.lightTextOnPrimaryWhite,
+  actionsGradientBackground: [
+    VoicesColors.darkPrimary,
+    VoicesColors.darkOnPrimaryContainer,
+  ],
 );
 
 const BrandAssets lightBrandAssets = BrandAssets(
@@ -239,6 +243,10 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   discoveryOnPrimary: VoicesColors.lightOnPrimary,
   discoveryTextOnPrimary: VoicesColors.lightTextOnPrimaryLevel0,
   discoveryTextOnPrimaryWhite: VoicesColors.lightTextOnPrimaryWhite,
+  actionsGradientBackground: [
+    VoicesColors.lightPrimary,
+    VoicesColors.lightOnPrimaryContainer,
+  ],
 );
 
 /// A safe font family set to act as a fallback in case

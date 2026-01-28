@@ -22,28 +22,9 @@ void main() {
       draftVote1Updated = Vote.draft(proposal: proposal1, type: VoteType.abstain);
     });
 
-    group('watchedCastedVotes', () {
-      test('should provide current value to late subscribers', () async {
-        //Arrange
-        await repository.castVotes([draftVote1]);
-
-        //Act
-        final votesStream = repository.watchedCastedVotes;
-
-        //Assert
-        final casted = draftVote1.toCasted();
-        expect(
-          votesStream,
-          emitsInOrder(<List<Vote>>[
-            <Vote>[casted],
-          ]),
-        );
-      });
-    });
-
     group('castVotes', () {
       test('should convert draft votes to casted votes', () async {
-        final votesStream = repository.watchedCastedVotes;
+        final votesStream = repository.watchCastedVotes;
         final casted = draftVote1.toCasted();
 
         expect(
@@ -55,7 +36,7 @@ void main() {
 
         await repository.castVotes([draftVote1]);
 
-        final votes = await repository.watchedCastedVotes.first;
+        final votes = await repository.watchCastedVotes.first;
         expect(votes, hasLength(1));
         expect(votes.first.proposal, equals(proposal1));
         expect(votes.first.type, equals(VoteType.yes));
@@ -64,7 +45,7 @@ void main() {
       });
 
       test('should add multiple votes for different proposals', () async {
-        final votesStream = repository.watchedCastedVotes;
+        final votesStream = repository.watchCastedVotes;
         final casted1 = draftVote1.toCasted();
         final casted2 = draftVote2.toCasted();
 
@@ -79,7 +60,7 @@ void main() {
       });
 
       test('should replace existing vote for same proposal', () async {
-        final votesStream = repository.watchedCastedVotes;
+        final votesStream = repository.watchCastedVotes;
         final casted1 = draftVote1.toCasted();
         final casted1Updated = draftVote1Updated.toCasted();
 
@@ -97,7 +78,7 @@ void main() {
       });
 
       test('should handle mixed new and updated votes', () async {
-        final votesStream = repository.watchedCastedVotes;
+        final votesStream = repository.watchCastedVotes;
         final casted1 = draftVote1.toCasted();
         final casted1Updated = draftVote1Updated.toCasted();
         final casted2 = draftVote2.toCasted();
@@ -116,7 +97,7 @@ void main() {
       });
 
       test('should emit updated list to stream subscribers', () async {
-        final votesStream = repository.watchedCastedVotes;
+        final votesStream = repository.watchCastedVotes;
         final casted = draftVote1.toCasted();
 
         expect(
@@ -130,7 +111,7 @@ void main() {
       });
 
       test('should handle empty vote list', () async {
-        final votesStream = repository.watchedCastedVotes;
+        final votesStream = repository.watchCastedVotes;
 
         expect(
           votesStream,
@@ -143,7 +124,7 @@ void main() {
       });
 
       test('should maintain vote order consistency', () async {
-        final votesStream = repository.watchedCastedVotes;
+        final votesStream = repository.watchCastedVotes;
         final casted1 = draftVote1.toCasted();
         final casted2 = draftVote2.toCasted();
         final casted1Updated = draftVote1Updated.toCasted();

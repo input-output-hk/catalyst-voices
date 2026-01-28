@@ -27,7 +27,7 @@ class _ActionsPageContentState extends State<ActionsPageContent>
       spacing: 16,
       children: [
         VoicesDrawerHeader(
-          text: context.l10n.myActions,
+          title: Text(context.l10n.myActions),
           onCloseTap: () => ActionsShellPage.close(context),
         ),
         Expanded(

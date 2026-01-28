@@ -565,50 +565,6 @@ void main() {
       });
     });
 
-    group('refreshActiveAccountVotingPower', () {
-      setUp(() {
-        userRepository = MockUserRepository();
-        service = UserService(userRepository, userObserver, poller);
-
-        registerFallbackValue(const User.empty());
-      });
-
-      tearDown(() {
-        reset(userRepository);
-      });
-
-      test('user account is updated when voting power changes', () async {
-        // Given
-        final keychainId = const Uuid().v4();
-        final votingPower = VotingPower.dummy();
-        final updatedVotingPower = votingPower.copyWith();
-
-        final keychain = await keychainProvider.create(keychainId);
-        final account =
-            Account.dummy(
-              catalystId: CatalystIdFactory.create(),
-              keychain: keychain,
-              isActive: true,
-            ).copyWith(
-              votingPower: Optional(votingPower),
-            );
-        final user = User.optional(accounts: [account]);
-
-        // When
-        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
-        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
-        when(
-          () => userRepository.getVotingPower(),
-        ).thenAnswer((_) => Future.value(updatedVotingPower));
-
-        await service.useLocalUser();
-        await service.refreshActiveAccountVotingPower();
-
-        // Then
-        expect(service.user.activeAccount?.votingPower, updatedVotingPower);
-      });
-    });
-
     group('updateAccount', () {
       setUp(() {
         userRepository = MockUserRepository();

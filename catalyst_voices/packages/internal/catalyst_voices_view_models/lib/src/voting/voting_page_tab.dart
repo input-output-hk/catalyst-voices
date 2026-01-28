@@ -1,1 +1,1 @@
-enum VotingPageTab { total, favorites, my, votedOn }
+enum VotingPageTab { results, total, myFinalProposals, favorites, myVotes }

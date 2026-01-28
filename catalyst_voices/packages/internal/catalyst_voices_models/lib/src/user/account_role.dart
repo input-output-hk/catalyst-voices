@@ -9,7 +9,7 @@ enum AccountRole {
   voter(number: 0, registrationOffset: 0, isDefault: true),
 
   /// A delegated representative that can vote on behalf of other accounts.
-  drep(number: 1, registrationOffset: 1, isHidden: true),
+  drep(number: 1, registrationOffset: 1),
 
   /// An account role that can create new proposals.
   proposer(number: 3, registrationOffset: 2);
@@ -32,13 +32,11 @@ enum AccountRole {
   /// role the signing key belongs.
   final int registrationOffset;
   final bool isDefault;
-  final bool isHidden;
 
   const AccountRole({
     required this.number,
     required this.registrationOffset,
     this.isDefault = false,
-    this.isHidden = false,
   });
 
   factory AccountRole.fromNumber(int number) {

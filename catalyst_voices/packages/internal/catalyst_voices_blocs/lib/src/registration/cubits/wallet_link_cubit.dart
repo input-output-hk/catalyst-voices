@@ -29,10 +29,21 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     required this.blockchainConfig,
   }) : super(WalletLinkStateData.initial());
 
-  Set<AccountRole> get roles =>
-      state.roles.where((element) => element.isSelected).map((e) => e.type).toSet();
-
   CardanoWallet? get selectedWallet => _selectedWallet;
+
+  void clearSelectedWallet() {
+    _selectedWallet = null;
+
+    emit(
+      state.copyWith(
+        selectedWallet: const Optional.empty(),
+        walletConnection: const Optional.empty(),
+        walletSummary: const Optional.empty(),
+        isNetworkIdMatching: false,
+        hasEnoughBalance: false,
+      ),
+    );
+  }
 
   @override
   Future<void> refreshWallets() async {

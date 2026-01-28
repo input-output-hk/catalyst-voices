@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 typedef CountdownBuilder =
     Widget Function(
       BuildContext context, {
-      required int days,
-      required int hours,
-      required int minutes,
-      required int seconds,
+      required ValueListenable<int> days,
+      required ValueListenable<int> hours,
+      required ValueListenable<int> minutes,
+      required ValueListenable<int> seconds,
     });
 
 class VoicesCountdown extends StatefulWidget {
@@ -33,17 +33,21 @@ class VoicesCountdown extends StatefulWidget {
 
 class _VoicesCountdownState extends State<VoicesCountdown> {
   Timer? _timer;
-  Duration _timeLeft = Duration.zero;
   bool _hasStarted = false;
+
+  final _days = ValueNotifier<int>(0);
+  final _hours = ValueNotifier<int>(0);
+  final _minutes = ValueNotifier<int>(0);
+  final _seconds = ValueNotifier<int>(0);
 
   @override
   Widget build(BuildContext context) {
     return widget.builder(
       context,
-      days: _timeLeft.inDays,
-      hours: _timeLeft.inHours % Duration.hoursPerDay,
-      minutes: _timeLeft.inMinutes % Duration.minutesPerHour,
-      seconds: _timeLeft.inSeconds % Duration.secondsPerMinute,
+      days: _days,
+      hours: _hours,
+      minutes: _minutes,
+      seconds: _seconds,
     );
   }
 
@@ -53,6 +57,7 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
     if (widget.dateTime != oldWidget.dateTime) {
       _timer?.cancel();
       _timer = null;
+      _hasStarted = false;
       _startCountdown();
     }
   }
@@ -61,6 +66,10 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
   void dispose() {
     _timer?.cancel();
     _timer = null;
+    _days.dispose();
+    _hours.dispose();
+    _minutes.dispose();
+    _seconds.dispose();
     super.dispose();
   }
 
@@ -70,6 +79,32 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
     _startCountdown();
   }
 
+  void _onTick(Timer timer) {
+    final now = DateTimeExt.now();
+    final diff = widget.dateTime.difference(now);
+
+    if (diff.isNegative) {
+      _timer?.cancel();
+      _updateValues(Duration.zero);
+      widget.onCountdownEnd?.call(true);
+    } else {
+      _updateValues(diff);
+    }
+  }
+
+  void _updateValues(Duration diff) {
+    final newDays = diff.inDays;
+    final newHours = diff.inHours % Duration.hoursPerDay;
+    final newMinutes = diff.inMinutes % Duration.minutesPerHour;
+    final newSeconds = diff.inSeconds % Duration.secondsPerMinute;
+
+    // Only notify listeners if value actually changed
+    if (_days.value != newDays) _days.value = newDays;
+    if (_hours.value != newHours) _hours.value = newHours;
+    if (_minutes.value != newMinutes) _minutes.value = newMinutes;
+    if (_seconds.value != newSeconds) _seconds.value = newSeconds;
+  }
+
   void _startCountdown() {
     final initialTimeLeft = widget.dateTime.difference(DateTimeExt.now());
 
@@ -77,27 +112,10 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
       widget.onCountdownStart?.call(false);
       return;
     }
-    setState(() {
-      _timeLeft = initialTimeLeft;
-    });
+    _updateValues(initialTimeLeft);
     _hasStarted = true;
     widget.onCountdownStart?.call(true);
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      final now = DateTimeExt.now();
-      final diff = widget.dateTime.difference(now);
-
-      if (diff.isNegative) {
-        _timer?.cancel();
-        setState(() {
-          _timeLeft = Duration.zero;
-        });
-        widget.onCountdownEnd?.call(true);
-      } else {
-        setState(() {
-          _timeLeft = diff;
-        });
-      }
-    });
+    _timer = Timer.periodic(const Duration(seconds: 1), _onTick);
   }
 }

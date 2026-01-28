@@ -19,7 +19,7 @@ enum ActionsCardType {
     return switch (this) {
       ActionsCardType.proposalApproval => l10n.participationPreferences,
       ActionsCardType.displayConsent => l10n.participationPreferences,
-      ActionsCardType.representative => '',
+      ActionsCardType.representative => l10n.participationPreferences,
       ActionsCardType.votingPower => '',
     };
   }
@@ -30,7 +30,7 @@ enum ActionsCardType {
     return switch (this) {
       ActionsCardType.proposalApproval => l10n.finalProposalApproval,
       ActionsCardType.displayConsent => l10n.collaboratorDisplayConsent,
-      ActionsCardType.representative => '',
+      ActionsCardType.representative => l10n.becomeARepresentative,
       ActionsCardType.votingPower => '',
     };
   }

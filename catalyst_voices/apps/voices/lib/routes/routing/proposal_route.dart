@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/proposal/proposal.dart';
+import 'package:catalyst_voices/pages/proposal_viewer/proposal_viewer_page.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +55,7 @@ final class ProposalRoute extends GoRouteData with $ProposalRoute, FadePageTrans
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalPage(ref: ref);
+    return ProposalViewerPage(ref: ref);
   }
 
   static bool isPath(Uri uri) {

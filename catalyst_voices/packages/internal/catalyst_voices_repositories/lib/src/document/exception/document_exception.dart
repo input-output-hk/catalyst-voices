@@ -34,12 +34,23 @@ final class DocumentNotFoundException implements DocumentException {
 
   @override
   String toString() {
-    final message = this.message;
-    if (message != null) {
-      return message;
-    }
+    return message ?? 'Document matching $ref not found';
+  }
+}
 
-    return 'Document matching $ref not found';
+/// Exception thrown when document is found but revoked.
+final class DocumentRevokedException implements DocumentException {
+  final DocumentRef ref;
+  final String? message;
+
+  DocumentRevokedException({
+    required this.ref,
+    this.message,
+  });
+
+  @override
+  String toString() {
+    return message ?? 'Document matching $ref is revoked';
   }
 }
 

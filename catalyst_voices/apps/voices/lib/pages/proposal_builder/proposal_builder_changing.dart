@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/indicators/voices_loading_overlay.dart';
+import 'package:catalyst_voices/widgets/document_builder/layout/document_builder_changing_overlay.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 
@@ -28,9 +28,7 @@ class _ProposalBuilderChangingSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
       selector: (state) => state.isChanging,
-      builder: (context, isChanging) {
-        return VoicesLoadingOverlay(show: isChanging);
-      },
+      builder: (context, isChanging) => DocumentBuilderChangingOverlay(show: isChanging),
     );
   }
 }

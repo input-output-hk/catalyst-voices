@@ -2663,7 +2663,7 @@ void main() {
 
           // When
           final result = await dao.getDocuments(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
             latestOnly: false,
             limit: 100,
             offset: 0,
@@ -2708,7 +2708,7 @@ void main() {
           // When
           final result = await dao.getDocuments(
             type: DocumentType.proposalDocument,
-            campaign: CampaignFilters(categoriesIds: [catA.id]),
+            campaign: CampaignFilters(categoriesIds: {catA.id}),
             latestOnly: true,
             limit: 10,
             offset: 0,

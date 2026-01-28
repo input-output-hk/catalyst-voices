@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
-import 'package:catalyst_voices/pages/voting/widgets/content/pre_voting_content.dart';
-import 'package:catalyst_voices/pages/voting/widgets/content/voting_background.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/voting_content.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -44,27 +41,11 @@ class _VotingPageState extends State<VotingPage>
   @override
   Widget build(BuildContext context) {
     return SelectionArea(
-      child: CampaignPhaseAware.when(
-        phase: CampaignPhaseType.communityVoting,
-        upcoming: (_, phase, fundNumber) => HeaderAndContentLayout(
-          header: const VotingHeader(),
-          content: PreVotingContent(phase: phase, fundNumber: fundNumber),
-          background: const VotingBackground(),
-          separateHeaderAndContent: false,
-        ),
-        active: (_, __, ___) => HeaderAndContentLayout(
-          header: const VotingHeader(),
-          content: VotingContent(
-            tabController: _tabController,
-            pagingController: _pagingController,
-          ),
-        ),
-        post: (_, __, ___) => HeaderAndContentLayout(
-          header: const VotingHeader(),
-          content: VotingContent(
-            tabController: _tabController,
-            pagingController: _pagingController,
-          ),
+      child: HeaderAndContentLayout(
+        header: const VotingHeader(),
+        content: VotingContent(
+          tabController: _tabController,
+          pagingController: _pagingController,
         ),
       ),
     );

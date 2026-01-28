@@ -34,8 +34,6 @@ abstract interface class UserRepository {
 
   Future<User> getUser();
 
-  Future<VotingPower> getVotingPower();
-
   Future<bool> isPubliclyVerified({
     required CatalystId catalystId,
     RbacToken? token,
@@ -102,15 +100,12 @@ final class UserRepositoryImpl implements UserRepository {
     final username =
         publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
 
-    final votingPower = await _getVotingPower(token: rbacToken);
-
     return RecoverableAccount(
       username: username,
       email: publicProfile?.email,
       roles: rbacRegistration.accountRoles,
       stakeAddress: rbacRegistration.stakeAddress,
       publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
-      votingPower: votingPower,
       isPersistent: rbacRegistration.lastPersistentTxn != null,
     );
   }
@@ -120,11 +115,6 @@ final class UserRepositoryImpl implements UserRepository {
     final dto = await _storage.readUser();
     final user = await dto?.toModel(keychainProvider: _keychainProvider);
     return user ?? const User.empty();
-  }
-
-  @override
-  Future<VotingPower> getVotingPower() {
-    return _getVotingPower();
   }
 
   @override
@@ -176,12 +166,6 @@ final class UserRepositoryImpl implements UserRepository {
         // Review module returns 401 Registration not found for the auth token
         .onError<UnauthorizedException>((error, stackTrace) => null)
         .then((value) => value?.toModel());
-  }
-
-  // TODO(dt-iohk): fetch voting power from backend using token
-  // ignore: unused_element_parameter
-  Future<VotingPower> _getVotingPower({RbacToken? token}) async {
-    return VotingPower.dummy();
   }
 
   Future<String?> _lookupUsernameFromDocuments({

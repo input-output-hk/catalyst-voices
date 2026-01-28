@@ -4,10 +4,10 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/user/user_stream_transformers.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/rxdart.dart';
 
 /// [UserService] allows to manage user accounts.
 /// [watchUser] returns a stream of user changes which allows to react to user changes.
@@ -58,9 +58,6 @@ abstract interface class UserService implements ActiveAware {
 
   /// Refreshes the active account with the latest profile from the server.
   Future<void> refreshActiveAccountProfile();
-
-  /// Refreshes the active account with the voting power from the server.
-  Future<void> refreshActiveAccountVotingPower();
 
   /// Registers a new [account] and makes it active.
   ///
@@ -142,13 +139,9 @@ final class UserServiceImpl implements UserService {
   User get user => _userObserver.user;
 
   @override
-  Stream<Account?> get watchUnlockedActiveAccount =>
-      watchUser.map((e) => e.activeAccount).switchMap((account) {
-        if (account == null) return Stream.value(null);
-
-        final isUnlockedStream = account.keychain.watchIsUnlocked;
-        return isUnlockedStream.map((isUnlocked) => isUnlocked ? account : null);
-      }).distinct();
+  Stream<Account?> get watchUnlockedActiveAccount {
+    return _userObserver.watchUser.toUnlockedActiveAccount();
+  }
 
   @override
   Stream<User> get watchUser => _userObserver.watchUser;
@@ -274,22 +267,6 @@ final class UserServiceImpl implements UserService {
     if (account != activeAccount) {
       final updatedUser = user.updateAccount(account);
 
-      await _updateUser(updatedUser);
-    }
-  }
-
-  @override
-  Future<void> refreshActiveAccountVotingPower() async {
-    final user = await getUser();
-    final activeAccount = user.activeAccount;
-    if (activeAccount == null) {
-      return;
-    }
-
-    final votingPower = await _userRepository.getVotingPower();
-    if (votingPower != activeAccount.votingPower) {
-      final updatedAccount = activeAccount.copyWith(votingPower: Optional(votingPower));
-      final updatedUser = user.updateAccount(updatedAccount);
       await _updateUser(updatedUser);
     }
   }

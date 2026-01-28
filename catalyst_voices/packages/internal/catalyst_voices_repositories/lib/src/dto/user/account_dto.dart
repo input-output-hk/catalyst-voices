@@ -15,7 +15,6 @@ final class AccountDto {
   final String? address;
   @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   final AccountPublicStatus? publicStatus;
-  final VotingPowerDto? votingPower;
   final AccountRegistrationStatusDto? registrationStatus;
 
   const AccountDto({
@@ -25,7 +24,6 @@ final class AccountDto {
     required this.roles,
     required this.address,
     this.publicStatus,
-    this.votingPower,
     this.registrationStatus,
   });
 
@@ -45,7 +43,6 @@ final class AccountDto {
         roles: data.roles,
         address: data.address?.toBech32(),
         publicStatus: data.publicStatus,
-        votingPower: data.votingPower != null ? VotingPowerDto.fromModel(data.votingPower!) : null,
         registrationStatus: AccountRegistrationStatusDto.fromModel(data.registrationStatus),
       );
 
@@ -71,7 +68,6 @@ final class AccountDto {
       roles: roles,
       address: address != null ? ShelleyAddress.fromBech32(address) : null,
       publicStatus: _publicStatus,
-      votingPower: votingPower?.toModel(),
       isActive: keychainId == activeKeychainId,
       registrationStatus:
           registrationStatus?.toModel() ??
@@ -177,41 +173,6 @@ final class AccountWalletMetadataDto {
     return WalletMetadata(
       name: name,
       icon: icon,
-    );
-  }
-}
-
-@JsonSerializable()
-final class VotingPowerDto {
-  final int amount;
-  @JsonKey(unknownEnumValue: VotingPowerStatus.provisional)
-  final VotingPowerStatus status;
-  final DateTime updatedAt;
-
-  const VotingPowerDto({
-    required this.amount,
-    required this.status,
-    required this.updatedAt,
-  });
-
-  factory VotingPowerDto.fromJson(Map<String, dynamic> json) {
-    return _$VotingPowerDtoFromJson(json);
-  }
-
-  VotingPowerDto.fromModel(VotingPower model)
-    : this(
-        amount: model.amount,
-        status: model.status,
-        updatedAt: model.updatedAt,
-      );
-
-  Map<String, dynamic> toJson() => _$VotingPowerDtoToJson(this);
-
-  VotingPower toModel() {
-    return VotingPower(
-      amount: amount,
-      status: status,
-      updatedAt: updatedAt,
     );
   }
 }

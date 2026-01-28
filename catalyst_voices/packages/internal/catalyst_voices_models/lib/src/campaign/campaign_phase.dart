@@ -41,6 +41,7 @@ enum CampaignPhaseType {
   proposalSubmission,
   communityReview,
   communityVoting,
+  votingTally,
   votingRegistration,
   reviewRegistration,
   votingResults,

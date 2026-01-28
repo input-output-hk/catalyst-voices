@@ -7,6 +7,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SubmissionClosingWarningDialog extends StatelessWidget {
@@ -78,19 +79,22 @@ class _Countdown extends StatelessWidget {
       builder:
           (
             context, {
-            required days,
-            required hours,
-            required minutes,
-            required seconds,
-          }) => Text(
-            context.l10n.catalystAppClosesIn(
-              days,
-              hours,
-              minutes,
-              seconds,
-            ),
-            style: context.textTheme.titleMedium?.copyWith(
-              color: context.colorScheme.primary,
+            required ValueListenable<int> days,
+            required ValueListenable<int> hours,
+            required ValueListenable<int> minutes,
+            required ValueListenable<int> seconds,
+          }) => ListenableBuilder(
+            listenable: Listenable.merge([days, hours, minutes, seconds]),
+            builder: (context, _) => Text(
+              context.l10n.catalystAppClosesIn(
+                days.value,
+                hours.value,
+                minutes.value,
+                seconds.value,
+              ),
+              style: context.textTheme.titleMedium?.copyWith(
+                color: context.colorScheme.primary,
+              ),
             ),
           ),
     );

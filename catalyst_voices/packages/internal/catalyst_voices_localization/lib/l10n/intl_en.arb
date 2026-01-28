@@ -221,6 +221,10 @@
   "@balance": {
     "description": "The balance the user holds / amount of Ada in the wallet"
   },
+  "becomeARepresentative": "Become a Representative",
+  "@becomeARepresentative": {
+    "description": "Title for the become a representative card/section"
+  },
   "becomeReviewer": "Become a Reviewer!",
   "@becomeReviewer": {
     "description": "Title for becoming a reviewer"
@@ -1134,6 +1138,14 @@
   "@doWord": {
     "description": "Label for a list of things to do"
   },
+  "documentBuilderValidationExitDialogTitle": "Exit form issue mode?",
+  "@documentBuilderValidationExitDialogTitle": {
+    "description": "Title in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "documentBuilderValidationExitIssueMode": "Exit Issue Mode",
+  "@documentBuilderValidationExitIssueMode": {
+    "description": "Button text for exiting the document builder validation snackbar."
+  },
   "documentHiddenException": "The proposal is no longer available.",
   "@documentHiddenException": {
     "description": "Message when the document (proposal) is no longer available due to being hidden."
@@ -1182,9 +1194,53 @@
   "@drep": {
     "description": "Account role"
   },
-  "drepDescription": "The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.",
+  "drepDescription": "The Representative has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.",
   "@drepDescription": {
     "description": "A description for drep"
+  },
+  "drepLinkAccountDetailsAction": "Add Representative Role",
+  "@drepLinkAccountDetailsAction": {
+    "description": "Action button text to link Representative role to account"
+  },
+  "drepLinkCompletedCreateProfileButton": "Create Representative Profile",
+  "@drepLinkCompletedCreateProfileButton": {
+    "description": "Button text to create drep profile"
+  },
+  "drepLinkCompletedRoleAdded": "Added",
+  "@drepLinkCompletedRoleAdded": {
+    "description": "Label for role added"
+  },
+  "drepLinkCompletedRoleRegistration": "role registration",
+  "@drepLinkCompletedRoleRegistration": {
+    "description": "Label for role registration action"
+  },
+  "drepLinkCompletedRoleTitle": "Representative",
+  "@drepLinkCompletedRoleTitle": {
+    "description": "Title for role registration"
+  },
+  "drepLinkCompletedRolesUpdatedInfo": "You modified your selection of Catalyst roles and signed the transaction with your wallet.",
+  "@drepLinkCompletedRolesUpdatedInfo": {
+    "description": "Information about wallet linking and role selection process"
+  },
+  "drepLinkCompletedRolesUpdatedTitle": "Catalyst roles updated",
+  "@drepLinkCompletedRolesUpdatedTitle": {
+    "description": "Title showing that Catalyst roles were updated in summary"
+  },
+  "drepLinkCompletedSkipButton": "I’ll do this later",
+  "@drepLinkCompletedSkipButton": {
+    "description": "Button text to skip create drep profile"
+  },
+  "drepLinkCompletedSummaryHeader": "Role Summary",
+  "@drepLinkCompletedSummaryHeader": {
+    "description": "Header text for summary section on drep link completion screen"
+  },
+  "drepLinkCompletedWhatNextMessage": "You’ll need to update your Representative profile. Once that’s done people can find you, and  you’ll be eligible to take part as a community Representative.",
+  "@drepLinkCompletedWhatNextMessage": {
+    "description": "Message for summary what next after linking drep"
+  },
+  "drepLinkCompletedWhatNextTitle": "Get Ready to Represent:",
+  "@drepLinkCompletedWhatNextTitle": {
+    "description": "Title for summary what next after linking drep"
   },
   "drepSummaryCastVotes": "Cast delegated votes",
   "@drepSummaryCastVotes": {
@@ -1198,9 +1254,9 @@
   "@drepSummaryDelegatedVotes": {
     "description": "Text representing that dRep can used delegated votes"
   },
-  "drepSummaryRewards": "dRep rewards",
+  "drepSummaryRewards": "Representative rewards",
   "@drepSummaryRewards": {
-    "description": "Text representing that dRep can used rewards"
+    "description": "Text representing that Representative can used rewards"
   },
   "drepVerboseName": "Community expert",
   "@drepVerboseName": {
@@ -1770,6 +1826,10 @@
   "@getStartedButtonLabelText": {
     "description": "Label text shown in the GetStartedButton widget."
   },
+  "globalSyncIndicatorTitle": "Syncing...",
+  "@globalSyncIndicatorTitle": {
+    "description": "Title shown in the global sync indicator banner"
+  },
   "goMyProposals": "Go My proposals",
   "@goMyProposals": {
     "description": "Action to go to my proposals"
@@ -1993,6 +2053,10 @@
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {
     "description": "Title shown in dialog when a Catalyst keychain has been deleted"
+  },
+  "keychainFound": "Keychain found!",
+  "@keychainFound": {
+    "description": "Message shown when keychain is found"
   },
   "knowledgeBase": "knowledge base",
   "@knowledgeBase": {
@@ -2265,6 +2329,15 @@
       }
     }
   },
+  "noOfAllFinalProposals": "All Final Proposals · {count}",
+  "@noOfAllFinalProposals": {
+    "description": "Tab label for all final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfComments": "{count} {count, plural, =0{comments} =1{comment} other{comments}}",
   "@noOfComments": {
     "description": "Indicates the amount of comments on a proposal card.",
@@ -2293,6 +2366,15 @@
       }
     }
   },
+  "noOfFavoriteFinals": "Favorite Finals · {count}",
+  "@noOfFavoriteFinals": {
+    "description": "Tab label for favorite final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfFavorites": "Favorites · {count}",
   "@noOfFavorites": {
     "description": "Tab label for draft proposals in voting space",
@@ -2311,6 +2393,15 @@
       }
     }
   },
+  "noOfMyFinalProposals": "My Final Proposals · {count}",
+  "@noOfMyFinalProposals": {
+    "description": "Tab label for my final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfMyProposals": "My proposals · {count}",
   "@noOfMyProposals": {
     "description": "Tab label for my proposals in voting space",
@@ -2320,27 +2411,9 @@
       }
     }
   },
-  "noOfProposalInvites": "Proposal Invites · {count}",
-  "@noOfProposalInvites": {
-    "description": "Information about count of proposals",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noOfProposals": "Proposals · {count}",
-  "@noOfProposals": {
-    "description": "Information about count of proposals",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noOfVotedOn": "Voted On · {count}",
-  "@noOfVotedOn": {
-    "description": "Tab label for voted on proposals in voting space",
+  "noOfMyVotes": "My Votes · {count}",
+  "@noOfMyVotes": {
+    "description": "Tab label for my votes in voting space",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2764,14 +2837,6 @@
         "type": "int"
       }
     }
-  },
-  "proposalEditorValidationExitDialogTitle": "Exit form issue mode?",
-  "@proposalEditorValidationExitDialogTitle": {
-    "description": "Title in a dialog asking if the user wants to leave the form issue mode."
-  },
-  "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
-  "@proposalEditorValidationExitIssueMode": {
-    "description": "Button text for exiting the proposal editor validation snackbar."
   },
   "proposalHidden": "Proposal is hidden",
   "@proposalHidden": {
@@ -3241,6 +3306,10 @@
   "@refresh": {
     "description": "Refresh button label"
   },
+  "registerAsRepresentative": "Register as Representative",
+  "@registerAsRepresentative": {
+    "description": "Button text to register as a representative (dRep)"
+  },
   "registerToVoteFund": "Register to Vote in Fund{fundNumber}",
   "@registerToVoteFund": {
     "description": "Title of the register to vote section",
@@ -3413,6 +3482,10 @@
   "@registrationUnlockPasswordNotFound": {
     "description": "Error message shown when attempting to register or recover account but password was not found"
   },
+  "registrationWalletMismatch": "Your account is not linked with this wallet. Connect the same wallet you used to set up your Catalyst account!",
+  "@registrationWalletMismatch": {
+    "description": "Error message shown when user tries to update account with a different wallet than the one used during initial registration"
+  },
   "registrationWalletNotFound": "Wallet not found",
   "@registrationWalletNotFound": {
     "description": "Error message shown when connect wallet but matching was not found"
@@ -3449,6 +3522,14 @@
   "removingProposalFromFinalStage": "You remove this proposal from review/voting stage.",
   "@removingProposalFromFinalStage": {
     "description": "Information for user that his proposal is going back to draft. "
+  },
+  "representative": "Representative",
+  "@representative": {
+    "description": "representative account role"
+  },
+  "repsList": "Representative List",
+  "@repsList": {
+    "description": "Generic text describing any list with representatives for voting on someone behalf"
   },
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
   "@requestedAmountShouldBeBetweenMinAndMax": {
@@ -3499,6 +3580,10 @@
   "resubmitAsFinalWarning": "You need to resubmit this proposal as final, to be eligible for funding, so make sure to Submit to review stage (Final) after editing.",
   "@resubmitAsFinalWarning": {
     "description": "Information for user that proposal needs to be resubmitted as final to be eligible for funding."
+  },
+  "results": "Results",
+  "@results": {
+    "description": "Tab label for results in voting space"
   },
   "resumeButtonText": "Resume",
   "@resumeButtonText": {
@@ -3605,6 +3690,10 @@
   "selectCategoryToSeeDetailsTitle": "Select a category to check if this category is for you.",
   "@selectCategoryToSeeDetailsTitle": {
     "description": "Text for the select category to see details title in new proposal dialog"
+  },
+  "selectWallet": "Select Wallet",
+  "@selectWallet": {
+    "description": "Button text to select a wallet"
   },
   "selectedCategory": "Selected category",
   "@selectedCategory": {
@@ -3888,6 +3977,10 @@
   "successToCastVotesTitle": "Your Votes Have Been Submitted",
   "@successToCastVotesTitle": {
     "description": "Title for success to cast votes"
+  },
+  "summary": "Summary",
+  "@summary": {
+    "description": "Label for summary section"
   },
   "systemStatusIssueBannerMessage": "We're aware of an issue and are working on a fix. Thanks for your patience! {readMoreLink}",
   "@systemStatusIssueBannerMessage": {
@@ -4297,6 +4390,30 @@
   "@votingRegistrationTimelineHeader": {
     "description": "Header for the voting registration timeline"
   },
+  "votingResultsButton": "View Results at ProjectCatalyst.io",
+  "@votingResultsButton": {
+    "description": "The button label to see the voting results."
+  },
+  "votingResultsHeader": "The Results Are In!",
+  "@votingResultsHeader": {
+    "description": "The header for voting results."
+  },
+  "votingResultsIncomingHeader": "Results Incoming!",
+  "@votingResultsIncomingHeader": {
+    "description": "The header for voting results incoming state."
+  },
+  "votingResultsIncomingSubheader": "The community has spoken. Get ready to see the results!",
+  "@votingResultsIncomingSubheader": {
+    "description": "The subheader for voting results incoming state."
+  },
+  "votingResultsMessage": "The wait is over, voting results are here!\nCheck out the winning proposals and see how the community’s voice has shaped the future.",
+  "@votingResultsMessage": {
+    "description": "The message for voting results."
+  },
+  "votingResultsSubheader": "The community has spoken. Check out the results!",
+  "@votingResultsSubheader": {
+    "description": "The subheader for voting results."
+  },
   "votingStarts": "Voting starts",
   "@votingStarts": {
     "description": "Label when the voting phase starts."
@@ -4318,6 +4435,10 @@
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
   },
+  "walletAccountDetailsTitle": "Catalyst Account",
+  "@walletAccountDetailsTitle": {
+    "description": "Main title for wallet account details panel"
+  },
   "walletAddress": "Wallet address",
   "@walletAddress": {
     "description": "A cardano wallet address"
@@ -4333,6 +4454,18 @@
   "walletDetectionSummary": "Wallet detection summary",
   "@walletDetectionSummary": {
     "description": "Message shown when presenting the details of a connected wallet."
+  },
+  "walletDrepLinkAddKeyTitle": "You are about to link the following key:",
+  "@walletDrepLinkAddKeyTitle": {
+    "description": "Title shown when adding Drep role key to an existing account"
+  },
+  "walletDrepLinkAddRoleHeader": "Link key to your Catalyst Keychain",
+  "@walletDrepLinkAddRoleHeader": {
+    "description": "A header in link wallet flow when adding Representative role key."
+  },
+  "walletDrepLinkAddRoleSubheader": "Add Representation key",
+  "@walletDrepLinkAddRoleSubheader": {
+    "description": "Subtitle shown when adding a Representative role key"
   },
   "walletLinkExitConfirmDialogContent": "Leaving before linking wallet means account creation is incomplete. \n\nYou cannot login without \ncompleting your account setup.",
   "@walletLinkExitConfirmDialogContent": {
@@ -4412,6 +4545,10 @@
   "@walletLinkTransactionChangeRoles": {
     "description": "The secondary button label to change the roles on transaction summary screen."
   },
+  "walletLinkTransactionDrepRole": "1 Representative key",
+  "@walletLinkTransactionDrepRole": {
+    "description": "Transaction summary for the Representative role linking"
+  },
   "walletLinkTransactionLinkItem": "1 {wallet} wallet",
   "@walletLinkTransactionLinkItem": {
     "description": "An item in the transaction summary for the wallet link.",
@@ -4445,6 +4582,10 @@
   "walletLinkTransactionTitle": "Let's make sure everything looks right.",
   "@walletLinkTransactionTitle": {
     "description": "A title in link wallet flow on transaction screen."
+  },
+  "walletLinkTransactionToKeychain": "You are linking to Catalyst Keychain",
+  "@walletLinkTransactionToKeychain": {
+    "description": "A subtitle in link wallet flow on transaction screen."
   },
   "walletLinkWalletDetailsContent": "{wallet} connected successfully!",
   "@walletLinkWalletDetailsContent": {
@@ -4508,6 +4649,24 @@
   "@xCharactersMinimum": {
     "placeholders": {
       "number": {
+        "type": "int"
+      }
+    }
+  },
+  "xProposalsAdded": "{count, plural, =0{Proposals} =1{Proposal} other{Proposals}} Added",
+  "@xProposalsAdded": {
+    "description": "Number of proposals added to the ballot for voting",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "xRepsAdded": "{count, plural, =0{Reps} =1{Rep} other{Reps}} Added",
+  "@xRepsAdded": {
+    "description": "Number of representatives added for voting on someone behalf",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }

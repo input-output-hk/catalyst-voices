@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/co_proposers/widgets/add_collaborator/add_collaborator_dialog.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
-import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
-import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/comment/document_add_comment_tile.dart';
+import 'package:catalyst_voices/widgets/comment/document_comments_header_tile.dart';
 import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/category_brief_dialog.dart';
@@ -170,19 +170,19 @@ class _ProposalBuilderSegments extends StatelessWidget {
               final item = items[index];
               final nextItem = items.elementAtOrNull(index + 1);
 
-              if (nextItem is ProposalCommentsSegment) {
+              if (nextItem is DocumentCommentsSegment) {
                 return const SizedBox(height: 32);
               }
 
-              if (item is ProposalCommentsSegment && nextItem != null) {
+              if (item is DocumentCommentsSegment && nextItem != null) {
                 return const SizedBox(height: 32);
               }
 
-              if (item is ProposalViewCommentsSection && nextItem != null) {
+              if (item is DocumentViewCommentsSection && nextItem != null) {
                 return const ProposalSeparatorBox(height: 24);
               }
 
-              if (item is ProposalViewCommentsSection && nextItem is ProposalAddCommentSection) {
+              if (item is DocumentViewCommentsSection && nextItem is DocumentAddCommentSection) {
                 return const ProposalDivider(height: 48);
               }
 
@@ -203,23 +203,23 @@ class _ProposalBuilderSegments extends StatelessWidget {
     required SegmentsListViewItem item,
   }) {
     return switch (item) {
-      ProposalViewCommentsSection(:final sort) => ProposalCommentsHeaderTile(
+      DocumentViewCommentsSection(:final sort) => DocumentCommentsHeaderTile(
         sort: sort,
         showSort: item.comments.isNotEmpty,
         onChanged: (value) {
           context.read<ProposalBuilderBloc>().add(UpdateCommentsSortEvent(sort: value));
         },
       ),
-      ProposalCommentListItem(:final comment, :final canReply) => ProposalBuilderCommentTile(
+      DocumentCommentListItem(:final comment, :final canReply) => ProposalBuilderCommentTile(
         key: ValueKey(comment.comment.metadata.id),
         comment: comment,
         canReply: canReply,
       ),
-      ProposalAddCommentSection(
+      DocumentAddCommentSection(
         :final schema,
         :final showUsernameRequired,
       ) =>
-        ProposalAddCommentTile(
+        DocumentAddCommentTile(
           schema: schema,
           showUsernameRequired: showUsernameRequired,
           onSubmit: ({required document, reply}) async {
@@ -245,7 +245,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
     required SegmentsListViewItem? previousItem,
     required SegmentsListViewItem? nextItem,
   }) {
-    final isFirst = previousItem is ProposalCommentsSegment;
+    final isFirst = previousItem is DocumentCommentsSegment;
     final isLast = nextItem == null;
 
     return ProposalTileDecoration(
@@ -274,7 +274,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
         id: item.id,
         name: item.resolveTitle(context),
       ),
-      ProposalCommentsSegment() => SegmentHeaderTile(
+      DocumentCommentsSegment() => SegmentHeaderTile(
         id: item.id,
         name: item.resolveTitle(context),
       ),

@@ -10,12 +10,12 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class ProposalBuilderResponsiveness extends StatelessWidget {
+class ResponsiveProposalBuilderLayout extends StatelessWidget {
   final ItemScrollController segmentsScrollController;
   final DocumentBuilderSectionTileController sectionTileController;
   final VoidCallback onRetryTap;
 
-  const ProposalBuilderResponsiveness({
+  const ResponsiveProposalBuilderLayout({
     super.key,
     required this.segmentsScrollController,
     required this.sectionTileController,
@@ -30,15 +30,10 @@ class ProposalBuilderResponsiveness extends StatelessWidget {
         sectionTileController: sectionTileController,
         onRetryTap: onRetryTap,
       ),
-      md: SidebarScaffold(
-        leftRail: const ProposalBuilderNavigationPanel(),
-        rightRail: const ProposalBuilderSetupPanel(),
-        body: ProposalBuilderContent(
-          itemScrollController: segmentsScrollController,
-          sectionTileController: sectionTileController,
-          onRetryTap: onRetryTap,
-        ),
-        bodyConstraints: const BoxConstraints.expand(),
+      md: _MediumScreenProposalBuilderLayout(
+        segmentsScrollController: segmentsScrollController,
+        sectionTileController: sectionTileController,
+        onRetryTap: onRetryTap,
       ),
     );
   }
@@ -61,6 +56,32 @@ class _KeepAliveWrapperState extends State<_KeepAliveWrapper> with AutomaticKeep
   Widget build(BuildContext context) {
     super.build(context);
     return widget.child;
+  }
+}
+
+class _MediumScreenProposalBuilderLayout extends StatelessWidget {
+  final ItemScrollController segmentsScrollController;
+  final DocumentBuilderSectionTileController sectionTileController;
+  final VoidCallback onRetryTap;
+
+  const _MediumScreenProposalBuilderLayout({
+    required this.segmentsScrollController,
+    required this.sectionTileController,
+    required this.onRetryTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SidebarScaffold(
+      leftRail: const ProposalBuilderNavigationPanel(),
+      rightRail: const ProposalBuilderSetupPanel(),
+      body: ProposalBuilderContent(
+        itemScrollController: segmentsScrollController,
+        sectionTileController: sectionTileController,
+        onRetryTap: onRetryTap,
+      ),
+      bodyConstraints: const BoxConstraints.expand(),
+    );
   }
 }
 

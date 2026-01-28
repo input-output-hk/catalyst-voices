@@ -57,19 +57,21 @@ extension on VotingPageTab {
     required int count,
   }) {
     return switch (this) {
-      VotingPageTab.total => context.l10n.noOfAll(count),
-      VotingPageTab.favorites => context.l10n.noOfFavorites(count),
-      VotingPageTab.my => context.l10n.noOfMyProposals(count),
-      VotingPageTab.votedOn => context.l10n.noOfVotedOn(count),
+      VotingPageTab.results => context.l10n.results,
+      VotingPageTab.total => context.l10n.noOfAllFinalProposals(count),
+      VotingPageTab.favorites => context.l10n.noOfFavoriteFinals(count),
+      VotingPageTab.myFinalProposals => context.l10n.noOfMyFinalProposals(count),
+      VotingPageTab.myVotes => context.l10n.noOfMyVotes(count),
     };
   }
 
   Key tabKey() {
     return switch (this) {
+      VotingPageTab.results => const Key('ResultsTab'),
       VotingPageTab.total => const Key('AllProposalsTab'),
       VotingPageTab.favorites => const Key('FavoriteProposalsTab'),
-      VotingPageTab.my => const Key('MyProposalsTab'),
-      VotingPageTab.votedOn => const Key('VotedOnProposalsTab'),
+      VotingPageTab.myFinalProposals => const Key('MyProposalsTab'),
+      VotingPageTab.myVotes => const Key('VotedOnProposalsTab'),
     };
   }
 }

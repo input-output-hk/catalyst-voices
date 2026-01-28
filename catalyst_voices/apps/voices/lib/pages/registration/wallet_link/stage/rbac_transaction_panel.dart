@@ -16,7 +16,12 @@ import 'package:result_type/result_type.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RbacTransactionPanel extends StatefulWidget {
-  const RbacTransactionPanel({super.key});
+  final bool isDrepLink;
+
+  const RbacTransactionPanel({
+    super.key,
+    this.isDrepLink = false,
+  });
 
   @override
   State<RbacTransactionPanel> createState() => _RbacTransactionPanelState();
@@ -53,25 +58,31 @@ class _BlocSubmitTxButton extends StatelessWidget {
 }
 
 class _BlocSummary extends StatelessWidget {
-  const _BlocSummary();
+  final bool isDrepLink;
+
+  const _BlocSummary({required this.isDrepLink});
 
   @override
   Widget build(BuildContext context) {
     return BlocSelector<
       RegistrationCubit,
       RegistrationState,
-      ({Set<AccountRole> roles, WalletInfo selectedWallet, String transactionFee})?
+      ({
+        IterableData<Set<AccountRole>> rolesData,
+        WalletInfo selectedWallet,
+        String transactionFee,
+      })?
     >(
       selector: (state) {
         final selectedWallet = state.walletLinkStateData.selectedWallet;
         final transactionFee = state.registrationStateData.transactionFee;
-        final selectedRoles = state.walletLinkStateData.selectedRoleTypes;
+        final selectedRolesData = state.walletLinkStateData.selectedRoleTypesData;
         if (selectedWallet == null || transactionFee == null) {
           return null;
         }
 
         return (
-          roles: selectedRoles,
+          rolesData: selectedRolesData,
           selectedWallet: selectedWallet,
           transactionFee: transactionFee,
         );
@@ -82,9 +93,10 @@ class _BlocSummary extends StatelessWidget {
         }
 
         return _Summary(
-          roles: state.roles,
+          roles: state.rolesData.value,
           walletInfo: state.selectedWallet,
           transactionFee: state.transactionFee,
+          isDrepLink: isDrepLink,
         );
       },
     );
@@ -93,8 +105,12 @@ class _BlocSummary extends StatelessWidget {
 
 class _BlocTransactionDetails extends StatelessWidget {
   final VoidCallback onRefreshTap;
+  final bool isDrepLink;
 
-  const _BlocTransactionDetails({required this.onRefreshTap});
+  const _BlocTransactionDetails({
+    required this.onRefreshTap,
+    required this.isDrepLink,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +118,7 @@ class _BlocTransactionDetails extends StatelessWidget {
       selector: (state) => state.canSubmitTx,
       builder: (context, result) {
         return switch (result) {
-          Success() => const _TransactionDetails(),
+          Success() => _TransactionDetails(isDrepLink: isDrepLink),
           Failure(:final value) => _Error(error: value, onRetry: onRefreshTap),
           _ => const Center(child: VoicesCircularProgressIndicator()),
         };
@@ -193,7 +209,9 @@ class _ErrorNavigation extends StatelessWidget {
 }
 
 class _Navigation extends StatelessWidget {
-  const _Navigation();
+  final bool showChangeRolesButton;
+
+  const _Navigation({required this.showChangeRolesButton});
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +221,7 @@ class _Navigation extends StatelessWidget {
         if (isFailure) {
           return const _ErrorNavigation();
         } else {
-          return const _SuccessNavigation();
+          return _SuccessNavigation(showChangeRolesButton: showChangeRolesButton);
         }
       },
     );
@@ -215,8 +233,11 @@ class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
   Widget build(BuildContext context) {
     return RegistrationDetailsPanelScaffold(
       title: const _Title(),
-      body: _BlocTransactionDetails(onRefreshTap: _onRefresh),
-      footer: const _Navigation(),
+      body: _BlocTransactionDetails(
+        onRefreshTap: _onRefresh,
+        isDrepLink: widget.isDrepLink,
+      ),
+      footer: _Navigation(showChangeRolesButton: !widget.isDrepLink),
     );
   }
 
@@ -232,7 +253,9 @@ class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
 }
 
 class _SuccessNavigation extends StatelessWidget {
-  const _SuccessNavigation();
+  final bool showChangeRolesButton;
+
+  const _SuccessNavigation({required this.showChangeRolesButton});
 
   @override
   Widget build(BuildContext context) {
@@ -242,17 +265,19 @@ class _SuccessNavigation extends StatelessWidget {
         _BlocSubmitTxButton(
           onSubmit: () => _submitRegistration(context),
         ),
-        const SizedBox(height: 10),
-        VoicesTextButton(
-          leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: () {
-            RegistrationCubit.of(context).changeRoleSetup();
-          },
-          child: Text(
-            context.l10n.walletLinkTransactionChangeRoles,
-            semanticsIdentifier: 'TransactionReviewChangeRolesButton',
+        if (showChangeRolesButton) ...[
+          const SizedBox(height: 10),
+          VoicesTextButton(
+            leading: VoicesAssets.icons.wallet.buildIcon(),
+            onTap: () {
+              RegistrationCubit.of(context).changeRoleSetup();
+            },
+            child: Text(
+              context.l10n.walletLinkTransactionChangeRoles,
+              semanticsIdentifier: 'TransactionReviewChangeRolesButton',
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -266,11 +291,13 @@ class _Summary extends StatelessWidget {
   final Set<AccountRole> roles;
   final WalletInfo walletInfo;
   final String transactionFee;
+  final bool isDrepLink;
 
   const _Summary({
     required this.roles,
     required this.walletInfo,
     required this.transactionFee,
+    required this.isDrepLink,
   });
 
   @override
@@ -288,22 +315,32 @@ class _Summary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            context.l10n.walletLinkTransactionAccountCompletion,
+            isDrepLink
+                ? context.l10n.walletLinkTransactionToKeychain
+                : context.l10n.walletLinkTransactionAccountCompletion,
             style: Theme.of(context).textTheme.titleSmall,
           ),
-          const SizedBox(height: 12),
-          Text(
-            context.l10n.walletLinkTransactionLinkItem(walletInfo.metadata.name.capitalize()),
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          for (final role in roles) ...[
+          if (isDrepLink) ...[
             const SizedBox(height: 12),
             Text(
-              context.l10n.walletLinkTransactionRoleItem(
-                role.getName(context).toLowerCase(),
-              ),
+              context.l10n.walletLinkTransactionDrepRole,
               style: Theme.of(context).textTheme.bodySmall,
             ),
+          ] else ...[
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.walletLinkTransactionLinkItem(walletInfo.metadata.name.capitalize()),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            for (final role in roles) ...[
+              const SizedBox(height: 12),
+              Text(
+                context.l10n.walletLinkTransactionRoleItem(
+                  role.getName(context).toLowerCase(),
+                ),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
           ],
           const Divider(height: 24),
           Row(
@@ -364,15 +401,17 @@ class _Title extends StatelessWidget {
 }
 
 class _TransactionDetails extends StatelessWidget {
-  const _TransactionDetails();
+  final bool isDrepLink;
+
+  const _TransactionDetails({required this.isDrepLink});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _BlocSummary(),
-        _BlocTxSubmitError(),
+        _BlocSummary(isDrepLink: isDrepLink),
+        const _BlocTxSubmitError(),
       ],
     );
   }

@@ -98,7 +98,7 @@ class _Details extends StatelessWidget {
         },
         ProposalVersionChip(
           version: proposal.iteration.toString(),
-          foregroundColor: !isPublished ? context.colors.iconsBackground : null,
+          foregroundColor: isPublished ? context.colors.iconsBackground : null,
         ),
         DayMonthTimeTextWithTooltip(
           datetime: proposal.updateDate,

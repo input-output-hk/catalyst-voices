@@ -27,6 +27,8 @@ export 'reporting/noop_reporting_service.dart';
 export 'reporting/reporting_service.dart';
 export 'reporting/reporting_service_mediator.dart' show ReportingServiceMediator;
 export 'reporting/sentry_reporting_service.dart';
+export 'representatives/delegation_builder.dart' show DelegationBuilder;
+export 'representatives/representatives_service.dart';
 export 'share/share_app_resource_url_resolver.dart';
 export 'share/share_reviews_resource_url_resolver.dart';
 export 'share/share_service.dart' show ShareService;

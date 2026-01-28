@@ -1,4 +1,5 @@
-import 'package:catalyst_voices/widgets/menu/voices_node_menu_placeholder.dart';
+import 'package:catalyst_voices/widgets/document_builder/layout/document_builder_menu_placeholder.dart';
+import 'package:catalyst_voices/widgets/document_builder/layout/document_builder_segments_menu.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -18,34 +19,15 @@ class ProposalBuilderNavigationPanel extends StatelessWidget {
       tabs: [
         SpaceSidePanelTab(
           name: context.l10n.workspaceProposalNavigationSegments,
-          body: const _MenuSelector(),
+          body: const _MenuSelectorTab(),
         ),
       ],
     );
   }
 }
 
-class _MenuPlaceholder extends StatelessWidget {
-  const _MenuPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 12,
-      children: [
-        const VoicesNodeMenuPlaceholder(
-          isExpanded: true,
-          childrenCount: 2,
-        ),
-        for (int i = 0; i < 8; i++) const VoicesNodeMenuPlaceholder(),
-      ],
-    );
-  }
-}
-
-class _MenuSelector extends StatelessWidget {
-  const _MenuSelector();
+class _MenuSelectorTab extends StatelessWidget {
+  const _MenuSelectorTab();
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +35,9 @@ class _MenuSelector extends StatelessWidget {
       selector: (state) => state.isLoading,
       builder: (context, isLoading) {
         if (isLoading) {
-          return const _MenuPlaceholder();
+          return const DocumentBuilderMenuPlaceholder();
         } else {
-          return SegmentsMenuListener(
-            controller: SegmentsControllerScope.of(context),
-          );
+          return DocumentBuilderSegmentsMenu(controller: SegmentsControllerScope.of(context));
         }
       },
     );

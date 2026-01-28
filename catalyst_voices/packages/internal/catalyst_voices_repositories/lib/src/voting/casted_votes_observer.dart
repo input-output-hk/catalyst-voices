@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
+// TODO(damian-molinski): Remove this and depend only on VotingRepository.
 abstract interface class CastedVotesObserver {
   List<Vote> get votes;
 

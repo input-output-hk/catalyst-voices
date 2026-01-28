@@ -28,7 +28,7 @@ class _CoProposersConsentPageContentState extends State<CoProposersConsentPageCo
         Padding(
           padding: const EdgeInsets.only(left: 24, right: 24, top: 22, bottom: 16),
           child: VoicesDrawerHeader(
-            text: context.l10n.collaboratorDisplayConsentHeader,
+            title: Text(context.l10n.collaboratorDisplayConsentHeader),
             onCloseTap: widget.onCloseTap,
             showBackButton: true,
           ),

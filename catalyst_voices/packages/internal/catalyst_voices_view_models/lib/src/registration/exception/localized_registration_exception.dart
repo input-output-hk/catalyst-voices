@@ -153,6 +153,15 @@ final class LocalizedRegistrationWalletNotFoundException extends LocalizedRegist
   String message(BuildContext context) => context.l10n.registrationWalletNotFound;
 }
 
+/// Exception thrown when user tries to update account with a different wallet
+/// than the one used during initial registration.
+final class LocalizedRegistrationWalletMismatchException extends LocalizedRegistrationException {
+  const LocalizedRegistrationWalletMismatchException();
+
+  @override
+  String message(BuildContext context) => context.l10n.registrationWalletMismatch;
+}
+
 final class LocalizedSaveRegistrationProgressException extends LocalizedRegistrationException {
   final List<LocalizedException> reasons;
 
