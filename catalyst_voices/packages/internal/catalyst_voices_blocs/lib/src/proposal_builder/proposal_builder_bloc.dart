@@ -590,18 +590,18 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     if (canComment || comments.isNotEmpty) {
       return [
-        ProposalCommentsSegment(
+        DocumentCommentsSegment(
           id: const NodeId('comments'),
           sort: commentsState.commentsSort,
           sections: [
-            ProposalViewCommentsSection(
+            DocumentViewCommentsSection(
               id: const NodeId('comments.view'),
               sort: commentsState.commentsSort,
               comments: commentsState.commentsSort.applyTo(comments),
               canReply: canReply,
             ),
             if (canComment)
-              ProposalAddCommentSection(
+              DocumentAddCommentSection(
                 id: const NodeId('comments.add'),
                 schema: commentSchema,
                 showUsernameRequired: !hasActiveAccount,

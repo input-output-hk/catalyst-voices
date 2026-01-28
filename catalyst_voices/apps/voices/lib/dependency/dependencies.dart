@@ -166,13 +166,13 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
       })
-      ..registerFactory<ProposalCubit>(() {
-        return ProposalCubit(
-          get<UserService>(),
+      ..registerFactory<ProposalViewerCubit>(() {
+        return ProposalViewerCubit(
           get<ProposalService>(),
-          get<CommentService>(),
+          get<UserService>(),
           get<DocumentMapper>(),
           get<FeatureFlagsService>(),
+          get<CommentService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {

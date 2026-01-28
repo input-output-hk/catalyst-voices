@@ -55,7 +55,7 @@ class VotingListBottomSheetSuccessResult extends StatelessWidget {
     return VotingListBottomSheetContent(
       nextAction: () {
         VotingListDrawer.close(context);
-        VotingRoute(tab: VotingPageTab.votedOn.name).go(context);
+        VotingRoute(tab: VotingPageTab.myVotes.name).go(context);
       },
       nextActionText: context.l10n.viewCastVotes,
       body: Column(
