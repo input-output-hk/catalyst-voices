@@ -46,7 +46,3 @@ final class VotingBalloutBuilderFabViewModel extends Equatable {
     );
   }
 }
-
-extension on Campaign {
-  bool isVotingActive() => phaseStateTo(CampaignPhaseType.communityVoting).status.isActive;
-}

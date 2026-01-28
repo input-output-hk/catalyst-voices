@@ -276,3 +276,7 @@ final class CampaignState extends Equatable {
   @override
   List<Object?> get props => [activePhases];
 }
+
+extension CampaignUtils on Campaign {
+  bool isVotingActive() => phaseStateTo(CampaignPhaseType.communityVoting).status.isActive;
+}
