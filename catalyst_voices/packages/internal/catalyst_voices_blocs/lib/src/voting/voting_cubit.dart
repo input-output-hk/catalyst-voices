@@ -18,6 +18,7 @@ final class VotingCubit extends Cubit<VotingState>
   final CampaignService _campaignService;
   final ProposalService _proposalService;
   final VotingService _votingService;
+  final VotingBallotBuilder _ballotBuilder;
 
   VotingCubitCache _cache = const VotingCubitCache();
   Timer? _countdownTimer;
@@ -35,6 +36,7 @@ final class VotingCubit extends Cubit<VotingState>
     this._campaignService,
     this._proposalService,
     this._votingService,
+    this._ballotBuilder,
   ) : super(const VotingState());
 
   void changeFilters({
@@ -120,6 +122,8 @@ final class VotingCubit extends Cubit<VotingState>
     }
     _proposalsRequestCompleter = null;
 
+    _ballotBuilder.removeListener(_updateBallotBuilderCount);
+
     return super.close();
   }
 
@@ -177,6 +181,9 @@ final class VotingCubit extends Cubit<VotingState>
       const Duration(seconds: 1),
       (_) => _dispatchState(),
     );
+
+    _ballotBuilder.addListener(_updateBallotBuilderCount);
+    _updateBallotBuilderCount();
   }
 
   /// Changes the favorite status of the proposal with [ref].
@@ -395,6 +402,12 @@ final class VotingCubit extends Cubit<VotingState>
     final isDelegator = votingRole is AccountVotingRoleDelegator;
     final isVotingResultsOrTallyActive = campaign?.isVotingResultsOrTallyActive();
 
+    final fab = VotingBalloutBuilderFabViewModel.build(
+      ballotBuilderCount: state.fab.count,
+      votingRole: votingRole,
+      campaign: campaign,
+    );
+
     return state.copyWith(
       header: header,
       fundNumber: Optional(fundNumber),
@@ -404,6 +417,7 @@ final class VotingCubit extends Cubit<VotingState>
       isDelegator: isDelegator,
       isVotingResultsOrTallyActive: isVotingResultsOrTallyActive,
       categorySelectorItems: categorySelectorItems,
+      fab: fab,
     );
   }
 
@@ -415,6 +429,10 @@ final class VotingCubit extends Cubit<VotingState>
       filters: filters,
       activeAccountId: activeAccount?.catalystId,
     );
+  }
+
+  void _updateBallotBuilderCount() {
+    emit(state.copyWith(fab: state.fab.copyWith(count: _ballotBuilder.length)));
   }
 
   void _updateFavoriteProposalLocally(DocumentRef ref, bool isFavorite) {

@@ -4,6 +4,7 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/voting_content.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_header.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_space_vote_ballot_builder_count_fab.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
@@ -40,14 +41,23 @@ class _VotingPageState extends State<VotingPage>
 
   @override
   Widget build(BuildContext context) {
-    return SelectionArea(
-      child: HeaderAndContentLayout(
-        header: const VotingHeader(),
-        content: VotingContent(
-          tabController: _tabController,
-          pagingController: _pagingController,
+    return Stack(
+      children: [
+        SelectionArea(
+          child: HeaderAndContentLayout(
+            header: const VotingHeader(),
+            content: VotingContent(
+              tabController: _tabController,
+              pagingController: _pagingController,
+            ),
+          ),
         ),
-      ),
+        const Positioned(
+          right: 24,
+          bottom: 36,
+          child: VotingSpaceVoteBallotBuilderCountFab(),
+        ),
+      ],
     );
   }
 

@@ -53,6 +53,7 @@ class VotingState extends Equatable {
   final bool isVotingResultsOrTallyActive;
   final Map<VotingPageTab, int> count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
+  final VotingBalloutBuilderFabViewModel fab;
 
   const VotingState({
     this.header = const VotingHeaderData(),
@@ -64,6 +65,7 @@ class VotingState extends Equatable {
     this.isVotingResultsOrTallyActive = false,
     this.count = const {},
     this.categorySelectorItems = const [],
+    this.fab = const VotingBalloutBuilderFabViewModel(),
   });
 
   bool get hasSelectedCategory => categorySelectorItems.any((element) => element.isSelected);
@@ -79,6 +81,7 @@ class VotingState extends Equatable {
     isVotingResultsOrTallyActive,
     count,
     categorySelectorItems,
+    fab,
   ];
 
   SignedDocumentRef? get selectedCategoryId {
@@ -95,6 +98,7 @@ class VotingState extends Equatable {
     bool? isVotingResultsOrTallyActive,
     Map<VotingPageTab, int>? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
+    VotingBalloutBuilderFabViewModel? fab,
   }) {
     return VotingState(
       header: header ?? this.header,
@@ -107,6 +111,7 @@ class VotingState extends Equatable {
           isVotingResultsOrTallyActive ?? this.isVotingResultsOrTallyActive,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
+      fab: fab ?? this.fab,
     );
   }
 
