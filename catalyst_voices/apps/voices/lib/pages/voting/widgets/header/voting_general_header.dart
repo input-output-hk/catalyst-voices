@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_selector.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_picker.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_phase_progress_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -75,7 +75,7 @@ class _FundNumberAndVotingPower extends StatelessWidget {
             const _CatalystFund(),
           ],
         ),
-        const AccountVotingRoleCardSelector(),
+        const AccountVotingRoleCard(),
       ],
     );
   }

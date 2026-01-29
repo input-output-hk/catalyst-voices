@@ -7,8 +7,8 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class AccountVotingRoleCardSelector extends StatelessWidget {
-  const AccountVotingRoleCardSelector({super.key});
+class AccountVotingRoleCard extends StatelessWidget {
+  const AccountVotingRoleCard({super.key});
 
   @override
   Widget build(BuildContext context) {
