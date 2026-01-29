@@ -4,11 +4,11 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/voting_content.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_header.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_space_vote_ballot_builder_count_fab.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
 import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -55,7 +55,7 @@ class _VotingPageState extends State<VotingPage>
         const Positioned(
           right: 24,
           bottom: 36,
-          child: VotingSpaceVoteBallotBuilderCountFab(),
+          child: VotingBallotProposalsCountFab(),
         ),
       ],
     );

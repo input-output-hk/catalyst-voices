@@ -107,6 +107,11 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
             ),
           ),
           const DocumentViewerError(),
+          const Positioned(
+            right: 24,
+            bottom: 36,
+            child: VotingBallotProposalsCountFab(),
+          ),
         ],
       ),
     );

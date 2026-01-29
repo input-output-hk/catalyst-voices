@@ -43,19 +43,22 @@ final class RemoveVoteEvent extends VotingBallotEvent {
   List<Object?> get props => [proposal];
 }
 
-final class UpdateFooterFromBallotBuilderEvent extends VotingBallotEvent {
-  final bool canCastVotes;
+final class UpdateFromBallotBuilderEvent extends VotingBallotEvent {
   final bool showPendingVotesDisclaimer;
+  final bool canCastVotes;
+  final int proposalsCount;
 
-  const UpdateFooterFromBallotBuilderEvent({
-    required this.canCastVotes,
+  const UpdateFromBallotBuilderEvent({
     required this.showPendingVotesDisclaimer,
+    required this.canCastVotes,
+    required this.proposalsCount,
   });
 
   @override
   List<Object?> get props => [
-    canCastVotes,
     showPendingVotesDisclaimer,
+    canCastVotes,
+    proposalsCount,
   ];
 }
 
@@ -66,6 +69,17 @@ final class UpdateFundNumberEvent extends VotingBallotEvent {
 
   @override
   List<Object?> get props => [number];
+}
+
+final class UpdateVotingEnabledEvent extends VotingBallotEvent {
+  final bool isEnabled;
+
+  const UpdateVotingEnabledEvent({
+    required this.isEnabled,
+  });
+
+  @override
+  List<Object?> get props => [isEnabled];
 }
 
 final class UpdateLastCastedVoteEvent extends VotingBallotEvent {

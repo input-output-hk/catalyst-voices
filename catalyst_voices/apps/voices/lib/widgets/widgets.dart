@@ -133,3 +133,4 @@ export 'user/username_text.dart';
 export 'voting/representative_count_floating_action_button.dart';
 export 'voting/vote_button.dart';
 export 'voting/votes_count_floating_action_button.dart';
+export 'voting/voting_ballot_proposals_count_fab.dart';

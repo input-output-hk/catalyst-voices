@@ -17,7 +17,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     with BlocSignalEmitterMixin<VotingBallotSignal, VotingBallotState> {
   final UserService _userService;
   final CampaignService _campaignService;
-  final VotingBallotBuilder _ballotBuilder;
+  final VotingBallotBuilder _builder;
   final VotingService _votingService;
 
   var _cache = const VotingBallotCache();
@@ -31,13 +31,13 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   VotingBallotBloc(
     this._userService,
     this._campaignService,
-    this._ballotBuilder,
+    this._builder,
     this._votingService,
   ) : super(const VotingBallotState()) {
     on<UpdateVotingRoleEvent>(_updateVotingRole, transformer: uniqueEvents());
     on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress, transformer: uniqueEvents());
     on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
-    on<UpdateFooterFromBallotBuilderEvent>(_updateFooterFromBallot, transformer: uniqueEvents());
+    on<UpdateFromBallotBuilderEvent>(_updateFromBallotBuilder, transformer: uniqueEvents());
     on<UpdateLastCastedVoteEvent>(_updateLastCastedVote, transformer: uniqueEvents());
     on<UpdateVoteTiles>(_updateTiles);
     on<UpdateVoteEvent>(_updateVote);
@@ -46,6 +46,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     on<ConfirmCastingVotesEvent>(_confirmCastingVotes);
     on<CancelCastingVotesEvent>(_cancelCastingVotes);
     on<CheckPasswordEvent>(_checkPassword);
+    on<UpdateVotingEnabledEvent>(_updateIsEnabled);
 
     _activeVotingRoleSub = _votingService.watchActiveVotingRole().distinct().listen(
       _handleActiveVotingRoleChange,
@@ -53,7 +54,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
     _activeCampaignSub = _campaignService.watchActiveCampaign.listen(_handleCampaignChange);
 
-    _ballotBuilder.addListener(_handleBallotBuilderChange);
+    _builder.addListener(_handleBallotBuilderChange);
     _handleBallotBuilderChange();
 
     _watchedCastedVotesSub = _votingService
@@ -65,7 +66,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
   @override
   Future<void> close() async {
-    _ballotBuilder.removeListener(_handleBallotBuilderChange);
+    _builder.removeListener(_handleBallotBuilderChange);
 
     await _activeVotingRoleSub?.cancel();
     _activeVotingRoleSub = null;
@@ -83,7 +84,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   List<VotingListTileData> _buildTiles() {
-    final votes = _ballotBuilder.votes;
+    final votes = _builder.votes;
 
     final proposals = _cache.votesProposals;
 
@@ -182,7 +183,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     Emitter<VotingBallotState> emit,
   ) async {
     try {
-      final votingBallot = _ballotBuilder.build();
+      final votingBallot = _builder.build();
       // First cast votes then clear the ballot because when something fails in casting then we don't
       // want to clear the ballot and let the user try again.
       await _votingService.castVotes(votingBallot.votes);
@@ -192,7 +193,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       // Move clear ballot below castVotes from service
       final randomBool = Random().nextBool();
       if (randomBool) {
-        _ballotBuilder.clear();
+        _builder.clear();
         _cache = _cache.copyWith(votesProposals: {});
         final tiles = _buildTiles();
         emit(state.copyWith(tiles: tiles, footer: footer));
@@ -250,12 +251,14 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   void _handleBallotBuilderChange() {
-    final canCastVotes = _ballotBuilder.length > 0;
-    final showPendingVotesDisclaimer = _ballotBuilder.length > 0;
+    final proposalsCount = _builder.length;
+    final showPendingVotesDisclaimer = proposalsCount > 0;
+    final canCastVotes = proposalsCount > 0;
 
-    final event = UpdateFooterFromBallotBuilderEvent(
-      canCastVotes: canCastVotes,
+    final event = UpdateFromBallotBuilderEvent(
       showPendingVotesDisclaimer: showPendingVotesDisclaimer,
+      canCastVotes: canCastVotes,
+      proposalsCount: proposalsCount,
     );
 
     add(event);
@@ -287,6 +290,23 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     ).toList();
   }
 
+  void _onTimerTick(Timer timer) {
+    final campaign = _cache.campaign;
+    final updatedVotingPhase = _buildVotingPhaseDetails(campaign);
+    add(UpdateVotingPhaseProgressEvent(votingPhase: updatedVotingPhase));
+
+    final isVotingActive = updatedVotingPhase?.status.isActive ?? false;
+    if (_cache.isVotingActive != isVotingActive) {
+      _cache = _cache.copyWith(isVotingActive: isVotingActive);
+      final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
+      add(UpdateVotingEnabledEvent(isEnabled: isVotingActive && isManualVotingEnabled));
+    }
+
+    if (updatedVotingPhase?.status == CampaignPhaseStatus.post) {
+      timer.cancel();
+    }
+  }
+
   void _rebuildTilesAndSendEvent() {
     final tiles = _buildTiles();
 
@@ -298,19 +318,20 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     Emitter<VotingBallotState> emit,
   ) {
     _cache = _cache.removeProposal(event.proposal);
-    _ballotBuilder.removeVoteOn(event.proposal);
+    _builder.removeVoteOn(event.proposal);
   }
 
-  void _updateFooterFromBallot(
-    UpdateFooterFromBallotBuilderEvent event,
+  void _updateFromBallotBuilder(
+    UpdateFromBallotBuilderEvent event,
     Emitter<VotingBallotState> emit,
   ) {
     final footer = state.footer.copyWith(
-      canCastVotes: event.canCastVotes,
       showPendingVotesDisclaimer: event.showPendingVotesDisclaimer,
+      canCastVotes: event.canCastVotes,
     );
+    final fab = state.fab.copyWith(count: event.proposalsCount);
 
-    emit(state.copyWith(footer: footer));
+    emit(state.copyWith(footer: footer, fab: fab));
   }
 
   void _updateFundNumber(
@@ -319,6 +340,16 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   ) {
     final votingProgress = state.votingProgress.copyWith(activeFundNumber: Optional(event.number));
     emit(state.copyWith(votingProgress: votingProgress));
+  }
+
+  void _updateIsEnabled(
+    UpdateVotingEnabledEvent event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    final fab = state.fab.copyWith(isVisible: event.isEnabled);
+    final footer = state.footer.copyWith(canCastVotes: false);
+
+    emit(state.copyWith(fab: fab, footer: footer));
   }
 
   void _updateLastCastedVote(
@@ -334,7 +365,9 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     UpdateVoteTiles event,
     Emitter<VotingBallotState> emit,
   ) {
-    emit(state.copyWith(tiles: event.tiles, votesCount: _cache.votesCount));
+    final votesCount = _cache.votesCount;
+    final fab = state.fab.copyWith(count: votesCount);
+    emit(state.copyWith(tiles: event.tiles, votesCount: votesCount, fab: fab));
   }
 
   Future<void> _updateVote(
@@ -352,11 +385,11 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
     // If it has already voted in the ballot, when we don't need to do anything
     // because .voteOn will just update type with and keep it the same.
-    final voteId = _ballotBuilder.hasVotedOn(proposalRef)
+    final voteId = _builder.hasVotedOn(proposalRef)
         ? null
         : await _getLastCastedVoteOn(proposalRef).then((vote) => vote?.id.id);
 
-    _ballotBuilder.voteOn(
+    _builder.voteOn(
       proposal: proposalRef,
       type: event.type,
       voteId: voteId,
@@ -384,43 +417,50 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     final votingPhase = _buildVotingPhaseDetails(campaign);
     add(UpdateVotingPhaseProgressEvent(votingPhase: votingPhase));
 
+    final isVotingActive = votingPhase?.status.isActive ?? false;
+    if (_cache.isVotingActive != isVotingActive) {
+      _cache = _cache.copyWith(isVotingActive: isVotingActive);
+      final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
+      add(UpdateVotingEnabledEvent(isEnabled: isVotingActive && isManualVotingEnabled));
+    }
+
     if (votingPhase == null || votingPhase.status == CampaignPhaseStatus.post) {
       return;
     }
 
-    _phaseProgressTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        final updatedVotingPhase = _buildVotingPhaseDetails(campaign);
-
-        add(UpdateVotingPhaseProgressEvent(votingPhase: updatedVotingPhase));
-
-        if (updatedVotingPhase?.status == CampaignPhaseStatus.post) {
-          timer.cancel();
-        }
-      },
-    );
+    _phaseProgressTimer = Timer.periodic(const Duration(seconds: 1), _onTimerTick);
   }
 
   void _updateVotingRole(
     UpdateVotingRoleEvent event,
     Emitter<VotingBallotState> emit,
   ) {
-    final votingPower = event.data;
+    _cache = _cache.copyWith(votingRole: Optional(event.data));
+    final isVotingActive = _cache.isVotingActive;
 
-    final amount = votingPower?.totalVotingPowerAmount ?? 0;
-    final status = switch (votingPower) {
+    final votingRole = event.data;
+
+    final amount = votingRole?.totalVotingPowerAmount ?? 0;
+    final status = switch (votingRole) {
       AccountVotingRoleDelegator(:final votingPower) => votingPower.data?.status,
       AccountVotingRoleIndividual(:final votingPower) => votingPower.data?.status,
       AccountVotingRoleRepresentative(:final votingPower) => votingPower.data?.status,
       null => null,
     };
+    final isNullOrIndividual = votingRole == null || votingRole is AccountVotingRoleIndividual;
 
     final userSummary = VotingListUserSummaryData(
       amount: amount,
       status: status,
     );
 
-    emit(state.copyWith(userSummary: userSummary));
+    final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
+
+    final fab = state.fab.copyWith(
+      useGradient: !isNullOrIndividual,
+      isVisible: isVotingActive && isManualVotingEnabled,
+    );
+
+    emit(state.copyWith(userSummary: userSummary, fab: fab));
   }
 }

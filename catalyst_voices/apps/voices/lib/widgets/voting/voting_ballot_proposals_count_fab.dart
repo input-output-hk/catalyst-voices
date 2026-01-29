@@ -3,22 +3,22 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class VotingSpaceVoteBallotBuilderCountFab extends StatelessWidget {
-  const VotingSpaceVoteBallotBuilderCountFab({super.key});
+class VotingBallotProposalsCountFab extends StatelessWidget {
+  const VotingBallotProposalsCountFab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, VotingBalloutBuilderFabViewModel>(
+    return BlocSelector<VotingBallotBloc, VotingBallotState, VotingBalloutBuilderFabViewModel>(
       selector: (state) => state.fab,
-      builder: (context, state) => _VotingSpaceVoteBallotBuilderCountFab(data: state),
+      builder: (context, state) => _VotingBallotProposalsCountFab(data: state),
     );
   }
 }
 
-class _VotingSpaceVoteBallotBuilderCountFab extends StatelessWidget {
+class _VotingBallotProposalsCountFab extends StatelessWidget {
   final VotingBalloutBuilderFabViewModel data;
 
-  const _VotingSpaceVoteBallotBuilderCountFab({
+  const _VotingBallotProposalsCountFab({
     required this.data,
   });
 
