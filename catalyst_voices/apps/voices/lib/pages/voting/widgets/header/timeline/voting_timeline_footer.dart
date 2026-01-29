@@ -1,19 +1,17 @@
 part of 'voting_timeline_header.dart';
 
 class _Countdown extends StatelessWidget {
-  final VotingTimelinePhaseType phaseType;
-  final Duration phaseEndsIn;
+  final VotingTimelineFooterCountdownEvent data;
 
   const _Countdown({
-    required this.phaseType,
-    required this.phaseEndsIn,
+    required this.data,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final formattedEndsIn = DurationFormatter.formatDurationDDhhmm(context.l10n, phaseEndsIn);
-    final text = phaseType.getCountdownLabel(context, duration: formattedEndsIn);
+    final formattedDuration = DurationFormatter.formatDurationDDhhmm(context.l10n, data.duration);
+    final text = data.phaseType.getCountdownLabel(context, duration: formattedDuration);
 
     return Text(
       text,
@@ -24,20 +22,32 @@ class _Countdown extends StatelessWidget {
   }
 }
 
-class _VotingPowerSnapshot extends StatelessWidget {
-  final DateTime? snapshotDate;
+class _FooterEvent extends StatelessWidget {
+  final VotingTimelineFooterEvent? event;
 
-  const _VotingPowerSnapshot({
-    required this.snapshotDate,
+  const _FooterEvent({
+    required this.event,
   });
 
   @override
   Widget build(BuildContext context) {
-    final snapshotDate = this.snapshotDate;
-    if (snapshotDate == null) {
-      return const SizedBox.shrink();
-    }
+    return switch (event) {
+      final VotingTimelineFooterPowerSnapshotEvent event => _VotingPowerSnapshot(data: event),
+      final VotingTimelineFooterCountdownEvent event => _Countdown(data: event),
+      null => const SizedBox.shrink(),
+    };
+  }
+}
 
+class _VotingPowerSnapshot extends StatelessWidget {
+  final VotingTimelineFooterPowerSnapshotEvent data;
+
+  const _VotingPowerSnapshot({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textStyle = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colors.textOnPrimaryLevel1,
@@ -56,7 +66,7 @@ class _VotingPowerSnapshot extends StatelessWidget {
           const TextSpan(text: ' '),
           WidgetSpan(
             child: TimezoneDateTimeText(
-              snapshotDate,
+              data.date,
               formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
               style: textStyle,
             ),
@@ -97,11 +107,8 @@ class _VotingTimelineFooterContent extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _VotingPowerSnapshot(snapshotDate: viewModel.snapshotDate),
-        _Countdown(
-          phaseType: viewModel.phaseType,
-          phaseEndsIn: viewModel.phaseEndsIn,
-        ),
+        _FooterEvent(event: viewModel.leftEvent),
+        _FooterEvent(event: viewModel.rightEvent),
       ],
     );
   }

@@ -74,20 +74,45 @@ final class VotingTimelineDetailsViewModel extends Equatable {
   }
 }
 
-/// View model for voting timeline footer widget.
-final class VotingTimelineFooterViewModel extends Equatable {
+final class VotingTimelineFooterCountdownEvent extends VotingTimelineFooterEvent {
   final VotingTimelinePhaseType phaseType;
-  final Duration phaseEndsIn;
-  final DateTime? snapshotDate;
+  final Duration duration;
 
-  const VotingTimelineFooterViewModel({
+  const VotingTimelineFooterCountdownEvent({
     required this.phaseType,
-    required this.phaseEndsIn,
-    required this.snapshotDate,
+    required this.duration,
   });
 
   @override
-  List<Object?> get props => [phaseType, phaseEndsIn, snapshotDate];
+  List<Object?> get props => [phaseType, duration];
+}
+
+/// Sealed class for footer events.
+sealed class VotingTimelineFooterEvent extends Equatable {
+  const VotingTimelineFooterEvent();
+}
+
+final class VotingTimelineFooterPowerSnapshotEvent extends VotingTimelineFooterEvent {
+  final DateTime date;
+
+  const VotingTimelineFooterPowerSnapshotEvent({required this.date});
+
+  @override
+  List<Object?> get props => [date];
+}
+
+/// View model for voting timeline footer widget.
+final class VotingTimelineFooterViewModel extends Equatable {
+  final VotingTimelineFooterEvent? leftEvent;
+  final VotingTimelineFooterEvent? rightEvent;
+
+  const VotingTimelineFooterViewModel({
+    this.leftEvent,
+    this.rightEvent,
+  });
+
+  @override
+  List<Object?> get props => [leftEvent, rightEvent];
 }
 
 /// View model for voting timeline phases widget.
@@ -254,7 +279,7 @@ final class VotingTimelineProgressViewModel extends Equatable {
     if (phases.isEmpty) {
       return null;
     }
-
+    final snapshotDate = this.snapshotDate;
     final phaseViewModels = phases
         .map((phase) => VotingTimelinePhaseViewModel.fromModel(phase, now))
         .toList();
@@ -285,15 +310,23 @@ final class VotingTimelineProgressViewModel extends Equatable {
       campaignProgress = campaignElapsedTime.inMicroseconds / campaignDuration.inMicroseconds;
     }
 
-    // Calculate countdown for current phase
-    // TODO(bstolinski): get next phase from if null get current dateRange.to
-    final currentPhaseEnd = currentPhase.dateRange.to;
-    final Duration phaseEndsIn;
-    if (currentPhaseEnd == null || now.isAfter(currentPhaseEnd)) {
-      phaseEndsIn = Duration.zero;
-    } else {
-      phaseEndsIn = currentPhaseEnd.difference(now);
-    }
+    // Calculate countdown to next phase start
+    final currentPhaseIndex = phaseViewModels.indexOf(currentPhase);
+    final nextPhase = currentPhaseIndex < phaseViewModels.length - 1
+        ? phaseViewModels[currentPhaseIndex + 1]
+        : null;
+    final targetDate = nextPhase?.dateRange.from ?? currentPhase.dateRange.to;
+    final nextPhaseStartsIn = (targetDate == null || now.isAfter(targetDate))
+        ? Duration.zero
+        : targetDate.difference(now);
+
+    final footerLeftEvent = snapshotDate != null
+        ? VotingTimelineFooterPowerSnapshotEvent(date: snapshotDate)
+        : null;
+    final footerRightEvent = VotingTimelineFooterCountdownEvent(
+      phaseType: currentPhase.type,
+      duration: nextPhaseStartsIn,
+    );
 
     // Show category picker when current phase is voting
     final showCategoryPicker = currentPhase.type == VotingTimelinePhaseType.voting;
@@ -310,9 +343,8 @@ final class VotingTimelineProgressViewModel extends Equatable {
         isVotingDelegated: isVotingDelegated,
       ),
       footerViewModel: VotingTimelineFooterViewModel(
-        phaseType: currentPhase.type,
-        phaseEndsIn: phaseEndsIn,
-        snapshotDate: snapshotDate,
+        leftEvent: footerLeftEvent,
+        rightEvent: footerRightEvent,
       ),
       campaignProgress: campaignProgress,
     );
