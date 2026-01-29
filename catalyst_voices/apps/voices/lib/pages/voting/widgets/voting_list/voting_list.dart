@@ -36,6 +36,7 @@ class VotingList extends StatelessWidget {
   }
 }
 
+// TODO(LynxLynxx): Refactor to use New Drawer API as Page
 class VotingListDrawer extends StatelessWidget {
   const VotingListDrawer({super.key});
 

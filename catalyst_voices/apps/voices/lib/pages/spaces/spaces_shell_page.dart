@@ -4,8 +4,8 @@ import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_appbar.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
-import 'package:catalyst_voices/pages/spaces/drawer/spaces_end_drawer.dart';
 import 'package:catalyst_voices/pages/spaces/spaces_shell_bloc_provider.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -97,7 +97,8 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
                         isUnlocked: state.isActive,
                       )
                     : null,
-                endDrawer: SpacesEndDrawer(space: widget.space),
+                // TODO(LynxLynxx): Remove after VotingDrawer is refactor as Page
+                endDrawer: const VotingListDrawer(),
                 body: widget.child,
               );
             },

@@ -10,7 +10,6 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_changing
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_responsiveness.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_validation_snackbar.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
-import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
@@ -97,7 +96,6 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
               AccountSettingsAction(),
             ],
           ),
-          endDrawer: const OpportunitiesDrawer(),
           body: SegmentsControllerScope(
             controller: _segmentsController,
             child: ResponsiveProposalBuilderLayout(

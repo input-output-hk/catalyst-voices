@@ -23,6 +23,7 @@ class ActionsShellPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesDrawer(
       width: 500,
+      padding: EdgeInsets.zero,
       child: child,
     );
   }

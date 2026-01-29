@@ -22,6 +22,7 @@ class _CoProposersConsentPageState extends State<CoProposersConsentPage> {
       value: _cubit,
       child: ScaffoldMessenger(
         child: Scaffold(
+          backgroundColor: Colors.transparent,
           body: CoProposersConsentPageContent(
             onCloseTap: () => ActionsShellPage.close(context),
           ),

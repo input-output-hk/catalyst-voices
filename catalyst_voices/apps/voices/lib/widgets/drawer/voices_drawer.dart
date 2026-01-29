@@ -15,6 +15,8 @@ class VoicesDrawer extends StatefulWidget {
   /// This widget is main "body" of [VoicesDrawer].
   final Widget child;
 
+  final EdgeInsets padding;
+
   /// The sticky item at the bottom.
   final Widget? footer;
 
@@ -26,9 +28,10 @@ class VoicesDrawer extends StatefulWidget {
   const VoicesDrawer({
     super.key,
     this.width = 360,
-    required this.child,
+    this.padding = const EdgeInsets.all(16),
     this.footer,
     this.bottomSheet,
+    required this.child,
   });
 
   @override
@@ -77,7 +80,7 @@ class VoicesDrawerState extends State<VoicesDrawer> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: widget.padding,
         child: Container(
           clipBehavior: Clip.antiAlias,
           decoration: const BoxDecoration(

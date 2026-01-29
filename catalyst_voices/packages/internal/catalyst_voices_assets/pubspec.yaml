@@ -29,7 +29,6 @@ flutter:
   assets:
     - assets/images/
     - assets/images/category/
-    - assets/images/opportunities/
     - assets/images/svg/
     - assets/icons/
     - assets/lottie/
