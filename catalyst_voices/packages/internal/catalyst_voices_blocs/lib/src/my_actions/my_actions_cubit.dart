@@ -100,7 +100,7 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     unawaited(_setupInvitesApprovalsCountSubscription());
   }
 
-  void _handleCampaignChange(CampaignTimeline? timeline) {
+  void _handleCampaignTimelineChange(CampaignTimeline? timeline) {
     final proposalSubmissionCloseDate = timeline
         ?.phase(CampaignPhaseType.proposalSubmission)
         ?.timeline
@@ -159,7 +159,7 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     _activeCampaignSub = _campaignService.watchActiveCampaign
         .map((event) => event?.timeline)
         .distinct()
-        .listen(_handleCampaignChange);
+        .listen(_handleCampaignTimelineChange);
   }
 
   Future<void> _setupActiveVotingRoleSubscription() async {
