@@ -200,7 +200,22 @@ final class VotingCubit extends Cubit<VotingState>
   }
 
   void togglePhasesExpanded() {
-    emit(state.copyWith(votingPhasesExpanded: !state.votingPhasesExpanded));
+    final votingTimeline = state.votingTimeline;
+    if (votingTimeline == null) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        votingTimeline: Optional(
+          votingTimeline.copyWith(
+            titleViewModel: votingTimeline.titleViewModel.copyWith(
+              phasesExpanded: !votingTimeline.titleViewModel.phasesExpanded,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void updateSearchQuery(String query) {
@@ -272,48 +287,27 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
-  VotingTimelineProgressViewModel? _buildVotingTimeline(Campaign? campaign) {
-    final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
-    final campaignStartDate = campaign?.startDate;
-    final campaignTimeline = campaign?.timeline;
-    final phases = <VotingTimelinePhase>[];
-    if (campaignTimeline != null) {
-      final timelinePhaseTypes = [
-        CampaignPhaseType.votingRegistration,
-        CampaignPhaseType.communityVoting,
-        CampaignPhaseType.votingTally,
-        CampaignPhaseType.votingResults,
-      ];
-
-      for (final type in timelinePhaseTypes) {
-        final campaignPhase = campaignTimeline.phase(type);
-        if (campaignPhase != null) {
-          phases.add(VotingTimelinePhase.fromCampaignPhase(campaignPhase));
-        }
-      }
-    }
-
-    if (campaignVotingPhase != null && campaignStartDate != null) {
-      return VotingTimelineProgressViewModel.fromModel(
-        state: campaignVotingPhase,
-        campaignStartDate: campaignStartDate,
-        phases: phases,
-      );
-    } else {
-      return null;
-    }
-  }
-
   VotingPhaseProgressDetailsViewModel? _buildVotingPhaseDetails(Campaign? campaign) {
     final votingPhase = _buildVotingPhase(campaign);
     final now = DateTimeExt.now();
     return votingPhase?.progress(now);
   }
 
+  VotingTimelineProgressViewModel? _buildVotingTimeline(Campaign? campaign) {
+    final campaignTimeline = campaign?.timeline;
+    return campaignTimeline != null
+        ? VotingTimelineProgressViewModel.fromTimeline(campaignTimeline)
+        : null;
+  }
+
   VotingTimelineDetailsViewModel? _buildVotingTimelineDetails(Campaign? campaign) {
     final votingTimeline = _buildVotingTimeline(campaign);
     final now = DateTimeExt.now();
-    return votingTimeline?.progress(now);
+    return votingTimeline?.progress(
+      now: now,
+      phasesExpanded: state.votingTimeline?.phasesExpanded ?? true,
+      isVotingDelegated: state.isDelegator,
+    );
   }
 
   void _dispatchState() {
@@ -428,7 +422,6 @@ final class VotingCubit extends Cubit<VotingState>
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
 
-    final showCategoryPicker = votingPhaseViewModel?.status.isActive ?? false;
     final selectedCategoryHeaderData = selectedCategory != null
         ? VotingHeaderCategoryData.fromModel(selectedCategory)
         : null;
@@ -442,7 +435,6 @@ final class VotingCubit extends Cubit<VotingState>
       votingPower: votingPowerViewModel,
       votingPhase: Optional(votingPhaseViewModel),
       votingTimeline: Optional(votingTimelineDetailsViewModel),
-      showCategoryPicker: showCategoryPicker,
       hasSearchQuery: hasSearchQuery,
       isDelegator: isDelegator,
       isVotingResultsOrTallyActive: isVotingResultsOrTallyActive,

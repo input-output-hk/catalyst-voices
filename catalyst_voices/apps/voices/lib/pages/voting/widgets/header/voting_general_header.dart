@@ -30,7 +30,7 @@ class VotingGeneralHeader extends StatelessWidget {
         const SizedBox(height: 32),
         const _Cards(),
         const SizedBox(height: 32),
-        const VotingTimelineHeaderSelector(),
+        const VotingTimelineHeader(),
       ],
     );
   }

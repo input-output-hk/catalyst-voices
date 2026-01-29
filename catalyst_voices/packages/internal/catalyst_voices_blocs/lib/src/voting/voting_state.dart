@@ -36,8 +36,6 @@ class VotingState extends Equatable {
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
   final VotingTimelineDetailsViewModel? votingTimeline;
-  final bool votingPhasesExpanded;
-  final bool showCategoryPicker;
   final bool hasSearchQuery;
   final bool isDelegator;
   final bool isVotingResultsOrTallyActive;
@@ -50,8 +48,6 @@ class VotingState extends Equatable {
     this.votingPower = const VotingPowerViewModel(),
     this.votingPhase,
     this.votingTimeline,
-    this.votingPhasesExpanded = true,
-    this.showCategoryPicker = true,
     this.hasSearchQuery = false,
     this.isDelegator = false,
     this.isVotingResultsOrTallyActive = false,
@@ -68,8 +64,6 @@ class VotingState extends Equatable {
     votingPower,
     votingPhase,
     votingTimeline,
-    votingPhasesExpanded,
-    showCategoryPicker,
     hasSearchQuery,
     isDelegator,
     isVotingResultsOrTallyActive,
@@ -87,8 +81,6 @@ class VotingState extends Equatable {
     VotingPowerViewModel? votingPower,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     Optional<VotingTimelineDetailsViewModel>? votingTimeline,
-    bool? votingPhasesExpanded,
-    bool? showCategoryPicker,
     bool? hasSearchQuery,
     bool? isDelegator,
     bool? isVotingResultsOrTallyActive,
@@ -103,8 +95,6 @@ class VotingState extends Equatable {
       votingPower: votingPower ?? this.votingPower,
       votingPhase: votingPhase.dataOr(this.votingPhase),
       votingTimeline: votingTimeline.dataOr(this.votingTimeline),
-      votingPhasesExpanded: votingPhasesExpanded ?? this.votingPhasesExpanded,
-      showCategoryPicker: showCategoryPicker ?? this.showCategoryPicker,
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       isDelegator: isDelegator ?? this.isDelegator,
       isVotingResultsOrTallyActive:

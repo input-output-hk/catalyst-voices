@@ -1,59 +1,44 @@
 part of 'voting_timeline_header.dart';
 
 class _DateCounter extends StatelessWidget {
-  final VotingTimelinePhaseViewModel phase;
+  final VotingTimelineDateCounterViewModel dateCounter;
 
   const _DateCounter({
-    required this.phase,
+    required this.dateCounter,
   });
 
   @override
   Widget build(BuildContext context) {
-    final dateRange = phase.dateRange;
-    final startDate = dateRange.from;
-    final endDate = dateRange.to;
-
-    if (startDate == null || endDate == null) {
+    final dateCounterType = dateCounter.type;
+    if (dateCounterType == VotingTimelineDateCounterType.hidden) {
       return const _DateCounterText.placeholder();
     }
 
-    final now = DateTimeExt.now();
+    final data = switch (dateCounterType) {
+      VotingTimelineDateCounterType.startingIn => (
+        label: context.l10n.votingTimelineStartingIn,
+        value: context.l10n.votingTimelineStartingInXDays(dateCounter.daysCount),
+      ),
+      VotingTimelineDateCounterType.startingWithDate => (
+        label: context.l10n.votingTimelineStarting,
+        value: DateFormatter.formatFullDateFormat(dateCounter.date),
+      ),
+      VotingTimelineDateCounterType.endedDaysAgo => (
+        label: context.l10n.votingTimelineEnded,
+        value: context.l10n.votingTimelineEndedXDaysAgo(dateCounter.daysCount),
+      ),
+      VotingTimelineDateCounterType.endedWithDate => (
+        label: context.l10n.votingTimelineEnded,
+        value: DateFormatter.formatFullDateFormat(dateCounter.date),
+      ),
+      // handled above
+      VotingTimelineDateCounterType.hidden => (label: '', value: ''),
+    };
 
-    switch (phase.rangeStatus) {
-      case DateRangeStatus.inRange:
-        return const _DateCounterText.placeholder();
-      case DateRangeStatus.before:
-        var daysUntil = startDate.difference(now).inDays;
-        daysUntil = daysUntil == 0 ? 1 : daysUntil;
-
-        if (daysUntil.isNegative) {
-          return const _DateCounterText.placeholder();
-        }
-
-        return _DateCounterText(
-          label: context.l10n.votingTimelineStartingIn,
-          value: context.l10n.votingTimelineStartingInXDays(daysUntil),
-        );
-      case DateRangeStatus.after:
-        var daysSince = now.difference(endDate).inDays;
-        daysSince = daysSince == 0 ? 1 : daysSince;
-
-        if (daysSince.isNegative) {
-          return const _DateCounterText.placeholder();
-        }
-
-        if (daysSince > 30) {
-          return _DateCounterText(
-            label: context.l10n.votingTimelineEnded,
-            value: DateFormatter.formatFullDate24Format(endDate),
-          );
-        } else {
-          return _DateCounterText(
-            label: context.l10n.votingTimelineEnded,
-            value: context.l10n.votingTimelineEndedXDaysAgo(daysSince),
-          );
-        }
-    }
+    return _DateCounterText(
+      label: data.label,
+      value: data.value,
+    );
   }
 }
 
@@ -132,12 +117,7 @@ class _DateWindow extends StatelessWidget {
     final startDate = dateRange?.from;
     final endDate = dateRange?.to;
     final isResultsPhase = phaseType == VotingTimelinePhaseType.results;
-    final windowTitle = switch (phaseType) {
-      VotingTimelinePhaseType.registration => context.l10n.votingTimelinePreVotingWindow,
-      VotingTimelinePhaseType.voting => context.l10n.votingTimelineVotingWindow,
-      VotingTimelinePhaseType.tally => context.l10n.votingTimelineTallyWindow,
-      VotingTimelinePhaseType.results => context.l10n.votingTimelineResultsLabel,
-    };
+    final windowLabel = phaseType.getDateWindowLabel(context);
 
     return Column(
       spacing: 4,
@@ -145,37 +125,25 @@ class _DateWindow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          windowTitle,
+          windowLabel,
           style: textTheme.titleSmall?.copyWith(
             color: textColor,
             fontWeight: FontWeight.bold,
           ),
         ),
-        if (dateRange == null || (startDate == null && endDate == null))
-          Text(
-            context.l10n.votingTimelineToBeAnnounced,
-            style: textTheme.bodyMedium?.copyWith(
-              color: textColor,
-              fontWeight: FontWeight.w500,
-            ),
-          )
-        else ...[
-          if (startDate != null)
-            _DateWindowRow(
-              label: isResultsPhase
-                  ? context.l10n.votingTimelineDrop
-                  : context.l10n.votingTimelineStarts,
-              date: startDate,
-              isPhaseActive: isPhaseActive,
-            ),
-          if (endDate != null && !isResultsPhase) ...[
-            _DateWindowRow(
-              label: context.l10n.votingTimelineFinishes,
-              date: endDate,
-              isPhaseActive: isPhaseActive,
-            ),
-          ],
-        ],
+        _DateWindowRow(
+          label: isResultsPhase
+              ? context.l10n.votingTimelineDrop
+              : context.l10n.votingTimelineStarts,
+          date: startDate,
+          isPhaseActive: isPhaseActive,
+        ),
+        if (!isResultsPhase)
+          _DateWindowRow(
+            label: context.l10n.votingTimelineFinishes,
+            date: endDate,
+            isPhaseActive: isPhaseActive,
+          ),
       ],
     );
   }
@@ -183,7 +151,7 @@ class _DateWindow extends StatelessWidget {
 
 class _DateWindowRow extends StatelessWidget {
   final String label;
-  final DateTime date;
+  final DateTime? date;
   final bool isPhaseActive;
 
   const _DateWindowRow({
@@ -201,7 +169,6 @@ class _DateWindowRow extends StatelessWidget {
       fontWeight: FontWeight.w500,
       color: textColor,
     );
-    final formattedDate = DateFormatter.formatFullDate24Format(date);
 
     return Text.rich(
       maxLines: 1,
@@ -216,13 +183,16 @@ class _DateWindowRow extends StatelessWidget {
             ),
           ),
           const TextSpan(text: ' '),
-          TextSpan(text: formattedDate),
-          const WidgetSpan(
-            child: Padding(
-              padding: EdgeInsets.only(left: 6),
-              child: _UtcBadge(),
-            ),
-          ),
+          if (date case final date?)
+            WidgetSpan(
+              child: TimezoneDateTimeText(
+                date,
+                formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
+                style: textStyle,
+              ),
+            )
+          else
+            TextSpan(text: context.l10n.votingTimelineToBeAnnounced),
         ],
       ),
     );
@@ -295,11 +265,13 @@ class _LiveBadge extends StatelessWidget {
 }
 
 class _Title extends StatelessWidget {
-  final VotingTimelinePhaseType phaseType;
+  final String text;
+  final bool isVotingDelegated;
   final bool isPhaseActive;
 
   const _Title({
-    required this.phaseType,
+    required this.text,
+    required this.isVotingDelegated,
     required this.isPhaseActive,
   });
 
@@ -313,7 +285,7 @@ class _Title extends StatelessWidget {
         if (isPhaseActive) const _LiveBadge(),
         Expanded(
           child: Text(
-            phaseType.getLabel(context),
+            text,
             style: theme.textTheme.titleMedium?.copyWith(
               color: isPhaseActive
                   ? theme.colors.textOnPrimaryWhite
@@ -327,37 +299,14 @@ class _Title extends StatelessWidget {
   }
 }
 
-class _UtcBadge extends StatelessWidget {
-  const _UtcBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colors;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      decoration: BoxDecoration(
-        color: colors.onSurfaceNeutralOpaqueLv2,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        context.l10n.utc,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: colors.textOnPrimaryLevel1,
-          fontWeight: FontWeight.w500,
-          fontSize: 11,
-          height: 1.45,
-        ),
-      ),
-    );
-  }
-}
-
 class _VotingTimelinePhaseCard extends StatelessWidget {
   final VotingTimelinePhaseViewModel phase;
+  final bool isVotingDelegated;
 
-  const _VotingTimelinePhaseCard({required this.phase});
+  const _VotingTimelinePhaseCard({
+    required this.phase,
+    required this.isVotingDelegated,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -374,6 +323,8 @@ class _VotingTimelinePhaseCard extends StatelessWidget {
           : null,
       color: isActive ? null : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
     );
+    final title = phase.type.getLabel(context, isVotingDelegated: isVotingDelegated);
+    final description = phase.type.getDescription(context, isVotingDelegated: isVotingDelegated);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -389,16 +340,17 @@ class _VotingTimelinePhaseCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _DateCounter(phase: phase),
+          _DateCounter(dateCounter: phase.dateCounter),
           const SizedBox(height: 1),
           _Title(
-            phaseType: phase.type,
+            text: title,
+            isVotingDelegated: isVotingDelegated,
             isPhaseActive: isActive,
           ),
           SizedBox(height: isActive ? 12 : 4),
           Expanded(
             child: _Description(
-              text: phase.description,
+              text: description,
               isPhaseActive: isActive,
             ),
           ),

@@ -3,156 +3,137 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+/// Type of date counter display.
+enum VotingTimelineDateCounterType {
+  /// Show "Starting in X days"
+  startingIn,
+
+  /// Show "Starting" with date
+  startingWithDate,
+
+  /// Show "Ended X days ago"
+  endedDaysAgo,
+
+  /// Show "Ended" with date
+  endedWithDate,
+
+  /// Counter is hidden (e.g., for active phases)
+  hidden,
+}
+
+/// View model for date counter in phase cards.
+final class VotingTimelineDateCounterViewModel extends Equatable {
+  final VotingTimelineDateCounterType type;
+  final int daysCount;
+  final DateTime date;
+
+  const VotingTimelineDateCounterViewModel({
+    required this.type,
+    required this.daysCount,
+    required this.date,
+  });
+
+  @override
+  List<Object?> get props => [type, daysCount, date];
+}
+
+/// View model for voting timeline header.
 final class VotingTimelineDetailsViewModel extends Equatable {
-  final VotingTimelinePhaseViewModel currentPhase;
-  final Duration currentPhaseEndsIn;
-  final double currentPhaseProgress;
-  final List<VotingTimelinePhaseViewModel> phases;
-  final DateTime? snapshotDate;
+  final VotingTimelineTitleViewModel titleViewModel;
+  final VotingTimelinePhasesViewModel phasesViewModel;
+  final VotingTimelineFooterViewModel footerViewModel;
+  final double campaignProgress;
 
   const VotingTimelineDetailsViewModel({
-    required this.currentPhase,
-    required this.currentPhaseEndsIn,
-    required this.currentPhaseProgress,
-    required this.phases,
+    required this.titleViewModel,
+    required this.phasesViewModel,
+    required this.footerViewModel,
+    required this.campaignProgress,
+  });
+
+  @override
+  List<Object?> get props => [
+    titleViewModel,
+    phasesViewModel,
+    footerViewModel,
+    campaignProgress,
+  ];
+
+  VotingTimelineDetailsViewModel copyWith({
+    VotingTimelineTitleViewModel? titleViewModel,
+    VotingTimelinePhasesViewModel? phasesViewModel,
+    VotingTimelineFooterViewModel? footerViewModel,
+    double? campaignProgress,
+  }) {
+    return VotingTimelineDetailsViewModel(
+      titleViewModel: titleViewModel ?? this.titleViewModel,
+      phasesViewModel: phasesViewModel ?? this.phasesViewModel,
+      footerViewModel: footerViewModel ?? this.footerViewModel,
+      campaignProgress: campaignProgress ?? this.campaignProgress,
+    );
+  }
+}
+
+/// View model for voting timeline footer widget.
+final class VotingTimelineFooterViewModel extends Equatable {
+  final VotingTimelinePhaseType phaseType;
+  final Duration phaseEndsIn;
+  final DateTime? snapshotDate;
+
+  const VotingTimelineFooterViewModel({
+    required this.phaseType,
+    required this.phaseEndsIn,
     required this.snapshotDate,
   });
 
   @override
-  List<Object?> get props => [
-    currentPhase,
-    currentPhaseEndsIn,
-    currentPhaseProgress,
-    phases,
-    snapshotDate,
-  ];
+  List<Object?> get props => [phaseType, phaseEndsIn, snapshotDate];
 }
 
-final class VotingTimelineProgressViewModel extends Equatable {
-  final DateRange? votingDateRange;
+/// View model for voting timeline phases widget.
+final class VotingTimelinePhasesViewModel extends Equatable {
+  final List<VotingTimelinePhaseViewModel> phases;
+  final bool isVotingDelegated;
 
-  /// The starting date of a phase that precedes the voting phase.
-  ///
-  /// Usually this is needed when voting hasn't yet started
-  /// to show a progress bar when the voting starts.
-  final DateTime? campaignStartDate;
-  final List<VotingTimelinePhase> phases;
-
-  const VotingTimelineProgressViewModel({
-    this.votingDateRange,
-    this.campaignStartDate,
-    this.phases = const [],
+  const VotingTimelinePhasesViewModel({
+    required this.phases,
+    required this.isVotingDelegated,
   });
 
-  factory VotingTimelineProgressViewModel.fromModel({
-    required CampaignPhaseState state,
-    required DateTime campaignStartDate,
-    required List<VotingTimelinePhase> phases,
-  }) {
-    return VotingTimelineProgressViewModel(
-      votingDateRange: state.phase.timeline,
-      campaignStartDate: campaignStartDate,
-      phases: phases,
-    );
-  }
-
   @override
-  List<Object?> get props => [
-    votingDateRange,
-    campaignStartDate,
-    phases,
-  ];
-
-  VotingTimelineDetailsViewModel? progress(DateTime now) {
-    final votingDateRange = this.votingDateRange;
-    if (votingDateRange == null) return null;
-
-    DateTime start;
-    DateTime end;
-
-    final status = CampaignPhaseStatus.fromRange(votingDateRange, now);
-    switch (status) {
-      case CampaignPhaseStatus.upcoming:
-        start = campaignStartDate ?? now;
-        end = votingDateRange.from ?? now;
-
-      case CampaignPhaseStatus.active:
-      case CampaignPhaseStatus.post:
-        start = votingDateRange.from ?? now;
-        end = votingDateRange.to ?? now;
-    }
-
-    final phases2 = phases
-        .map((phase) => VotingTimelinePhaseViewModel.fromModel(phase, now))
-        .toList();
-
-    final currentPhase = phases2.firstWhereOrNull((p) => p.isActive);
-    if (currentPhase == null) return null;
-
-    // Get snapshot date from registration phase
-    final registrationPhase = phases.firstWhereOrNull(
-      (p) => p.type == VotingTimelinePhaseType.registration,
-    );
-    final snapshotDate = registrationPhase?.dateRange.to;
-
-    if (now.isBefore(start) || now.isAtSameMomentAs(start)) {
-      return VotingTimelineDetailsViewModel(
-        currentPhase: currentPhase,
-        currentPhaseEndsIn: Duration.zero,
-        currentPhaseProgress: 0,
-        phases: phases2,
-        snapshotDate: snapshotDate,
-      );
-    } else if (now.isAfter(end) || now.isAtSameMomentAs(end)) {
-      return VotingTimelineDetailsViewModel(
-        currentPhase: currentPhase,
-        currentPhaseEndsIn: Duration.zero,
-        currentPhaseProgress: 1,
-        phases: phases2,
-        snapshotDate: snapshotDate,
-      );
-    } else {
-      final phaseDuration = end.difference(start);
-      final phaseCurrentTs = now.difference(start);
-      final phaseEndsIn = end.difference(now);
-      final phaseValue = phaseCurrentTs.inMicroseconds / phaseDuration.inMicroseconds;
-
-      return VotingTimelineDetailsViewModel(
-        currentPhase: currentPhase,
-        currentPhaseEndsIn: phaseEndsIn,
-        currentPhaseProgress: phaseValue,
-        phases: phases2,
-        snapshotDate: snapshotDate,
-      );
-    }
-  }
+  List<Object?> get props => [phases, isVotingDelegated];
 }
 
+/// View model for voting timeline phase widget.
 final class VotingTimelinePhaseViewModel extends Equatable {
   final VotingTimelinePhaseType type;
-  final String title;
-  final String description;
   final DateRange dateRange;
   final DateRangeStatus rangeStatus;
+  final VotingTimelineDateCounterViewModel dateCounter;
 
   const VotingTimelinePhaseViewModel({
     required this.type,
-    required this.title,
-    required this.description,
     required this.dateRange,
     required this.rangeStatus,
+    required this.dateCounter,
   });
 
   factory VotingTimelinePhaseViewModel.fromModel(
     VotingTimelinePhase model,
     DateTime now,
   ) {
+    final rangeStatus = model.dateRange.rangeStatus(now);
+    final dateCounter = _buildDateCounter(
+      now: now,
+      dateRange: model.dateRange,
+      rangeStatus: rangeStatus,
+    );
+
     return VotingTimelinePhaseViewModel(
       type: model.type,
-      title: model.title,
-      description: model.description,
       dateRange: model.dateRange,
-      rangeStatus: model.dateRange.rangeStatus(now),
+      rangeStatus: rangeStatus,
+      dateCounter: dateCounter,
     );
   }
 
@@ -161,9 +142,220 @@ final class VotingTimelinePhaseViewModel extends Equatable {
   @override
   List<Object?> get props => [
     type,
-    title,
-    description,
     dateRange,
     rangeStatus,
+    dateCounter,
   ];
+
+  static VotingTimelineDateCounterViewModel _buildDateCounter({
+    required DateTime now,
+    required DateRange dateRange,
+    required DateRangeStatus rangeStatus,
+  }) {
+    final startDate = dateRange.from;
+    final endDate = dateRange.to;
+
+    if (startDate == null || endDate == null) {
+      return VotingTimelineDateCounterViewModel(
+        type: VotingTimelineDateCounterType.hidden,
+        daysCount: 0,
+        date: DateTime(0),
+      );
+    }
+
+    switch (rangeStatus) {
+      case DateRangeStatus.inRange:
+        return VotingTimelineDateCounterViewModel(
+          type: VotingTimelineDateCounterType.hidden,
+          daysCount: 0,
+          date: DateTime(0),
+        );
+      case DateRangeStatus.before:
+        var daysUntil = startDate.difference(now).inDays;
+        daysUntil = daysUntil == 0 ? 1 : daysUntil;
+        final type = daysUntil > 30
+            ? VotingTimelineDateCounterType.startingWithDate
+            : VotingTimelineDateCounterType.startingIn;
+        return VotingTimelineDateCounterViewModel(
+          type: type,
+          daysCount: daysUntil,
+          date: startDate,
+        );
+      case DateRangeStatus.after:
+        var daysSince = now.difference(endDate).inDays;
+        daysSince = daysSince == 0 ? 1 : daysSince;
+        final type = daysSince > 30
+            ? VotingTimelineDateCounterType.endedWithDate
+            : VotingTimelineDateCounterType.endedDaysAgo;
+        return VotingTimelineDateCounterViewModel(
+          type: type,
+          daysCount: daysSince,
+          date: endDate,
+        );
+    }
+  }
+}
+
+final class VotingTimelineProgressViewModel extends Equatable {
+  final List<VotingTimelinePhase> phases;
+  final DateTime? snapshotDate;
+
+  const VotingTimelineProgressViewModel({
+    this.phases = const [],
+    this.snapshotDate,
+  });
+
+  factory VotingTimelineProgressViewModel.fromTimeline(CampaignTimeline timeline) {
+    final phases = <VotingTimelinePhase>[];
+
+    // pre-voting = campaign start -> beginning of community voting
+    final communityVoting = timeline.phase(CampaignPhaseType.communityVoting);
+    if (communityVoting != null) {
+      final preVotingRange = DateRange(
+        from: timeline.campaignStartDate,
+        to: communityVoting.timeline.from,
+      );
+      final preVoting = VotingTimelinePhase(
+        type: VotingTimelinePhaseType.preVoting,
+        dateRange: preVotingRange,
+      );
+      phases
+        ..add(preVoting)
+        ..add(VotingTimelinePhase.fromCampaignPhase(communityVoting));
+    }
+
+    final tally = timeline.phase(CampaignPhaseType.votingTally);
+    if (tally != null) {
+      phases.add(VotingTimelinePhase.fromCampaignPhase(tally));
+    }
+
+    final results = timeline.phase(CampaignPhaseType.votingResults);
+    if (results != null) {
+      phases.add(VotingTimelinePhase.fromCampaignPhase(results));
+    }
+
+    return VotingTimelineProgressViewModel(
+      phases: phases,
+      snapshotDate: timeline.votingSnapshotDate,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    phases,
+    snapshotDate,
+  ];
+
+  VotingTimelineDetailsViewModel? progress({
+    required DateTime now,
+    required bool phasesExpanded,
+    required bool isVotingDelegated,
+  }) {
+    if (phases.isEmpty) {
+      return null;
+    }
+
+    final phaseViewModels = phases
+        .map((phase) => VotingTimelinePhaseViewModel.fromModel(phase, now))
+        .toList();
+
+    // Find active phase or fallback to first upcoming or last ended phase
+    var currentPhase = phaseViewModels.firstWhereOrNull((p) => p.isActive);
+    currentPhase ??= phaseViewModels.firstWhereOrNull(
+      (p) => p.rangeStatus == DateRangeStatus.before,
+    );
+    currentPhase ??= phaseViewModels.lastOrNull;
+
+    if (currentPhase == null) {
+      return null;
+    }
+
+    // Calculate campaign progress (from first phase start to last phase end)
+    final campaignStart = phaseViewModels.first.dateRange.from;
+    final campaignEnd = phaseViewModels.last.dateRange.to;
+
+    if (campaignStart == null || campaignEnd == null) {
+      return null;
+    }
+
+    final double campaignProgress;
+    if (now.isBefore(campaignStart)) {
+      campaignProgress = 0;
+    } else if (now.isAfter(campaignEnd)) {
+      campaignProgress = 1;
+    } else {
+      final campaignDuration = campaignEnd.difference(campaignStart);
+      final campaignCurrentTs = now.difference(campaignStart);
+      campaignProgress = campaignCurrentTs.inMicroseconds / campaignDuration.inMicroseconds;
+    }
+
+    // Calculate countdown for current phase
+    // TODO(bstolinski): get next phase from if null get current dateRange.to
+    final currentPhaseEnd = currentPhase.dateRange.to;
+    final Duration phaseEndsIn;
+    if (currentPhaseEnd == null || now.isAfter(currentPhaseEnd)) {
+      phaseEndsIn = Duration.zero;
+    } else {
+      phaseEndsIn = currentPhaseEnd.difference(now);
+    }
+
+    // Show category picker when current phase is voting
+    final showCategoryPicker = currentPhase.type == VotingTimelinePhaseType.voting;
+
+    return VotingTimelineDetailsViewModel(
+      titleViewModel: VotingTimelineTitleViewModel(
+        phaseType: currentPhase.type,
+        phasesExpanded: phasesExpanded,
+        showCategoryPicker: showCategoryPicker,
+        isVotingDelegated: isVotingDelegated,
+      ),
+      phasesViewModel: VotingTimelinePhasesViewModel(
+        phases: phaseViewModels,
+        isVotingDelegated: isVotingDelegated,
+      ),
+      footerViewModel: VotingTimelineFooterViewModel(
+        phaseType: currentPhase.type,
+        phaseEndsIn: phaseEndsIn,
+        snapshotDate: snapshotDate,
+      ),
+      campaignProgress: campaignProgress,
+    );
+  }
+}
+
+/// View model for voting timeline title widget.
+final class VotingTimelineTitleViewModel extends Equatable {
+  final VotingTimelinePhaseType phaseType;
+  final bool phasesExpanded;
+  final bool showCategoryPicker;
+  final bool isVotingDelegated;
+
+  const VotingTimelineTitleViewModel({
+    required this.phaseType,
+    required this.phasesExpanded,
+    required this.showCategoryPicker,
+    required this.isVotingDelegated,
+  });
+
+  @override
+  List<Object?> get props => [
+    phaseType,
+    phasesExpanded,
+    showCategoryPicker,
+    isVotingDelegated,
+  ];
+
+  VotingTimelineTitleViewModel copyWith({
+    VotingTimelinePhaseType? phaseType,
+    bool? phasesExpanded,
+    bool? showCategoryPicker,
+    bool? isVotingDelegated,
+  }) {
+    return VotingTimelineTitleViewModel(
+      phaseType: phaseType ?? this.phaseType,
+      phasesExpanded: phasesExpanded ?? this.phasesExpanded,
+      showCategoryPicker: showCategoryPicker ?? this.showCategoryPicker,
+      isVotingDelegated: isVotingDelegated ?? this.isVotingDelegated,
+    );
+  }
 }

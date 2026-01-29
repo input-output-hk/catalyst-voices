@@ -1,10 +1,10 @@
 part of 'voting_timeline_header.dart';
 
-class _CategorySelector extends StatelessWidget {
+class _CategoryPicker extends StatelessWidget {
   final int? fundNumber;
   final List<ProposalsCategorySelectorItem> items;
 
-  const _CategorySelector({
+  const _CategoryPicker({
     super.key,
     required this.fundNumber,
     required this.items,
@@ -27,8 +27,8 @@ class _CategorySelector extends StatelessWidget {
   }
 }
 
-class _VotingCategoryPickerSelector extends StatelessWidget {
-  const _VotingCategoryPickerSelector();
+class _VotingCategoryPicker extends StatelessWidget {
+  const _VotingCategoryPicker();
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +42,8 @@ class _VotingCategoryPickerSelector extends StatelessWidget {
         items: state.categorySelectorItems,
       ),
       builder: (context, state) {
-        return _CategorySelector(
-          key: const Key('ChangeCategoryBtnSelector'),
+        return _CategoryPicker(
+          key: const Key('ChangeCategoryBtn'),
           fundNumber: state.fundNumber,
           items: state.items,
         );
@@ -53,20 +53,37 @@ class _VotingCategoryPickerSelector extends StatelessWidget {
 }
 
 class _VotingTimelineTitle extends StatelessWidget {
-  final VotingTimelinePhaseType phaseType;
-  final bool isExpanded;
-  final bool showCategoryPicker;
+  const _VotingTimelineTitle();
 
-  const _VotingTimelineTitle({
-    required this.phaseType,
-    required this.isExpanded,
-    required this.showCategoryPicker,
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<VotingCubit, VotingState, VotingTimelineTitleViewModel?>(
+      selector: (state) => state.votingTimeline?.titleViewModel,
+      builder: (context, viewModel) => _VotingTimelineTitleContent(viewModel: viewModel),
+    );
+  }
+}
+
+class _VotingTimelineTitleContent extends StatelessWidget {
+  final VotingTimelineTitleViewModel? viewModel;
+
+  const _VotingTimelineTitleContent({
+    required this.viewModel,
   });
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = this.viewModel;
+    if (viewModel == null) {
+      return const SizedBox.shrink();
+    }
+
     final theme = Theme.of(context);
-    final phaseLabel = phaseType.getLabel(context);
+    final phaseType = viewModel.phaseType;
+    final isExpanded = viewModel.phasesExpanded;
+    final showCategoryPicker = viewModel.showCategoryPicker;
+    final isVotingDelegated = viewModel.isVotingDelegated;
+    final phaseLabel = phaseType.getLabel(context, isVotingDelegated: isVotingDelegated);
 
     return Row(
       spacing: 12,
@@ -88,7 +105,7 @@ class _VotingTimelineTitle extends StatelessWidget {
                 : context.l10n.votingTimelineShowEvents,
           ),
         ),
-        if (showCategoryPicker) const _VotingCategoryPickerSelector(),
+        if (showCategoryPicker) const _VotingCategoryPicker(),
       ],
     );
   }

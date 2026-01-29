@@ -4432,6 +4432,10 @@
       }
     }
   },
+  "votingTimelineDelegated": "Voting Delegated",
+  "@votingTimelineDelegated": {
+    "description": "Label for delegated voting phase"
+  },
   "votingTimelineDrop": "Drop:",
   "@votingTimelineDrop": {
     "description": "Label for the results drop date"
@@ -4473,6 +4477,10 @@
   "@votingTimelinePreVoting": {
     "description": "Label for the pre-voting (registration) phase in the voting timeline"
   },
+  "votingTimelinePreVotingDescription": "Now is the time to get prepared for voting! Top up your wallet, check out representatives and be ready!",
+  "@votingTimelinePreVotingDescription": {
+    "description": "Description for the pre-voting phase"
+  },
   "votingTimelinePreVotingWindow": "Pre-voting window:",
   "@votingTimelinePreVotingWindow": {
     "description": "Label for the pre-voting date window section"
@@ -4480,6 +4488,10 @@
   "votingTimelineResults": "Results",
   "@votingTimelineResults": {
     "description": "Label for results announcement phase"
+  },
+  "votingTimelineResultsDescription": "The results are in! Check out the final report to see which proposals won funding and see what’s next for the community.",
+  "@votingTimelineResultsDescription": {
+    "description": "Description for the results phase"
   },
   "votingTimelineResultsIn": "Results in {countdown}",
   "@votingTimelineResultsIn": {
@@ -4502,6 +4514,10 @@
   "@votingTimelineShowEvents": {
     "description": "Button text to show the voting timeline phase cards"
   },
+  "votingTimelineStarting": "Starting",
+  "@votingTimelineStarting": {
+    "description": "Text showing when a phase starts"
+  },
   "votingTimelineStartingIn": "Starting in",
   "@votingTimelineStartingIn": {
     "description": "Text showing how many days until a phase starts"
@@ -4523,6 +4539,10 @@
   "@votingTimelineTally": {
     "description": "Label for vote tallying phase"
   },
+  "votingTimelineTallyDescription": "Voting is closed and results are being tallied. Stay tuned for the results announcement to see which proposals won funding.",
+  "@votingTimelineTallyDescription": {
+    "description": "Description for the tally phase"
+  },
   "votingTimelineTallyIn": "Tally in {countdown}",
   "@votingTimelineTallyIn": {
     "description": "Countdown text showing when tally starts",
@@ -4543,6 +4563,14 @@
   "votingTimelineVoting": "Voting",
   "@votingTimelineVoting": {
     "description": "Label for active voting phase"
+  },
+  "votingTimelineVotingDelegatedDescription": "Voting is live! You delegated your vote, so you won’t be able to participate directly.",
+  "@votingTimelineVotingDelegatedDescription": {
+    "description": "Description for the voting delegated phase"
+  },
+  "votingTimelineVotingDescription": "Ready, set, vote! Cast votes and support your favourite proposals to boost their funding chances from the treasury.",
+  "@votingTimelineVotingDescription": {
+    "description": "Description for the voting phase"
   },
   "votingTimelineVotingIn": "Voting in {countdown}",
   "@votingTimelineVotingIn": {
