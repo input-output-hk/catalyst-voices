@@ -156,8 +156,8 @@ impl_array_types!(
     })
 );
 
-impl From<problem_report::ProblemReport> for ProblemReport {
-    fn from(value: problem_report::ProblemReport) -> Self {
+impl From<&problem_report::ProblemReport> for ProblemReport {
+    fn from(value: &problem_report::ProblemReport) -> Self {
         Self(
             value
                 .entries()

@@ -51,7 +51,7 @@ impl Params {
         txn_index: TxnIndex,
         purpose: Option<UuidV4>,
         prv_txn_id: Option<TransactionId>,
-        report: problem_report::ProblemReport,
+        report: &problem_report::ProblemReport,
     ) -> Self {
         let purpose = purpose.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));

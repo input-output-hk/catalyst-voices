@@ -20,7 +20,7 @@ impl PutDocumentUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
     pub(crate) fn new(
         error: &(impl ToString + ?Sized),
-        report: Option<ProblemReport>,
+        report: Option<&ProblemReport>,
     ) -> Self {
         Self {
             error: error.to_string().into(),
@@ -33,7 +33,7 @@ impl Example for PutDocumentUnprocessableContent {
     fn example() -> Self {
         Self::new(
             "Missing Document in request body",
-            Some(ProblemReport::new("Missing Document in request body")),
+            Some(&ProblemReport::new("Missing Document in request body")),
         )
     }
 }
