@@ -16,15 +16,11 @@ final class ProposalMetadataSegmentData extends Equatable {
   /// The effective publish status of the proposal.
   final ProposalPublish effectivePublish;
 
-  /// Whether the proposal is in read-only mode (submission phase ended).
-  final bool isReadOnlyMode;
-
   const ProposalMetadataSegmentData({
     required this.proposal,
     required this.category,
     required this.currentVersion,
     required this.effectivePublish,
-    required this.isReadOnlyMode,
   });
 
   /// Whether this is a draft proposal (not yet submitted).
@@ -42,6 +38,5 @@ final class ProposalMetadataSegmentData extends Equatable {
     category,
     currentVersion,
     effectivePublish,
-    isReadOnlyMode,
   ];
 }
