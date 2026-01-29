@@ -15,7 +15,7 @@ class HeadsUpBecomeReviewerHintCard extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(16)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: context.colors.dropShadow,
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
