@@ -303,10 +303,12 @@ final class VotingCubit extends Cubit<VotingState>
   VotingTimelineDetailsViewModel? _buildVotingTimelineDetails(Campaign? campaign) {
     final votingTimeline = _buildVotingTimeline(campaign);
     final now = DateTimeExt.now();
+    final phasesExpanded = state.votingTimeline?.titleViewModel.phasesExpanded ?? true;
+    final isDelegator = state.isDelegator;
     return votingTimeline?.progress(
       now: now,
-      phasesExpanded: state.votingTimeline?.phasesExpanded ?? true,
-      isVotingDelegated: state.isDelegator,
+      phasesExpanded: phasesExpanded,
+      isVotingDelegated: isDelegator,
     );
   }
 
