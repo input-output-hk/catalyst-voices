@@ -141,6 +141,14 @@
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
   },
+  "allActionsEmptyDescription": "Actions will appear here.",
+  "@allActionsEmptyDescription": {
+    "description": "Description shown when there are no actions available."
+  },
+  "allActionsEmptyTitle": "No Actions found",
+  "@allActionsEmptyTitle": {
+    "description": "Title shown when there are no actions available."
+  },
   "allProposals": "All Proposals",
   "@allProposals": {
     "description": "text indicating to view all proposals"
@@ -204,6 +212,14 @@
   "approvals": "Approvals",
   "@approvals": {
     "description": "Label for approvals tab"
+  },
+  "approvalsActionsEmptyDescription": "You can request approvals from your community members.",
+  "@approvalsActionsEmptyDescription": {
+    "description": "Approval requests will appear here."
+  },
+  "approvalsActionsEmptyTitle": "No Approvals requests yet",
+  "@approvalsActionsEmptyTitle": {
+    "description": "Title shown when there are no approvals requests available."
   },
   "approve": "Approve",
   "@approve": {
@@ -1674,6 +1690,14 @@
   "external": "External",
   "@external": {
     "description": "label for external tab"
+  },
+  "externalActionsEmptyDescription": "External actions will appear here.",
+  "@externalActionsEmptyDescription": {
+    "description": "External actions will appear here."
+  },
+  "externalActionsEmptyTitle": "No External actions yet",
+  "@externalActionsEmptyTitle": {
+    "description": "Title shown when there are no external actions available."
   },
   "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
   "@failedAuthenticationDescription": {
@@ -3606,6 +3630,14 @@
   "role": "Role",
   "@role": {
     "description": "Label for role tab"
+  },
+  "roleActionsEmptyDescription": "Role actions will appear here.",
+  "@roleActionsEmptyDescription": {
+    "description": "Role actions will appear here."
+  },
+  "roleActionsEmptyTitle": "No Role actions yet",
+  "@roleActionsEmptyTitle": {
+    "description": "Title shown when there are no role actions available."
   },
   "safariNotSupportedMessage": "Safari is not supported, please use Chrome or Firefox.",
   "@safariNotSupportedMessage": {

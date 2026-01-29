@@ -135,13 +135,18 @@ final class MyActionsCubit extends Cubit<MyActionsState>
   }
 
   void _rebuildState() {
+    final actionCardsState = state.actionCardsState.copyWith(
+      availableCards: _computeAvailableCards(),
+      selectedTab: _cache.selectedTab,
+    );
+
     emit(
       state.copyWith(
         displayConsentCount: _cache.displayConsentCount,
         finalProposalCount: _cache.finalProposalCount,
         proposalSubmissionCloseDate: Optional(_cache.proposalSubmissionCloseDate),
         becomeReviewerCloseDate: Optional(_cache.becomeReviewerCloseDate),
-        availableCards: _computeAvailableCards(),
+        actionCardsState: actionCardsState,
       ),
     );
   }
