@@ -1,15 +1,19 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/src/actions/actions_page_tab.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
 /// Represents a type of action card that can be displayed to the user.
 ///
 /// Card types can carry state (e.g., isSet) to adapt their behavior
 /// based on user context without needing separate classes.
-sealed class ActionsCardType {
+sealed class ActionsCardType extends Equatable {
   final ActionsPageTab associatedTab;
 
   const ActionsCardType(this.associatedTab);
+
+  @override
+  List<Object?> get props => [associatedTab];
 
   String labelText(BuildContext context);
 
@@ -80,6 +84,9 @@ final class RepresentativeCardType extends ActionsCardType {
   const RepresentativeCardType({this.isSet = false}) : super(ActionsPageTab.role);
 
   @override
+  List<Object?> get props => [...super.props, isSet];
+
+  @override
   String labelText(BuildContext context) {
     return context.l10n.participationPreferences;
   }
@@ -94,6 +101,9 @@ final class VotingPowerDelegationCardType extends ActionsCardType {
   final bool isSet;
 
   const VotingPowerDelegationCardType({this.isSet = false}) : super(ActionsPageTab.role);
+
+  @override
+  List<Object?> get props => [...super.props, isSet];
 
   @override
   String labelText(BuildContext context) {

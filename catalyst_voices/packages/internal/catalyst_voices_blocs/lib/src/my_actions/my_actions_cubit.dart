@@ -18,7 +18,7 @@ final class MyActionsCubit extends Cubit<MyActionsState>
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<AccountInvitesApprovalsCount?>? _invitesApprovalsCountSub;
-  StreamSubscription<(DocumentRef?, CampaignTimeline?)>? _activeCampaignSub;
+  StreamSubscription<CampaignTimeline?>? _activeCampaignSub;
   StreamSubscription<AccountVotingRole?>? _activeVotingRoleSub;
 
   MyActionsCubit(
@@ -98,12 +98,9 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     _cache = _cache.copyWith(activeAccountId: Optional(catalystId));
 
     unawaited(_setupInvitesApprovalsCountSubscription());
-    unawaited(_setupActiveVotingRoleSubscription());
   }
 
-  void _handleCampaignChange((DocumentRef?, CampaignTimeline?) campaignData) {
-    final (campaignId, timeline) = campaignData;
-
+  void _handleCampaignChange(CampaignTimeline? timeline) {
     final proposalSubmissionCloseDate = timeline
         ?.phase(CampaignPhaseType.proposalSubmission)
         ?.timeline
@@ -114,13 +111,10 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         .to;
 
     _cache = _cache.copyWith(
-      activeCampaignId: Optional(campaignId),
       proposalSubmissionCloseDate: Optional(proposalSubmissionCloseDate),
       becomeReviewerCloseDate: Optional(becomeReviewerCloseDate),
     );
     _rebuildState();
-
-    unawaited(_setupActiveVotingRoleSubscription());
   }
 
   void _handleInvitesApprovalsCountChange(AccountInvitesApprovalsCount? count) {
@@ -163,22 +157,14 @@ final class MyActionsCubit extends Cubit<MyActionsState>
   Future<void> _setupActiveCampaignSubscription() async {
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .map((event) => (event?.id, event?.timeline))
+        .map((event) => event?.timeline)
         .distinct()
         .listen(_handleCampaignChange);
   }
 
   Future<void> _setupActiveVotingRoleSubscription() async {
     await _activeVotingRoleSub?.cancel();
-    final accountId = _cache.activeAccountId;
-    final campaignId = _cache.activeCampaignId;
-    final votingRoleStream = accountId != null && campaignId != null
-        ? _votingService.watchAccountVotingRoleFor(
-            accountId: accountId,
-            campaignId: campaignId,
-          )
-        : Stream<AccountVotingRole?>.value(null);
-    _activeVotingRoleSub = votingRoleStream.distinct().listen(
+    _activeVotingRoleSub = _votingService.watchActiveVotingRole().distinct().listen(
       _handleVotingRoleChange,
     );
   }

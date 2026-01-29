@@ -12,15 +12,15 @@ class ActionCardsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<MyActionsCubit, MyActionsState, List<ActionsCardType>>(
-      selector: (state) => state.availableCards,
+    return BlocSelector<MyActionsCubit, MyActionsState, IterableData<List<ActionsCardType>>>(
+      selector: (state) => IterableData(state.availableCards),
       builder: (context, availableCards) {
-        if (availableCards.isEmpty) {
+        if (availableCards.value.isEmpty) {
           return const _EmptyState();
         }
 
         final cards = [
-          for (final cardType in availableCards) ?_buildCardForType(cardType),
+          for (final cardType in availableCards.value) ?_buildCardForType(cardType),
         ];
 
         return SliverList.separated(
