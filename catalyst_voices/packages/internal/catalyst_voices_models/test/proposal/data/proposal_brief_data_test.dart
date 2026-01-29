@@ -47,7 +47,7 @@ void main() {
         expect(brief.isFinal, isTrue);
         expect(brief.isFavorite, isTrue);
         expect(brief.iteration, 1);
-        expect(brief.commentsCount, isNull);
+        expect(brief.commentsCount, 10);
         expect(brief.versions?.length, 3);
         expect(brief.collaborators?.first.id, isNull);
       });
