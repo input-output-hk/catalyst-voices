@@ -130,29 +130,6 @@ impl catalyst_signed_doc::providers::TimeThresholdProvider for DocProvider {
     }
 }
 
-impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocProvider {
-    async fn try_get_doc(
-        &self,
-        doc_ref: &catalyst_signed_doc_v1::DocumentRef,
-    ) -> anyhow::Result<Option<catalyst_signed_doc_v1::CatalystSignedDocument>> {
-        let id = doc_ref.id.uuid();
-        let ver = doc_ref.ver.uuid();
-        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
-            Err(err) => Err(err),
-        }
-    }
-
-    fn future_threshold(&self) -> Option<std::time::Duration> {
-        <Self as catalyst_signed_doc::providers::TimeThresholdProvider>::future_threshold(self)
-    }
-
-    fn past_threshold(&self) -> Option<std::time::Duration> {
-        <Self as catalyst_signed_doc::providers::TimeThresholdProvider>::past_threshold(self)
-    }
-}
-
 // TODO: make the struct to support multi sigs validation
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait

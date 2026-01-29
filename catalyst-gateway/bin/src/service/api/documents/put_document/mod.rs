@@ -82,7 +82,7 @@ pub(crate) async fn endpoint(
         Ok(retrieved) if db_doc != retrieved => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Document with the same `id` and `ver` already exists",
-                Some(doc.problem_report()),
+                Some(doc.report()),
             )))
             .into();
         },
@@ -106,53 +106,24 @@ pub(crate) async fn endpoint(
         },
     };
 
-    match doc.is_deprecated() {
-        // apply older validation rule
-        Ok(true) => {
-            let doc = match doc_bytes.as_slice().try_into() {
-                Ok(doc) => doc,
-                Err(err) => return AllResponses::handle_error(&err),
-            };
-
-            match catalyst_signed_doc_v1::validator::validate(&doc, &DocProvider).await {
-                Ok(true) => (),
-                Ok(false) => {
-                    return Responses::UnprocessableContent(Json(
-                        PutDocumentUnprocessableContent::new(
-                            "Failed validating document integrity",
-                            None,
-                        ),
-                    ))
-                    .into();
-                },
-                Err(err) => return AllResponses::handle_error(&err),
-            }
+    match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
+        Ok(true) => (),
+        Ok(false) if doc.report().is_problematic() => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Failed validating document integrity",
+                Some(doc.report()),
+            )))
+            .into();
         },
-        // apply newest validation rules
         Ok(false) => {
-            match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
-                Ok(true) => (),
-                Ok(false) if doc.report().is_problematic() => {
-                    return Responses::UnprocessableContent(Json(
-                        PutDocumentUnprocessableContent::new(
-                            "Failed validating document integrity",
-                            Some(doc.report()),
-                        ),
-                    ))
-                    .into();
-                },
-                Ok(false) => {
-                    return AllResponses::handle_error(&anyhow::anyhow!(
-                        "Document must be problematic, empty problem report."
-                    ));
-                },
-                Err(err) => {
-                    // means that something happened inside the `DocProvider`, some db error.
-                    return AllResponses::handle_error(&err);
-                },
-            }
+            return AllResponses::handle_error(&anyhow::anyhow!(
+                "Document must be problematic, empty problem report."
+            ));
         },
-        Err(err) => return AllResponses::handle_error(&err),
+        Err(err) => {
+            // means that something happened inside the `DocProvider`, some db error.
+            return AllResponses::handle_error(&err);
+        },
     }
 
     if doc.report().is_problematic() {
