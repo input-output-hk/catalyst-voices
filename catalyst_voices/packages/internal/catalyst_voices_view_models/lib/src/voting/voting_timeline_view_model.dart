@@ -264,11 +264,7 @@ final class VotingTimelineProgressViewModel extends Equatable {
     currentPhase ??= phaseViewModels.firstWhereOrNull(
       (p) => p.rangeStatus == DateRangeStatus.before,
     );
-    currentPhase ??= phaseViewModels.lastOrNull;
-
-    if (currentPhase == null) {
-      return null;
-    }
+    currentPhase ??= phaseViewModels.last;
 
     // Calculate campaign progress (from first phase start to last phase end)
     final campaignStart = phaseViewModels.first.dateRange.from;
@@ -285,8 +281,8 @@ final class VotingTimelineProgressViewModel extends Equatable {
       campaignProgress = 1;
     } else {
       final campaignDuration = campaignEnd.difference(campaignStart);
-      final campaignCurrentTs = now.difference(campaignStart);
-      campaignProgress = campaignCurrentTs.inMicroseconds / campaignDuration.inMicroseconds;
+      final campaignElapsedTime = now.difference(campaignStart);
+      campaignProgress = campaignElapsedTime.inMicroseconds / campaignDuration.inMicroseconds;
     }
 
     // Calculate countdown for current phase
