@@ -18,8 +18,8 @@ class CollaboratorDisplayConsentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MyActionCard(
-      key: ValueKey(ActionsCardType.displayConsent),
-      type: ActionsCardType.displayConsent,
+      key: ValueKey(DisplayConsentCardType),
+      type: DisplayConsentCardType(),
       actionWidget: _ActionButton(),
       timeRemainingWidget: _Timer(),
     );

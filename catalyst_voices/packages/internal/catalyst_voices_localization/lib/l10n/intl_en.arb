@@ -225,9 +225,17 @@
   "@becomeARepresentative": {
     "description": "Title for the become a representative card/section"
   },
-  "becomeReviewer": "Become a Reviewer!",
+  "becomeCommunityReviewer": "Become a Community\nReviewer",
+  "@becomeCommunityReviewer": {
+    "description": "CTA to become a community reviewer"
+  },
+  "becomeReviewer": "Become a Reviewer",
   "@becomeReviewer": {
     "description": "Title for becoming a reviewer"
+  },
+  "becomeReviewerActionHeaderText": "The Representative has an expert role in the Cardano Catalyst as people can delegate their vote to Cardano Experts.",
+  "@becomeReviewerActionHeaderText": {
+    "description": "Header text for the become a representative card/section"
   },
   "becomeVoter": "Become a Voter",
   "@becomeVoter": {
@@ -748,6 +756,10 @@
   "@copyLink": {
     "description": "Action title to copy a link in share dialog."
   },
+  "copyYourCatalystId": "Copy your Catalyst ID",
+  "@copyYourCatalystId": {
+    "description": "Step description how to register in review module"
+  },
   "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \naccount to the Cardano Mainnet.",
   "@createKeychainCreatedNextStep": {
     "description": "Information about the next step after keychain creation"
@@ -1008,6 +1020,10 @@
   "defaultRole": "Default",
   "@defaultRole": {
     "description": "Related to account role"
+  },
+  "delegateYourVotingPower": "Delegate Your Voting Power",
+  "@delegateYourVotingPower": {
+    "description": "Button text to delegate your voting power"
   },
   "delegated": "Delegated",
   "@delegated": {
@@ -1752,16 +1768,6 @@
       }
     }
   },
-  "fundVoting": "F{fundNumber} Voting: Make sure you're ready.",
-  "@fundVoting": {
-    "description": "Title for registration for F{fundNumber} voting",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
   "fundX": "Fund{fundNumber}",
   "@fundX": {
     "description": "Generic text about nr. of fund / campaign",
@@ -1833,6 +1839,10 @@
   "guidance": "Guidance",
   "@guidance": {
     "description": "A tab name of the guidance for the proposal editor."
+  },
+  "headOverToReviewModule": "Head over to the Review module",
+  "@headOverToReviewModule": {
+    "description": "Title CTA for user to go to review module"
   },
   "headsUp": "Heads up",
   "@headsUp": {
@@ -2123,6 +2133,14 @@
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
   },
+  "manageDelegation": "Manage Delegation",
+  "@manageDelegation": {
+    "description": "Button text to manage a delegation"
+  },
+  "manageRepresentative": "Manage Representative",
+  "@manageRepresentative": {
+    "description": "Button text to manage a representative (dRep)"
+  },
   "maxBudgetRequest": "Max budget request",
   "@maxBudgetRequest": {
     "description": "A label for the maximum budget request for a proposal."
@@ -2201,10 +2219,6 @@
   "@myDelegatedVotingPower": {
     "description": "Label for the voting power that the current user has delegated to a representative."
   },
-  "myOpportunities": "My Opportunities",
-  "@myOpportunities": {
-    "description": "Options available to user to make more impact in the app"
-  },
   "myProposals": "My Proposals",
   "@myProposals": {
     "description": "Header text for user's proposals section"
@@ -2247,10 +2261,6 @@
         "type": "String"
       }
     }
-  },
-  "newUpdates": "New updates - see what's new!",
-  "@newUpdates": {
-    "description": "A message shown when user has new updates"
   },
   "next": "Next",
   "@next": {
@@ -2528,10 +2538,6 @@
   "openInEditor": "Open in editor",
   "@openInEditor": {
     "description": "description of the button that opens the proposal in editor"
-  },
-  "opportunities": "Opportunities",
-  "@opportunities": {
-    "description": "The title of the tile that shows the list of opportunities."
   },
   "optional": "Optional",
   "@optional": {
@@ -3589,6 +3595,10 @@
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
   },
+  "reviewerInstructions": "Reviewer Instructions",
+  "@reviewerInstructions": {
+    "description": "Instructions for reviewers registration"
+  },
   "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
   "@richTextEditorImageSupportInfo": {
     "description": "Information about supported image sources in the editor"
@@ -4044,10 +4054,6 @@
   "@tryDifferentSearch": {
     "description": "Description of empty search result. Try different search"
   },
-  "turnOpinionsIntoActions": "Turn Your Opinions into Impact.",
-  "@turnOpinionsIntoActions": {
-    "description": "Title for becoming a reviewer"
-  },
   "twoDaysAgo": "2 days ago",
   "@twoDaysAgo": {
     "description": "Refers to date which is two days ago."
@@ -4141,6 +4147,10 @@
   "@uploadProgressInfo": {
     "description": "Status message shown during file upload process"
   },
+  "useYourCatalystIdToRegister": "Use  your copied Catalyst ID to register",
+  "@useYourCatalystIdToRegister": {
+    "description": "Step description how to register in review module"
+  },
   "userAuthenticationState": "User Authentication State",
   "@userAuthenticationState": {
     "description": "The state of the user (keychain), actor, guest, visitor, etc."
@@ -4202,6 +4212,14 @@
   "verifiedEmailNeededToPublishTitle": "A verified email is required to publish your proposal",
   "@verifiedEmailNeededToPublishTitle": {
     "description": "Title of snackbar shown when user tries to publish a proposal without having a verified email"
+  },
+  "verifyYourReviewerRegistration": "Verify your Reviewer registration",
+  "@verifyYourReviewerRegistration": {
+    "description": "Title for the verify your reviewer registration section"
+  },
+  "verifyYourReviewerRegistrationDescription": "• The review module has it’s own tool outside of the Catalyst App.\n• Don’t forget to confirm your registration by checking your email!",
+  "@verifyYourReviewerRegistrationDescription": {
+    "description": "Description for the verify your reviewer registration section"
   },
   "view": "View",
   "@view": {

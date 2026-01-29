@@ -27,7 +27,7 @@ class ActionsHintCard extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: context.colors.dropShadow,
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
