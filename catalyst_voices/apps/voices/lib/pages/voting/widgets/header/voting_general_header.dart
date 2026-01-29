@@ -1,12 +1,8 @@
-import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_power_card.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/timeline/voting_timeline_header.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_picker.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/voting_phase_progress_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/timeline/voting_timeline_header.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VotingGeneralHeader extends StatelessWidget {
@@ -14,14 +10,14 @@ class VotingGeneralHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 36),
-        const _FundNumberAndVotingPower(),
-        const SizedBox(height: 52),
-        const VotingTimelineHeader(),
+        SizedBox(height: 36),
+        _FundNumberAndVotingPower(),
+        SizedBox(height: 52),
+        VotingTimelineHeader(),
       ],
     );
   }
@@ -73,23 +69,6 @@ class _FundNumberAndVotingPower extends StatelessWidget {
           ],
         ),
         const AccountVotingRoleCard(),
-      ],
-    );
-  }
-}
-
-class _SmallCards extends StatelessWidget {
-  const _SmallCards();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 16,
-      children: [
-        VotingPhaseProgressCardSelector(),
-        AccountVotingPowerCardSelector(),
       ],
     );
   }
