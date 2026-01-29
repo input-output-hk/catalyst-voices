@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_power_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_picker.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_phase_progress_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -17,50 +17,15 @@ class VotingGeneralHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 36),
-        Text(
-          context.l10n.spaceVotingName,
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: theme.colors.textOnPrimaryLevel1,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            spacing: 16,
-            runSpacing: 12,
-            children: [
-              const _CatalystFund(),
-              if (showCategoryPicker)
-                ResponsivePadding(
-                  md: const EdgeInsets.only(top: 3),
-                  lg: const EdgeInsets.only(top: 3, right: 32),
-                  child: const VotingCategoryPickerSelector(),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        const _Cards(),
+        const _FundNumberAndVotingPower(),
+        const SizedBox(height: 52),
+        _VotingTimeline(showCategoryPicker: showCategoryPicker),
       ],
-    );
-  }
-}
-
-class _Cards extends StatelessWidget {
-  const _Cards();
-
-  @override
-  Widget build(BuildContext context) {
-    return ResponsiveChildBuilder(
-      sm: (_) => const _SmallCards(),
-      md: (_) => const _DesktopCards(),
     );
   }
 }
@@ -85,34 +50,55 @@ class _CatalystFund extends StatelessWidget {
   }
 }
 
-class _DesktopCards extends StatelessWidget {
-  const _DesktopCards();
+class _FundNumberAndVotingPower extends StatelessWidget {
+  const _FundNumberAndVotingPower();
 
   @override
   Widget build(BuildContext context) {
-    return const Wrap(
-      spacing: 24,
+    final theme = Theme.of(context);
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 16,
       runSpacing: 16,
       children: [
-        VotingPhaseProgressCardSelector(),
-        AccountVotingPowerCardSelector(),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.l10n.spaceVotingName,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colors.textOnPrimaryLevel1,
+              ),
+            ),
+            const _CatalystFund(),
+          ],
+        ),
+        const AccountVotingRoleCard(),
       ],
     );
   }
 }
 
-class _SmallCards extends StatelessWidget {
-  const _SmallCards();
+class _VotingTimeline extends StatelessWidget {
+  final bool showCategoryPicker;
+
+  const _VotingTimeline({required this.showCategoryPicker});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 16,
+    // TODO(dt-iohk): implement in https://github.com/input-output-hk/catalyst-voices/issues/3961
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        VotingPhaseProgressCardSelector(),
-        AccountVotingPowerCardSelector(),
+        const VotingPhaseProgressCardSelector(),
+        if (showCategoryPicker)
+          ResponsivePadding(
+            md: const EdgeInsets.only(top: 3),
+            lg: const EdgeInsets.only(top: 3, right: 32),
+            child: const VotingCategoryPickerSelector(),
+          ),
       ],
     );
   }
