@@ -33,7 +33,7 @@ final class VotingHeaderCategoryData extends Equatable {
 class VotingState extends Equatable {
   final VotingHeaderCategoryData? selectedCategoryHeaderData;
   final int? fundNumber;
-  final VotingPowerViewModel votingPower;
+  final VotingRoleViewModel votingRole;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
   final VotingTimelineDetailsViewModel? votingTimeline;
   final bool hasSearchQuery;
@@ -45,7 +45,7 @@ class VotingState extends Equatable {
   const VotingState({
     this.selectedCategoryHeaderData,
     this.fundNumber,
-    this.votingPower = const VotingPowerViewModel(),
+    this.votingRole = const EmptyVotingRoleViewModel(),
     this.votingPhase,
     this.votingTimeline,
     this.hasSearchQuery = false,
@@ -61,7 +61,7 @@ class VotingState extends Equatable {
   List<Object?> get props => [
     selectedCategoryHeaderData,
     fundNumber,
-    votingPower,
+    votingRole,
     votingPhase,
     votingTimeline,
     hasSearchQuery,
@@ -78,7 +78,7 @@ class VotingState extends Equatable {
   VotingState copyWith({
     Optional<VotingHeaderCategoryData>? selectedCategoryHeaderData,
     Optional<int>? fundNumber,
-    VotingPowerViewModel? votingPower,
+    VotingRoleViewModel? votingRole,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     Optional<VotingTimelineDetailsViewModel>? votingTimeline,
     bool? hasSearchQuery,
@@ -92,7 +92,7 @@ class VotingState extends Equatable {
         this.selectedCategoryHeaderData,
       ),
       fundNumber: fundNumber.dataOr(this.fundNumber),
-      votingPower: votingPower ?? this.votingPower,
+      votingRole: votingRole ?? this.votingRole,
       votingPhase: votingPhase.dataOr(this.votingPhase),
       votingTimeline: votingTimeline.dataOr(this.votingTimeline),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,

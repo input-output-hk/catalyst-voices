@@ -1,5 +1,8 @@
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_power_card.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/timeline/voting_timeline_header.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_picker.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/voting_phase_progress_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -11,39 +14,15 @@ class VotingGeneralHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 36),
-        Text(
-          context.l10n.spaceVotingName,
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: theme.colors.textOnPrimaryLevel1,
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.only(top: 4),
-          child: _CatalystFund(),
-        ),
-        const SizedBox(height: 32),
-        const _Cards(),
-        const SizedBox(height: 32),
+        const _FundNumberAndVotingPower(),
+        const SizedBox(height: 52),
         const VotingTimelineHeader(),
       ],
-    );
-  }
-}
-
-class _Cards extends StatelessWidget {
-  const _Cards();
-
-  @override
-  Widget build(BuildContext context) {
-    return ResponsiveChildBuilder(
-      sm: (_) => const _SmallCards(),
-      md: (_) => const _DesktopCards(),
     );
   }
 }
@@ -68,12 +47,34 @@ class _CatalystFund extends StatelessWidget {
   }
 }
 
-class _DesktopCards extends StatelessWidget {
-  const _DesktopCards();
+class _FundNumberAndVotingPower extends StatelessWidget {
+  const _FundNumberAndVotingPower();
 
   @override
   Widget build(BuildContext context) {
-    return const AccountVotingPowerCardSelector();
+    final theme = Theme.of(context);
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 16,
+      runSpacing: 16,
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.l10n.spaceVotingName,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colors.textOnPrimaryLevel1,
+              ),
+            ),
+            const _CatalystFund(),
+          ],
+        ),
+        const AccountVotingRoleCard(),
+      ],
+    );
   }
 }
 
@@ -82,6 +83,14 @@ class _SmallCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const AccountVotingPowerCardSelector();
+    return const Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 16,
+      children: [
+        VotingPhaseProgressCardSelector(),
+        AccountVotingPowerCardSelector(),
+      ],
+    );
   }
 }

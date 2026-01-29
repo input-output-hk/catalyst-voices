@@ -1018,6 +1018,14 @@
   "@defaultRole": {
     "description": "Related to account role"
   },
+  "delegated": "Delegated",
+  "@delegated": {
+    "description": "Refers to something that the user delegated (i.e. voting power)."
+  },
+  "delegatedTo": "Delegated To",
+  "@delegatedTo": {
+    "description": "In the context of delegating a voting power to a representative."
+  },
   "delegationButton": "Delegation",
   "@delegationButton": {
     "description": "The label for voting power delegation."
@@ -2201,6 +2209,10 @@
   "@myActionsPageHeader": {
     "description": "The header text on the My Actions page."
   },
+  "myDelegatedVotingPower": "My (Delegated) Voting Power",
+  "@myDelegatedVotingPower": {
+    "description": "Label for the voting power that the current user has delegated to a representative."
+  },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
     "description": "Options available to user to make more impact in the app"
@@ -2212,6 +2224,10 @@
   "myRoles": "My Roles",
   "@myRoles": {
     "description": "Header text for user's roles section"
+  },
+  "myVotingPower": "My Voting Power",
+  "@myVotingPower": {
+    "description": "Label for the user own voting power."
   },
   "nameOfWallet": "Name of the wallet",
   "@nameOfWallet": {
@@ -2561,6 +2577,10 @@
         "type": "int"
       }
     }
+  },
+  "own": "Own",
+  "@own": {
+    "description": "Refers to something that the user owns (i.e. voting power)."
   },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
@@ -3498,6 +3518,10 @@
   "representative": "Representative",
   "@representative": {
     "description": "representative account role"
+  },
+  "representing": "Representing",
+  "@representing": {
+    "description": "Describes a representative representing the delegators."
   },
   "repsList": "Representative List",
   "@repsList": {
@@ -4787,9 +4811,27 @@
       }
     }
   },
+  "xDelegates": "{count, plural, =0{Delegates} =1{Delegate} other{Delegates}}",
+  "@xDelegates": {
+    "description": "Plural word for delegators",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "xProposalsAdded": "{count, plural, =0{Proposals} =1{Proposal} other{Proposals}} Added",
   "@xProposalsAdded": {
     "description": "Number of proposals added to the ballot for voting",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "xRepresentatives": "{count, plural, =0{Representatives} =1{Representative} other{Representatives}}",
+  "@xRepresentatives": {
+    "description": "Plural word for dreps",
     "placeholders": {
       "count": {
         "type": "int"

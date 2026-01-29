@@ -107,5 +107,6 @@ export 'voting/voting_page_tab.dart';
 export 'voting/voting_phase_progress_view_model.dart';
 export 'voting/voting_power_status_view_model.dart';
 export 'voting/voting_power_view_model.dart';
+export 'voting/voting_role_view_model.dart';
 export 'voting/voting_timeline_view_model.dart';
 export 'workspace/workspace_filters.dart';
