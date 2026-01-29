@@ -46,7 +46,7 @@ final class VotingHeaderData extends Equatable {
 class VotingState extends Equatable {
   final VotingHeaderData header;
   final int? fundNumber;
-  final VotingPowerViewModel votingPower;
+  final VotingRoleViewModel votingRole;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
   final bool hasSearchQuery;
   final bool isDelegator;
@@ -57,7 +57,7 @@ class VotingState extends Equatable {
   const VotingState({
     this.header = const VotingHeaderData(),
     this.fundNumber,
-    this.votingPower = const VotingPowerViewModel(),
+    this.votingRole = const EmptyVotingRoleViewModel(),
     this.votingPhase,
     this.hasSearchQuery = false,
     this.isDelegator = false,
@@ -72,7 +72,7 @@ class VotingState extends Equatable {
   List<Object?> get props => [
     header,
     fundNumber,
-    votingPower,
+    votingRole,
     votingPhase,
     hasSearchQuery,
     isDelegator,
@@ -88,7 +88,7 @@ class VotingState extends Equatable {
   VotingState copyWith({
     VotingHeaderData? header,
     Optional<int>? fundNumber,
-    VotingPowerViewModel? votingPower,
+    VotingRoleViewModel? votingRole,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     bool? hasSearchQuery,
     bool? isDelegator,
@@ -99,7 +99,7 @@ class VotingState extends Equatable {
     return VotingState(
       header: header ?? this.header,
       fundNumber: fundNumber.dataOr(this.fundNumber),
-      votingPower: votingPower ?? this.votingPower,
+      votingRole: votingRole ?? this.votingRole,
       votingPhase: votingPhase.dataOr(this.votingPhase),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       isDelegator: isDelegator ?? this.isDelegator,
