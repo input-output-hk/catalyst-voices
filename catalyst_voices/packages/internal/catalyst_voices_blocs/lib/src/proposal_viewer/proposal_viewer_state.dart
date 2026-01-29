@@ -13,7 +13,6 @@ class ProposalViewerState extends DocumentViewerState<ProposalViewData>
     super.isLoading,
     super.data = const ProposalViewData(),
     super.error,
-    super.readOnlyMode,
     this.collaborator = const NoneCollaboratorProposalState(),
     this.comments = const CommentsState(),
   });
@@ -34,7 +33,6 @@ class ProposalViewerState extends DocumentViewerState<ProposalViewData>
       isLoading: isLoading ?? this.isLoading,
       data: data ?? this.data,
       error: error.dataOr(this.error),
-      readOnlyMode: readOnlyMode ?? this.readOnlyMode,
       collaborator: collaborator ?? this.collaborator,
       comments: comments ?? this.comments,
     );

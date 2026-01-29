@@ -249,26 +249,6 @@
   "@browse": {
     "description": "Button or link text for browsing files or content"
   },
-  "browseFundProposals": "Browse Fund{fundNumber} proposals",
-  "@browseFundProposals": {
-    "description": "Text shown when Catalyst app is closed",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
-  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund{fundNumber} proposals on ProjectCatalyst.io",
-  "@browseProposalsOnProjectCatalyst": {
-    "description": "Text shown when Catalyst app is closed",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
   "campaign": "Campaign",
   "@campaign": {
     "description": "Label for campaign section"
@@ -412,10 +392,6 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
-  },
-  "catalystAppClosed": "The Catalyst app is closed.",
-  "@catalystAppClosed": {
-    "description": "Text shown when Catalyst app is closed"
   },
   "catalystAppClosesIn": "Catalyst App closes in {days}d, {hours}h, {minutes}m, {seconds}s.",
   "@catalystAppClosesIn": {
