@@ -69,10 +69,6 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Height to reserve space to avoid jumping UI
-    // when VotingProposalsSearch widget disappears.
-    const itemHeight = 60.0;
-
     return SizedBox(
       width: double.infinity,
       child: ListenableBuilder(
@@ -83,15 +79,12 @@ class _TabBar extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.end,
             runSpacing: 10,
             children: [
-              SizedBox(
-                height: itemHeight,
+              Padding(
+                // top padding to align the tabs with the search bar.
+                padding: const EdgeInsets.only(top: 16),
                 child: VotingProposalsTabs(controller: tabController),
               ),
-              if (tabController.tab != VotingPageTab.results)
-                const SizedBox(
-                  height: itemHeight,
-                  child: VotingProposalsSearch(),
-                ),
+              if (tabController.tab != VotingPageTab.results) const VotingProposalsSearch(),
             ],
           );
         },
