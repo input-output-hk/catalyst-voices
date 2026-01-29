@@ -15,13 +15,14 @@ final class VotingPowerAmount extends Equatable {
   const VotingPowerAmount.empty() : formattedWithSymbol = '---', formatted = '---';
 
   factory VotingPowerAmount.fromModel(int amount) {
+    final money = Coin.fromWholeAda(amount).toMoney();
     return VotingPowerAmount(
       formattedWithSymbol: MoneyFormatter.formatCompactRounded(
-        Coin.fromWholeAda(amount).toMoney(),
+        money,
         decoration: MoneyDecoration.symbol,
       ),
       formatted: MoneyFormatter.formatCompactRounded(
-        Coin.fromWholeAda(amount).toMoney(),
+        money,
         decoration: MoneyDecoration.none,
       ),
     );
