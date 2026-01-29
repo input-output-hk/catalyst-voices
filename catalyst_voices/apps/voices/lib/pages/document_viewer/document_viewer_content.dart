@@ -12,7 +12,6 @@ import 'package:catalyst_voices/widgets/comment/document_comments_header_tile.da
 import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -90,16 +89,11 @@ class _SegmentsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final readOnlyMode = context.select<DocumentViewerCubit, bool>(
-      (cubit) => cubit.state.readOnlyMode,
-    );
-    final readOnlyModeOrMobile = readOnlyMode || CatalystFormFactor.current.isMobile;
-
     return BasicSegmentsListView(
       key: const ValueKey('DocumentViewerSegmentsListView'),
       items: items,
       itemScrollController: scrollController,
-      padding: EdgeInsets.only(top: readOnlyMode ? 150 : 56, bottom: 64),
+      padding: const EdgeInsets.only(top: 56, bottom: 64),
       itemBuilder: (context, index) {
         final item = items[index];
         final nextItem = items.elementAtOrNull(index + 1);
@@ -125,7 +119,7 @@ class _SegmentsListView extends StatelessWidget {
             isLast:
                 (!isNextSectionOrComment && !isVotingStatusSection) || isNotEmptyCommentsSegment,
           ),
-          child: _buildItem(context, item, readOnlyModeOrMobile),
+          child: _buildItem(context, item),
         );
       },
       separatorBuilder: (context, index) {
@@ -140,7 +134,7 @@ class _SegmentsListView extends StatelessWidget {
           return const ProposalSeparatorBox(height: 24);
         }
 
-        if (nextItem is DocumentAddCommentSection && !readOnlyModeOrMobile) {
+        if (nextItem is DocumentAddCommentSection) {
           return const ProposalDivider(height: 48);
         }
 
@@ -157,7 +151,7 @@ class _SegmentsListView extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(BuildContext context, SegmentsListViewItem item, bool readOnlyModeOrMobile) {
+  Widget _buildItem(BuildContext context, SegmentsListViewItem item) {
     final baseCubit = context.read<DocumentViewerCubit>();
     final cubitWithComments = baseCubit is DocumentViewerCommentsMixin ? baseCubit : null;
     return switch (item) {
@@ -208,8 +202,7 @@ class _SegmentsListView extends StatelessWidget {
         DocumentAddCommentSection(
           :final schema,
           :final showUsernameRequired,
-        )
-            when !readOnlyModeOrMobile =>
+        ) =>
           DocumentAddCommentTile(
             schema: schema,
             showUsernameRequired: showUsernameRequired,
@@ -220,7 +213,6 @@ class _SegmentsListView extends StatelessWidget {
               unawaited(cubitWithComments?.updateUsername(value));
             },
           ),
-        _ => const SizedBox.shrink(),
       },
       DocumentCommentListItem(
         :final comment,
@@ -229,7 +221,7 @@ class _SegmentsListView extends StatelessWidget {
         DocumentCommentTile(
           key: ValueKey(comment.comment.metadata.id),
           comment: comment,
-          canReply: canReply && !readOnlyModeOrMobile,
+          canReply: canReply,
         ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };
