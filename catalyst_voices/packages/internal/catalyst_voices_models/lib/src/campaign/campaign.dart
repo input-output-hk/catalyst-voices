@@ -7,3 +7,4 @@ export 'campaign_timeline.dart';
 export 'campaign_total_ask.dart';
 export 'exception/active_campaign_not_found_exception.dart';
 export 'exception/campaign_not_found_exception.dart';
+export 'voting_timeline_phase.dart';

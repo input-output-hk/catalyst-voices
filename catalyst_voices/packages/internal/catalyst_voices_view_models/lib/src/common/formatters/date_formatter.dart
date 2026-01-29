@@ -82,6 +82,10 @@ abstract class DateFormatter {
     return DateFormat('d MMM, yyyy - HH:mm').format(dateTime);
   }
 
+  static String formatFullDateFormat(DateTime dateTime) {
+    return DateFormat('d MMM, yyyy').format(dateTime);
+  }
+
   /// Formats full date and time in 24 format with leading day of week.
   /// If [timeOnNewline] is true then the time will be placed on a new line.
   ///

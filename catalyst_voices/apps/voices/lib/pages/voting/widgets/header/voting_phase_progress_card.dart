@@ -9,8 +9,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class VotingPhaseProgressCardSelector extends StatelessWidget {
-  const VotingPhaseProgressCardSelector({super.key});
+class VotingPhaseProgressCard extends StatelessWidget {
+  const VotingPhaseProgressCard({super.key});
 
   @override
   Widget build(BuildContext context) {
