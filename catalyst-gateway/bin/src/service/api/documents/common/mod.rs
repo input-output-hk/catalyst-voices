@@ -3,6 +3,7 @@
 
 use catalyst_signed_doc::{CatalystSignedDocument, providers::CatalystSignedDocumentSearchQuery};
 use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV7};
+use tokio::runtime::Handle;
 
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
@@ -93,7 +94,9 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id().uuid();
         let ver = doc_ref.ver().uuid();
-        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
+
+        let handle = Handle::current();
+        match handle.block_on(FullSignedDoc::retrieve(&id, Some(&ver))) {
             Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
@@ -104,7 +107,8 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         &self,
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        match FullSignedDoc::retrieve(&id.uuid(), None).await {
+        let handle = Handle::current();
+        match handle.block_on(FullSignedDoc::retrieve(&id.uuid(), None)) {
             Ok(doc) => Ok(Some(doc.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
@@ -115,7 +119,8 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         &self,
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        match FullSignedDoc::retrieve(&id.uuid(), Some(&id.uuid())).await {
+        let handle = Handle::current();
+        match handle.block_on(FullSignedDoc::retrieve(&id.uuid(), Some(&id.uuid()))) {
             Ok(doc) => Ok(Some(doc.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
