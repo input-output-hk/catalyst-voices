@@ -1,7 +1,7 @@
 //! A module for placing common structs, functions, and variables across the `document`
 //! endpoint module not specified to a specific endpoint.
 
-use catalyst_signed_doc::CatalystSignedDocument;
+use catalyst_signed_doc::{CatalystSignedDocument, providers::CatalystSignedDocumentSearchQuery};
 use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV7};
 
 use crate::{
@@ -34,25 +34,32 @@ impl ValidationProvider {
 }
 
 impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for ValidationProvider {
-    async fn try_get_doc(
+    fn try_get_doc(
         &self,
         doc_ref: &catalyst_signed_doc::DocumentRef,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        self.doc_provider.try_get_doc(doc_ref).await
+        self.doc_provider.try_get_doc(doc_ref)
     }
 
-    async fn try_get_last_doc(
+    fn try_get_last_doc(
         &self,
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        self.doc_provider.try_get_last_doc(id).await
+        self.doc_provider.try_get_last_doc(id)
     }
 
-    async fn try_get_first_doc(
+    fn try_get_first_doc(
         &self,
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        self.doc_provider.try_get_first_doc(id).await
+        self.doc_provider.try_get_first_doc(id)
+    }
+
+    fn try_search_docs(
+        &self,
+        query: &CatalystSignedDocumentSearchQuery,
+    ) -> anyhow::Result<Vec<CatalystSignedDocument>> {
+        self.doc_provider.try_search_docs(query)
     }
 }
 
@@ -67,13 +74,11 @@ impl catalyst_signed_doc::providers::TimeThresholdProvider for ValidationProvide
 }
 
 impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
-    async fn try_get_registered_key(
+    fn try_get_registered_key(
         &self,
         kid: &CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        self.verifying_key_provider
-            .try_get_registered_key(kid)
-            .await
+        self.verifying_key_provider.try_get_registered_key(kid)
     }
 }
 
@@ -82,7 +87,7 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
 pub(crate) struct DocProvider;
 
 impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvider {
-    async fn try_get_doc(
+    fn try_get_doc(
         &self,
         doc_ref: &catalyst_signed_doc::DocumentRef,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
@@ -95,7 +100,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         }
     }
 
-    async fn try_get_last_doc(
+    fn try_get_last_doc(
         &self,
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
@@ -106,7 +111,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         }
     }
 
-    async fn try_get_first_doc(
+    fn try_get_first_doc(
         &self,
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
@@ -115,6 +120,14 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }
+    }
+
+    fn try_search_docs(
+        &self,
+        query: &CatalystSignedDocumentSearchQuery,
+    ) -> anyhow::Result<Vec<CatalystSignedDocument>> {
+        // TODO: FIXME:
+        todo!()
     }
 }
 
@@ -141,7 +154,7 @@ pub(crate) struct VerifyingKeyProvider {
 }
 
 impl catalyst_signed_doc::providers::CatalystIdProvider for VerifyingKeyProvider {
-    async fn try_get_registered_key(
+    fn try_get_registered_key(
         &self,
         kid: &CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {

@@ -1,5 +1,6 @@
 //! Implementation of the PUT `/document` endpoint
 
+use catalyst_signed_doc::validator::Validator;
 use poem_openapi::{ApiResponse, payload::Json};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
@@ -106,20 +107,16 @@ pub(crate) async fn endpoint(
         },
     };
 
-    match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
-        Ok(true) => (),
-        Ok(false) if doc.report().is_problematic() => {
+    let validator = Validator::new();
+    match validator.validate(&doc, &validation_provider) {
+        Ok(()) if doc.report().is_problematic() => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Failed validating document integrity",
                 Some(doc.report()),
             )))
             .into();
         },
-        Ok(false) => {
-            return AllResponses::handle_error(&anyhow::anyhow!(
-                "Document must be problematic, empty problem report."
-            ));
-        },
+        Ok(()) => (),
         Err(err) => {
             // means that something happened inside the `DocProvider`, some db error.
             return AllResponses::handle_error(&err);
