@@ -77,8 +77,7 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
                 child: _ArrowRightButton(
                   onTap: () {
                     // TODO(dt-iohk): handle representatives button.
-                    // Probably navigating to the representatives page would
-                    // make sense, however the page doesn't exist yet.
+                    // It should open the "Representative List" drawer which doesn't exist yet.
                   },
                 ),
               ),
