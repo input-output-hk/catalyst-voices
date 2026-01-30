@@ -1033,6 +1033,10 @@
   "@delegatedTo": {
     "description": "In the context of delegating a voting power to a representative."
   },
+  "delegation": "Delegation",
+  "@delegation": {
+    "description": "The voting power delegation."
+  },
   "delegationButton": "Delegation",
   "@delegationButton": {
     "description": "The label for voting power delegation."
@@ -4411,6 +4415,22 @@
   "votingResultsSubheader": "The community has spoken. Check out the results!",
   "@votingResultsSubheader": {
     "description": "The subheader for voting results."
+  },
+  "votingRoleDelegatedToPopupMessage": "Representatives refers to the number of community members you have delegated your voting power to.",
+  "@votingRoleDelegatedToPopupMessage": {
+    "description": "The popup menu message explaining what is the voting power delegation."
+  },
+  "votingRoleIndividualLearnMoreDialogMessage": "Your voting power in [Cardano] Catalyst is determined by the amount of [ADA] held in the wallet that you linked to your Catalyst Keychain during account setup. Even though your voting power is based on your holdings, there is no token locking or cost to participate.\n\nFor each vote cast during the voting period, your full voting power will be applied in favor of that proposal. Casting votes does not diminish your voting power, and you may vote on as many proposals as you like.\n\nPrior to the start of voting, your voting power may fluctuate as you buy, sell, and trade [ADA]. You will see this indicated by a “Provisional” status on your voting power.\n\nAt the start of voting, your voting power will be frozen, based on your holdings at a certain point in time. You will see this indicated by a “Confirmed” status on your voting power.",
+  "@votingRoleIndividualLearnMoreDialogMessage": {
+    "description": "The message for the voting power info dialog."
+  },
+  "votingRoleIndividualLearnMoreDialogTitle": "Direct Voters - My Voting Power",
+  "@votingRoleIndividualLearnMoreDialogTitle": {
+    "description": "The title for the voting power info dialog."
+  },
+  "votingRoleIndividualPopupMessage": "Voting Power refers to the amount of influence you have during voting, based on the amount of ADA held in your wallet.",
+  "@votingRoleIndividualPopupMessage": {
+    "description": "The popup menu message explaining the individual voting power."
   },
   "votingStarts": "Voting starts",
   "@votingStarts": {

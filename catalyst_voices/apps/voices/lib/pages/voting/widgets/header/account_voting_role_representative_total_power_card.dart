@@ -9,14 +9,12 @@ class AccountVotingRoleRepresentativeTotalPowerCard extends StatelessWidget {
   final VotingPowerAmount totalVotingPower;
   final VotingPowerViewModel ownVotingPower;
   final VotingPowerViewModel delegatedVotingPower;
-  final VoidCallback onInfoTap;
 
   const AccountVotingRoleRepresentativeTotalPowerCard({
     super.key,
     required this.totalVotingPower,
     required this.ownVotingPower,
     required this.delegatedVotingPower,
-    required this.onInfoTap,
   });
 
   @override
@@ -49,7 +47,11 @@ class AccountVotingRoleRepresentativeTotalPowerCard extends StatelessWidget {
           ),
         ],
       ),
-      onInfoTap: onInfoTap,
+      infoButton: AccountVotingRoleInfoButton(
+        onTap: () {
+          // TODO(dt-iohk): https://github.com/input-output-hk/catalyst-voices/issues/3968
+        },
+      ),
     );
   }
 }
