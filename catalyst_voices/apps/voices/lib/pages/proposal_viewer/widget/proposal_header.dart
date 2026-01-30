@@ -3,7 +3,6 @@ import 'package:catalyst_voices/pages/document_viewer/document_viewer_content.da
 import 'package:catalyst_voices/pages/document_viewer/widgets/document_favorite_button.dart';
 import 'package:catalyst_voices/pages/document_viewer/widgets/document_share_button.dart';
 import 'package:catalyst_voices/pages/document_viewer/widgets/document_version_text.dart';
-import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_app_closed.dart';
 import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_collaborator_banner.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -55,7 +54,6 @@ class ProposalHeaderWrapper extends StatelessWidget {
             // is not under the ProposalHeader while ProposalHeader is animating.
             verticalDirection: VerticalDirection.up,
             children: [
-              ProposalAppClosed(),
               ProposalHeader(),
               ProposalCollaboratorBanner(),
             ],
@@ -74,18 +72,13 @@ class _ProposalControls extends StatelessWidget {
     // TODO(LynxLynxx): Remove when we support mobile web
     return ResponsiveChildBuilder(
       xs: (context) => const SizedBox(),
-      sm: (context) => Row(
+      sm: (context) => const Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 4,
         children: [
-          const DocumentVersionText(),
-          const DocumentShareButton(),
-          Offstage(
-            offstage: context.select<DocumentViewerCubit, bool>(
-              (cubit) => cubit.state.readOnlyMode,
-            ),
-            child: const DocumentFavoriteButton(),
-          ),
+          DocumentVersionText(),
+          DocumentShareButton(),
+          DocumentFavoriteButton(),
         ],
       ),
     );

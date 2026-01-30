@@ -47,25 +47,21 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final readOnlyMode = context.select<DocumentViewerCubit, bool>(
-      (cubit) => cubit.state.readOnlyMode,
-    );
-
     return VoicesAppBar(
-      leading: !(readOnlyMode || CatalystFormFactor.current.isMobile)
+      leading: !CatalystFormFactor.current.isMobile
           ? NavigationBack(
               isCompact: true,
               onCanNotPop: (context, _) => const ProposalsRoute().go(context),
             )
           : null,
-      enableBackHome: !(readOnlyMode || CatalystFormFactor.current.isMobile),
+      enableBackHome: !CatalystFormFactor.current.isMobile,
       actions: [
         Offstage(
-          offstage: readOnlyMode || CatalystFormFactor.current.isMobile,
+          offstage: CatalystFormFactor.current.isMobile,
           child: const SessionCtaAction(),
         ),
         Offstage(
-          offstage: readOnlyMode || CatalystFormFactor.current.isMobile,
+          offstage: CatalystFormFactor.current.isMobile,
           child: const AccountSettingsAction(),
         ),
       ],

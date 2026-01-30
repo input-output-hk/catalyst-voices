@@ -193,6 +193,25 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
+  void togglePhasesExpanded() {
+    final votingTimeline = state.votingTimeline;
+    if (votingTimeline == null) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        votingTimeline: Optional(
+          votingTimeline.copyWith(
+            titleViewModel: votingTimeline.titleViewModel.copyWith(
+              phasesExpanded: !votingTimeline.titleViewModel.phasesExpanded,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void updateSearchQuery(String query) {
     final asOptional = query.isEmpty ? const Optional<String>.empty() : Optional(query);
 
@@ -266,6 +285,25 @@ final class VotingCubit extends Cubit<VotingState>
     final votingPhase = _buildVotingPhase(campaign);
     final now = DateTimeExt.now();
     return votingPhase?.progress(now);
+  }
+
+  VotingTimelineProgressViewModel? _buildVotingTimeline(Campaign? campaign) {
+    final campaignTimeline = campaign?.timeline;
+    return campaignTimeline != null
+        ? VotingTimelineProgressViewModel.fromTimeline(campaignTimeline)
+        : null;
+  }
+
+  VotingTimelineDetailsViewModel? _buildVotingTimelineDetails(Campaign? campaign) {
+    final votingTimeline = _buildVotingTimeline(campaign);
+    final now = DateTimeExt.now();
+    final phasesExpanded = state.votingTimeline?.titleViewModel.phasesExpanded ?? true;
+    final isDelegator = state.isDelegator;
+    return votingTimeline?.progress(
+      now: now,
+      phasesExpanded: phasesExpanded,
+      isVotingDelegated: isDelegator,
+    );
   }
 
   void _dispatchState() {
@@ -406,32 +444,27 @@ final class VotingCubit extends Cubit<VotingState>
     );
 
     final fundNumber = campaign?.fundNumber;
-    // TODO(dt-iohk): get voting power from voting role and display different states:
-    // https://github.com/input-output-hk/catalyst-voices/issues/3967#issue-3792489539
-    // final votingPower = votingRole?.votingPower;
-    const VotingPower? votingPower = null;
-    final votingPowerViewModel = votingPower != null
-        ? VotingPowerViewModel.fromModel(votingPower)
-        : const VotingPowerViewModel();
+    final votingRoleViewModel = votingRole != null
+        ? VotingRoleViewModel.fromModel(votingRole)
+        : const EmptyVotingRoleViewModel();
     final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
+    final votingTimelineDetailsViewModel = _buildVotingTimelineDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
 
-    final header = VotingHeaderData(
-      showCategoryPicker: votingPhaseViewModel?.status.isActive ?? false,
-      category: selectedCategory != null
-          ? VotingHeaderCategoryData.fromModel(selectedCategory)
-          : null,
-    );
+    final selectedCategoryHeaderData = selectedCategory != null
+        ? VotingHeaderCategoryData.fromModel(selectedCategory)
+        : null;
 
     final isDelegator = votingRole is AccountVotingRoleDelegator;
     final isVotingResultsOrTallyActive = campaign?.isVotingResultsOrTallyActive();
 
     return state.copyWith(
-      header: header,
+      selectedCategoryHeaderData: Optional(selectedCategoryHeaderData),
       fundNumber: Optional(fundNumber),
-      votingPower: votingPowerViewModel,
+      votingRole: votingRoleViewModel,
       votingPhase: Optional(votingPhaseViewModel),
+      votingTimeline: Optional(votingTimelineDetailsViewModel),
       hasSearchQuery: hasSearchQuery,
       isDelegator: isDelegator,
       isVotingResultsOrTallyActive: isVotingResultsOrTallyActive,

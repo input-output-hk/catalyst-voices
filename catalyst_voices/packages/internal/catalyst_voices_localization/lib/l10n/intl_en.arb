@@ -225,9 +225,17 @@
   "@becomeARepresentative": {
     "description": "Title for the become a representative card/section"
   },
-  "becomeReviewer": "Become a Reviewer!",
+  "becomeCommunityReviewer": "Become a Community\nReviewer",
+  "@becomeCommunityReviewer": {
+    "description": "CTA to become a community reviewer"
+  },
+  "becomeReviewer": "Become a Reviewer",
   "@becomeReviewer": {
     "description": "Title for becoming a reviewer"
+  },
+  "becomeReviewerActionHeaderText": "The Representative has an expert role in the Cardano Catalyst as people can delegate their vote to Cardano Experts.",
+  "@becomeReviewerActionHeaderText": {
+    "description": "Header text for the become a representative card/section"
   },
   "becomeVoter": "Become a Voter",
   "@becomeVoter": {
@@ -240,26 +248,6 @@
   "browse": "browse",
   "@browse": {
     "description": "Button or link text for browsing files or content"
-  },
-  "browseFundProposals": "Browse Fund{fundNumber} proposals",
-  "@browseFundProposals": {
-    "description": "Text shown when Catalyst app is closed",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
-  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund{fundNumber} proposals on ProjectCatalyst.io",
-  "@browseProposalsOnProjectCatalyst": {
-    "description": "Text shown when Catalyst app is closed",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
   },
   "campaign": "Campaign",
   "@campaign": {
@@ -405,10 +393,6 @@
   "@catalyst": {
     "description": "Catalyst is a project name"
   },
-  "catalystAppClosed": "The Catalyst app is closed.",
-  "@catalystAppClosed": {
-    "description": "Text shown when Catalyst app is closed"
-  },
   "catalystAppClosesIn": "Catalyst App closes in {days}d, {hours}h, {minutes}m, {seconds}s.",
   "@catalystAppClosesIn": {
     "description": "Message displayed when the app closes in a few seconds",
@@ -438,6 +422,15 @@
   "catalystFundNo": "Catalyst Fund{fundNumber}",
   "@catalystFundNo": {
     "description": "Used in discovery page in hero section",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "catalystFundNoCategories": "Catalyst Fund{fundNumber} Categories:",
+  "@catalystFundNoCategories": {
+    "description": "Used in category picker menu",
     "placeholders": {
       "fundNumber": {
         "type": "int"
@@ -772,6 +765,10 @@
   "@copyLink": {
     "description": "Action title to copy a link in share dialog."
   },
+  "copyYourCatalystId": "Copy your Catalyst ID",
+  "@copyYourCatalystId": {
+    "description": "Step description how to register in review module"
+  },
   "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \naccount to the Cardano Mainnet.",
   "@createKeychainCreatedNextStep": {
     "description": "Information about the next step after keychain creation"
@@ -1032,6 +1029,18 @@
   "defaultRole": "Default",
   "@defaultRole": {
     "description": "Related to account role"
+  },
+  "delegateYourVotingPower": "Delegate Your Voting Power",
+  "@delegateYourVotingPower": {
+    "description": "Button text to delegate your voting power"
+  },
+  "delegated": "Delegated",
+  "@delegated": {
+    "description": "Refers to something that the user delegated (i.e. voting power)."
+  },
+  "delegatedTo": "Delegated To",
+  "@delegatedTo": {
+    "description": "In the context of delegating a voting power to a representative."
   },
   "delegationButton": "Delegation",
   "@delegationButton": {
@@ -1768,16 +1777,6 @@
       }
     }
   },
-  "fundVoting": "F{fundNumber} Voting: Make sure you're ready.",
-  "@fundVoting": {
-    "description": "Title for registration for F{fundNumber} voting",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
-  },
   "fundX": "Fund{fundNumber}",
   "@fundX": {
     "description": "Generic text about nr. of fund / campaign",
@@ -1849,6 +1848,10 @@
   "guidance": "Guidance",
   "@guidance": {
     "description": "A tab name of the guidance for the proposal editor."
+  },
+  "headOverToReviewModule": "Head over to the Review module",
+  "@headOverToReviewModule": {
+    "description": "Title CTA for user to go to review module"
   },
   "headsUp": "Heads up",
   "@headsUp": {
@@ -2139,6 +2142,14 @@
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
   },
+  "manageDelegation": "Manage Delegation",
+  "@manageDelegation": {
+    "description": "Button text to manage a delegation"
+  },
+  "manageRepresentative": "Manage Representative",
+  "@manageRepresentative": {
+    "description": "Button text to manage a representative (dRep)"
+  },
   "maxBudgetRequest": "Max budget request",
   "@maxBudgetRequest": {
     "description": "A label for the maximum budget request for a proposal."
@@ -2213,9 +2224,9 @@
   "@myActionsPageHeader": {
     "description": "The header text on the My Actions page."
   },
-  "myOpportunities": "My Opportunities",
-  "@myOpportunities": {
-    "description": "Options available to user to make more impact in the app"
+  "myDelegatedVotingPower": "My (Delegated) Voting Power",
+  "@myDelegatedVotingPower": {
+    "description": "Label for the voting power that the current user has delegated to a representative."
   },
   "myProposals": "My Proposals",
   "@myProposals": {
@@ -2224,6 +2235,10 @@
   "myRoles": "My Roles",
   "@myRoles": {
     "description": "Header text for user's roles section"
+  },
+  "myVotingPower": "My Voting Power",
+  "@myVotingPower": {
+    "description": "Label for the user own voting power."
   },
   "nameOfWallet": "Name of the wallet",
   "@nameOfWallet": {
@@ -2241,10 +2256,6 @@
   "@newAppVersionAvailableTitle": {
     "description": "Used in banner to inform user that new version of the app is available"
   },
-  "newInvites": "New Invites",
-  "@newInvites": {
-    "description": "Title of new invites section"
-  },
   "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
   "@newIterationTitle": {
     "description": "Title for new iteration card",
@@ -2259,10 +2270,6 @@
         "type": "String"
       }
     }
-  },
-  "newUpdates": "New updates - see what's new!",
-  "@newUpdates": {
-    "description": "A message shown when user has new updates"
   },
   "next": "Next",
   "@next": {
@@ -2420,10 +2427,6 @@
       }
     }
   },
-  "noPendingInvitesMessage": "You don’t have any proposal invites",
-  "@noPendingInvitesMessage": {
-    "description": "Message shown when user don't have any pending messages"
-  },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
     "description": "Text when there are no proposals to publish"
@@ -2545,10 +2548,6 @@
   "@openInEditor": {
     "description": "description of the button that opens the proposal in editor"
   },
-  "opportunities": "Opportunities",
-  "@opportunities": {
-    "description": "The title of the tile that shows the list of opportunities."
-  },
   "optional": "Optional",
   "@optional": {
     "description": "Generic indicator that some field, for example Email, is optional."
@@ -2581,6 +2580,10 @@
         "type": "int"
       }
     }
+  },
+  "own": "Own",
+  "@own": {
+    "description": "Refers to something that the user owns (i.e. voting power)."
   },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
@@ -2688,10 +2691,6 @@
   "proposalApprovalSubheader": "Once the proposal draft is finalized, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
   "@proposalApprovalSubheader": {
     "description": "Subheader for final proposal approval page"
-  },
-  "proposalApprovalTabDecide": "Decide",
-  "@proposalApprovalTabDecide": {
-    "description": "Label for \"decide\" tab"
   },
   "proposalApprovals": "Proposal Approvals",
   "@proposalApprovals": {
@@ -3306,10 +3305,6 @@
   "@refresh": {
     "description": "Refresh button label"
   },
-  "registerAsRepresentative": "Register as Representative",
-  "@registerAsRepresentative": {
-    "description": "Button text to register as a representative (dRep)"
-  },
   "registerToVoteFund": "Register to Vote in Fund{fundNumber}",
   "@registerToVoteFund": {
     "description": "Title of the register to vote section",
@@ -3527,6 +3522,10 @@
   "@representative": {
     "description": "representative account role"
   },
+  "representing": "Representing",
+  "@representing": {
+    "description": "Describes a representative representing the delegators."
+  },
   "repsList": "Representative List",
   "@repsList": {
     "description": "Generic text describing any list with representatives for voting on someone behalf"
@@ -3601,13 +3600,13 @@
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
   },
-  "reviewRequest": "Review Request",
-  "@reviewRequest": {
-    "description": "CTA to make user review invite to collaboration on proposal"
-  },
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
+  },
+  "reviewerInstructions": "Reviewer Instructions",
+  "@reviewerInstructions": {
+    "description": "Instructions for reviewers registration"
   },
   "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
   "@richTextEditorImageSupportInfo": {
@@ -4064,10 +4063,6 @@
   "@tryDifferentSearch": {
     "description": "Description of empty search result. Try different search"
   },
-  "turnOpinionsIntoActions": "Turn Your Opinions into Impact.",
-  "@turnOpinionsIntoActions": {
-    "description": "Title for becoming a reviewer"
-  },
   "twoDaysAgo": "2 days ago",
   "@twoDaysAgo": {
     "description": "Refers to date which is two days ago."
@@ -4116,10 +4111,6 @@
   "@unlockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after unlocking the keychain."
   },
-  "updated": "Updated",
-  "@updated": {
-    "description": "A label when something was last updated."
-  },
   "upload": "Upload",
   "@upload": {
     "description": "Button text for uploading files"
@@ -4160,6 +4151,10 @@
   "uploadProgressInfo": "Upload in progress",
   "@uploadProgressInfo": {
     "description": "Status message shown during file upload process"
+  },
+  "useYourCatalystIdToRegister": "Use  your copied Catalyst ID to register",
+  "@useYourCatalystIdToRegister": {
+    "description": "Step description how to register in review module"
   },
   "userAuthenticationState": "User Authentication State",
   "@userAuthenticationState": {
@@ -4222,6 +4217,14 @@
   "verifiedEmailNeededToPublishTitle": "A verified email is required to publish your proposal",
   "@verifiedEmailNeededToPublishTitle": {
     "description": "Title of snackbar shown when user tries to publish a proposal without having a verified email"
+  },
+  "verifyYourReviewerRegistration": "Verify your Reviewer registration",
+  "@verifyYourReviewerRegistration": {
+    "description": "Title for the verify your reviewer registration section"
+  },
+  "verifyYourReviewerRegistrationDescription": "• The review module has it’s own tool outside of the Catalyst App.\n• Don’t forget to confirm your registration by checking your email!",
+  "@verifyYourReviewerRegistrationDescription": {
+    "description": "Description for the verify your reviewer registration section"
   },
   "view": "View",
   "@view": {
@@ -4431,9 +4434,171 @@
   "@votingStatus": {
     "description": "Text shown in voting status section"
   },
+  "votingTimeline": "Voting Timeline · {phase}",
+  "@votingTimeline": {
+    "description": "Header for the voting timeline section",
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineDelegated": "Voting Delegated",
+  "@votingTimelineDelegated": {
+    "description": "Label for delegated voting phase"
+  },
+  "votingTimelineDrop": "Drop:",
+  "@votingTimelineDrop": {
+    "description": "Label for the results drop date"
+  },
+  "votingTimelineEnded": "Ended",
+  "@votingTimelineEnded": {
+    "description": "Text showing when a phase ended"
+  },
+  "votingTimelineEndedXDaysAgo": "{days} {days, plural, =1{day} other{days}} ago",
+  "@votingTimelineEndedXDaysAgo": {
+    "description": "Text showing how many days ago a phase ended",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "votingTimelineFinishes": "Finishes:",
+  "@votingTimelineFinishes": {
+    "description": "Label for the end date of a voting phase"
+  },
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
+  },
+  "votingTimelineHideEvents": "Hide Events",
+  "@votingTimelineHideEvents": {
+    "description": "Button text to hide the voting timeline phase cards"
+  },
+  "votingTimelineLive": "LIVE",
+  "@votingTimelineLive": {
+    "description": "Badge text for the currently active voting phase"
+  },
+  "votingTimelineNewFundComingSoon": "New Fund Coming Soon!",
+  "@votingTimelineNewFundComingSoon": {
+    "description": "Label for new fund coming soon"
+  },
+  "votingTimelinePreVoting": "Pre-Voting",
+  "@votingTimelinePreVoting": {
+    "description": "Label for the pre-voting (registration) phase in the voting timeline"
+  },
+  "votingTimelinePreVotingDescription": "Now is the time to get prepared for voting! Top up your wallet, check out representatives and be ready!",
+  "@votingTimelinePreVotingDescription": {
+    "description": "Description for the pre-voting phase"
+  },
+  "votingTimelinePreVotingWindow": "Pre-voting window:",
+  "@votingTimelinePreVotingWindow": {
+    "description": "Label for the pre-voting date window section"
+  },
+  "votingTimelineResults": "Results",
+  "@votingTimelineResults": {
+    "description": "Label for results announcement phase"
+  },
+  "votingTimelineResultsDescription": "The results are in! Check out the final report to see which proposals won funding and see what’s next for the community.",
+  "@votingTimelineResultsDescription": {
+    "description": "Description for the results phase"
+  },
+  "votingTimelineResultsIn": "Results in {countdown}",
+  "@votingTimelineResultsIn": {
+    "description": "Countdown text showing when results starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineResultsLabel": "Results:",
+  "@votingTimelineResultsLabel": {
+    "description": "Label for the results date section"
+  },
+  "votingTimelineSelectCategory": "Select Category",
+  "@votingTimelineSelectCategory": {
+    "description": "Button text to open category selection dropdown"
+  },
+  "votingTimelineShowEvents": "Show Events",
+  "@votingTimelineShowEvents": {
+    "description": "Button text to show the voting timeline phase cards"
+  },
+  "votingTimelineStarting": "Starting",
+  "@votingTimelineStarting": {
+    "description": "Text showing when a phase starts"
+  },
+  "votingTimelineStartingIn": "Starting in",
+  "@votingTimelineStartingIn": {
+    "description": "Text showing how many days until a phase starts"
+  },
+  "votingTimelineStartingInXDays": "{days} {days, plural, =1{day} other{days}}",
+  "@votingTimelineStartingInXDays": {
+    "description": "Text showing how many days until a phase starts",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "votingTimelineStarts": "Starts:",
+  "@votingTimelineStarts": {
+    "description": "Label for the start date of a voting phase"
+  },
+  "votingTimelineTally": "Tally",
+  "@votingTimelineTally": {
+    "description": "Label for vote tallying phase"
+  },
+  "votingTimelineTallyDescription": "Voting is closed and results are being tallied. Stay tuned for the results announcement to see which proposals won funding.",
+  "@votingTimelineTallyDescription": {
+    "description": "Description for the tally phase"
+  },
+  "votingTimelineTallyIn": "Tally in {countdown}",
+  "@votingTimelineTallyIn": {
+    "description": "Countdown text showing when tally starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineTallyWindow": "Tally window:",
+  "@votingTimelineTallyWindow": {
+    "description": "Label for the tally date window section"
+  },
+  "votingTimelineToBeAnnounced": "To be announced",
+  "@votingTimelineToBeAnnounced": {
+    "description": "Text shown when voting timeline phase dates are not yet available"
+  },
+  "votingTimelineVoting": "Voting",
+  "@votingTimelineVoting": {
+    "description": "Label for active voting phase"
+  },
+  "votingTimelineVotingDelegatedDescription": "Voting is live! You delegated your vote, so you won’t be able to participate directly.",
+  "@votingTimelineVotingDelegatedDescription": {
+    "description": "Description for the voting delegated phase"
+  },
+  "votingTimelineVotingDescription": "Ready, set, vote! Cast votes and support your favourite proposals to boost their funding chances from the treasury.",
+  "@votingTimelineVotingDescription": {
+    "description": "Description for the voting phase"
+  },
+  "votingTimelineVotingIn": "Voting in {countdown}",
+  "@votingTimelineVotingIn": {
+    "description": "Countdown text showing when voting starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineVotingPowerSnapshot": "Voting Power Snapshot",
+  "@votingTimelineVotingPowerSnapshot": {
+    "description": "Label for the voting power snapshot deadline"
+  },
+  "votingTimelineVotingWindow": "Voting window:",
+  "@votingTimelineVotingWindow": {
+    "description": "Label for the voting date window section"
   },
   "walletAccountDetailsTitle": "Catalyst Account",
   "@walletAccountDetailsTitle": {
@@ -4653,9 +4818,27 @@
       }
     }
   },
+  "xDelegates": "{count, plural, =0{Delegates} =1{Delegate} other{Delegates}}",
+  "@xDelegates": {
+    "description": "Plural word for delegators",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "xProposalsAdded": "{count, plural, =0{Proposals} =1{Proposal} other{Proposals}} Added",
   "@xProposalsAdded": {
     "description": "Number of proposals added to the ballot for voting",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "xRepresentatives": "{count, plural, =0{Representatives} =1{Representative} other{Representatives}}",
+  "@xRepresentatives": {
+    "description": "Plural word for dreps",
     "placeholders": {
       "count": {
         "type": "int"

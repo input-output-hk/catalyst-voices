@@ -25,6 +25,7 @@ class CatalystIdText extends StatefulWidget {
   final TextStyle? labelStyle;
   final double labelGap;
   final Color? backgroundColor;
+  final String? labelText;
 
   const CatalystIdText(
     this.data, {
@@ -40,6 +41,7 @@ class CatalystIdText extends StatefulWidget {
     this.labelStyle,
     this.labelGap = 6,
     this.backgroundColor,
+    this.labelText,
   });
 
   @override
@@ -57,7 +59,12 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   @override
   Widget build(BuildContext context) {
     return AffixDecorator(
-      prefix: widget.showLabel ? _LabelText(style: widget.labelStyle) : null,
+      prefix: widget.showLabel
+          ? _LabelText(
+              text: widget.labelText ?? '${context.l10n.catalystId}:',
+              style: widget.labelStyle,
+            )
+          : null,
       gap: widget.labelGap,
       child: Offstage(
         offstage: _effectiveData.isEmpty,
@@ -266,9 +273,11 @@ class _Copy extends StatelessWidget {
 }
 
 class _LabelText extends StatelessWidget {
+  final String text;
   final TextStyle? style;
 
   const _LabelText({
+    required this.text,
     this.style,
   });
 
@@ -279,7 +288,7 @@ class _LabelText extends StatelessWidget {
         .copyWith(color: context.colors.textOnPrimaryLevel0);
 
     return Text(
-      '${context.l10n.catalystId}:',
+      text,
       style: effectiveStyle,
     );
   }

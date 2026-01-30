@@ -18,8 +18,8 @@ class ProposalApprovalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MyActionCard(
-      key: ValueKey(ActionsCardType.proposalApproval),
-      type: ActionsCardType.proposalApproval,
+      key: ValueKey(ProposalApprovalCardType),
+      type: ProposalApprovalCardType(),
       actionWidget: _ActionButton(),
       timeRemainingWidget: _Timer(),
     );
