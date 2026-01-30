@@ -29,25 +29,13 @@ final class VotingHeaderCategoryData extends Equatable {
   ];
 }
 
-final class VotingHeaderData extends Equatable {
-  final bool showCategoryPicker;
-  final VotingHeaderCategoryData? category;
-
-  const VotingHeaderData({
-    this.showCategoryPicker = false,
-    this.category,
-  });
-
-  @override
-  List<Object?> get props => [showCategoryPicker, category];
-}
-
 /// The state of available proposals in the voting page.
 class VotingState extends Equatable {
-  final VotingHeaderData header;
+  final VotingHeaderCategoryData? selectedCategoryHeaderData;
   final int? fundNumber;
   final VotingRoleViewModel votingRole;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
+  final VotingTimelineDetailsViewModel? votingTimeline;
   final bool hasSearchQuery;
   final bool isDelegator;
   final bool isVotingResultsOrTallyActive;
@@ -55,10 +43,11 @@ class VotingState extends Equatable {
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
   const VotingState({
-    this.header = const VotingHeaderData(),
+    this.selectedCategoryHeaderData,
     this.fundNumber,
     this.votingRole = const EmptyVotingRoleViewModel(),
     this.votingPhase,
+    this.votingTimeline,
     this.hasSearchQuery = false,
     this.isDelegator = false,
     this.isVotingResultsOrTallyActive = false,
@@ -70,10 +59,11 @@ class VotingState extends Equatable {
 
   @override
   List<Object?> get props => [
-    header,
+    selectedCategoryHeaderData,
     fundNumber,
     votingRole,
     votingPhase,
+    votingTimeline,
     hasSearchQuery,
     isDelegator,
     isVotingResultsOrTallyActive,
@@ -86,10 +76,11 @@ class VotingState extends Equatable {
   }
 
   VotingState copyWith({
-    VotingHeaderData? header,
+    Optional<VotingHeaderCategoryData>? selectedCategoryHeaderData,
     Optional<int>? fundNumber,
     VotingRoleViewModel? votingRole,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
+    Optional<VotingTimelineDetailsViewModel>? votingTimeline,
     bool? hasSearchQuery,
     bool? isDelegator,
     bool? isVotingResultsOrTallyActive,
@@ -97,10 +88,13 @@ class VotingState extends Equatable {
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
     return VotingState(
-      header: header ?? this.header,
+      selectedCategoryHeaderData: selectedCategoryHeaderData.dataOr(
+        this.selectedCategoryHeaderData,
+      ),
       fundNumber: fundNumber.dataOr(this.fundNumber),
       votingRole: votingRole ?? this.votingRole,
       votingPhase: votingPhase.dataOr(this.votingPhase),
+      votingTimeline: votingTimeline.dataOr(this.votingTimeline),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       isDelegator: isDelegator ?? this.isDelegator,
       isVotingResultsOrTallyActive:
