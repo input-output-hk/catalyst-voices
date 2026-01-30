@@ -110,9 +110,12 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         ?.timeline
         .to;
 
+    final votingSnapshotDate = timeline?.votingSnapshotDate;
+
     _cache = _cache.copyWith(
       proposalSubmissionCloseDate: Optional(proposalSubmissionCloseDate),
       becomeReviewerCloseDate: Optional(becomeReviewerCloseDate),
+      votingSnapshotDate: Optional(votingSnapshotDate),
     );
     _rebuildState();
   }
@@ -146,6 +149,7 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         finalProposalCount: _cache.finalProposalCount,
         proposalSubmissionCloseDate: Optional(_cache.proposalSubmissionCloseDate),
         becomeReviewerCloseDate: Optional(_cache.becomeReviewerCloseDate),
+        votingSnapshotDate: Optional(_cache.votingSnapshotDate),
         actionCardsState: actionCardsState,
       ),
     );

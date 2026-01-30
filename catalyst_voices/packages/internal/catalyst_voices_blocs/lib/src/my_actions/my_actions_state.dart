@@ -30,6 +30,7 @@ final class MyActionsState extends Equatable {
   final int finalProposalCount;
   final DateTime? proposalSubmissionCloseDate;
   final DateTime? becomeReviewerCloseDate;
+  final DateTime? votingSnapshotDate;
   final ActionCardsState actionCardsState;
 
   const MyActionsState({
@@ -37,6 +38,7 @@ final class MyActionsState extends Equatable {
     this.finalProposalCount = 0,
     this.proposalSubmissionCloseDate,
     this.becomeReviewerCloseDate,
+    this.votingSnapshotDate,
     this.actionCardsState = const ActionCardsState(),
   });
 
@@ -46,6 +48,7 @@ final class MyActionsState extends Equatable {
     finalProposalCount,
     proposalSubmissionCloseDate,
     becomeReviewerCloseDate,
+    votingSnapshotDate,
     actionCardsState,
   ];
 
@@ -54,6 +57,7 @@ final class MyActionsState extends Equatable {
     int? finalProposalCount,
     Optional<DateTime>? proposalSubmissionCloseDate,
     Optional<DateTime>? becomeReviewerCloseDate,
+    Optional<DateTime>? votingSnapshotDate,
     ActionCardsState? actionCardsState,
   }) {
     return MyActionsState(
@@ -64,6 +68,9 @@ final class MyActionsState extends Equatable {
       ),
       becomeReviewerCloseDate: becomeReviewerCloseDate.dataOr(
         this.becomeReviewerCloseDate,
+      ),
+      votingSnapshotDate: votingSnapshotDate.dataOr(
+        this.votingSnapshotDate,
       ),
       actionCardsState: actionCardsState ?? this.actionCardsState,
     );

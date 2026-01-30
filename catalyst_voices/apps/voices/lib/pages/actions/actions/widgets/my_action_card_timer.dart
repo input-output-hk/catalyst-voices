@@ -9,9 +9,9 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class MyActionCardTimer extends StatefulWidget {
-  final Duration duration;
+  final Duration? duration;
 
-  const MyActionCardTimer({super.key, required this.duration});
+  const MyActionCardTimer({super.key, this.duration});
 
   @override
   State<MyActionCardTimer> createState() => _MyActionCardTimerState();
@@ -25,7 +25,22 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
 
   @override
   Widget build(BuildContext context) {
-    if (_remainingDuration < Duration.zero) {
+    if (widget.duration == null) {
+      return AffixDecorator(
+        prefix: VoicesAssets.icons.clock.buildIcon(
+          size: 18,
+          color: context.colors.iconsBackground,
+        ),
+        child: Text(
+          context.l10n.votingTimelineToBeAnnounced,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.colors.textOnPrimaryWhite,
+          ),
+        ),
+      );
+    }
+
+    if (_remainingDuration <= Duration.zero) {
       return const Offstage();
     }
 
@@ -42,7 +57,7 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'duration' => TextSpan(
-              text: DurationFormatter.formatDurationHHmmss(
+              text: DurationFormatter.formatDurationDaysOrHHmm(
                 context.l10n,
                 _remainingDuration,
               ),
@@ -63,8 +78,8 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.duration != oldWidget.duration) {
-      _initialDuration = widget.duration;
-      _remainingDuration = widget.duration;
+      _initialDuration = widget.duration ?? Duration.zero;
+      _remainingDuration = widget.duration ?? Duration.zero;
       _timer?.cancel();
       _stopwatch.reset();
       _startTimer();
@@ -81,12 +96,16 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
   @override
   void initState() {
     super.initState();
-    _initialDuration = widget.duration;
-    _remainingDuration = widget.duration;
+    _initialDuration = widget.duration ?? Duration.zero;
+    _remainingDuration = widget.duration ?? Duration.zero;
     _startTimer();
   }
 
   void _startTimer() {
+    if (widget.duration == null || _initialDuration == Duration.zero) {
+      return;
+    }
+
     _stopwatch.start();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {

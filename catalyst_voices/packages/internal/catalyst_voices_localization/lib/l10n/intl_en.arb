@@ -237,7 +237,7 @@
   "@balance": {
     "description": "The balance the user holds / amount of Ada in the wallet"
   },
-  "becomeARepresentative": "Become a Representative",
+  "becomeARepresentative": "Become a\nRepresentative",
   "@becomeARepresentative": {
     "description": "Title for the become a representative card/section"
   },
@@ -1037,7 +1037,7 @@
   "@defaultRole": {
     "description": "Related to account role"
   },
-  "delegateYourVotingPower": "Delegate Your Voting Power",
+  "delegateYourVotingPower": "Delegate your\nVoting Power",
   "@delegateYourVotingPower": {
     "description": "Button text to delegate your voting power"
   },
@@ -2157,11 +2157,11 @@
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
   },
-  "manageDelegation": "Manage Delegation",
+  "manageDelegation": "Manage\nDelegation",
   "@manageDelegation": {
     "description": "Button text to manage a delegation"
   },
-  "manageRepresentative": "Manage Representative",
+  "manageRepresentative": "Manage\nRepresentative",
   "@manageRepresentative": {
     "description": "Button text to manage a representative (dRep)"
   },
@@ -4464,6 +4464,10 @@
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
+  },
+  "votingTimelineToBeAnnounced": "To be announced",
+  "@votingTimelineToBeAnnounced": {
+    "description": "Text shown when voting timeline phase dates are not yet available"
   },
   "walletAccountDetailsTitle": "Catalyst Account",
   "@walletAccountDetailsTitle": {
