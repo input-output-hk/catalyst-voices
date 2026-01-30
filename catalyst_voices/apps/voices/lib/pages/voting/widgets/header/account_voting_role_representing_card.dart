@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_learn_more_dialog.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_tooltip.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class AccountVotingRoleRepresentingCard extends StatelessWidget {
   final int delegatorsCount;
-  final VoidCallback onInfoTap;
 
   const AccountVotingRoleRepresentingCard({
     super.key,
     required this.delegatorsCount,
-    required this.onInfoTap,
   });
 
   @override
@@ -38,9 +41,29 @@ class AccountVotingRoleRepresentingCard extends StatelessWidget {
                   color: theme.colors.textOnPrimaryWhite,
                 ),
               ),
-              AccountVotingRoleInfoButton(
-                onTap: onInfoTap,
+              AccountVotingRolePopupInfoButton(
                 color: theme.colors.iconsBackground,
+                menuBuilder: (context) {
+                  return AccountVotingRoleTooltip(
+                    title: context.l10n.delegation,
+                    message: context.l10n.votingRoleRepresentingPopupMessage,
+                    // TODO(dt-iohk): clarify what date time to display here
+                    // in the context of drep.
+                    updatedAt: DateTime.now(),
+                    // TODO(dt-iohk): clarify what status to display here
+                    // in the context of drep.
+                    status: VotingPowerStatus.provisional,
+                    onLearnMore: () {
+                      unawaited(
+                        AccountVotingRoleLearnMoreDialog.show(
+                          context: context,
+                          title: context.l10n.votingRoleRepresentingLearnMoreDialogTitle,
+                          message: context.l10n.votingRoleRepresentingLearnMoreDialogMessage,
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ],
           ),

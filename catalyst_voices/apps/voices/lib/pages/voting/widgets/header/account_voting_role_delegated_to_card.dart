@@ -1,22 +1,22 @@
 import 'dart:math' as math;
 
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_tooltip.dart';
 import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class AccountVotingRoleDelegatedToCard extends StatelessWidget {
+  final VotingPowerViewModel votingPower;
   final int representativesCount;
-  final VoidCallback onInfoTap;
-  final VoidCallback onRepresentativesTap;
 
   const AccountVotingRoleDelegatedToCard({
     super.key,
+    required this.votingPower,
     required this.representativesCount,
-    required this.onInfoTap,
-    required this.onRepresentativesTap,
   });
 
   @override
@@ -57,13 +57,27 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              AccountVotingRoleInfoButton(
-                onTap: onInfoTap,
+              AccountVotingRolePopupInfoButton(
                 color: theme.colors.iconsBackground,
+                menuBuilder: (context) {
+                  return AccountVotingRoleTooltip(
+                    title: context.l10n.delegation,
+                    message: context.l10n.votingRoleDelegatedToPopupMessage,
+                    updatedAt: votingPower.updatedAt,
+                    status: votingPower.status,
+                    onLearnMore: () {
+                      // TODO(dt-iohk): define what to do when learn more is pressed
+                    },
+                  );
+                },
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 16, bottom: 4),
-                child: _ArrowRightButton(onTap: onRepresentativesTap),
+                child: _ArrowRightButton(
+                  onTap: () {
+                    // TODO(dt-iohk): handle representatives button
+                  },
+                ),
               ),
             ],
           ),
