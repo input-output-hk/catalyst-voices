@@ -5,7 +5,7 @@ icon: material/translate
 # Frontend Localization
 
 This section documents internationalization and localization patterns in the Catalyst Voices
-rontend application.
+frontend application.
 
 ## Overview
 
