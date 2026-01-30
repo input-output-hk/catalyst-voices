@@ -38,6 +38,21 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              AccountVotingRoleInfoButton(
+                onTap: onInfoTap,
+                color: theme.colors.iconsBackground,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 16, bottom: 4),
+                child: _ArrowRightButton(onTap: onRepresentativesTap),
+              ),
+            ],
+          ),
+          const SizedBox(width: 20),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
@@ -50,21 +65,6 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
                 ),
               ),
               _RepresentativesCount(count: representativesCount),
-            ],
-          ),
-          const SizedBox(width: 20),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              AccountVotingRoleInfoButton(
-                onTap: onInfoTap,
-                color: theme.colors.iconsBackground,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 16, bottom: 4),
-                child: _ArrowRightButton(onTap: onRepresentativesTap),
-              ),
             ],
           ),
         ],

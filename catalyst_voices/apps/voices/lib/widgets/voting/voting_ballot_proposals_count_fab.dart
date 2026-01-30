@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -29,8 +32,9 @@ class _VotingBallotProposalsCountFab extends StatelessWidget {
       child: VotesCountFloatingActionButton(
         count: data.count,
         useGradient: data.useGradient,
-        // TODO(damian-molinski): Push page.
-        onTap: () {},
+        onTap: () {
+          unawaited(const VotingListRoute().push(context));
+        },
       ),
     );
   }

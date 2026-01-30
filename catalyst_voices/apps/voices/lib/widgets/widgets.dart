@@ -27,6 +27,7 @@ export 'common/page_overflow.dart';
 export 'common/shortcut_activator_view.dart';
 export 'common/simple_tree_view.dart';
 export 'common/tab_bar_stack_view.dart';
+export 'containers/bottom_sheet_container.dart';
 export 'containers/roles_chooser_container.dart';
 export 'containers/roles_summary_container.dart';
 export 'containers/sidebar/sidebar_panel.dart';
