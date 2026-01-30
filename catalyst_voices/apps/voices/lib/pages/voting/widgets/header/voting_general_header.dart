@@ -1,30 +1,23 @@
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_picker.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/voting_phase_progress_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/timeline/voting_timeline_header.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VotingGeneralHeader extends StatelessWidget {
-  final bool showCategoryPicker;
-
-  const VotingGeneralHeader({
-    super.key,
-    this.showCategoryPicker = true,
-  });
+  const VotingGeneralHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 36),
-        const _FundNumberAndVotingPower(),
-        const SizedBox(height: 52),
-        _VotingTimeline(showCategoryPicker: showCategoryPicker),
+        SizedBox(height: 36),
+        _FundNumberAndVotingPower(),
+        SizedBox(height: 52),
+        VotingTimelineHeader(),
       ],
     );
   }
@@ -76,29 +69,6 @@ class _FundNumberAndVotingPower extends StatelessWidget {
           ],
         ),
         const AccountVotingRoleCard(),
-      ],
-    );
-  }
-}
-
-class _VotingTimeline extends StatelessWidget {
-  final bool showCategoryPicker;
-
-  const _VotingTimeline({required this.showCategoryPicker});
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO(dt-iohk): implement in https://github.com/input-output-hk/catalyst-voices/issues/3961
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const VotingPhaseProgressCardSelector(),
-        if (showCategoryPicker)
-          ResponsivePadding(
-            md: const EdgeInsets.only(top: 3),
-            lg: const EdgeInsets.only(top: 3, right: 32),
-            child: const VotingCategoryPickerSelector(),
-          ),
       ],
     );
   }

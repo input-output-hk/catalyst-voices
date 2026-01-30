@@ -93,6 +93,7 @@ export 'treasury/treasury_segments.dart';
 export 'utils/string_ext.dart';
 export 'utils/typedefs.dart';
 export 'viewer_segments_data/viewer_segments_data.dart';
+export 'voting/timeline/voting_timeline_view_model.dart';
 export 'voting/vote_button_action.dart';
 export 'voting/vote_button_colors.dart';
 export 'voting/vote_button_data.dart';

@@ -33,6 +33,17 @@ final class CampaignTimeline extends Equatable {
     return votingPhase?.timeline.from?.subtract(const Duration(days: 2));
   }
 
+  DateTime? get campaignStartDate {
+    DateTime? earliest;
+    for (final phase in phases) {
+      final from = phase.timeline.from;
+      if (from != null && (earliest == null || from.isBefore(earliest))) {
+        earliest = from;
+      }
+    }
+    return earliest;
+  }
+
   /// Date range when final votes count takes place.
   DateRange? get votingTallyDateRange {
     return phase(CampaignPhaseType.votingTally)?.timeline;
