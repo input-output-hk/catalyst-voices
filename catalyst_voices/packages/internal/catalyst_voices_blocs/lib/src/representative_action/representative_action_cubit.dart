@@ -9,7 +9,7 @@ final class RepresentativeActionCubit extends Cubit<RepresentativeActionState> {
   final VotingService _votingService;
   final CampaignService _campaignService;
 
-  RepresnetativeActionCubitCache _cache = const RepresnetativeActionCubitCache();
+  RepresentativeActionCubitCache _cache = const RepresentativeActionCubitCache();
 
   StreamSubscription<DateTime?>? _activeCampaignSub;
   StreamSubscription<AccountVotingRole?>? _activeVotingRoleSub;
@@ -29,7 +29,7 @@ final class RepresentativeActionCubit extends Cubit<RepresentativeActionState> {
   }
 
   void init() {
-    unawaited(_setupActiveCamapignTimelineSubscription());
+    unawaited(_setupActiveCampaignTimelineSubscription());
     unawaited(_setupActiveVotingRoleSubscription());
   }
 
@@ -54,7 +54,7 @@ final class RepresentativeActionCubit extends Cubit<RepresentativeActionState> {
     );
   }
 
-  Future<void> _setupActiveCamapignTimelineSubscription() async {
+  Future<void> _setupActiveCampaignTimelineSubscription() async {
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = _campaignService.watchActiveCampaign
         .map((event) => event?.timeline.votingSnapshotDate)
