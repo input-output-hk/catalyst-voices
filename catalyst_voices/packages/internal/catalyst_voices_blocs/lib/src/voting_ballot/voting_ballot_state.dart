@@ -7,7 +7,7 @@ final class VotingBallotState extends Equatable {
   final List<VotingListTileData> tiles;
   final VotingListFooterData footer;
   final int votesCount;
-  final VotingBalloutBuilderFabViewModel fab;
+  final VotingBallotBuilderFabViewModel fab;
 
   const VotingBallotState({
     this.votingProgress = const VotingListCampaignPhaseData(),
@@ -15,7 +15,7 @@ final class VotingBallotState extends Equatable {
     this.tiles = const [],
     this.footer = const VotingListFooterData(),
     this.votesCount = 0,
-    this.fab = const VotingBalloutBuilderFabViewModel(),
+    this.fab = const VotingBallotBuilderFabViewModel(),
   });
 
   @override
@@ -34,7 +34,7 @@ final class VotingBallotState extends Equatable {
     List<VotingListTileData>? tiles,
     VotingListFooterData? footer,
     int? votesCount,
-    VotingBalloutBuilderFabViewModel? fab,
+    VotingBallotBuilderFabViewModel? fab,
   }) {
     return VotingBallotState(
       votingProgress: votingProgress ?? this.votingProgress,

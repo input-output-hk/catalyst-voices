@@ -11,7 +11,7 @@ class VotingBallotProposalsCountFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VotingBallotBloc, VotingBallotState, VotingBalloutBuilderFabViewModel>(
+    return BlocSelector<VotingBallotBloc, VotingBallotState, VotingBallotBuilderFabViewModel>(
       selector: (state) => state.fab,
       builder: (context, state) => _VotingBallotProposalsCountFab(data: state),
     );
@@ -19,7 +19,7 @@ class VotingBallotProposalsCountFab extends StatelessWidget {
 }
 
 class _VotingBallotProposalsCountFab extends StatelessWidget {
-  final VotingBalloutBuilderFabViewModel data;
+  final VotingBallotBuilderFabViewModel data;
 
   const _VotingBallotProposalsCountFab({
     required this.data,
