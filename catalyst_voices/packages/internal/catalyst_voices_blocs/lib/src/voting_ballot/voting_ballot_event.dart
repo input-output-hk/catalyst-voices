@@ -43,6 +43,13 @@ final class RemoveVoteEvent extends VotingBallotEvent {
   List<Object?> get props => [proposal];
 }
 
+final class TimerTickEvent extends VotingBallotEvent {
+  const TimerTickEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class UpdateFromBallotBuilderEvent extends VotingBallotEvent {
   final bool showPendingVotesDisclaimer;
   final bool canCastVotes;
@@ -69,17 +76,6 @@ final class UpdateFundNumberEvent extends VotingBallotEvent {
 
   @override
   List<Object?> get props => [number];
-}
-
-final class UpdateVotingEnabledEvent extends VotingBallotEvent {
-  final bool isEnabled;
-
-  const UpdateVotingEnabledEvent({
-    required this.isEnabled,
-  });
-
-  @override
-  List<Object?> get props => [isEnabled];
 }
 
 final class UpdateLastCastedVoteEvent extends VotingBallotEvent {
@@ -111,17 +107,6 @@ final class UpdateVoteTiles extends VotingBallotEvent {
 
   @override
   List<Object?> get props => [tiles];
-}
-
-final class UpdateVotingPhaseProgressEvent extends VotingBallotEvent {
-  final VotingPhaseProgressDetailsViewModel? votingPhase;
-
-  const UpdateVotingPhaseProgressEvent({
-    this.votingPhase,
-  });
-
-  @override
-  List<Object?> get props => [votingPhase];
 }
 
 final class UpdateVotingRoleEvent extends VotingBallotEvent {

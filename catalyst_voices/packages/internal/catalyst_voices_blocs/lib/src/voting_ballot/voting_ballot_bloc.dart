@@ -35,7 +35,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     this._votingService,
   ) : super(const VotingBallotState()) {
     on<UpdateVotingRoleEvent>(_updateVotingRole, transformer: uniqueEvents());
-    on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress, transformer: uniqueEvents());
     on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
     on<UpdateFromBallotBuilderEvent>(_updateFromBallotBuilder, transformer: uniqueEvents());
     on<UpdateLastCastedVoteEvent>(_updateLastCastedVote, transformer: uniqueEvents());
@@ -46,7 +45,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     on<ConfirmCastingVotesEvent>(_confirmCastingVotes);
     on<CancelCastingVotesEvent>(_cancelCastingVotes);
     on<CheckPasswordEvent>(_checkPassword);
-    on<UpdateVotingEnabledEvent>(_updateIsEnabled);
+    on<TimerTickEvent>(_updateTimeSensitiveStateData);
 
     _activeVotingRoleSub = _votingService.watchActiveVotingRole().distinct().listen(
       _handleActiveVotingRoleChange,
@@ -62,6 +61,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
         .map((votes) => votes.lastOrNull)
         .listen(_handleLastCastedChange);
     _handleLastCastedChange(null);
+
+    _phaseProgressTimer = Timer.periodic(const Duration(seconds: 1), _onTimerTick);
   }
 
   @override
@@ -247,18 +248,22 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   void _handleActiveVotingRoleChange(AccountVotingRole? votingRole) {
+    _cache = _cache.copyWith(votingRole: Optional(votingRole));
+
     add(UpdateVotingRoleEvent(votingRole));
   }
 
   void _handleBallotBuilderChange() {
-    final proposalsCount = _builder.length;
-    final showPendingVotesDisclaimer = proposalsCount > 0;
-    final canCastVotes = proposalsCount > 0;
+    final isVotingActive = _cache.campaign?.isVotingActive() ?? false;
+    final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
+
+    final canCastVotes = isVotingActive && isManualVotingEnabled && _builder.length > 0;
+    final showPendingVotesDisclaimer = _builder.length > 0;
 
     final event = UpdateFromBallotBuilderEvent(
       showPendingVotesDisclaimer: showPendingVotesDisclaimer,
       canCastVotes: canCastVotes,
-      proposalsCount: proposalsCount,
+      proposalsCount: _builder.length,
     );
 
     add(event);
@@ -266,12 +271,9 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   void _handleCampaignChange(Campaign? campaign) {
-    add(UpdateFundNumberEvent(campaign?.fundNumber));
+    _cache = _cache.copyWith(campaign: Optional(campaign));
 
-    if (campaign != _cache.campaign) {
-      _cache = _cache.copyWith(campaign: Optional(campaign));
-      _updateVotingPhaseProgressTimer();
-    }
+    add(UpdateFundNumberEvent(campaign?.fundNumber));
   }
 
   void _handleLastCastedChange(Vote? vote) {
@@ -291,20 +293,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   void _onTimerTick(Timer timer) {
-    final campaign = _cache.campaign;
-    final updatedVotingPhase = _buildVotingPhaseDetails(campaign);
-    add(UpdateVotingPhaseProgressEvent(votingPhase: updatedVotingPhase));
-
-    final isVotingActive = updatedVotingPhase?.status.isActive ?? false;
-    if (_cache.isVotingActive != isVotingActive) {
-      _cache = _cache.copyWith(isVotingActive: isVotingActive);
-      final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
-      add(UpdateVotingEnabledEvent(isEnabled: isVotingActive && isManualVotingEnabled));
-    }
-
-    if (updatedVotingPhase?.status == CampaignPhaseStatus.post) {
-      timer.cancel();
-    }
+    add(const TimerTickEvent());
   }
 
   void _rebuildTilesAndSendEvent() {
@@ -326,8 +315,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     Emitter<VotingBallotState> emit,
   ) {
     final footer = state.footer.copyWith(
-      showPendingVotesDisclaimer: event.showPendingVotesDisclaimer,
       canCastVotes: event.canCastVotes,
+      showPendingVotesDisclaimer: event.showPendingVotesDisclaimer,
     );
     final fab = state.fab.copyWith(count: event.proposalsCount);
 
@@ -340,16 +329,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   ) {
     final votingProgress = state.votingProgress.copyWith(activeFundNumber: Optional(event.number));
     emit(state.copyWith(votingProgress: votingProgress));
-  }
-
-  void _updateIsEnabled(
-    UpdateVotingEnabledEvent event,
-    Emitter<VotingBallotState> emit,
-  ) {
-    final fab = state.fab.copyWith(isVisible: event.isEnabled);
-    final footer = state.footer.copyWith(canCastVotes: false);
-
-    emit(state.copyWith(fab: fab, footer: footer));
   }
 
   void _updateLastCastedVote(
@@ -368,6 +347,29 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     final votesCount = _cache.votesCount;
     final fab = state.fab.copyWith(count: votesCount);
     emit(state.copyWith(tiles: event.tiles, votesCount: votesCount, fab: fab));
+  }
+
+  void _updateTimeSensitiveStateData(
+    TimerTickEvent event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    final campaign = _cache.campaign;
+    final updatedVotingPhase = _buildVotingPhaseDetails(campaign);
+    final votingProgress = state.votingProgress.copyWith(
+      votingPhaseProgress: updatedVotingPhase?.votingPhaseProgress ?? 0,
+      votingEndsIn: Optional(updatedVotingPhase?.votingPhaseEndsIn),
+    );
+
+    final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
+    final isVotingActive = updatedVotingPhase?.status.isActive ?? false;
+    final isFabVisible = isVotingActive && isManualVotingEnabled;
+    final fab = state.fab.copyWith(isVisible: isFabVisible);
+
+    final footer = state.footer.copyWith(
+      canCastVotes: isVotingActive && isManualVotingEnabled && _builder.length > 0,
+    );
+
+    emit(state.copyWith(votingProgress: votingProgress, fab: fab, footer: footer));
   }
 
   Future<void> _updateVote(
@@ -396,48 +398,10 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     );
   }
 
-  void _updateVotingPhaseProgress(
-    UpdateVotingPhaseProgressEvent event,
-    Emitter<VotingBallotState> emit,
-  ) {
-    final votingPhase = event.votingPhase;
-    final votingProgress = state.votingProgress.copyWith(
-      votingPhaseProgress: votingPhase?.votingPhaseProgress ?? 0,
-      votingEndsIn: Optional(votingPhase?.votingPhaseEndsIn),
-    );
-
-    emit(state.copyWith(votingProgress: votingProgress));
-  }
-
-  void _updateVotingPhaseProgressTimer() {
-    _phaseProgressTimer?.cancel();
-    _phaseProgressTimer = null;
-
-    final campaign = _cache.campaign;
-    final votingPhase = _buildVotingPhaseDetails(campaign);
-    add(UpdateVotingPhaseProgressEvent(votingPhase: votingPhase));
-
-    final isVotingActive = votingPhase?.status.isActive ?? false;
-    if (_cache.isVotingActive != isVotingActive) {
-      _cache = _cache.copyWith(isVotingActive: isVotingActive);
-      final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
-      add(UpdateVotingEnabledEvent(isEnabled: isVotingActive && isManualVotingEnabled));
-    }
-
-    if (votingPhase == null || votingPhase.status == CampaignPhaseStatus.post) {
-      return;
-    }
-
-    _phaseProgressTimer = Timer.periodic(const Duration(seconds: 1), _onTimerTick);
-  }
-
   void _updateVotingRole(
     UpdateVotingRoleEvent event,
     Emitter<VotingBallotState> emit,
   ) {
-    _cache = _cache.copyWith(votingRole: Optional(event.data));
-    final isVotingActive = _cache.isVotingActive;
-
     final votingRole = event.data;
 
     final amount = votingRole?.totalVotingPowerAmount ?? 0;
@@ -454,11 +418,13 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       status: status,
     );
 
-    final isManualVotingEnabled = _cache.votingRole?.isManualVotingEnabled ?? false;
+    final isManualVotingEnabled = votingRole?.isManualVotingEnabled ?? false;
+    final isVotingActive = _cache.campaign?.isVotingActive() ?? false;
+    final isFabVisible = isVotingActive && isManualVotingEnabled;
 
     final fab = state.fab.copyWith(
       useGradient: !isNullOrIndividual,
-      isVisible: isVotingActive && isManualVotingEnabled,
+      isVisible: isFabVisible,
     );
 
     emit(state.copyWith(userSummary: userSummary, fab: fab));

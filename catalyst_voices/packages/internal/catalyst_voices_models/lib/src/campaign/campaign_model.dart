@@ -215,6 +215,9 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       status: CampaignPhaseStatus.fromRange(phase.timeline, date),
     );
   }
+
+  @override
+  String toString() => 'Campaign f$fundNumber';
 }
 
 final class CampaignPhaseState extends Equatable {

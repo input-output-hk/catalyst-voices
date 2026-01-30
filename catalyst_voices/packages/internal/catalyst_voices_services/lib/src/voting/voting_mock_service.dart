@@ -80,7 +80,7 @@ final class VotingMockService implements VotingService {
     return Stream.periodic(
       const Duration(seconds: 30),
       (computationCount) {
-        return switch (2 & computationCount) {
+        return switch (3 & computationCount) {
           1 => AccountVotingRoleRepresentative(
             accountId: accountId,
             campaignId: campaignId,
@@ -103,6 +103,12 @@ final class VotingMockService implements VotingService {
           ),
         };
       },
+    ).startWith(
+      AccountVotingRoleIndividual(
+        accountId: accountId,
+        campaignId: campaignId,
+        votingPower: Snapshot.done(data: VotingPower.dummy()),
+      ),
     );
   }
 
