@@ -8,9 +8,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// A popup menu designed to work with [AccountVotingRolePopupInfoButton].
-///
-// TODO(dt-iohk): design on figma included a wallet address,
-// icon and connection status, consider how to add it here.
 class AccountVotingRolePopupMenu extends StatelessWidget {
   final String title;
   final String message;

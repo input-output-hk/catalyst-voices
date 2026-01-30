@@ -5,14 +5,16 @@ import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_popup_menu.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class AccountVotingRoleRepresentingCard extends StatelessWidget {
+  final VotingPowerViewModel totalVotingPower;
   final int delegatorsCount;
 
   const AccountVotingRoleRepresentingCard({
     super.key,
+    required this.totalVotingPower,
     required this.delegatorsCount,
   });
 
@@ -47,12 +49,8 @@ class AccountVotingRoleRepresentingCard extends StatelessWidget {
                   return AccountVotingRolePopupMenu(
                     title: context.l10n.delegation,
                     message: context.l10n.votingRoleRepresentingPopupMessage,
-                    // TODO(dt-iohk): clarify what date time to display here
-                    // in the context of drep.
-                    updatedAt: DateTime.now(),
-                    // TODO(dt-iohk): clarify what status to display here
-                    // in the context of drep.
-                    status: VotingPowerStatus.provisional,
+                    updatedAt: totalVotingPower.updatedAt,
+                    status: totalVotingPower.status,
                     onLearnMore: () {
                       unawaited(
                         AccountVotingRoleLearnMoreDialog.show(

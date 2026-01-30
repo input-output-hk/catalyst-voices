@@ -47,7 +47,7 @@ void main() {
     });
 
     group('updatedAt calculation', () {
-      test('returns the latest date', () {
+      test('returns the earlier date', () {
         // Given
         final laterDate = DateTime.utc(2025, 1, 5);
         final earlierDate = DateTime.utc(2025);
@@ -66,7 +66,7 @@ void main() {
         final result = VotingPowerViewModel.totalFromModels(first, second);
 
         // Then
-        expect(result.updatedAt, laterDate);
+        expect(result.updatedAt, earlierDate);
       });
 
       test('returns first updatedAt when only first is provided', () {

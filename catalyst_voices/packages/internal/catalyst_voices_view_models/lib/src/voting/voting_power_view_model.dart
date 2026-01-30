@@ -76,7 +76,7 @@ final class VotingPowerViewModel extends Equatable {
           : VotingPowerStatus.confirmed;
 
       // Updated at is the latest date
-      totalUpdatedAt = first.updatedAt.isAfter(second.updatedAt)
+      totalUpdatedAt = first.updatedAt.isBefore(second.updatedAt)
           ? first.updatedAt
           : second.updatedAt;
     } else if (first != null) {

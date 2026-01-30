@@ -156,6 +156,7 @@ class _RepresentativeVotingRoleCards extends StatelessWidget {
           delegatedVotingPower: delegatedVotingPower,
         ),
         AccountVotingRoleRepresentingCard(
+          totalVotingPower: totalVotingPower,
           delegatorsCount: delegatorsCount,
         ),
       ],
