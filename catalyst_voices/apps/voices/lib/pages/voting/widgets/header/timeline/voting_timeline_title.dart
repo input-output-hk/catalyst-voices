@@ -22,7 +22,7 @@ class _CategoryPicker extends StatelessWidget {
         for (final item in items) item.toDropdownItem(),
       ],
       onSelected: (value) => context.read<VotingCubit>().changeSelectedCategory(value.ref?.id),
-      menuTitle: context.l10n.catalystFundNoCategories(fundNumber ?? 14),
+      menuTitle: fundNumber != null ? context.l10n.catalystFundNoCategories(fundNumber!) : '-',
     );
   }
 }

@@ -1259,9 +1259,6 @@
   "@duration": {
     "description": "Label for duration of proposal"
   },
-  "durationDaysAbbreviation": "d",
-  "durationHoursAbbreviation": "h",
-  "durationMinutesAbbreviation": "m",
   "editButtonText": "Edit",
   "@editButtonText": {
     "description": "Text shown in edit button"
@@ -4108,10 +4105,6 @@
   "@unlockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after unlocking the keychain."
   },
-  "updated": "Updated",
-  "@updated": {
-    "description": "A label when something was last updated."
-  },
   "upload": "Upload",
   "@upload": {
     "description": "Button text for uploading files"
@@ -4168,10 +4161,6 @@
   "usernameSavedTitle": "Display Name Saved",
   "@usernameSavedTitle": {
     "description": "Used as username change confirmation snack bar title"
-  },
-  "utc": "UTC",
-  "@utc": {
-    "description": "UTC timezone"
   },
   "valueMilestones": "{count} {count, plural, =0{Milestones} =1{Milestone} other{Milestones}}",
   "@valueMilestones": {
