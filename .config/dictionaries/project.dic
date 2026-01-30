@@ -181,8 +181,8 @@ iohk
 IPFS
 iphoneos
 iphonesimulator
-isready
 IPLD
+isready
 jaegertracing
 jdbc
 jetbrains
@@ -289,6 +289,8 @@ Podspec
 postcss
 Pozhylenkov
 Precache
+precached
+Precaching
 Precertificate
 precompressed
 preprod
@@ -321,6 +323,7 @@ RGBO
 rgloader
 ripgrep
 ristretto
+riverpod
 rlib
 rngs
 rollouts
@@ -349,6 +352,7 @@ skeletonizer
 slotno
 snackbars
 socat
+sqflite
 sqlfluff
 SRCROOT
 sslmode
@@ -413,6 +417,7 @@ uuidv
 varint
 vers
 Vespr
+VIEWMODELS
 vite
 vitss
 vkey
