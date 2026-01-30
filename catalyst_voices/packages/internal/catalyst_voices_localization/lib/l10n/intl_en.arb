@@ -4115,6 +4115,10 @@
   "@unlockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after unlocking the keychain."
   },
+  "updated": "Updated",
+  "@updated": {
+    "description": "A label for when something has been updated."
+  },
   "upload": "Upload",
   "@upload": {
     "description": "Button text for uploading files"
