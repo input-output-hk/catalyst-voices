@@ -56,6 +56,8 @@ final class MyActionsCubit extends Cubit<MyActionsState>
   }
 
   void updatePageTab(ActionsPageTab tab) {
+    if (_cache.selectedTab == tab) return;
+
     _cache = _cache.copyWith(selectedTab: tab);
     _rebuildState();
     emitSignal(ChangeTabMyActionsSignal(tab));

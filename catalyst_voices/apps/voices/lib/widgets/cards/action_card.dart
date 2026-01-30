@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 class ActionCard extends StatelessWidget {
   final Widget icon;
   final Color? iconBackgroundColor;
+  final EdgeInsets iconPadding;
   final Widget? title;
   final Widget desc;
   final Widget? statusIcon;
@@ -17,6 +18,7 @@ class ActionCard extends StatelessWidget {
     super.key,
     required this.icon,
     this.iconBackgroundColor,
+    this.iconPadding = const EdgeInsets.all(8),
     this.title,
     required this.desc,
     this.statusIcon,
@@ -49,6 +51,7 @@ class ActionCard extends StatelessWidget {
           children: [
             _IconContainer(
               iconBackgroundColor: iconBackgroundColor,
+              iconPadding: iconPadding,
               child: icon,
             ),
             Expanded(
@@ -87,10 +90,12 @@ class ActionCard extends StatelessWidget {
 class _IconContainer extends StatelessWidget {
   final Widget child;
   final Color? iconBackgroundColor;
+  final EdgeInsets iconPadding;
 
   const _IconContainer({
     required this.child,
     this.iconBackgroundColor,
+    required this.iconPadding,
   });
 
   @override
@@ -102,8 +107,8 @@ class _IconContainer extends StatelessWidget {
       color: theme.colors.iconsBackground,
     );
 
-    return Container(
-      padding: const EdgeInsets.all(8),
+    return DecoratedBox(
+      // padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: iconBackgroundColor ?? theme.colorScheme.primary,
         borderRadius: BorderRadius.circular(8),

@@ -3,6 +3,7 @@ import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/actions/become_reviewer/become_reviewer_page.dart';
 import 'package:catalyst_voices/pages/actions/co_proposers_consent/co_proposers_consent_page.dart';
 import 'package:catalyst_voices/pages/actions/proposal_approval/proposal_approval_page.dart';
+import 'package:catalyst_voices/pages/actions/representative/representative_action_page.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
@@ -50,6 +51,10 @@ final class ActionsRoute extends GoRouteData with $ActionsRoute, CompositeRouteG
         TypedGoRoute<BecomeReviewerRoute>(
           path: 'become_reviewer',
           name: 'become_reviewer',
+        ),
+        TypedGoRoute<RepresentativeActionRoute>(
+          path: 'representative_action',
+          name: 'representative_action',
         ),
       ],
     ),
@@ -118,5 +123,21 @@ final class ProposalApprovalRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ProposalApprovalPage();
+  }
+}
+
+final class RepresentativeActionRoute extends GoRouteData
+    with $RepresentativeActionRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
+  const RepresentativeActionRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const RepresentativeActionPage();
   }
 }

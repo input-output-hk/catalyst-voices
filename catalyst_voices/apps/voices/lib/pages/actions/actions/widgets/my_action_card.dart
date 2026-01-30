@@ -75,10 +75,16 @@ class _TitleText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: context.textTheme.headlineSmall?.copyWith(
-        color: context.colors.textOnPrimaryWhite,
+    return FractionallySizedBox(
+      widthFactor: 0.7,
+      alignment: Alignment.centerLeft,
+      child: Text(
+        text,
+        style: context.textTheme.headlineSmall?.copyWith(
+          color: context.colors.textOnPrimaryWhite,
+        ),
+        maxLines: 2,
+        softWrap: true,
       ),
     );
   }

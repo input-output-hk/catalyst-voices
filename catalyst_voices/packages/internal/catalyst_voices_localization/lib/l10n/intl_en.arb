@@ -237,11 +237,11 @@
   "@balance": {
     "description": "The balance the user holds / amount of Ada in the wallet"
   },
-  "becomeARepresentative": "Become a\nRepresentative",
+  "becomeARepresentative": "Become a Representative",
   "@becomeARepresentative": {
     "description": "Title for the become a representative card/section"
   },
-  "becomeCommunityReviewer": "Become a Community\nReviewer",
+  "becomeCommunityReviewer": "Become a Community Reviewer",
   "@becomeCommunityReviewer": {
     "description": "CTA to become a community reviewer"
   },
@@ -1731,7 +1731,7 @@
   "@finalProposal": {
     "description": "Label indicating final proposal status"
   },
-  "finalProposalApproval": "Final Proposal\nApproval",
+  "finalProposalApproval": "Final Proposal Approval",
   "@finalProposalApproval": {
     "description": "Generic title to inform user about proposal approval"
   },
@@ -1887,6 +1887,23 @@
   "headsUpProposalApprovalHintTitle": "Heads up on Final Proposals",
   "@headsUpProposalApprovalHintTitle": {
     "description": "Title for heads up about final proposals approval"
+  },
+  "headsUpRepresentativeHintContent1": "Please keep in mind that your Representation comes into effect, after your ‘Join Campaign action’ is completed.",
+  "@headsUpRepresentativeHintContent1": {
+    "description": "Content for heads up about representative role"
+  },
+  "headsUpRepresentativeHintContent2": "Current Snapshot deadline: {snapshotDeadline}",
+  "@headsUpRepresentativeHintContent2": {
+    "description": "Content for heads up about representative role",
+    "placeholders": {
+      "snapshotDeadline": {
+        "type": "String"
+      }
+    }
+  },
+  "headsUpRepresentativeHintTitle": "Heads up on Representation",
+  "@headsUpRepresentativeHintTitle": {
+    "description": "Title for heads up about representative role"
   },
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {
@@ -2157,11 +2174,11 @@
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
   },
-  "manageDelegation": "Manage\nDelegation",
+  "manageDelegation": "Manage Delegation",
   "@manageDelegation": {
     "description": "Button text to manage a delegation"
   },
-  "manageRepresentative": "Manage\nRepresentative",
+  "manageRepresentative": "Manage Representative",
   "@manageRepresentative": {
     "description": "Button text to manage a representative (dRep)"
   },
@@ -4249,8 +4266,12 @@
   "@verifyYourReviewerRegistration": {
     "description": "Title for the verify your reviewer registration section"
   },
-  "verifyYourReviewerRegistrationDescription": "• The review module has it’s own tool outside of the Catalyst App.\n• Don’t forget to confirm your registration by checking your email!",
-  "@verifyYourReviewerRegistrationDescription": {
+  "verifyYourReviewerRegistrationDescription1": "The review module has it’s own tool outside of the Catalyst App.\n• Don’t forget to confirm your registration by checking your email!",
+  "@verifyYourReviewerRegistrationDescription1": {
+    "description": "Description for the verify your reviewer registration section"
+  },
+  "verifyYourReviewerRegistrationDescription2": "Don’t forget to confirm your registration by checking your email!",
+  "@verifyYourReviewerRegistrationDescription2": {
     "description": "Description for the verify your reviewer registration section"
   },
   "view": "View",

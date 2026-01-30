@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -38,11 +39,15 @@ class HeadsUpBecomeReviewerHintCard extends StatelessWidget {
                 color: context.colors.textOnPrimaryLevel1,
               ),
             ),
-            Text(
-              context.l10n.verifyYourReviewerRegistrationDescription,
+            BulletList(
+              items: [
+                context.l10n.verifyYourReviewerRegistrationDescription1,
+                context.l10n.verifyYourReviewerRegistrationDescription2,
+              ],
               style: context.textTheme.bodySmall?.copyWith(
                 color: context.colors.textOnPrimaryLevel1,
               ),
+              spacing: 2,
             ),
           ],
         ),

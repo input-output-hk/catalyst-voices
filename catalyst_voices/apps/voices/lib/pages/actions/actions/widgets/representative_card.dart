@@ -47,7 +47,7 @@ class _ActionButton extends StatelessWidget {
   }
 
   void onTap(BuildContext context) {
-    unawaited(const BecomeReviewerRoute().push(context));
+    unawaited(const RepresentativeActionRoute().push(context));
   }
 }
 
