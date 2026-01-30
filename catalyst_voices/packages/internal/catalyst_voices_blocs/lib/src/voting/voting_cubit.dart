@@ -199,6 +199,25 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
+  void togglePhasesExpanded() {
+    final votingTimeline = state.votingTimeline;
+    if (votingTimeline == null) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        votingTimeline: Optional(
+          votingTimeline.copyWith(
+            titleViewModel: votingTimeline.titleViewModel.copyWith(
+              phasesExpanded: !votingTimeline.titleViewModel.phasesExpanded,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void updateSearchQuery(String query) {
     final asOptional = query.isEmpty ? const Optional<String>.empty() : Optional(query);
 
@@ -272,6 +291,25 @@ final class VotingCubit extends Cubit<VotingState>
     final votingPhase = _buildVotingPhase(campaign);
     final now = DateTimeExt.now();
     return votingPhase?.progress(now);
+  }
+
+  VotingTimelineProgressViewModel? _buildVotingTimeline(Campaign? campaign) {
+    final campaignTimeline = campaign?.timeline;
+    return campaignTimeline != null
+        ? VotingTimelineProgressViewModel.fromTimeline(campaignTimeline)
+        : null;
+  }
+
+  VotingTimelineDetailsViewModel? _buildVotingTimelineDetails(Campaign? campaign) {
+    final votingTimeline = _buildVotingTimeline(campaign);
+    final now = DateTimeExt.now();
+    final phasesExpanded = state.votingTimeline?.titleViewModel.phasesExpanded ?? true;
+    final isDelegator = state.isDelegator;
+    return votingTimeline?.progress(
+      now: now,
+      phasesExpanded: phasesExpanded,
+      isVotingDelegated: isDelegator,
+    );
   }
 
   void _dispatchState() {
@@ -378,24 +416,23 @@ final class VotingCubit extends Cubit<VotingState>
         ? VotingRoleViewModel.fromModel(votingRole)
         : const EmptyVotingRoleViewModel();
     final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
+    final votingTimelineDetailsViewModel = _buildVotingTimelineDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
 
-    final header = VotingHeaderData(
-      showCategoryPicker: votingPhaseViewModel?.status.isActive ?? false,
-      category: selectedCategory != null
-          ? VotingHeaderCategoryData.fromModel(selectedCategory)
-          : null,
-    );
+    final selectedCategoryHeaderData = selectedCategory != null
+        ? VotingHeaderCategoryData.fromModel(selectedCategory)
+        : null;
 
     final isDelegator = votingRole is AccountVotingRoleDelegator;
     final isVotingResultsOrTallyActive = campaign?.isVotingResultsOrTallyActive();
 
     return state.copyWith(
-      header: header,
+      selectedCategoryHeaderData: Optional(selectedCategoryHeaderData),
       fundNumber: Optional(fundNumber),
       votingRole: votingRoleViewModel,
       votingPhase: Optional(votingPhaseViewModel),
+      votingTimeline: Optional(votingTimelineDetailsViewModel),
       hasSearchQuery: hasSearchQuery,
       isDelegator: isDelegator,
       isVotingResultsOrTallyActive: isVotingResultsOrTallyActive,

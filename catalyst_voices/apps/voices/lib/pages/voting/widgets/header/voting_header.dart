@@ -8,14 +8,12 @@ class VotingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, VotingHeaderData>(
-      selector: (state) => state.header,
-      builder: (context, header) {
-        if (header.category == null) {
-          return VotingGeneralHeader(showCategoryPicker: header.showCategoryPicker);
-        } else {
-          return VotingCategoryHeader(category: header.category!);
-        }
+    return BlocSelector<VotingCubit, VotingState, VotingHeaderCategoryData?>(
+      selector: (state) => state.selectedCategoryHeaderData,
+      builder: (context, categoryHeaderData) {
+        return categoryHeaderData == null
+            ? const VotingGeneralHeader()
+            : VotingCategoryHeader(category: categoryHeaderData);
       },
     );
   }
