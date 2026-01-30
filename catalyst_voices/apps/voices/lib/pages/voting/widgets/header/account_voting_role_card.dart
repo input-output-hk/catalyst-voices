@@ -5,7 +5,7 @@ import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_learn_more_dialog.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_representative_total_power_card.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_representing_card.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_tooltip.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_popup_menu.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -111,7 +111,7 @@ class _IndividualVotingRoleCards extends StatelessWidget {
       label: Text(context.l10n.myVotingPower),
       value: Text(votingPower.amount.formattedWithSymbol),
       infoButton: AccountVotingRolePopupInfoButton(
-        menuBuilder: (context) => AccountVotingRoleTooltip(
+        menuBuilder: (context) => AccountVotingRolePopupMenu(
           title: context.l10n.votingPower,
           message: context.l10n.votingRoleIndividualPopupMessage,
           updatedAt: votingPower.updatedAt,

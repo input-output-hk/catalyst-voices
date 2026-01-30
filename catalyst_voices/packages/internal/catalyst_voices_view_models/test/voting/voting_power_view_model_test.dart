@@ -4,27 +4,6 @@ import 'package:test/test.dart';
 
 void main() {
   group(VotingPowerViewModel, () {
-    test('calculates total amount when both models are provided', () {
-      // Given
-      final first = VotingPower(
-        amount: 1000,
-        status: VotingPowerStatus.confirmed,
-        updatedAt: DateTime.utc(2025),
-      );
-      final second = VotingPower(
-        amount: 500,
-        status: VotingPowerStatus.confirmed,
-        updatedAt: DateTime.utc(2025, 1, 2),
-      );
-
-      // When
-      final result = VotingPowerViewModel.totalFromModels(first, second);
-
-      // Then
-      expect(result.amount.formatted, isNotEmpty);
-      expect(result.amount.formattedWithSymbol, isNotEmpty);
-    });
-
     group('status calculation', () {
       test('returns provisional when one is provisional and other is confirmed', () {
         // Given

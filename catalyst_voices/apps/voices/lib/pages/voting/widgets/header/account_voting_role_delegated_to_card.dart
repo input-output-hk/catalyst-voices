@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_tooltip.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_popup_menu.dart';
 import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -60,13 +60,14 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
               AccountVotingRolePopupInfoButton(
                 color: theme.colors.iconsBackground,
                 menuBuilder: (context) {
-                  return AccountVotingRoleTooltip(
+                  return AccountVotingRolePopupMenu(
                     title: context.l10n.delegation,
                     message: context.l10n.votingRoleDelegatedToPopupMessage,
                     updatedAt: votingPower.updatedAt,
                     status: votingPower.status,
                     onLearnMore: () {
                       // TODO(dt-iohk): define what to do when learn more is pressed
+                      // The design did not specify what should happen.
                     },
                   );
                 },
@@ -75,7 +76,9 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 16, bottom: 4),
                 child: _ArrowRightButton(
                   onTap: () {
-                    // TODO(dt-iohk): handle representatives button
+                    // TODO(dt-iohk): handle representatives button.
+                    // Probably navigating to the representatives page would
+                    // make sense, however the page doesn't exist yet.
                   },
                 ),
               ),

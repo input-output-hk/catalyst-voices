@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_learn_more_dialog.dart';
-import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_tooltip.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_popup_menu.dart';
 import 'package:catalyst_voices/widgets/text/voices_gradient_text.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -53,7 +53,7 @@ class AccountVotingRoleRepresentativeTotalPowerCard extends StatelessWidget {
       ),
       infoButton: AccountVotingRolePopupInfoButton(
         menuBuilder: (context) {
-          return AccountVotingRoleTooltip(
+          return AccountVotingRolePopupMenu(
             title: context.l10n.delegation,
             message: context.l10n.votingRoleDelegatedToPopupMessage,
             updatedAt: totalVotingPower.updatedAt,

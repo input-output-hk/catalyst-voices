@@ -2,12 +2,12 @@ import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_info_dialog.dart';
 import 'package:flutter/material.dart';
 
+/// A reusable dialog for display "Learn more" information about the voting role (power).
 class AccountVotingRoleLearnMoreDialog extends StatelessWidget {
   final String title;
   final String message;
 
-  const AccountVotingRoleLearnMoreDialog({
-    super.key,
+  const AccountVotingRoleLearnMoreDialog._({
     required this.title,
     required this.message,
   });
@@ -45,7 +45,7 @@ class AccountVotingRoleLearnMoreDialog extends StatelessWidget {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(name: '/voting/voting-role/learn-more'),
-      builder: (context) => AccountVotingRoleLearnMoreDialog(
+      builder: (context) => AccountVotingRoleLearnMoreDialog._(
         title: title,
         message: message,
       ),

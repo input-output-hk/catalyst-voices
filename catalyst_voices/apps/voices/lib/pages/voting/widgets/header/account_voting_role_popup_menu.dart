@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/menu/voices_raw_popup_menu.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -6,16 +7,18 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
+/// A popup menu designed to work with [AccountVotingRolePopupInfoButton].
+///
 // TODO(dt-iohk): design on figma included a wallet address,
 // icon and connection status, consider how to add it here.
-class AccountVotingRoleTooltip extends StatelessWidget {
+class AccountVotingRolePopupMenu extends StatelessWidget {
   final String title;
   final String message;
   final DateTime? updatedAt;
   final VotingPowerStatus? status;
   final VoidCallback onLearnMore;
 
-  const AccountVotingRoleTooltip({
+  const AccountVotingRolePopupMenu({
     super.key,
     required this.title,
     required this.message,
@@ -63,7 +66,7 @@ class AccountVotingRoleTooltip extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: _TooltipItem(
+                      child: _Item(
                         label: context.l10n.updated,
                         value: updatedAt != null
                             ? DateFormatter.formatDayMonthTime(updatedAt)
@@ -71,7 +74,7 @@ class AccountVotingRoleTooltip extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: _TooltipItem(
+                      child: _Item(
                         label: context.l10n.status,
                         value: status != null ? status.localizedName(context) : _formatEmpty(),
                       ),
@@ -98,11 +101,11 @@ class AccountVotingRoleTooltip extends StatelessWidget {
   String _formatEmpty() => '---';
 }
 
-class _TooltipItem extends StatelessWidget {
+class _Item extends StatelessWidget {
   final String label;
   final String value;
 
-  const _TooltipItem({
+  const _Item({
     required this.label,
     required this.value,
   });

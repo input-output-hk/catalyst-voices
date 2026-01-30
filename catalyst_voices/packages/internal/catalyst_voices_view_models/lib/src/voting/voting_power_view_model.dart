@@ -58,6 +58,10 @@ final class VotingPowerViewModel extends Equatable {
         : VotingPowerViewModel.fromModel(votingPower);
   }
 
+  /// Merges two voting powers into a total.
+  ///
+  /// The [status] is going to be provisional if any of the provided statuses is provisional.
+  /// The [updatedAt] is going to be the latest provided date.
   factory VotingPowerViewModel.totalFromModels(VotingPower? first, VotingPower? second) {
     final totalAmount = VotingPowerAmount.fromModel(
       (first?.amount ?? 0) + (second?.amount ?? 0),
