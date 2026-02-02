@@ -9,20 +9,20 @@ import 'package:flutter/material.dart';
 /// Call [VoicesDialog.show] with [VoicesInfoDialog] in order to show it.
 class VoicesInfoDialog extends StatelessWidget {
   final IconThemeData? iconThemeData;
-  final Widget icon;
+  final Widget? icon;
   final Widget title;
   final Widget message;
   final Widget? subMessage;
-  final Widget action;
+  final Widget? action;
 
   const VoicesInfoDialog({
     super.key,
     this.iconThemeData,
-    required this.icon,
+    this.icon,
     required this.title,
     required this.message,
     this.subMessage,
-    required this.action,
+    this.action,
   });
 
   @override
@@ -64,11 +64,13 @@ class VoicesInfoDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 36),
-                IconTheme(
-                  data: iconThemeData,
-                  child: icon,
-                ),
-                const SizedBox(height: 8),
+                if (icon case final icon?) ...[
+                  IconTheme(
+                    data: iconThemeData,
+                    child: icon,
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 DefaultTextStyle(
                   style: titleStyle,
                   maxLines: 1,
@@ -89,8 +91,10 @@ class VoicesInfoDialog extends StatelessWidget {
                     child: subMessage,
                   ),
                 ],
-                const SizedBox(height: 24),
-                action,
+                if (action case final action?) ...[
+                  const SizedBox(height: 24),
+                  action,
+                ],
                 const SizedBox(height: 20),
               ],
             ),

@@ -572,11 +572,11 @@ scanning the entire JSON document each time to filter or sort by a particular fi
    * This avoids having to search through raw JSON each time.
 
 **Flexible**: You can dynamically extract any fields you find valuable for quick look ups or queries without constantly
-modifying the schema.  
+modifying the schema.
 **Performance**: Frequent queries on a few fields do not require scanning large JSON documents, as the metadata can be indexed
 more efficiently.
 
-> **Note**  
+> **Note**
 > In SQLite, foreign key references are not enabled by default.
 > They must be enabled with `PRAGMA foreign_keys = ON`.
 
@@ -609,7 +609,7 @@ class Documents extends Table {
  IntColumn get createdAt => integer()();
  TextColumn get metadata => text().nullable()();
 
- @override    
+ @override
  Set<Column> get primaryKey => {idHi, idLo, verIdHi, verIdLo};
 
  @override
@@ -883,7 +883,8 @@ performed intelligently to maintain data consistency without compromising offlin
     * The ids of these document types can be used to pull the latest documents from the API when boot strapping the client and
     performing initial local caching operations.
     * A list of document types and specifications can be
-    found [here](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+    found in the
+    [signed document types documentation](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
 
 ### 8.9 Background Synchronisation (Optional)
 
@@ -915,7 +916,7 @@ performed intelligently to maintain data consistency without compromising offlin
 
 ### 9.1 Latest API Specification
 
-For the latest and most detailed API specification, refer to the following location:  
+For the latest and most detailed API specification, refer to the following location:
 [Updated API Specification](https://input-output-hk.github.io/catalyst-voices/api/cat-gateway/openapi-swagger/)
 
 ## 10 Out of Scope

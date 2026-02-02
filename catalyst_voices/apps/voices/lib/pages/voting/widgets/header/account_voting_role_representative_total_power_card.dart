@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_learn_more_dialog.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_popup_menu.dart';
 import 'package:catalyst_voices/widgets/text/voices_gradient_text.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -6,17 +10,15 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class AccountVotingRoleRepresentativeTotalPowerCard extends StatelessWidget {
-  final VotingPowerAmount totalVotingPower;
+  final VotingPowerViewModel totalVotingPower;
   final VotingPowerViewModel ownVotingPower;
   final VotingPowerViewModel delegatedVotingPower;
-  final VoidCallback onInfoTap;
 
   const AccountVotingRoleRepresentativeTotalPowerCard({
     super.key,
     required this.totalVotingPower,
     required this.ownVotingPower,
     required this.delegatedVotingPower,
-    required this.onInfoTap,
   });
 
   @override
@@ -31,7 +33,7 @@ class AccountVotingRoleRepresentativeTotalPowerCard extends StatelessWidget {
         spacing: 20,
         children: [
           VoicesGradientText(
-            totalVotingPower.formattedWithSymbol,
+            totalVotingPower.amount.formattedWithSymbol,
             gradient: LinearGradient(
               colors: [
                 theme.colorScheme.primary,
@@ -49,7 +51,25 @@ class AccountVotingRoleRepresentativeTotalPowerCard extends StatelessWidget {
           ),
         ],
       ),
-      onInfoTap: onInfoTap,
+      infoButton: AccountVotingRolePopupInfoButton(
+        menuBuilder: (context) {
+          return AccountVotingRolePopupMenu(
+            title: context.l10n.delegation,
+            message: context.l10n.votingRoleDelegatedToPopupMessage,
+            updatedAt: totalVotingPower.updatedAt,
+            status: totalVotingPower.status,
+            onLearnMore: () {
+              unawaited(
+                AccountVotingRoleLearnMoreDialog.show(
+                  context: context,
+                  title: context.l10n.votingRoleRepresentativeLearnMoreDialogTitle,
+                  message: context.l10n.votingRoleRepresentativeLearnMoreDialogMessage,
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
