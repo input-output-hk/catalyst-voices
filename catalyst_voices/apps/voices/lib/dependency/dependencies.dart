@@ -244,8 +244,9 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerFactory<RepresentativeActionCubit>(
         () => RepresentativeActionCubit(
-          get<VotingService>(),
+          get<RepresentativesService>(),
           get<CampaignService>(),
+          get<UserService>(),
         ),
       );
   }
