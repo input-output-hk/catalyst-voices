@@ -108,8 +108,7 @@ class _LeadingIcon extends StatelessWidget {
     required this.contributors,
   });
 
-  bool get _tooltipVisibility =>
-      contributors.isNotEmpty && ownership is CollaboratorProposalOwnership;
+  bool get _tooltipVisibility => !(contributors.length == 1 && contributors.first.isAuthor);
 
   @override
   Widget build(BuildContext context) {
