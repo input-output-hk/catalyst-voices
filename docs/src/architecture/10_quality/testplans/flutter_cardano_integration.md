@@ -98,16 +98,16 @@ User submit transactions
 
 ## Extensions
 
-| \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
-| --- | --------- | ----- | ---------------- | --------------- |
+| # | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
+|:---:|:---:|:---:|:---:|:---:|
 | 1   | Wallet extension installation success |  Start application, Download wallet chrome extension  | Displays message when Wallet extension is successfully installed | YES  |
 | 2   | Wallet extension installation failure |  Start application, Download wallet chrome extension  | Displays error message handling when Wallet extension installation fails | YES  |
 | 3   | Wallet extension detection |  Start application, Download wallet chrome extension | Displays message when the app correctly detects the presence of the Wallet extension | YES  |
 
 ## User actions
 
-| \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
-| --- | --------- | ----- | ---------------- | --------------- |
+| # | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
+|:---:|:---:|:---:|:---:|:---:|
 | 1   | User can retrieve his wallet details |  Start application, Download wallet chrome extension, Connect wallet extension in the application, Enable wallet  | Wallet details (balance, addresses, etc.) is correctly returned | YES  |
 | 2   | User can sign data | Connect the wallet as #1, sign data | No exceptions are thrown, VkeyWitness is valid | YES |
 | 3   | User can sign transactions | Connect the wallet as #1, sign transaction data | No exceptions are thrown, and in TransactionWitnessSet, atleast one VkeyWitness is present | YES |
@@ -118,8 +118,8 @@ User submit transactions
 
 ## Wallet
 
-| \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
-| --- | --------- | ----- | ---------------- | --------------- |
+| # | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
+|:---:|:---:|:---:|:---:|:---:|
 | 1   | Empty wallet list |  Start application, Download wallet chrome extension, Connect wallet extension in the application  | Displays empty message when no wallets are available | YES  |
 | 2   | Wallet enabling success |  Start application, Download wallet chrome extension, Connect wallet extension in the application, Enable wallet  | Displays message is displayed when enabling wallet success | YES  |
 | 3  | Wallet enabling failure |  Start application, Download wallet chrome extension, Connect wallet extension in the application, Enable wallet  | Error message is displayed when enabling wallet fails | YES  |
