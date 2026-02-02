@@ -40,6 +40,43 @@ class RepresentativeActionsInstructions extends StatelessWidget {
   }
 }
 
+class RepresentativeAdditionalActions extends StatelessWidget {
+  const RepresentativeAdditionalActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<
+      RepresentativeActionCubit,
+      RepresentativeActionState,
+      StepBackRepresentativeActionStep?
+    >(
+      selector: (state) {
+        return state.additionalStep;
+      },
+      builder: (context, stepDownAction) {
+        if (stepDownAction == null) {
+          return const SizedBox.shrink();
+        }
+        return VoicesInstructionsWithStepsCard(
+          title: Text(
+            context.l10n.additionalActions,
+            style: context.textTheme.titleSmall,
+          ),
+          steps: [
+            InstructionStep(
+              prefix: _PrefixIcon(stepDownAction),
+              prefixBackgroundColor: stepDownAction.prefixBackgroundColor(context),
+              suffix: _ActionButton(stepDownAction),
+              isActive: stepDownAction.active,
+              child: _RepresentativeStepInstructions(stepDownAction),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _ActionButton extends StatelessWidget {
   final RepresentativeActionStep step;
   const _ActionButton(this.step);
@@ -131,9 +168,9 @@ class _RepresentativeActionsInstructions extends StatelessWidget {
             (step) => InstructionStep(
               prefix: _PrefixIcon(step),
               prefixBackgroundColor: step.prefixBackgroundColor(context),
-              child: _RepresentativeStepInstructions(step),
               suffix: _ActionButton(step),
               isActive: step.active,
+              child: _RepresentativeStepInstructions(step),
             ),
           )
           .toList(),

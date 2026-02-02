@@ -85,17 +85,7 @@ final class RepresentativeActionCubit extends Cubit<RepresentativeActionState> {
     emit(
       state.copyWith(
         votingSnapshotDate: _cache.votingSnapshotDate,
-        // representativeActions: representativeSteps.representativeActions,
-        representativeActions: [
-          const RegistrationRepresentativeActionStep(active: true),
-          const RegistrationRepresentativeActionStep(active: false),
-          ProfileRepresentativeActionStep(
-            representativeDocumentId: SignedDocumentRef.generateFirstRef(),
-          ),
-          const MissingRepresentativeProfileActionStep(),
-          const SettingRepresentativeProfileLockActionStep(),
-          const StepBackRepresentativeActionStep(),
-        ],
+        representativeActions: representativeSteps.representativeActions,
         additionalStep: Optional(representativeSteps.additionalStep),
         registrationStatus: Optional(registrationStatus),
       ),

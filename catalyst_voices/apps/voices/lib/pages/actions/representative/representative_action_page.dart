@@ -42,6 +42,7 @@ class _RepresentativeActionContent extends StatelessWidget {
                 ActionsHeaderText(text: context.l10n.becomeReviewerActionHeaderText),
                 const RepresentativeRegistrationStatusCard(),
                 const RepresentativeActionsInstructions(),
+                const RepresentativeAdditionalActions(),
               ],
             ),
           ),
