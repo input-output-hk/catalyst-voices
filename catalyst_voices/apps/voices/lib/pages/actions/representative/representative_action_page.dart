@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/actions/actions_shell_page.dart';
 import 'package:catalyst_voices/pages/actions/representative/widgets/heads_up_representative_hint_card.dart';
-import 'package:catalyst_voices/pages/actions/representative/widgets/representative_actions_instructions.dart';
+import 'package:catalyst_voices/pages/actions/representative/widgets/representative_actions/additional_actions_card.dart';
+import 'package:catalyst_voices/pages/actions/representative/widgets/representative_actions/representative_actions_card.dart';
 import 'package:catalyst_voices/pages/actions/representative/widgets/representative_registration_status_card.dart';
 import 'package:catalyst_voices/pages/actions/widgets/actions_header_text.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
@@ -41,8 +42,8 @@ class _RepresentativeActionContent extends StatelessWidget {
               children: [
                 ActionsHeaderText(text: context.l10n.becomeReviewerActionHeaderText),
                 const RepresentativeRegistrationStatusCard(),
-                const RepresentativeActionsInstructions(),
-                const RepresentativeAdditionalActions(),
+                const RepresentativeActionsCard(),
+                const AdditionalActionsCard(),
               ],
             ),
           ),

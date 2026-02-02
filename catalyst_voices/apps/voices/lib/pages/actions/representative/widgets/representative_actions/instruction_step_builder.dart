@@ -6,76 +6,12 @@ import 'package:catalyst_voices/pages/account/verification_required_dialog.dart'
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
-import 'package:catalyst_voices/widgets/cards/voices_instructions_with_steps_card.dart';
 import 'package:catalyst_voices/widgets/text/published_on_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-
-class RepresentativeActionsInstructions extends StatelessWidget {
-  const RepresentativeActionsInstructions({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<
-      RepresentativeActionCubit,
-      RepresentativeActionState,
-      IterableData<List<RepresentativeActionStep>>
-    >(
-      selector: (state) {
-        return IterableData(state.representativeActions);
-      },
-      builder: (context, data) {
-        final steps = data.value;
-        return Offstage(
-          offstage: steps.isEmpty,
-          child: _RepresentativeActionsInstructions(
-            steps: steps,
-          ),
-        );
-      },
-    );
-  }
-}
-
-class RepresentativeAdditionalActions extends StatelessWidget {
-  const RepresentativeAdditionalActions({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<
-      RepresentativeActionCubit,
-      RepresentativeActionState,
-      StepBackRepresentativeActionStep?
-    >(
-      selector: (state) {
-        return state.additionalStep;
-      },
-      builder: (context, stepDownAction) {
-        if (stepDownAction == null) {
-          return const SizedBox.shrink();
-        }
-        return VoicesInstructionsWithStepsCard(
-          title: Text(
-            context.l10n.additionalActions,
-            style: context.textTheme.titleSmall,
-          ),
-          steps: [
-            InstructionStep(
-              prefix: _PrefixIcon(stepDownAction),
-              prefixBackgroundColor: stepDownAction.prefixBackgroundColor(context),
-              suffix: _ActionButton(stepDownAction),
-              isActive: stepDownAction.active,
-              child: _RepresentativeStepInstructions(stepDownAction),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
 
 class _ActionButton extends StatelessWidget {
   final RepresentativeActionStep step;
@@ -149,35 +85,6 @@ class _PrefixIcon extends StatelessWidget {
   }
 }
 
-class _RepresentativeActionsInstructions extends StatelessWidget {
-  final List<RepresentativeActionStep> steps;
-
-  const _RepresentativeActionsInstructions({
-    required this.steps,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesInstructionsWithStepsCard(
-      title: Text(
-        context.l10n.representativeActions,
-        style: context.textTheme.titleSmall,
-      ),
-      steps: steps
-          .map(
-            (step) => InstructionStep(
-              prefix: _PrefixIcon(step),
-              prefixBackgroundColor: step.prefixBackgroundColor(context),
-              suffix: _ActionButton(step),
-              isActive: step.active,
-              child: _RepresentativeStepInstructions(step),
-            ),
-          )
-          .toList(),
-    );
-  }
-}
-
 class _RepresentativeStepInstructions extends StatelessWidget {
   final RepresentativeActionStep step;
 
@@ -207,6 +114,8 @@ class _Subtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final publishedAt = step.publishedAt;
+
     return Row(
       spacing: 3,
       children: [
@@ -216,9 +125,9 @@ class _Subtitle extends StatelessWidget {
             width: 10,
             height: 10,
           ),
-        if (step is ProfileRepresentativeActionStep)
+        if (publishedAt != null)
           PublishedOnTimeText(
-            dateTime: (step as ProfileRepresentativeActionStep).updatedAt,
+            dateTime: publishedAt,
             showTimezone: true,
           ),
         Text(step.subtitle(context)),
@@ -239,6 +148,13 @@ extension on RepresentativeActionStep {
     return switch (this) {
       RegistrationRepresentativeActionStep() => VoicesAssets.icons.key,
       _ => VoicesAssets.icons.userGroup,
+    };
+  }
+
+  DateTime? get publishedAt {
+    return switch (this) {
+      ProfileRepresentativeActionStep(:final updatedAt) => updatedAt,
+      _ => null,
     };
   }
 
@@ -277,5 +193,23 @@ extension on RepresentativeActionStep {
       MissingRepresentativeProfileActionStep() ||
       SettingRepresentativeProfileLockActionStep() => context.l10n.representativeProfileStepTitle,
     };
+  }
+}
+
+/// Extension on [InstructionStep] that provides a factory constructor
+/// for creating instruction steps from [RepresentativeActionStep].
+extension InstructionStepFactory on InstructionStep {
+  /// Factory constructor that creates an [InstructionStep] from a [RepresentativeActionStep].
+  static InstructionStep fromRepresentativeActionStep(
+    RepresentativeActionStep step,
+    BuildContext context,
+  ) {
+    return InstructionStep(
+      prefix: _PrefixIcon(step),
+      prefixBackgroundColor: step.prefixBackgroundColor(context),
+      suffix: _ActionButton(step),
+      isActive: step.active,
+      child: _RepresentativeStepInstructions(step),
+    );
   }
 }
