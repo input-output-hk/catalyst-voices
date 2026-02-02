@@ -428,6 +428,15 @@
       }
     }
   },
+  "catalystFundNoCategories": "Catalyst Fund{fundNumber} Categories:",
+  "@catalystFundNoCategories": {
+    "description": "Used in category picker menu",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
+  },
   "catalystId": "Catalyst ID",
   "@catalystId": {
     "description": "Label of chip with account catalyst ID clearly describing content"
@@ -1032,6 +1041,10 @@
   "delegatedTo": "Delegated To",
   "@delegatedTo": {
     "description": "In the context of delegating a voting power to a representative."
+  },
+  "delegation": "Delegation",
+  "@delegation": {
+    "description": "The voting power delegation."
   },
   "delegationButton": "Delegation",
   "@delegationButton": {
@@ -4104,7 +4117,7 @@
   },
   "updated": "Updated",
   "@updated": {
-    "description": "A label when something was last updated."
+    "description": "A label for when something has been updated."
   },
   "upload": "Upload",
   "@upload": {
@@ -4424,6 +4437,50 @@
   "@votingResultsSubheader": {
     "description": "The subheader for voting results."
   },
+  "votingRoleDelegatedToPopupMessage": "Representatives refers to the number of community members you have delegated your voting power to.",
+  "@votingRoleDelegatedToPopupMessage": {
+    "description": "The popup menu message explaining what is the voting power delegation."
+  },
+  "votingRoleIndividualLearnMoreDialogMessage": "Your voting power in [Cardano] Catalyst is determined by the amount of [ADA] held in the wallet that you linked to your Catalyst Keychain during account setup. Even though your voting power is based on your holdings, there is no token locking or cost to participate.\n\nFor each vote cast during the voting period, your full voting power will be applied in favor of that proposal. Casting votes does not diminish your voting power, and you may vote on as many proposals as you like.\n\nPrior to the start of voting, your voting power may fluctuate as you buy, sell, and trade [ADA]. You will see this indicated by a “Provisional” status on your voting power.\n\nAt the start of voting, your voting power will be frozen, based on your holdings at a certain point in time. You will see this indicated by a “Confirmed” status on your voting power.",
+  "@votingRoleIndividualLearnMoreDialogMessage": {
+    "description": "The message for the individual voting power learn more dialog."
+  },
+  "votingRoleIndividualLearnMoreDialogTitle": "Direct Voters - My Voting Power",
+  "@votingRoleIndividualLearnMoreDialogTitle": {
+    "description": "The title for the individual voting power learn more dialog."
+  },
+  "votingRoleIndividualPopupMessage": "Voting Power refers to the amount of influence you have during voting, based on the amount of ADA held in your wallet.",
+  "@votingRoleIndividualPopupMessage": {
+    "description": "The popup menu message explaining the individual voting power."
+  },
+  "votingRoleMyDelegatedPowerLearnMoreDialogMessage": "Your delegated voting power in [Cardano] Catalyst is determined by the amount of [ADA] held in the wallet that you linked to your Catalyst Keychain during account setup. Even though your delegated voting power is based on your holdings, there is no token locking or cost to participate.\n\nFor each vote cast by your selected Representative, your full voting power will be applied i favor of that proposal, in addition to the voting power of all other users that have delegated voting power to that Representative.\n\nIf you have delegated to more than one Representative, your total voting power will be evenly split among them, and applied in the way described above.\n\nPrior to the start of voting, your delegated voting power may fluctuate as buy, sell, and trade [ADA]. You will see this indicated by a “Provisional” status on your voting power.\n\nAt the start of voting, your delegated voting power will be frozen, based on your holdings at a certain point in time. You will see this indicated by a “Confirmed” status on your voting power.",
+  "@votingRoleMyDelegatedPowerLearnMoreDialogMessage": {
+    "description": "The message for the my delegated voting power learn more dialog."
+  },
+  "votingRoleMyDelegatedPowerLearnMoreDialogTitle": "Delegators - My (Delegated) Voting Power",
+  "@votingRoleMyDelegatedPowerLearnMoreDialogTitle": {
+    "description": "The title for the my delegated voting power learn more dialog."
+  },
+  "votingRoleRepresentativeLearnMoreDialogMessage": "As a [Cardano] Representative, your total voting power in [Cardano] Catalyst is determined by the total ADA holdings across your own wallet that you linked to your Catalyst Keychain during account setup, as well as those of your delegators.\n\nFor each vote cast during the voting period, your full voting power will be applied in favor of that proposal. Casting votes does not diminish your voting power, and you may vote on as many proposals as you like.\n\nPrior to the start of voting, your voting power may fluctuate as you or your delegators buy, sell, and trade [ADA]. You will see this indicated by a “Provisional” status on your voting power.\n\nAt the start of voting, your total voting power will be frozen, based on your holdings, as well as those of your delegators, at a certain point in time. You will see this indicated by a “Confirmed” status on your total voting power.",
+  "@votingRoleRepresentativeLearnMoreDialogMessage": {
+    "description": "The message for the voting power learn more dialog."
+  },
+  "votingRoleRepresentativeLearnMoreDialogTitle": "Dreps - Total Voting Power",
+  "@votingRoleRepresentativeLearnMoreDialogTitle": {
+    "description": "The title for the voting power learn more dialog."
+  },
+  "votingRoleRepresentingLearnMoreDialogMessage": "As a [Cardano] Representative, your total voting power in [Cardano] Catalyst is determined by your own holdings and those of all your delegators.\n\nThis number represents the unique number of [Cardano] holders that have chosen to delegate their voting power to you. Decide responsibly!\n\nPrior to the start of voting, your delegation count may fluctuate as delegators lock in their final selections. You will see this indicated by a “Provisional” status on your delegations.\n\nAt the start of voting, your delegation count will be frozen as delegators lock in their choices. You will see this indicated by a “Confirmed” status on your delegation count.",
+  "@votingRoleRepresentingLearnMoreDialogMessage": {
+    "description": "The message for the voting power learn more dialog."
+  },
+  "votingRoleRepresentingLearnMoreDialogTitle": "Dreps - Representing",
+  "@votingRoleRepresentingLearnMoreDialogTitle": {
+    "description": "The title for the voting power learn more dialog."
+  },
+  "votingRoleRepresentingPopupMessage": "Delegates refers to the number of community members that have delegated their voting power to you.",
+  "@votingRoleRepresentingPopupMessage": {
+    "description": "The popup menu message explaining what is the voting power delegation representation."
+  },
   "votingStarts": "Voting starts",
   "@votingStarts": {
     "description": "Label when the voting phase starts."
@@ -4441,9 +4498,171 @@
   "@votingStatus": {
     "description": "Text shown in voting status section"
   },
+  "votingTimeline": "Voting Timeline · {phase}",
+  "@votingTimeline": {
+    "description": "Header for the voting timeline section",
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineDelegated": "Voting Delegated",
+  "@votingTimelineDelegated": {
+    "description": "Label for delegated voting phase"
+  },
+  "votingTimelineDrop": "Drop:",
+  "@votingTimelineDrop": {
+    "description": "Label for the results drop date"
+  },
+  "votingTimelineEnded": "Ended",
+  "@votingTimelineEnded": {
+    "description": "Text showing when a phase ended"
+  },
+  "votingTimelineEndedXDaysAgo": "{days} {days, plural, =1{day} other{days}} ago",
+  "@votingTimelineEndedXDaysAgo": {
+    "description": "Text showing how many days ago a phase ended",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "votingTimelineFinishes": "Finishes:",
+  "@votingTimelineFinishes": {
+    "description": "Label for the end date of a voting phase"
+  },
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
+  },
+  "votingTimelineHideEvents": "Hide Events",
+  "@votingTimelineHideEvents": {
+    "description": "Button text to hide the voting timeline phase cards"
+  },
+  "votingTimelineLive": "LIVE",
+  "@votingTimelineLive": {
+    "description": "Badge text for the currently active voting phase"
+  },
+  "votingTimelineNewFundComingSoon": "New Fund Coming Soon!",
+  "@votingTimelineNewFundComingSoon": {
+    "description": "Label for new fund coming soon"
+  },
+  "votingTimelinePreVoting": "Pre-Voting",
+  "@votingTimelinePreVoting": {
+    "description": "Label for the pre-voting (registration) phase in the voting timeline"
+  },
+  "votingTimelinePreVotingDescription": "Now is the time to get prepared for voting! Top up your wallet, check out representatives and be ready!",
+  "@votingTimelinePreVotingDescription": {
+    "description": "Description for the pre-voting phase"
+  },
+  "votingTimelinePreVotingWindow": "Pre-voting window:",
+  "@votingTimelinePreVotingWindow": {
+    "description": "Label for the pre-voting date window section"
+  },
+  "votingTimelineResults": "Results",
+  "@votingTimelineResults": {
+    "description": "Label for results announcement phase"
+  },
+  "votingTimelineResultsDescription": "The results are in! Check out the final report to see which proposals won funding and see what’s next for the community.",
+  "@votingTimelineResultsDescription": {
+    "description": "Description for the results phase"
+  },
+  "votingTimelineResultsIn": "Results in {countdown}",
+  "@votingTimelineResultsIn": {
+    "description": "Countdown text showing when results starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineResultsLabel": "Results:",
+  "@votingTimelineResultsLabel": {
+    "description": "Label for the results date section"
+  },
+  "votingTimelineSelectCategory": "Select Category",
+  "@votingTimelineSelectCategory": {
+    "description": "Button text to open category selection dropdown"
+  },
+  "votingTimelineShowEvents": "Show Events",
+  "@votingTimelineShowEvents": {
+    "description": "Button text to show the voting timeline phase cards"
+  },
+  "votingTimelineStarting": "Starting",
+  "@votingTimelineStarting": {
+    "description": "Text showing when a phase starts"
+  },
+  "votingTimelineStartingIn": "Starting in",
+  "@votingTimelineStartingIn": {
+    "description": "Text showing how many days until a phase starts"
+  },
+  "votingTimelineStartingInXDays": "{days} {days, plural, =1{day} other{days}}",
+  "@votingTimelineStartingInXDays": {
+    "description": "Text showing how many days until a phase starts",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "votingTimelineStarts": "Starts:",
+  "@votingTimelineStarts": {
+    "description": "Label for the start date of a voting phase"
+  },
+  "votingTimelineTally": "Tally",
+  "@votingTimelineTally": {
+    "description": "Label for vote tallying phase"
+  },
+  "votingTimelineTallyDescription": "Voting is closed and results are being tallied. Stay tuned for the results announcement to see which proposals won funding.",
+  "@votingTimelineTallyDescription": {
+    "description": "Description for the tally phase"
+  },
+  "votingTimelineTallyIn": "Tally in {countdown}",
+  "@votingTimelineTallyIn": {
+    "description": "Countdown text showing when tally starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineTallyWindow": "Tally window:",
+  "@votingTimelineTallyWindow": {
+    "description": "Label for the tally date window section"
+  },
+  "votingTimelineToBeAnnounced": "To be announced",
+  "@votingTimelineToBeAnnounced": {
+    "description": "Text shown when voting timeline phase dates are not yet available"
+  },
+  "votingTimelineVoting": "Voting",
+  "@votingTimelineVoting": {
+    "description": "Label for active voting phase"
+  },
+  "votingTimelineVotingDelegatedDescription": "Voting is live! You delegated your vote, so you won’t be able to participate directly.",
+  "@votingTimelineVotingDelegatedDescription": {
+    "description": "Description for the voting delegated phase"
+  },
+  "votingTimelineVotingDescription": "Ready, set, vote! Cast votes and support your favourite proposals to boost their funding chances from the treasury.",
+  "@votingTimelineVotingDescription": {
+    "description": "Description for the voting phase"
+  },
+  "votingTimelineVotingIn": "Voting in {countdown}",
+  "@votingTimelineVotingIn": {
+    "description": "Countdown text showing when voting starts",
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "votingTimelineVotingPowerSnapshot": "Voting Power Snapshot",
+  "@votingTimelineVotingPowerSnapshot": {
+    "description": "Label for the voting power snapshot deadline"
+  },
+  "votingTimelineVotingWindow": "Voting window:",
+  "@votingTimelineVotingWindow": {
+    "description": "Label for the voting date window section"
   },
   "walletAccountDetailsTitle": "Catalyst Account",
   "@walletAccountDetailsTitle": {
