@@ -5,6 +5,17 @@ import json
 from pathlib import Path
 from typing import Any
 
+# Load .env file if it exists (for local development)
+env_file = Path(__file__).resolve().parent / ".env"
+if env_file.exists():
+    with open(env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, value = line.split("=", 1)
+                if key not in os.environ:  # Don't override existing env vars
+                    os.environ[key] = value
+
 from catalyst_python.admin import AdminKey
 from catalyst_python.ed25519 import Ed25519Keys
 from catalyst_python.catalyst_ffi import (
@@ -67,6 +78,8 @@ def setup_fund(env: str):
     timeout = settings["timeout"]
 
     docs_to_publish = []
+    # Collect category UUIDs to print at the end for easy copying
+    category_uuids = []
 
     brand_parameters_form_template_settings = settings["brand"][
         "parameters_form_template"
@@ -150,6 +163,8 @@ def setup_fund(env: str):
                 id=None,
             )
             docs_to_publish.append(category_parameters)
+            # Collect category UUID for printing at the end
+            category_uuids.append(category_parameters.id())
 
             proposal_form_template_settings = category["proposal_form_template"]
             proposal_form_template = proposal_form_template_doc(
@@ -186,6 +201,25 @@ def setup_fund(env: str):
             doc=doc,
             token=admin.auth_token(),
         )
+
+    # Output category UUIDs to .env file for dart-define
+    if category_uuids:
+        env_file = file_dir.parent / "catalyst_voices" / "apps" / "voices" / ".env"
+        env_content = "\n".join(
+            f"FUND_CATEGORY_{i}={uuid}" for i, uuid in enumerate(category_uuids)
+        )
+        env_file.write_text(env_content + "\n")
+        
+        print("\n" + "=" * 60)
+        print(f"Category UUIDs written to: {env_file}")
+        print("=" * 60)
+        for i, uuid in enumerate(category_uuids):
+            print(f"  FUND_CATEGORY_{i}={uuid}")
+        print("=" * 60)
+        print("\nNow rebuild voices with:")
+        print("  cd catalyst_voices/apps/voices/e2e_tests")
+        print("  just rebuild-voices")
+        print("=" * 60 + "\n")
 
 
 parser = argparse.ArgumentParser(description="Catalyst Signed Document importer.")

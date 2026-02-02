@@ -1,0 +1,68 @@
+{
+  "url": "http://localhost:3030/api/v1/document",
+  "timeout": 10,
+  "network": "preprod",
+  "admin_private_key_env": "CAT_GATEWAY_ADMIN_PRIVATE_KEY",
+  "brand": {
+    "parameters_form_template": {
+      "path": "brand_parameters_form_template.json"
+    },
+    "parameters": {
+      "path": "brand_parameters.json"
+    },
+    "campaigns": [
+      {
+        "parameters_form_template": {
+          "path": "campaign_parameters_form_template.json"
+        },
+        "parameters": {
+          "path": "campaign_parameters.json"
+        },
+        "categories": [
+          {
+            "parameters_form_template": {
+              "path": "categories/category_parameters_form_template_1.json"
+            },
+            "parameters": {
+              "path": "categories/category_parameters_1.json"
+            },
+            "proposal_form_template": {
+              "path": "categories/proposal_form_template_1.json"
+            },
+            "proposal_comment_form_template": {
+              "path": "categories/proposal_comment_form_template_1.json"
+            }
+          },
+          {
+            "parameters_form_template": {
+              "path": "categories/category_parameters_form_template_1.json"
+            },
+            "parameters": {
+              "path": "categories/category_parameters_1.json"
+            },
+            "proposal_form_template": {
+              "path": "categories/proposal_form_template_1.json"
+            },
+            "proposal_comment_form_template": {
+              "path": "categories/proposal_comment_form_template_1.json"
+            }
+          },
+          {
+            "parameters_form_template": {
+              "path": "categories/category_parameters_form_template_1.json"
+            },
+            "parameters": {
+              "path": "categories/category_parameters_1.json"
+            },
+            "proposal_form_template": {
+              "path": "categories/proposal_form_template_1.json"
+            },
+            "proposal_comment_form_template": {
+              "path": "categories/proposal_comment_form_template_1.json"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

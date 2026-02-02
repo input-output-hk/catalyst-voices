@@ -28,7 +28,34 @@ docker:
 
     SAVE IMAGE ${container}:${tag}
 
-# Build all required images for E2E testing
+# Build infrastructure images (everything except voices)
+# Use this first, then run setup_fund.py to get UUIDs, then build voices separately
+infra-images:
+    FROM scratch
+    
+    # Build gateway and its dependencies
+    BUILD ../../../../catalyst-gateway+docker
+    BUILD ../../../../catalyst-gateway/event-db+docker
+    
+    # Build reviews mock server
+    BUILD ../../../../utilities/reviews-mock-server+docker
+    
+    # Build E2E test runner
+    BUILD +docker
+
+# Build voices image with optional category UUIDs
+voices-image:
+    ARG FUND_CATEGORY_0=""
+    ARG FUND_CATEGORY_1=""
+    ARG FUND_CATEGORY_2=""
+    
+    BUILD ../../../+docker --UPLOAD_DEBUG_SYMBOLS=false \
+        --FUND_CATEGORY_0=$FUND_CATEGORY_0 \
+        --FUND_CATEGORY_1=$FUND_CATEGORY_1 \
+        --FUND_CATEGORY_2=$FUND_CATEGORY_2
+
+# Build all required images for E2E testing (voices uses default UUIDs)
+# For e2e with dynamic UUIDs, use: infra-images -> setup-docs -> voices-image
 all-images:
     FROM scratch
     

@@ -1,0 +1,112 @@
+#!/usr/bin/env just --justfile
+# E2E Test Automation for Catalyst Voices
+# cspell: words justfile
+
+# Path to the .env file with category UUIDs
+env_file := "../.env"
+
+default:
+    @just --list --unsorted
+
+# Build infrastructure images (gateway, event-db, mock server, test runner)
+# Does NOT build voices - use build-voices after setup-docs
+build-infra:
+    @echo "Building infrastructure images (excluding voices)..."
+    earthly +infra-images
+
+# Build voices image with category UUIDs from .env
+build-voices:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    
+    # Read category UUIDs from .env file
+    if [ -f "{{env_file}}" ]; then
+        source "{{env_file}}"
+        echo "Building voices with category UUIDs from {{env_file}}:"
+        echo "  FUND_CATEGORY_0=${FUND_CATEGORY_0:-<not set>}"
+        echo "  FUND_CATEGORY_1=${FUND_CATEGORY_1:-<not set>}"
+        echo "  FUND_CATEGORY_2=${FUND_CATEGORY_2:-<not set>}"
+        
+        earthly +voices-image \
+            --FUND_CATEGORY_0="${FUND_CATEGORY_0:-}" \
+            --FUND_CATEGORY_1="${FUND_CATEGORY_1:-}" \
+            --FUND_CATEGORY_2="${FUND_CATEGORY_2:-}"
+    else
+        echo "No .env file found at {{env_file}}, using default UUIDs"
+        earthly +voices-image
+    fi
+
+# Build all Docker images (voices uses default UUIDs)
+# For dynamic UUIDs, use: build-infra -> start -> setup-docs -> build-voices
+build-all:
+    earthly +all-images
+
+# Start the infrastructure (databases, gateway, nginx - but NOT voices yet)
+start-infra:
+    docker compose up -d cat-gateway config-init reviews-mock-server
+    @echo "Waiting for gateway to be healthy..."
+    @sleep 15
+    @echo "Infrastructure started. Gateway available at http://localhost:3030"
+
+# Start everything including voices and nginx
+start:
+    docker compose up -d nginx
+    @echo "Waiting for services to be healthy..."
+    @sleep 5
+    @echo "All services started."
+
+# Stop all containers
+stop:
+    docker compose down
+
+# Stop all containers and remove volumes (clean slate)
+clean:
+    docker compose down -v
+
+# Run the document setup script (outputs UUIDs to .env)
+setup-docs:
+    @echo "Running document setup..."
+    cd ../../../../signed_docs && uv run setup_fund.py local
+    @echo ""
+    @echo "Category UUIDs saved to: {{env_file}}"
+
+# Restart only the voices container with the new image
+restart-voices:
+    docker compose up -d --force-recreate cat-voices nginx
+
+# ============================================================
+# ONE-COMMAND SOLUTIONS
+# ============================================================
+
+# Full e2e setup (optimized - builds voices only once with correct UUIDs)
+e2e-setup: build-infra start-infra setup-docs build-voices start
+    @echo ""
+    @echo "============================================================"
+    @echo "E2E environment is ready!"
+    @echo "Frontend: http://localhost:80"
+    @echo "Gateway:  http://localhost:3030"
+    @echo "============================================================"
+
+# Quick refresh: update docs and rebuild voices (when infra already running)
+refresh: setup-docs build-voices restart-voices
+    @echo "Voices container refreshed with new UUIDs"
+
+# ============================================================
+# UTILITIES
+# ============================================================
+
+# View logs from all containers
+logs:
+    docker compose logs -f
+
+# View logs from a specific container
+logs-service service:
+    docker compose logs -f {{service}}
+
+# Run the e2e tests
+test:
+    docker compose up e2e-test-runner
+
+# Check container status
+status:
+    docker compose ps

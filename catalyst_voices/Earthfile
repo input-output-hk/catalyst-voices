@@ -102,8 +102,25 @@ build-web:
     ARG WORKDIR=/frontend/apps/voices
     ARG UPLOAD_DEBUG_SYMBOLS=false
     ARG tag='latest'
+    # Category UUIDs for FX campaign (used in e2e tests)
+    # These can be overridden by passing --FUND_CATEGORY_0=<uuid> etc.
+    ARG FUND_CATEGORY_0=""
+    ARG FUND_CATEGORY_1=""
+    ARG FUND_CATEGORY_2=""
 
     DO +PARSE_BUILD_ARGS --tag=$tag
+
+    # Build dart-define flags if category UUIDs are provided
+    LET DART_DEFINES=""
+    IF [ -n "$FUND_CATEGORY_0" ]
+        SET DART_DEFINES="--dart-define=FUND_CATEGORY_0=$FUND_CATEGORY_0"
+    END
+    IF [ -n "$FUND_CATEGORY_1" ]
+        SET DART_DEFINES="$DART_DEFINES --dart-define=FUND_CATEGORY_1=$FUND_CATEGORY_1"
+    END
+    IF [ -n "$FUND_CATEGORY_2" ]
+        SET DART_DEFINES="$DART_DEFINES --dart-define=FUND_CATEGORY_2=$FUND_CATEGORY_2"
+    END
 
     DO flutter-ci+BUILD_WEB \
         --WORKDIR=$WORKDIR \
@@ -114,7 +131,8 @@ build-web:
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
         --SENTRY_PROJECT='catalyst-voices' \
-        --WASM=true
+        --WASM=true \
+        --EXTRA_BUILD_ARGS="$DART_DEFINES"
 
     # Version web assets with content-based MD5 hashes for cache busting
     RUN dart run /frontend/scripts/version_web_assets/version_web_assets.dart --build-dir=$WORKDIR/build/web --wasm=true
@@ -127,11 +145,14 @@ package:
     FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
     ARG tag='latest'
     ARG UPLOAD_DEBUG_SYMBOLS=false
+    ARG FUND_CATEGORY_0=""
+    ARG FUND_CATEGORY_1=""
+    ARG FUND_CATEGORY_2=""
 
     IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
-        COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true --tag=$tag) /app
+        COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true --tag=$tag --FUND_CATEGORY_0=$FUND_CATEGORY_0 --FUND_CATEGORY_1=$FUND_CATEGORY_1 --FUND_CATEGORY_2=$FUND_CATEGORY_2) /app
     ELSE
-        COPY --keep-ts +build-web/web /app
+        COPY --keep-ts (+build-web/web --FUND_CATEGORY_0=$FUND_CATEGORY_0 --FUND_CATEGORY_1=$FUND_CATEGORY_1 --FUND_CATEGORY_2=$FUND_CATEGORY_2) /app
     END
 
     # Note this is only used for local development, a different Caddyfile is
@@ -147,8 +168,11 @@ docker:
    ARG container="voices"
    ARG tag="latest"
    ARG UPLOAD_DEBUG_SYMBOLS=true
+   ARG FUND_CATEGORY_0=""
+   ARG FUND_CATEGORY_1=""
+   ARG FUND_CATEGORY_2=""
 
-   FROM +package --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS --tag=$tag
+   FROM +package --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS --tag=$tag --FUND_CATEGORY_0=$FUND_CATEGORY_0 --FUND_CATEGORY_1=$FUND_CATEGORY_1 --FUND_CATEGORY_2=$FUND_CATEGORY_2
 
    SAVE IMAGE ${container}:${tag}
 
