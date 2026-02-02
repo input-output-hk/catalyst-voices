@@ -58,6 +58,45 @@ final class VotingPowerViewModel extends Equatable {
         : VotingPowerViewModel.fromModel(votingPower);
   }
 
+  /// Merges two voting powers into a total.
+  ///
+  /// The [status] is going to be provisional if any of the provided statuses is provisional.
+  /// The [updatedAt] is going to be the earliest provided date.
+  factory VotingPowerViewModel.totalFromModels(VotingPower? first, VotingPower? second) {
+    final totalAmount = VotingPowerAmount.fromModel(
+      (first?.amount ?? 0) + (second?.amount ?? 0),
+    );
+
+    final VotingPowerStatus? totalStatus;
+    final DateTime? totalUpdatedAt;
+    if (first != null && second != null) {
+      // If any of the statuses is provisional then total status is provisional too
+      totalStatus = [first.status, second.status].contains(VotingPowerStatus.provisional)
+          ? VotingPowerStatus.provisional
+          : VotingPowerStatus.confirmed;
+
+      // Updated at is the latest date
+      totalUpdatedAt = first.updatedAt.isBefore(second.updatedAt)
+          ? first.updatedAt
+          : second.updatedAt;
+    } else if (first != null) {
+      totalStatus = first.status;
+      totalUpdatedAt = first.updatedAt;
+    } else if (second != null) {
+      totalStatus = second.status;
+      totalUpdatedAt = second.updatedAt;
+    } else {
+      totalStatus = null;
+      totalUpdatedAt = null;
+    }
+
+    return VotingPowerViewModel(
+      amount: totalAmount,
+      status: totalStatus,
+      updatedAt: totalUpdatedAt,
+    );
+  }
+
   @override
   List<Object?> get props => [amount, status, updatedAt];
 }

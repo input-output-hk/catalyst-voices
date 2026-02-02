@@ -7,7 +7,7 @@ icon: material/format-list-group-plus
 <!-- See: https://docs.arc42.org/section-12/ -->
 
 | Term | Definition |
-|---|---|
+| --- | --- |
 | Catalyst Voices | Client applications and supporting code for Catalyst proposal and voting. |
 | Catalyst Gateway | Rust backend service providing APIs, validation, and data access. |
 | Event | A time bounded Catalyst funding round or activity. |

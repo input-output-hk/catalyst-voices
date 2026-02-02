@@ -67,13 +67,13 @@ final class VotingRoleViewModelIndividual extends VotingRoleViewModel {
 
 /// See [AccountVotingRoleRepresentative].
 final class VotingRoleViewModelRepresentative extends VotingRoleViewModel {
-  final VotingPowerAmount totalVotingPower;
+  final VotingPowerViewModel totalVotingPower;
   final VotingPowerViewModel ownVotingPower;
   final VotingPowerViewModel delegatedVotingPower;
   final int delegatorsCount;
 
   const VotingRoleViewModelRepresentative({
-    this.totalVotingPower = const VotingPowerAmount.empty(),
+    this.totalVotingPower = const VotingPowerViewModel(),
     this.ownVotingPower = const VotingPowerViewModel(),
     this.delegatedVotingPower = const VotingPowerViewModel(),
     this.delegatorsCount = 0,
@@ -82,11 +82,13 @@ final class VotingRoleViewModelRepresentative extends VotingRoleViewModel {
   factory VotingRoleViewModelRepresentative.fromModel(AccountVotingRoleRepresentative model) {
     final ownVotingPower = model.votingPower.data?.own;
     final delegatedVotingPower = model.votingPower.data?.delegated;
+    final totalVotingPower = VotingPowerViewModel.totalFromModels(
+      ownVotingPower,
+      delegatedVotingPower,
+    );
 
     return VotingRoleViewModelRepresentative(
-      totalVotingPower: VotingPowerAmount.fromModel(
-        (ownVotingPower?.amount ?? 0) + (delegatedVotingPower?.amount ?? 0),
-      ),
+      totalVotingPower: totalVotingPower,
       ownVotingPower: ownVotingPower != null
           ? VotingPowerViewModel.fromModel(ownVotingPower)
           : const VotingPowerViewModel(),
