@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/src/representative/representative_action_steps_view_model.dart';
 import 'package:catalyst_voices_view_models/src/representative/representative_registration_status.dart';
 import 'package:equatable/equatable.dart';
 
@@ -41,11 +42,7 @@ sealed class RepresentativeActionStep extends Equatable {
   @override
   List<Object?> get props => [active];
 
-  static ({
-    List<RepresentativeActionStep> representativeActions,
-    StepBackRepresentativeActionStep? additionalStep,
-  })
-  steps({
+  static RepresentativeActionStepsViewModel steps({
     required RepresentativeRegistrationStatus registrationStatus,
     DocumentRef? representativeDocumentId,
   }) {
@@ -65,11 +62,12 @@ sealed class RepresentativeActionStep extends Equatable {
       RepresentativeRegistrationStatus.registered => const MissingRepresentativeProfileActionStep(),
     };
 
-    final stepBackStep = registrationStatus.isRegistered
-        ? const StepBackRepresentativeActionStep()
-        : null;
+    final stepBackStep = switch (registrationStatus) {
+      RepresentativeRegistrationStatus.notRegistered => null,
+      RepresentativeRegistrationStatus.registered => const StepBackRepresentativeActionStep(),
+    };
 
-    return (
+    return RepresentativeActionStepsViewModel(
       representativeActions: [
         ?registrationStep,
         profileStep,
