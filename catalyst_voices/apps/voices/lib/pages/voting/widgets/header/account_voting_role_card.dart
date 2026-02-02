@@ -76,10 +76,6 @@ class _DelegatorVotingRoleCards extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 12,
       children: [
-        AccountVotingRoleDelegatedToCard(
-          votingPower: votingPower,
-          representativesCount: representativesCount,
-        ),
         AccountVotingRoleInfoCard(
           label: Text(context.l10n.myDelegatedVotingPower),
           value: Text(votingPower.amount.formattedWithSymbol),
@@ -94,6 +90,10 @@ class _DelegatorVotingRoleCards extends StatelessWidget {
               );
             },
           ),
+        ),
+        AccountVotingRoleDelegatedToCard(
+          votingPower: votingPower,
+          representativesCount: representativesCount,
         ),
       ],
     );

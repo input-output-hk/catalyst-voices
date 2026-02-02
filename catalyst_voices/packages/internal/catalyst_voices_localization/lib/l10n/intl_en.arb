@@ -4457,6 +4457,10 @@
   "@votingRoleRepresentativeLearnMoreDialogTitle": {
     "description": "The title for the voting power learn more dialog."
   },
+  "votingRoleRepresentativePopupMessage": "Voting Power refers to the amount of influence you have during voting, based on the amount of ADA held in your wallet.",
+  "@votingRoleRepresentativePopupMessage": {
+    "description": "The popup menu message explaining the representative voting power."
+  },
   "votingRoleRepresentingLearnMoreDialogMessage": "As a [Cardano] Representative, your total voting power in [Cardano] Catalyst is determined by your own holdings and those of all your delegators.\n\nThis number represents the unique number of [Cardano] holders that have chosen to delegate their voting power to you. Decide responsibly!\n\nPrior to the start of voting, your delegation count may fluctuate as delegators lock in their final selections. You will see this indicated by a “Provisional” status on your delegations.\n\nAt the start of voting, your delegation count will be frozen as delegators lock in their choices. You will see this indicated by a “Confirmed” status on your delegation count.",
   "@votingRoleRepresentingLearnMoreDialogMessage": {
     "description": "The message for the voting power learn more dialog."
