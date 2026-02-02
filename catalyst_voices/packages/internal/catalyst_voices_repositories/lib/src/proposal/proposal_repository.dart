@@ -348,7 +348,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final updatedDocument = await _signedDocumentManager.signUpdatedDocument(
       artifact,
       buildMetadataUpdates: (metadata) {
-        final updatedDocumentId = metadata.id.fresh().toSignedDocumentRef();
+        final updatedDocumentId = metadata.id.nextVersion();
 
         final updatedCollaborators = metadata.collaborators
             ?.whereNot((e) => e.isSameAs(collaboratorId))
