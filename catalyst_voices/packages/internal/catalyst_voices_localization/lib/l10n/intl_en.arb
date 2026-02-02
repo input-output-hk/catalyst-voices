@@ -121,6 +121,10 @@
   "@addUrl": {
     "description": "Button text to add a URL"
   },
+  "additionalActions": "Additional actions",
+  "@additionalActions": {
+    "description": "Title for additional actions"
+  },
   "agree": "I Agree",
   "@agree": {
     "description": "Button text for confirming agreement"
@@ -3215,8 +3219,16 @@
   "@published": {
     "description": "Label indicating published status"
   },
-  "publishedOn": "Published on {date} at {time}",
+  "publishedOn": "Published {date}",
   "@publishedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "publishedOnAt": "Published on {date} at {time}",
+  "@publishedOnAt": {
     "placeholders": {
       "date": {
         "type": "String"
@@ -3345,6 +3357,14 @@
   "refresh": "Refresh",
   "@refresh": {
     "description": "Refresh button label"
+  },
+  "registerAsRepresentativeStepSubtitle": "Key not found · Play an expert role",
+  "@registerAsRepresentativeStepSubtitle": {
+    "description": "Subtitle for register as representative step"
+  },
+  "registerAsRepresentativeStepTitle": "Register as Representative",
+  "@registerAsRepresentativeStepTitle": {
+    "description": "Title for register as representative step"
   },
   "registerToVoteFund": "Register to Vote in Fund{fundNumber}",
   "@registerToVoteFund": {
@@ -3562,6 +3582,30 @@
   "representative": "Representative",
   "@representative": {
     "description": "representative account role"
+  },
+  "representativeActions": "Representative Actions",
+  "@representativeActions": {
+    "description": "Title for representative actions"
+  },
+  "representativeProfileLockStepSubtitle": "Step locked · Needs registration",
+  "@representativeProfileLockStepSubtitle": {
+    "description": "Subtitle for representative profile lock step"
+  },
+  "representativeProfileMissingStepSubtitle": "Not found · Create now!",
+  "@representativeProfileMissingStepSubtitle": {
+    "description": "Subtitle for representative profile missing step"
+  },
+  "representativeProfileStepTitle": "Representative Profile",
+  "@representativeProfileStepTitle": {
+    "description": "Title for representative profile step"
+  },
+  "representativeRegistrationFound": "Representative registration found",
+  "@representativeRegistrationFound": {
+    "description": "Status message when representative registration is found"
+  },
+  "representativeRegistrationNotFound": "Representative registration not found",
+  "@representativeRegistrationNotFound": {
+    "description": "Status message when representative registration is not found"
   },
   "representing": "Representing",
   "@representing": {
@@ -3950,6 +3994,14 @@
   "@stayInvolvedReviewerDescription": {
     "description": "Description for the reviewer cards in stay involved section"
   },
+  "stepBackFromRepresenting": "Step back from Representing",
+  "@stepBackFromRepresenting": {
+    "description": "Title for step back from representing"
+  },
+  "stepBackFromRepresentingSubtitle": "Caution · All data will be lost",
+  "@stepBackFromRepresentingSubtitle": {
+    "description": "Subtitle for step back from representing"
+  },
   "stepEdit": "Edit",
   "@stepEdit": {
     "description": "Button name in step"
@@ -4298,6 +4350,10 @@
   "viewLatestDocumentVersion": "View Latest",
   "@viewLatestDocumentVersion": {
     "description": "Action to change back to latest version"
+  },
+  "viewNowRepresentativeProfile": "· View now!",
+  "@viewNowRepresentativeProfile": {
+    "description": "Representative profile view now button"
   },
   "viewProposalComments": "View proposal comments",
   "@viewProposalComments": {
