@@ -107,8 +107,8 @@ class _IconContainer extends StatelessWidget {
       color: theme.colors.iconsBackground,
     );
 
-    return DecoratedBox(
-      // padding: const EdgeInsets.all(8),
+    return Container(
+      padding: iconPadding,
       decoration: BoxDecoration(
         color: iconBackgroundColor ?? theme.colorScheme.primary,
         borderRadius: BorderRadius.circular(8),

@@ -1050,7 +1050,7 @@
   "@defaultRole": {
     "description": "Related to account role"
   },
-  "delegateYourVotingPower": "Delegate your\nVoting Power",
+  "delegateYourVotingPower": "Delegate your Voting Power",
   "@delegateYourVotingPower": {
     "description": "Button text to delegate your voting power"
   },
