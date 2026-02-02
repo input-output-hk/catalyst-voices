@@ -80,7 +80,7 @@ final class VotingMockService implements VotingService {
     return Stream.periodic(
       const Duration(seconds: 30),
       (computationCount) {
-        return switch (3 & computationCount) {
+        return switch (computationCount % 3) {
           1 => AccountVotingRoleRepresentative(
             accountId: accountId,
             campaignId: campaignId,
