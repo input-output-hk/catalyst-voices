@@ -238,6 +238,7 @@ jobs:
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         env:
           API_TEST_MARKS: "health_endpoint"
+          CAT_GATEWAY_TEST_URL: "http://localhost:3030"
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
