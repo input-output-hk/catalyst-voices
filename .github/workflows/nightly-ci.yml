@@ -28,6 +28,115 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+#      - name: Free Disk Space (Ubuntu)
+#        uses: jlumbroso/free-disk-space@main
+#        with:
+#          # this might remove tools that are actually needed,
+#          # if set to "true" but frees about 6 GB
+#          tool-cache: false
+#          # all of these default to true, but feel free to set to
+#          # "false" if necessary for your workflow
+#          android: true
+#          dotnet: false
+#          haskell: false
+#          large-packages: false
+#          docker-images: false
+#          swap-storage: true
+
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        with:
+          enable_caching: "true"
+          version: 0.21.0
+
+#      - name: Setup
+#        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+#
+#      - name: Prepare artifacts
+#        id : images
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+#        with:
+#          command: run
+#          args: ./catalyst-gateway/tests/+all-images
+#
+#      - name: Spin up catalyst-gateway
+#        id: gateway-started
+#        if: ${{ steps.images.conclusion == 'success' }}
+#        run: |
+#          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+#
+#      - name: Wait for cat-gateway to become healthy
+#        id: gateway-healthy
+#        if: ${{ steps.gateway-started.conclusion == 'success' }}
+#        run: |
+#          echo "Waiting for container to be healthy..."
+#          for i in {1..500}; do
+#            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+#            echo "Health status: $STATUS"
+#            if [ "$STATUS" == "healthy" ]; then
+#              echo "Container is healthy!"
+#              break
+#            fi
+#            if [ "$STATUS" == "unhealthy" ]; then
+#              echo "Container became unhealthy."
+#              docker logs cat-gateway
+#              exit 1
+#            fi
+#            sleep 5
+#          done
+#
+#      - name: Schemathesis tests
+#        id: schemathesis-tests
+#        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+#        run: |
+#          export HYPOTHESIS_MAX_EXAMPLES=5000
+#          export MAX_RESPONSE_TIME=25000
+#          export HYPOTHESIS_DEADLINE=25000
+#          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
+#
+#      - name: Spin up catalyst-gateway with haproxy
+#        id: gateway-with-proxy-started
+#        env:
+#          EVENT_DB_URL: "haproxy:18080"
+#          INDEX_DB_URL: "haproxy:18090"
+#        run: |
+#          docker stop cat-gateway || true
+#          docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy --detach
+#          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+#
+#      - name: Wait for cat-gateway to become healthy
+#        id: gateway-with-proxy-healthy
+#        if: ${{ steps.gateway-with-proxy-started.conclusion == 'success' }}
+#        run: |
+#          echo "Waiting for container to be healthy..."
+#          for i in {1..500}; do
+#            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+#            echo "Health status: $STATUS"
+#            if [ "$STATUS" == "healthy" ]; then
+#              echo "Container is healthy!"
+#              break
+#            fi
+#            if [ "$STATUS" == "unhealthy" ]; then
+#              echo "Container became unhealthy."
+#              docker logs cat-gateway
+#              exit 1
+#            fi
+#            sleep 5
+#          done
+#
+#      - name: Integration health thru proxy tests
+#        if: ${{ steps.gateway-with-proxy-healthy.conclusion == 'success' }}
+#        env:
+#          API_TEST_MARKS: "health_with_proxy_endpoint"
+#        run: |
+#          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
+
+  tests_devnet:
+    name: nightly tests devnet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
@@ -59,11 +168,75 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+all-images
 
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.QA_REPO_SSH_KEY }}
+
+      - name: Prepare artifacts devnet
+        id: images-devnet
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+images-devnet
+
+      - name: Spin up devnet
+        if: ${{ steps.images-devnet.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
+
+      - name: Wait for cat-devnet to become healthy
+        id: devnet-check
+        run: |
+          DEVNET_HEALTHY="false"
+          echo "Waiting for container to be healthy ..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              DEVNET_HEALTHY="true"
+              echo "devnet_healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml stop cat-devnet 
+              echo "devnet_healthy=$DEVNET_HEALTHY" >> $GITHUB_OUTPUT
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Spin up devnet ... retry
+        if: steps.devnet-check.outputs.devnet_healthy == 'false'
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-devnet -d
+
+      - name: Wait for cat-devnet to become healthy ... retry
+        if: steps.devnet-check.outputs.devnet_healthy == 'false'
+        run: |
+          echo "Waiting for container to be healthy ... retry"
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              exit 0
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-devnet
+              exit 1
+            fi
+            sleep 5
+          done
+
       - name: Spin up catalyst-gateway
         id: gateway-started
-        if: ${{ steps.images.conclusion == 'success' }}
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up cat-gateway -d
 
       - name: Wait for cat-gateway to become healthy
         id: gateway-healthy
@@ -79,61 +252,20 @@ jobs:
             fi
             if [ "$STATUS" == "unhealthy" ]; then
               echo "Container became unhealthy."
-              docker logs cat-gateway
+              docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml logs cat-gateway
               exit 1
             fi
             sleep 5
           done
 
       - name: Schemathesis tests
-        id: schemathesis-tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         run: |
-          export HYPOTHESIS_MAX_EXAMPLES=5000
-          export MAX_RESPONSE_TIME=25000
-          export HYPOTHESIS_DEADLINE=25000
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
-
-      - name: Spin up catalyst-gateway with haproxy
-        id: gateway-with-proxy-started
-        env:
-          EVENT_DB_URL: "haproxy:18080"
-          INDEX_DB_URL: "haproxy:18090"
-        run: |
-          docker stop cat-gateway || true
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy --detach
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
-
-      - name: Wait for cat-gateway to become healthy
-        id: gateway-with-proxy-healthy
-        if: ${{ steps.gateway-with-proxy-started.conclusion == 'success' }}
-        run: |
-          echo "Waiting for container to be healthy..."
-          for i in {1..500}; do
-            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
-            echo "Health status: $STATUS"
-            if [ "$STATUS" == "healthy" ]; then
-              echo "Container is healthy!"
-              break
-            fi
-            if [ "$STATUS" == "unhealthy" ]; then
-              echo "Container became unhealthy."
-              docker logs cat-gateway
-              exit 1
-            fi
-            sleep 5
-          done
-
-      - name: Integration health thru proxy tests
-        if: ${{ steps.gateway-with-proxy-healthy.conclusion == 'success' }}
-        env:
-          API_TEST_MARKS: "health_with_proxy_endpoint"
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose-devnet.yml up schemathesis-runner --exit-code-from schemathesis-runner
 
   slack-notification:
-    needs: tests
-    if: ${{ always() && needs.tests.result == 'failure' }}
+    needs: [ tests, tests_devnet ]
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
     uses: input-output-hk/catalyst-ci/.github/workflows/qa-notify.yml@master
     with:
       failed_repo: ${{ github.repository }}
