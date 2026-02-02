@@ -9,6 +9,7 @@ final class VotingCubitCache extends Equatable {
   final ProposalsFiltersV2 filters;
   final VotingPageTab? tab;
   final CatalystId? activeAccountId;
+  final VoteType? voteType;
 
   const VotingCubitCache({
     this.campaign,
@@ -17,6 +18,7 @@ final class VotingCubitCache extends Equatable {
     this.filters = const ProposalsFiltersV2(),
     this.tab,
     this.activeAccountId,
+    this.voteType,
   });
 
   @override
@@ -27,6 +29,7 @@ final class VotingCubitCache extends Equatable {
     filters,
     tab,
     activeAccountId,
+    voteType,
   ];
 
   VotingCubitCache copyWith({
@@ -36,6 +39,7 @@ final class VotingCubitCache extends Equatable {
     ProposalsFiltersV2? filters,
     Optional<VotingPageTab>? tab,
     Optional<CatalystId>? activeAccountId,
+    Optional<VoteType>? voteType,
   }) {
     return VotingCubitCache(
       campaign: campaign.dataOr(this.campaign),
@@ -44,6 +48,7 @@ final class VotingCubitCache extends Equatable {
       filters: filters ?? this.filters,
       tab: tab.dataOr(this.tab),
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
+      voteType: voteType.dataOr(this.voteType),
     );
   }
 }

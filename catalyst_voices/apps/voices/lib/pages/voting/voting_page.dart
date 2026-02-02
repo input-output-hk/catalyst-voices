@@ -18,11 +18,13 @@ import 'package:rxdart/rxdart.dart';
 class VotingPage extends StatefulWidget {
   final String? categoryId;
   final VotingPageTab? tab;
+  final VoteType? voteType;
 
   const VotingPage({
     super.key,
     this.categoryId,
     this.tab,
+    this.voteType,
   });
 
   @override
@@ -46,6 +48,7 @@ class _VotingPageState extends State<VotingPage>
         content: VotingContent(
           tabController: _tabController,
           pagingController: _pagingController,
+          voteType: widget.voteType,
         ),
       ),
     );
@@ -57,10 +60,13 @@ class _VotingPageState extends State<VotingPage>
 
     final tab = widget.tab ?? VotingPageTab.total;
 
-    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
+    if (widget.categoryId != oldWidget.categoryId ||
+        widget.tab != oldWidget.tab ||
+        widget.voteType != oldWidget.voteType) {
       context.read<VotingCubit>().changeFilters(
         categoryId: Optional(widget.categoryId),
         tab: Optional(tab),
+        voteType: Optional(widget.voteType),
       );
 
       _doResetPagination();
@@ -86,6 +92,8 @@ class _VotingPageState extends State<VotingPage>
         _updateRoute(categoryId: Optional(to));
       case ChangeTabVotingSignal(:final tab):
         _updateRoute(tab: tab);
+      case ChangeVoteTypeFilterVotingSignal(:final voteType):
+        _updateRoute(voteType: Optional(voteType));
       case ResetPaginationVotingSignal():
         _doResetPagination();
       case PageReadyVotingSignal(:final page):
@@ -129,6 +137,7 @@ class _VotingPageState extends State<VotingPage>
       votingCubit.init(
         categoryId: widget.categoryId,
         tab: selectedTab,
+        voteType: widget.voteType,
       ),
     );
 
@@ -171,14 +180,17 @@ class _VotingPageState extends State<VotingPage>
   void _updateRoute({
     Optional<String>? categoryId,
     VotingPageTab? tab,
+    Optional<VoteType>? voteType,
   }) {
     Router.neglect(context, () {
       final effectiveCategoryId = categoryId.dataOr(widget.categoryId);
       final effectiveTab = tab?.name ?? widget.tab?.name;
+      final effectiveVoteType = voteType.dataOr(widget.voteType)?.name;
 
       VotingRoute(
         categoryId: effectiveCategoryId,
         tab: effectiveTab,
+        voteType: effectiveVoteType,
       ).replace(context);
     });
   }
