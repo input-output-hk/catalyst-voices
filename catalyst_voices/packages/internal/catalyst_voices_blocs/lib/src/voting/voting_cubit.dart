@@ -250,11 +250,15 @@ final class VotingCubit extends Cubit<VotingState>
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
         relationships: const {},
+        voteBy: const Optional.empty(),
+        voteType: const Optional.empty(),
       ),
       VotingPageTab.favorites => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional(true),
         relationships: const {},
+        voteBy: const Optional.empty(),
+        voteType: const Optional.empty(),
       ),
       VotingPageTab.myFinalProposals => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
@@ -262,6 +266,8 @@ final class VotingCubit extends Cubit<VotingState>
         relationships: {
           if (_cache.activeAccountId != null) OriginalAuthor(_cache.activeAccountId!),
         },
+        voteBy: const Optional.empty(),
+        voteType: const Optional.empty(),
       ),
       VotingPageTab.myVotes => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
