@@ -15,10 +15,13 @@ def is_live(timeout=60):
 
 
 def is_ready(timeout=60):
-    resp = poll(health.ready(), 204, timeout)
+    url = health.ready()  # Log/print this!
+    print(f"Polling {url} for 60s")  # Or logger.debug
+    resp = poll(url, 204, timeout)
+    if resp is None:
+        raise AssertionError(f"Poll timed out after {timeout}s on {url}. Check service startup/bind.")
     assert resp.status_code == 204, (
-        f"Service is expected to be ready: {resp.status_code} - {resp.text}\\n"
-        f"{resp.url}"
+        f"Expected 204: {resp.status_code} - {resp.text}\n{resp.url}"
     )
     logger.info("cat-gateway service is READY.")
 
