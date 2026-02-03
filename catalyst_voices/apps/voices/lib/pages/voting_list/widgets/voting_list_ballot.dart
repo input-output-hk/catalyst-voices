@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_tile.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_tile.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';

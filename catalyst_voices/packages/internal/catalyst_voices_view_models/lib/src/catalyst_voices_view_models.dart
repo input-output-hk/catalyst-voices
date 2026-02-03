@@ -99,6 +99,7 @@ export 'voting/vote_button_colors.dart';
 export 'voting/vote_button_data.dart';
 export 'voting/vote_type_data.dart';
 export 'voting/vote_type_view_model.dart';
+export 'voting/voting_ballot_builder_fab_view_model.dart';
 export 'voting/voting_list_campaign_phase_data.dart';
 export 'voting/voting_list_casting_step.dart';
 export 'voting/voting_list_footer_data.dart';

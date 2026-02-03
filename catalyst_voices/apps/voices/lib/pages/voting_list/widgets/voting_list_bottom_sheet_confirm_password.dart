@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_bottom_sheet.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_bottom_sheet.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_password_text_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
