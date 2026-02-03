@@ -20,6 +20,9 @@ class VoicesChip extends StatelessWidget {
   /// The radius of rounded corners of the chip.
   final BorderRadius borderRadius;
 
+  /// The color of the border.
+  final Color? borderColor;
+
   /// The internal padding from the widget borders to the internal content.
   final EdgeInsetsGeometry? padding;
 
@@ -34,6 +37,7 @@ class VoicesChip extends StatelessWidget {
     this.trailing,
     this.backgroundColor,
     required this.borderRadius,
+    this.borderColor,
     this.padding,
     this.onTap,
   });
@@ -46,6 +50,7 @@ class VoicesChip extends StatelessWidget {
     this.leading,
     this.trailing,
     this.backgroundColor,
+    this.borderColor,
     this.padding,
     this.onTap,
   }) : borderRadius = const BorderRadius.all(Radius.circular(8));
@@ -57,6 +62,7 @@ class VoicesChip extends StatelessWidget {
     this.leading,
     this.trailing,
     this.backgroundColor,
+    this.borderColor,
     this.padding,
     this.onTap,
   }) : borderRadius = const BorderRadius.all(Radius.circular(32));
@@ -90,7 +96,7 @@ class VoicesChip extends StatelessWidget {
         border: backgroundColor != null
             ? null
             : Border.all(
-                color: Theme.of(context).colors.outlineBorderVariant,
+                color: borderColor ?? Theme.of(context).colors.outlineBorderVariant,
               ),
         borderRadius: borderRadius,
       ),
