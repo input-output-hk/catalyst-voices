@@ -14,6 +14,7 @@ export 'proposal_creation_step.dart';
 export 'proposal_data.dart';
 export 'proposal_enums.dart';
 export 'proposal_forget_actions.dart';
+export 'proposal_invitation_status.dart';
 export 'proposal_model.dart';
 export 'proposal_or_document.dart';
 export 'proposal_version.dart';

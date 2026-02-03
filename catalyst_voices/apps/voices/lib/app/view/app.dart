@@ -68,6 +68,7 @@ class _AppState extends State<App> {
         lazy: false,
         create: (_) => Dependencies.instance.get<CampaignPhaseAwareCubit>(),
       ),
+      // Have to be global
       BlocProvider<VotingBallotBloc>(
         create: (_) => Dependencies.instance.get<VotingBallotBloc>(),
       ),

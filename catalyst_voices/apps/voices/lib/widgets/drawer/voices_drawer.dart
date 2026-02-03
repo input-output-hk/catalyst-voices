@@ -1,7 +1,5 @@
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices/widgets/containers/bottom_sheet_container.dart';
 import 'package:flutter/material.dart';
-
-const Duration _animDuration = Duration(milliseconds: 200);
 
 /// A custom [Drawer] component that implements the Voices style
 /// navigation drawer.
@@ -59,14 +57,11 @@ class VoicesDrawer extends StatefulWidget {
 }
 
 class VoicesDrawerState extends State<VoicesDrawer> {
-  bool _isBottomSheetOpen = false;
-
-  bool get isBottomSheetOpen => _isBottomSheetOpen;
+  final _bottomSheetController = BottomSheetContainerController();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bottomSheet = widget.bottomSheet;
 
     return Theme(
       data: theme.copyWith(
@@ -86,67 +81,36 @@ class VoicesDrawerState extends State<VoicesDrawer> {
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
-          child: Stack(
-            children: [
-              Drawer(
-                key: const Key('Drawer'),
-                width: widget.width,
-                child: Column(
-                  children: [
-                    Expanded(child: widget.child),
-                    if (widget.footer != null) widget.footer!,
-                  ],
-                ),
+          child: BottomSheetContainer(
+            bottomSheet: widget.bottomSheet,
+            controller: _bottomSheetController,
+            child: Drawer(
+              key: const Key('Drawer'),
+              width: widget.width,
+              child: Column(
+                children: [
+                  Expanded(child: widget.child),
+                  if (widget.footer != null) widget.footer!,
+                ],
               ),
-              Positioned.fill(
-                key: const Key('BottomSheetOverlay'),
-                child: AnimatedSwitcher(
-                  duration: _animDuration,
-                  child: (bottomSheet != null && _isBottomSheetOpen)
-                      ? const _BottomSheetOverlay()
-                      : null,
-                ),
-              ),
-              Positioned(
-                key: const Key('BottomSheet'),
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: AnimatedSwitcher(
-                  duration: _animDuration,
-                  child: Offstage(
-                    offstage: !_isBottomSheetOpen,
-                    child: bottomSheet,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
+  @override
+  void dispose() {
+    _bottomSheetController.dispose();
+    super.dispose();
+  }
+
   void hideBottomSheet() {
-    setState(() {
-      _isBottomSheetOpen = false;
-    });
+    _bottomSheetController.hide();
   }
 
   void showBottomSheet() {
-    setState(() {
-      _isBottomSheetOpen = true;
-    });
-  }
-}
-
-class _BottomSheetOverlay extends StatelessWidget {
-  const _BottomSheetOverlay();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colors.onSurfaceNeutral016.withAlpha(50),
-    );
+    _bottomSheetController.show();
   }
 }

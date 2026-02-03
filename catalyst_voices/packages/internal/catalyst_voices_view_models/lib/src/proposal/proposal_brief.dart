@@ -4,7 +4,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-class ProposalBrief extends Equatable {
+final class ProposalBrief extends Equatable {
   final DocumentRef id;
   final String title;
   final String categoryName;
@@ -19,6 +19,7 @@ class ProposalBrief extends Equatable {
   final bool isFavorite;
   final VoteButtonData? voteData;
   final List<ProposalDataCollaborator>? collaborators;
+  final bool votingEnabled;
 
   const ProposalBrief({
     required this.id,
@@ -35,9 +36,14 @@ class ProposalBrief extends Equatable {
     this.isFavorite = false,
     this.voteData,
     this.collaborators,
+    this.votingEnabled = false,
   });
 
-  factory ProposalBrief.fromData(ProposalBriefData data) {
+  factory ProposalBrief.fromData(
+    ProposalBriefData data, {
+    bool showVoteData = false,
+    bool votingEnabled = false,
+  }) {
     return ProposalBrief(
       id: data.id,
       title: data.title ?? '',
@@ -51,8 +57,9 @@ class ProposalBrief extends Equatable {
       updateDate: data.createdAt,
       commentsCount: data.commentsCount,
       isFavorite: data.isFavorite,
-      voteData: data.votes.toViewModel(),
+      voteData: showVoteData ? data.votes.toViewModel() : null,
       collaborators: data.collaborators,
+      votingEnabled: votingEnabled,
     );
   }
 
@@ -101,6 +108,7 @@ class ProposalBrief extends Equatable {
     isFavorite,
     voteData,
     collaborators,
+    votingEnabled,
   ];
 
   ProposalBrief copyWith({
@@ -118,6 +126,7 @@ class ProposalBrief extends Equatable {
     bool? isFavorite,
     Optional<VoteButtonData>? voteData,
     Optional<List<ProposalDataCollaborator>>? collaborators,
+    bool? votingEnabled,
   }) {
     return ProposalBrief(
       id: id ?? this.id,
@@ -134,6 +143,7 @@ class ProposalBrief extends Equatable {
       isFavorite: isFavorite ?? this.isFavorite,
       voteData: voteData.dataOr(this.voteData),
       collaborators: collaborators.dataOr(this.collaborators),
+      votingEnabled: votingEnabled ?? this.votingEnabled,
     );
   }
 }

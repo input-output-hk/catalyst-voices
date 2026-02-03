@@ -14,7 +14,9 @@ class DioInterceptorFactory {
   Interceptor? logInterceptor([Logger? logger]) {
     logger ??= Logger('LogInterceptor');
 
-    return kDebugMode ? LogInterceptor(logPrint: logger.fine) : null;
+    return kDebugMode
+        ? LogInterceptor(logPrint: logger.fine, requestHeader: false, responseHeader: false)
+        : null;
   }
 
   Interceptor retryInterceptor([Interceptor? authInterceptor]) {
