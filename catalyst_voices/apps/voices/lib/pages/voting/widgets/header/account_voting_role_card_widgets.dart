@@ -35,27 +35,6 @@ class AccountVotingRoleCardDecoration extends StatelessWidget {
   }
 }
 
-class AccountVotingRoleInfoButton extends StatelessWidget {
-  final Color? color;
-  final VoidCallback? onTap;
-
-  const AccountVotingRoleInfoButton({
-    super.key,
-    this.color,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesIconButton(
-      onTap: onTap,
-      child: VoicesAssets.icons.informationCircle.buildIcon(
-        color: color ?? Theme.of(context).colors.iconsPrimary,
-      ),
-    );
-  }
-}
-
 class AccountVotingRoleInfoCard extends StatelessWidget {
   final EdgeInsets padding;
   final Widget label;

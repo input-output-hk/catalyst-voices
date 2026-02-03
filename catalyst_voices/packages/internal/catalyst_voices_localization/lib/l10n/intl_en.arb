@@ -4425,9 +4425,21 @@
   "@votingResultsSubheader": {
     "description": "The subheader for voting results."
   },
+  "votingRoleDelegatedToLearnMoreDialogMessage": "placeholder",
+  "@votingRoleDelegatedToLearnMoreDialogMessage": {
+    "description": "The message for the my delegated voting power learn more dialog."
+  },
+  "votingRoleDelegatedToLearnMoreDialogTitle": "placeholder",
+  "@votingRoleDelegatedToLearnMoreDialogTitle": {
+    "description": "The title for the my delegated voting power learn more dialog."
+  },
   "votingRoleDelegatedToPopupMessage": "Representatives refers to the number of community members you have delegated your voting power to.",
   "@votingRoleDelegatedToPopupMessage": {
     "description": "The popup menu message explaining what is the voting power delegation."
+  },
+  "votingRoleDelegatedToPopupTitle": "placeholder",
+  "@votingRoleDelegatedToPopupTitle": {
+    "description": "The popup menu title explaining what is the voting power delegation."
   },
   "votingRoleIndividualLearnMoreDialogMessage": "Your voting power in [Cardano] Catalyst is determined by the amount of [ADA] held in the wallet that you linked to your Catalyst Keychain during account setup. Even though your voting power is based on your holdings, there is no token locking or cost to participate.\n\nFor each vote cast during the voting period, your full voting power will be applied in favor of that proposal. Casting votes does not diminish your voting power, and you may vote on as many proposals as you like.\n\nPrior to the start of voting, your voting power may fluctuate as you buy, sell, and trade [ADA]. You will see this indicated by a “Provisional” status on your voting power.\n\nAt the start of voting, your voting power will be frozen, based on your holdings at a certain point in time. You will see this indicated by a “Confirmed” status on your voting power.",
   "@votingRoleIndividualLearnMoreDialogMessage": {
@@ -4448,6 +4460,14 @@
   "votingRoleMyDelegatedPowerLearnMoreDialogTitle": "Delegators - My (Delegated) Voting Power",
   "@votingRoleMyDelegatedPowerLearnMoreDialogTitle": {
     "description": "The title for the my delegated voting power learn more dialog."
+  },
+  "votingRoleMyDelegatedPowerPopupMessage": "placeholder",
+  "@votingRoleMyDelegatedPowerPopupMessage": {
+    "description": "The message for the my delegated voting power popup menu"
+  },
+  "votingRoleMyDelegatedPowerPopupTitle": "placeholder",
+  "@votingRoleMyDelegatedPowerPopupTitle": {
+    "description": "The title for the my delegated voting power popup menu"
   },
   "votingRoleRepresentativeLearnMoreDialogMessage": "As a [Cardano] Representative, your total voting power in [Cardano] Catalyst is determined by the total ADA holdings across your own wallet that you linked to your Catalyst Keychain during account setup, as well as those of your delegators.\n\nFor each vote cast during the voting period, your full voting power will be applied in favor of that proposal. Casting votes does not diminish your voting power, and you may vote on as many proposals as you like.\n\nPrior to the start of voting, your voting power may fluctuate as you or your delegators buy, sell, and trade [ADA]. You will see this indicated by a “Provisional” status on your voting power.\n\nAt the start of voting, your total voting power will be frozen, based on your holdings, as well as those of your delegators, at a certain point in time. You will see this indicated by a “Confirmed” status on your total voting power.",
   "@votingRoleRepresentativeLearnMoreDialogMessage": {

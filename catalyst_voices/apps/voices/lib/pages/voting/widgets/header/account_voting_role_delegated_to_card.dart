@@ -64,7 +64,7 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
                 color: theme.colors.iconsBackground,
                 menuBuilder: (context) {
                   return AccountVotingRolePopupMenu(
-                    title: context.l10n.delegation,
+                    title: context.l10n.votingRoleDelegatedToPopupTitle,
                     message: context.l10n.votingRoleDelegatedToPopupMessage,
                     updatedAt: votingPower.updatedAt,
                     status: votingPower.status,
@@ -72,8 +72,8 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
                       unawaited(
                         AccountVotingRoleLearnMoreDialog.show(
                           context: context,
-                          title: context.l10n.votingRoleMyDelegatedPowerLearnMoreDialogTitle,
-                          message: context.l10n.votingRoleMyDelegatedPowerLearnMoreDialogMessage,
+                          title: context.l10n.votingRoleDelegatedToLearnMoreDialogTitle,
+                          message: context.l10n.votingRoleDelegatedToLearnMoreDialogMessage,
                         ),
                       );
                     },
