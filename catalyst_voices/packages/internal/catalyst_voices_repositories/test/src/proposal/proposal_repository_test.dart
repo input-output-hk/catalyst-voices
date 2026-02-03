@@ -453,8 +453,7 @@ void main() {
     });
 
     group('removeCollaboratorFromProposal', () {
-      test('removes collaborator from proposal and publishes updated document', () async {
-        // Given
+      setUpAll(() {
         registerFallbackValue(Uint8List(0));
         registerFallbackValue(SignedDocumentUnknownPayload(Uint8List(0)));
         registerFallbackValue(
@@ -466,8 +465,11 @@ void main() {
         );
         registerFallbackValue(CatalystIdFactory.create());
         registerFallbackValue(FakeCatalystPrivateKey());
+      });
 
-        const proposalId = SignedDocumentRef(id: 'proposal-1', ver: 'v1');
+      test('removes collaborator from proposal and publishes updated document', () async {
+        // Given
+        const proposalId = SignedDocumentRef(id: 'proposal-1', ver: 'proposal-1');
         final collaboratorId = CatalystIdFactory.create(
           username: 'collaborator-1',
         );
@@ -555,6 +557,94 @@ void main() {
           () => mockDocumentRepository.publishDocument(document: mockUpdatedDocument),
         ).called(1);
       });
+
+      test(
+        'leaving first iteration (genesis) of proposal does not create new id - bug 4085',
+        () async {
+          // Given
+          const proposalId = SignedDocumentRef.first('proposal-1');
+          final authorId = CatalystIdFactory.create(username: 'author');
+          final collaboratorId = CatalystIdFactory.create(
+            username: 'collaborator',
+            role0KeySeed: 1,
+          );
+
+          final originalMetadata = DocumentDataMetadata.proposal(
+            id: proposalId,
+            template: const SignedDocumentRef(id: 'template-1', ver: 'template-ver-1'),
+            parameters: const DocumentParameters(),
+            authors: [authorId],
+            collaborators: [collaboratorId],
+          );
+          final mockOriginalDocument = FakeSignedDocument(
+            metadata: originalMetadata,
+            payload: SignedDocumentBinaryPayload(Uint8List(0)),
+          );
+
+          final expectedUpdatedId = proposalId.nextVersion().toSignedDocumentRef();
+          final expectedUpdatedMetadata = originalMetadata.copyWith(
+            id: expectedUpdatedId,
+            collaborators: const Optional.empty(),
+          );
+          final mockUpdatedDocument = FakeSignedDocument(
+            metadata: expectedUpdatedMetadata,
+            payload: SignedDocumentBinaryPayload(Uint8List(0)),
+          );
+
+          // When
+          when(
+            () => mockDocumentRepository.getDocumentArtifact(id: proposalId),
+          ).thenAnswer((_) async => DocumentArtifact(Uint8List(0)));
+          when(
+            () => mockSignedDocumentManager.parseDocument(any()),
+          ).thenAnswer((_) async => mockOriginalDocument);
+          when(
+            () => mockSignedDocumentManager.signUpdatedDocument(
+              any(),
+              buildMetadataUpdates: any(named: 'buildMetadataUpdates'),
+              catalystId: any(named: 'catalystId'),
+              privateKey: any(named: 'privateKey'),
+            ),
+          ).thenAnswer((_) async => mockUpdatedDocument);
+          when(
+            () => mockDocumentRepository.publishDocument(document: mockUpdatedDocument),
+          ).thenAnswer((_) async {
+            return;
+          });
+
+          await repository.removeCollaboratorFromProposal(
+            proposalId: proposalId,
+            collaboratorId: collaboratorId,
+            privateKey: FakeCatalystPrivateKey(),
+          );
+
+          // Then
+          verify(
+            () => mockSignedDocumentManager.signUpdatedDocument(
+              any(),
+              buildMetadataUpdates: any(
+                named: 'buildMetadataUpdates',
+                that: predicate<DocumentMetadataUpdatesBuilder>((builder) {
+                  final updates = builder(originalMetadata);
+                  final id = updates.id?.data;
+                  final collaborators = updates.collaborators?.data;
+
+                  if (id == proposalId) return false; // first version
+                  if (id?.id != proposalId.id) return false; // id have to stay the same
+                  if (id?.ver == proposalId.ver) return false; // but ver is different
+                  return listEquals(collaborators, []);
+                }),
+              ),
+              catalystId: collaboratorId,
+              privateKey: any(named: 'privateKey'),
+            ),
+          ).called(1);
+
+          verify(
+            () => mockDocumentRepository.publishDocument(document: mockUpdatedDocument),
+          ).called(1);
+        },
+      );
     });
   });
 }
