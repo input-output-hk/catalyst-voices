@@ -58,7 +58,8 @@ final class RepresentativesDocumentsService implements RepresentativesService {
 
   @override
   Stream<Representative?> watchRepresentative({required CatalystId representativeId}) {
-    throw UnimplementedError();
+    // TODO(damian-molinski): Implement actual document watching
+    return Stream.value(null);
   }
 
   @override
