@@ -97,6 +97,19 @@ services:
         condition: service_healthy
     network_mode: host
 
+  api-tests-runner-devnet:
+    image: api-tests-runner:latest
+    container_name: api-tests-runner
+    environment:
+      - CAT_GATEWAY_TEST_URL=http://localhost:3030}
+      - CAT_GATEWAY_INTERNAL_API_KEY=123
+      - CAT_GATEWAY_ADMIN_PRIVATE_KEY=4dc7e0388d106e973d602044daae8838b16bbae651a368d0b5c0d8ee990e09b4
+      - SERVICE_LIVE_COUNTER_THRESHOLD=100
+      - SERVICE_LIVE_TIMEOUT_INTERVAL=30
+    command: >
+      uv run pytest -m "${API_TEST_MARKS}" -s --junitxml junit-report.xml --cov integration --cov-report lcov
+    network_mode: host
+
   schemathesis-runner:
     image: schemathesis-runner:latest
     container_name: schemathesis-runner
