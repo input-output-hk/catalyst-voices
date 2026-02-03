@@ -1,8 +1,8 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/become_community_reviewer_card.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/collaborator_display_consent_card.dart';
 import 'package:catalyst_voices/pages/actions/actions/widgets/proposal_approval_card.dart';
-import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices/pages/actions/actions/widgets/representative_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -12,16 +12,16 @@ class ActionCardsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<MyActionsCubit, MyActionsState, IterableData<List<ActionsCardType>>>(
-      selector: (state) => IterableData(state.availableCards),
-      builder: (context, availableCards) {
-        if (availableCards.value.isEmpty) {
-          return const _EmptyState();
-        }
-
+    return BlocSelector<MyActionsCubit, MyActionsState, ActionCardsState>(
+      selector: (state) => state.actionCardsState,
+      builder: (context, actionCards) {
         final cards = [
-          for (final cardType in availableCards.value) ?_buildCardForType(cardType),
+          for (final cardType in actionCards.availableCards) ?_buildCardForType(cardType),
         ];
+
+        if (cards.isEmpty) {
+          return _EmptyState(actionCards.selectedTab);
+        }
 
         return SliverList.separated(
           itemCount: cards.length,
@@ -36,7 +36,9 @@ class ActionCardsList extends StatelessWidget {
     return switch (cardType) {
       ProposalApprovalCardType() => const ProposalApprovalCard(),
       DisplayConsentCardType() => const CollaboratorDisplayConsentCard(),
-      RepresentativeCardType() => null, // TODO(LynxLynxx): Implement representative card
+      RepresentativeCardType() => RepresentativeCard(
+        cardType: cardType,
+      ),
       VotingPowerDelegationCardType() => null, // TODO(LynxLynxx): Implement voting power card
       BecomeReviewerCardType() => const BecomeCommunityReviewerCard(),
     };
@@ -44,15 +46,37 @@ class ActionCardsList extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  final ActionsPageTab tab;
+
+  const _EmptyState(this.tab);
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
-      // TODO(LynxLynxx): update empty state design after design will be provided
-      child: EmptyState(
-        title: const Text('There are no actions available at the moment'),
-        image: VoicesAssets.images.svg.noVotes.buildPicture(),
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 232),
+        decoration: BoxDecoration(
+          color: context.colors.elevationsOnSurfaceNeutralLv1Grey,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 8,
+          children: [
+            Text(
+              tab.localizedEmptyStateTitle(context),
+              style: context.textTheme.titleMedium?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
+            ),
+            Text(
+              tab.localizedEmptyStateDescription(context),
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

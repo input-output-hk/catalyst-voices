@@ -6,6 +6,7 @@ import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart' as p
 import 'package:catalyst_voices/routes/routing/proposal_route.dart' as proposal;
 import 'package:catalyst_voices/routes/routing/root_route.dart' as root;
 import 'package:catalyst_voices/routes/routing/spaces_route.dart' as spaces;
+import 'package:catalyst_voices/routes/routing/voting_list_route.dart' as voting_list;
 import 'package:go_router/go_router.dart';
 
 /// Semantic anchor for generated routes so only this class
@@ -20,6 +21,7 @@ abstract final class Routes {
     ...proposal_builder.$appRoutes,
     ...actions.$appRoutes,
     ...my_representatives.$appRoutes,
+    ...voting_list.$appRoutes,
   ];
 
   static String get initialLocation {

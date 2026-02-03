@@ -24,6 +24,7 @@ export 'proposal_builder/proposal_builder.dart';
 export 'proposal_viewer/proposal_viewer.dart';
 export 'proposals/proposals.dart';
 export 'registration/registration.dart';
+export 'representative_action/representative_action.dart';
 export 'session/session.dart';
 export 'sync_indicator/sync_indicator.dart';
 export 'system_status/system_status.dart';

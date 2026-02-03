@@ -64,7 +64,7 @@ class _FooterHint extends StatelessWidget {
       },
       child: ActionsHintCard(
         title: context.l10n.headsUpProposalApprovalHintTitle,
-        description: context.l10n.headsUpProposalApprovalHintContent,
+        description: Text(context.l10n.headsUpProposalApprovalHintContent),
       ),
     );
   }

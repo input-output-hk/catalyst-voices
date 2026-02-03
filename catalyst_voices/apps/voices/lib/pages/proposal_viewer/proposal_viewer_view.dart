@@ -10,6 +10,7 @@ import 'package:catalyst_voices/pages/document_viewer/snack_bar/viewing_older_ve
 import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_sidebars.dart';
+import 'package:catalyst_voices/pages/proposal_viewer/widget/proposal_voting_fab.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -103,6 +104,11 @@ class _ProposalViewerViewState extends State<ProposalViewerView>
             ),
           ),
           const DocumentViewerError(),
+          const Positioned(
+            right: 24,
+            bottom: 36,
+            child: ProposalVotingFab(),
+          ),
         ],
       ),
     );

@@ -56,6 +56,8 @@ final class MyActionsCubit extends Cubit<MyActionsState>
   }
 
   void updatePageTab(ActionsPageTab tab) {
+    if (_cache.selectedTab == tab) return;
+
     _cache = _cache.copyWith(selectedTab: tab);
     _rebuildState();
     emitSignal(ChangeTabMyActionsSignal(tab));
@@ -110,9 +112,12 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         ?.timeline
         .to;
 
+    final votingSnapshotDate = timeline?.votingSnapshotDate;
+
     _cache = _cache.copyWith(
       proposalSubmissionCloseDate: Optional(proposalSubmissionCloseDate),
       becomeReviewerCloseDate: Optional(becomeReviewerCloseDate),
+      votingSnapshotDate: Optional(votingSnapshotDate),
     );
     _rebuildState();
   }
@@ -135,13 +140,19 @@ final class MyActionsCubit extends Cubit<MyActionsState>
   }
 
   void _rebuildState() {
+    final actionCardsState = state.actionCardsState.copyWith(
+      availableCards: _computeAvailableCards(),
+      selectedTab: _cache.selectedTab,
+    );
+
     emit(
       state.copyWith(
         displayConsentCount: _cache.displayConsentCount,
         finalProposalCount: _cache.finalProposalCount,
         proposalSubmissionCloseDate: Optional(_cache.proposalSubmissionCloseDate),
         becomeReviewerCloseDate: Optional(_cache.becomeReviewerCloseDate),
-        availableCards: _computeAvailableCards(),
+        votingSnapshotDate: Optional(_cache.votingSnapshotDate),
+        actionCardsState: actionCardsState,
       ),
     );
   }

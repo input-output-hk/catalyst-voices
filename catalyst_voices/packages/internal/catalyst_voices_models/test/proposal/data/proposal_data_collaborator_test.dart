@@ -26,6 +26,7 @@ void main() {
           prevCollaborators: collaborators,
           prevAuthors: [authorCatalystId],
           isProposalFinal: false,
+          proposalId: SignedDocumentRef.generateFirstRef(),
         );
 
         expect(
@@ -40,6 +41,7 @@ void main() {
       'and versions are the same and proposal is a draft',
       () {
         final collaborators = [collaborator1Id, collaborator2Id, collaborator3Id, collaborator4Id];
+        final proposalId = SignedDocumentRef.generateFirstRef();
         final result = ProposalDataCollaborator.resolveCollaboratorStatuses(
           currentCollaborators: collaborators,
           prevCollaborators: collaborators,
@@ -48,23 +50,24 @@ void main() {
             collaborator2Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.draft,
               id: collaborator2Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
             collaborator3Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.aFinal,
               id: collaborator4Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
             collaborator4Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.hide,
               id: collaborator4Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
           },
           isProposalFinal: false,
+          proposalId: proposalId,
         );
 
         expect(
@@ -84,6 +87,7 @@ void main() {
       'and versions are the same and proposal is final',
       () {
         final collaborators = [collaborator1Id, collaborator2Id, collaborator3Id, collaborator4Id];
+        final proposalId = SignedDocumentRef.generateFirstRef();
         final result = ProposalDataCollaborator.resolveCollaboratorStatuses(
           currentCollaborators: collaborators,
           prevCollaborators: collaborators,
@@ -92,23 +96,24 @@ void main() {
             collaborator2Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.draft,
               id: collaborator2Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
             collaborator3Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.aFinal,
               id: collaborator4Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
             collaborator4Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.hide,
               id: collaborator4Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
           },
           isProposalFinal: true,
+          proposalId: proposalId,
         );
 
         expect(
@@ -131,6 +136,7 @@ void main() {
           prevCollaborators: [collaborator1Id],
           prevAuthors: [collaborator1Id],
           isProposalFinal: false,
+          proposalId: SignedDocumentRef.generateFirstRef(),
         );
 
         expect(
@@ -151,6 +157,7 @@ void main() {
           prevCollaborators: [collaborator1Id],
           prevAuthors: [authorCatalystId],
           isProposalFinal: false,
+          proposalId: SignedDocumentRef.generateFirstRef(),
         );
 
         expect(
@@ -166,6 +173,7 @@ void main() {
       'sets collaborators status as removed when he is not the author of proposal '
       'and is absent in collaborators list but he accepted invitation',
       () {
+        final proposalId = SignedDocumentRef.generateFirstRef();
         final result = ProposalDataCollaborator.resolveCollaboratorStatuses(
           currentCollaborators: [],
           prevCollaborators: [collaborator1Id],
@@ -174,11 +182,12 @@ void main() {
             collaborator1Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.draft,
               id: collaborator1Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
           },
           isProposalFinal: false,
+          proposalId: proposalId,
         );
 
         expect(
@@ -194,6 +203,7 @@ void main() {
       'sets collaborators status as left when he is the author of proposal '
       'and is absent in collaborators list but he accepted invitation',
       () {
+        final proposalId = SignedDocumentRef.generateFirstRef();
         final result = ProposalDataCollaborator.resolveCollaboratorStatuses(
           currentCollaborators: [],
           prevCollaborators: [collaborator1Id],
@@ -202,11 +212,12 @@ void main() {
             collaborator1Id.toSignificant(): RawCollaboratorAction(
               action: ProposalSubmissionAction.draft,
               id: collaborator1Id,
-              proposalId: SignedDocumentRef.generateFirstRef(),
+              proposalId: proposalId,
               actionId: SignedDocumentRef.generateFirstRef(),
             ),
           },
           isProposalFinal: false,
+          proposalId: proposalId,
         );
 
         expect(
@@ -214,6 +225,46 @@ void main() {
           equals([
             ProposalsCollaborationStatus.left,
           ]),
+        );
+      },
+    );
+
+    test(
+      'collaborator invitation status is accepted and status pending '
+      'when latest action was taken on not latest version',
+      () {
+        final collaborators = [collaborator1Id];
+        final proposalIdVer1 = SignedDocumentRef.generateFirstRef();
+        final proposalIdVer2 = proposalIdVer1.nextVersion().toSignedDocumentRef();
+
+        final result = ProposalDataCollaborator.resolveCollaboratorStatuses(
+          currentCollaborators: collaborators,
+          prevCollaborators: collaborators,
+          prevAuthors: [authorCatalystId],
+          collaboratorsActions: {
+            // accepted invitation for first version
+            collaborator1Id.toSignificant(): RawCollaboratorAction(
+              action: ProposalSubmissionAction.draft,
+              id: collaborator1Id,
+              proposalId: proposalIdVer1,
+              actionId: SignedDocumentRef.generateFirstRef(),
+            ),
+          },
+          // section version is final
+          isProposalFinal: true,
+          proposalId: proposalIdVer2,
+        );
+
+        final statuses = result.map((c) => c.status).toList();
+        final invitations = result.map((c) => c.invitation).toList();
+
+        expect(
+          statuses,
+          equals([ProposalsCollaborationStatus.pending]),
+        );
+        expect(
+          invitations,
+          equals([ProposalInvitationStatus.accepted]),
         );
       },
     );

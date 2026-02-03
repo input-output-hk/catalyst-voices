@@ -1,10 +1,10 @@
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_ballot.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_bottom_sheet.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_campaign_phase_progress.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_footer.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_header.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_user_summary.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_ballot.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_bottom_sheet.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_campaign_phase_progress.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_footer.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_header.dart';
+import 'package:catalyst_voices/pages/voting_list/widgets/voting_list_user_summary.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 

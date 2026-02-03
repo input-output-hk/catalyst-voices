@@ -1,7 +1,5 @@
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/voting/vote_delegation_button.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/voting/vote_list_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/voting/voting_category_leading_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -47,8 +45,6 @@ class _VotingAppbar extends StatelessWidget {
       leading: _getLeadingWidget(),
       automaticallyImplyLeading: false,
       actions: const [
-        VoteListButton(),
-        VoteDelegationButton(),
         SessionCtaAction(),
         AccountSettingsAction(),
       ],
