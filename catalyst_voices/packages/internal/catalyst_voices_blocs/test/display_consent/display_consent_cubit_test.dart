@@ -109,6 +109,7 @@ void main() {
               ProposalDataCollaborator(
                 id: catalystId,
                 status: ProposalsCollaborationStatus.pending,
+                invitation: ProposalInvitationStatus.pending,
                 createdAt: DateTime(2024, 1, 2),
               ),
             ],
@@ -170,6 +171,7 @@ void main() {
             ProposalDataCollaborator(
               id: catalystId,
               status: ProposalsCollaborationStatus.pending,
+              invitation: ProposalInvitationStatus.pending,
               createdAt: DateTime(2024, 1, 2),
             ),
           ],
@@ -441,6 +443,7 @@ void main() {
               ProposalDataCollaborator(
                 id: catalystId,
                 status: ProposalsCollaborationStatus.pending,
+                invitation: ProposalInvitationStatus.pending,
                 createdAt: DateTime(2024, 1, 4),
               ),
             ],

@@ -41,23 +41,6 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  context.l10n.delegatedTo,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colors.textOnPrimaryWhite,
-                  ),
-                ),
-              ),
-              _RepresentativesCount(count: representativesCount),
-            ],
-          ),
-          const SizedBox(width: 20),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               AccountVotingRolePopupInfoButton(
@@ -86,6 +69,23 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
                   onTap: () => const MyRepresentativesRoute().push<void>(context),
                 ),
               ),
+            ],
+          ),
+          const SizedBox(width: 20),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  context.l10n.delegatedTo,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colors.textOnPrimaryWhite,
+                  ),
+                ),
+              ),
+              _RepresentativesCount(count: representativesCount),
             ],
           ),
         ],
