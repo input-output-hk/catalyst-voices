@@ -74,9 +74,9 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
         final rawCollaboratorAction = collaboratorsActions[id.toSignificant()];
         return ProposalDataCollaborator.fromAction(
           id: id,
-          action: rawCollaboratorAction?.action,
+          rawAction: rawCollaboratorAction,
+          proposalId: data.proposal.id,
           isProposalFinal: isFinal,
-          actionId: rawCollaboratorAction?.actionId,
         );
       },
     ).toList();

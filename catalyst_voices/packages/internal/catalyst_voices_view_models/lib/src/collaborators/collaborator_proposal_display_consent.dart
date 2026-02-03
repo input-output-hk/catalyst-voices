@@ -12,13 +12,12 @@ enum CollaboratorDisplayConsentStatus {
   const CollaboratorDisplayConsentStatus();
 
   factory CollaboratorDisplayConsentStatus.fromCollaborationStatus(
-    ProposalsCollaborationStatus? status,
+    ProposalInvitationStatus status,
   ) {
     return switch (status) {
-      ProposalsCollaborationStatus.accepted => CollaboratorDisplayConsentStatus.allowed,
-      ProposalsCollaborationStatus.rejected => CollaboratorDisplayConsentStatus.denied,
-      // For other statuses, default to pending
-      _ => CollaboratorDisplayConsentStatus.pending,
+      ProposalInvitationStatus.pending => CollaboratorDisplayConsentStatus.pending,
+      ProposalInvitationStatus.accepted => CollaboratorDisplayConsentStatus.allowed,
+      ProposalInvitationStatus.rejected => CollaboratorDisplayConsentStatus.denied,
     };
   }
 
@@ -85,9 +84,9 @@ class CollaboratorProposalDisplayConsent extends Equatable {
         'This indicates that filters used to retrieve this proposal brief data are not correct.',
       ),
     );
-    final collaboratorStatus = collaborator?.status;
+    final invitation = collaborator?.invitation ?? ProposalInvitationStatus.pending;
     final displayConsentStatus = CollaboratorDisplayConsentStatus.fromCollaborationStatus(
-      collaboratorStatus,
+      invitation,
     );
 
     return CollaboratorProposalDisplayConsent(

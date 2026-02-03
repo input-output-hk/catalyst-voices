@@ -711,11 +711,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       proposalId: proposalId,
     );
 
-    final isFinal = action == ProposalSubmissionAction.aFinal;
-
     final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
-      // if proposal is final find actions for specific version
-      proposalsRefs: [if (isFinal) proposalId else proposalId.toLoose()],
+      // Get latest submission action for any version of proposal.
+      // Later it will be resolved in ProposalDataCollaborator.fromAction
+      proposalsRefs: [proposalId.toLoose()],
     );
     final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
 

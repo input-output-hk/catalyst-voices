@@ -6,11 +6,13 @@ import 'package:equatable/equatable.dart';
 class ProposalDataCollaborator extends Equatable {
   final CatalystId id;
   final ProposalsCollaborationStatus status;
+  final ProposalInvitationStatus invitation;
   final DateTime? createdAt;
 
   const ProposalDataCollaborator({
     required this.id,
     required this.status,
+    required this.invitation,
     required this.createdAt,
   });
 
@@ -24,11 +26,17 @@ class ProposalDataCollaborator extends Equatable {
   /// - [ProposalSubmissionAction.hide] → [ProposalsCollaborationStatus.rejected]
   factory ProposalDataCollaborator.fromAction({
     required CatalystId id,
-    required ProposalSubmissionAction? action,
+    required RawCollaboratorAction? rawAction,
     required bool isProposalFinal,
-    SignedDocumentRef? actionId,
+    required DocumentRef proposalId,
   }) {
-    final status = switch (action) {
+    final action = proposalId.id != rawAction?.proposalId.id ? null : rawAction?.action;
+
+    // if proposal is final and actions is for different version we should skip it and
+    // consider no action which affects status.
+    final statusAction = isProposalFinal && rawAction?.proposalId != proposalId ? null : action;
+
+    final status = switch (statusAction) {
       null => ProposalsCollaborationStatus.pending,
       ProposalSubmissionAction.aFinal => ProposalsCollaborationStatus.accepted,
       // When proposal is final, draft action does not mean it's accepted
@@ -37,10 +45,18 @@ class ProposalDataCollaborator extends Equatable {
       ProposalSubmissionAction.hide => ProposalsCollaborationStatus.rejected,
     };
 
+    final invitation = switch (action) {
+      null => ProposalInvitationStatus.pending,
+      ProposalSubmissionAction.aFinal ||
+      ProposalSubmissionAction.draft => ProposalInvitationStatus.accepted,
+      ProposalSubmissionAction.hide => ProposalInvitationStatus.rejected,
+    };
+
     return ProposalDataCollaborator(
       id: id,
       status: status,
-      createdAt: actionId?.id.dateTime,
+      invitation: invitation,
+      createdAt: rawAction?.actionId.id.dateTime,
     );
   }
 
@@ -49,6 +65,7 @@ class ProposalDataCollaborator extends Equatable {
 
   static List<ProposalDataCollaborator> resolveCollaboratorStatuses({
     required bool isProposalFinal,
+    required DocumentRef proposalId,
     List<CatalystId> currentCollaborators = const [],
     Map<CatalystId, RawCollaboratorAction> collaboratorsActions = const {},
     List<CatalystId> prevCollaborators = const [],
@@ -59,9 +76,9 @@ class ProposalDataCollaborator extends Equatable {
       final collaboratorAction = collaboratorsActions[id.toSignificant()];
       return ProposalDataCollaborator.fromAction(
         id: id,
-        action: collaboratorAction?.action,
+        rawAction: collaboratorAction,
         isProposalFinal: isProposalFinal,
-        actionId: collaboratorAction?.actionId,
+        proposalId: proposalId,
       );
     });
 
@@ -80,6 +97,7 @@ class ProposalDataCollaborator extends Equatable {
       return ProposalDataCollaborator(
         id: id,
         status: status,
+        invitation: ProposalInvitationStatus.rejected,
         createdAt: createdAt,
       );
     });
