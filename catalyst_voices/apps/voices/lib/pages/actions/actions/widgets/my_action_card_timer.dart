@@ -18,10 +18,10 @@ class MyActionCardTimer extends StatefulWidget {
 }
 
 class _MyActionCardTimerState extends State<MyActionCardTimer> {
-  Duration _remainingDuration = Duration.zero;
+  Duration? _remainingDuration;
   Timer? _timer;
   final Stopwatch _stopwatch = Stopwatch();
-  Duration _initialDuration = Duration.zero;
+  Duration? _initialDuration;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
       );
     }
 
-    if (_remainingDuration <= Duration.zero) {
+    if (_remainingDuration == null || _remainingDuration! <= Duration.zero) {
       return const Offstage();
     }
 
@@ -59,7 +59,7 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
             'duration' => TextSpan(
               text: DurationFormatter.formatDurationDaysOrHHmm(
                 context.l10n,
-                _remainingDuration,
+                _remainingDuration!,
               ),
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.colors.textOnPrimaryWhite,
@@ -78,8 +78,8 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.duration != oldWidget.duration) {
-      _initialDuration = widget.duration ?? Duration.zero;
-      _remainingDuration = widget.duration ?? Duration.zero;
+      _initialDuration = widget.duration;
+      _remainingDuration = widget.duration;
       _timer?.cancel();
       _stopwatch.reset();
       _startTimer();
@@ -96,21 +96,21 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
   @override
   void initState() {
     super.initState();
-    _initialDuration = widget.duration ?? Duration.zero;
-    _remainingDuration = widget.duration ?? Duration.zero;
+    _initialDuration = widget.duration;
+    _remainingDuration = widget.duration;
     _startTimer();
   }
 
   void _startTimer() {
-    if (widget.duration == null || _initialDuration == Duration.zero) {
+    if (widget.duration == null || _initialDuration == null) {
       return;
     }
 
     _stopwatch.start();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _remainingDuration = _initialDuration - _stopwatch.elapsed;
-        if (_remainingDuration.isNegative) {
+        _remainingDuration = _initialDuration! - _stopwatch.elapsed;
+        if (_remainingDuration!.isNegative) {
           _stopwatch.stop();
           timer.cancel();
         }
