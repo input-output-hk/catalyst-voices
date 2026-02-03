@@ -40,6 +40,10 @@ base class ProposalsFiltersV2 extends Equatable {
   /// If null, this filter is not applied.
   final CatalystId? voteBy;
 
+  /// Filters proposals by the type of vote cast.
+  /// If null, all vote types are included.
+  final VoteType? voteType;
+
   // TODO(damian-molinski): Remove this when voteBy is implemented
   /// Temporary filter only for mocked implementation of [voteBy].
   final List<String>? ids;
@@ -54,6 +58,7 @@ base class ProposalsFiltersV2 extends Equatable {
     this.latestUpdate,
     this.campaign,
     this.voteBy,
+    this.voteType,
     this.ids,
   });
 
@@ -67,6 +72,7 @@ base class ProposalsFiltersV2 extends Equatable {
     latestUpdate,
     campaign,
     voteBy,
+    voteType,
     ids,
   ];
 
@@ -79,6 +85,7 @@ base class ProposalsFiltersV2 extends Equatable {
     Optional<Duration>? latestUpdate,
     Optional<CampaignFilters>? campaign,
     Optional<CatalystId>? voteBy,
+    Optional<VoteType>? voteType,
     Optional<List<String>>? ids,
   }) {
     return ProposalsFiltersV2(
@@ -90,6 +97,7 @@ base class ProposalsFiltersV2 extends Equatable {
       latestUpdate: latestUpdate.dataOr(this.latestUpdate),
       campaign: campaign.dataOr(this.campaign),
       voteBy: voteBy.dataOr(this.voteBy),
+      voteType: voteType.dataOr(this.voteType),
       ids: ids.dataOr(this.ids),
     );
   }
@@ -122,6 +130,9 @@ base class ProposalsFiltersV2 extends Equatable {
     }
     if (voteBy != null) {
       parts.add('votedBy: $voteBy');
+    }
+    if (voteType != null) {
+      parts.add('voteType: $voteType');
     }
     if (ids != null) {
       parts.add('ids: ${ids!.join(',')}');

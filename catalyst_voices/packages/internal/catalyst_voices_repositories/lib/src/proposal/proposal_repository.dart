@@ -592,9 +592,21 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       return Stream.value(filters);
     }
 
-    return _castedVotesObserver.watchCastedVotes
-        .map((votes) => votes.map((e) => e.proposal.id).toList())
-        .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
+    return _castedVotesObserver.watchCastedVotes.map((votes) {
+      var filteredVotes = votes;
+
+      // Filter by vote type if specified
+      if (filters.voteType != null) {
+        filteredVotes = votes.where((e) => e.type == filters.voteType).toList();
+      }
+
+      final ids = filteredVotes.map((e) => e.proposal.id).toList();
+      return filters.copyWith(
+        voteBy: const Optional.empty(),
+        voteType: const Optional.empty(),
+        ids: Optional(ids),
+      );
+    });
   }
 
   Future<List<ProposalBriefData>> _assembleProposalBriefData(

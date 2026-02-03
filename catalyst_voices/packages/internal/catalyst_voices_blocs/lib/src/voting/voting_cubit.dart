@@ -41,9 +41,13 @@ final class VotingCubit extends Cubit<VotingState>
     Optional<String>? categoryId,
     Optional<VotingPageTab>? tab,
     Optional<String>? searchQuery,
+    Optional<VoteType>? voteType,
     bool resetProposals = false,
   }) {
-    _cache = _cache.copyWith(tab: tab);
+    _cache = _cache.copyWith(
+      tab: tab,
+      voteType: voteType,
+    );
 
     final campaign = _cache.campaign;
     final activeAccountId = _cache.activeAccountId;
@@ -68,6 +72,9 @@ final class VotingCubit extends Cubit<VotingState>
       voteBy: _cache.tab == VotingPageTab.myVotes
           ? Optional(_cache.activeAccountId)
           : const Optional.empty(),
+      voteType: _cache.tab == VotingPageTab.myVotes
+          ? Optional(_cache.voteType)
+          : const Optional.empty(),
     );
 
     if (_cache.filters == filters) {
@@ -77,8 +84,10 @@ final class VotingCubit extends Cubit<VotingState>
     final categoryChanged = _cache.filters.categoryId != filters.categoryId;
     final searchQueryChanged = _cache.filters.searchQuery != filters.searchQuery;
     final campaignChanged = _cache.filters.campaign != filters.campaign;
+    final voteTypeChanged = _cache.filters.voteType != filters.voteType;
 
-    final shouldRebuildCountSubs = categoryChanged || searchQueryChanged || campaignChanged;
+    final shouldRebuildCountSubs =
+        categoryChanged || searchQueryChanged || campaignChanged || voteTypeChanged;
 
     _cache = _cache.copyWith(filters: filters);
 
@@ -88,6 +97,10 @@ final class VotingCubit extends Cubit<VotingState>
 
   void changeSelectedCategory(String? categoryId) {
     emitSignal(ChangeCategoryVotingSignal(to: categoryId));
+  }
+
+  void changeVoteTypeFilter(VoteType? voteType) {
+    emitSignal(ChangeVoteTypeFilterVotingSignal(voteType));
   }
 
   @override
@@ -139,6 +152,7 @@ final class VotingCubit extends Cubit<VotingState>
   Future<void> init({
     required String? categoryId,
     required VotingPageTab? tab,
+    required VoteType? voteType,
   }) async {
     _resetCache();
     _rebuildProposalsCountSubs();
@@ -148,7 +162,11 @@ final class VotingCubit extends Cubit<VotingState>
       return;
     }
 
-    changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
+    changeFilters(
+      categoryId: Optional(categoryId),
+      tab: Optional(tab),
+      voteType: Optional(voteType),
+    );
 
     unawaited(_activeAccountSub?.cancel());
     _activeAccountSub = _userService.watchUser
@@ -245,11 +263,15 @@ final class VotingCubit extends Cubit<VotingState>
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
         relationships: const {},
+        voteBy: const Optional.empty(),
+        voteType: const Optional.empty(),
       ),
       VotingPageTab.favorites => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional(true),
         relationships: const {},
+        voteBy: const Optional.empty(),
+        voteType: const Optional.empty(),
       ),
       VotingPageTab.myFinalProposals => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
@@ -257,12 +279,15 @@ final class VotingCubit extends Cubit<VotingState>
         relationships: {
           if (_cache.activeAccountId != null) OriginalAuthor(_cache.activeAccountId!),
         },
+        voteBy: const Optional.empty(),
+        voteType: const Optional.empty(),
       ),
       VotingPageTab.myVotes => _cache.filters.copyWith(
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
         relationships: const {},
         voteBy: Optional(_cache.activeAccountId),
+        voteType: Optional(_cache.voteType),
       ),
     };
   }

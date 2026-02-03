@@ -185,10 +185,12 @@ final class VotingRoute extends GoRouteData
 
   final String? categoryId;
   final String? tab;
+  final String? voteType;
 
   const VotingRoute({
     this.categoryId,
     this.tab,
+    this.voteType,
   });
 
   @override
@@ -199,10 +201,12 @@ final class VotingRoute extends GoRouteData
     final categoryId = this.categoryId;
 
     final tab = VotingPageTab.values.asNameMap()[this.tab];
+    final voteType = VoteType.values.asNameMap()[this.voteType];
 
     return VotingPage(
       categoryId: categoryId,
       tab: tab,
+      voteType: voteType,
     );
   }
 }

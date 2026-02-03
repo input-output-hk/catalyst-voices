@@ -4403,6 +4403,18 @@
   "@voteAbstain": {
     "description": "Vote abstain on proposal"
   },
+  "allVotesFilter": "All Votes",
+  "@allVotesFilter": {
+    "description": "Filter option to show all votes"
+  },
+  "yesVotesFilter": "Yes Votes",
+  "@yesVotesFilter": {
+    "description": "Filter option to show only yes votes"
+  },
+  "abstainVotesFilter": "Abstain Votes",
+  "@abstainVotesFilter": {
+    "description": "Filter option to show only abstain votes"
+  },
   "voteList": "Vote List",
   "@voteList": {
     "description": "Name of place where user adds votes on proposals"
