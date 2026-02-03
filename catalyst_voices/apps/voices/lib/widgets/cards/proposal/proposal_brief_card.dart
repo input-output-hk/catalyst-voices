@@ -344,7 +344,7 @@ class _ProposalInfo extends StatelessWidget {
     };
     final dt = DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
 
-    return context.l10n.publishedOn(dt.date, dt.time);
+    return context.l10n.publishedOnAt(dt.date, dt.time);
   }
 }
 

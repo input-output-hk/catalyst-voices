@@ -32,25 +32,25 @@ abstract class DurationFormatter {
     return values.join(' ');
   }
 
-  /// Formats the [duration] as hours / minutes / seconds.
-  /// Skips each segment where the value is 0 and previous segments were zero too.
+  /// Formats the [duration] as days or hours / minutes.
+  /// If duration is >= 24 hours, shows days (e.g., "1 Day" or "5 Days").
+  /// If duration is < 24 hours, shows hours and minutes (e.g., "2h 15min").
   ///
   /// Examples:
+  /// - 1 Day
+  /// - 5 Days
   /// - 3h 15min
-  /// - 45min
-  /// - 30s
-  static String formatDurationHHmmss(VoicesLocalizations localizations, Duration duration) {
+  /// - 0h 45min
+  static String formatDurationDaysOrHHmm(VoicesLocalizations localizations, Duration duration) {
     final nf = NumberFormat('0');
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds;
+    final days = duration.inDays;
 
-    if (hours > 0) {
-      return '${nf.format(hours)}${localizations.hourAbbr} ${nf.format(minutes)}${localizations.minuteAbbr}';
-    } else if (minutes > 0) {
-      return '${nf.format(minutes)}${localizations.minAbbr}';
+    if (days > 0) {
+      return '${nf.format(days)} ${localizations.days(days)}';
     } else {
-      return '${nf.format(seconds)}${localizations.secondAbbr}';
+      final hours = duration.inHours;
+      final minutes = duration.inMinutes.remainder(60);
+      return '${nf.format(hours)}${localizations.hourAbbr} ${nf.format(minutes)}${localizations.minuteAbbr}';
     }
   }
 

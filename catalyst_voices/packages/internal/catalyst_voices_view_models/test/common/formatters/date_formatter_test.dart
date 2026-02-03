@@ -235,7 +235,7 @@ class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   String get yesterday => 'Yesterday';
 
   @override
-  String publishedOn(String date, String time) {
+  String publishedOnAt(String date, String time) {
     return 'Published on $date at $time';
   }
 }

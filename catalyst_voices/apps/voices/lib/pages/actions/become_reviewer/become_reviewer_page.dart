@@ -12,6 +12,7 @@ import 'package:catalyst_voices/widgets/drawer/voices_drawer_header.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class BecomeReviewerPage extends StatelessWidget {
@@ -100,11 +101,11 @@ class _Instructions extends StatelessWidget {
         style: context.textTheme.titleSmall,
       ),
       steps: const [
-        InstructionStepItem(
+        InstructionStep(
           child: _CopyCatalystIdStep(),
         ),
-        InstructionStepItem(
-          icon: _ReviewModuleButton(),
+        InstructionStep(
+          suffix: _ReviewModuleButton(),
           child: _HeadOverToReviewModuleSteps(),
         ),
       ],
