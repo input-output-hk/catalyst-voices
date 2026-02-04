@@ -405,17 +405,32 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     final votingRole = event.data;
 
     final amount = votingRole?.totalVotingPowerAmount ?? 0;
+    final formattedAmount = VotingPowerAmount.fromModel(amount);
     final status = switch (votingRole) {
       AccountVotingRoleDelegator(:final votingPower) => votingPower.data?.status,
       AccountVotingRoleIndividual(:final votingPower) => votingPower.data?.status,
       AccountVotingRoleRepresentative(:final votingPower) => votingPower.data?.status,
       null => null,
     };
+    final updatedAt = switch (votingRole) {
+      AccountVotingRoleDelegator(:final votingPower) => votingPower.data?.updatedAt,
+      AccountVotingRoleIndividual(:final votingPower) => votingPower.data?.updatedAt,
+      AccountVotingRoleRepresentative(:final votingPower) => votingPower.data?.updatedAt,
+      null => null,
+    };
+    final isRepresentative = votingRole is AccountVotingRoleRepresentative;
+    final delegatorsCount = switch (votingRole) {
+      AccountVotingRoleRepresentative(:final delegatorsCount) => delegatorsCount,
+      _ => 0,
+    };
     final isNullOrIndividual = votingRole == null || votingRole is AccountVotingRoleIndividual;
 
     final userSummary = VotingListUserSummaryData(
-      amount: amount,
+      formattedAmount: formattedAmount,
       status: status,
+      isRepresentative: isRepresentative,
+      delegatorsCount: delegatorsCount,
+      updatedAt: updatedAt,
     );
 
     final isManualVotingEnabled = votingRole?.isManualVotingEnabled ?? false;

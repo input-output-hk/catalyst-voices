@@ -32,6 +32,19 @@ final class RepresentativeVotingPower extends Equatable {
   /// Total voting power amount.
   int get totalAmount => (own?.amount ?? 0) + (delegated?.amount ?? 0);
 
+  DateTime? get updatedAt {
+    final ownDate = own?.updatedAt;
+    final delegatedDate = delegated?.updatedAt;
+
+    return switch ((ownDate, delegatedDate)) {
+      (null, null) => null,
+      (null, final delegatedDate?) => delegatedDate,
+      (final ownDate?, null) => ownDate,
+      (final ownDate?, final delegatedDate?) =>
+        ownDate.isAfter(delegatedDate) ? ownDate : delegatedDate,
+    };
+  }
+
   /// Creates a copy of this instance with the given fields replaced with the new values.
   RepresentativeVotingPower copyWith({
     Optional<VotingPower>? own,

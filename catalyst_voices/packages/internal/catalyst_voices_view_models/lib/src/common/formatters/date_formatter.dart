@@ -78,6 +78,21 @@ abstract class DateFormatter {
     return DateFormat('d MMM HH:mm').format(dateTime);
   }
 
+  /// Formats a given [DateTime] object into a string
+  /// with the format "HH:mm · dd/MM/yyyy".
+  ///
+  /// The format consists of:
+  /// - 24-hour time format with hours and minutes (e.g., 13:45)
+  /// - A middle dot separator (·)
+  /// - Date in day/month/year format (e.g., 01/05/2025)
+  ///
+  /// Example output: "13:45 · 01/05/2025"
+  static String formatTimeAndDate(DateTime dateTime) {
+    final time = DateFormat('HH:mm').format(dateTime);
+    final date = DateFormat('dd/MM/yyyy').format(dateTime);
+    return '$time · $date';
+  }
+
   static String formatFullDate24Format(DateTime dateTime) {
     return DateFormat('d MMM, yyyy - HH:mm').format(dateTime);
   }
