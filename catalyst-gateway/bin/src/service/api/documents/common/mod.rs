@@ -6,8 +6,7 @@ use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV7};
 use tokio::runtime::Handle;
 
 use crate::{
-    db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
-    service::common::auth::rbac::token::CatalystRBACTokenV1,
+    db::event::signed_docs::FullSignedDoc, service::common::auth::rbac::token::CatalystRBACTokenV1,
     settings::Settings,
 };
 
@@ -96,9 +95,9 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         let ver = doc_ref.ver().uuid();
 
         let handle = Handle::current();
-        match handle.block_on(FullSignedDoc::retrieve(&id, Some(&ver))) {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
+        match handle.block_on(FullSignedDoc::retrieve_one(&id, Some(&ver))) {
+            Ok(Some(doc)) => Ok(Some(doc.raw().try_into()?)),
+            Ok(None) => Ok(None),
             Err(err) => Err(err),
         }
     }
@@ -108,9 +107,9 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let handle = Handle::current();
-        match handle.block_on(FullSignedDoc::retrieve(&id.uuid(), None)) {
-            Ok(doc) => Ok(Some(doc.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
+        match handle.block_on(FullSignedDoc::retrieve_one(&id.uuid(), None)) {
+            Ok(Some(doc)) => Ok(Some(doc.raw().try_into()?)),
+            Ok(None) => Ok(None),
             Err(err) => Err(err),
         }
     }
@@ -120,9 +119,9 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let handle = Handle::current();
-        match handle.block_on(FullSignedDoc::retrieve(&id.uuid(), Some(&id.uuid()))) {
-            Ok(doc) => Ok(Some(doc.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
+        match handle.block_on(FullSignedDoc::retrieve_one(&id.uuid(), Some(&id.uuid()))) {
+            Ok(Some(doc)) => Ok(Some(doc.raw().try_into()?)),
+            Ok(None) => Ok(None),
             Err(err) => Err(err),
         }
     }

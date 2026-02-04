@@ -4,6 +4,8 @@ SELECT
   signed_docs.type,
   signed_docs.authors,
   signed_docs.metadata
+  signed_docs.payload,
+  signed_docs.raw
 FROM signed_docs
 WHERE
   {{ conditions }}

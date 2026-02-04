@@ -6,10 +6,7 @@ use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
-    db::{
-        event::{error::NotFoundError, signed_docs::FullSignedDoc},
-        index::session::CassandraSessionError,
-    },
+    db::{event::signed_docs::FullSignedDoc, index::session::CassandraSessionError},
     service::{
         api::documents::common::ValidationProvider,
         common::{
@@ -79,16 +76,16 @@ pub(crate) async fn endpoint(
     // making sure that the document was already submitted before running validation,
     // otherwise validation would fail, because of the assumption that this document wasn't
     // published yet.
-    match FullSignedDoc::retrieve(db_doc.id(), Some(db_doc.ver())).await {
-        Ok(retrieved) if db_doc != retrieved => {
+    match FullSignedDoc::retrieve_one(db_doc.id(), Some(db_doc.ver())).await {
+        Ok(Some(retrieved)) if db_doc != retrieved => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Document with the same `id` and `ver` already exists",
                 Some(doc.report()),
             )))
             .into();
         },
-        Ok(_) => return Responses::NoContent.into(),
-        Err(err) if err.is::<NotFoundError>() => (),
+        Ok(Some(_)) => return Responses::NoContent.into(),
+        Ok(None) => (),
         Err(err) => return AllResponses::handle_error(&err),
     }
 
