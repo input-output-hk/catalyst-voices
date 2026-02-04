@@ -1,5 +1,6 @@
 //! Reusable common database objects
 
+pub(crate) mod catalyst_id_selector;
 pub(crate) mod query_limits;
 pub(crate) mod uuid_list;
 pub(crate) mod uuid_selector;

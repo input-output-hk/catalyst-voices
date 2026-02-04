@@ -132,11 +132,12 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         query: &CatalystSignedDocumentSearchQuery,
     ) -> anyhow::Result<Vec<CatalystSignedDocument>> {
         let handle = Handle::current();
-        // match handle.block_on(FullSignedDoc::retrieve(&id.uuid(), Some(&id.uuid()))) {
-        //     Ok(doc) => Ok(Some(doc.raw().try_into()?)),
-        //     Err(err) if err.is::<NotFoundError>() => Ok(None),
-        //     Err(err) => Err(err),
-        // }
+        // let docs = handle.block_on(async {
+        //     let docs = SignedDocBody::retrieve(&query.into(), &QueryLimits::ALL)
+        //         .await
+        //         .try_collect()?;
+        //     docs
+        // })?;
         // TODO: FIXME:
         todo!()
     }

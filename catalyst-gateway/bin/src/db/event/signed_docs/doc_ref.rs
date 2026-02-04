@@ -3,7 +3,7 @@
 use crate::db::event::common::{ConditionalStmt, uuid_selector::UuidSelector};
 
 /// Document Reference filtering struct.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) struct DocumentRef {
     /// Document id filtering
     pub(crate) id: Option<UuidSelector>,

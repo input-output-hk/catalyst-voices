@@ -1,6 +1,7 @@
 //! Signed docs queries
 
 mod doc_ref;
+mod doc_ref_selector;
 mod full_signed_doc;
 mod query_filter;
 mod signed_doc_body;

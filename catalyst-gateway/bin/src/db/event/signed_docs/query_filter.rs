@@ -1,9 +1,17 @@
 //! `DocsQueryFilter` struct implementation.
 
-use std::fmt::Display;
+use std::{fmt::Display, ops::Deref};
+
+use catalyst_signed_doc::providers::{CatalystSignedDocumentSearchQuery, DocTypeSelector};
 
 use super::DocumentRef;
-use crate::db::event::common::{ConditionalStmt, uuid_list::UuidList, uuid_selector::UuidSelector};
+use crate::db::event::{
+    common::{
+        ConditionalStmt, catalyst_id_selector::CatalystIdSelector, uuid_list::UuidList,
+        uuid_selector::UuidSelector,
+    },
+    signed_docs::doc_ref_selector::DocumentRefSelector,
+};
 
 /// A `select_signed_docs` query filtering argument.
 /// If all fields would be `None` the query will search for all entries from the db.
@@ -16,13 +24,17 @@ pub(crate) struct DocsQueryFilter {
     /// `ver` field. `None` if unspecified.
     ver: Option<UuidSelector>,
     /// `metadata->'ref'` field.
-    doc_ref: Option<DocumentRef>,
+    doc_ref: Option<DocumentRefSelector>,
     /// `metadata->'template'` field.
-    template: Option<DocumentRef>,
+    template: Option<DocumentRefSelector>,
     /// `metadata->'reply'` field.
-    reply: Option<DocumentRef>,
+    reply: Option<DocumentRefSelector>,
     /// `metadata->'parameters'` field.
-    parameters: Option<DocumentRef>,
+    parameters: Option<DocumentRefSelector>,
+    /// `metadata->'collaborators'` field.
+    collaborators: Option<CatalystIdSelector>,
+    /// `authors` field.
+    authors: Option<CatalystIdSelector>,
 }
 
 impl Display for DocsQueryFilter {
@@ -62,6 +74,16 @@ impl Display for DocsQueryFilter {
             (
                 "metadata->'parameters'",
                 self.parameters
+                    .as_ref()
+                    .map(|v| -> &dyn ConditionalStmt { v }),
+            ),
+            (
+                "signed_docs.authors",
+                self.authors.as_ref().map(|v| -> &dyn ConditionalStmt { v }),
+            ),
+            (
+                "metadata->collaborators",
+                self.collaborators
                     .as_ref()
                     .map(|v| -> &dyn ConditionalStmt { v }),
             ),
@@ -123,7 +145,7 @@ impl DocsQueryFilter {
         arg: DocumentRef,
     ) -> Self {
         DocsQueryFilter {
-            doc_ref: Some(arg),
+            doc_ref: Some(DocumentRefSelector::IdOrVer(arg)),
             ..self
         }
     }
@@ -134,7 +156,7 @@ impl DocsQueryFilter {
         arg: DocumentRef,
     ) -> Self {
         DocsQueryFilter {
-            template: Some(arg),
+            template: Some(DocumentRefSelector::IdOrVer(arg)),
             ..self
         }
     }
@@ -145,7 +167,7 @@ impl DocsQueryFilter {
         arg: DocumentRef,
     ) -> Self {
         DocsQueryFilter {
-            reply: Some(arg),
+            reply: Some(DocumentRefSelector::IdOrVer(arg)),
             ..self
         }
     }
@@ -156,8 +178,34 @@ impl DocsQueryFilter {
         arg: DocumentRef,
     ) -> Self {
         DocsQueryFilter {
-            parameters: Some(arg),
+            parameters: Some(DocumentRefSelector::IdOrVer(arg)),
             ..self
+        }
+    }
+}
+
+impl From<CatalystSignedDocumentSearchQuery> for DocsQueryFilter {
+    fn from(val: CatalystSignedDocumentSearchQuery) -> Self {
+        let doc_type = val
+            .doc_type
+            .map(|DocTypeSelector::In(types)| {
+                types
+                    .into_iter()
+                    .map(|t| t.deref().uuid())
+                    .collect::<Vec<_>>()
+                    .into()
+            })
+            .unwrap_or_default();
+        Self {
+            doc_type,
+            id: val.id.map(Into::into),
+            ver: val.ver.map(Into::into),
+            doc_ref: val.doc_ref.map(Into::into),
+            template: val.template.map(Into::into),
+            reply: val.reply.map(Into::into),
+            parameters: val.parameters.map(Into::into),
+            collaborators: val.collaborators.map(Into::into),
+            authors: val.authors.map(Into::into),
         }
     }
 }
