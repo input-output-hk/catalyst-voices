@@ -586,7 +586,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           return isListedAsCollaborator;
         }
 
-        // 2. What is the user's latest action content?
+        // 2. Collaborator's latest action content
         final latestAction =
             '''
           SELECT json_extract(action.content, '\$.action')
@@ -601,11 +601,66 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           LIMIT 1
         ''';
 
-        // 3. Specific Condition based on status
+        // 3. Specific Condition based on status.
+        // Not this is just invitation, not approvals for such as final proposal.
         final statusCondition = switch (status) {
           CollaborationInvitationStatus.accepted => "($latestAction) IN ('draft', 'final')",
           CollaborationInvitationStatus.rejected => "($latestAction) = 'hide'",
           CollaborationInvitationStatus.pending => '($latestAction) IS NULL',
+        };
+
+        // Combine: MUST be listed AND meet the status condition
+        return '($isListedAsCollaborator AND $statusCondition)';
+      case ProposalApproval(:final id, :final status):
+        final escapedId = _escapeSqlString(id.toSignificant().toString());
+        final actionTypeUuid = DocumentType.proposalActionDocument.uuid;
+
+        // 1. Is the user listed in 'collaborators' on the current version?
+        final isListedAsCollaborator =
+            '''
+          EXISTS (
+            SELECT 1 FROM document_collaborators dc
+            WHERE dc.document_id = p.id
+              AND dc.document_ver = p.ver
+              AND dc.account_significant_id = '$escapedId'
+          )
+        ''';
+
+        // 2. Collaborator's latest action content for specific version
+        final latestAction =
+            '''
+          SELECT json_extract(action.content, '\$.action')
+          FROM documents_v2 action
+          INNER JOIN document_authors da
+            ON action.id = da.document_id
+            AND action.ver = da.document_ver
+          WHERE action.type = '$actionTypeUuid'
+            AND action.ref_id = p.id
+            AND action.ref_ver = p.ver
+            AND da.account_significant_id = '$escapedId'
+          ORDER BY action.ver DESC
+          LIMIT 1
+        ''';
+
+        // 3. Status logic using ep.action_type for global context.
+        // ep.action_type is 'final', 'draft', or NULL (treated as draft)
+        final statusCondition = switch (status) {
+          ProposalApprovalStatus.accepted =>
+            '''
+            CASE 
+              WHEN ep.action_type = 'final' THEN ($latestAction) = 'final'
+              ELSE ($latestAction) IN ('draft', 'final')
+            END
+          ''',
+          ProposalApprovalStatus.rejected => "($latestAction) = 'hide'",
+          ProposalApprovalStatus.pending =>
+            '''
+            (
+              ($latestAction) IS NULL 
+              OR 
+              (ep.action_type = 'final' AND ($latestAction) = 'draft')
+            )
+          ''',
         };
 
         // Combine: MUST be listed AND meet the status condition
