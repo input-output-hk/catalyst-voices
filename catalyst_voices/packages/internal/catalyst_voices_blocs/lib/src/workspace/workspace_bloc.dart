@@ -327,13 +327,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       relationships: switch (_cache.workspaceFilter) {
         WorkspaceFilters.allProposals => {
           OriginalAuthor(activeAccountId),
-          CollaborationInvitation.accepted(activeAccountId, isPinned: false),
+          CollaborationInvitation.accepted(activeAccountId),
         },
         WorkspaceFilters.mainProposer => {
           OriginalAuthor(activeAccountId),
         },
         WorkspaceFilters.collaborator => {
-          CollaborationInvitation.accepted(activeAccountId, isPinned: false),
+          CollaborationInvitation.accepted(activeAccountId),
         },
       },
     );

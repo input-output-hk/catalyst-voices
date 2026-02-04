@@ -15,11 +15,21 @@ final class CollaboratorInvitationsProposalsFilter extends ProposalsFiltersV2 {
 final class CollaboratorProposalApprovalsFilter extends ProposalsFiltersV2 {
   CollaboratorProposalApprovalsFilter(
     CatalystId id, {
-    ProposalApprovalStatus approvalStatus = ProposalApprovalStatus.any,
+    required ProposalApprovalStatus status,
   }) : super(
          status: ProposalStatusFilter.aFinal,
-         relationships: approvalStatus.approvalFilter(id),
+         relationships: {
+           ProposalApproval(id: id, status: status),
+         },
        );
+
+  CollaboratorProposalApprovalsFilter.any(CatalystId id)
+    : super(
+        status: ProposalStatusFilter.aFinal,
+        relationships: {
+          CollaborationInvitation.any(id),
+        },
+      );
 }
 
 // TODO(damian-molinski): should filter by campaign

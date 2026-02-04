@@ -56,6 +56,40 @@ final class OriginalAuthor extends ProposalsRelationship {
   String toString() => 'OriginalAuthor($id)';
 }
 
+/// Matches proposals where [id] is a collaborator with a specific [status].
+final class ProposalApproval extends ProposalsRelationship {
+  final CatalystId id;
+  final ProposalApprovalStatus status;
+
+  const ProposalApproval({
+    required this.id,
+    required this.status,
+  });
+
+  const ProposalApproval.accepted(this.id) : status = ProposalApprovalStatus.accepted;
+
+  const ProposalApproval.pending(this.id) : status = ProposalApprovalStatus.pending;
+
+  const ProposalApproval.rejected(this.id) : status = ProposalApprovalStatus.rejected;
+
+  @override
+  List<Object?> get props => [id, status];
+}
+
+/// Approving proposal is different from accepting invitation as it require explicit final action
+/// for final proposals.
+enum ProposalApprovalStatus {
+  /// The user approved proposal. This means different actions for public draft and final proposal.
+  accepted,
+
+  /// The user has rejected the proposal by submitting a 'hide' action for specific version.
+  rejected,
+
+  /// The user is listed as a collaborator but has not submitted any action for that version OR
+  /// submitted draft for but proposal is final.
+  pending,
+}
+
 /// Defines the specific relationship criteria for filtering proposals.
 sealed class ProposalsRelationship extends Equatable {
   const ProposalsRelationship();
