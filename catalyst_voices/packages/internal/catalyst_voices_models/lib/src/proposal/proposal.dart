@@ -9,7 +9,6 @@ export 'data/raw_proposal_brief.dart';
 export 'data/raw_proposal_collaborators_actions.dart';
 export 'detail_proposal.dart';
 export 'exception/proposal_limit_reached_exception.dart';
-export 'proposal_approval_status.dart';
 export 'proposal_creation_step.dart';
 export 'proposal_data.dart';
 export 'proposal_enums.dart';

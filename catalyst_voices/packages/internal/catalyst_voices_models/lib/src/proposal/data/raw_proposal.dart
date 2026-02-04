@@ -33,7 +33,6 @@ class RawProposal extends Equatable {
   RawProposal copyWith({
     DocumentData? proposal,
     Optional<DocumentData>? template,
-    Optional<ProposalSubmissionAction>? actionType,
     List<String>? versionIds,
     int? commentsCount,
     bool? isFavorite,

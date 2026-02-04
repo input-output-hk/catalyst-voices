@@ -972,6 +972,111 @@ void main() {
 
           expect(result, 2);
         });
+
+        test('returns correct value for approvals of final proposals', () async {
+          // GIVEN
+          final author = _createTestAuthor(name: 'author');
+          final collab = _createTestAuthor(name: 'collab', role0KeySeed: 1);
+
+          // Initial public draft
+          final p1Id = SignedDocumentRef.first(DocumentRefFactory.uuidV7At(earliest));
+          final pV1 = _createTestDocumentEntity(
+            id: p1Id.id,
+            ver: p1Id.ver,
+            authors: [author],
+            collaborators: [collab],
+          );
+
+          // Collaborator accepted version 1
+          final collabActionId = SignedDocumentRef.first(DocumentRefFactory.uuidV7At(middle));
+          final collabAcceptDraft = _createTestDocumentEntity(
+            id: collabActionId.id,
+            ver: collabActionId.ver,
+            type: DocumentType.proposalActionDocument,
+            refId: p1Id.id,
+            refVer: p1Id.ver,
+            authors: [collab],
+            contentData: ProposalSubmissionActionDto.draft.toJson(),
+          );
+
+          // Moving proposal to final
+          final authorActionIdUuid = DocumentRefFactory.uuidV7At(
+            middle.add(const Duration(days: 1)),
+          );
+          final authorMovesToFinal = _createTestDocumentEntity(
+            id: authorActionIdUuid,
+            ver: authorActionIdUuid,
+            authors: [author],
+            type: DocumentType.proposalActionDocument,
+            refId: p1Id.id,
+            refVer: p1Id.ver,
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([pV1, collabAcceptDraft, authorMovesToFinal]);
+
+          // WHEN
+          final filters = CollaboratorProposalApprovalsFilter(
+            collab,
+            status: ProposalApprovalStatus.pending,
+          );
+          final count = await dao.getVisibleProposalsCount(filters: filters);
+
+          // THEN
+          // Should find the one proposal because didn't accept final proposal yet.
+          expect(count, equals(1));
+        });
+
+        test('proposal with final action are also considered as display consent', () async {
+          // GIVEN
+          final author = _createTestAuthor(name: 'author');
+          final collab = _createTestAuthor(name: 'collab', role0KeySeed: 1);
+
+          // Initial public draft
+          final p1Id = SignedDocumentRef.first(DocumentRefFactory.uuidV7At(earliest));
+          final pV1 = _createTestDocumentEntity(
+            id: p1Id.id,
+            ver: p1Id.ver,
+            authors: [author],
+            collaborators: [collab],
+          );
+
+          // Moving proposal to final
+          final authorActionIdUuid = DocumentRefFactory.uuidV7At(middle);
+          final authorMovesToFinal = _createTestDocumentEntity(
+            id: authorActionIdUuid,
+            ver: authorActionIdUuid,
+            authors: [author],
+            type: DocumentType.proposalActionDocument,
+            refId: p1Id.id,
+            refVer: p1Id.ver,
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          // Collaborator accepted version 1
+          final collabActionId = SignedDocumentRef.first(
+            DocumentRefFactory.uuidV7At(middle.add(const Duration(days: 1))),
+          );
+          final collabAcceptDraft = _createTestDocumentEntity(
+            id: collabActionId.id,
+            ver: collabActionId.ver,
+            type: DocumentType.proposalActionDocument,
+            refId: p1Id.id,
+            refVer: p1Id.ver,
+            authors: [collab],
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([pV1, collabAcceptDraft, authorMovesToFinal]);
+
+          // WHEN
+          final filters = CollaboratorInvitationsProposalsFilter(collab);
+          final count = await dao.getVisibleProposalsCount(filters: filters);
+
+          // THEN
+          // Should not include proposal because it was implicitly accepted by final action.
+          expect(count, equals(0));
+        });
       });
 
       group('updateProposalFavorite', () {
@@ -5692,6 +5797,53 @@ void main() {
                 // Then: Should not find any proposals
                 expect(result.items, isEmpty);
               });
+
+              test('should return proposal when invitation is accepted and NOT pinned', () async {
+                // GIVEN
+                // Create two versions of the same proposal
+                final pV1 = _createTestDocumentEntity(
+                  id: 'p1',
+                  ver: 'v1',
+                  authors: [author],
+                  collaborators: [collab],
+                );
+                final pV2 = _createTestDocumentEntity(
+                  id: 'p1',
+                  ver: 'v2',
+                  authors: [author],
+                  collaborators: [collab],
+                );
+
+                // Collaborator accepted version 1, but no action exists for version 2
+                final actionV1 = _createTestDocumentEntity(
+                  id: 'a1',
+                  ver: 'v1-action',
+                  type: DocumentType.proposalActionDocument,
+                  refId: 'p1',
+                  refVer: 'v1',
+                  authors: [collab],
+                  contentData: ProposalSubmissionActionDto.draft.toJson(),
+                );
+
+                await db.documentsV2Dao.saveAll([pV1, pV2, actionV1]);
+
+                // WHEN
+                // Querying with isPinned: false (unpinned)
+                final filters = ProposalsFiltersV2(
+                  relationships: {
+                    CollaborationInvitation.accepted(collab),
+                  },
+                );
+                final result = await dao.getProposalsBriefPage(
+                  request: const PageRequest(page: 0, size: 10),
+                  filters: filters,
+                );
+
+                // THEN
+                // Should find the proposal because the latest action for the ID is 'accepted'
+                expect(result.items, hasLength(1));
+                expect(result.items.first.proposal.id, 'p1');
+              });
             });
 
             group('Combined (OR logic)', () {
@@ -7688,7 +7840,10 @@ void main() {
 
         test('returns proper amount of approvals of proposals', () async {
           final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
-          final approvalsFilters = CollaboratorProposalApprovalsFilter(collaborator);
+          final approvalsFilters = CollaboratorProposalApprovalsFilter(
+            collaborator,
+            status: ProposalApprovalStatus.pending,
+          );
 
           final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
 
@@ -7822,11 +7977,11 @@ void main() {
           );
         });
 
-        test('returns proper amount of pending approvals with decide status', () async {
+        test('returns proper amount of pending approvals with pending status', () async {
           final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
           final approvalsFilters = CollaboratorProposalApprovalsFilter(
             collaborator,
-            approvalStatus: ProposalApprovalStatus.decide,
+            status: ProposalApprovalStatus.pending,
           );
 
           final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
@@ -7930,11 +8085,11 @@ void main() {
           );
         });
 
-        test('returns proper amount of final approvals with aFinal status', () async {
+        test('returns proper amount of final approvals with accepted status', () async {
           final collaborator = _createTestAuthor(name: 'Collaborator', role0KeySeed: 0);
           final approvalsFilters = CollaboratorProposalApprovalsFilter(
             collaborator,
-            approvalStatus: ProposalApprovalStatus.aFinal,
+            status: ProposalApprovalStatus.accepted,
           );
 
           final author = _createTestAuthor(name: 'Author', role0KeySeed: 2);
@@ -8031,9 +8186,10 @@ void main() {
 
           await expectLater(
             finalCount,
-            emits(2),
+            emits(1),
             reason:
-                'Proposal2 has accepted status and proposal3 has rejected status. '
+                'Proposal2 has accepted status. '
+                'Proposal3 has rejected status and is not counted. '
                 'Proposal1 has pending status and is not counted.',
           );
         });

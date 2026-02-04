@@ -488,7 +488,7 @@ final class ProposalServiceImpl implements ProposalService {
     final invitationsFilters = CollaboratorInvitationsProposalsFilter(id);
     final approvalsFilters = CollaboratorProposalApprovalsFilter(
       id,
-      approvalStatus: ProposalApprovalStatus.decide,
+      status: ProposalApprovalStatus.pending,
     );
 
     final invitationsCountStream = watchProposalsCountV2(

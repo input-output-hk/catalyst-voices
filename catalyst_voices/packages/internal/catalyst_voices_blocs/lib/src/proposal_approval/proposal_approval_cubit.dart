@@ -48,7 +48,7 @@ final class ProposalApprovalCubit extends Cubit<ProposalApprovalState> with Bloc
       return null;
     }
 
-    return CollaboratorProposalApprovalsFilter(activeAccountId);
+    return CollaboratorProposalApprovalsFilter.any(activeAccountId);
   }
 
   List<UsersProposalOverview> _filterDecideItems(
