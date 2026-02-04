@@ -1,5 +1,9 @@
 {
   "@@locale": "en",
+  "abstainVotesFilter": "Abstain Votes",
+  "@abstainVotesFilter": {
+    "description": "Filter option to show only abstain votes"
+  },
   "account": "Account",
   "@account": {
     "description": "Label for account section or navigation"
@@ -156,6 +160,10 @@
   "allProposals": "All Proposals",
   "@allProposals": {
     "description": "text indicating to view all proposals"
+  },
+  "allVotesFilter": "All Votes",
+  "@allVotesFilter": {
+    "description": "Filter option to show all votes"
   },
   "allow": "Allow",
   "@allow": {
@@ -4403,18 +4411,6 @@
   "@voteAbstain": {
     "description": "Vote abstain on proposal"
   },
-  "allVotesFilter": "All Votes",
-  "@allVotesFilter": {
-    "description": "Filter option to show all votes"
-  },
-  "yesVotesFilter": "Yes Votes",
-  "@yesVotesFilter": {
-    "description": "Filter option to show only yes votes"
-  },
-  "abstainVotesFilter": "Abstain Votes",
-  "@abstainVotesFilter": {
-    "description": "Filter option to show only abstain votes"
-  },
   "voteList": "Vote List",
   "@voteList": {
     "description": "Name of place where user adds votes on proposals"
@@ -5039,6 +5035,10 @@
   "yes": "Yes",
   "@yes": {
     "description": "CTA to confirm something"
+  },
+  "yesVotesFilter": "Yes Votes",
+  "@yesVotesFilter": {
+    "description": "Filter option to show only yes votes"
   },
   "yesterday": "Yesterday",
   "@yesterday": {
