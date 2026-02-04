@@ -566,7 +566,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           )
         ''';
 
-      case CollaborationInvitation(:final id, :final status):
+      case CollaborationInvitation(:final id, :final status, :final isPinned):
         final escapedId = _escapeSqlString(id.toSignificant().toString());
         final actionTypeUuid = DocumentType.proposalActionDocument.uuid;
 
@@ -586,7 +586,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           return isListedAsCollaborator;
         }
 
-        // 2. What is the user's latest action content?
+        // 2. Collaborator's latest action content
+        // Uses isPinned to decide if we look at specific version or document history
+        final versionPinClause = isPinned ? 'AND action.ref_ver = p.ver' : '';
         final latestAction =
             '''
           SELECT json_extract(action.content, '\$.action')
@@ -596,16 +598,31 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
             AND action.ver = da.document_ver
           WHERE action.type = '$actionTypeUuid'
             AND action.ref_id = p.id
+            $versionPinClause
             AND da.account_significant_id = '$escapedId'
           ORDER BY action.ver DESC
           LIMIT 1
         ''';
 
-        // 3. Specific Condition based on status
+        // 3. Status logic using ep.action_type for global context.
+        // ep.action_type is 'final', 'draft', or NULL (treated as draft)
         final statusCondition = switch (status) {
-          CollaborationInvitationStatus.accepted => "($latestAction) IN ('draft', 'final')",
+          CollaborationInvitationStatus.accepted =>
+            '''
+            CASE 
+              WHEN ep.action_type = 'final' THEN ($latestAction) = 'final'
+              ELSE ($latestAction) IN ('draft', 'final')
+            END
+          ''',
           CollaborationInvitationStatus.rejected => "($latestAction) = 'hide'",
-          CollaborationInvitationStatus.pending => '($latestAction) IS NULL',
+          CollaborationInvitationStatus.pending =>
+            '''
+            (
+              ($latestAction) IS NULL 
+              OR 
+              (ep.action_type = 'final' AND ($latestAction) = 'draft')
+            )
+          ''',
         };
 
         // Combine: MUST be listed AND meet the status condition

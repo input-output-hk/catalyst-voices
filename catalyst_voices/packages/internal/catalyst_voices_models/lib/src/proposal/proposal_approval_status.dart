@@ -5,17 +5,20 @@ enum ProposalApprovalStatus {
   aFinal,
   any;
 
-  Set<CollaborationInvitation> approvalFilter(CatalystId id) {
+  Set<CollaborationInvitation> approvalFilter(
+    CatalystId id, {
+    required bool isPinned,
+  }) {
     return switch (this) {
       decide => {
-        CollaborationInvitation.pending(id),
+        CollaborationInvitation.pending(id, isPinned: isPinned),
       },
       aFinal => {
-        CollaborationInvitation.accepted(id),
-        CollaborationInvitation.rejected(id),
+        CollaborationInvitation.accepted(id, isPinned: isPinned),
+        CollaborationInvitation.rejected(id, isPinned: isPinned),
       },
       any => {
-        CollaborationInvitation.any(id),
+        CollaborationInvitation.any(id, isPinned: isPinned),
       },
     };
   }

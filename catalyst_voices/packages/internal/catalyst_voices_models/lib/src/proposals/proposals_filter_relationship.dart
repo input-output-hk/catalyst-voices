@@ -14,11 +14,11 @@ final class CollaborationInvitation extends ProposalsRelationship {
 
   const CollaborationInvitation.accepted(this.id) : status = CollaborationInvitationStatus.accepted;
 
+  const CollaborationInvitation.any(this.id) : status = null;
+
   const CollaborationInvitation.pending(this.id) : status = CollaborationInvitationStatus.pending;
 
   const CollaborationInvitation.rejected(this.id) : status = CollaborationInvitationStatus.rejected;
-
-  const CollaborationInvitation.any(this.id) : status = null;
 
   @override
   List<Object?> get props => [id, status];

@@ -705,17 +705,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       referencing: proposalId.toLoose(),
       authors: rawProposal.originalAuthors,
     );
-
-    final action = _resolveProposalAction(
-      actionDocs: actionsDocs,
-      proposalId: proposalId,
-    );
+    final action = _resolveProposalAction(actionDocs: actionsDocs, proposalId: proposalId);
 
     final collaboratorsActions = await _proposalsLocalSource.getCollaboratorsActions(
-      // Get latest submission action for any version of proposal.
-      // Later it will be resolved in ProposalDataCollaborator.fromAction
-      proposalsRefs: [proposalId.toLoose()],
+      proposalsRefs: [
+        if (action != ProposalSubmissionAction.aFinal) proposalId.toLoose() else proposalId,
+      ],
     );
+
     final proposalCollaboratorsActions = collaboratorsActions[proposalId.id]?.data ?? const {};
 
     return ProposalDataV2.build(

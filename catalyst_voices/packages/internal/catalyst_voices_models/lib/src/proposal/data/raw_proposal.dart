@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 class RawProposal extends Equatable {
   final DocumentData proposal;
   final DocumentData? template;
-  final ProposalSubmissionAction? actionType;
   final List<String> versionIds;
   final int commentsCount;
   final bool isFavorite;
@@ -13,14 +12,11 @@ class RawProposal extends Equatable {
   const RawProposal({
     required this.proposal,
     required this.template,
-    this.actionType,
     required this.versionIds,
     required this.commentsCount,
     required this.isFavorite,
     required this.originalAuthors,
   });
-
-  bool get isFinal => actionType == ProposalSubmissionAction.aFinal;
 
   int get iteration => versionIds.indexOf(proposal.id.ver!) + 1;
 
@@ -28,7 +24,6 @@ class RawProposal extends Equatable {
   List<Object?> get props => [
     proposal,
     template,
-    actionType,
     versionIds,
     commentsCount,
     isFavorite,
@@ -38,7 +33,6 @@ class RawProposal extends Equatable {
   RawProposal copyWith({
     DocumentData? proposal,
     Optional<DocumentData>? template,
-    Optional<ProposalSubmissionAction>? actionType,
     List<String>? versionIds,
     int? commentsCount,
     bool? isFavorite,
@@ -47,7 +41,6 @@ class RawProposal extends Equatable {
     return RawProposal(
       proposal: proposal ?? this.proposal,
       template: template.dataOr(this.template),
-      actionType: actionType.dataOr(this.actionType),
       versionIds: versionIds ?? this.versionIds,
       commentsCount: commentsCount ?? this.commentsCount,
       isFavorite: isFavorite ?? this.isFavorite,
