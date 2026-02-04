@@ -4,7 +4,6 @@ export 'auth/auth_token_generator.dart' show AuthTokenGenerator;
 export 'blockchain/blockchain_service.dart' show BlockchainService;
 export 'campaign/active_campaign_observer.dart';
 export 'campaign/campaign_service.dart' show CampaignService;
-export 'campaign/campaign_service.dart' show mockedActiveCampaign;
 export 'comment/comment_service.dart' show CommentService;
 export 'config/config_service.dart' show ConfigService;
 export 'crypto/bip32_ed25519_catalyst_private_key.dart' show Bip32Ed25519XCatalystPrivateKeyFactory;

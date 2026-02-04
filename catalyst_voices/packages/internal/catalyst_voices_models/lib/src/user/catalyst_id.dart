@@ -95,6 +95,11 @@ final class CatalystId extends Equatable {
     return CatalystId.fromUri(Uri.parse(data));
   }
 
+  bool get isAnonymous {
+    final username = this.username;
+    return username == null || username.isBlank;
+  }
+
   @override
   List<Object?> get props => [
     host,
@@ -105,6 +110,14 @@ final class CatalystId extends Equatable {
     rotation,
     encrypt,
   ];
+
+  /// A unique string representation of the significant parts of this ID.
+  /// Format: scheme://host/encodedKey
+  String get uid {
+    // We can cache this string if we implement a lazy-loaded variable,
+    // but calculation is generally cheap enough.
+    return '$scheme://$host/${base64UrlNoPadEncode(role0Key)}';
+  }
 
   CatalystId copyWith({
     String? scheme,
@@ -128,9 +141,20 @@ final class CatalystId extends Equatable {
     );
   }
 
+  /// Whether this and [other] represent the same user.
+  bool isSameAs(CatalystId other) {
+    if (identical(this, other)) return true;
+    if (host != other.host) return false;
+    if (scheme != other.scheme) return false;
+
+    return listEquals(role0Key, other.role0Key);
+  }
+
   /// Objects which holds [CatalystId] can be uniquely identified only by
   /// comparing [role0Key] and [host] thus they're significant parts of
   /// [CatalystId].
+  ///
+  /// If possible prefer [uid] as it's faster and do not create unnecessary objects.
   CatalystId toSignificant() => CatalystId(scheme: scheme, host: host, role0Key: role0Key);
 
   @override
@@ -250,5 +274,18 @@ enum CatalystIdHost {
       (element) => element.host.equalsIgnoreCase(host),
       orElse: () => CatalystIdHost.undefined,
     );
+  }
+}
+
+extension NullableCatalystId on CatalystId? {
+  /// Helper extension method which makes it easier to compare nullable [CatalystId].
+  ///
+  /// Returns true if both instance are null or [CatalystId.isSameAs] returns true.
+  bool isSameAs(CatalystId? other) {
+    final instance = this;
+    if (instance == null && other == null) return true;
+    if (instance != null && other != null) return instance.isSameAs(other);
+
+    return false;
   }
 }

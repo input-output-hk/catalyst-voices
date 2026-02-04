@@ -8,6 +8,7 @@ import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart'
 import 'package:catalyst_voices_repositories/src/api/models/id_selector.dart';
 import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
 import 'package:catalyst_voices_repositories/src/api/models/indexed_document_version.dart';
+import 'package:catalyst_voices_repositories/src/api/models/ver_selector.dart';
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:collection/collection.dart';
@@ -68,9 +69,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     int limit = 100,
     required DocumentIndexFilters filters,
   }) {
+    final id = filters.id?.id;
+    final ver = filters.id?.ver;
+    final parameters = filters.parameters;
+
     final filter = DocumentIndexQueryFilter(
       type: filters.type?.map((e) => e.uuid).toList(),
-      parameters: IdAndVerRef.idOnly(IdSelector.inside(filters.categoriesIds)),
+      id: id != null ? IdSelector.eq(id) : null,
+      ver: ver != null ? VerSelector.eq(ver) : null,
+      parameters: parameters != null ? IdAndVerRef.idOnly(IdSelector.inside(parameters)) : null,
     );
 
     return _getDocumentIndexList(
@@ -165,11 +172,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 }
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
+  /// Looks up matching signed document according to [ref].
   @override
   Future<DocumentDataWithArtifact?> get(DocumentRef ref);
 
   Future<String?> getLatestVersion(String id);
 
+  /// Looks up all signed document refs according to [filters].
+  ///
+  /// Response is paginated using [page] and [limit].
   Future<DocumentIndex> index({
     int page,
     int limit,

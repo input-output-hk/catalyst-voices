@@ -10,7 +10,7 @@ const _requiredTapCount = 6;
 final _logger = Logger('DevToolsBloc');
 
 /// Manages the dev tools.
-
+///
 /// It allows developers to obtain information about the system.
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
@@ -19,10 +19,12 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
   final LoggingService? _loggingService;
   final DownloaderService _downloaderService;
   final DocumentsService _documentsService;
+  final CampaignService _campaignService;
 
   Timer? _resetCountTimer;
   StreamSubscription<SyncStats>? _syncStartsSub;
   StreamSubscription<int>? _documentsCountSub;
+  StreamSubscription<Campaign?>? _activeCampaignSub;
 
   DevToolsBloc(
     this._devToolsService,
@@ -30,25 +32,26 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     this._loggingService,
     this._downloaderService,
     this._documentsService,
+    this._campaignService,
   ) : super(const DevToolsState()) {
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
-    on<RecoverDataEvent>(_handleRecoverData);
-    on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
+    on<InitDataEvent>(_handleInitData);
     on<SyncDocumentsEvent>(_handleSyncDocuments);
-    on<UpdateAllEvent>(_handleUpdateAll);
-    on<WatchSystemInfoEvent>(_handleWatchSystemInfoEvent);
-    on<StopWatchingSystemInfoEvent>(_handleStopWatchingSystemInfoEvent);
-    on<WatchDocumentsEvent>(_handleWatchDocumentsEvent);
-    on<StopWatchingDocumentsEvent>(_handleStopWatchingDocumentsEvent);
-    on<DocumentsCountChangedEvent>(_updateDocumentsCount);
+    on<WatchSystemInfoEvent>(_handleWatchSystemInfo);
+    on<StopWatchingSystemInfoEvent>(_handleStopWatchingSystemInfo);
+    on<WatchDocumentsEvent>(_handleWatchDocuments);
+    on<StopWatchingDocumentsEvent>(_handleStopWatchingDocuments);
+    on<WatchActiveCampaignEvent>(_handleWatchActiveCampaign);
+    on<StopWatchingActiveCampaignEvent>(_handleStopWatchingActiveCampaign);
+    on<DocumentsCountChangedEvent>(_updateDocumentsCountChanged);
     on<SyncStatsChangedEvent>(_handleSyncStatsChanged);
     on<ChangeLogLevelEvent>(_handleChangeLogLevel);
-    on<ChangeCollectLogsEvent>(_handleChangeCollectLogs);
+    on<ChangeCollectLogsEvent>(_handleChangeCollectLogsEvent);
+    on<ChangeActiveCampaignEvent>(_handleChangeActiveCampaign);
     on<PrepareAndExportLogsEvent>(_handleExportLogs);
     on<ClearDocumentsEvent>(_handleClearDocuments);
-
-    add(const RecoverDataEvent());
+    on<ActiveCampaignChangedEvent>(_handleActiveCampaignChanged);
   }
 
   @override
@@ -62,10 +65,31 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     await _documentsCountSub?.cancel();
     _documentsCountSub = null;
 
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
+
     return super.close();
   }
 
-  Future<void> _handleChangeCollectLogs(
+  void _handleActiveCampaignChanged(ActiveCampaignChangedEvent event, Emitter<DevToolsState> emit) {
+    emit(state.copyWithActiveCampaign(event.campaign));
+  }
+
+  Future<void> _handleChangeActiveCampaign(
+    ChangeActiveCampaignEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    final previousCampaign = state.campaign.activeCampaign;
+    try {
+      emit(state.copyWithActiveCampaign(event.campaign));
+      await _campaignService.changeActiveCampaign(event.campaign);
+    } catch (error, stackTrace) {
+      _logger.severe('handleChangeActiveCampaign', error, stackTrace);
+      emit(state.copyWithActiveCampaign(previousCampaign));
+    }
+  }
+
+  Future<void> _handleChangeCollectLogsEvent(
     ChangeCollectLogsEvent event,
     Emitter<DevToolsState> emit,
   ) async {
@@ -75,7 +99,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
 
     final settings = await _loggingService!.updateSettings(collectLogs: Optional(collectLogs));
 
-    if (!isClosed) emit(state.copyWith(collectLogs: settings.effectiveCollectLogs));
+    emit(state.copyWith(collectLogs: settings.effectiveCollectLogs));
   }
 
   Future<void> _handleChangeLogLevel(ChangeLogLevelEvent event, Emitter<DevToolsState> emit) async {
@@ -85,7 +109,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
 
     final settings = await _loggingService!.updateSettings(level: Optional(level));
 
-    if (!isClosed) emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
+    emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
   }
 
   Future<void> _handleClearDocuments(ClearDocumentsEvent event, Emitter<DevToolsState> emit) async {
@@ -142,7 +166,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
       final content = await _loggingService!.prepareForExportCollectedLogs();
       final encodedContent = utf8.encode(content);
 
-      final filename = 'catalyst_app_${DateTimeExt.now().toIso8601String()}_logs.txt';
+      final filename = 'catalyst_app_${DateTimeExt.now().microsecondsSinceEpoch}_logs.txt';
 
       await _downloaderService.download(data: encodedContent, filename: filename);
     } catch (error, stack) {
@@ -150,26 +174,38 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
-  Future<void> _handleRecoverData(RecoverDataEvent event, Emitter<DevToolsState> emit) async {
+  Future<void> _handleInitData(InitDataEvent event, Emitter<DevToolsState> emit) async {
     final isDeveloper = await _devToolsService.isDeveloper();
     final syncStats = await _devToolsService.getStats();
     final areLogsOptionsAvailable = _loggingService != null;
     final loggingSettings = await _loggingService?.getSettings();
+    final activeCampaign = await _campaignService.getActiveCampaign();
+    final allCampaigns = await _campaignService.getAllCampaigns();
 
-    if (!isClosed) {
-      emit(
-        state.copyWith(
-          isDeveloper: isDeveloper,
-          syncStats: Optional(syncStats),
-          areLogsOptionsAvailable: areLogsOptionsAvailable,
-          logsLevel: Optional(loggingSettings?.effectiveLevel),
-          collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
+    emit(
+      state.copyWith(
+        isDeveloper: isDeveloper,
+        syncStats: Optional(syncStats),
+        areLogsOptionsAvailable: areLogsOptionsAvailable,
+        logsLevel: Optional(loggingSettings?.effectiveLevel),
+        collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
+        campaign: DevToolsCampaignState(
+          activeCampaign: activeCampaign,
+          allCampaigns: allCampaigns,
         ),
-      );
-    }
+      ),
+    );
   }
 
-  Future<void> _handleStopWatchingDocumentsEvent(
+  Future<void> _handleStopWatchingActiveCampaign(
+    StopWatchingActiveCampaignEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    await _activeCampaignSub?.cancel();
+    _activeCampaignSub = null;
+  }
+
+  Future<void> _handleStopWatchingDocuments(
     StopWatchingDocumentsEvent event,
     Emitter<DevToolsState> emit,
   ) async {
@@ -177,7 +213,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _documentsCountSub = null;
   }
 
-  Future<void> _handleStopWatchingSystemInfoEvent(
+  Future<void> _handleStopWatchingSystemInfo(
     StopWatchingSystemInfoEvent event,
     Emitter<DevToolsState> emit,
   ) async {
@@ -185,12 +221,13 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _syncStartsSub = null;
   }
 
-  Future<void> _handleSyncDocuments(SyncDocumentsEvent event, Emitter<DevToolsState> emit) async {
-    try {
-      await _syncManager.start();
-    } catch (error, stack) {
-      _logger.warning('Sync failed', error, stack);
+  void _handleSyncDocuments(SyncDocumentsEvent event, Emitter<DevToolsState> emit) {
+    final activeCampaign = state.campaign.activeCampaign;
+    if (activeCampaign == null) {
+      return;
     }
+    // Non periodic request, no need to cancel periodic one.
+    _syncManager.queue(CampaignSyncRequest(activeCampaign));
   }
 
   void _handleSyncStatsChanged(SyncStatsChangedEvent event, Emitter<DevToolsState> emit) {
@@ -204,38 +241,16 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     emit(state.copyWith(enableTapCount: 0));
   }
 
-  Future<void> _handleUpdateAll(UpdateAllEvent event, Emitter<DevToolsState> emit) async {
-    try {
-      final systemInfo = await _devToolsService.getSystemInfo();
-      final syncStats = await _devToolsService.getStats();
-
-      if (!isClosed) {
-        emit(state.copyWith(systemInfo: Optional(systemInfo), syncStats: Optional(syncStats)));
-      }
-    } catch (error, stack) {
-      _logger.warning('Updating all failed', error, stack);
-    }
-  }
-
-  Future<void> _handleUpdateSystemInfo(
-    UpdateSystemInfoEvent event,
+  Future<void> _handleWatchActiveCampaign(
+    WatchActiveCampaignEvent event,
     Emitter<DevToolsState> emit,
   ) async {
-    SystemInfo? systemInfo;
-
-    try {
-      systemInfo = await _devToolsService.getSystemInfo();
-    } catch (error, stack) {
-      _logger.warning('Updating system info failed', error, stack);
-      systemInfo = null;
-    } finally {
-      if (!isClosed) {
-        emit(state.copyWith(systemInfo: Optional(systemInfo)));
-      }
-    }
+    _activeCampaignSub = _campaignService.watchActiveCampaign.listen((value) {
+      add(ActiveCampaignChangedEvent(value));
+    });
   }
 
-  Future<void> _handleWatchDocumentsEvent(
+  Future<void> _handleWatchDocuments(
     WatchDocumentsEvent event,
     Emitter<DevToolsState> emit,
   ) async {
@@ -244,7 +259,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     );
   }
 
-  Future<void> _handleWatchSystemInfoEvent(
+  Future<void> _handleWatchSystemInfo(
     WatchSystemInfoEvent event,
     Emitter<DevToolsState> emit,
   ) async {
@@ -253,7 +268,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     );
   }
 
-  void _updateDocumentsCount(DocumentsCountChangedEvent event, Emitter<DevToolsState> emit) {
+  void _updateDocumentsCountChanged(DocumentsCountChangedEvent event, Emitter<DevToolsState> emit) {
     emit(state.copyWith(documentsCount: Optional(event.count)));
   }
 }

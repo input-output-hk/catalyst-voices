@@ -7,7 +7,6 @@ import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_ch
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -36,6 +35,11 @@ abstract interface class UserRepository {
   Future<User> getUser();
 
   Future<VotingPower> getVotingPower();
+
+  Future<bool> isPubliclyVerified({
+    required CatalystId catalystId,
+    RbacToken? token,
+  });
 
   /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<AccountPublicProfile> publishUserProfile({
@@ -91,9 +95,9 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
 
-    final publicProfile = await _getAccountPublicProfile(
-      token: rbacToken,
-    ).onError<ForbiddenException>((_, _) => null);
+    final publicProfile = await _getAccountPublicProfile(token: rbacToken)
+        .onError<NotFoundException>((error, stackTrace) => null)
+        .onError<ForbiddenException>((error, stackTrace) => null);
 
     final username =
         publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
@@ -121,6 +125,21 @@ final class UserRepositoryImpl implements UserRepository {
   @override
   Future<VotingPower> getVotingPower() {
     return _getVotingPower();
+  }
+
+  @override
+  Future<bool> isPubliclyVerified({
+    required CatalystId catalystId,
+    RbacToken? token,
+  }) async {
+    final response = await _apiServices.reviews
+        .isPubliclyVerified(
+          lookup: catalystId.toUri().toStringWithoutScheme(),
+          authorization: token?.authHeader(),
+        )
+        .successBodyOrThrow();
+
+    return response;
   }
 
   @override
@@ -154,7 +173,6 @@ final class UserRepositoryImpl implements UserRepository {
         .getPublicProfile(authorization: token?.authHeader())
         .successBodyOrThrow()
         .then<CatalystIdPublic?>((value) => value)
-        .onError<NotFoundException>((error, stackTrace) => null)
         // Review module returns 401 Registration not found for the auth token
         .onError<UnauthorizedException>((error, stackTrace) => null)
         .then((value) => value?.toModel());
@@ -169,13 +187,12 @@ final class UserRepositoryImpl implements UserRepository {
   Future<String?> _lookupUsernameFromDocuments({
     required CatalystId catalystId,
   }) {
-    final significantId = catalystId.toSignificant();
     return _documentRepository
-        .findFirst(originalAuthorId: significantId)
+        .findFirst(originalAuthorId: catalystId.toSignificant())
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
           (authors) {
-            return authors.firstWhereOrNull((id) => id.toSignificant() == significantId);
+            return authors.firstWhereOrNull((id) => id.isSameAs(catalystId));
           },
         )
         .then((value) => value?.username);

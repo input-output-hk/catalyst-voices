@@ -364,6 +364,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
           proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
           currentIteration: signal.currentIteration,
           nextIteration: signal.nextIteration,
+          showCollaboratorsInfo: signal.hasCollaborators,
         ) ??
         false;
 
@@ -401,6 +402,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
           proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
           currentIteration: signal.currentIteration,
           nextIteration: signal.nextIteration,
+          showCollaboratorsInfo: signal.hasCollaborators,
         ) ??
         false;
 

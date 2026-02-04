@@ -7,6 +7,17 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 /// newer versions.
 /// See [DatabaseDocumentsDataSource].
 abstract interface class SignedDocumentDataSource implements DocumentDataLocalSource {
+  @override
+  Future<List<DocumentData>> findAll({
+    DocumentType? type,
+    DocumentRef? id,
+    DocumentRef? referencing,
+    List<CatalystId>? authors,
+    bool latestOnly,
+    int limit,
+    int offset,
+  });
+
   /// Retrieves a single signed document matching the filters.
   ///
   /// * [originalAuthorId]: Filters documents authored by a specific [CatalystId].

@@ -3,16 +3,22 @@ import 'dart:math' as math;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentParameters;
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/raw_proposal_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
 import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/extensions/json1.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Data Access Object for Proposal-specific queries.
@@ -56,6 +62,8 @@ import 'package:rxdart/rxdart.dart';
     DocumentsV2,
     DocumentAuthors,
     DocumentParameters,
+    LocalDocumentsDrafts,
+    DocumentCollaborators,
     DocumentsLocalMetadata,
   ],
 )
@@ -65,19 +73,99 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftProposalsV2Dao(super.attachedDatabase);
 
   @override
-  Future<DocumentEntityV2?> getProposal(DocumentRef ref) async {
-    final query = select(documentsV2)
-      ..where((tbl) => tbl.id.equals(ref.id) & tbl.type.equals(DocumentType.proposalDocument.uuid));
+  Future<Map<String, RawProposalCollaboratorsActions>> getCollaboratorsActions({
+    required List<DocumentRef> proposalsRefs,
+  }) async {
+    if (proposalsRefs.isEmpty) return {};
 
-    if (ref.isExact) {
-      query.where((tbl) => tbl.ver.equals(ref.ver!));
-    } else {
-      query
-        ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
-        ..limit(1);
-    }
+    final idToRef = Map.fromEntries(proposalsRefs.map((e) => MapEntry(e.id, e)));
 
-    return query.getSingleOrNull();
+    final action = alias(documentsV2, 'action');
+    final author = alias(documentAuthors, 'author');
+    final collaborator = alias(documentCollaborators, 'collab');
+
+    final query =
+        select(action).join([
+            // 1. Identify the signer of the Action
+            innerJoin(
+              author,
+              Expression.and([
+                author.documentId.equalsExp(action.id),
+                author.documentVer.equalsExp(action.ver),
+              ]),
+            ),
+            // 2. FILTER: Only if that signer is a collaborator on the PROPOSAL
+            // We join on:
+            // - collab.documentId == action.refId (The Proposal ID)
+            // - collab.accountSignificantId == author.accountSignificantId (The Signer)
+            innerJoin(
+              collaborator,
+              Expression.and([
+                collaborator.documentId.equalsExp(action.refId),
+                collaborator.documentVer.equalsExp(action.refVer),
+                collaborator.accountSignificantId.equalsExp(author.accountSignificantId),
+              ]),
+            ),
+          ])
+          ..where(action.type.equalsValue(DocumentType.proposalActionDocument))
+          ..where(action.refId.isIn(idToRef.keys))
+          // Sort DESC so the first one we see is the latest
+          ..orderBy([OrderingTerm.desc(action.createdAt)]);
+
+    return query.get().then((rows) => _processCollaboratorsActions(rows, action, author, idToRef));
+  }
+
+  @override
+  Future<List<RawProposalBriefEntity>> getLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftsProposalsBrief(author: author).get();
+  }
+
+  @override
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) async {
+    if (proposalIds.isEmpty) return const ProposalVersionsTitles.empty();
+
+    final documentIdColumn = localDocumentsDrafts.id;
+    final documentVerColumn = localDocumentsDrafts.ver;
+    final titleColumn = localDocumentsDrafts.content.jsonExtract<String>('\$.${nodeId.value}');
+
+    final query = selectOnly(localDocumentsDrafts, distinct: true)
+      ..addColumns([
+        documentIdColumn,
+        documentVerColumn,
+        titleColumn,
+      ])
+      ..where(
+        Expression.and([
+          localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument),
+          localDocumentsDrafts.id.isIn(proposalIds),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(localDocumentsDrafts.createdAt)]);
+
+    return _extractVersionsTitles(
+      query: query,
+      idColumn: documentIdColumn,
+      verColumn: documentVerColumn,
+      titleColumn: titleColumn,
+    );
+  }
+
+  @override
+  Future<RawProposalEntity?> getLocalRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftRawProposal(id: id, author: author).getSingleOrNull();
+  }
+
+  @override
+  Future<RawProposalEntity?> getProposal({required DocumentRef id}) async {
+    return _queryProposal(id).getSingleOrNull();
   }
 
   /// Retrieves a paginated list of proposals with resolved status and enriched data.
@@ -92,7 +180,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// 3. **Pagination:** Applies limit/offset logic.
   /// 4. **Enrichment:** Joins templates, authors, and counts comments via subqueries.
   @override
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+  Future<Page<RawProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -144,6 +232,39 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     ).get().then(Map.fromEntries).then(ProposalsTotalAsk.new);
   }
 
+  @override
+  Future<ProposalVersionsTitles> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) async {
+    if (proposalIds.isEmpty) return const ProposalVersionsTitles.empty();
+
+    final documentIdColumn = documentsV2.id;
+    final documentVerColumn = documentsV2.ver;
+    final titleColumn = documentsV2.content.jsonExtract<String>('\$.${nodeId.value}');
+
+    final query = selectOnly(documentsV2, distinct: true)
+      ..addColumns([
+        documentIdColumn,
+        documentVerColumn,
+        titleColumn,
+      ])
+      ..where(
+        Expression.and([
+          documentsV2.type.equalsValue(DocumentType.proposalDocument),
+          documentsV2.id.isIn(proposalIds),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(documentsV2.createdAt)]);
+
+    return _extractVersionsTitles(
+      query: query,
+      idColumn: documentIdColumn,
+      verColumn: documentVerColumn,
+      titleColumn: titleColumn,
+    );
+  }
+
   /// Counts the total number of visible proposals matching the [filters].
   ///
   /// **Consistency:**
@@ -184,6 +305,38 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  @override
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  }) {
+    final query = selectOnly(localDocumentsDrafts)
+      ..addColumns([localDocumentsDrafts.id.count()])
+      ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
+      ..where(localDocumentsDrafts.authorsSignificant.equalsValue([author.toSignificant()]));
+
+    return query.map((row) => row.read(localDocumentsDrafts.id.count()) ?? 0).watchSingle();
+  }
+
+  @override
+  Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftsProposalsBrief(author: author).watch();
+  }
+
+  @override
+  Stream<RawProposalEntity?> watchLocalRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  }) {
+    return _queryLocalDraftRawProposal(id: id, author: author).watchSingleOrNull();
+  }
+
+  @override
+  Stream<RawProposalEntity?> watchProposal({required DocumentRef id}) {
+    return _queryProposal(id).watchSingleOrNull();
+  }
+
   /// Reactive stream version of [getProposalsBriefPage].
   ///
   /// Emits a new [Page] whenever:
@@ -192,7 +345,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - Local metadata (Favorites) changes.
   /// - Authors change.
   @override
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+  Stream<Page<RawProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
@@ -213,7 +366,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     ).watch();
     final totalStream = _countVisibleProposals(filters: filters).watchSingle();
 
-    return Rx.combineLatest2<List<JoinedProposalBriefEntity>, int, Page<JoinedProposalBriefEntity>>(
+    return Rx.combineLatest2<List<RawProposalBriefEntity>, int, Page<RawProposalBriefEntity>>(
       itemsStream,
       totalStream,
       (items, total) => Page(
@@ -284,19 +437,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    if (filters.originalAuthor != null) {
-      final significant = filters.originalAuthor!.toSignificant();
-      final escapedSignificant = _escapeSqlString(significant.toString());
+    if (filters.relationships.isNotEmpty) {
+      final relationshipClauses = filters.relationships.map(_buildRelationshipClause);
 
-      /// Check against p.id to target the first version (where id == ver)
-      clauses.add('''
-        EXISTS (
-          SELECT 1 FROM document_authors da
-          WHERE da.document_id = p.id 
-            AND da.document_ver = p.id
-            AND da.account_significant_id = '$escapedSignificant'
-        )
-      ''');
+      clauses.add('(${relationshipClauses.join(' OR ')})');
     }
 
     if (filters.categoryId != null) {
@@ -408,6 +552,122 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         .join(', \n      ');
   }
 
+  String _buildRelationshipClause(ProposalsRelationship relationship) {
+    switch (relationship) {
+      case OriginalAuthor(:final id):
+        final escapedId = _escapeSqlString(id.toSignificant().toString());
+        // Matches if id signed the genesis version (id == ver)
+        return '''
+          EXISTS (
+            SELECT 1 FROM document_authors da
+            WHERE da.document_id = p.id 
+              AND da.document_ver = p.id
+              AND da.account_significant_id = '$escapedId'
+          )
+        ''';
+
+      case CollaborationInvitation(:final id, :final status):
+        final escapedId = _escapeSqlString(id.toSignificant().toString());
+        final actionTypeUuid = DocumentType.proposalActionDocument.uuid;
+
+        // 1. Is the user listed in 'collaborators' on the current version?
+        final isListedAsCollaborator =
+            '''
+          EXISTS (
+            SELECT 1 FROM document_collaborators dc
+            WHERE dc.document_id = p.id
+              AND dc.document_ver = p.ver
+              AND dc.account_significant_id = '$escapedId'
+          )
+        ''';
+
+        // If status is null, only check if user is listed as collaborator (match any status)
+        if (status == null) {
+          return isListedAsCollaborator;
+        }
+
+        // 2. Collaborator's latest action content
+        final latestAction =
+            '''
+          SELECT json_extract(action.content, '\$.action')
+          FROM documents_v2 action
+          INNER JOIN document_authors da
+            ON action.id = da.document_id
+            AND action.ver = da.document_ver
+          WHERE action.type = '$actionTypeUuid'
+            AND action.ref_id = p.id
+            AND da.account_significant_id = '$escapedId'
+          ORDER BY action.ver DESC
+          LIMIT 1
+        ''';
+
+        // 3. Specific Condition based on status.
+        // Not this is just invitation, not approvals for such as final proposal.
+        final statusCondition = switch (status) {
+          CollaborationInvitationStatus.accepted => "($latestAction) IN ('draft', 'final')",
+          CollaborationInvitationStatus.rejected => "($latestAction) = 'hide'",
+          CollaborationInvitationStatus.pending => '($latestAction) IS NULL',
+        };
+
+        // Combine: MUST be listed AND meet the status condition
+        return '($isListedAsCollaborator AND $statusCondition)';
+      case ProposalApproval(:final id, :final status):
+        final escapedId = _escapeSqlString(id.toSignificant().toString());
+        final actionTypeUuid = DocumentType.proposalActionDocument.uuid;
+
+        // 1. Is the user listed in 'collaborators' on the current version?
+        final isListedAsCollaborator =
+            '''
+          EXISTS (
+            SELECT 1 FROM document_collaborators dc
+            WHERE dc.document_id = p.id
+              AND dc.document_ver = p.ver
+              AND dc.account_significant_id = '$escapedId'
+          )
+        ''';
+
+        // 2. Collaborator's latest action content for specific version
+        final latestAction =
+            '''
+          SELECT json_extract(action.content, '\$.action')
+          FROM documents_v2 action
+          INNER JOIN document_authors da
+            ON action.id = da.document_id
+            AND action.ver = da.document_ver
+          WHERE action.type = '$actionTypeUuid'
+            AND action.ref_id = p.id
+            AND action.ref_ver = p.ver
+            AND da.account_significant_id = '$escapedId'
+          ORDER BY action.ver DESC
+          LIMIT 1
+        ''';
+
+        // 3. Status logic using ep.action_type for global context.
+        // ep.action_type is 'final', 'draft', or NULL (treated as draft)
+        final statusCondition = switch (status) {
+          ProposalApprovalStatus.accepted =>
+            '''
+            CASE 
+              WHEN ep.action_type = 'final' THEN ($latestAction) = 'final'
+              ELSE ($latestAction) IN ('draft', 'final')
+            END
+          ''',
+          ProposalApprovalStatus.rejected => "($latestAction) = 'hide'",
+          ProposalApprovalStatus.pending =>
+            '''
+            (
+              ($latestAction) IS NULL 
+              OR 
+              (ep.action_type = 'final' AND ($latestAction) = 'draft')
+            )
+          ''',
+        };
+
+        // Combine: MUST be listed AND meet the status condition
+        return '($isListedAsCollaborator AND $statusCondition)';
+    }
+  }
+
   /// Internal query to count visible proposals.
   ///
   /// Uses the [_getEffectiveProposalsCTE] to determine the valid set of IDs,
@@ -435,7 +695,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       documentsV2,
       if (filters.isFavorite != null) documentsLocalMetadata,
       if (filters.categoryId != null || filters.campaign != null) documentParameters,
-      if (filters.originalAuthor != null ||
+      if (filters.relationships.whereType<OriginalAuthor>().isNotEmpty ||
           (filters.searchQuery != null && filters.searchQuery!.isNotEmpty))
         documentAuthors,
     };
@@ -490,6 +750,28 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// Returns: The escaped string.
   String _escapeSqlString(String input) {
     return input.replaceAll("'", "''");
+  }
+
+  Future<ProposalVersionsTitles> _extractVersionsTitles({
+    required JoinedSelectStatement<HasResultSet, dynamic> query,
+    required GeneratedColumn<String> idColumn,
+    required GeneratedColumn<String> verColumn,
+    required Expression<String> titleColumn,
+  }) async {
+    final proposalVersions = <String, VersionsTitles>{};
+
+    await query.map((row) {
+      final id = row.read<String>(idColumn)!;
+      final ver = row.read<String>(verColumn)!;
+      final title = row.read<String>(titleColumn);
+      proposalVersions.update(
+        id,
+        (value) => VersionsTitles({...value.data, ver: title}),
+        ifAbsent: () => VersionsTitles({ver: title}),
+      );
+    }).get();
+
+    return ProposalVersionsTitles(proposalVersions);
   }
 
   /// Returns the Common Table Expression (CTE) string defining "Effective Proposals".
@@ -566,6 +848,265 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     )
     '''
         .trim();
+  }
+
+  /// Processes a database row from [getCollaboratorsActions] query.
+  Map<String, RawProposalCollaboratorsActions> _processCollaboratorsActions(
+    List<TypedResult> rows,
+    $DocumentsV2Table action,
+    $DocumentAuthorsTable author,
+    Map<String, DocumentRef> idToRef,
+  ) {
+    final tempMap = <String, Map<CatalystId, RawCollaboratorAction>>{};
+
+    for (final row in rows) {
+      final doc = row.readTable(action);
+      final signer = row.readTable(author);
+
+      final refId = doc.refId;
+      if (refId == null) continue;
+
+      final ref = SignedDocumentRef(id: refId, ver: doc.refVer);
+
+      final proposalRef = idToRef[ref.id];
+      // if proposalRef has specified ver we should only get action for that ver, not latest.
+      if (proposalRef == null || !proposalRef.contains(ref)) continue;
+
+      final proposalActions = tempMap.putIfAbsent(refId, () => {});
+      final signerFullId = CatalystId.tryParse(signer.accountId);
+      final signerId = CatalystId.tryParse(signer.accountSignificantId);
+
+      // Since we ordered by createdAt DESC, if we already have an entry for
+      // this signer, it is newer than the current row. We skip the current row.
+      if (signerId == null || proposalActions.containsKey(signerId)) continue;
+
+      try {
+        final actionData = doc.content.data;
+        final action = ProposalSubmissionActionDocumentDto.fromJson(actionData).action.toModel();
+
+        final actionDocumentRef = SignedDocumentRef(id: doc.id, ver: doc.ver);
+
+        final rawCollaboratorAction = RawCollaboratorAction(
+          id: signerFullId ?? signerId,
+          proposalId: ref,
+          action: action,
+          actionId: actionDocumentRef,
+        );
+
+        proposalActions[signerId] = rawCollaboratorAction;
+      } catch (_) {
+        // Gracefully handle malformed JSON means there is no valid action
+        proposalActions.remove(signerId);
+      }
+    }
+
+    return tempMap.map((key, value) => MapEntry(key, RawProposalCollaboratorsActions(value)));
+  }
+
+  Selectable<RawProposalEntity> _queryLocalDraftRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  }) {
+    final ldd = alias(localDocumentsDrafts, 'ldd');
+    final t = alias(documentsV2, 't');
+    final dlm = alias(documentsLocalMetadata, 'dlm');
+
+    // Subquery: Get all public versions from documentsV2 for this proposal ID
+    final publicVersionIds = subqueryExpression<String>(
+      selectOnly(documentsV2)
+        ..addColumns([
+          FunctionCallExpression(
+            'GROUP_CONCAT',
+            [documentsV2.ver],
+          ),
+        ])
+        ..where(documentsV2.id.equalsExp(ldd.id))
+        ..where(documentsV2.type.equalsValue(DocumentType.proposalDocument)),
+    );
+
+    final query =
+        select(ldd).join([
+            leftOuterJoin(
+              t,
+              Expression.and([
+                t.id.equalsExp(ldd.templateId),
+                t.ver.equalsExp(ldd.templateVer),
+              ]),
+            ),
+            leftOuterJoin(dlm, dlm.id.equalsExp(ldd.id)),
+          ])
+          // Add calculated columns to the selection
+          ..addColumns([
+            publicVersionIds,
+          ])
+          // Filter by ID, Type, and Author (NOT by ver - only one local version exists)
+          ..where(ldd.id.equals(id.id))
+          ..where(ldd.type.equalsValue(DocumentType.proposalDocument))
+          ..where(ldd.authorsSignificant.equalsValue([author.toSignificant()]))
+          ..limit(1);
+
+    return query.map((row) {
+      final proposal = row.readTable(ldd);
+      final template = row.readTableOrNull(t);
+
+      final publicVersionIdsStr = row.read(publicVersionIds) ?? '';
+      // Combine local draft version with any public versions from documentsV2
+      final publicVersionsList = publicVersionIdsStr.isEmpty
+          ? <String>[]
+          : publicVersionIdsStr.split(',');
+      final allVersionIds = [proposal.ver, ...publicVersionsList];
+
+      final isFavorite = row.read(dlm.isFavorite) ?? false;
+
+      return RawProposalEntity(
+        proposal: SignedDocumentOrLocalDraft.local(proposal),
+        template: template != null ? SignedDocumentOrLocalDraft.signed(template) : null,
+        versionIds: allVersionIds,
+        commentsCount: 0,
+        isFavorite: isFavorite,
+        originalAuthors: proposal.authors,
+      );
+    });
+  }
+
+  Selectable<RawProposalBriefEntity> _queryLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    final template = alias(documentsV2, 't');
+
+    final query =
+        select(localDocumentsDrafts).join([
+            leftOuterJoin(
+              template,
+              Expression.and([
+                localDocumentsDrafts.templateId.equalsExp(template.id),
+                localDocumentsDrafts.templateVer.equalsExp(template.ver),
+                template.type.equalsValue(DocumentType.proposalTemplate),
+              ]),
+            ),
+            leftOuterJoin(
+              documentsLocalMetadata,
+              documentsLocalMetadata.id.equalsExp(localDocumentsDrafts.id),
+            ),
+          ])
+          ..where(localDocumentsDrafts.type.equalsValue(DocumentType.proposalDocument))
+          // comparing exact list since local drafts do have one author
+          ..where(localDocumentsDrafts.authorsSignificant.equalsValue([author.toSignificant()]))
+          ..orderBy([OrderingTerm.desc(localDocumentsDrafts.createdAt)]);
+
+    return query.map(
+      (row) {
+        final proposal = row.readTable(localDocumentsDrafts);
+        final templateEntity = row.readTableOrNull(template);
+        final isFavorite = row.read(documentsLocalMetadata.isFavorite) ?? false;
+
+        return RawProposalBriefEntity(
+          proposal: SignedDocumentOrLocalDraft.local(proposal),
+          template: templateEntity != null
+              ? SignedDocumentOrLocalDraft.signed(templateEntity)
+              : null,
+          // Local drafts do not have a submission action state
+          actionType: null,
+          // Local drafts are not public, so 0 comments
+          commentsCount: 0,
+          isFavorite: isFavorite,
+          originalAuthors: proposal.authors,
+        );
+      },
+    );
+  }
+
+  Selectable<RawProposalEntity> _queryProposal(DocumentRef ref) {
+    final p = alias(documentsV2, 'p');
+    final t = alias(documentsV2, 't');
+    final dlm = alias(documentsLocalMetadata, 'dlm');
+    final da = alias(documentsV2, 'da');
+
+    // 1. Subquery: Count comments for this specific proposal version
+    final commentsCount = subqueryExpression<int>(
+      selectOnly(documentsV2)
+        ..addColumns([countAll()])
+        ..where(documentsV2.type.equalsValue(DocumentType.commentDocument))
+        ..where(documentsV2.refId.equalsExp(p.id))
+        ..where(documentsV2.refVer.equalsExp(p.ver)),
+    );
+
+    // 2. Subquery: Get all versions (comma separated) for this proposal ID
+    final versionIds = subqueryExpression<String>(
+      selectOnly(documentsV2)
+        ..addColumns([
+          FunctionCallExpression(
+            'GROUP_CONCAT',
+            [documentsV2.ver],
+          ),
+        ])
+        ..where(documentsV2.id.equalsExp(p.id))
+        ..where(documentsV2.type.equalsValue(DocumentType.proposalDocument)),
+    );
+
+    // 4. Subquery: Get Original Authors (authors of version where id == ver)
+    final originAuthors = subqueryExpression<String>(
+      selectOnly(da)
+        ..addColumns([da.authors])
+        ..where(da.id.equalsExp(p.id))
+        ..where(da.id.equalsExp(da.ver))
+        ..where(da.type.equalsValue(DocumentType.proposalDocument)),
+    );
+
+    final query =
+        select(p).join([
+            leftOuterJoin(
+              t,
+              Expression.and([
+                t.id.equalsExp(p.templateId),
+                t.ver.equalsExp(p.templateVer),
+              ]),
+            ),
+            leftOuterJoin(dlm, dlm.id.equalsExp(p.id)),
+          ])
+          // Add calculated columns to the selection
+          ..addColumns([
+            commentsCount,
+            versionIds,
+            originAuthors,
+          ])
+          // Filter by ID and Type
+          ..where(p.id.equals(ref.id))
+          ..where(p.type.equalsValue(DocumentType.proposalDocument));
+
+    if (ref.isExact) {
+      // Exact Match: Return specific version
+      query.where(p.ver.equals(ref.ver!));
+    } else {
+      // Loose Match: Return latest version by CreatedAt
+      query
+        ..orderBy([OrderingTerm.desc(p.createdAt)])
+        ..limit(1);
+    }
+
+    return query.map((row) {
+      final proposal = row.readTable(p);
+      final template = row.readTableOrNull(t);
+
+      final versionIdsStr = row.read(versionIds) ?? '';
+      final versionIdsList = versionIdsStr.isEmpty ? <String>[] : versionIdsStr.split(',');
+
+      final count = row.read(commentsCount) ?? 0;
+      final isFavorite = row.read(dlm.isFavorite) ?? false;
+
+      // Map Original Authors
+      final originalAuthorsRaw = row.read(originAuthors) ?? '';
+      final authorsList = DocumentConverters.catId.fromSql(originalAuthorsRaw);
+
+      return RawProposalEntity(
+        proposal: SignedDocumentOrLocalDraft.signed(proposal),
+        template: template != null ? SignedDocumentOrLocalDraft.signed(template) : null,
+        versionIds: versionIdsList,
+        commentsCount: count,
+        isFavorite: isFavorite,
+        originalAuthors: authorsList,
+      );
+    });
   }
 
   /// Internal query to calculate total ask.
@@ -656,7 +1197,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - `version_ids_str`: Comma-separated list of all version UUIDs.
   /// - `comments_count`: Count of comments referencing this proposal.
   /// - `original_authors_str`: Authors of the FIRST version (id=ver).
-  Selectable<JoinedProposalBriefEntity> _queryVisibleProposalsPage(
+  Selectable<RawProposalBriefEntity> _queryVisibleProposalsPage(
     int page,
     int size, {
     required ProposalsOrder order,
@@ -676,16 +1217,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       $proposalColumns, 
       $templateColumns, 
       ep.action_type,
-      
-      (
-        SELECT GROUP_CONCAT(v_list.ver, ',')
-        FROM (
-          SELECT ver 
-          FROM documents_v2 v_sub 
-          WHERE v_sub.id = p.id AND v_sub.type = ? 
-          ORDER BY v_sub.ver ASC
-        ) v_list
-      ) as version_ids_str,
       
       (
         SELECT COUNT(*) 
@@ -719,7 +1250,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         // Subquery Variables
-        Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.commentDocument.uuid),
         // Main Join Variables
         // origin join, template join, main WHERE
@@ -748,20 +1278,16 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final actionTypeRaw = row.readNullable<String>('action_type') ?? '';
       final actionType = ProposalSubmissionActionDto.fromJson(actionTypeRaw)?.toModel();
 
-      final versionIdsRaw = row.readNullable<String>('version_ids_str') ?? '';
-      final versionIds = versionIdsRaw.split(',');
-
       final commentsCount = row.readNullable<int>('comments_count') ?? 0;
       final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
 
       final originalAuthorsRaw = row.readNullable<String>('origin_authors');
       final originalAuthors = DocumentConverters.catId.fromSql(originalAuthorsRaw ?? '');
 
-      return JoinedProposalBriefEntity(
-        proposal: proposal,
-        template: template,
+      return RawProposalBriefEntity(
+        proposal: SignedDocumentOrLocalDraft.signed(proposal),
+        template: template != null ? SignedDocumentOrLocalDraft.signed(template) : null,
         actionType: actionType,
-        versionIds: versionIds,
         commentsCount: commentsCount,
         isFavorite: isFavorite,
         originalAuthors: originalAuthors,
@@ -835,23 +1361,61 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 /// - Final: Proposal is submitted, shows specific or latest version
 /// - Hide: Proposal is hidden from all views
 abstract interface class ProposalsV2Dao {
-  /// Retrieves a single proposal by its reference.
+  /// Retrieves the latest valid submission actions performed by collaborators for the specified
+  /// proposals.
   ///
-  /// Filters by type == proposalDocument.
+  /// This method resolves the current collaboration state by:
+  /// 1.  **Discovery**: Identifying all [DocumentType.proposalActionDocument]s that reference
+  ///     the IDs found in [proposalsRefs].
+  /// 2.  **Validation**: Verifying that the signer of the action is explicitly listed as a
+  ///     collaborator on the referenced proposal document.
+  /// 3.  **Versioning**:
+  ///     * If a [DocumentRef] is **exact** (specifies `ver`), only actions targeting that
+  ///         specific version are returned.
+  ///     * If a [DocumentRef] is **loose** (null `ver`), actions targeting *any* version
+  ///         of the proposal ID are considered.
+  /// 4.  **Resolution**: Returns only the most recent action (by creation time) for each
+  ///     unique collaborator.
+  ///
+  /// Returns a [Map] where:
+  /// * **Key**: The Proposal ID (`String`).
+  /// * **Value**: A [RawProposalCollaboratorsActions] container holding the map of
+  ///     collaborator IDs to their latest [RawCollaboratorAction].
+  Future<Map<String, RawProposalCollaboratorsActions>> getCollaboratorsActions({
+    required List<DocumentRef> proposalsRefs,
+  });
+
+  /// Simpler version of [getProposalsBriefPage] which returns all local
+  /// drafts for given [author]. Locally there is only one version of each proposal
+  /// so no need to take into consideration a lot of stuff from [getProposalsBriefPage].
+  Future<List<RawProposalBriefEntity>> getLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
+
+  /// Retrieves titles for all versions of the specified proposals from local drafts.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
   ///
   /// **Parameters:**
-  ///   - ref: Document reference with id (required) and version (optional)
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
   ///
-  /// **Behavior:**
-  ///   - If ref.isExact (has version): Returns specific version
-  ///   - If ref.isLoose (no version): Returns latest version by createdAt
-  ///   - Returns null if no matching proposal found
-  ///
-  /// **Note:** This method does NOT respect proposal actions (draft/final/hide).
-  /// It returns the raw document data. Use getProposalsBriefPage for status-aware queries.
-  ///
-  /// **Returns:** [DocumentEntityV2] or null
-  Future<DocumentEntityV2?> getProposal(DocumentRef ref);
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  });
+
+  /// Same as [watchLocalRawProposal] but returns single Future.
+  Future<RawProposalEntity?> getLocalRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  });
+
+  /// Same as [watchProposal] but returns single Future.
+  Future<RawProposalEntity?> getProposal({required DocumentRef id});
 
   /// Retrieves a paginated page of proposal briefs with filtering and ordering.
   ///
@@ -871,7 +1435,7 @@ abstract interface class ProposalsV2Dao {
   ///   - Single query with CTEs (no N+1 queries)
   ///
   /// **Returns:** Page object with items, total count, and pagination metadata
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+  Future<Page<RawProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
@@ -888,6 +1452,22 @@ abstract interface class ProposalsV2Dao {
   Future<ProposalsTotalAsk> getProposalsTotalTask({
     required NodeId nodeId,
     required ProposalsTotalAskFilters filters,
+  });
+
+  /// Retrieves titles for all versions of the specified proposals from signed documents.
+  ///
+  /// This method extracts the title from each version of a proposal document by
+  /// traversing the JSON content using the provided [nodeId].
+  ///
+  /// **Parameters:**
+  /// - [proposalIds]: List of proposal IDs to fetch version titles for.
+  /// - [nodeId]: The path in the document JSON to extract the title from.
+  ///
+  /// **Returns:**
+  /// - [ProposalVersionsTitles]
+  Future<ProposalVersionsTitles> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
   });
 
   /// Counts the total number of visible proposals that match the given filters.
@@ -921,6 +1501,45 @@ abstract interface class ProposalsV2Dao {
     required bool isFavorite,
   });
 
+  /// Watches the count of [author]'s local drafts (not published).
+  ///
+  /// Updates automatically when local drafts are created or deleted.
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
+  });
+
+  /// Reactive stream version of [getLocalDraftsProposalsBrief].
+  ///
+  /// Updates automatically when local drafts are changing.
+  Stream<List<RawProposalBriefEntity>> watchLocalDraftsProposalsBrief({
+    required CatalystId author,
+  });
+
+  Stream<RawProposalEntity?> watchLocalRawProposal({
+    required DocumentRef id,
+    required CatalystId author,
+  });
+
+  /// Watches a single proposal by its reference.
+  ///
+  /// Returns a reactive stream that emits the proposal data whenever it changes.
+  ///
+  /// **Parameters:**
+  ///   - [id]: Document reference with id (required) and version (required)
+  ///
+  /// **Behavior:**
+  ///   - Emits `null` if the proposal is not found
+  ///   - Includes hidden proposals with `actionType = hide` so UI can show hidden state
+  ///   - Gets action status for this specific version (draft/final/hide)
+  ///
+  /// **Reactivity:**
+  ///   - Emits new value when proposal document changes
+  ///   - Emits new value when action documents change
+  ///   - Emits new value when local metadata (favorites) changes
+  Stream<RawProposalEntity?> watchProposal({
+    required DocumentRef id,
+  });
+
   /// Watches for changes and emits paginated pages of proposal briefs.
   ///
   /// Provides a reactive stream that emits a new [Page] whenever the
@@ -935,7 +1554,7 @@ abstract interface class ProposalsV2Dao {
   /// - Same query optimization as [getProposalsBriefPage]
   ///
   /// **Returns:** Stream of Page objects with current state
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+  Stream<Page<RawProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,

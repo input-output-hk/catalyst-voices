@@ -19,14 +19,14 @@ final class CategoryTemplatesRefs extends Equatable {
     ?comment,
   ];
 
+  @override
+  List<Object?> get props => [category, proposal, comment];
+
   Map<DocumentType, SignedDocumentRef> asMap() => {
     DocumentType.categoryParametersDocument: category,
     DocumentType.proposalTemplate: ?proposal,
     DocumentType.commentTemplate: ?comment,
   };
-
-  @override
-  List<Object?> get props => [category, proposal, comment];
 
   bool hasId(String id) => withId(id) != null;
 

@@ -10,22 +10,18 @@ final _logger = Logger('CampaignPhaseAwareCubit');
 
 final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   final CampaignService _campaignService;
-  final SyncManager _syncManager;
+
   StreamSubscription<Campaign?>? _campaignSubscription;
   Campaign? _activeCampaign;
   Timer? _timer;
-  var _synchronizationCompleter = Completer<bool>();
+  bool _isLoadingActiveCampaign = false;
 
-  CampaignPhaseAwareCubit(this._campaignService, this._syncManager)
-    : super(const LoadingCampaignPhaseAwareState()) {
+  CampaignPhaseAwareCubit(this._campaignService) : super(const LoadingCampaignPhaseAwareState()) {
     _campaignSubscription = _campaignService.watchActiveCampaign.distinct().listen(
-      _handleCampaignChange,
+      _handleActiveCampaignChange,
     );
-    unawaited(getActiveCampaign());
     _timer = Timer.periodic(const Duration(seconds: 1), _handleTimerTick);
   }
-
-  Future<bool> get awaitForInitialize => _synchronizationCompleter.future;
 
   CampaignPhaseType? activeCampaignPhaseType() {
     return state.activeCampaignPhaseType;
@@ -41,71 +37,73 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   }
 
   Future<void> getActiveCampaign() async {
-    if (_synchronizationCompleter.isCompleted) {
-      _synchronizationCompleter = Completer();
-    }
-
-    emit(const LoadingCampaignPhaseAwareState());
-    await _syncManager.waitForSync;
-
     try {
+      _isLoadingActiveCampaign = true;
+
+      emit(const LoadingCampaignPhaseAwareState());
+
       final campaign = await _campaignService.getActiveCampaign();
+      if (isClosed) return;
 
-      if (isClosed) {
-        _synchronizationCompleter.complete(true);
-        return;
-      }
-
-      if (campaign == null) {
-        _synchronizationCompleter.complete(true);
-        return emit(const NoActiveCampaignPhaseAwareState());
-      }
-
-      _handleCampaignChange(campaign);
-      _synchronizationCompleter.complete(true);
-      _emitState();
+      _handleActiveCampaignChange(campaign);
     } catch (error, stackTrace) {
       _logger.severe('Error getting active campaign', error, stackTrace);
-      emit(ErrorCampaignPhaseAwareState(error: LocalizedException.create(error)));
-      _synchronizationCompleter.complete(false);
+
+      if (!isClosed) {
+        emit(ErrorCampaignPhaseAwareState(error: LocalizedException.create(error)));
+      }
+    } finally {
+      _isLoadingActiveCampaign = false;
+
+      if (!isClosed) emit(_buildState());
     }
   }
 
-  CampaignPhaseType? _activeCampaignPhaseType() {
-    if (_activeCampaign == null) return null;
-    return _activeCampaign!.state.activePhases.firstOrNull?.phase.type;
-  }
-
-  void _emitState() {
-    if (_activeCampaign == null) return;
-    final phasesStates = <CampaignPhaseState>[];
-
-    for (final phase in _activeCampaign!.timeline.phases) {
-      phasesStates.add(
-        CampaignPhaseState(
-          phase: phase,
-          status: CampaignPhaseStatus.fromRange(phase.timeline, DateTimeExt.now()),
-        ),
-      );
+  CampaignPhaseAwareState _buildState() {
+    final isLoadingActiveCampaign = _isLoadingActiveCampaign;
+    if (isLoadingActiveCampaign) {
+      return const LoadingCampaignPhaseAwareState();
     }
 
-    final activeCampaignPhaseType = _activeCampaignPhaseType();
+    final activeCampaign = _activeCampaign;
+    if (activeCampaign == null) {
+      return const NoActiveCampaignPhaseAwareState();
+    }
 
-    emit(
-      DataCampaignPhaseAwareState(
-        activeCampaignPhaseType: activeCampaignPhaseType,
-        phasesStates: phasesStates,
-        fundNumber: _activeCampaign!.fundNumber,
-      ),
+    return DataCampaignPhaseAwareState(
+      activeCampaignPhaseType: activeCampaign.phaseType,
+      phasesStates: activeCampaign.phasesStates,
+      fundNumber: activeCampaign.fundNumber,
     );
   }
 
-  // ignore: use_setters_to_change_properties
-  void _handleCampaignChange(Campaign? campaign) {
+  void _handleActiveCampaignChange(Campaign? campaign) {
+    if (_activeCampaign?.id == campaign?.id) return;
+
     _activeCampaign = campaign;
+    emit(_buildState());
   }
 
   void _handleTimerTick(Timer timer) {
-    _emitState();
+    emit(_buildState());
+  }
+}
+
+extension on Campaign {
+  List<CampaignPhaseState> get phasesStates {
+    final now = DateTimeExt.now();
+
+    return timeline.phases.map(
+      (phase) {
+        return CampaignPhaseState(
+          phase: phase,
+          status: CampaignPhaseStatus.fromRange(phase.timeline, now),
+        );
+      },
+    ).toList();
+  }
+
+  CampaignPhaseType? get phaseType {
+    return state.activePhases.firstOrNull?.phase.type;
   }
 }

@@ -3,15 +3,13 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_composite_entity.dart';
-import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/model/signed_document_or_local_draft.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_artifacts.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_collaborators.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
-import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
-import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -57,6 +55,7 @@ final class DatabaseDocumentsDataSource
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
+    List<CatalystId>? authors,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -66,6 +65,7 @@ final class DatabaseDocumentsDataSource
           type: type,
           id: id,
           referencing: referencing,
+          authors: authors,
           latestOnly: latestOnly,
           limit: limit,
           offset: offset,
@@ -101,8 +101,51 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<Map<String, RawProposalCollaboratorsActions>> getCollaboratorsActions({
+    required List<DocumentRef> proposalsRefs,
+  }) {
+    return _database.proposalsV2Dao.getCollaboratorsActions(proposalsRefs: proposalsRefs);
+  }
+
+  @override
   Future<DocumentRef?> getLatestRefOf(DocumentRef ref) {
     return _database.documentsV2Dao.getLatestOf(ref);
+  }
+
+  @override
+  Future<ProposalVersionsTitles> getLocalDraftsVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) {
+    return _database.proposalsV2Dao.getLocalDraftsVersionsTitles(
+      proposalIds: proposalIds,
+      nodeId: nodeId,
+    );
+  }
+
+  @override
+  Future<RawProposal?> getLocalRawProposalData({
+    required DocumentRef id,
+    CatalystId? originalAuthor,
+  }) {
+    // If author is null, return null future as verification that author can see this version
+    if (originalAuthor == null) {
+      return Future.value();
+    }
+
+    return _database.proposalsV2Dao
+        .getLocalRawProposal(id: id, author: originalAuthor)
+        .then((data) => data?.toModel());
+  }
+
+  @override
+  Future<DocumentDataMetadata?> getMetadata(DocumentRef ref) {
+    return _database.documentsV2Dao.getDocumentMetadata(ref).then((value) => value?.toModel());
+  }
+
+  @override
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
+    return _database.documentsV2Dao.getPreviousOf(id: id);
   }
 
   @override
@@ -111,6 +154,26 @@ final class DatabaseDocumentsDataSource
     required ProposalsTotalAskFilters filters,
   }) {
     return _database.proposalsV2Dao.getProposalsTotalTask(filters: filters, nodeId: nodeId);
+  }
+
+  @override
+  Future<RawProposal?> getRawProposalData({required DocumentRef id}) {
+    final tr = _profiler.startTransaction('Query proposal: $id');
+    return _database.proposalsV2Dao.getProposal(id: id).then((value) {
+      if (!tr.finished) unawaited(tr.finish());
+      return value?.toModel();
+    });
+  }
+
+  @override
+  Future<ProposalVersionsTitles> getVersionsTitles({
+    required List<String> proposalIds,
+    required NodeId nodeId,
+  }) {
+    return _database.proposalsV2Dao.getVersionsTitles(
+      proposalIds: proposalIds,
+      nodeId: nodeId,
+    );
   }
 
   @override
@@ -193,22 +256,25 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
-    required PageRequest request,
-    ProposalsOrder order = const UpdateDate.desc(),
-    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  Stream<int> watchLocalDraftProposalsCount({
+    required CatalystId author,
   }) {
-    final tr = _profiler.startTransaction('Query proposals: $request:$order:$filters');
+    return _database.proposalsV2Dao.watchLocalDraftProposalsCount(author: author).distinct();
+  }
+
+  @override
+  Stream<RawProposal?> watchLocalRawProposalData({
+    required DocumentRef id,
+    CatalystId? originalAuthor,
+  }) {
+    // If author is null, return null stream as verification that author can see this version
+    if (originalAuthor == null) {
+      return Stream.value(null);
+    }
 
     return _database.proposalsV2Dao
-        .watchProposalsBriefPage(request: request, order: order, filters: filters)
-        .doOnData(
-          (_) {
-            if (!tr.finished) unawaited(tr.finish());
-          },
-        )
-        .distinct()
-        .map((page) => page.map((data) => data.toModel()));
+        .watchLocalRawProposal(id: id, author: originalAuthor)
+        .map((data) => data?.toModel());
   }
 
   @override
@@ -243,36 +309,46 @@ final class DatabaseDocumentsDataSource
         .distinct(listEquals)
         .map((event) => event.map((e) => e.toModel()).toList());
   }
-}
 
-extension on DocumentEntityV2 {
-  DocumentData toModel() {
-    return DocumentData(
-      metadata: DocumentDataMetadata(
-        contentType: DocumentContentType.fromJson(contentType),
-        type: type,
-        id: SignedDocumentRef(id: id, ver: ver),
-        ref: refId.toRef(refVer),
-        template: templateId.toRef(templateVer),
-        reply: replyId.toRef(replyVer),
-        section: section,
-        collaborators: collaborators.isEmpty ? null : collaborators,
-        parameters: parameters,
-        authors: authors.isEmpty ? null : authors,
-      ),
-      content: content,
-    );
+  @override
+  Stream<List<RawProposalBrief>> watchRawLocalDraftsProposalsBrief({
+    required CatalystId author,
+  }) {
+    return _database.proposalsV2Dao
+        .watchLocalDraftsProposalsBrief(author: author)
+        .distinct(listEquals)
+        .map((event) => event.map((e) => e.toModel()).toList());
   }
-}
 
-extension on String? {
-  SignedDocumentRef? toRef([String? ver]) {
-    final id = this;
-    if (id == null) {
-      return null;
-    }
+  @override
+  Stream<RawProposal?> watchRawProposalData({required DocumentRef id}) {
+    final tr = _profiler.startTransaction('Query proposal: $id');
+    return _database.proposalsV2Dao
+        .watchProposal(id: id)
+        .doOnData((_) {
+          if (!tr.finished) unawaited(tr.finish());
+        })
+        .distinct()
+        .map((proposal) => proposal?.toModel());
+  }
 
-    return SignedDocumentRef(id: id, ver: ver);
+  @override
+  Stream<Page<RawProposalBrief>> watchRawProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    final tr = _profiler.startTransaction('Query proposals: $request:$order:$filters');
+
+    return _database.proposalsV2Dao
+        .watchProposalsBriefPage(request: request, order: order, filters: filters)
+        .doOnData(
+          (_) {
+            if (!tr.finished) unawaited(tr.finish());
+          },
+        )
+        .distinct()
+        .map((page) => page.map((data) => data.toModel()));
   }
 }
 
@@ -339,33 +415,5 @@ extension on DocumentDataWithArtifact {
         documentVer: metadata.id.ver!,
       );
     }).toList();
-  }
-}
-
-extension on JoinedProposalBriefEntity {
-  JoinedProposalBriefData toModel() {
-    final proposalDocumentData = proposal.toModel();
-    final templateDocumentData = template?.toModel();
-
-    final proposalOrDocument = templateDocumentData == null
-        ? ProposalOrDocument.data(proposalDocumentData)
-        : () {
-            final template = ProposalTemplateFactory.create(templateDocumentData);
-            final proposal = ProposalDocumentFactory.create(
-              proposalDocumentData,
-              template: template,
-            );
-
-            return ProposalOrDocument.proposal(proposal);
-          }();
-
-    return JoinedProposalBriefData(
-      proposal: proposalOrDocument,
-      actionType: actionType,
-      versionIds: versionIds,
-      commentsCount: commentsCount,
-      isFavorite: isFavorite,
-      originalAuthors: originalAuthors,
-    );
   }
 }

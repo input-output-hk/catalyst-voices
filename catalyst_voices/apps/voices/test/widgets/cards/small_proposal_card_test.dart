@@ -4,7 +4,7 @@ import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart'
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show ProposalVersionViewModel, UsersProposalOverview;
+    show AuthorProposalOwnership, ProposalVersionViewModel, UsersProposalOverview;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -30,6 +30,8 @@ void main() {
         updateDate: DateTime.now(),
         fundsRequested: Money.zero(currency: Currencies.ada),
         publish: ProposalPublish.publishedDraft,
+        iteration: 3,
+        ownership: const AuthorProposalOwnership(),
         versions: [
           ProposalVersionViewModel(
             publish: ProposalPublish.localDraft,
@@ -89,13 +91,6 @@ void main() {
       expect(find.byType(SmallProposalCard), findsOneWidget);
       expect(find.text('Test Proposal'), findsOneWidget);
       expect(find.text('Cardano Use Cases: Concept'), findsOneWidget);
-    });
-
-    testWidgets('shows version number', (tester) async {
-      await pumpCard(tester);
-      await tester.pumpAndSettle();
-
-      expect(find.text('2'), findsOneWidget);
     });
 
     testWidgets('shows new iteration details when showLatestLocal '

@@ -2,6 +2,7 @@ import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
 /// Enum representing proposal menu item actions
@@ -13,7 +14,8 @@ enum ProposalMenuItemAction {
   forget,
   export,
   share,
-  delete;
+  delete,
+  leave;
 
   final bool clickable;
 
@@ -52,6 +54,8 @@ enum ProposalMenuItemAction {
         return VoicesAssets.icons.unlink;
       case ProposalMenuItemAction.share:
         return VoicesAssets.icons.upload;
+      case ProposalMenuItemAction.leave:
+        return VoicesAssets.icons.unlink;
     }
   }
 
@@ -88,6 +92,7 @@ enum ProposalMenuItemAction {
       ProposalMenuItemAction.forget => context.l10n.forgetProposal,
       ProposalMenuItemAction.export => context.l10n.export,
       ProposalMenuItemAction.delete => context.l10n.delete,
+      ProposalMenuItemAction.leave => context.l10n.leaveProposal,
       _ => '',
     };
   }
@@ -125,10 +130,22 @@ enum ProposalMenuItemAction {
   static List<ProposalMenuItemAction> workspaceAvailableOptions(
     ProposalPublish proposalPublish, {
     required bool fromActiveCampaign,
+    required UserProposalOwnership ownership,
   }) {
     return switch (proposalPublish) {
       _ when !fromActiveCampaign => [view],
-      ProposalPublish.localDraft => [edit, export, delete],
+      ProposalPublish.localDraft when ownership is AuthorProposalOwnership => [
+        edit,
+        view,
+        export,
+        delete,
+      ],
+      _ when ownership is CollaboratorProposalOwnership => [
+        view,
+        share,
+        export,
+        leave,
+      ],
       _ => [
         edit,
         view,

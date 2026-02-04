@@ -9,35 +9,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/test.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  late AppMetaStorage appMetaStorage;
+  late DocumentsSynchronizer synchronizer;
   late SyncStatsStorage statsStorage;
-  late DocumentsService documentsService;
-  late CampaignService campaignService;
   late SyncManager syncManager;
 
   setUpAll(() async {
     SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
 
-    registerFallbackValue(Campaign.f15());
-    registerFallbackValue(const Uuid().v7());
-    registerFallbackValue(SignedDocumentRef.first(const Uuid().v7()));
+    registerFallbackValue(CampaignSyncRequest(Campaign.f15()) as DocumentsSyncRequest);
   });
 
   setUp(() {
+    synchronizer = _MockDocumentsSynchronizer();
     statsStorage = SyncStatsLocalStorage(sharedPreferences: SharedPreferencesAsync());
-    appMetaStorage = AppMetaStorageLocalStorage(sharedPreferences: SharedPreferencesAsync());
-
-    documentsService = _MockDocumentsService();
-    campaignService = _MockCampaignService();
 
     syncManager = SyncManager(
-      appMetaStorage,
+      synchronizer,
       statsStorage,
-      documentsService,
-      campaignService,
       const CatalystProfiler.noop(),
     );
   });
@@ -47,152 +37,132 @@ void main() {
   });
 
   group(SyncManager, () {
-    group('start', () {
-      test(
-        'given active campaign, '
-        'when start is called, '
-        'then it syncs documents and updates stats',
-        () async {
-          // Given
-          final campaign = Campaign.f15();
-          when(() => campaignService.getActiveCampaign()).thenAnswer((_) async => campaign);
-          when(
-            () => documentsService.clear(keepLocalDrafts: any(named: 'keepLocalDrafts')),
-          ).thenAnswer((_) async => 0);
+    test('initial state is idle', () {
+      expect(syncManager.activeRequest, isNull);
+      expect(syncManager.pendingRequests, isEmpty);
+    });
 
-          when(
-            () => documentsService.sync(
-              campaign: any(named: 'campaign'),
-              onProgress: any(named: 'onProgress'),
-            ),
-          ).thenAnswer(
-            (_) async => const DocumentsSyncResult(
-              newDocumentsCount: 5,
-              // ignore: avoid_redundant_argument_values
-              failedDocumentsCount: 0,
-            ),
-          );
+    test('queueing a request makes it active and eventually completes', () async {
+      final request = CampaignSyncRequest(Campaign.f15());
 
-          // When
-          await syncManager.start();
-          final success = await syncManager.waitForSync;
+      when(
+        () => synchronizer.start(any(), onProgress: any(named: 'onProgress')),
+      ).thenAnswer((_) async => const DocumentsSyncResult());
 
-          // Then
-          expect(success, isTrue);
+      syncManager.queue(request);
 
-          verify(
-            () => documentsService.sync(
-              campaign: campaign,
-              onProgress: any(named: 'onProgress'),
-            ),
-          ).called(1);
+      // Verify it became active
+      expect(syncManager.activeRequest, equals(request));
 
-          final stats = await statsStorage.read();
-          expect(stats?.lastAddedRefsCount, 5);
-          expect(stats?.lastSuccessfulSyncAt, isNotNull);
-        },
+      final result = await syncManager.waitForActiveRequest;
+
+      expect(result, isTrue);
+      expect(syncManager.activeRequest, isNull);
+      verify(() => synchronizer.start(request, onProgress: any(named: 'onProgress'))).called(1);
+    });
+
+    test('multiple requests execute sequentially', () async {
+      final request1 = TargetSyncRequest(SignedDocumentRef.generateFirstRef());
+      final request2 = CampaignSyncRequest(Campaign.f15());
+
+      final completer1 = Completer<DocumentsSyncResult>();
+      final completer2 = Completer<DocumentsSyncResult>();
+
+      // Request 1 will hang until we complete it
+      when(
+        () => synchronizer.start(request1, onProgress: any(named: 'onProgress')),
+      ).thenAnswer((_) => completer1.future);
+      when(
+        () => synchronizer.start(request2, onProgress: any(named: 'onProgress')),
+      ).thenAnswer((_) => completer2.future);
+
+      syncManager
+        ..queue(request1)
+        ..queue(request2);
+
+      // Verify first is active, second is pending
+      expect(syncManager.activeRequest, equals(request1));
+      expect(syncManager.pendingRequests, contains(request2));
+
+      // Finish first request
+      completer1.complete(const DocumentsSyncResult());
+      await pumpEventQueue();
+
+      // Verify second is now active
+      expect(syncManager.activeRequest, equals(request2));
+
+      completer2.complete(const DocumentsSyncResult());
+      await pumpEventQueue();
+
+      expect(syncManager.activeRequest, isNull);
+    });
+
+    test('activeRequestProgress emits correct sequence', () async {
+      final request = CampaignSyncRequest(Campaign.f15());
+
+      when(() => synchronizer.start(any(), onProgress: any(named: 'onProgress'))).thenAnswer((
+        invocation,
+      ) async {
+        final onProgress = invocation.namedArguments[#onProgress] as void Function(double);
+        onProgress(0.5);
+        return const DocumentsSyncResult();
+      });
+
+      // We expect 0.0 (start), 0.5 (synchronizer update), 1.0 (finally block)
+      unawaited(
+        expectLater(
+          syncManager.activeRequestProgress,
+          emitsInOrder([0.0, 0.5, 1.0]),
+        ),
       );
 
-      test(
-        'given stored campaign differs from active campaign, '
-        'when start is called, '
-        'then it clears local storage and updates active campaign',
-        () async {
-          // Given
-          const oldCampaignId = SignedDocumentRef.first('campaign_old');
-          await appMetaStorage.write(const AppMeta(activeCampaign: oldCampaignId));
+      syncManager.queue(request);
+      await syncManager.waitForActiveRequest;
+    });
 
-          final newCampaign = Campaign.f15();
-          when(() => campaignService.getActiveCampaign()).thenAnswer((_) async => newCampaign);
+    test('updates stats correctly on success', () async {
+      final request = CampaignSyncRequest(Campaign.f15());
+      const expectedCount = 42;
 
-          when(
-            () => documentsService.clear(keepLocalDrafts: any(named: 'keepLocalDrafts')),
-          ).thenAnswer((_) async => 0);
+      when(
+        () => synchronizer.start(any(), onProgress: any(named: 'onProgress')),
+      ).thenAnswer((_) async => const DocumentsSyncResult(newDocumentsCount: expectedCount));
 
-          when(
-            () => documentsService.sync(
-              campaign: any(named: 'campaign'),
-              onProgress: any(named: 'onProgress'),
-            ),
-          ).thenAnswer((_) async => const DocumentsSyncResult());
+      syncManager.queue(request);
 
-          // When
-          await syncManager.start();
+      await syncManager.waitForActiveRequest;
 
-          // Then
-          verify(() => documentsService.clear(keepLocalDrafts: true)).called(1);
+      final stats = await statsStorage.read();
+      expect(stats?.lastAddedRefsCount, equals(expectedCount));
+      expect(stats?.lastSuccessfulSyncAt, isNotNull);
+    });
 
-          final storedMeta = await appMetaStorage.read();
-          expect(storedMeta.activeCampaign, newCampaign.id);
-        },
-      );
+    test('recovers and continues queue after a failure', () async {
+      final failingRequest = TargetSyncRequest(SignedDocumentRef.generateFirstRef());
+      final succeedingRequest = CampaignSyncRequest(Campaign.f15());
 
-      test(
-        'given documents service throws error, '
-        'when start is called, '
-        'then it rethrows error and completes waitForSync with false',
-        () async {
-          // Given
-          when(() => campaignService.getActiveCampaign()).thenAnswer((_) async => Campaign.f15());
+      when(
+        () => synchronizer.start(failingRequest, onProgress: any(named: 'onProgress')),
+      ).thenThrow(Exception('Sync failed!'));
+      when(
+        () => synchronizer.start(succeedingRequest, onProgress: any(named: 'onProgress')),
+      ).thenAnswer((_) async => const DocumentsSyncResult());
 
-          when(
-            () => documentsService.sync(
-              campaign: any(named: 'campaign'),
-              onProgress: any(named: 'onProgress'),
-            ),
-          ).thenThrow(Exception('Sync failed'));
+      syncManager
+        ..queue(failingRequest)
+        ..queue(succeedingRequest);
 
-          // When & Then
-          // Expect the immediate future to fail (rethrow)
-          expect(syncManager.start(), throwsException);
+      // Wait for the failure to process
+      final firstResult = await syncManager.waitForActiveRequest;
+      expect(firstResult, isFalse);
 
-          // Wait to ensure internal state settles (if needed)
-          try {
-            await syncManager.waitForSync;
-          } catch (_) {}
+      // Wait for next request
+      expect(syncManager.activeRequest, equals(succeedingRequest));
 
-          // Verify the completer status
-          expect(await syncManager.waitForSync, isFalse);
-        },
-      );
-
-      test(
-        'given sync is already in progress, '
-        'when start is called again, '
-        'then second call is ignored (locked)',
-        () async {
-          // Given
-          when(() => campaignService.getActiveCampaign()).thenAnswer((_) async => Campaign.f15());
-
-          final syncCompleter = Completer<DocumentsSyncResult>();
-          when(
-            () => documentsService.sync(
-              campaign: any(named: 'campaign'),
-              onProgress: any(named: 'onProgress'),
-            ),
-          ).thenAnswer((_) => syncCompleter.future);
-
-          // When
-          final firstCall = syncManager.start();
-          final secondCall = syncManager.start(); // This should be locked
-
-          syncCompleter.complete(const DocumentsSyncResult());
-          await firstCall;
-          await secondCall;
-
-          // Then
-          verify(
-            () => documentsService.sync(
-              campaign: any(named: 'campaign'),
-              onProgress: any(named: 'onProgress'),
-            ),
-          ).called(1);
-        },
-      );
+      final secondResult = await syncManager.waitForActiveRequest;
+      expect(secondResult, isTrue);
     });
   });
 }
 
-class _MockCampaignService extends Mock implements CampaignService {}
-
-class _MockDocumentsService extends Mock implements DocumentsService {}
+class _MockDocumentsSynchronizer extends Mock implements DocumentsSynchronizer {}

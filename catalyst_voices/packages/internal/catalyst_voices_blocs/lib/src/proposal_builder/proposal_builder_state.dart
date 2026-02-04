@@ -12,6 +12,8 @@ final class ProposalBuilderMetadata extends Equatable {
   final DocumentParameters? parameters;
   final List<DocumentVersion> versions;
   final bool fromActiveCampaign;
+  final CatalystId? authorId;
+  final List<CatalystId> collaborators;
 
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
@@ -21,6 +23,8 @@ final class ProposalBuilderMetadata extends Equatable {
     this.parameters,
     this.versions = const [],
     this.fromActiveCampaign = true,
+    this.authorId,
+    this.collaborators = const [],
   });
 
   factory ProposalBuilderMetadata.newDraft({
@@ -46,6 +50,8 @@ final class ProposalBuilderMetadata extends Equatable {
     parameters,
     versions,
     fromActiveCampaign,
+    authorId,
+    collaborators,
   ];
 
   ProposalBuilderMetadata copyWith({
@@ -56,6 +62,8 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<DocumentParameters>? parameters,
     List<DocumentVersion>? versions,
     bool? fromActiveCampaign,
+    Optional<CatalystId>? authorId,
+    List<CatalystId>? collaborators,
   }) {
     return ProposalBuilderMetadata(
       publish: publish ?? this.publish,
@@ -65,6 +73,8 @@ final class ProposalBuilderMetadata extends Equatable {
       parameters: parameters.dataOr(this.parameters),
       versions: versions ?? this.versions,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
+      authorId: authorId.dataOr(this.authorId),
+      collaborators: collaborators ?? this.collaborators,
     );
   }
 }

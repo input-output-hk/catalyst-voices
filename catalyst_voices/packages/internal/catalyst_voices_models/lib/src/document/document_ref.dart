@@ -41,11 +41,18 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// Whether the ref specifies the document [ver].
   bool get isExact => ver != null;
 
+  bool get isGenesis => id == ver;
+
   bool get isLoose => !isExact;
 
   bool get isSigned => this is SignedDocumentRef;
 
-  bool get isGenesis => id == ver;
+  bool get isValid {
+    final isIdValid = Uuid.isValidUUID(fromString: id);
+    final isVersionValid = ver == null || Uuid.isValidUUID(fromString: ver!);
+
+    return isIdValid && isVersionValid;
+  }
 
   @override
   List<Object?> get props => [id, ver];
@@ -68,6 +75,29 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
     }
 
     return 0;
+  }
+
+  /// Checks if this reference encompasses the [other] reference.
+  ///
+  /// Returns `true` if:
+  /// - Both references have the same runtime type (e.g. both are [DraftRef]).
+  /// - Both references have the same [id].
+  /// - This reference includes the version of [other].
+  ///
+  /// Specific behavior regarding versions:
+  /// - If this reference is **loose** ([ver] is `null`), it contains any version of [other]
+  ///   (both loose and exact).
+  /// - If this reference is **exact** ([ver] is not `null`), it only contains [other] if
+  ///   [other] has the exactly same [ver].
+  bool contains(DocumentRef other) {
+    if (runtimeType != other.runtimeType) return false;
+
+    if (id != other.id) return false;
+
+    final ver = this.ver;
+    final otherVer = other.ver;
+
+    return ver == null || ver == otherVer;
   }
 
   DocumentRef copyWith({
@@ -179,13 +209,6 @@ final class SignedDocumentRef extends DocumentRef {
   }
 
   const SignedDocumentRef.loose({required super.id});
-
-  bool get isValid {
-    final isIdValid = Uuid.isValidUUID(fromString: id);
-    final isVersionValid = ver == null || Uuid.isValidUUID(fromString: ver!);
-
-    return isIdValid && isVersionValid;
-  }
 
   @override
   SignedDocumentRef copyWith({

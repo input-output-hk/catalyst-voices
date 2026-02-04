@@ -16,6 +16,7 @@ abstract base class LocalizedException with EquatableMixin implements Exception 
     if (error is LocalizedException) return error;
     if (error is ApiException) return LocalizedApiException.from(error);
     if (error is NotFoundException) return const LocalizedNotFoundException();
+    if (error is DocumentHiddenException) return const LocalizedDocumentHiddenException();
     if (error is ResourceConflictException) {
       return LocalizedResourceConflictException(error.message);
     }

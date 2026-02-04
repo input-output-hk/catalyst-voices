@@ -139,14 +139,17 @@ class NewProposalCubit extends Cubit<NewProposalState>
   Future<void> _getActiveCampaign() async {
     try {
       final campaign = await _campaignService.getActiveCampaign();
-
-      _handleActiveCampaignChange(campaign);
+      if (!isClosed) {
+        _handleActiveCampaignChange(campaign);
+      }
     } catch (error, stackTrace) {
-      _logger.severe('Load', error, stackTrace);
+      _logger.severe('Get active campaign', error, stackTrace);
 
       // TODO(dt-iohk): handle error state as dialog content,
       // don't emit the error
-      emitError(LocalizedException.create(error));
+      if (!isClosed) {
+        emitError(LocalizedException.create(error));
+      }
     }
   }
 
@@ -165,7 +168,9 @@ class NewProposalCubit extends Cubit<NewProposalState>
     unawaited(_activeCampaignTotalAskSub?.cancel());
     _activeCampaignTotalAskSub = null;
 
-    if (campaign != null) _watchCampaignTotalAsk(campaign);
+    if (campaign != null) {
+      _watchCampaignTotalAsk(campaign);
+    }
   }
 
   void _handleCampaignTotalAskChange(CampaignTotalAsk data) {
@@ -229,7 +234,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   void _watchActiveCampaign() {
     unawaited(_activeCampaignSub?.cancel());
     _activeCampaignSub = _campaignService.watchActiveCampaign
-        .distinct((previous, next) => previous?.id != next?.id)
+        .distinct((previous, next) => previous?.id == next?.id)
         .listen(_handleActiveCampaignChange);
   }
 

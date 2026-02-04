@@ -19,6 +19,33 @@ final class SignedDocumentMapper {
 
   SignedDocumentMapper._();
 
+  /// Returns a copy of [headers] with applied changes from [updates].
+  static CoseHeaders applyCoseProtectedHeadersUpdates(
+    CoseHeaders headers,
+    DocumentDataMetadataUpdate updates,
+  ) {
+    final id = updates.id;
+    final collaborators = updates.collaborators;
+
+    return headers.copyWith(
+      id: id == null
+          ? null
+          : () {
+              final uuid = id.data?.id.asUuidV7;
+              return uuid == null ? null : CoseDocumentId(uuid);
+            },
+      ver: id == null
+          ? null
+          : () {
+              final uuid = id.data?.ver?.asUuidV7;
+              return uuid == null ? null : CoseDocumentVer(uuid);
+            },
+      collaborators: collaborators == null
+          ? null
+          : () => _mapCollaboratorsToCose(collaborators.data),
+    );
+  }
+
   /// Maps domain [DocumentDataMetadata] into [CoseHeaders].
   ///
   /// Unprotected headers are not permitted by the specification,
@@ -104,7 +131,7 @@ final class SignedDocumentMapper {
   static CoseCollaborators? _mapCollaboratorsToCose(
     List<CatalystId>? collaborators,
   ) {
-    if (collaborators == null) return null;
+    if (collaborators == null || collaborators.isEmpty) return null;
     return CoseCollaborators(
       collaborators.map((e) => CatalystIdKid.fromString(e.toString())).toList(),
     );

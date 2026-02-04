@@ -89,6 +89,10 @@
   "@acknowledgeToResubmitProposal": {
     "description": "Information for user that he needs to resubmit his proposal. "
   },
+  "actionTypes": "Action Types:",
+  "@actionTypes": {
+    "description": "Label for action types tabs"
+  },
   "active": "Active",
   "@active": {
     "description": "Activated state"
@@ -96,6 +100,14 @@
   "actor": "Actor",
   "@actor": {
     "description": "Refers to user that created keychain and is unlocked."
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Generic add label text"
+  },
+  "addCollaborator": "Add Co-proposer",
+  "@addCollaborator": {
+    "description": "Informs user that he is adding collaborator to his proposal"
   },
   "addCommentSection": "Add comment",
   "@addCommentSection": {
@@ -128,6 +140,22 @@
   "all": "All",
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
+  },
+  "allProposals": "All Proposals",
+  "@allProposals": {
+    "description": "text indicating to view all proposals"
+  },
+  "allow": "Allow",
+  "@allow": {
+    "description": "new status to be set for display consent"
+  },
+  "allowed": "Allowed",
+  "@allowed": {
+    "description": "status of user action for display consent"
+  },
+  "andSign": "&",
+  "@andSign": {
+    "description": "Generic and sign"
   },
   "anonymousUsername": "Anonymous",
   "@anonymousUsername": {
@@ -172,6 +200,14 @@
   "apiErrorUnknown": "Unknown error response",
   "@apiErrorUnknown": {
     "description": "A fallback error message when api returns error code"
+  },
+  "approvals": "Approvals",
+  "@approvals": {
+    "description": "Label for approvals tab"
+  },
+  "approve": "Approve",
+  "@approve": {
+    "description": "Action label to approve (give consent) to something."
   },
   "back": "Back",
   "@back": {
@@ -345,6 +381,10 @@
   "@cancelCommit": {
     "description": "Cancel comment submission"
   },
+  "candidateFinalProposal": "Candidate Final",
+  "@candidateFinalProposal": {
+    "description": "Label indicating a candidate for a final proposal status"
+  },
   "cantEditThisProposal": "Can't edit this proposal",
   "@cantEditThisProposal": {
     "description": "Message shown when user tries to edit a proposal that should not be editable."
@@ -403,6 +443,18 @@
   "catalystId": "Catalyst ID",
   "@catalystId": {
     "description": "Label of chip with account catalyst ID clearly describing content"
+  },
+  "catalystIdAlreadyAddedAsCollaboratorMessage": "This Catalyst ID is already added as Co-Proposer",
+  "@catalystIdAlreadyAddedAsCollaboratorMessage": {
+    "description": "Error message shown to user when he tries to add Catalyst ID which already exists as collaborator in proposal"
+  },
+  "catalystIdBelongsToMainProposer": "This Catalyst ID belongs to the Author and can't be added as Co-Proposer",
+  "@catalystIdBelongsToMainProposer": {
+    "description": "Error message shown to user when he tries to add Catalyst ID which belongs to himself"
+  },
+  "catalystIdFormatInvalidMessage": "This Catalyst ID has invalid format",
+  "@catalystIdFormatInvalidMessage": {
+    "description": "Error message shown to user when Catalyst ID has not valid format"
   },
   "catalystKeychain": "Catalyst Keychain",
   "@catalystKeychain": {
@@ -480,6 +532,107 @@
   "close": "Close",
   "@close": {
     "description": "CTA To close something"
+  },
+  "collaborator": "Co-Proposer",
+  "@collaborator": {
+    "description": "text indicating to view Collaborator proposals"
+  },
+  "collaboratorApprovedFinal": "Approved final",
+  "@collaboratorApprovedFinal": {
+    "description": "Collaborator approved final proposal"
+  },
+  "collaboratorAwaitingApproval": "Awaiting approval",
+  "@collaboratorAwaitingApproval": {
+    "description": "Collaborator awaiting approval for a proposal"
+  },
+  "collaboratorDisplayConsent": "Co-Proposer\nDisplay Consent",
+  "@collaboratorDisplayConsent": {
+    "description": "Generic title to inform user about display consent"
+  },
+  "collaboratorDisplayConsentHeader": "Co-Proposer Display Consent",
+  "@collaboratorDisplayConsentHeader": {
+    "description": "Header title for Co-Proposer Display Consent page in my actions tab"
+  },
+  "collaboratorDisplayConsentPageHeader": "Co-proposers can choose whether or not to be displayed on a proposal you’ve been invited for. This action allows you to approve or decline your visibility for transparency and collaboration.",
+  "@collaboratorDisplayConsentPageHeader": {
+    "description": "Header text for the collaborator display consent page"
+  },
+  "collaboratorFinalProposalAcceptButton": "Approve Final Proposal",
+  "@collaboratorFinalProposalAcceptButton": {
+    "description": "Dialog button when accepting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalAcceptMessage": "Are you sure you want to publish this final proposal\nto the next governance stage? ",
+  "@collaboratorFinalProposalAcceptMessage": {
+    "description": "Dialog message when accepting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalAcceptTitle": "Final Publishing consent?",
+  "@collaboratorFinalProposalAcceptTitle": {
+    "description": "Dialog title when accepting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalRejectButton": "Reject Final Proposal",
+  "@collaboratorFinalProposalRejectButton": {
+    "description": "Dialog button when rejecting a final proposal as a collaborator."
+  },
+  "collaboratorFinalProposalRejectMessage": "Are you sure you want to publish this final proposal\nto the next governance stage? ",
+  "@collaboratorFinalProposalRejectMessage": {
+    "description": "Dialog message when rejecting a final proposal as a collaborator"
+  },
+  "collaboratorFinalProposalRejectTitle": "Final Publishing consent?",
+  "@collaboratorFinalProposalRejectTitle": {
+    "description": "Dialog title when rejecting a final proposal as a collaborator"
+  },
+  "collaboratorInvitationAcceptButton": "Allow",
+  "@collaboratorInvitationAcceptButton": {
+    "description": "Dialog button when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptMessage": "Are you sure you want to be displayed as\nco-proposer on this proposal?",
+  "@collaboratorInvitationAcceptMessage": {
+    "description": "Dialog message when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationAcceptTitle": "Display consent?",
+  "@collaboratorInvitationAcceptTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectButton": "Deny",
+  "@collaboratorInvitationRejectButton": {
+    "description": "Dialog button when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectMessage": "Are you sure you want to be displayed as\nco-proposer on this proposal?",
+  "@collaboratorInvitationRejectMessage": {
+    "description": "Dialog message when rejecting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationRejectTitle": "Display consent?",
+  "@collaboratorInvitationRejectTitle": {
+    "description": "Dialog title when accepting an invitation to become a collaborator on a proposal."
+  },
+  "collaboratorInvitationStatusAccepted": "Accepted",
+  "@collaboratorInvitationStatusAccepted": {
+    "description": "Collaborator invitation status: accepted."
+  },
+  "collaboratorInvitationStatusLeft": "Left",
+  "@collaboratorInvitationStatusLeft": {
+    "description": "Collaborator invitation status: collaborator left after accepting."
+  },
+  "collaboratorInvitationStatusPending": "Pending",
+  "@collaboratorInvitationStatusPending": {
+    "description": "Collaborator invitation status: pending."
+  },
+  "collaboratorInvitationStatusRejected": "Rejected",
+  "@collaboratorInvitationStatusRejected": {
+    "description": "Collaborator invitation status: rejected."
+  },
+  "collaboratorInvitationStatusRemoved": "Removed",
+  "@collaboratorInvitationStatusRemoved": {
+    "description": "Collaborator invitation status: removed."
+  },
+  "collaboratorsSectionDescription": "You can add up to {max} co-proposers. Co-Proposers will be notified via email upon proposal publishing. Only registered proposers with a verified email can be added.",
+  "@collaboratorsSectionDescription": {
+    "description": "Description for the collaborators section explaining the rules",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
   },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
@@ -571,6 +724,18 @@
   "@contributorDescription": {
     "description": "A description for contributor"
   },
+  "contributorMissingProposerRole": "This Catalyst ID doesn't have the Proposer role required to be added as Co-Proposer",
+  "@contributorMissingProposerRole": {
+    "description": "Error message shown when trying to add a collaborator who lacks the proposer role"
+  },
+  "contributorNotProposerAndNotVerified": "This Catalyst ID doesn't have the Proposer role and is not verified. Both are required to be added as Co-Proposer",
+  "@contributorNotProposerAndNotVerified": {
+    "description": "Error message shown when trying to add a collaborator who lacks both proposer role and verification"
+  },
+  "contributorNotVerifiedProfile": "This Catalyst ID is not verified and cannot be added as Co-Proposer",
+  "@contributorNotVerifiedProfile": {
+    "description": "Error message shown when trying to add a collaborator with an unverified profile"
+  },
   "contributorSummaryComment": "Comment on Proposals",
   "@contributorSummaryComment": {
     "description": "Text representing that contributor can comment on proposals"
@@ -586,6 +751,18 @@
   "copied": "Copied!",
   "@copied": {
     "description": "Snackbar message shown when user copies a link."
+  },
+  "coproposer": "Co-proposer",
+  "@coproposer": {
+    "description": "Collaborator of the proposal."
+  },
+  "coproposers": "Co-proposers",
+  "@coproposers": {
+    "description": "Collaborators of the proposal."
+  },
+  "coproposersAndApplicants": "Co-Proposers and additional applicants",
+  "@coproposersAndApplicants": {
+    "description": "Label for proposal builder collaborators tile"
   },
   "copyLink": "Copy Link",
   "@copyLink": {
@@ -880,6 +1057,14 @@
   "@deleteLocalVersionIfWantToPublishThisVersion": {
     "description": "Message shown when user tries to publish a draft proposal as final proposal but there is a newer local draft proposal."
   },
+  "denied": "Denied",
+  "@denied": {
+    "description": "status of user action for display consent"
+  },
+  "deny": "Deny",
+  "@deny": {
+    "description": "new status to be set for display consent"
+  },
   "description": "Description",
   "@description": {
     "description": "Label for description field"
@@ -949,9 +1134,17 @@
   "@doWord": {
     "description": "Label for a list of things to do"
   },
+  "documentHiddenException": "The proposal is no longer available.",
+  "@documentHiddenException": {
+    "description": "Message when the document (proposal) is no longer available due to being hidden."
+  },
   "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
   "@documentImportInvalidDataError": {
     "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
+  },
+  "documentReferenceError": "Invalid proposal reference.",
+  "@documentReferenceError": {
+    "description": "Message when the resource reference such as proposal is invalid."
   },
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
@@ -1422,6 +1615,10 @@
   "@exportProposalsIndividually": {
     "description": "Title for section informing user that they can export their proposals individually"
   },
+  "external": "External",
+  "@external": {
+    "description": "label for external tab"
+  },
   "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
   "@failedAuthenticationDescription": {
     "description": "Description for failed authentication reason to not find wallet"
@@ -1453,6 +1650,10 @@
   "finalProposal": "Final",
   "@finalProposal": {
     "description": "Label indicating final proposal status"
+  },
+  "finalProposalApproval": "Final Proposal\nApproval",
+  "@finalProposalApproval": {
+    "description": "Generic title to inform user about proposal approval"
   },
   "finishAccountButtonLabelText": "Finish account",
   "@finishAccountButtonLabelText": {
@@ -1526,6 +1727,17 @@
     "description": "Generic text about nr. of fund / campaign",
     "placeholders": {
       "fundNumber": {
+        "description": "Number of fund",
+        "type": "int"
+      }
+    }
+  },
+  "fundXAbbr": "F{fundNumber}",
+  "@fundXAbbr": {
+    "description": "Abbreviated title for fund number.",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
         "type": "int"
       }
     }
@@ -1582,6 +1794,22 @@
   "@headsUp": {
     "description": "In context for important information below"
   },
+  "headsUpDisplayConsentHintContent": "You can agree or disagree to be displayed on any proposal you’re invited to.\n\nChanged your mind? You can update your display consent anytime, just keep the submission deadline in mind. Earlier iterations will still show your previous choice.",
+  "@headsUpDisplayConsentHintContent": {
+    "description": "Content for heads up about final proposals approval"
+  },
+  "headsUpDisplayConsentHintTitle": "Heads up on Co-proposer Display consent",
+  "@headsUpDisplayConsentHintTitle": {
+    "description": "Title for heads up about co-proposer display consent"
+  },
+  "headsUpProposalApprovalHintContent": "Final proposals are published to Voting space, do keep in mind that Drafts are not eligible for funding.",
+  "@headsUpProposalApprovalHintContent": {
+    "description": "Content for heads up about co-proposer display consent"
+  },
+  "headsUpProposalApprovalHintTitle": "Heads up on Final Proposals",
+  "@headsUpProposalApprovalHintTitle": {
+    "description": "Title for heads up about final proposals approval"
+  },
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {
     "description": "Text to tell user that something important is happening"
@@ -1634,6 +1862,10 @@
   "howItWorksVoteDescription": "Use a voting app to choose ideas with impact worth funding. Get rewarded in ada for taking part.",
   "@howItWorksVoteDescription": {
     "description": "Description of voting process and rewards"
+  },
+  "howToAddCollaboratorDescription": "Enter the full catalyst ID of the co-proposer you wish to add to your proposal:",
+  "@howToAddCollaboratorDescription": {
+    "description": "Description on how to add collaborator"
   },
   "ideaJourney": "Idea Journey",
   "@ideaJourney": {
@@ -1733,6 +1965,19 @@
   "@invalidSeedPhraseWord": {
     "description": "Error shown when user inputs SeedPhrase word but invalid does not match any"
   },
+  "invitationsAndApprovals": "Invitations & Approvals",
+  "@invitationsAndApprovals": {
+    "description": "CTA to show Invitations and Approvals"
+  },
+  "invitedBy": "Invited by {username}",
+  "@invitedBy": {
+    "description": "Information about who invited user",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "joinNewsletter": "Join Newsletter",
   "@joinNewsletter": {
     "description": "Action to join newsletter"
@@ -1778,6 +2023,18 @@
   "@learnMore": {
     "description": "A label on a clickable element that can show more content."
   },
+  "leaveProposal": "Leave Proposal",
+  "@leaveProposal": {
+    "description": "CTA to leave proposal as collaborator"
+  },
+  "leaveProposalDescription": "Are you sure you want to leave? You won’t be able to undo this. Leaving the proposal means you’ll be removed as a collaborator and won’t be eligible for funding.",
+  "@leaveProposalDescription": {
+    "description": "Description about leaving proposal as collaborator"
+  },
+  "leaveProposalQuestion": "Leave Proposal?",
+  "@leaveProposalQuestion": {
+    "description": "title for leave proposal dialog"
+  },
   "linkCopiedToClipboard": "Link copied to clipboard",
   "@linkCopiedToClipboard": {
     "description": "Snackbar title shown when user copies a link."
@@ -1810,6 +2067,10 @@
   "@lockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after locking the keychain."
   },
+  "mainProposer": "Main Proposer",
+  "@mainProposer": {
+    "description": "text indicating to view Main Proposer proposals"
+  },
   "mainnetNetworkId": "Mainnet",
   "@mainnetNetworkId": {
     "description": "A mainnet cardano network name."
@@ -1830,6 +2091,10 @@
         "type": "String"
       }
     }
+  },
+  "minAbbr": "min",
+  "@minAbbr": {
+    "description": "A short abbreviation for minute."
   },
   "minBudgetRequest": "Min budget request",
   "@minBudgetRequest": {
@@ -1876,6 +2141,14 @@
   "@myAccount": {
     "description": "Header text for user's account section"
   },
+  "myActions": "My Actions",
+  "@myActions": {
+    "description": "CTA to open My Actions side bar"
+  },
+  "myActionsPageHeader": "Find your place in Catalyst by exploring ways to participate, set up your preferences and help shape Cardano’s future.",
+  "@myActionsPageHeader": {
+    "description": "The header text on the My Actions page."
+  },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
     "description": "Options available to user to make more impact in the app"
@@ -1903,6 +2176,10 @@
   "newAppVersionAvailableTitle": "New version available",
   "@newAppVersionAvailableTitle": {
     "description": "Used in banner to inform user that new version of the app is available"
+  },
+  "newInvites": "New Invites",
+  "@newInvites": {
+    "description": "Title of new invites section"
   },
   "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
   "@newIterationTitle": {
@@ -1967,6 +2244,14 @@
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
   },
+  "noInvitesYet": "No invites yet",
+  "@noInvitesYet": {
+    "description": "Title for empty state when user has no invites"
+  },
+  "noInvitesYetDescription": "Once you’re invited to a proposal, it will appear here.",
+  "@noInvitesYetDescription": {
+    "description": "Description for empty state when user has no invites"
+  },
   "noLocalUserProposals": "No Local proposals found",
   "@noLocalUserProposals": {
     "description": "Title shown when user has no local proposals in workspace"
@@ -1990,6 +2275,15 @@
       }
     }
   },
+  "noOfDecide": "Decide · {count}",
+  "@noOfDecide": {
+    "description": "Tab label for \"Decide\" proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfDraft": "Draft proposals · {count}",
   "@noOfDraft": {
     "description": "Tab label for draft proposals in voting space",
@@ -2010,7 +2304,7 @@
   },
   "noOfFinal": "Final proposals · {count}",
   "@noOfFinal": {
-    "description": "Tab label for final proposals in voting space",
+    "description": "Tab label for final proposals",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2026,6 +2320,24 @@
       }
     }
   },
+  "noOfProposalInvites": "Proposal Invites · {count}",
+  "@noOfProposalInvites": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfProposals": "Proposals · {count}",
+  "@noOfProposals": {
+    "description": "Information about count of proposals",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noOfVotedOn": "Voted On · {count}",
   "@noOfVotedOn": {
     "description": "Tab label for voted on proposals in voting space",
@@ -2034,6 +2346,10 @@
         "type": "int"
       }
     }
+  },
+  "noPendingInvitesMessage": "You don’t have any proposal invites",
+  "@noPendingInvitesMessage": {
+    "description": "Message shown when user don't have any pending messages"
   },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
@@ -2107,6 +2423,10 @@
   "@notPublishedProposals": {
     "description": "Title for section to show not published proposals"
   },
+  "notShownOnFinalProposal": "Not shown on final proposal",
+  "@notShownOnFinalProposal": {
+    "description": "Text explaining that given piece of information is not shown on final proposal."
+  },
   "notVerified": "Not verified",
   "@notVerified": {
     "description": "Message of account status chip next to email. Meaning Account is not verified."
@@ -2144,6 +2464,10 @@
   "@openAppSettings": {
     "description": "CTA to open app settings"
   },
+  "openForDecision": "Open for Decision",
+  "@openForDecision": {
+    "description": "Navigate to the details of the proposal to take a decision about it"
+  },
   "openInEditor": "Open in editor",
   "@openInEditor": {
     "description": "description of the button that opens the proposal in editor"
@@ -2176,6 +2500,15 @@
   "@orderProposalsUpdateDateDesc": {
     "description": "Order proposals by update date option"
   },
+  "others": "{count} {count, plural, =1{Other} other{Others}}",
+  "@others": {
+    "description": "In context of proposal author and collaborators. Eg. Author & 5 Others",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
     "description": "Below pagination list, next to page switch controls",
@@ -2190,6 +2523,10 @@
         "type": "int"
       }
     }
+  },
+  "participationPreferences": "Participation preferences",
+  "@participationPreferences": {
+    "description": "Title for the participation preferences section in user actions"
   },
   "passwordDoNotMatch": "Passwords do not match, please correct",
   "@passwordDoNotMatch": {
@@ -2254,6 +2591,38 @@
   "proposal": "Proposal",
   "@proposal": {
     "description": "Generic name to describe an type of item."
+  },
+  "proposalApprovalDecideEmptyDescription": "Approval requests will appear here.",
+  "@proposalApprovalDecideEmptyDescription": {
+    "description": "Header for final proposal approval page empty state for proposals to decide tab"
+  },
+  "proposalApprovalDecideEmptyTitle": "No final approval requests yet",
+  "@proposalApprovalDecideEmptyTitle": {
+    "description": "Header for final proposal approval page empty state for proposals to decide tab"
+  },
+  "proposalApprovalFinalProposalsEmptyDescription": "Final proposals will appear here.",
+  "@proposalApprovalFinalProposalsEmptyDescription": {
+    "description": "Header for final proposal approval page empty state for final proposals tab"
+  },
+  "proposalApprovalFinalProposalsEmptyTitle": "No final proposals yet",
+  "@proposalApprovalFinalProposalsEmptyTitle": {
+    "description": "Header for final proposal approval page empty state for final proposals tab"
+  },
+  "proposalApprovalHeader": "Final Proposal Approval",
+  "@proposalApprovalHeader": {
+    "description": "Header for final proposal approval page"
+  },
+  "proposalApprovalSubheader": "Once the proposal draft is finalized, co-proposers must approve or deny the final version. This ensures unanimous agreement before moving forward.",
+  "@proposalApprovalSubheader": {
+    "description": "Subheader for final proposal approval page"
+  },
+  "proposalApprovalTabDecide": "Decide",
+  "@proposalApprovalTabDecide": {
+    "description": "Label for \"decide\" tab"
+  },
+  "proposalApprovals": "Proposal Approvals",
+  "@proposalApprovals": {
+    "description": "CTA to see proposal that needs approval"
   },
   "proposalEditorBackToProposals": "Back to Proposals",
   "@proposalEditorBackToProposals": {
@@ -2404,6 +2773,10 @@
   "@proposalEditorValidationExitIssueMode": {
     "description": "Button text for exiting the proposal editor validation snackbar."
   },
+  "proposalHidden": "Proposal is hidden",
+  "@proposalHidden": {
+    "description": "Message shown to user when was found but it's hidden"
+  },
   "proposalImportDialogDescription": "Make sure it's a correct Catalyst proposal file.",
   "@proposalImportDialogDescription": {
     "description": "The description of the dialog to import a proposal."
@@ -2411,6 +2784,10 @@
   "proposalImportDialogTitle": "Import Proposal",
   "@proposalImportDialogTitle": {
     "description": "The title of the dialog to import a proposal."
+  },
+  "proposalInvitations": "Proposal Invitations",
+  "@proposalInvitations": {
+    "description": "CTA to see proposal invitations"
   },
   "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
   "@proposalIterationPublishUpdateAndTitle": {
@@ -2485,13 +2862,37 @@
       }
     }
   },
+  "proposalTemplateNotFound": "Template for this Proposal is missing. Can't view this document",
+  "@proposalTemplateNotFound": {
+    "description": "Message shown to user when proposal can't be build because of missing template"
+  },
   "proposalTitleShortDescription": "A strong proposal title can really set the tone and capture attention. ",
   "@proposalTitleShortDescription": {
     "description": "Short description for the title input field"
   },
+  "proposalViewAcceptedFinalProposalBannerChangeToReject": "Change to Reject",
+  "@proposalViewAcceptedFinalProposalBannerChangeToReject": {
+    "description": "The button in the collaborator final proposal banner on the proposal viewer page after the user has accepted and wants to reject it instead."
+  },
+  "proposalViewAcceptedFinalProposalBannerMessage": "**Invitation Accepted:** You'll be named as a co-proposer and will be eligible for funding on final proposals with your team.",
+  "@proposalViewAcceptedFinalProposalBannerMessage": {
+    "description": "The message in the collaborator final proposal banner on the proposal viewer page after the user has accepted the proposal."
+  },
+  "proposalViewAcceptedInvitationBannerChangeToDeny": "Change to Deny",
+  "@proposalViewAcceptedInvitationBannerChangeToDeny": {
+    "description": "The button in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation and wants to reject it instead."
+  },
+  "proposalViewAcceptedInvitationBannerMessage": "**Display allowed:** You'll be named as a co-proposer and will be eligible for funding on final proposals with your team.",
+  "@proposalViewAcceptedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has accepted the invitation."
+  },
   "proposalViewFundingRequested": "Funding Requested",
   "@proposalViewFundingRequested": {
     "description": "When viewing proposal"
+  },
+  "proposalViewLoadErrorMessage": "We weren't able to load that proposal.",
+  "@proposalViewLoadErrorMessage": {
+    "description": "Error message shown when proposal cannot be loaded (i.e. due to connection error)."
   },
   "proposalViewMetadataOverviewSegment": "Overview",
   "@proposalViewMetadataOverviewSegment": {
@@ -2501,6 +2902,34 @@
   "@proposalViewMetadataSection": {
     "description": "Viewing proposal navigation section"
   },
+  "proposalViewNotFoundButton": "Go to Catalyst Home.",
+  "@proposalViewNotFoundButton": {
+    "description": "Error button shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundMessage": "It looks like we can't find the proposal you're looking for.\nMaybe a good time for a coffee break?",
+  "@proposalViewNotFoundMessage": {
+    "description": "Error message shown when proposal cannot be found."
+  },
+  "proposalViewNotFoundTitle": "We can't find that proposal.",
+  "@proposalViewNotFoundTitle": {
+    "description": "Error title shown when proposal cannot be found."
+  },
+  "proposalViewPendingFinalProposalBannerMessage": "Are you sure you want to publish this final proposal to the next governance stage?",
+  "@proposalViewPendingFinalProposalBannerMessage": {
+    "description": "Message for the pending final proposal banner on the proposal asking the collaborator to approve / reject it."
+  },
+  "proposalViewPendingInvitationBannerAcceptButton": "Allow",
+  "@proposalViewPendingInvitationBannerAcceptButton": {
+    "description": "The accept button label in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerMessage": "You have been invited to be displayed as a co-proposer on this proposal",
+  "@proposalViewPendingInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page."
+  },
+  "proposalViewPendingInvitationBannerRejectButton": "Deny",
+  "@proposalViewPendingInvitationBannerRejectButton": {
+    "description": "The reject button label in the collaborator invitation banner on the proposal viewer page."
+  },
   "proposalViewProjectDelivery": "Project Delivery",
   "@proposalViewProjectDelivery": {
     "description": "When viewing proposal"
@@ -2508,6 +2937,22 @@
   "proposalViewProjectDuration": "Project Duration",
   "@proposalViewProjectDuration": {
     "description": "When viewing proposal"
+  },
+  "proposalViewRejectedFinalProposalBannerChangeToApprove": "Change to Approve",
+  "@proposalViewRejectedFinalProposalBannerChangeToApprove": {
+    "description": "The button in the collaborator final proposal banner on the proposal viewer page after the user has rejected the proposal and wants to accept it instead."
+  },
+  "proposalViewRejectedFinalProposalBannerMessage": "**Final Proposal Rejected:** You rejected this proposal to be final.  Be aware that co-proposers, who do not respond or reject and not shown on the final proposal!",
+  "@proposalViewRejectedFinalProposalBannerMessage": {
+    "description": "The message in the collaborator final proposal banner on the proposal viewer page after the user has rejected the proposal."
+  },
+  "proposalViewRejectedInvitationBannerChangeToAllow": "Change to Allow",
+  "@proposalViewRejectedInvitationBannerChangeToAllow": {
+    "description": "The button in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation and wants to accept it instead."
+  },
+  "proposalViewRejectedInvitationBannerMessage": "**Display Denied:** Your name will not appear as a co-proposer on this proposal, and you will not be eligible to receive grant funding for this idea.",
+  "@proposalViewRejectedInvitationBannerMessage": {
+    "description": "The message in the collaborator invitation banner on the proposal viewer page after the user has rejected the invitation."
   },
   "proposals": "Proposals",
   "@proposals": {
@@ -2609,16 +3054,20 @@
   "@publishButtonText": {
     "description": "Text shown in publish button"
   },
-  "publishNewProposalIterationDialogList1": "Published iterations are always public.",
+  "publishNewProposalIterationDialogList1": "Co-Proposers will be notified within the application. They can choose to accept or reject the invitation, so publish wisely.",
   "@publishNewProposalIterationDialogList1": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about Co-Proposers will be notified via application."
+  },
+  "publishNewProposalIterationDialogList2": "Published iterations are always public.",
+  "@publishNewProposalIterationDialogList2": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about proposals being public."
   },
-  "publishNewProposalIterationDialogList2": "Contributors can comment on the latest iteration.",
-  "@publishNewProposalIterationDialogList2": {
-    "description": "The bullet point in the dialog for publishing a proposal iteration about contributors being able to comment on drafts."
-  },
-  "publishNewProposalIterationDialogList3": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
+  "publishNewProposalIterationDialogList3": "Voters can comment on the latest iteration.",
   "@publishNewProposalIterationDialogList3": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about voters being able to comment on drafts."
+  },
+  "publishNewProposalIterationDialogList4": "Drafts are not submitted for voting. Use ‘Submit for review’ to enter the community review stage.",
+  "@publishNewProposalIterationDialogList4": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about drafts not being automatically submitted for voting."
   },
   "publishNewProposalIterationDialogSubtitle": "Published proposal drafts are public to other users, including all previous iterations.",
@@ -2633,16 +3082,20 @@
   "@publishProposalForReviewDialogAgreement": {
     "description": "The agreement confirmation in the dialog for submitting a proposal into review."
   },
-  "publishProposalForReviewDialogList1": "Published iterations are always public.",
+  "publishProposalForReviewDialogList1": "Co-Proposers will be notified within the application. They can choose to accept or reject the invitation, so publish wisely. ",
   "@publishProposalForReviewDialogList1": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about Co-Proposers will be notified via application."
+  },
+  "publishProposalForReviewDialogList2": "Published iterations are always public.",
+  "@publishProposalForReviewDialogList2": {
     "description": "The bullet point in the dialog for submitting a proposal into review about proposals being public."
   },
-  "publishProposalForReviewDialogList2": "Contributors can only comment on the latest iteration.",
-  "@publishProposalForReviewDialogList2": {
-    "description": "The bullet point in the dialog for submitting a proposal into review about contributors being able to comment on drafts."
-  },
-  "publishProposalForReviewDialogList3": "Proposals are entered into the review stage unless a later iteration is published before the deadline.",
+  "publishProposalForReviewDialogList3": "Voters can comment on the latest iteration.",
   "@publishProposalForReviewDialogList3": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about voters being able to comment on drafts."
+  },
+  "publishProposalForReviewDialogList4": "Drafts are not submitted for voting. Use ‘Submit for review’ to enter the community review stage.",
+  "@publishProposalForReviewDialogList4": {
     "description": "The bullet point in the dialog for submitting a proposal into review about drafts not being automatically submitted for voting."
   },
   "publishProposalForReviewDialogSubtitle": "Submitted final proposals are entered into the community review stage and are eligible for funding.",
@@ -2964,6 +3417,19 @@
   "@registrationWalletNotFound": {
     "description": "Error message shown when connect wallet but matching was not found"
   },
+  "reject": "Reject",
+  "@reject": {
+    "description": "Action label to deny (forbid consent) something."
+  },
+  "remaining": "{duration} remaining",
+  "@remaining": {
+    "description": "Label showing remaining time duration",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "removeFromVoteList": "Remove from Vote List",
   "@removeFromVoteList": {
     "description": "When vote is added but not casted yet it can be removed."
@@ -3050,6 +3516,10 @@
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
   },
+  "reviewRequest": "Review Request",
+  "@reviewRequest": {
+    "description": "CTA to make user review invite to collaboration on proposal"
+  },
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
@@ -3057,6 +3527,10 @@
   "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
   "@richTextEditorImageSupportInfo": {
     "description": "Information about supported image sources in the editor"
+  },
+  "role": "Role",
+  "@role": {
+    "description": "Label for role tab"
   },
   "safariNotSupportedMessage": "Safari is not supported, please use Chrome or Firefox.",
   "@safariNotSupportedMessage": {
@@ -4054,6 +4528,10 @@
   "yesterday": "Yesterday",
   "@yesterday": {
     "description": "Refers to date which is yesterday."
+  },
+  "you": "You",
+  "@you": {
+    "description": "You (referring to the current app user)"
   },
   "youAreSettingFinalToDraft": "You are setting your final proposal back to draft.",
   "@youAreSettingFinalToDraft": {
