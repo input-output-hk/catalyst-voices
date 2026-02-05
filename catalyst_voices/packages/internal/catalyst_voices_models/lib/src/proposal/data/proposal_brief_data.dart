@@ -93,7 +93,7 @@ final class ProposalBriefData extends Equatable implements Comparable<ProposalBr
       fundsRequested: proposal.fundsRequested,
       createdAt: id.ver!.dateTime,
       iteration: iteration,
-      commentsCount: isFinal ? null : data.commentsCount,
+      commentsCount: data.commentsCount,
       isFinal: isFinal,
       isFavorite: data.isFavorite,
       votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,

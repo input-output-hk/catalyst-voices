@@ -29,6 +29,9 @@ class RoleChooserCard extends StatelessWidget {
   /// Toggles view-only mode.
   final bool isViewOnly;
 
+  /// Whether to display the value.
+  final bool displayValue;
+
   /// A callback triggered when the role selection changes.
   final ValueChanged<bool>? onChanged;
 
@@ -44,6 +47,7 @@ class RoleChooserCard extends StatelessWidget {
     this.isDefault = false,
     this.isLearnMoreHidden = false,
     this.isViewOnly = false,
+    this.displayValue = true,
     this.onChanged,
     this.onLearnMore,
   });
@@ -61,10 +65,15 @@ class RoleChooserCard extends StatelessWidget {
             ),
       child: Row(
         children: [
-          Column(children: [icon]),
+          Column(
+            mainAxisAlignment: displayValue ? MainAxisAlignment.start : MainAxisAlignment.center,
+            children: [icon],
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
+              mainAxisAlignment: displayValue ? MainAxisAlignment.start : MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   children: [
@@ -81,20 +90,19 @@ class RoleChooserCard extends StatelessWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    if (isViewOnly)
-                      _DisplayingValueAsChips(value: value, isDefault: isDefault)
-                    else
-                      _DisplayingValueAsSegmentedButton(
-                        value: value,
-                        isLocked: isLocked,
-                        isDefault: isDefault,
-                        onChanged: onChanged,
-                      ),
-                  ],
-                ),
+                if (displayValue) ...[
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    child: isViewOnly
+                        ? _DisplayingValueAsChips(value: value, isDefault: isDefault)
+                        : _DisplayingValueAsSegmentedButton(
+                            value: value,
+                            isLocked: isLocked,
+                            isDefault: isDefault,
+                            onChanged: onChanged,
+                          ),
+                  ),
+                ],
               ],
             ),
           ),

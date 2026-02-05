@@ -9,6 +9,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class AccountCompletedPanel extends StatelessWidget {
@@ -192,10 +193,10 @@ class _RolesSelectedCardSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<RegistrationCubit, RegistrationState, Set<AccountRole>>(
-      selector: (state) => state.walletLinkStateData.selectedRoleTypes,
-      builder: (context, roles) {
-        return _RolesSelectedCard(roles: roles);
+    return BlocSelector<RegistrationCubit, RegistrationState, IterableData<Set<AccountRole>>>(
+      selector: (state) => state.walletLinkStateData.selectedRoleTypesData,
+      builder: (context, data) {
+        return _RolesSelectedCard(roles: data.value);
       },
     );
   }

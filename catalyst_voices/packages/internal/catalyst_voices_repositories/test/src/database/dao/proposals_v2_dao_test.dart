@@ -765,7 +765,7 @@ void main() {
 
           final result = await dao.getVisibleProposalsCount(
             filters: ProposalsFiltersV2(
-              campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
+              campaign: CampaignFilters(categoriesIds: {cat1.id, cat2.id}),
             ),
           );
 
@@ -782,7 +782,7 @@ void main() {
 
           final result = await dao.getVisibleProposalsCount(
             filters: const ProposalsFiltersV2(
-              campaign: ProposalsCampaignFilters(categoriesIds: {}),
+              campaign: CampaignFilters(categoriesIds: {}),
             ),
           );
 
@@ -799,7 +799,7 @@ void main() {
 
           final result = await dao.getVisibleProposalsCount(
             filters: ProposalsFiltersV2(
-              campaign: ProposalsCampaignFilters(categoriesIds: {cat2.id, cat3.id}),
+              campaign: CampaignFilters(categoriesIds: {cat2.id, cat3.id}),
               categoryId: cat1.id,
             ),
           );
@@ -4968,7 +4968,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: ProposalsFiltersV2(
-                  campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
+                  campaign: CampaignFilters(categoriesIds: {cat1.id, cat2.id}),
                 ),
               );
 
@@ -4999,7 +4999,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: const ProposalsFiltersV2(
-                  campaign: ProposalsCampaignFilters(categoriesIds: {}),
+                  campaign: CampaignFilters(categoriesIds: {}),
                 ),
               );
 
@@ -5036,7 +5036,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: ProposalsFiltersV2(
-                  campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
+                  campaign: CampaignFilters(categoriesIds: {cat1.id, cat2.id}),
                   categoryId: cat1.id,
                 ),
               );
@@ -5076,7 +5076,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: ProposalsFiltersV2(
-                  campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
+                  campaign: CampaignFilters(categoriesIds: {cat1.id, cat2.id}),
                   categoryId: cat3.id,
                 ),
               );
@@ -5142,7 +5142,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: ProposalsFiltersV2(
-                  campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id, cat2.id}),
+                  campaign: CampaignFilters(categoriesIds: {cat1.id, cat2.id}),
                 ),
               );
 
@@ -5168,7 +5168,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: const ProposalsFiltersV2(
-                  campaign: ProposalsCampaignFilters(categoriesIds: categoriesIds),
+                  campaign: CampaignFilters(categoriesIds: categoriesIds),
                 ),
               );
 
@@ -5222,7 +5222,7 @@ void main() {
               final result = await dao.getProposalsBriefPage(
                 request: request,
                 filters: ProposalsFiltersV2(
-                  campaign: ProposalsCampaignFilters(categoriesIds: {cat1.id}),
+                  campaign: CampaignFilters(categoriesIds: {cat1.id}),
                   status: ProposalStatusFilter.draft,
                 ),
               );
@@ -5956,7 +5956,7 @@ void main() {
           await db.documentsV2Dao.saveAll([draftProposal]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6024,7 +6024,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6098,7 +6098,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6171,7 +6171,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6243,7 +6243,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6312,7 +6312,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6414,7 +6414,7 @@ void main() {
           ]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id, cat2.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id, cat2.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6487,7 +6487,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposalV1, proposalV2, proposalV3, finalAction]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6545,7 +6545,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposalV1, proposalV2, finalActionWithoutRefVer]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6614,7 +6614,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6674,7 +6674,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposalV1, proposalV2, finalActionWithoutRefVer]);
 
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final result = await dao.getProposalsTotalTask(
@@ -6698,7 +6698,7 @@ void main() {
 
         test('returns empty map when categories list is empty', () async {
           const filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: []),
+            campaign: CampaignFilters(categoriesIds: {}),
           );
 
           final stream = dao.watchProposalsTotalTask(
@@ -6745,7 +6745,7 @@ void main() {
 
           final emissions = <Map<DocumentRef, ProposalsTotalAskPerTemplate>>[];
           final filters = ProposalsTotalAskFilters(
-            campaign: CampaignFilters(categoriesIds: [cat1.id]),
+            campaign: CampaignFilters(categoriesIds: {cat1.id}),
           );
 
           final subscription = dao

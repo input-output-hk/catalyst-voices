@@ -68,6 +68,8 @@ class _RegistrationDialogState extends State<RegistrationDialog> {
         _cubit.goToStep(const RecoverWithSeedPhraseStep());
       case ContinueRegistration():
         unawaited(_cubit.recoverProgress());
+      case LinkDrepKey(:final id):
+        unawaited(_cubit.startLinkDrepKey(id: id));
     }
   }
 
@@ -76,7 +78,7 @@ class _RegistrationDialogState extends State<RegistrationDialog> {
     required RegistrationStep step,
     required double progress,
   }) async {
-    if (widget.type is UpdateAccount) {
+    if (widget.type is UpdateAccount || step.isWalletDrepLinkFlow) {
       final stayInTheFlow = await VoicesQuestionDialog.show(
         context,
         routeSettings: const RouteSettings(name: '/registration-confirm-exit'),

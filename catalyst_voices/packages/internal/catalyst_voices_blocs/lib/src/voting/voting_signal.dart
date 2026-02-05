@@ -22,6 +22,15 @@ final class ChangeTabVotingSignal extends VotingSignal {
   List<Object?> get props => [tab];
 }
 
+final class ChangeVoteTypeFilterVotingSignal extends VotingSignal {
+  final VoteType? voteType;
+
+  const ChangeVoteTypeFilterVotingSignal(this.voteType);
+
+  @override
+  List<Object?> get props => [voteType];
+}
+
 final class PageReadyVotingSignal extends VotingSignal {
   final Page<ProposalBrief> page;
 

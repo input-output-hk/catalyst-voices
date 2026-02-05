@@ -5,11 +5,11 @@ import 'package:go_router/go_router.dart';
 class VoicesDrawerHeader extends StatelessWidget {
   final VoidCallback? onCloseTap;
   final bool showBackButton;
-  final String text;
+  final Widget title;
 
   const VoicesDrawerHeader({
     super.key,
-    required this.text,
+    required this.title,
     this.showBackButton = false,
     this.onCloseTap,
   });
@@ -26,12 +26,7 @@ class VoicesDrawerHeader extends StatelessWidget {
               padding: const EdgeInsets.only(right: 8),
             ),
           ),
-        Expanded(
-          child: Text(
-            text,
-            style: context.textTheme.titleLarge,
-          ),
-        ),
+        Expanded(child: _Title(child: title)),
         CloseButton(
           onPressed: onCloseTap != null ? onCloseTap!.call : Navigator.maybeOf(context)?.pop,
           style: IconButton.styleFrom(
@@ -39,6 +34,35 @@ class VoicesDrawerHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  final Widget child;
+
+  const _Title({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = (context.textTheme.titleLarge ?? const TextStyle()).copyWith(
+      color: context.colors.textOnPrimaryLevel0,
+    );
+    final iconThemeData = IconThemeData(
+      size: 24,
+      color: context.colors.iconsForeground,
+    );
+
+    return DefaultTextStyle(
+      style: textStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      child: IconTheme(
+        data: iconThemeData,
+        child: child,
+      ),
     );
   }
 }

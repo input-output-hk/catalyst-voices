@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/comment/proposal_comment_with_replies_card.dart';
+import 'package:catalyst_voices/widgets/comment/document_comment_with_replies_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +26,8 @@ class ProposalBuilderCommentTile extends StatelessWidget {
     final id = comment.comment.metadata.id.id;
     final bloc = context.read<ProposalBuilderBloc>();
 
-    return ProposalCommentWithRepliesCard(
-      key: ValueKey('ProposalComment.$id.WithReplies'),
+    return DocumentCommentWithRepliesCard(
+      key: ValueKey('DocumentComment.$id.WithReplies'),
       comment: comment,
       canReply: canReply,
       showReplies: showReplies,

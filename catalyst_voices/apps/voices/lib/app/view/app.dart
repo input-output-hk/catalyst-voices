@@ -57,9 +57,6 @@ class _AppState extends State<App> {
       BlocProvider<AccountCubit>(
         create: (context) => Dependencies.instance.get<AccountCubit>(),
       ),
-      BlocProvider<ProposalCubit>(
-        create: (_) => Dependencies.instance.get<ProposalCubit>(),
-      ),
       BlocProvider<NewProposalCubit>(
         create: (_) => Dependencies.instance.get<NewProposalCubit>(),
       ),
@@ -71,11 +68,15 @@ class _AppState extends State<App> {
         lazy: false,
         create: (_) => Dependencies.instance.get<CampaignPhaseAwareCubit>(),
       ),
+      // Have to be global
       BlocProvider<VotingBallotBloc>(
         create: (_) => Dependencies.instance.get<VotingBallotBloc>(),
       ),
       BlocProvider<FeatureFlagsCubit>(
         create: (_) => Dependencies.instance.get<FeatureFlagsCubit>(),
+      ),
+      BlocProvider<SyncIndicatorCubit>(
+        create: (_) => Dependencies.instance.get<SyncIndicatorCubit>(),
       ),
     ];
   }

@@ -86,6 +86,9 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<SystemStatusCubit>(
         () => SystemStatusCubit(get<SystemStatusService>()),
       )
+      ..registerLazySingleton<SyncIndicatorCubit>(
+        () => SyncIndicatorCubit(get<SyncManager>()),
+      )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
@@ -123,6 +126,7 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
+          get<VotingService>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management
@@ -162,13 +166,13 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
       })
-      ..registerFactory<ProposalCubit>(() {
-        return ProposalCubit(
-          get<UserService>(),
+      ..registerFactory<ProposalViewerCubit>(() {
+        return ProposalViewerCubit(
           get<ProposalService>(),
-          get<CommentService>(),
+          get<UserService>(),
           get<DocumentMapper>(),
           get<FeatureFlagsService>(),
+          get<CommentService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -222,6 +226,7 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
           get<CampaignService>(),
           get<UserService>(),
+          get<VotingService>(),
         );
       })
       ..registerFactory<DisplayConsentCubit>(() {
@@ -236,7 +241,14 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
         );
-      });
+      })
+      ..registerFactory<RepresentativeActionCubit>(
+        () => RepresentativeActionCubit(
+          get<RepresentativesService>(),
+          get<CampaignService>(),
+          get<UserService>(),
+        ),
+      );
   }
 
   void _registerNetwork() {
@@ -484,10 +496,12 @@ final class Dependencies extends DependencyProvider {
       );
     });
     registerLazySingleton<VotingService>(() {
-      return VotingService(
+      return VotingService.mock(
         get<VotingRepository>(),
         get<ProposalService>(),
         get<CampaignService>(),
+        get<UserObserver>(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<ReportingServiceMediator>(
@@ -511,6 +525,12 @@ final class Dependencies extends DependencyProvider {
       return SystemStatusService(
         get<SystemStatusRepository>(),
         get<AppMetaStorage>(),
+      );
+    });
+    registerLazySingleton<DelegationBuilder>(DelegationBuilder.new);
+    registerLazySingleton<RepresentativesService>(() {
+      return RepresentativesService(
+        get<DocumentRepository>(),
       );
     });
   }

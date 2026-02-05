@@ -16,7 +16,6 @@ class ProposalBriefCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
-  final bool canVote;
 
   const ProposalBriefCard({
     super.key,
@@ -24,7 +23,6 @@ class ProposalBriefCard extends StatefulWidget {
     this.onTap,
     this.onFavoriteChanged,
     this.onVoteAction,
-    this.canVote = true,
   });
 
   @override
@@ -255,7 +253,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     VoteButton(
                       data: voteData,
                       onSelected: onVoteAction,
-                      readOnly: !widget.canVote,
+                      readOnly: !proposal.votingEnabled,
                     ),
                   ],
                 ],
@@ -346,7 +344,7 @@ class _ProposalInfo extends StatelessWidget {
     };
     final dt = DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
 
-    return context.l10n.publishedOn(dt.date, dt.time);
+    return context.l10n.publishedOnAt(dt.date, dt.time);
   }
 }
 

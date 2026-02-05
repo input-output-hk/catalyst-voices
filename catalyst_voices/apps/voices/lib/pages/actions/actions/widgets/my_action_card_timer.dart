@@ -9,23 +9,38 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class MyActionCardTimer extends StatefulWidget {
-  final Duration duration;
+  final Duration? duration;
 
-  const MyActionCardTimer({super.key, required this.duration});
+  const MyActionCardTimer({super.key, this.duration});
 
   @override
   State<MyActionCardTimer> createState() => _MyActionCardTimerState();
 }
 
 class _MyActionCardTimerState extends State<MyActionCardTimer> {
-  Duration _remainingDuration = Duration.zero;
+  Duration? _remainingDuration;
   Timer? _timer;
   final Stopwatch _stopwatch = Stopwatch();
-  Duration _initialDuration = Duration.zero;
+  Duration? _initialDuration;
 
   @override
   Widget build(BuildContext context) {
-    if (_remainingDuration < Duration.zero) {
+    if (widget.duration == null) {
+      return AffixDecorator(
+        prefix: VoicesAssets.icons.clock.buildIcon(
+          size: 18,
+          color: context.colors.iconsBackground,
+        ),
+        child: Text(
+          context.l10n.votingTimelineToBeAnnounced,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.colors.textOnPrimaryWhite,
+          ),
+        ),
+      );
+    }
+
+    if (_remainingDuration == null || _remainingDuration! <= Duration.zero) {
       return const Offstage();
     }
 
@@ -42,9 +57,9 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'duration' => TextSpan(
-              text: DurationFormatter.formatDurationHHmmss(
+              text: DurationFormatter.formatDurationDaysOrHHmm(
                 context.l10n,
-                _remainingDuration,
+                _remainingDuration!,
               ),
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.colors.textOnPrimaryWhite,
@@ -87,11 +102,15 @@ class _MyActionCardTimerState extends State<MyActionCardTimer> {
   }
 
   void _startTimer() {
+    if (widget.duration == null || _initialDuration == null) {
+      return;
+    }
+
     _stopwatch.start();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _remainingDuration = _initialDuration - _stopwatch.elapsed;
-        if (_remainingDuration.isNegative) {
+        _remainingDuration = _initialDuration! - _stopwatch.elapsed;
+        if (_remainingDuration!.isNegative) {
           _stopwatch.stop();
           timer.cancel();
         }

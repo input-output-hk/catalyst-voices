@@ -1,39 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
-
-/// A set of filters to be applied when querying for campaign proposals.
-final class ProposalsCampaignFilters extends Equatable {
-  /// Filters proposals by their category IDs.
-  final Set<String> categoriesIds;
-
-  /// Creates a set of filters for querying campaign proposals.
-  const ProposalsCampaignFilters({
-    required this.categoriesIds,
-  });
-
-  /// Currently hardcoded active campaign helper constructor.
-  factory ProposalsCampaignFilters.active() {
-    final categoriesIds = Campaign.all
-        .where((campaign) => campaign.id == activeCampaignRef)
-        .map((campaign) => campaign.categories.map((category) => category.id.id))
-        .flattened
-        .toSet();
-
-    return ProposalsCampaignFilters(categoriesIds: categoriesIds);
-  }
-
-  factory ProposalsCampaignFilters.from(Campaign campaign) {
-    final categoriesIds = campaign.categories.map((e) => e.id.id).toSet();
-    return ProposalsCampaignFilters(categoriesIds: categoriesIds);
-  }
-
-  @override
-  List<Object?> get props => [categoriesIds];
-
-  @override
-  String toString() => 'categoriesIds: $categoriesIds';
-}
 
 /// A set of filters to be applied when querying for proposals.
 base class ProposalsFiltersV2 extends Equatable {
@@ -67,12 +33,16 @@ base class ProposalsFiltersV2 extends Equatable {
   /// Filters proposals based on their campaign categories.
   /// If [campaign] is not null and [categoryId] is not included, empty list will be returned.
   /// If null, this filter is not applied.
-  final ProposalsCampaignFilters? campaign;
+  final CampaignFilters? campaign;
 
   /// Filters proposals based on whether a specific user has voted on them.
   /// The value is the [CatalystId] of the user.
   /// If null, this filter is not applied.
   final CatalystId? voteBy;
+
+  /// Filters proposals by the type of vote cast.
+  /// If null, all vote types are included.
+  final VoteType? voteType;
 
   // TODO(damian-molinski): Remove this when voteBy is implemented
   /// Temporary filter only for mocked implementation of [voteBy].
@@ -88,6 +58,7 @@ base class ProposalsFiltersV2 extends Equatable {
     this.latestUpdate,
     this.campaign,
     this.voteBy,
+    this.voteType,
     this.ids,
   });
 
@@ -101,6 +72,7 @@ base class ProposalsFiltersV2 extends Equatable {
     latestUpdate,
     campaign,
     voteBy,
+    voteType,
     ids,
   ];
 
@@ -111,8 +83,9 @@ base class ProposalsFiltersV2 extends Equatable {
     Optional<String>? categoryId,
     Optional<String>? searchQuery,
     Optional<Duration>? latestUpdate,
-    Optional<ProposalsCampaignFilters>? campaign,
+    Optional<CampaignFilters>? campaign,
     Optional<CatalystId>? voteBy,
+    Optional<VoteType>? voteType,
     Optional<List<String>>? ids,
   }) {
     return ProposalsFiltersV2(
@@ -124,6 +97,7 @@ base class ProposalsFiltersV2 extends Equatable {
       latestUpdate: latestUpdate.dataOr(this.latestUpdate),
       campaign: campaign.dataOr(this.campaign),
       voteBy: voteBy.dataOr(this.voteBy),
+      voteType: voteType.dataOr(this.voteType),
       ids: ids.dataOr(this.ids),
     );
   }
@@ -156,6 +130,9 @@ base class ProposalsFiltersV2 extends Equatable {
     }
     if (voteBy != null) {
       parts.add('votedBy: $voteBy');
+    }
+    if (voteType != null) {
+      parts.add('voteType: $voteType');
     }
     if (ids != null) {
       parts.add('ids: ${ids!.join(',')}');

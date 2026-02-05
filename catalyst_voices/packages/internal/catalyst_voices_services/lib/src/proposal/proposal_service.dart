@@ -526,7 +526,7 @@ final class ProposalServiceImpl implements ProposalService {
           relationships: {
             OriginalAuthor(author),
           },
-          campaign: ProposalsCampaignFilters.from(campaign),
+          campaign: CampaignFilters.from(campaign),
         );
       },
     ).distinct().switchMap(

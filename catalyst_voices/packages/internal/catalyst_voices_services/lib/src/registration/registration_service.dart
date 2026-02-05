@@ -335,7 +335,6 @@ final class RegistrationServiceImpl implements RegistrationService {
           roles: recoverable.roles,
           address: recoverable.stakeAddress,
           publicStatus: recoverable.publicStatus,
-          votingPower: recoverable.votingPower,
           registrationStatus: registrationStatus,
         );
       });

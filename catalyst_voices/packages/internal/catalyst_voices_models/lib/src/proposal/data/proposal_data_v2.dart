@@ -44,8 +44,9 @@ final class ProposalDataV2 extends Equatable {
     ProposalSubmissionAction? action,
   }) {
     final id = data.proposal.id;
-    final versions = data.versionIds.map((ver) => id.copyWith(ver: Optional(ver))).toList();
     final isFinal = action == ProposalSubmissionAction.aFinal;
+
+    final versions = data.versionIds.map((ver) => id.copyWith(ver: Optional(ver))).toList();
 
     final collaborators = ProposalDataCollaborator.resolveCollaboratorStatuses(
       proposalId: id,
@@ -57,6 +58,8 @@ final class ProposalDataV2 extends Equatable {
       createdAt: id.ver?.tryDateTime,
     );
 
+    final votes = isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null;
+
     return ProposalDataV2(
       id: id,
       proposalOrDocument: proposalOrDocument,
@@ -65,7 +68,7 @@ final class ProposalDataV2 extends Equatable {
       categoryName: proposalOrDocument.categoryName ?? '',
       collaborators: collaborators,
       versions: versions,
-      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
+      votes: votes,
     );
   }
 

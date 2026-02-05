@@ -150,7 +150,6 @@ final class AccountCubit extends Cubit<AccountState>
     final catalystId = from?.catalystId;
 
     final accountRolesItems = AccountRole.values
-        .where((role) => !role.isHidden)
         .map(
           (role) => MyAccountRoleItem(
             type: role,

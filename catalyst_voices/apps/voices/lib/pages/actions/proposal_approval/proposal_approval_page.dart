@@ -64,7 +64,7 @@ class _FooterHint extends StatelessWidget {
       },
       child: ActionsHintCard(
         title: context.l10n.headsUpProposalApprovalHintTitle,
-        description: context.l10n.headsUpProposalApprovalHintContent,
+        description: Text(context.l10n.headsUpProposalApprovalHintContent),
       ),
     );
   }
@@ -78,7 +78,7 @@ class _Header extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 24, right: 24, top: 22),
       child: VoicesDrawerHeader(
-        text: context.l10n.proposalApprovalHeader,
+        title: Text(context.l10n.proposalApprovalHeader),
         onCloseTap: () => ActionsShellPage.close(context),
         showBackButton: true,
       ),

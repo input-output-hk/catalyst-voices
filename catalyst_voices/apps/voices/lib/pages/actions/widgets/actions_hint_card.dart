@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 class ActionsHintCard extends StatelessWidget {
   final String? title;
   final Widget? icon;
-  final String description;
+  final Widget description;
   final BoxConstraints? constraints;
+  final EdgeInsets iconPadding;
+  final Color? iconBackgroundColor;
 
   const ActionsHintCard({
     super.key,
@@ -15,6 +17,8 @@ class ActionsHintCard extends StatelessWidget {
     this.icon,
     required this.description,
     this.constraints,
+    this.iconPadding = const EdgeInsets.all(8),
+    this.iconBackgroundColor,
   });
 
   @override
@@ -27,7 +31,7 @@ class ActionsHintCard extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: context.colors.dropShadow,
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -35,9 +39,10 @@ class ActionsHintCard extends StatelessWidget {
       ),
       child: ActionCard(
         icon: icon ?? VoicesAssets.icons.informationCircle.buildIcon(),
-        iconBackgroundColor: context.colors.iconsSecondary,
+        iconBackgroundColor: iconBackgroundColor ?? context.colors.iconsSecondary,
+        iconPadding: iconPadding,
         title: title != null ? Text(title!) : null,
-        desc: Text(description),
+        desc: description,
       ),
     );
   }

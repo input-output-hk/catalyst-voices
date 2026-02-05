@@ -4,22 +4,30 @@ import 'package:equatable/equatable.dart';
 
 final class ConfirmPasswordStep extends VotingListCastingStep {
   final bool isLoading;
+  final bool isRepresentative;
   final LocalizedException? exception;
 
   const ConfirmPasswordStep({
     this.isLoading = false,
+    this.isRepresentative = false,
     this.exception,
   });
 
   @override
-  List<Object?> get props => [isLoading, exception];
+  List<Object?> get props => [
+    isLoading,
+    isRepresentative,
+    exception,
+  ];
 
   ConfirmPasswordStep copyWith({
     bool? isLoading,
+    bool? isRepresentative,
     Optional<LocalizedException>? exception,
   }) {
     return ConfirmPasswordStep(
       isLoading: isLoading ?? this.isLoading,
+      isRepresentative: isRepresentative ?? this.isRepresentative,
       exception: exception.dataOr(this.exception),
     );
   }

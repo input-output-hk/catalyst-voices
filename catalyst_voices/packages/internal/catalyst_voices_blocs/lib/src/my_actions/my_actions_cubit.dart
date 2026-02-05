@@ -4,6 +4,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/my_actions/my_actions_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
 final class MyActionsCubit extends Cubit<MyActionsState>
@@ -11,15 +12,21 @@ final class MyActionsCubit extends Cubit<MyActionsState>
   final ProposalService _proposalService;
   final CampaignService _campaignService;
   final UserService _userService;
+  final VotingService _votingService;
 
   MyActionsCubitCache _cache = const MyActionsCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<AccountInvitesApprovalsCount?>? _invitesApprovalsCountSub;
   StreamSubscription<CampaignTimeline?>? _activeCampaignSub;
+  StreamSubscription<AccountVotingRole?>? _activeVotingRoleSub;
 
-  MyActionsCubit(this._proposalService, this._campaignService, this._userService)
-    : super(const MyActionsState());
+  MyActionsCubit(
+    this._proposalService,
+    this._campaignService,
+    this._userService,
+    this._votingService,
+  ) : super(const MyActionsState());
 
   @override
   Future<void> close() async {
@@ -32,6 +39,9 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
 
+    await _activeVotingRoleSub?.cancel();
+    _activeVotingRoleSub = null;
+
     return super.close();
   }
 
@@ -41,11 +51,49 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     await _setupInvitesApprovalsCountSubscription();
 
     await _setupActiveCampaignSubscription();
+
+    await _setupActiveVotingRoleSubscription();
   }
 
   void updatePageTab(ActionsPageTab tab) {
+    if (_cache.selectedTab == tab) return;
+
     _cache = _cache.copyWith(selectedTab: tab);
+    _rebuildState();
     emitSignal(ChangeTabMyActionsSignal(tab));
+  }
+
+  List<ActionsCardType> _computeAvailableCards() {
+    final baseCardTypes = ActionsCardType.valuesForTab(_cache.selectedTab);
+    final accountVotingRole = _cache.accountVotingRole;
+
+    final cards = <ActionsCardType>[];
+
+    for (final cardType in baseCardTypes) {
+      switch (cardType) {
+        case DisplayConsentCardType():
+          cards.add(cardType);
+
+        case ProposalApprovalCardType():
+          cards.add(cardType);
+
+        case BecomeReviewerCardType():
+          final closeDate = _cache.becomeReviewerCloseDate;
+          if (closeDate == null || DateTimeExt.now().isBefore(closeDate)) {
+            cards.add(const BecomeReviewerCardType());
+          }
+
+        case RepresentativeCardType():
+          // TODO(LynxLynxx): Add correct logic
+          final isRepresentative = accountVotingRole is AccountVotingRoleRepresentative;
+          cards.add(RepresentativeCardType(isSet: isRepresentative));
+
+        case VotingPowerDelegationCardType():
+        // TODO(LynxLynxx): Add correct logic
+      }
+    }
+
+    return cards;
   }
 
   void _handleActiveAccountIdChange(CatalystId? catalystId) {
@@ -59,7 +107,18 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         ?.phase(CampaignPhaseType.proposalSubmission)
         ?.timeline
         .to;
-    _cache = _cache.copyWith(proposalSubmissionCloseDate: Optional(proposalSubmissionCloseDate));
+    final becomeReviewerCloseDate = timeline
+        ?.phase(CampaignPhaseType.reviewRegistration)
+        ?.timeline
+        .to;
+
+    final votingSnapshotDate = timeline?.votingSnapshotDate;
+
+    _cache = _cache.copyWith(
+      proposalSubmissionCloseDate: Optional(proposalSubmissionCloseDate),
+      becomeReviewerCloseDate: Optional(becomeReviewerCloseDate),
+      votingSnapshotDate: Optional(votingSnapshotDate),
+    );
     _rebuildState();
   }
 
@@ -72,12 +131,28 @@ final class MyActionsCubit extends Cubit<MyActionsState>
     _rebuildState();
   }
 
+  void _handleVotingRoleChange(AccountVotingRole? votingRole) {
+    _cache = _cache.copyWith(
+      accountVotingRole: Optional(votingRole),
+    );
+
+    _rebuildState();
+  }
+
   void _rebuildState() {
+    final actionCardsState = state.actionCardsState.copyWith(
+      availableCards: _computeAvailableCards(),
+      selectedTab: _cache.selectedTab,
+    );
+
     emit(
       state.copyWith(
         displayConsentCount: _cache.displayConsentCount,
         finalProposalCount: _cache.finalProposalCount,
         proposalSubmissionCloseDate: Optional(_cache.proposalSubmissionCloseDate),
+        becomeReviewerCloseDate: Optional(_cache.becomeReviewerCloseDate),
+        votingSnapshotDate: Optional(_cache.votingSnapshotDate),
+        actionCardsState: actionCardsState,
       ),
     );
   }
@@ -96,6 +171,13 @@ final class MyActionsCubit extends Cubit<MyActionsState>
         .map((event) => event?.timeline)
         .distinct()
         .listen(_handleCampaignTimelineChange);
+  }
+
+  Future<void> _setupActiveVotingRoleSubscription() async {
+    await _activeVotingRoleSub?.cancel();
+    _activeVotingRoleSub = _votingService.watchActiveVotingRole().distinct().listen(
+      _handleVotingRoleChange,
+    );
   }
 
   Future<void> _setupInvitesApprovalsCountSubscription() async {

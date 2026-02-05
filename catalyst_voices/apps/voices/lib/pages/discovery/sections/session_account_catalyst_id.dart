@@ -5,10 +5,18 @@ import 'package:flutter/material.dart';
 
 class SessionAccountCatalystId extends StatelessWidget {
   final EdgeInsets padding;
+  final bool isCompact;
+  final bool showLabel;
+  final double labelGap;
+  final String? labelText;
 
   const SessionAccountCatalystId({
     super.key,
     this.padding = EdgeInsets.zero,
+    this.isCompact = true,
+    this.showLabel = true,
+    this.labelGap = 0,
+    this.labelText,
   });
 
   @override
@@ -24,9 +32,10 @@ class SessionAccountCatalystId extends StatelessWidget {
           padding: padding,
           child: CatalystIdText(
             catalystId,
-            isCompact: true,
-            showLabel: true,
-            labelGap: 0,
+            isCompact: isCompact,
+            showLabel: showLabel,
+            labelGap: labelGap,
+            labelText: labelText,
           ),
         );
       },

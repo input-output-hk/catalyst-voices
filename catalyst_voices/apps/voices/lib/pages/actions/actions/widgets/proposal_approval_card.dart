@@ -6,7 +6,6 @@ import 'package:catalyst_voices/pages/actions/actions/widgets/my_action_card_tim
 import 'package:catalyst_voices/routes/routing/actions_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/chips/count_indicator_chip.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -18,12 +17,11 @@ class ProposalApprovalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MyActionCard(
-      key: const ValueKey(ActionsCardType.proposalApproval),
-      type: ActionsCardType.proposalApproval,
-      backgroundImagePath: VoicesAssets.images.pixelatedBallot.path,
-      actionWidget: const _ActionButton(),
-      timeRemainingWidget: const _Timer(),
+    return const MyActionCard(
+      key: ValueKey(ProposalApprovalCardType),
+      type: ProposalApprovalCardType(),
+      actionWidget: _ActionButton(),
+      timeRemainingWidget: _Timer(),
     );
   }
 }

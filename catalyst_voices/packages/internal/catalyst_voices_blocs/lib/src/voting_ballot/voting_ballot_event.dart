@@ -43,19 +43,29 @@ final class RemoveVoteEvent extends VotingBallotEvent {
   List<Object?> get props => [proposal];
 }
 
-final class UpdateFooterFromBallotBuilderEvent extends VotingBallotEvent {
-  final bool canCastVotes;
-  final bool showPendingVotesDisclaimer;
+final class TimerTickEvent extends VotingBallotEvent {
+  const TimerTickEvent();
 
-  const UpdateFooterFromBallotBuilderEvent({
-    required this.canCastVotes,
+  @override
+  List<Object?> get props => [];
+}
+
+final class UpdateFromBallotBuilderEvent extends VotingBallotEvent {
+  final bool showPendingVotesDisclaimer;
+  final bool canCastVotes;
+  final int proposalsCount;
+
+  const UpdateFromBallotBuilderEvent({
     required this.showPendingVotesDisclaimer,
+    required this.canCastVotes,
+    required this.proposalsCount,
   });
 
   @override
   List<Object?> get props => [
-    canCastVotes,
     showPendingVotesDisclaimer,
+    canCastVotes,
+    proposalsCount,
   ];
 }
 
@@ -99,21 +109,10 @@ final class UpdateVoteTiles extends VotingBallotEvent {
   List<Object?> get props => [tiles];
 }
 
-final class UpdateVotingPhaseProgressEvent extends VotingBallotEvent {
-  final VotingPhaseProgressDetailsViewModel? votingPhase;
+final class UpdateVotingRoleEvent extends VotingBallotEvent {
+  final AccountVotingRole? data;
 
-  const UpdateVotingPhaseProgressEvent({
-    this.votingPhase,
-  });
-
-  @override
-  List<Object?> get props => [votingPhase];
-}
-
-final class UpdateVotingPowerEvent extends VotingBallotEvent {
-  final VotingPower? data;
-
-  const UpdateVotingPowerEvent(this.data);
+  const UpdateVotingRoleEvent(this.data);
 
   @override
   List<Object?> get props => [data];

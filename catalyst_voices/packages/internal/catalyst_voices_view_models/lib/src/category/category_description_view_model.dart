@@ -30,4 +30,9 @@ It will help support proposers, especially new Catalyst entrants, get their idea
 
   @override
   List<Object?> get props => [title, description];
+
+  @override
+  String toString() {
+    return 'CategoryDescriptionViewModel{title: $title}';
+  }
 }
