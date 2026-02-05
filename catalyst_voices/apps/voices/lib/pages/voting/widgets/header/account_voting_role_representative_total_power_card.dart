@@ -54,8 +54,8 @@ class AccountVotingRoleRepresentativeTotalPowerCard extends StatelessWidget {
       infoButton: AccountVotingRolePopupInfoButton(
         menuBuilder: (context) {
           return AccountVotingRolePopupMenu(
-            title: context.l10n.delegation,
-            message: context.l10n.votingRoleDelegatedToPopupMessage,
+            title: context.l10n.votingPower,
+            message: context.l10n.votingRoleRepresentativePopupMessage,
             updatedAt: totalVotingPower.updatedAt,
             status: totalVotingPower.status,
             onLearnMore: () {

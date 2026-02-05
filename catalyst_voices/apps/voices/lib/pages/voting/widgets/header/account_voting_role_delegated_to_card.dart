@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_card_widgets.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_learn_more_dialog.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/account_voting_role_popup_menu.dart';
+import 'package:catalyst_voices/routes/routing/my_representatives_route.dart';
 import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -44,13 +47,18 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
                 color: theme.colors.iconsBackground,
                 menuBuilder: (context) {
                   return AccountVotingRolePopupMenu(
-                    title: context.l10n.delegation,
+                    title: context.l10n.votingRoleDelegatedToPopupTitle,
                     message: context.l10n.votingRoleDelegatedToPopupMessage,
                     updatedAt: votingPower.updatedAt,
                     status: votingPower.status,
                     onLearnMore: () {
-                      // TODO(dt-iohk): define what to do when learn more is pressed
-                      // The design did not specify what should happen.
+                      unawaited(
+                        AccountVotingRoleLearnMoreDialog.show(
+                          context: context,
+                          title: context.l10n.votingRoleDelegatedToLearnMoreDialogTitle,
+                          message: context.l10n.votingRoleDelegatedToLearnMoreDialogMessage,
+                        ),
+                      );
                     },
                   );
                 },
@@ -58,10 +66,7 @@ class AccountVotingRoleDelegatedToCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 16, bottom: 4),
                 child: _ArrowRightButton(
-                  onTap: () {
-                    // TODO(dt-iohk): handle representatives button.
-                    // It should open the "Representative List" drawer which doesn't exist yet.
-                  },
+                  onTap: () => const MyRepresentativesRoute().push<void>(context),
                 ),
               ),
             ],

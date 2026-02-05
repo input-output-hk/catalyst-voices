@@ -76,24 +76,30 @@ class _DelegatorVotingRoleCards extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 12,
       children: [
-        AccountVotingRoleDelegatedToCard(
-          votingPower: votingPower,
-          representativesCount: representativesCount,
-        ),
         AccountVotingRoleInfoCard(
           label: Text(context.l10n.myDelegatedVotingPower),
           value: Text(votingPower.amount.formattedWithSymbol),
-          infoButton: AccountVotingRoleInfoButton(
-            onTap: () {
-              unawaited(
-                AccountVotingRoleLearnMoreDialog.show(
-                  context: context,
-                  title: context.l10n.votingRoleMyDelegatedPowerLearnMoreDialogTitle,
-                  message: context.l10n.votingRoleMyDelegatedPowerLearnMoreDialogMessage,
-                ),
-              );
-            },
+          infoButton: AccountVotingRolePopupInfoButton(
+            menuBuilder: (context) => AccountVotingRolePopupMenu(
+              title: context.l10n.votingRoleMyDelegatedPowerPopupTitle,
+              message: context.l10n.votingRoleMyDelegatedPowerPopupMessage,
+              updatedAt: votingPower.updatedAt,
+              status: votingPower.status,
+              onLearnMore: () {
+                unawaited(
+                  AccountVotingRoleLearnMoreDialog.show(
+                    context: context,
+                    title: context.l10n.votingRoleMyDelegatedPowerLearnMoreDialogTitle,
+                    message: context.l10n.votingRoleMyDelegatedPowerLearnMoreDialogMessage,
+                  ),
+                );
+              },
+            ),
           ),
+        ),
+        AccountVotingRoleDelegatedToCard(
+          votingPower: votingPower,
+          representativesCount: representativesCount,
         ),
       ],
     );
