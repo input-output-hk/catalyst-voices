@@ -15,10 +15,11 @@ use crate::{
 const INSERT_SIGNED_DOCS: &str = include_str!("./sql/insert_signed_documents.sql");
 
 /// Filtered select sql query jinja template
-pub(crate) const FILTERED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
-    name: "filtered_select_signed_documents.jinja.template",
-    source: include_str!("./sql/filtered_select_signed_documents.sql.jinja"),
-};
+pub(crate) const FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource =
+    JinjaTemplateSource {
+        name: "filtered_select_full_signed_documents.jinja.template",
+        source: include_str!("./sql/filtered_select_full_signed_documents.sql.jinja"),
+    };
 
 /// Full signed doc event db struct
 #[derive(Debug, Clone, PartialEq)]

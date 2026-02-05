@@ -3,10 +3,12 @@
 
 use catalyst_signed_doc::{CatalystSignedDocument, providers::CatalystSignedDocumentSearchQuery};
 use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV7};
+use futures::TryStreamExt;
 use tokio::runtime::Handle;
 
 use crate::{
-    db::event::signed_docs::FullSignedDoc, service::common::auth::rbac::token::CatalystRBACTokenV1,
+    db::event::{common::query_limits::QueryLimits, signed_docs::FullSignedDoc},
+    service::common::auth::rbac::token::CatalystRBACTokenV1,
     settings::Settings,
 };
 
@@ -131,14 +133,17 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         query: &CatalystSignedDocumentSearchQuery,
     ) -> anyhow::Result<Vec<CatalystSignedDocument>> {
         let handle = Handle::current();
-        // let docs = handle.block_on(async {
-        //     let docs = SignedDocBody::retrieve(&query.into(), &QueryLimits::ALL)
-        //         .await
-        //         .try_collect()?;
-        //     docs
-        // })?;
-        // TODO: FIXME:
-        todo!()
+        handle.block_on(async {
+            // FullSignedDoc::retrieve(&query.clone().into(), &QueryLimits::ALL)
+            //     .await?
+            //     .map_ok(|d| d.raw().try_into())
+            //     .try_collect()
+            //     .await
+            let stream = FullSignedDoc::retrieve(&query.clone().into(), &QueryLimits::ALL).await?;
+            let map_ok = stream.map_ok(|d| d.raw().try_into());
+            let res = map_ok.try_collect().await?;
+            res
+        })
     }
 }
 

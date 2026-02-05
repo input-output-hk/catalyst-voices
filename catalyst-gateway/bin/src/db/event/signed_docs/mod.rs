@@ -9,7 +9,7 @@ mod signed_doc_body;
 mod tests;
 
 pub(crate) use doc_ref::DocumentRef;
-pub(crate) use full_signed_doc::FullSignedDoc;
+pub(crate) use full_signed_doc::{FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE, FullSignedDoc};
 pub(crate) use query_filter::DocsQueryFilter;
 pub(crate) use signed_doc_body::{
     FILTERED_COUNT_SIGNED_DOCS_TEMPLATE, FILTERED_SELECT_SIGNED_DOCS_TEMPLATE, SignedDocBody,
