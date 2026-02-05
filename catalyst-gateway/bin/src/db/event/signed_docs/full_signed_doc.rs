@@ -1,19 +1,25 @@
 //! `FullSignedDoc` struct implementation.
 
-use super::SignedDocBody;
+use futures::{Stream, StreamExt};
+
+use super::{DocsQueryFilter, SignedDocBody};
 use crate::{
-    db::event::EventDB,
+    db::event::{
+        EventDB,
+        common::{query_limits::QueryLimits, uuid_selector::UuidSelector},
+    },
     jinja::{JinjaTemplateSource, get_template},
 };
 
 /// Insert sql query
 const INSERT_SIGNED_DOCS: &str = include_str!("./sql/insert_signed_documents.sql");
 
-/// Select sql query jinja template
-pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
-    name: "select_signed_documents.jinja.template",
-    source: include_str!("./sql/select_signed_documents.sql.jinja"),
-};
+/// Filtered select sql query jinja template
+pub(crate) const FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource =
+    JinjaTemplateSource {
+        name: "filtered_select_full_signed_documents.jinja.template",
+        source: include_str!("./sql/filtered_select_full_signed_documents.sql.jinja"),
+    };
 
 /// Full signed doc event db struct
 #[derive(Debug, Clone, PartialEq)]
@@ -139,18 +145,34 @@ impl FullSignedDoc {
     /// # Arguments:
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
-    pub(crate) async fn retrieve(
+    pub(crate) async fn retrieve_one(
         id: &uuid::Uuid,
         ver: Option<&uuid::Uuid>,
-    ) -> anyhow::Result<Self> {
-        let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
-        let query = query_template.render(serde_json::json!({
-            "id": id,
-            "ver": ver,
-        }))?;
-        let row = EventDB::query_one(&query, &[]).await?;
+    ) -> anyhow::Result<Option<Self>> {
+        let mut conditions = DocsQueryFilter::all().with_id(UuidSelector::Eq(id.clone()));
+        if let Some(ver) = ver {
+            conditions = conditions.with_ver(UuidSelector::Eq(ver.clone()));
+        }
 
-        Self::from_row(id, ver, &row)
+        Self::retrieve(&conditions, &QueryLimits::ONE)
+            .await?
+            .next()
+            .await
+            .transpose()
+    }
+
+    pub(crate) async fn retrieve(
+        conditions: &DocsQueryFilter,
+        query_limits: &QueryLimits,
+    ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
+        let query_template = get_template(&FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE)?;
+        let query = query_template.render(serde_json::json!({
+            "conditions": conditions.to_string(),
+            "query_limits": query_limits.to_string(),
+        }))?;
+        let rows = EventDB::query_stream(&query, &[]).await?;
+        let docs = rows.map(|res_row| res_row.and_then(|row| Self::from_row(&row)));
+        Ok(docs)
     }
 
     /// Returns all signed document fields for the event db queries
@@ -168,21 +190,11 @@ impl FullSignedDoc {
     }
 
     /// Creates a  `FullSignedDoc` from postgresql row object.
-    fn from_row(
-        id: &uuid::Uuid,
-        ver: Option<&uuid::Uuid>,
-        row: &tokio_postgres::Row,
-    ) -> anyhow::Result<Self> {
-        let ver = if let Some(ver) = ver {
-            *ver
-        } else {
-            row.try_get("ver")?
-        };
-
+    fn from_row(row: &tokio_postgres::Row) -> anyhow::Result<Self> {
         Ok(FullSignedDoc {
             body: SignedDocBody::new(
-                *id,
-                ver,
+                row.try_get("id")?,
+                row.try_get("ver")?,
                 row.try_get("type")?,
                 row.try_get("authors")?,
                 row.try_get("metadata")?,

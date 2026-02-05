@@ -177,7 +177,7 @@ impl Rbac509InsertQuery {
                 chain.catalyst_id().clone(),
                 Some(previous_txn),
                 reg.purpose(),
-                reg.report().clone(),
+                reg.report(),
             );
 
             return Ok(());
@@ -250,7 +250,7 @@ impl Rbac509InsertQuery {
                     cat_id.clone(),
                     None,
                     reg.purpose(),
-                    reg.report().clone(),
+                    reg.report(),
                 );
             } else {
                 // This isn't a hard error because user input can contain invalid information.
@@ -411,7 +411,7 @@ impl Rbac509InsertQuery {
         catalyst_id: CatalystId,
         previous_transaction: Option<TransactionId>,
         purpose: Option<UuidV4>,
-        report: ProblemReport,
+        report: &ProblemReport,
     ) {
         inc_invalid_rbac_reg_count();
         self.invalid.push(insert_rbac509_invalid::Params::new(

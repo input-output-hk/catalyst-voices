@@ -5,6 +5,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use catalyst_types::uuid::UuidV4;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -91,8 +92,8 @@ impl TryInto<uuid::Uuid> for UUIDv4 {
     }
 }
 
-impl From<catalyst_signed_doc::UuidV4> for UUIDv4 {
-    fn from(value: catalyst_signed_doc::UuidV4) -> Self {
+impl From<UuidV4> for UUIDv4 {
+    fn from(value: UuidV4) -> Self {
         Self(value.to_string())
     }
 }

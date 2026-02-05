@@ -1,10 +1,13 @@
 //! A module for placing common structs, functions, and variables across the `document`
 //! endpoint module not specified to a specific endpoint.
 
-use catalyst_signed_doc::CatalystSignedDocument;
+use catalyst_signed_doc::{CatalystSignedDocument, providers::CatalystSignedDocumentSearchQuery};
+use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV7};
+use futures::TryStreamExt;
+use tokio::runtime::Handle;
 
 use crate::{
-    db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
+    db::event::{common::query_limits::QueryLimits, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
     settings::Settings,
 };
@@ -33,27 +36,36 @@ impl ValidationProvider {
 }
 
 impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for ValidationProvider {
-    async fn try_get_doc(
+    fn try_get_doc(
         &self,
         doc_ref: &catalyst_signed_doc::DocumentRef,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        self.doc_provider.try_get_doc(doc_ref).await
+        self.doc_provider.try_get_doc(doc_ref)
     }
 
-    async fn try_get_last_doc(
+    fn try_get_last_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        self.doc_provider.try_get_last_doc(id).await
+        self.doc_provider.try_get_last_doc(id)
     }
 
-    async fn try_get_first_doc(
+    fn try_get_first_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        self.doc_provider.try_get_first_doc(id).await
+        self.doc_provider.try_get_first_doc(id)
     }
 
+    fn try_search_docs(
+        &self,
+        query: &CatalystSignedDocumentSearchQuery,
+    ) -> anyhow::Result<Vec<CatalystSignedDocument>> {
+        self.doc_provider.try_search_docs(query)
+    }
+}
+
+impl catalyst_signed_doc::providers::TimeThresholdProvider for ValidationProvider {
     fn future_threshold(&self) -> Option<std::time::Duration> {
         self.doc_provider.future_threshold()
     }
@@ -64,13 +76,11 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for Validati
 }
 
 impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
-    async fn try_get_registered_key(
+    fn try_get_registered_key(
         &self,
-        kid: &catalyst_signed_doc::CatalystId,
+        kid: &CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        self.verifying_key_provider
-            .try_get_registered_key(kid)
-            .await
+        self.verifying_key_provider.try_get_registered_key(kid)
     }
 }
 
@@ -79,41 +89,63 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
 pub(crate) struct DocProvider;
 
 impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvider {
-    async fn try_get_doc(
+    fn try_get_doc(
         &self,
         doc_ref: &catalyst_signed_doc::DocumentRef,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id().uuid();
         let ver = doc_ref.ver().uuid();
-        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
+
+        let handle = Handle::current();
+        match handle.block_on(FullSignedDoc::retrieve_one(&id, Some(&ver))) {
+            Ok(Some(doc)) => Ok(Some(doc.raw().try_into()?)),
+            Ok(None) => Ok(None),
             Err(err) => Err(err),
         }
     }
 
-    async fn try_get_last_doc(
+    fn try_get_last_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        match FullSignedDoc::retrieve(&id.uuid(), None).await {
-            Ok(doc) => Ok(Some(doc.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
+        let handle = Handle::current();
+        match handle.block_on(FullSignedDoc::retrieve_one(&id.uuid(), None)) {
+            Ok(Some(doc)) => Ok(Some(doc.raw().try_into()?)),
+            Ok(None) => Ok(None),
             Err(err) => Err(err),
         }
     }
 
-    async fn try_get_first_doc(
+    fn try_get_first_doc(
         &self,
-        id: catalyst_signed_doc::UuidV7,
+        id: UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        match FullSignedDoc::retrieve(&id.uuid(), Some(&id.uuid())).await {
-            Ok(doc) => Ok(Some(doc.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
+        let handle = Handle::current();
+        match handle.block_on(FullSignedDoc::retrieve_one(&id.uuid(), Some(&id.uuid()))) {
+            Ok(Some(doc)) => Ok(Some(doc.raw().try_into()?)),
+            Ok(None) => Ok(None),
             Err(err) => Err(err),
         }
     }
 
+    fn try_search_docs(
+        &self,
+        query: &CatalystSignedDocumentSearchQuery,
+    ) -> anyhow::Result<Vec<CatalystSignedDocument>> {
+        let handle = Handle::current();
+        handle
+            .block_on(async {
+                // TODO: Ideally we shouldn't use `QueryLimits::ALL` here.
+                FullSignedDoc::retrieve(&query.clone().into(), &QueryLimits::ALL)
+                    .await?
+                    .try_collect::<Vec<_>>()
+                    .await
+            })
+            .and_then(|docs| docs.into_iter().map(|d| d.raw().try_into()).collect())
+    }
+}
+
+impl catalyst_signed_doc::providers::TimeThresholdProvider for DocProvider {
     fn future_threshold(&self) -> Option<std::time::Duration> {
         let signed_doc_cfg = Settings::signed_doc_cfg();
         Some(signed_doc_cfg.future_threshold())
@@ -125,47 +157,20 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     }
 }
 
-impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocProvider {
-    async fn try_get_doc(
-        &self,
-        doc_ref: &catalyst_signed_doc_v1::DocumentRef,
-    ) -> anyhow::Result<Option<catalyst_signed_doc_v1::CatalystSignedDocument>> {
-        let id = doc_ref.id.uuid();
-        let ver = doc_ref.ver.uuid();
-        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
-            Err(err) if err.is::<NotFoundError>() => Ok(None),
-            Err(err) => Err(err),
-        }
-    }
-
-    fn future_threshold(&self) -> Option<std::time::Duration> {
-        <Self as catalyst_signed_doc::providers::CatalystSignedDocumentProvider>::future_threshold(
-            self,
-        )
-    }
-
-    fn past_threshold(&self) -> Option<std::time::Duration> {
-        <Self as catalyst_signed_doc::providers::CatalystSignedDocumentProvider>::past_threshold(
-            self,
-        )
-    }
-}
-
 // TODO: make the struct to support multi sigs validation
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
 pub(crate) struct VerifyingKeyProvider {
     /// A user's `CatalystId` from the corresponding `CatalystRBACTokenV1`
-    kid: catalyst_signed_doc::CatalystId,
+    kid: CatalystId,
     /// A corresponding `VerifyingKey` derived from the `CatalystRBACTokenV1`
     pk: ed25519_dalek::VerifyingKey,
 }
 
 impl catalyst_signed_doc::providers::CatalystIdProvider for VerifyingKeyProvider {
-    async fn try_get_registered_key(
+    fn try_get_registered_key(
         &self,
-        kid: &catalyst_signed_doc::CatalystId,
+        kid: &CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
         if &self.kid == kid {
             Ok(Some(self.pk))
@@ -202,7 +207,7 @@ impl VerifyingKeyProvider {
     /// - The KID is not using the latest rotation.
     pub(crate) async fn try_new(
         token: &mut CatalystRBACTokenV1,
-        kids: &[catalyst_signed_doc::CatalystId],
+        kids: &[CatalystId],
     ) -> anyhow::Result<Self> {
         use itertools::Itertools as _;
 

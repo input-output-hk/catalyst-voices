@@ -1,5 +1,6 @@
 //! Bad Document PUT request.
 
+use catalyst_types::problem_report::ProblemReport;
 use poem_openapi::{Object, types::Example};
 
 use crate::service::common;
@@ -19,7 +20,7 @@ impl PutDocumentUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
     pub(crate) fn new(
         error: &(impl ToString + ?Sized),
-        report: Option<catalyst_signed_doc::ProblemReport>,
+        report: Option<&ProblemReport>,
     ) -> Self {
         Self {
             error: error.to_string().into(),
@@ -32,9 +33,7 @@ impl Example for PutDocumentUnprocessableContent {
     fn example() -> Self {
         Self::new(
             "Missing Document in request body",
-            Some(catalyst_signed_doc::ProblemReport::new(
-                "Missing Document in request body",
-            )),
+            Some(&ProblemReport::new("Missing Document in request body")),
         )
     }
 }

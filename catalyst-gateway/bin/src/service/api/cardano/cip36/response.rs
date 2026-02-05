@@ -190,7 +190,7 @@ impl Cip36Details {
             is_payable: false.into(),
             cip15: true.into(),
             errors: Some(
-                common::objects::generic::problem_report::ProblemReport::from(problem_report),
+                common::objects::generic::problem_report::ProblemReport::from(&problem_report),
             ),
         }
     }

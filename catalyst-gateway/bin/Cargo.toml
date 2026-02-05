@@ -15,12 +15,18 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.19", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.19" }
-rbac-registration = { version = "0.0.15", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.15" }
-catalyst-signed-doc = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.10" }
-catalyst-signed-doc-v1 = { package = "catalyst-signed-doc", version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v.0.0.4" }
+# TODO: Use proper tags instead of branch.
+#cardano-chain-follower = { version = "0.0.19", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.19" }
+cardano-chain-follower = { git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "hack-do-not-merge-simple-versions" }
+#rbac-registration = { version = "0.0.15", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.15" }
+rbac-registration = { git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "hack-do-not-merge-simple-versions" }
+#catalyst-signed-doc = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.10" }
+catalyst-signed-doc = { git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "hack-do-not-merge-simple-versions" }
+#catalyst-contest = { version = "0.0.1", git = "https://github.com/input-output-hk/catalyst-libs.git", , tag = "catalyst-contest/v0.0.1" }
+catalyst-contest = { version = "0.0.1", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "hack-do-not-merge-simple-versions" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "c509-certificate-v0.0.3" }
-catalyst-types = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types/v0.0.10" }
+#catalyst-types = { version = "0.0.14", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types/v0.0.14" }
+catalyst-types = { git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "hack-do-not-merge-simple-versions" }
 
 clap = { version = "4.5.20", features = ["derive", "env"] }
 tracing = { version = "0.1.40", features = ["attributes", "log"] }

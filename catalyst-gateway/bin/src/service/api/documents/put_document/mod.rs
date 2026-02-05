@@ -1,14 +1,12 @@
 //! Implementation of the PUT `/document` endpoint
 
+use catalyst_signed_doc::validator::Validator;
 use poem_openapi::{ApiResponse, payload::Json};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
-    db::{
-        event::{error::NotFoundError, signed_docs::FullSignedDoc},
-        index::session::CassandraSessionError,
-    },
+    db::{event::signed_docs::FullSignedDoc, index::session::CassandraSessionError},
     service::{
         api::documents::common::ValidationProvider,
         common::{
@@ -78,16 +76,16 @@ pub(crate) async fn endpoint(
     // making sure that the document was already submitted before running validation,
     // otherwise validation would fail, because of the assumption that this document wasn't
     // published yet.
-    match FullSignedDoc::retrieve(db_doc.id(), Some(db_doc.ver())).await {
-        Ok(retrieved) if db_doc != retrieved => {
+    match FullSignedDoc::retrieve_one(db_doc.id(), Some(db_doc.ver())).await {
+        Ok(Some(retrieved)) if db_doc != retrieved => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Document with the same `id` and `ver` already exists",
-                Some(doc.problem_report()),
+                Some(doc.report()),
             )))
             .into();
         },
-        Ok(_) => return Responses::NoContent.into(),
-        Err(err) if err.is::<NotFoundError>() => (),
+        Ok(Some(_)) => return Responses::NoContent.into(),
+        Ok(None) => (),
         Err(err) => return AllResponses::handle_error(&err),
     }
 
@@ -106,59 +104,26 @@ pub(crate) async fn endpoint(
         },
     };
 
-    match doc.is_deprecated() {
-        // apply older validation rule
-        Ok(true) => {
-            let doc = match doc_bytes.as_slice().try_into() {
-                Ok(doc) => doc,
-                Err(err) => return AllResponses::handle_error(&err),
-            };
-
-            match catalyst_signed_doc_v1::validator::validate(&doc, &DocProvider).await {
-                Ok(true) => (),
-                Ok(false) => {
-                    return Responses::UnprocessableContent(Json(
-                        PutDocumentUnprocessableContent::new(
-                            "Failed validating document integrity",
-                            None,
-                        ),
-                    ))
-                    .into();
-                },
-                Err(err) => return AllResponses::handle_error(&err),
-            }
+    let validator = Validator::new();
+    match validator.validate(&doc, &validation_provider) {
+        Ok(()) if doc.report().is_problematic() => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Failed validating document integrity",
+                Some(doc.report()),
+            )))
+            .into();
         },
-        // apply newest validation rules
-        Ok(false) => {
-            match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
-                Ok(true) => (),
-                Ok(false) if doc.problem_report().is_problematic() => {
-                    return Responses::UnprocessableContent(Json(
-                        PutDocumentUnprocessableContent::new(
-                            "Failed validating document integrity",
-                            Some(doc.problem_report()),
-                        ),
-                    ))
-                    .into();
-                },
-                Ok(false) => {
-                    return AllResponses::handle_error(&anyhow::anyhow!(
-                        "Document must be problematic, empty problem report."
-                    ));
-                },
-                Err(err) => {
-                    // means that something happened inside the `DocProvider`, some db error.
-                    return AllResponses::handle_error(&err);
-                },
-            }
+        Ok(()) => (),
+        Err(err) => {
+            // means that something happened inside the `DocProvider`, some db error.
+            return AllResponses::handle_error(&err);
         },
-        Err(err) => return AllResponses::handle_error(&err),
     }
 
-    if doc.problem_report().is_problematic() {
+    if doc.report().is_problematic() {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "Invalid Catalyst Signed Document",
-            Some(doc.problem_report()),
+            Some(doc.report()),
         )))
         .into();
     }
