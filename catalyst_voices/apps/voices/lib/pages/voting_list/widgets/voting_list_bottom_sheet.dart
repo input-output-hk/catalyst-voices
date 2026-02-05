@@ -19,9 +19,10 @@ class VotingListBottomSheet extends StatelessWidget {
       },
       builder: (context, state) {
         return switch (state) {
-          ConfirmPasswordStep(:final isLoading, :final exception) =>
+          ConfirmPasswordStep(:final isLoading, :final isRepresentative, :final exception) =>
             VotingListBottomSheetConfirmPassword(
               isLoading: isLoading,
+              isRepresentative: isRepresentative,
               exception: exception,
             ),
           SuccessfullyCastVotesStep() => const VotingListBottomSheetSuccessResult(),

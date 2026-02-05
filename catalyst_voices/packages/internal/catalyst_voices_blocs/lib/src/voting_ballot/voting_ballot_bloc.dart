@@ -213,9 +213,14 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   Future<void> _checkPassword(CheckPasswordEvent event, Emitter<VotingBallotState> emit) async {
-    const confirmPasswordStep = ConfirmPasswordStep(isLoading: true);
-    const confirmPasswordFailed = ConfirmPasswordStep(
-      exception: LocalizedUnlockPasswordException(),
+    final isRepresentative = state.footer.isRepresentative;
+    final confirmPasswordStep = ConfirmPasswordStep(
+      isLoading: true,
+      isRepresentative: isRepresentative,
+    );
+    final confirmPasswordFailed = ConfirmPasswordStep(
+      isRepresentative: isRepresentative,
+      exception: const LocalizedUnlockPasswordException(),
     );
     final newFooter = state.footer.copyWith(castingStep: confirmPasswordStep);
     emit(state.copyWith(footer: newFooter));
@@ -238,7 +243,10 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     ConfirmCastingVotesEvent event,
     Emitter<VotingBallotState> emit,
   ) {
-    final newFooter = state.footer.copyWith(castingStep: const ConfirmPasswordStep());
+    final isRepresentative = state.footer.isRepresentative;
+    final newFooter = state.footer.copyWith(
+      castingStep: ConfirmPasswordStep(isRepresentative: isRepresentative),
+    );
     emitSignal(const ShowBottomSheetSignal());
     emit(state.copyWith(footer: newFooter));
   }
@@ -442,6 +450,16 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       isVisible: isFabVisible,
     );
 
-    emit(state.copyWith(userSummary: userSummary, fab: fab));
+    final footer = state.footer.copyWith(
+      isRepresentative: isRepresentative,
+    );
+
+    emit(
+      state.copyWith(
+        userSummary: userSummary,
+        fab: fab,
+        footer: footer,
+      ),
+    );
   }
 }

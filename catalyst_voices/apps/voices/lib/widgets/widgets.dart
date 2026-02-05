@@ -6,6 +6,7 @@ export 'buttons/voices_buttons.dart';
 export 'buttons/voices_counter_floating_action_button.dart';
 export 'buttons/voices_filled_button.dart';
 export 'buttons/voices_floating_action_button.dart';
+export 'buttons/voices_gradient_button.dart';
 export 'buttons/voices_icon_button.dart';
 export 'buttons/voices_keyboard_key_button.dart';
 export 'buttons/voices_logical_keyboard_key_button.dart';

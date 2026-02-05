@@ -21,13 +21,22 @@ class VotingListFooter extends StatelessWidget {
 
 class _CastVotesButton extends StatelessWidget {
   final VoidCallback? onTap;
+  final bool useGradient;
 
   const _CastVotesButton({
     this.onTap,
+    this.useGradient = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (useGradient) {
+      return VoicesGradientButton(
+        onTap: onTap,
+        child: Text(context.l10n.votingListCastVotes),
+      );
+    }
+
     return VoicesFilledButton(
       onTap: onTap,
       style: FilledButton.styleFrom(
@@ -123,6 +132,7 @@ class _VotingListFooter extends StatelessWidget {
           ),
           Expanded(
             child: _CastVotesButton(
+              useGradient: data.isRepresentative,
               onTap: data.canCastVotes
                   ? () {
                       context.read<VotingBallotBloc>().add(const ConfirmCastingVotesEvent());
