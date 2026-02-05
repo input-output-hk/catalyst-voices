@@ -28,8 +28,10 @@ impl ConditionalStmt for DocumentRefSelector {
                 todo!()
             },
             Self::In(refs) => {
-                // TODO: FIXME:
-                todo!()
+                write!(
+                    f,
+                    "EXISTS (SELECT 1 FROM JSONB_ARRAY_ELEMENTS({table_field}) AS doc_ref WHERE doc_ref IN ({refs}))",
+                )
             },
         }
     }
