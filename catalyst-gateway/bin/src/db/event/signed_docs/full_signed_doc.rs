@@ -165,7 +165,7 @@ impl FullSignedDoc {
         conditions: &DocsQueryFilter,
         query_limits: &QueryLimits,
     ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
-        let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;
+        let query_template = get_template(&FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE)?;
         let query = query_template.render(serde_json::json!({
             "conditions": conditions.to_string(),
             "query_limits": query_limits.to_string(),

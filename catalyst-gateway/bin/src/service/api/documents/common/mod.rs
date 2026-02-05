@@ -133,17 +133,15 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         query: &CatalystSignedDocumentSearchQuery,
     ) -> anyhow::Result<Vec<CatalystSignedDocument>> {
         let handle = Handle::current();
-        handle.block_on(async {
-            // FullSignedDoc::retrieve(&query.clone().into(), &QueryLimits::ALL)
-            //     .await?
-            //     .map_ok(|d| d.raw().try_into())
-            //     .try_collect()
-            //     .await
-            let stream = FullSignedDoc::retrieve(&query.clone().into(), &QueryLimits::ALL).await?;
-            let map_ok = stream.map_ok(|d| d.raw().try_into());
-            let res = map_ok.try_collect().await?;
-            res
-        })
+        handle
+            .block_on(async {
+                // TODO: Ideally we shouldn't use `QueryLimits::ALL` here.
+                FullSignedDoc::retrieve(&query.clone().into(), &QueryLimits::ALL)
+                    .await?
+                    .try_collect::<Vec<_>>()
+                    .await
+            })
+            .and_then(|docs| docs.into_iter().map(|d| d.raw().try_into()).collect())
     }
 }
 
