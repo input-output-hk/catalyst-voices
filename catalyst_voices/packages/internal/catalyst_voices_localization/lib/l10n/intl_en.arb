@@ -721,7 +721,7 @@
   "@confirmPassword": {
     "description": "Label for password confirmation input field"
   },
-  "confirmYourVoteSubmission": "Confirm your vote submission",
+  "confirmYourVoteSubmission": "Confirm Your Vote Submission",
   "@confirmYourVoteSubmission": {
     "description": "Title for confirm vote submission"
   },
@@ -4497,6 +4497,14 @@
   "votingListPendingVotes": "Pending votes not yet cast",
   "@votingListPendingVotes": {
     "description": "Disclaimer about proposal votes not casted yet"
+  },
+  "votingListRepresentingWithImpact": "Representing With Impact",
+  "@votingListRepresentingWithImpact": {
+    "description": "Title for representative info card in vote confirmation"
+  },
+  "votingListRepresentingWithImpactMessage": "Your representative votes will be published after voting ends.\n\nYour vote as a representative carries the voices of your community. Every choice you make helps shape a better experience for those you represent.\n\nBe aware that your votes will be public after the tally.",
+  "@votingListRepresentingWithImpactMessage": {
+    "description": "Message for representative info card in vote confirmation"
   },
   "votingOverview": "Voting Overview",
   "@votingOverview": {
