@@ -97,12 +97,12 @@ jobs:
           docker cp api-tests-runner:/root/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
           docker cp api-tests-runner:/root/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
 
-      - name: Integration health tests
-        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
-        env:
-          API_TEST_MARKS: "health_endpoint"
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
+#      - name: Integration health tests
+#        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+#        env:
+#          API_TEST_MARKS: "health_endpoint"
+#        run: |
+#          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
@@ -233,6 +233,14 @@ jobs:
             fi
             sleep 5
           done
+
+      - name: Integration health tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        env:
+          API_TEST_MARKS: "health_endpoint"
+          CAT_GATEWAY_TEST_URL: "http://localhost:3030"
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
       - name: Schemathesis tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}
