@@ -174,6 +174,7 @@ class _SegmentsListView extends StatelessWidget {
       ProposalOverviewSection() => switch (item) {
         ProposalMetadataSection(:final data) => ProposalMetadataTile(
           author: data.author,
+          collaborators: data.collaborators,
           description: data.description,
           status: data.status,
           createdAt: data.createdAt,

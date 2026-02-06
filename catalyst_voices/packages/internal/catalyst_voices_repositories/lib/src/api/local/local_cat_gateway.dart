@@ -26,16 +26,23 @@ import 'package:cbor/cbor.dart';
 import 'package:collection/collection.dart';
 import 'package:uuid_plus/uuid_plus.dart' as u;
 
-var _time = DateTime.timestamp().millisecondsSinceEpoch;
+/* cSpell:disable */
+final _collabId = CatalystId(
+  host: CatalystIdHost.cardanoPreprod.host,
+  username: 'Collab',
+  role0Key: Uint8List.fromList(List.filled(32, 1)),
+);
+
+var _time = DateTime.utc(2025, 12, 19, 20, 3).millisecondsSinceEpoch;
 
 String _testAccountAuthorGetter(DocumentRef ref) {
-  /* cSpell:disable */
   return 'id.catalyst://Test@preprod.cardano/kouGJuMn6o18rRpDAZ1oiZadK171f5_-hgcHTYDGbo0=';
-  /* cSpell:enable */
 }
+/* cSpell:enable */
 
 String _v7() {
-  final config = u.V7Options(_time -= 2000, null);
+  final rand = Uint8List.fromList([42, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  final config = u.V7Options(_time -= 2000, rand);
   return const u.Uuid().v7(config: config);
 }
 
@@ -232,7 +239,10 @@ final class LocalCatGateway implements CatGatewayService {
   Uint8List _buildDoc(
     DocumentDataMetadata metadata, {
     ProposalSubmissionAction? action,
+    DocumentAuthorGetter? authorGetter,
   }) {
+    authorGetter ??= this.authorGetter;
+
     final protectedHeaders = SignedDocumentMapper.buildCoseProtectedHeaders(metadata);
 
     final payload = switch (metadata.type) {
@@ -276,7 +286,7 @@ final class LocalCatGateway implements CatGatewayService {
     final coseSign = CoseSign(
       protectedHeaders: protectedHeaders,
       unprotectedHeaders: const CoseHeaders.unprotected(),
-      payload: payload,
+      payload: CosePayload(payload),
       signatures: [signature],
     );
 
@@ -329,6 +339,7 @@ final class LocalCatGateway implements CatGatewayService {
           template: proposal,
           parameters: DocumentParameters({categoryConstRefs.category}),
           authors: const [],
+          collaborators: [_collabId],
         );
         _cache.update(
           id,
@@ -366,6 +377,24 @@ final class LocalCatGateway implements CatGatewayService {
 
           _cache[actionId] = [actionMetadata];
           _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
+
+          for (final collab in proposalMetadata.collaborators ?? <CatalystId>[]) {
+            final collabActionId = _v7();
+            const collabAction = ProposalSubmissionAction.draft;
+
+            final collabActionMetadata = DocumentDataMetadata.proposalAction(
+              id: SignedDocumentRef(id: collabActionId, ver: collabActionId),
+              proposalRef: SignedDocumentRef(id: id, ver: ver),
+              parameters: DocumentParameters({categoryConstRefs.category}),
+            );
+
+            _cache[collabActionId] = [collabActionMetadata];
+            _docs[collabActionMetadata] = _buildDoc(
+              collabActionMetadata,
+              action: collabAction,
+              authorGetter: (_) => collab.toString(),
+            );
+          }
         }
       }
     }

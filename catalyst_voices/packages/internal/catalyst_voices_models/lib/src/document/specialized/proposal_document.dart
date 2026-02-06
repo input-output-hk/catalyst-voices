@@ -9,6 +9,9 @@ final class ProposalDocument extends Equatable {
   /// The limit does not have any effect on drafts or published proposals.
   static const int maxSubmittedProposalsPerUser = 2;
 
+  /// The maximum amount of collaborators per proposal.
+  static const int maxCollaboratorsPerProposal = 5;
+
   /// A hardcoded [NodeId] of the title property.
   ///
   /// Since properties are dynamic the application cannot determine
@@ -21,6 +24,7 @@ final class ProposalDocument extends Equatable {
   static final requestedFundsNodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
   static final durationNodeId = DocumentNodeId.fromString('summary.time.duration');
   static final authorNameNodeId = DocumentNodeId.fromString('setup.proposer.applicant');
+  static final collaboratorsNodeId = DocumentNodeId.fromString('setup.collaborators');
   static final categoryDetailsNodeId = DocumentNodeId.fromString(
     'campaign_category.category_details',
   );
@@ -177,14 +181,16 @@ final class ProposalMetadata extends DocumentMetadata {
 
   final SignedDocumentRef templateRef;
   final List<CatalystId> authors;
+  final List<CatalystId>? collaborators;
 
   ProposalMetadata({
     required super.id,
     required super.parameters,
     required this.templateRef,
     required this.authors,
+    this.collaborators,
   });
 
   @override
-  List<Object?> get props => super.props + [templateRef, authors];
+  List<Object?> get props => super.props + [templateRef, authors, collaborators];
 }

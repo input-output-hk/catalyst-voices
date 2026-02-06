@@ -115,6 +115,7 @@ final class DocumentDataMetadata extends Equatable {
     );
   }
 
+  // TODO(damian-molinski): authors?
   /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalActionDocument].
   ///
   /// The [parameters] should be the ones assigned to the [proposalRef].

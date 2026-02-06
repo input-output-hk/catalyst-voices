@@ -12,12 +12,14 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
   final String proposalTitle;
   final int? currentVersion;
   final int nextVersion;
+  final bool showCollaboratorsInfo;
 
   const SubmitProposalForReviewDialog({
     super.key,
     required this.proposalTitle,
     required this.currentVersion,
     required this.nextVersion,
+    required this.showCollaboratorsInfo,
   });
 
   @override
@@ -31,6 +33,7 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
     required String proposalTitle,
     required int? currentIteration,
     required int nextIteration,
+    required bool showCollaboratorsInfo,
   }) {
     return VoicesDialog.show(
       context: context,
@@ -39,6 +42,7 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
         proposalTitle: proposalTitle,
         currentVersion: currentIteration,
         nextVersion: nextIteration,
+        showCollaboratorsInfo: showCollaboratorsInfo,
       ),
       barrierDismissible: false,
     );
@@ -123,7 +127,11 @@ class _Buttons extends StatelessWidget {
 }
 
 class _ListItems extends StatelessWidget {
-  const _ListItems();
+  final bool showCollaboratorsInfo;
+
+  const _ListItems({
+    required this.showCollaboratorsInfo,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -134,17 +142,22 @@ class _ListItems extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 8,
         children: [
+          if (showCollaboratorsInfo)
+            ProposalPublishDialogListItem(
+              icon: VoicesAssets.icons.users,
+              text: context.l10n.publishProposalForReviewDialogList1,
+            ),
           ProposalPublishDialogListItem(
             icon: VoicesAssets.icons.eye,
-            text: context.l10n.publishProposalForReviewDialogList1,
-          ),
-          ProposalPublishDialogListItem(
-            icon: VoicesAssets.icons.chatAlt2,
             text: context.l10n.publishProposalForReviewDialogList2,
           ),
           ProposalPublishDialogListItem(
-            icon: VoicesAssets.icons.exclamationCircle,
+            icon: VoicesAssets.icons.chatAlt2,
             text: context.l10n.publishProposalForReviewDialogList3,
+          ),
+          ProposalPublishDialogListItem(
+            icon: VoicesAssets.icons.exclamationCircle,
+            text: context.l10n.publishProposalForReviewDialogList4,
           ),
         ],
       ),
@@ -187,7 +200,7 @@ class _SubmitProposalForReviewDialogState extends State<SubmitProposalForReviewD
             const SizedBox(height: 28),
             const Divider(),
             const SizedBox(height: 8),
-            const _ListItems(),
+            _ListItems(showCollaboratorsInfo: widget.showCollaboratorsInfo),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 20),

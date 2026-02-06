@@ -26,6 +26,7 @@ void main() {
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
   late final FeatureFlagsService featureFlagService;
+  late final ProposalService proposalService;
 
   late AdminToolsCubit adminToolsCubit;
   late SessionCubit sessionCubit;
@@ -38,7 +39,7 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
-    DummyCatalystIdFactory.registerDummyKeyFactory();
+    CatalystIdFactory.registerDummyKeyFactory();
 
     keychainProvider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
@@ -66,6 +67,7 @@ void main() {
     accessControl = const AccessControl();
     featureFlagsRepository = FakeFeatureFlagsRepository();
     featureFlagService = FeatureFlagsService(featureFlagsRepository);
+    proposalService = _MockProposalService();
   });
 
   tearDownAll(() async {
@@ -92,7 +94,8 @@ void main() {
       accessControl,
       adminToolsCubit,
       featureFlagService,
-    );
+      proposalService,
+    )..init();
   });
 
   tearDown(() async {
@@ -194,7 +197,7 @@ void main() {
       await keychain.lock();
 
       final account = Account.dummy(
-        catalystId: DummyCatalystIdFactory.create(),
+        catalystId: CatalystIdFactory.create(),
         keychain: keychain,
       );
 
@@ -220,7 +223,7 @@ void main() {
       await keychain.setLock(lockFactor);
 
       final account = Account.dummy(
-        catalystId: DummyCatalystIdFactory.create(),
+        catalystId: CatalystIdFactory.create(),
         keychain: keychain,
       );
 
@@ -270,7 +273,8 @@ void main() {
           accessControl,
           adminToolsCubit,
           featureFlagService,
-        );
+          proposalService,
+        )..init();
 
         // Gives time for stream to emit.
         await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -302,7 +306,8 @@ void main() {
           accessControl,
           adminToolsCubit,
           featureFlagService,
-        );
+          proposalService,
+        )..init();
 
         // Gives time for stream to emit.
         await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -318,6 +323,13 @@ class _MockCardanoWallet extends Mock implements CardanoWallet {
   _MockCardanoWallet();
 }
 
+final class _MockProposalService extends Mock implements ProposalService {
+  @override
+  Stream<AccountInvitesApprovalsCount> watchInvitesApprovalsCount({required CatalystId id}) {
+    return Stream.value(const AccountInvitesApprovalsCount(invitesCount: 0, approvalsCount: 0));
+  }
+}
+
 class _MockRegistrationService extends Mock implements RegistrationService {
   final KeychainProvider keychainProvider;
   List<CardanoWallet> cardanoWallets;
@@ -329,7 +341,7 @@ class _MockRegistrationService extends Mock implements RegistrationService {
 
   @override
   Future<Account> createDummyAccount() async {
-    final catalystId = DummyCatalystIdFactory.create();
+    final catalystId = CatalystIdFactory.create();
 
     final keychain = await keychainProvider.create(Account.dummyKeychainId);
 

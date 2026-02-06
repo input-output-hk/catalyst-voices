@@ -84,30 +84,30 @@ class _ProposalPageState extends State<ProposalPage>
   Widget build(BuildContext context) {
     return SegmentsControllerScope(
       controller: _segmentsController,
-      child: Scaffold(
-        appBar: const _AppBar(),
-        endDrawer: const OpportunitiesDrawer(),
-        floatingActionButton: _ScrollToTopButton(
-          segmentsScrollController: _segmentsScrollController,
-        ),
-        body: Stack(
-          children: [
-            ProposalHeaderWrapper(
-              child: ProposalSidebars(
-                navPanel: const ProposalNavigationPanel(),
-                body: Stack(
-                  children: [
-                    ProposalContent(
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: const _AppBar(),
+            endDrawer: const OpportunitiesDrawer(),
+            floatingActionButton: _ScrollToTopButton(
+              segmentsScrollController: _segmentsScrollController,
+            ),
+            body: Stack(
+              children: [
+                ProposalHeaderWrapper(
+                  child: ProposalSidebars(
+                    navPanel: const ProposalNavigationPanel(),
+                    body: ProposalContent(
                       scrollController: _segmentsScrollController,
                     ),
-                    const ProposalError(),
-                  ],
+                  ),
                 ),
-              ),
+                const ProposalLoading(),
+              ],
             ),
-            const ProposalLoading(),
-          ],
-        ),
+          ),
+          const ProposalError(),
+        ],
       ),
     );
   }
@@ -117,7 +117,7 @@ class _ProposalPageState extends State<ProposalPage>
     super.didUpdateWidget(oldWidget);
 
     if (widget.ref != oldWidget.ref) {
-      unawaited(context.read<ProposalCubit>().load(ref: widget.ref));
+      unawaited(context.read<ProposalCubit>().loadProposal(widget.ref));
     }
   }
 
@@ -180,7 +180,7 @@ class _ProposalPageState extends State<ProposalPage>
 
     // TODO(damian-molinski): ProposalCubit should be scoped to this screen.
     bloc.clear();
-    unawaited(bloc.load(ref: widget.ref));
+    unawaited(bloc.loadProposal(widget.ref));
   }
 
   void _changeVersion(String? version) {

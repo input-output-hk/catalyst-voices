@@ -160,6 +160,7 @@ void main() {
 
       // Then
       expect(significantSame, isTrue);
+      expect(idOne.isSameAs(idTwo), isTrue);
     });
 
     test('different host makes id significant different', () {
@@ -176,6 +177,7 @@ void main() {
 
       // Then
       expect(significantSame, isFalse);
+      expect(idOne.isSameAs(idTwo), isFalse);
     });
 
     test('username with spaces is decoded correctly', () {
@@ -210,6 +212,91 @@ void main() {
 
       // Then
       expect(userInfo, contains(encodedUsername));
+    });
+
+    test('should fail at parsing', () {
+      const validUri = 'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
+
+      const invalidUri = 'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDs=';
+      const invalidUri2 = '';
+
+      final validCatalystId = CatalystId.tryParse(validUri);
+      expect(validCatalystId?.host, equals(CatalystIdHost.cardano.host));
+      expect(validCatalystId?.username, isNull);
+      expect(validCatalystId?.nonce, isNull);
+      expect(validCatalystId?.role0Key, isNotNull);
+      expect(validCatalystId?.role?.number, isNull);
+      expect(validCatalystId?.rotation, isNull);
+      expect(validCatalystId?.encrypt, isFalse);
+
+      final invalidCatalystId = CatalystId.tryParse(invalidUri);
+      final invalidCatalystId2 = CatalystId.tryParse(invalidUri2);
+
+      expect(invalidCatalystId, isNull);
+      expect(invalidCatalystId2, isNull);
+    });
+
+    group('uid', () {
+      test('returns correctly formatted string', () {
+        const host = CatalystIdHost.cardano;
+        final id = CatalystId(
+          // ignore: avoid_redundant_argument_values
+          scheme: CatalystId.idScheme,
+          host: host.host,
+          role0Key: role0Key,
+        );
+
+        // Expected format: scheme://host/encodedKey
+        final expected = '${CatalystId.idScheme}://${host.host}/${base64UrlNoPadEncode(role0Key)}';
+        expect(id.uid, expected);
+      });
+
+      test('remains same when non-identity fields differ', () {
+        final baseId = CatalystId(
+          host: CatalystIdHost.cardano.host,
+          role0Key: role0Key,
+          username: 'alice',
+          nonce: 123456,
+          // ignore: avoid_redundant_argument_values
+          encrypt: false,
+        );
+
+        final modifiedId = baseId.copyWith(
+          username: const Optional('bob'),
+          nonce: const Optional(999999),
+          encrypt: true,
+          role: const Optional(AccountRole.drep),
+        );
+
+        // The significant parts (host, scheme, key) haven't changed,
+        // so the UID must be identical.
+        expect(baseId.uid, equals(modifiedId.uid));
+      });
+
+      test('consistency with isSameAs', () {
+        // If two IDs are "the same", their UIDs must match.
+        final id1 = CatalystId(host: 'cardano', role0Key: role0Key, username: 'user1');
+
+        final id2 = CatalystId(host: 'cardano', role0Key: role0Key, username: 'user2');
+
+        expect(id1.isSameAs(id2), isTrue);
+        expect(id1.uid, equals(id2.uid));
+      });
+
+      test('can be parsed base into same CatalystId', () {
+        final catId = CatalystId(
+          host: CatalystIdHost.cardano.host,
+          role0Key: role0Key,
+          username: 'alice',
+          nonce: 123456,
+          // ignore: avoid_redundant_argument_values
+          encrypt: false,
+        );
+
+        final decodedCatId = CatalystId.parse(catId.uid);
+
+        expect(decodedCatId.isSameAs(catId), isTrue);
+      });
     });
   });
 }

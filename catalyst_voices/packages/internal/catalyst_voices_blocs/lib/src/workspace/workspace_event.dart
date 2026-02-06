@@ -4,6 +4,15 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class ChangeWorkspaceFilters extends WorkspaceEvent {
+  final WorkspaceFilters? filters;
+
+  const ChangeWorkspaceFilters({this.filters});
+
+  @override
+  List<Object?> get props => [...super.props, filters];
+}
+
 final class DeleteDraftProposalEvent extends WorkspaceEvent {
   final DraftRef ref;
 
@@ -54,6 +63,31 @@ final class ImportProposalEvent extends WorkspaceEvent {
   List<Object?> get props => proposalData;
 }
 
+final class InitWorkspaceEvent extends WorkspaceEvent {
+  const InitWorkspaceEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class InternalDataChangeEvent extends WorkspaceEvent {
+  final List<UsersProposalOverview> proposals;
+
+  const InternalDataChangeEvent(this.proposals);
+
+  @override
+  List<Object?> get props => [proposals];
+}
+
+final class LeaveProposalEvent extends WorkspaceEvent {
+  final DocumentRef id;
+
+  const LeaveProposalEvent(this.id);
+
+  @override
+  List<Object?> get props => [...super.props, id];
+}
+
 final class LoadProposalsEvent extends WorkspaceEvent {
   final List<UsersProposalOverview> proposals;
 
@@ -72,6 +106,14 @@ final class UnlockProposalEvent extends WorkspaceEvent {
   List<Object?> get props => [ref];
 }
 
+final class WatchActiveCampaignChangeEvent extends WorkspaceEvent {
+  const WatchActiveCampaignChangeEvent();
+}
+
+final class WatchUserCatalystIdEvent extends WorkspaceEvent {
+  const WatchUserCatalystIdEvent();
+}
+
 final class WatchUserProposalsEvent extends WorkspaceEvent {
   const WatchUserProposalsEvent();
 }
@@ -81,4 +123,13 @@ sealed class WorkspaceEvent extends Equatable {
 
   @override
   List<Object?> get props => [];
+}
+
+final class WorkspaceInvitationsAndApprovalsCount extends WorkspaceEvent {
+  final int count;
+
+  const WorkspaceInvitationsAndApprovalsCount(this.count);
+
+  @override
+  List<Object?> get props => [...super.props, count];
 }

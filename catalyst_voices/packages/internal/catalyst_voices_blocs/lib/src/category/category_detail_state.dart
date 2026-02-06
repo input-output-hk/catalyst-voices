@@ -8,6 +8,7 @@ class CategoryDetailState extends Equatable {
   final CategoryDetailStatePicker picker;
   final bool isLoading;
   final LocalizedException? error;
+  final DateTime? submissionCloseAt;
 
   const CategoryDetailState({
     this.selectedCategoryRef,
@@ -15,6 +16,7 @@ class CategoryDetailState extends Equatable {
     this.picker = const CategoryDetailStatePicker(),
     this.isLoading = false,
     this.error,
+    this.submissionCloseAt,
   });
 
   @override
@@ -24,6 +26,7 @@ class CategoryDetailState extends Equatable {
     picker,
     isLoading,
     error,
+    submissionCloseAt,
   ];
 
   CategoryDetailState copyWith({
@@ -32,6 +35,7 @@ class CategoryDetailState extends Equatable {
     CategoryDetailStatePicker? picker,
     bool? isLoading,
     Optional<LocalizedException>? error,
+    Optional<DateTime>? submissionCloseAt,
   }) {
     return CategoryDetailState(
       selectedCategoryRef: selectedCategoryRef.dataOr(this.selectedCategoryRef),
@@ -39,6 +43,7 @@ class CategoryDetailState extends Equatable {
       picker: picker ?? this.picker,
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
+      submissionCloseAt: submissionCloseAt.dataOr(this.submissionCloseAt),
     );
   }
 }

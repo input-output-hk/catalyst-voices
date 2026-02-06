@@ -17,6 +17,9 @@ class VoicesListTile extends StatelessWidget {
   /// See [ListTile.tileColor].
   final Color? tileColor;
 
+  /// See [ListTile.hoverColor].
+  final Color? hoverColor;
+
   /// The default constructor for the [VoicesListTile].
   const VoicesListTile({
     super.key,
@@ -25,6 +28,7 @@ class VoicesListTile extends StatelessWidget {
     this.title,
     this.onTap,
     this.tileColor,
+    this.hoverColor,
   });
 
   @override
@@ -44,6 +48,7 @@ class VoicesListTile extends StatelessWidget {
       trailing: trailing,
       onTap: onTap,
       tileColor: tileColor,
+      hoverColor: hoverColor,
     );
   }
 }

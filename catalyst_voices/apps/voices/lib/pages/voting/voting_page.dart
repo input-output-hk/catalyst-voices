@@ -144,9 +144,11 @@ class _VotingPageState extends State<VotingPage>
       _determineTabs,
     ).distinct().listen(_updateTabsIfNeeded);
 
-    votingCubit.init(
-      categoryId: widget.categoryId,
-      tab: selectedTab,
+    unawaited(
+      votingCubit.init(
+        categoryId: widget.categoryId,
+        tab: selectedTab,
+      ),
     );
 
     _pagingController

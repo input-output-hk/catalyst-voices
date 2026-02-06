@@ -8,11 +8,8 @@ final class VotingMockService implements VotingService {
   final VotingRepository _votingRepository;
   final ProposalService _proposalService;
   final CampaignService _campaignService;
-  Campaign? _cacheCampaign;
 
-  VotingMockService(this._votingRepository, this._proposalService, this._campaignService) {
-    unawaited(_loadCampaign());
-  }
+  VotingMockService(this._votingRepository, this._proposalService, this._campaignService);
 
   @override
   Future<void> castVotes(List<Vote> draftVotes) async {
@@ -28,10 +25,12 @@ final class VotingMockService implements VotingService {
   Future<VoteProposal> getVoteProposal(DocumentRef proposalRef) async {
     final proposal = await _proposalService.getProposal(id: proposalRef);
     final lastCastedVote = await getProposalLastCastedVote(proposalRef);
+    // TODO(dt-iohk): consider to use campaign assigned to the proposal
+    final campaign = await _campaignService.getActiveCampaign();
 
-    final category = _cacheCampaign!.categories.firstWhere(
+    final category = campaign!.categories.firstWhere(
       (category) => proposal.parameters.contains(category.id),
-      orElse: () => throw StateError('Category not found'),
+      orElse: () => throw NotFoundException(message: 'Category not found in ${campaign.id}'),
     );
 
     return VoteProposal.fromData(
@@ -44,11 +43,6 @@ final class VotingMockService implements VotingService {
   @override
   Stream<List<Vote>> watchedCastedVotes() {
     return _votingRepository.watchCastedVotes;
-  }
-
-  Future<void> _loadCampaign() async {
-    final campaign = await _campaignService.getActiveCampaign();
-    _cacheCampaign = campaign;
   }
 }
 

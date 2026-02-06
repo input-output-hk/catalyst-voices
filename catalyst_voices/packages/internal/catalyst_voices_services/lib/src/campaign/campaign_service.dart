@@ -1,21 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('CampaignService');
-
-Campaign? _mockedActiveCampaign;
-
-/// Overrides the current campaign returned by [CampaignService.getActiveCampaign].
-/// Only for unit testing.
-@visibleForTesting
-//ignore: avoid_setters_without_getters
-set mockedActiveCampaign(Campaign? campaign) {
-  _mockedActiveCampaign = campaign;
-}
 
 typedef _ProposalTemplateCategoryAndMoneyFormat = ({
   SignedDocumentRef? category,
@@ -31,22 +21,31 @@ abstract interface class CampaignService {
   const factory CampaignService(
     CampaignRepository campaignRepository,
     ProposalRepository proposalRepository,
+    DocumentRepository documentRepository,
     ActiveCampaignObserver activeCampaignObserver,
+    SyncManager syncManager,
   ) = CampaignServiceImpl;
 
   Stream<Campaign?> get watchActiveCampaign;
 
-  Future<Campaign?> getActiveCampaign();
-
-  Future<Campaign> getCampaign({
-    required String id,
+  Future<void> changeActiveCampaign(
+    Campaign campaign, {
+    bool sync,
   });
 
-  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
+  Future<Campaign?> getActiveCampaign();
+
+  Future<CampaignPhase> getActiveCampaignPhaseTimeline(CampaignPhaseType stage);
+
+  Future<List<Campaign>> getAllCampaigns();
+
+  Future<Campaign> getCampaign({required String id});
 
   Future<CampaignCategory> getCategory(DocumentParameters parameters);
 
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
+
+  Future<Campaign?> initActiveCampaign();
 
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters});
 
@@ -56,60 +55,83 @@ abstract interface class CampaignService {
 final class CampaignServiceImpl implements CampaignService {
   final CampaignRepository _campaignRepository;
   final ProposalRepository _proposalRepository;
+  final DocumentRepository _documentRepository;
   final ActiveCampaignObserver _activeCampaignObserver;
+  final SyncManager _syncManager;
 
   const CampaignServiceImpl(
     this._campaignRepository,
     this._proposalRepository,
+    this._documentRepository,
     this._activeCampaignObserver,
+    this._syncManager,
   );
 
   @override
-  Stream<Campaign?> get watchActiveCampaign => _activeCampaignObserver.watchCampaign;
+  Stream<Campaign?> get watchActiveCampaign async* {
+    if (_activeCampaignObserver.campaign == null) {
+      await _fetchInitialActiveCampaign();
+    }
+    yield* _activeCampaignObserver.watchCampaign;
+  }
+
+  @override
+  Future<void> changeActiveCampaign(
+    Campaign campaign, {
+    bool sync = true,
+  }) async {
+    final observedCampaignId = _activeCampaignObserver.campaign?.id;
+    final observedCampaignIdChanged = observedCampaignId != campaign.id;
+    _activeCampaignObserver.campaign = campaign;
+
+    await _updateAppActiveCampaign(campaign);
+
+    if (sync && observedCampaignIdChanged) {
+      final activeRequestsForCancellation = {
+        ..._syncManager.pendingRequests.whereType<CampaignSyncRequest>(),
+        ..._syncManager.scheduledRequests.whereType<CampaignSyncRequest>(),
+      };
+
+      for (final request in activeRequestsForCancellation) {
+        _syncManager.cancel(request);
+      }
+
+      _syncManager.queue(CampaignSyncRequest.periodic(campaign));
+    }
+  }
 
   @override
   Future<Campaign?> getActiveCampaign() async {
-    if (_activeCampaignObserver.campaign != null) {
-      return _activeCampaignObserver.campaign;
+    final activeCampaign = _activeCampaignObserver.campaign;
+    if (activeCampaign != null) {
+      return activeCampaign;
+    } else {
+      return _fetchInitialActiveCampaign();
     }
-    // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = _mockedActiveCampaign ?? await getCampaign(id: activeCampaignRef.id);
-    _activeCampaignObserver.campaign = campaign;
-    return campaign;
+  }
+
+  @override
+  Future<CampaignPhase> getActiveCampaignPhaseTimeline(CampaignPhaseType type) async {
+    final campaign = await getActiveCampaign();
+    if (campaign == null) {
+      // TODO(dt-iohk): Add specialized exceptions here.
+      // Later Campaign will by dynamic and there is no guarantee we do have active campaign.
+      throw StateError('No active campaign found');
+    }
+
+    return campaign.getPhaseTimeline(type);
+  }
+
+  @override
+  Future<List<Campaign>> getAllCampaigns() async {
+    return _campaignRepository.getAllCampaigns();
   }
 
   @override
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    final campaign = await _campaignRepository.getCampaign(id: id);
-    final proposalSubmissionTime = campaign
-        .phaseStateTo(CampaignPhaseType.proposalSubmission)
-        .phase
-        .timeline
-        .to;
-
-    final updatedCategories = campaign.categories
-        .map((e) => e.copyWith(submissionCloseDate: proposalSubmissionTime))
-        .toList();
-
-    return campaign.copyWith(
-      categories: updatedCategories,
-    );
-  }
-
-  @override
-  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType type) async {
-    final campaign = await getActiveCampaign();
-    if (campaign == null) {
-      throw StateError('No active campaign found');
-    }
-
-    final timelineStage = campaign.timeline.phases.firstWhere(
-      (element) => element.type == type,
-      orElse: () => throw StateError('Type $type not found'),
-    );
-    return timelineStage;
+    return _campaignRepository.getCampaign(id: id);
   }
 
   @override
@@ -120,14 +142,7 @@ final class CampaignServiceImpl implements CampaignService {
         message: 'Did not find category with parameters $parameters',
       );
     }
-
-    final proposalSubmissionStage = await getCampaignPhaseTimeline(
-      CampaignPhaseType.proposalSubmission,
-    );
-
-    return category.copyWith(
-      submissionCloseDate: proposalSubmissionStage.timeline.to,
-    );
+    return category;
   }
 
   @override
@@ -136,9 +151,27 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Stream<CampaignTotalAsk> watchCampaignTotalAsk({required ProposalsTotalAskFilters filters}) {
-    return _proposalRepository
-        .watchProposalTemplates(campaign: filters.campaign ?? CampaignFilters.active())
+  Future<Campaign?> initActiveCampaign() async {
+    final campaign = await _fetchInitialActiveCampaign();
+
+    await _updateAppActiveCampaign(campaign);
+
+    _activeCampaignObserver.campaign = campaign;
+
+    return campaign;
+  }
+
+  @override
+  Stream<CampaignTotalAsk> watchCampaignTotalAsk({
+    required ProposalsTotalAskFilters filters,
+  }) async* {
+    final campaignFilters = filters.campaign;
+    if (campaignFilters == null) {
+      throw StateError('Campaign filters are required to watch campaign total ask!');
+    }
+
+    yield* _proposalRepository
+        .watchProposalTemplates(campaign: campaignFilters)
         .map((templates) => templates.map((template) => template.toMapEntry()))
         .map(Map.fromEntries)
         .switchMap((templatesMoneyFormat) {
@@ -152,16 +185,20 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) {
-    final activeCampaign = _activeCampaignObserver.campaign;
-    final campaignFilters = activeCampaign != null ? CampaignFilters.from(activeCampaign) : null;
+  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) async* {
+    final campaign = await _getCampaignWithCategory(ref);
+    if (campaign == null) {
+      throw NotFoundException(
+        message: 'Did not find campaign which contains the category with ref $ref',
+      );
+    }
 
     final filters = ProposalsTotalAskFilters(
       categoryId: ref.id,
-      campaign: campaignFilters,
+      campaign: CampaignFilters.from(campaign),
     );
 
-    return watchCampaignTotalAsk(
+    yield* watchCampaignTotalAsk(
       filters: filters,
     ).map((campaignTotalAsk) => campaignTotalAsk.categoryOrZero(ref));
   }
@@ -202,6 +239,36 @@ final class CampaignServiceImpl implements CampaignService {
 
     return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
   }
+
+  // TODO(LynxLynxx): Call backend to get latest active campaign
+  Future<Campaign?> _fetchInitialActiveCampaign() {
+    return getCampaign(id: activeCampaignRef.id);
+  }
+
+  Future<Campaign?> _getCampaignWithCategory(SignedDocumentRef ref) async {
+    final allCampaigns = await getAllCampaigns();
+    return allCampaigns.firstWhereOrNull((campaign) => campaign.hasCategory(ref.id));
+  }
+
+  Future<void> _updateAppActiveCampaign(Campaign? campaign) async {
+    final appActiveCampaignId = await _campaignRepository.getAppActiveCampaignId();
+    if (appActiveCampaignId == campaign?.id) {
+      return;
+    }
+
+    _logger.fine(
+      'Updating active campaign from '
+      '[$appActiveCampaignId] '
+      'to '
+      '[${campaign?.id}]!',
+    );
+
+    await _campaignRepository.updateAppActiveCampaignId(id: campaign?.id);
+    await _documentRepository.removeAll(
+      excludeTypes: [DocumentType.proposalTemplate],
+      localDrafts: false,
+    );
+  }
 }
 
 extension on ProposalTemplate {
@@ -215,5 +282,14 @@ extension on ProposalTemplate {
         : null;
 
     return MapEntry(ref, (category: category, moneyFormat: moneyFormat));
+  }
+}
+
+extension on Campaign {
+  CampaignPhase getPhaseTimeline(CampaignPhaseType type) {
+    return timeline.phases.firstWhere(
+      (element) => element.type == type,
+      orElse: () => throw StateError('Campaign $id does not have $type phase'),
+    );
   }
 }

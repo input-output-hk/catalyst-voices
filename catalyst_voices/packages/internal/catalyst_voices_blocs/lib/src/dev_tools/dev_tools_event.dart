@@ -2,6 +2,24 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart' show Level;
 import 'package:equatable/equatable.dart';
 
+final class ActiveCampaignChangedEvent extends DevToolsEvent {
+  final Campaign? campaign;
+
+  const ActiveCampaignChangedEvent(this.campaign);
+
+  @override
+  List<Object?> get props => [campaign];
+}
+
+final class ChangeActiveCampaignEvent extends DevToolsEvent {
+  final Campaign campaign;
+
+  const ChangeActiveCampaignEvent(this.campaign);
+
+  @override
+  List<Object?> get props => [campaign];
+}
+
 final class ChangeCollectLogsEvent extends DevToolsEvent {
   final bool isEnabled;
 
@@ -48,6 +66,10 @@ final class DocumentsCountChangedEvent extends DevToolsEvent {
   List<Object?> get props => [count];
 }
 
+final class InitDataEvent extends DevToolsEvent {
+  const InitDataEvent();
+}
+
 final class PrepareAndExportLogsEvent extends DevToolsEvent {
   const PrepareAndExportLogsEvent();
 }
@@ -56,8 +78,8 @@ final class RecoverConfigEvent extends DevToolsEvent {
   const RecoverConfigEvent();
 }
 
-final class RecoverDataEvent extends DevToolsEvent {
-  const RecoverDataEvent();
+final class StopWatchingActiveCampaignEvent extends DevToolsEvent {
+  const StopWatchingActiveCampaignEvent();
 }
 
 final class StopWatchingDocumentsEvent extends DevToolsEvent {
@@ -81,12 +103,8 @@ final class SyncStatsChangedEvent extends DevToolsEvent {
   List<Object?> get props => [stats];
 }
 
-final class UpdateAllEvent extends DevToolsEvent {
-  const UpdateAllEvent();
-}
-
-final class UpdateSystemInfoEvent extends DevToolsEvent {
-  const UpdateSystemInfoEvent();
+final class WatchActiveCampaignEvent extends DevToolsEvent {
+  const WatchActiveCampaignEvent();
 }
 
 final class WatchDocumentsEvent extends DevToolsEvent {

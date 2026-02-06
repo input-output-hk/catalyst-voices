@@ -12,6 +12,7 @@ class DocumentObjectPropertyBuilder extends StatelessWidget {
   final DocumentObjectProperty property;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
+  final CollaboratorsSectionData collaboratorsSectionData;
   final DocumentPropertyBuilderOverrides? overrides;
 
   const DocumentObjectPropertyBuilder({
@@ -19,6 +20,7 @@ class DocumentObjectPropertyBuilder extends StatelessWidget {
     required this.property,
     required this.isEditMode,
     required this.onChanged,
+    required this.collaboratorsSectionData,
     this.overrides,
   });
 
@@ -45,6 +47,7 @@ class DocumentObjectPropertyBuilder extends StatelessWidget {
           property: property,
           isEditMode: isEditMode,
           onChanged: onChanged,
+          collaboratorsSectionData: collaboratorsSectionData,
           overrides: overrides,
         );
     }
@@ -58,6 +61,7 @@ class _FormField extends VoicesFormField<DocumentObjectProperty> {
     super.autovalidateMode,
     required bool isEditMode,
     required ValueChanged<List<DocumentChange>> onDocumentChanged,
+    required CollaboratorsSectionData collaboratorsSectionData,
     required DocumentPropertyBuilderOverrides? overrides,
   }) : super(
          enabled: isEditMode,
@@ -100,6 +104,7 @@ class _FormField extends VoicesFormField<DocumentObjectProperty> {
                          property: child,
                          isEditMode: isEditMode,
                          onChanged: onDocumentChanged,
+                         collaboratorsSectionData: collaboratorsSectionData,
                          overrides: overrides,
                        );
                      })
@@ -123,6 +128,7 @@ class _GenericDocumentObjectPropertyBuilder extends StatefulWidget {
   final DocumentObjectProperty property;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
+  final CollaboratorsSectionData collaboratorsSectionData;
   final DocumentPropertyBuilderOverrides? overrides;
 
   const _GenericDocumentObjectPropertyBuilder({
@@ -130,6 +136,7 @@ class _GenericDocumentObjectPropertyBuilder extends StatefulWidget {
     required this.property,
     required this.isEditMode,
     required this.onChanged,
+    required this.collaboratorsSectionData,
     this.overrides,
   });
 
@@ -150,6 +157,7 @@ class _GenericDocumentObjectPropertyBuilderState
       autovalidateMode: _autovalidateMode,
       isEditMode: widget.isEditMode,
       onDocumentChanged: _onDocumentChanged,
+      collaboratorsSectionData: widget.collaboratorsSectionData,
       overrides: widget.overrides,
     );
   }

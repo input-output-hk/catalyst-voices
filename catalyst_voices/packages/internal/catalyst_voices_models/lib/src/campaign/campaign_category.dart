@@ -20,9 +20,6 @@ class CampaignCategory extends Equatable {
   final List<String> dos;
   final List<String> donts;
 
-  // TODO(damian-molinski): remove this
-  final DateTime submissionCloseDate;
-
   const CampaignCategory({
     required this.id,
     required this.campaignRef,
@@ -37,7 +34,6 @@ class CampaignCategory extends Equatable {
     required this.descriptions,
     required this.dos,
     required this.donts,
-    required this.submissionCloseDate,
   });
 
   String get formattedCategoryName => '$categoryName $categorySubname';
@@ -56,7 +52,6 @@ class CampaignCategory extends Equatable {
     descriptions,
     dos,
     donts,
-    submissionCloseDate,
   ];
 
   CampaignCategory copyWith({
@@ -73,7 +68,6 @@ class CampaignCategory extends Equatable {
     List<CategoryDescription>? descriptions,
     List<String>? dos,
     List<String>? donts,
-    DateTime? submissionCloseDate,
   }) {
     return CampaignCategory(
       id: id ?? this.id,
@@ -89,7 +83,6 @@ class CampaignCategory extends Equatable {
       descriptions: descriptions ?? this.descriptions,
       dos: dos ?? this.dos,
       donts: donts ?? this.donts,
-      submissionCloseDate: submissionCloseDate ?? this.submissionCloseDate,
     );
   }
 }

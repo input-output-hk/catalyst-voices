@@ -23,7 +23,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final SvgGenImage image;
   final List<String> dos;
   final List<String> donts;
-  final DateTime submissionCloseDate;
 
   const CampaignCategoryDetailsViewModel({
     required super.id,
@@ -39,7 +38,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.descriptions,
     this.dos = const <String>[],
     this.donts = const <String>[],
-    required this.submissionCloseDate,
   });
 
   factory CampaignCategoryDetailsViewModel.fromModel(
@@ -61,7 +59,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),
       dos: model.dos,
       donts: model.donts,
-      submissionCloseDate: model.submissionCloseDate,
     );
   }
 
@@ -102,7 +99,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       ),
       descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
       image: CategoryImageUrl.image('1'),
-      submissionCloseDate: DateTimeExt.now(),
     );
   }
 
@@ -130,7 +126,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     image,
     dos,
     donts,
-    submissionCloseDate,
   ];
 }
 

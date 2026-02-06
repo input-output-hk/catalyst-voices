@@ -27,15 +27,15 @@ final class CategoryDetailRoute extends GoRouteData
   const CategoryDetailRoute({required this.categoryId});
 
   factory CategoryDetailRoute.fromRef({
-    required SignedDocumentRef categoryRef,
+    required SignedDocumentRef categoryId,
   }) {
-    return CategoryDetailRoute(categoryId: categoryRef.id);
+    return CategoryDetailRoute(categoryId: categoryId.id);
   }
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return CategoryPage(
-      categoryRef: SignedDocumentRef(id: categoryId),
+      categoryId: SignedDocumentRef(id: categoryId),
     );
   }
 }

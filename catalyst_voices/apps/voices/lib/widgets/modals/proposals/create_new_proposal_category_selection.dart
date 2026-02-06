@@ -90,40 +90,37 @@ class _CreateNewProposalCategorySelectionState extends State<CreateNewProposalCa
     final selected = widget.categories.selected;
 
     return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 68),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ListView.separated(
-                itemBuilder: (context, index) => _CategoryCard(
-                  name: categories[index].formattedName,
-                  description: categories[index].shortDescription,
-                  ref: categories[index].id,
-                  isSelected: categories[index].id == selected?.id,
-                  onCategorySelected: widget.onCategorySelected,
-                ),
-                separatorBuilder: (context, index) => const SizedBox(height: 16),
-                itemCount: categories.length,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ListView.separated(
+              itemBuilder: (context, index) => _CategoryCard(
+                name: categories[index].formattedName,
+                description: categories[index].shortDescription,
+                ref: categories[index].id,
+                isSelected: categories[index].id == selected?.id,
+                onCategorySelected: widget.onCategorySelected,
               ),
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              itemCount: categories.length,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 2,
-              child: selected != null
-                  ? VoicesScrollbar(
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 2,
+            child: selected != null
+                ? VoicesScrollbar(
+                    controller: _scrollController,
+                    alwaysVisible: true,
+                    child: SingleChildScrollView(
                       controller: _scrollController,
-                      alwaysVisible: true,
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        child: CategoryCompactDetailView(category: selected),
-                      ),
-                    )
-                  : const _NoneCategorySelected(),
-            ),
-          ],
-        ),
+                      child: CategoryCompactDetailView(category: selected),
+                    ),
+                  )
+                : const _NoneCategorySelected(),
+          ),
+        ],
       ),
     );
   }

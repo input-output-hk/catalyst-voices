@@ -2,12 +2,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 class ProposalBrief extends Equatable {
   final DocumentRef id;
   final String title;
   final String categoryName;
-  final String? author;
+  final CatalystId? author;
   final Money fundsRequested;
   final int duration;
   final ProposalPublish publish;
@@ -17,6 +18,7 @@ class ProposalBrief extends Equatable {
   final int? commentsCount;
   final bool isFavorite;
   final VoteButtonData? voteData;
+  final List<ProposalDataCollaborator>? collaborators;
 
   const ProposalBrief({
     required this.id,
@@ -32,23 +34,25 @@ class ProposalBrief extends Equatable {
     this.commentsCount,
     this.isFavorite = false,
     this.voteData,
+    this.collaborators,
   });
 
   factory ProposalBrief.fromData(ProposalBriefData data) {
     return ProposalBrief(
       id: data.id,
-      title: data.title,
-      categoryName: data.categoryName,
-      author: data.authorName,
-      fundsRequested: data.fundsRequested,
-      duration: data.durationInMonths,
+      title: data.title ?? '',
+      categoryName: data.categoryName ?? '',
+      author: data.author,
+      fundsRequested: data.fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      duration: data.durationInMonths ?? 0,
       publish: data.isFinal ? ProposalPublish.submittedProposal : ProposalPublish.publishedDraft,
-      description: data.description,
+      description: data.description ?? '',
       versionNumber: data.iteration,
       updateDate: data.createdAt,
       commentsCount: data.commentsCount,
       isFavorite: data.isFavorite,
       voteData: data.votes.toViewModel(),
+      collaborators: data.collaborators,
     );
   }
 
@@ -57,7 +61,11 @@ class ProposalBrief extends Equatable {
       id: SignedDocumentRef.generateFirstRef(),
       title: 'Proposal Title',
       categoryName: 'Category Name',
-      author: 'Author Name',
+      author: CatalystId(
+        host: CatalystIdHost.cardano.host,
+        role0Key: Uint8List.fromList(List.filled(32, 0)),
+        username: 'Author Name',
+      ),
       fundsRequested: Money.zero(currency: Currencies.ada),
       duration: 0,
       publish: ProposalPublish.publishedDraft,
@@ -67,6 +75,11 @@ class ProposalBrief extends Equatable {
       commentsCount: 0,
     );
   }
+
+  List<CatalystId>? get acceptedCollaboratorsIds => collaborators
+      ?.where((collaborator) => collaborator.status.isAccepted)
+      .map((collaborator) => collaborator.id)
+      .toList();
 
   String get formattedFunds {
     return MoneyFormatter.formatCompactRounded(fundsRequested);
@@ -87,13 +100,14 @@ class ProposalBrief extends Equatable {
     commentsCount,
     isFavorite,
     voteData,
+    collaborators,
   ];
 
   ProposalBrief copyWith({
     DocumentRef? id,
     String? title,
     String? categoryName,
-    Optional<String>? author,
+    Optional<CatalystId>? author,
     Money? fundsRequested,
     int? duration,
     ProposalPublish? publish,
@@ -103,6 +117,7 @@ class ProposalBrief extends Equatable {
     Optional<int>? commentsCount,
     bool? isFavorite,
     Optional<VoteButtonData>? voteData,
+    Optional<List<ProposalDataCollaborator>>? collaborators,
   }) {
     return ProposalBrief(
       id: id ?? this.id,
@@ -118,6 +133,7 @@ class ProposalBrief extends Equatable {
       commentsCount: commentsCount.dataOr(this.commentsCount),
       isFavorite: isFavorite ?? this.isFavorite,
       voteData: voteData.dataOr(this.voteData),
+      collaborators: collaborators.dataOr(this.collaborators),
     );
   }
 }

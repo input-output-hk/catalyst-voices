@@ -8,6 +8,8 @@ import 'package:catalyst_voices_repositories/src/database/table/document_collabo
 import 'package:catalyst_voices_repositories/src/database/table/document_parameters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.dart';
+import 'package:catalyst_voices_repositories/src/database/view/document_metadata_view.drift.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
@@ -77,6 +79,15 @@ abstract interface class DocumentsV2Dao {
   /// Returns `null` if no matching document is found.
   Future<DocumentArtifact?> getDocumentArtifact(DocumentRef id);
 
+  /// Retrieves only the metadata of a signed document, excluding the content blob.
+  ///
+  /// This is an optimized query that skips fetching the potentially large
+  /// content column from the database.
+  ///
+  /// Returns the [DocumentsV2MetadataViewData] for the matching document,
+  /// or `null` if no matching document is found.
+  Future<DocumentsV2MetadataViewData?> getDocumentMetadata(DocumentRef id);
+
   /// Retrieves a list of documents matching the criteria with pagination.
   ///
   /// [latestOnly] - If `true`, only the most recent version (by [DocumentEntityV2.createdAt])
@@ -91,6 +102,7 @@ abstract interface class DocumentsV2Dao {
     DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? campaign,
+    List<CatalystId>? authors,
     bool latestOnly,
     int limit,
     int offset,
@@ -103,6 +115,16 @@ abstract interface class DocumentsV2Dao {
   ///
   /// Returns `null` if the document ID does not exist in the database.
   Future<DocumentRef?> getLatestOf(DocumentRef id);
+
+  /// Returns a previous version of a document, if available.
+  ///
+  /// Behavior depends on whether the reference is exact or loose:
+  /// - [DocumentRef.isExact]: Returns the immediate previous version
+  ///   (the version with [DocumentEntityV2.createdAt] just before the specified version).
+  /// - [DocumentRef.isLoose]: Returns the first known version (where `id == ver`).
+  ///
+  /// Returns `null` if no previous version exists or the document is not found.
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id});
 
   /// Saves a single document and its associated authors.
   ///
@@ -163,6 +185,9 @@ abstract interface class DocumentsV2Dao {
     DocumentArtifacts,
     DocumentParameters,
     DocumentCollaborators,
+  ],
+  views: [
+    DocumentsV2MetadataView,
   ],
 )
 class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -288,11 +313,27 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<DocumentsV2MetadataViewData?> getDocumentMetadata(DocumentRef id) async {
+    final query = select(documentsV2MetadataView)..where((tbl) => tbl.id.equals(id.id));
+
+    if (id.isExact) {
+      query.where((tbl) => tbl.ver.equals(id.ver!));
+    }
+
+    query
+      ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])
+      ..limit(1);
+
+    return query.getSingleOrNull();
+  }
+
+  @override
   Future<List<DocumentEntityV2>> getDocuments({
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
     CampaignFilters? campaign,
+    List<CatalystId>? authors,
     bool latestOnly = false,
     int limit = 200,
     int offset = 0,
@@ -302,6 +343,7 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       id: id,
       referencing: referencing,
       campaign: campaign,
+      authors: authors,
       latestOnly: latestOnly,
       limit: limit,
       offset: offset,
@@ -324,6 +366,31 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           ),
         )
         .getSingleOrNull();
+  }
+
+  @override
+  Future<DocumentRef?> getPreviousOf({required DocumentRef id}) {
+    final query = selectOnly(documentsV2)
+      ..addColumns([documentsV2.id, documentsV2.ver])
+      ..where(documentsV2.id.equals(id.id));
+
+    if (id.isLoose) {
+      query.where(documentsV2.ver.equals(id.id));
+    } else {
+      query.where(documentsV2.ver.isSmallerThanValue(id.ver!));
+    }
+    query
+      ..orderBy([OrderingTerm.desc(documentsV2.ver)])
+      ..limit(1);
+
+    return query.map(
+      (row) {
+        return SignedDocumentRef.exact(
+          id: row.read(documentsV2.id)!,
+          ver: row.read(documentsV2.ver)!,
+        );
+      },
+    ).getSingleOrNull();
   }
 
   @override
@@ -546,8 +613,9 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     DocumentType? type,
     DocumentRef? id,
     DocumentRef? referencing,
-    CatalystId? originalAuthor,
     CampaignFilters? campaign,
+    List<CatalystId>? authors,
+    CatalystId? originalAuthor,
     required bool latestOnly,
     required int limit,
     required int offset,
@@ -598,6 +666,20 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
             ..where(dp.documentVer.equalsExp(tbl.ver))
             ..where(dp.id.isIn(campaign.categoriesIds)),
         );
+      });
+    }
+
+    if (authors != null && authors.isNotEmpty) {
+      final significantIds = authors
+          .map((author) => author.toSignificant().toUri().toString())
+          .toList();
+      query.where((tbl) {
+        final originalAuthorQuery = selectOnly(documentAuthors)
+          ..addColumns([const Constant(1)])
+          ..where(documentAuthors.documentId.equalsExp(tbl.id))
+          ..where(documentAuthors.documentVer.equalsExp(tbl.ver))
+          ..where(documentAuthors.accountSignificantId.isIn(significantIds));
+        return existsQuery(originalAuthorQuery);
       });
     }
 
