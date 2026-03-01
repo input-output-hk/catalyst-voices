@@ -11,7 +11,7 @@ environment:
 dependencies:
   collection: ^1.19.1
   # TODO(LynxLynxx): Update to latest version in https://github.com/input-output-hk/catalyst-voices/issues/3940
-  file_picker: 10.3.2
+  file_picker: 10.3.10
   flutter:
     sdk: flutter
   flutter_secure_storage: ^9.2.4
