@@ -19,7 +19,7 @@ dependencies:
     path: ../catalyst_voices_repositories
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
-  cbor: 6.3.7
+  cbor: 6.5.1
   collection: ^1.19.1
   cross_file: ^0.3.4+2
   dio: ^5.9.0

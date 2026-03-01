@@ -21,7 +21,7 @@ dependencies:
     path: ../catalyst_voices_models
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
-  cbor: 6.3.7
+  cbor: 6.5.1
   collection: ^1.19.1
   convert: ^3.1.2
   dio: ^5.9.0
