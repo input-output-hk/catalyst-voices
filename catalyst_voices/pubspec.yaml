@@ -38,7 +38,7 @@ dependencies:
 
 dev_dependencies:
   # TODO(LynxLynxx): Update to latest version in https://github.com/input-output-hk/catalyst-voices/issues/4071
-  melos: 7.3.0
+  melos: 7.4.0
 
 # TODO(dt-iohk): revert when flutter_secure_storage pulls transitively these or newer versions
 dependency_overrides:
