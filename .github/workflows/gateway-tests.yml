@@ -47,7 +47,7 @@ jobs:
 
       - name: Prepare artifacts
         id: images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.11.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+all-images
@@ -139,7 +139,7 @@ jobs:
 
       - name: Prepare artifacts
         id: images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.11.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+all-images
@@ -151,7 +151,7 @@ jobs:
 
       - name: Prepare artifacts devnet
         id: images-devnet
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.11.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+images-devnet
