@@ -44,7 +44,7 @@ jobs:
           version: 0.21.0
 
       - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.11.0
 
       - name: Build all images (gateway, event-db, voices, e2e-test-runner)
         id: build-images
