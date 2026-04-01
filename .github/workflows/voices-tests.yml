@@ -48,7 +48,7 @@ jobs:
 
       - name: Build all images (gateway, event-db, voices, e2e-test-runner)
         id: build-images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.11.0
         with:
           command: run
           args: ./${{ env.E2E_DIR }}/+all-images

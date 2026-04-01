@@ -28,7 +28,7 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
       - name: Build Flutter Web
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.11.0
         if: always()
         continue-on-error: true
         with:
