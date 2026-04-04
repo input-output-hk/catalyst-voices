@@ -1,7 +1,9 @@
+import 'package:catalyst_cardano_serialization/src/guards.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
+import 'package:catalyst_cardano_serialization/src/withdrawal.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
@@ -150,6 +152,9 @@ final class TransactionBody extends Equatable implements CborEncodable {
   /// A cbor key for [TransactionBody.ttl].
   static const ttlKey = CborSmallInt(3);
 
+  /// A cbor key for [Withdrawals].
+  static const withdrawalsKey = CborSmallInt(5);
+
   /// A cbor key for [TransactionBody.auxiliaryDataHash].
   static const auxiliaryDataHashKey = CborSmallInt(7);
 
@@ -165,8 +170,8 @@ final class TransactionBody extends Equatable implements CborEncodable {
   /// A cbor key for [TransactionBody.collateralInputs].
   static const collateralInputsKey = CborSmallInt(13);
 
-  /// A cbor key for [TransactionBody.requiredSigners].
-  static const requiredSignersKey = CborSmallInt(14);
+  /// A cbor key for [TransactionBody.guards].
+  static const guardsKey = CborSmallInt(14);
 
   /// A cbor key for [TransactionBody.networkId].
   static const networkIdKey = CborSmallInt(15);
@@ -195,6 +200,7 @@ final class TransactionBody extends Equatable implements CborEncodable {
 
   /// Certificates in an ordered set. tag: 4
   /// Withdrawals map of stake address, coin. tag: 5
+  final Withdrawals? withdrawals;
 
   /// The hash of the optional [AuxiliaryData]
   /// which is the metadata of the transaction. tag: 7
@@ -214,10 +220,21 @@ final class TransactionBody extends Equatable implements CborEncodable {
   /// Collateral inputs as nonempty set. tag: 13
   final Set<TransactionInput>? collateralInputs;
 
-  /// The list of public key hashes of addresses
-  /// that are required to sign the transaction.
-  /// Nonempty set of addr keyhash. tag: 14
-  final Set<Ed25519PublicKeyHash>? requiredSigners;
+  /// The list of public key hashes of addresses or script hashes that are
+  /// required to sign the transaction, or the list of guard conditions
+  /// Nonempty set of addr keyhash or nonempty ordered set of Credential e.g.
+  /// Ed25519PublicKeyHash or ScriptHash. tag: 14
+  ///
+  /// NOTE(ilap): from CDDL:
+  /// ```
+  /// required_signers = nonempty_set<addr_keyhash>
+  /// to guards = nonempty_set<addr_keyhash>/ nonempty_oset<credential>
+  /// nonempty_oset<a0> = #6.258([+ a0])/ [+ a0]
+  /// nonempty_set<a0>  = #6.258([+ a0])/ [+ a0]
+  /// credential = [0, addr_keyhash// 1, script_hash]
+  /// addr_keyhash = hash28 = bytes .size 28
+  /// ```
+  final Set<Credential>? guards;
 
   /// Specifies on which network the code will run. Network ID 0/1. tag: 15
   final NetworkId? networkId;
@@ -240,9 +257,10 @@ final class TransactionBody extends Equatable implements CborEncodable {
     this.auxiliaryDataHash,
     this.validityStart,
     this.mint,
+    this.withdrawals,
     this.scriptDataHash,
     this.collateralInputs,
-    this.requiredSigners,
+    this.guards,
     this.networkId,
     this.collateralReturn,
     this.totalCollateral,
@@ -259,6 +277,7 @@ final class TransactionBody extends Equatable implements CborEncodable {
         outputs: _extractList(map, outputsKey, TransactionOutput.fromCbor)!,
         fee: _extractValue(map, feeKey, Coin.fromCbor)!,
         ttl: _extractValue(map, ttlKey, SlotBigNum.fromCbor),
+        withdrawals: _extractValue(map, withdrawalsKey, Withdrawals.fromCbor),
         auxiliaryDataHash: _extractValue(map, auxiliaryDataHashKey, AuxiliaryDataHash.fromCbor),
         validityStart: _extractValue(map, validityStartKey, SlotBigNum.fromCbor),
         mint: _extractValue(map, mintKey, MultiAsset.fromCbor),
@@ -268,11 +287,7 @@ final class TransactionBody extends Equatable implements CborEncodable {
           collateralInputsKey,
           TransactionInput.fromCbor,
         )?.toSet(),
-        requiredSigners: _extractList(
-          map,
-          requiredSignersKey,
-          Ed25519PublicKeyHash.fromCbor,
-        )?.toSet(),
+        guards: _extractValue(map, guardsKey, Guards.fromCbor),
         networkId: _extractValue(
           map,
           networkIdKey,
@@ -293,12 +308,13 @@ final class TransactionBody extends Equatable implements CborEncodable {
     outputs,
     fee,
     ttl,
+    withdrawals,
     auxiliaryDataHash,
     validityStart,
     mint,
     scriptDataHash,
     collateralInputs,
-    requiredSigners,
+    guards,
     networkId,
     collateralReturn,
     totalCollateral,
@@ -331,8 +347,7 @@ final class TransactionBody extends Equatable implements CborEncodable {
       if (scriptDataHash != null) scriptDataHashKey: scriptDataHash!.toCbor(),
       if (collateralInputs != null && collateralInputs!.isNotEmpty)
         collateralInputsKey: _toCborList(collateralInputs!),
-      if (requiredSigners != null && requiredSigners!.isNotEmpty)
-        requiredSignersKey: _toCborList(requiredSigners!),
+      if (guards != null && guards!.isNotEmpty) guardsKey: Guards.guardsToCbor(guards)!,
       if (networkId != null) networkIdKey: CborSmallInt(networkId!.id),
       if (collateralReturn != null) collateralReturnKey: collateralReturn!.toCbor(),
       if (totalCollateral != null) totalCollateralKey: totalCollateral!.toCbor(),

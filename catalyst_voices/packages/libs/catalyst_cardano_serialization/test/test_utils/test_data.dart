@@ -454,7 +454,7 @@ Transaction fullSignedTestTransaction({Set<TransactionInput>? inputs}) {
       fee: const Coin(167173),
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
-      requiredSigners: {
+      guards: {
         Ed25519PublicKeyHash.fromPublicKey(
           Ed25519PublicKey.fromBytes(
             hexDecode(
@@ -509,7 +509,7 @@ Transaction fullUnsignedTestTransaction({Set<TransactionInput>? inputs}) {
       fee: const Coin(167173),
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
-      requiredSigners: {
+      guards: {
         Ed25519PublicKeyHash.fromPublicKey(
           Ed25519PublicKey.fromBytes(
             hexDecode(

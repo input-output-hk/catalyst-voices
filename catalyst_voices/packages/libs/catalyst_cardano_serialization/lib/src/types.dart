@@ -2,9 +2,17 @@ import 'dart:convert';
 
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
-import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
+import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
+
+/// The Credential class represents a blockchain credential, which can be either
+/// a key hash or a script hash, for all types of credentials e.g. payment,
+/// staking, governance, etc.
+abstract interface class Credential extends CborEncodable {
+  /// Deserializes the type from cbor.
+  BaseHash get hash;
+}
 
 /// The name of a native asset.
 final class AssetName extends Equatable implements CborEncodable {
@@ -400,52 +408,7 @@ enum NetworkId {
 }
 
 /// The hash of policy ID that minted native assets.
-final class PolicyId extends Equatable implements CborEncodable, Comparable<PolicyId> {
-  /// The fixed byte length of a policy ID hash.
-  static const hashLength = 28;
-
-  final List<int> _bytes;
-
-  /// hex hash of [PolicyId].
-  PolicyId(String hash) : this._(hexDecode(hash));
-
-  /// Deserializes the type from cbor.
-  factory PolicyId.fromCbor(CborValue value) {
-    return PolicyId._((value as CborBytes).bytes);
-  }
-
-  const PolicyId._(this._bytes);
-
-  /// Original list of bytes for this [PolicyId].
-  List<int> get bytes => List.unmodifiable(_bytes);
-
-  @override
-  List<Object?> get props => [_bytes];
-
-  @override
-  int compareTo(PolicyId other) {
-    final minLength = _bytes.length < other._bytes.length ? _bytes.length : other._bytes.length;
-
-    for (var i = 0; i < minLength; i++) {
-      final comparison = _bytes[i].compareTo(other._bytes[i]);
-      if (comparison != 0) {
-        return comparison;
-      }
-    }
-
-    // If all elements are equal up to minLength, compare lengths
-    return _bytes.length.compareTo(other._bytes.length);
-  }
-
-  /// Serializes the type as cbor.
-  @override
-  CborBytes toCbor({List<int> tags = const []}) {
-    return CborBytes(
-      _bytes,
-      tags: tags,
-    );
-  }
-}
+typedef PolicyId = ScriptHash;
 
 /// A blockchain slot number.
 extension type const SlotBigNum(int value) {

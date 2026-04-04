@@ -59,7 +59,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final dummyAuxiliaryData = AuxiliaryData.fromCbor(dummyMetadataCbor);
 
     final txBuilder = TransactionBuilder(
-      requiredSigners: requiredSigners,
+      guards: requiredSigners,
       config: transactionConfig,
       inputs: utxos,
       networkId: networkId,
@@ -238,7 +238,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
         .map((e) => e.address.publicKeyHash)
         .toSet();
 
-    final requiredSigners = (cborDecode(rawTx.requiredSigners) as CborList)
+    final requiredSigners = (cborDecode(rawTx.guards) as CborList)
         .map(Ed25519PublicKeyHash.fromCbor)
         .toSet();
 
@@ -253,7 +253,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     if (missingSigners.isNotEmpty) {
       throw OutputPublicKeyHashNotInRequiredSignerException(
         outputsPublicKeysHashes: outputsPublicKeysHashes,
-        requiredSigners: requiredSigners,
+        guards: requiredSigners,
       );
     }
   }

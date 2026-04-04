@@ -23,7 +23,7 @@ void main() {
           isValid: true,
           witnessSet: TransactionBuilder.generateFakeWitnessSet(
             builder.inputs,
-            builder.requiredSigners,
+            builder.guards,
           ),
           auxiliaryData: builder.auxiliaryData,
         );
@@ -48,7 +48,7 @@ void main() {
           isValid: true,
           witnessSet: TransactionBuilder.generateFakeWitnessSet(
             builder.inputs,
-            builder.requiredSigners,
+            builder.guards,
           ),
           auxiliaryData: builder.auxiliaryData,
         );

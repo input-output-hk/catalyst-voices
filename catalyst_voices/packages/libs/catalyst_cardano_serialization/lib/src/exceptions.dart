@@ -186,34 +186,34 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
       ')';
 }
 
-/// Exception thrown when the transaction requiredSigners does not include output address publicKeyHash.
+/// Exception thrown when the transaction guards does not include output address publicKeyHash.
 final class OutputPublicKeyHashNotInRequiredSignerException extends Equatable implements Exception {
   /// List of outputs public keys hashes
-  final Set<Ed25519PublicKeyHash> outputsPublicKeysHashes;
+  final Set<Credential> outputsPublicKeysHashes;
 
   /// List of required signers.
-  final Set<Ed25519PublicKeyHash> requiredSigners;
+  final Set<Credential> guards;
 
   /// The default constructor for [OutputPublicKeyHashNotInRequiredSignerException].
   const OutputPublicKeyHashNotInRequiredSignerException({
     required this.outputsPublicKeysHashes,
-    required this.requiredSigners,
+    required this.guards,
   });
 
   /// Set of missing keys hashes.
-  Set<Ed25519PublicKeyHash> get missing {
-    return outputsPublicKeysHashes.where((element) => !requiredSigners.contains(element)).toSet();
+  Set<Credential> get missing {
+    return outputsPublicKeysHashes.where((element) => !guards.contains(element)).toSet();
   }
 
   @override
   List<Object?> get props => [
     outputsPublicKeysHashes,
-    requiredSigners,
+    guards,
   ];
 
   @override
   String toString() {
-    return 'OutputPublicKeyHashNotInRequiredSigner(requiredSigners: $requiredSigners, outputsPublicKeysHashes: $outputsPublicKeysHashes)';
+    return 'OutputPublicKeyHashNotInRequiredSigner(guards: $guards, outputsPublicKeysHashes: $outputsPublicKeysHashes)';
   }
 }
 

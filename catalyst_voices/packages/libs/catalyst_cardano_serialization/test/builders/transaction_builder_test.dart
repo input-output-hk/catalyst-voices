@@ -481,7 +481,7 @@ void main() {
         isValid: true,
         witnessSet: TransactionBuilder.generateFakeWitnessSet(
           updatedBuilder.inputs,
-          updatedBuilder.requiredSigners,
+          updatedBuilder.guards,
         ),
         auxiliaryData: updatedBuilder.auxiliaryData,
       );
@@ -529,7 +529,7 @@ void main() {
         isValid: true,
         witnessSet: TransactionBuilder.generateFakeWitnessSet(
           updatedBuilder.inputs,
-          updatedBuilder.requiredSigners,
+          updatedBuilder.guards,
         ),
         auxiliaryData: updatedBuilder.auxiliaryData,
       );

@@ -47,9 +47,11 @@ final class AuxiliaryDataHash extends BaseHash {
 
 /// Implements a common base of hash types that holds
 /// binary [bytes] of exact [length].
-abstract base class BaseHash extends Equatable implements CborEncodable {
+abstract base class BaseHash extends Equatable implements CborEncodable, Comparable<BaseHash> {
   /// The raw [bytes] of a hash.
   final List<int> bytes;
+
+  //List<int> get bytes => List.unmodifiable(_bytes);
 
   /// Constructs the [BaseHash] from raw [bytes].
   BaseHash.fromBytes({required this.bytes}) {
@@ -80,6 +82,21 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
 
   @override
   String toString() => toHex();
+
+  @override
+  int compareTo(BaseHash other) {
+    final minLength = bytes.length < other.bytes.length ? bytes.length : other.bytes.length;
+
+    for (var i = 0; i < minLength; i++) {
+      final comparison = bytes[i].compareTo(other.bytes[i]);
+      if (comparison != 0) {
+        return comparison;
+      }
+    }
+
+    // If all elements are equal up to minLength, compare lengths
+    return bytes.length.compareTo(other.bytes.length);
+  }
 }
 
 /// Describes the Blake2b-128 hash of a certificate.
@@ -120,7 +137,7 @@ final class CertificateHash extends BaseHash {
 }
 
 /// Describes the Blake2b-224 hash of a [Ed25519PublicKey].
-final class Ed25519PublicKeyHash extends BaseHash {
+final class Ed25519PublicKeyHash extends BaseHash implements Credential {
   /// Length of the [Ed25519PublicKeyHash].
   static const int hashLength = 28;
 
@@ -145,6 +162,9 @@ final class Ed25519PublicKeyHash extends BaseHash {
 
   @override
   int get length => hashLength;
+
+  @override
+  BaseHash get hash => this;
 }
 
 /// Describes the Blake2b-256 hash of script data which is included
@@ -244,4 +264,51 @@ final class TransactionInputsHash extends BaseHash {
 
   @override
   int get length => hashLength;
+}
+
+/// Describes the Blake2b-224 hash of a script which can be used as a guard
+final class ScriptHash extends BaseHash implements Credential {
+  /// Length of the [TransactionHash].
+  static const int hashLength = 28;
+
+  /// Constructs a generic [ScriptHash] from a hex string.
+  ScriptHash(super.string) : super.fromHex();
+
+  /// Constructs the [TransactionHash] from raw [bytes].
+  ScriptHash.fromBytes({required super.bytes}) : super.fromBytes() {
+    if (bytes.isNotEmpty && bytes.length != hashLength) {
+      throw ArgumentError(
+        'ScriptHash must be 28 bytes or empty (ADA policy)',
+      );
+    }
+  }
+
+  /// Deserializes the type from cbor.
+  ScriptHash.fromCbor(super.value) : super.fromCbor();
+
+  /// Constructs the [TransactionHash] from a hex string representation
+  /// of [bytes].
+  ScriptHash.fromHex(super.string) : super.fromHex();
+
+  @override
+  List<Object?> get props => [bytes];
+
+  /// ADA policy ID is represented by an empty script hash, so we consider it
+  /// as ADA.
+  bool get isAda => bytes.isEmpty;
+
+  @override
+  int get length => bytes.isEmpty ? 0 : hashLength;
+
+  /// Serializes the type as cbor.
+  @override
+  CborBytes toCbor({List<int> tags = const []}) {
+    return CborBytes(
+      bytes,
+      tags: tags,
+    );
+  }
+
+  @override
+  BaseHash get hash => this;
 }

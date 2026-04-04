@@ -22,8 +22,8 @@ enum RawTransactionAspect {
   /// See [TransactionBody.auxiliaryDataHash].
   auxiliaryDataHash,
 
-  /// See [TransactionBody.requiredSigners].
-  requiredSigners,
+  /// See [TransactionBody.guards].
+  guards,
 
   /// See [TransactionBody.networkId].
   networkId,

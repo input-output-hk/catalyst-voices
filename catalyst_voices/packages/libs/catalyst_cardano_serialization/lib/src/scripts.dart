@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_cardano_serialization/src/guards.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
@@ -86,6 +87,7 @@ sealed class NativeScript extends Script {
           NativeScriptType.nOfK => ScriptNOfK.fromCbor(value),
           NativeScriptType.invalidBefore => InvalidBefore.fromCbor(value),
           NativeScriptType.invalidAfter => InvalidAfter.fromCbor(value),
+          NativeScriptType.requireGuard => RequireGuard.fromCbor(value),
         };
         // ignore: avoid_catching_errors
       } on RangeError catch (e) {
@@ -197,7 +199,10 @@ enum NativeScriptType {
   invalidBefore(4),
 
   /// Invalid after
-  invalidAfter(5);
+  invalidAfter(5),
+
+  /// Require guard
+  requireGuard(6);
 
   /// The value of the enum
   final int value;
@@ -284,7 +289,7 @@ class PlutusV3Script extends PlutusScript {
     return PlutusV3Script._((validCbor as CborBytes).bytes);
   }
 
-  /// Factory constructor to create an [PlutusV2Script] from a CBOR hex string.
+  /// Factory constructor to create an [PlutusV3Script] from a CBOR hex string.
   factory PlutusV3Script.fromHex(String cborHex) {
     final cborValue = cbor.decode(hexDecode(cborHex));
     return PlutusV3Script.fromCbor(cborValue);
@@ -292,6 +297,24 @@ class PlutusV3Script extends PlutusScript {
 
   /// [PlutusV3Script] constructor.
   const PlutusV3Script._(super.bytes);
+}
+
+/// Class representing a Plutus V4 script.
+class PlutusV4Script extends PlutusScript {
+  /// Factory constructor to create an [PlutusV4Script] from a CBOR list.
+  factory PlutusV4Script.fromCbor(CborValue cborValue) {
+    final validCbor = PlutusScript._plutusScriptValidity(cborValue);
+    return PlutusV4Script._((validCbor as CborBytes).bytes);
+  }
+
+  /// Factory constructor to create an [PlutusV4Script] from a CBOR hex string.
+  factory PlutusV4Script.fromHex(String cborHex) {
+    final cborValue = cbor.decode(hexDecode(cborHex));
+    return PlutusV4Script.fromCbor(cborValue);
+  }
+
+  /// [PlutusV4Script] constructor.
+  const PlutusV4Script._(super.bytes);
 }
 
 /// Define an enum for the different types of reference scripts
@@ -306,7 +329,10 @@ enum RefScriptType {
   plutusV2(2),
 
   /// PlutusV3 script
-  plutusV3(3);
+  plutusV3(3),
+
+  /// PlutusV4 script
+  plutusV4(4);
 
   /// The value of the enum
   final int value;
@@ -343,6 +369,7 @@ sealed class Script extends Equatable implements CborEncodable {
   /// - `1` for `PlutusV1Script`
   /// - `2` for `PlutusV2Script`
   /// - `3` for `PlutusV3Script`
+  /// - `4` for `PlutusV4Script`
   ///
   /// Throws an `ArgumentError` if the script type is not recognized.
   ///
@@ -353,6 +380,7 @@ sealed class Script extends Equatable implements CborEncodable {
     PlutusV1Script _ => 1,
     PlutusV2Script _ => 2,
     PlutusV3Script _ => 3,
+    PlutusV4Script _ => 4,
     _ => throw ArgumentError.value(
       this,
       'script',
@@ -506,6 +534,37 @@ class ScriptPubkey extends NativeScript {
   );
 }
 
+/// Class representing a Credential based native script.
+///
+class RequireGuard extends NativeScript {
+  /// Public key hash.
+  final Credential credential;
+
+  /// Constructor for the [RequireGuard] class.
+  const RequireGuard(this.credential);
+
+  /// Factory constructor to create a [RequireGuard] from a CBOR list.
+  factory RequireGuard.fromCbor(CborList value) {
+    NativeScript._checkGenericNativeScriptValidity(value);
+
+    return RequireGuard(Guards.fromCbor(value[1]).first);
+  }
+
+  /// Equatable props for value comparison.
+  @override
+  List<Object?> get props => [credential];
+
+  /// Converts the [RequireGuard] to its CBOR format.
+  @override
+  CborValue toCbor({List<int> tags = const []}) => CborList(
+    [
+      CborSmallInt(NativeScriptType.requireGuard.value),
+      CborBytes(credential.hash.bytes),
+    ],
+    tags: tags,
+  );
+}
+
 /// Class representing a reference script in an transaction output.
 class ScriptRef extends Script {
   /// A reference script.
@@ -523,6 +582,7 @@ class ScriptRef extends Script {
         RefScriptType.plutusV1 => PlutusV1Script.fromCbor(value[1]),
         RefScriptType.plutusV2 => PlutusV2Script.fromCbor(value[1]),
         RefScriptType.plutusV3 => PlutusV3Script.fromCbor(value[1]),
+        RefScriptType.plutusV4 => PlutusV4Script.fromCbor(value[1]),
       };
       return ScriptRef(script);
     } else {
@@ -549,6 +609,7 @@ class ScriptRef extends Script {
       PlutusV1Script _ => RefScriptType.plutusV1,
       PlutusV2Script _ => RefScriptType.plutusV2,
       PlutusV3Script _ => RefScriptType.plutusV3,
+      PlutusV4Script _ => RefScriptType.plutusV4,
       _ => throw ArgumentError.value(
         script,
         'script',

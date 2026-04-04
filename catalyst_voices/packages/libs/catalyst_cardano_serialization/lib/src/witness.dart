@@ -23,6 +23,9 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
   /// The Plutus V3 scripts.
   final Set<PlutusV3Script> plutusV3Scripts;
 
+  /// The Plutus V4 scripts.
+  final Set<PlutusV4Script> plutusV4Scripts;
+
   /// The default constructor for [TransactionWitnessSet].
   const TransactionWitnessSet({
     this.vkeyWitnesses = const {},
@@ -31,6 +34,7 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
     this.redeemers = const {},
     this.plutusV2Scripts = const {},
     this.plutusV3Scripts = const {},
+    this.plutusV4Scripts = const {},
   });
 
   /// Deserializes the type from cbor.
@@ -67,6 +71,11 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
         WitnessType.plutusV3Script,
         PlutusV3Script.fromCbor,
       ),
+      plutusV4Scripts: _getWitnesses<PlutusV4Script>(
+        map,
+        WitnessType.plutusV4Script,
+        PlutusV4Script.fromCbor,
+      ),
     );
   }
 
@@ -78,6 +87,7 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
     redeemers,
     plutusV2Scripts,
     plutusV3Scripts,
+    plutusV4Scripts,
   ];
 
   /// Serializes the type as cbor.
@@ -102,6 +112,7 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
       ..._generateCborPair(WitnessType.redeemers, redeemers),
       ..._generateCborPair(WitnessType.plutusV2Script, plutusV2Scripts),
       ..._generateCborPair(WitnessType.plutusV3Script, plutusV3Scripts),
+      ..._generateCborPair(WitnessType.plutusV4Script, plutusV4Scripts),
     };
   }
 
@@ -209,7 +220,10 @@ enum WitnessType {
   plutusV2Script(6),
 
   /// A Plutus v3 script witness.
-  plutusV3Script(7);
+  plutusV3Script(7),
+
+  /// A Plutus v4 script witness.
+  plutusV4Script(8);
 
   /// The integer value associated with the witness type.
   final int value;

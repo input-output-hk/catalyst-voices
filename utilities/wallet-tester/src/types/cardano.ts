@@ -98,7 +98,7 @@ export type TxBuilderArguments = {
   }[];
   auxiliaryDataHash: string;
   validityIntervalStart: string;
-  requiredSigners: {
+  guards: {
     address: string;
   }[];
   networkId: string;

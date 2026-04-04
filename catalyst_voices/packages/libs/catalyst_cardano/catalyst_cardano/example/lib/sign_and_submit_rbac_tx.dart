@@ -141,7 +141,7 @@ Transaction _buildUnsignedRbacTx({
   required AuxiliaryData auxiliaryData,
 }) {
   final txBuilder = TransactionBuilder(
-    requiredSigners: {
+    guards: {
       rewardAddress.publicKeyHash,
     },
     config: _buildTransactionBuilderConfig(),

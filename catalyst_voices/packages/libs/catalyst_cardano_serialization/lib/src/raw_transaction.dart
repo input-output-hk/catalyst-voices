@@ -48,8 +48,8 @@ final class RawTransaction extends BaseTransaction {
         RawTransactionAspect.auxiliaryDataHash,
         dataSize: AuxiliaryDataHash.hashLength,
       ),
-      TransactionBody.requiredSignersKey: const _TrackingAspect(
-        RawTransactionAspect.requiredSigners,
+      TransactionBody.guardsKey: const _TrackingAspect(
+        RawTransactionAspect.guards,
       ),
       TransactionBody.networkIdKey: const _TrackingAspect(RawTransactionAspect.networkId),
     };
@@ -218,12 +218,12 @@ final class RawTransaction extends BaseTransaction {
   @override
   List<Object?> get props => [bytes, _structuredBytes.context];
 
-  /// Returns requiredSigners bytes from [bytes].
-  List<int> get requiredSigners {
-    final value = _structuredBytes.getValueOf(RawTransactionAspect.requiredSigners);
+  /// Returns guards bytes from [bytes].
+  List<int> get guards {
+    final value = _structuredBytes.getValueOf(RawTransactionAspect.guards);
 
     if (value == null) {
-      throw StateError('RequiredSigners not found!');
+      throw StateError('Guards not found!');
     }
 
     return value;

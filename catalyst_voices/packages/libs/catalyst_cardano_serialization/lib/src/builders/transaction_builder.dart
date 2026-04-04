@@ -53,7 +53,7 @@ final class TransactionBuilder extends Equatable {
 
   /// The list of public key hashes of addresses that are required to sign the
   /// transaction. A nonempty set of addr key hashes.
-  final Set<Ed25519PublicKeyHash>? requiredSigners;
+  final Set<Credential>? guards;
 
   /// Specifies on which network the code will run.
   final NetworkId? networkId;
@@ -102,7 +102,7 @@ final class TransactionBuilder extends Equatable {
     this.mint,
     this.scriptData,
     this.collateralInputs,
-    this.requiredSigners,
+    this.guards,
     this.networkId,
     this.collateralReturn,
     this.totalCollateral,
@@ -123,7 +123,7 @@ final class TransactionBuilder extends Equatable {
     mint,
     scriptData,
     collateralInputs,
-    requiredSigners,
+    guards,
     networkId,
     collateralReturn,
     totalCollateral,
@@ -201,7 +201,7 @@ final class TransactionBuilder extends Equatable {
   Transaction buildFakeTransaction(TransactionBody txBody) {
     return Transaction(
       body: txBody,
-      witnessSet: generateFakeWitnessSet(inputs, requiredSigners),
+      witnessSet: generateFakeWitnessSet(inputs, guards),
       isValid: true,
       auxiliaryData: auxiliaryData,
     );
@@ -229,7 +229,7 @@ final class TransactionBuilder extends Equatable {
       mint: mint,
       scriptData: scriptData,
       collateralInputs: collateralInputs,
-      requiredSigners: requiredSigners,
+      guards: guards,
       networkId: networkId,
       collateralReturn: collateralReturn,
       totalCollateral: totalCollateral,
@@ -437,7 +437,7 @@ final class TransactionBuilder extends Equatable {
       mint: mint,
       scriptDataHash: scriptData != null ? ScriptDataHash.fromScriptData(scriptData!) : null,
       collateralInputs: collateralInputs,
-      requiredSigners: requiredSigners,
+      guards: guards,
       networkId: networkId,
       collateralReturn: collateralReturn,
       totalCollateral: totalCollateral,
@@ -783,10 +783,10 @@ final class TransactionBuilder extends Equatable {
   /// the builder's unique input addresses and required signers.
   static TransactionWitnessSet generateFakeWitnessSet(
     Set<TransactionUnspentOutput> inputs,
-    Set<Ed25519PublicKeyHash>? requiredSigners,
+    Set<Credential>? guards,
   ) {
     final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet()
-      ..addAll(requiredSigners ?? {});
+      ..addAll(guards?.whereType<Ed25519PublicKeyHash>() ?? {});
 
     return TransactionWitnessSet(
       vkeyWitnesses: {

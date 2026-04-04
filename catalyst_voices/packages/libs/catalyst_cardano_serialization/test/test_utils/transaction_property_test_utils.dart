@@ -62,7 +62,7 @@ void transactionPropertyTest(
           ttl,
           auxiliaryData,
           networkId,
-          requiredSigners,
+          guards,
         ) = data;
 
         final utxos = SelectionUtils.generateUtxos(
@@ -92,9 +92,9 @@ void transactionPropertyTest(
                   },
                 ),
           networkId: networkId,
-          requiredSigners: requiredSigners > 0
+          guards: guards > 0
               ? List.generate(
-                  requiredSigners,
+                  guards,
                   (i) => Ed25519PublicKeyHash.fromPublicKey(Ed25519PublicKey.seeded(i)),
                 ).toSet()
               : null,
@@ -108,7 +108,7 @@ void transactionPropertyTest(
           ttl: builderData.ttl,
           auxiliaryData: builderData.auxiliaryData,
           networkId: builderData.networkId,
-          requiredSigners: builderData.requiredSigners,
+          guards: builderData.guards,
           changeAddress: builderData.changeAddress,
         );
 
@@ -130,7 +130,7 @@ final class TransactionPropertyBuilderInputs extends Equatable {
   final SlotBigNum? ttl;
   final AuxiliaryData? auxiliaryData;
   final NetworkId? networkId;
-  final Set<Ed25519PublicKeyHash>? requiredSigners;
+  final Set<Credential>? guards;
   final ShelleyAddress changeAddress;
 
   const TransactionPropertyBuilderInputs({
@@ -139,7 +139,7 @@ final class TransactionPropertyBuilderInputs extends Equatable {
     required this.ttl,
     required this.auxiliaryData,
     required this.networkId,
-    required this.requiredSigners,
+    required this.guards,
     required this.changeAddress,
   });
 
@@ -150,7 +150,7 @@ final class TransactionPropertyBuilderInputs extends Equatable {
     ttl,
     auxiliaryData,
     networkId,
-    requiredSigners,
+    guards,
     changeAddress,
   ];
 }

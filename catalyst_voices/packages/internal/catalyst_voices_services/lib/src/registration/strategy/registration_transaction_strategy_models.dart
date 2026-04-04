@@ -47,7 +47,7 @@ final class RegistrationTransactionStrategyModels implements RegistrationTransac
     final dummyAuxiliaryData = await dummyX509Envelope.toAuxiliaryData();
 
     final txBuilder = TransactionBuilder(
-      requiredSigners: requiredSigners,
+      guards: requiredSigners,
       config: transactionConfig,
       inputs: utxos,
       networkId: networkId,
