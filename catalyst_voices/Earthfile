@@ -124,7 +124,6 @@ build-web:
     SAVE ARTIFACT --keep-ts web
 
 package:
-    FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
     ARG tag='latest'
     ARG UPLOAD_DEBUG_SYMBOLS=false
 
