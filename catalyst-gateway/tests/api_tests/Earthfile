@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.14 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.6.14 AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
+IMPORT github.com/cardano-foundation/catalyst-ci/earthly/python:v3.6.14 AS python-ci
+IMPORT github.com/cardano-foundation/catalyst-ci/earthly/rust:v3.6.14 AS rust-ci
+IMPORT github.com/cardano-foundation/catalyst-storage AS cat-storage
 
 builder:
     DO rust-ci+SETUP

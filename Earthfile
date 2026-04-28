@@ -1,11 +1,11 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.6.14 AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.6.14 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.6.14 AS postgresql-ci
+IMPORT github.com/cardano-foundation/catalyst-ci/earthly/mdlint:v3.6.14 AS mdlint-ci
+IMPORT github.com/cardano-foundation/catalyst-ci/earthly/cspell:v3.6.14 AS cspell-ci
+IMPORT github.com/cardano-foundation/catalyst-ci/earthly/postgresql:v3.6.14 AS postgresql-ci
 
-ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
-FROM ${REGISTRY}/debian:stable-slim
+
+FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 

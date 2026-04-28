@@ -37,17 +37,17 @@ jobs:
           swap-storage: true
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        uses: cardano-foundation/catalyst-forge/actions/install@ci/v1.10.0
         with:
           enable_caching: "true"
           version: 0.21.0
 
       - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+        uses: cardano-foundation/catalyst-forge/actions/setup@ci/v1.10.0
 
       - name: Prepare artifacts
         id: images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: cardano-foundation/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+all-images
@@ -129,17 +129,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        uses: cardano-foundation/catalyst-forge/actions/install@ci/v1.10.0
         with:
           enable_caching: "true"
           version: 0.21.0
 
       - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+        uses: cardano-foundation/catalyst-forge/actions/setup@ci/v1.10.0
 
       - name: Prepare artifacts
         id: images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: cardano-foundation/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+all-images
@@ -151,7 +151,7 @@ jobs:
 
       - name: Prepare artifacts devnet
         id: images-devnet
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: cardano-foundation/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+images-devnet

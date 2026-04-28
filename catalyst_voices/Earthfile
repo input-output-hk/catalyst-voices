@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../ AS repo-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.14 AS flutter-ci
+IMPORT github.com/cardano-foundation/catalyst-ci/earthly/flutter:v3.6.14 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -124,7 +124,7 @@ build-web:
     SAVE ARTIFACT --keep-ts web
 
 package:
-    FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
+    FROM caddy:2.10
     ARG tag='latest'
     ARG UPLOAD_DEBUG_SYMBOLS=false
 
