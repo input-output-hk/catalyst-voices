@@ -62,7 +62,7 @@ allow-git = [
     "https://github.com/txpipe/vrf",
     "https://github.com/txpipe/kes",
     "https://github.com/txpipe/curve25519-dalek",
-    "https://github.com/input-output-hk/mithril",
+    "https://github.com/IntersectMBO/mithril",
     # Maintained fork of an archived crates-io version.
     "https://github.com/dariusc93/rust-ipfs",
     # TODO(dt-iohk): remove this when changes from forked flutter_rust_bridge are merged into the official version
