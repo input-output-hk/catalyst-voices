@@ -2452,6 +2452,10 @@
   "@okay": {
     "description": "Short confirmation (okay.)"
   },
+  "oneAmWallet": "1AM Wallet",
+  "@oneAmWallet": {
+    "description": "Name of the 1AM wallet"
+  },
   "ongoing": "Ongoing",
   "@ongoing": {
     "description": "Label indicating ongoing status"

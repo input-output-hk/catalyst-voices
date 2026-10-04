@@ -349,6 +349,11 @@ class _SupportedWallets extends StatelessWidget {
           name: context.l10n.namiWallet,
           url: 'https://www.namiwallet.io/',
         ),
+        SupportedWallet(
+          image: VoicesAssets.images.oneAmWallet,
+          name: context.l10n.oneAmWallet,
+          url: 'https://1am.xyz/',
+        ),
       ],
     );
   }
